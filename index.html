@@ -595,19 +595,18 @@ function lockedModal(studentName){
   const msg = encodeURIComponent(
     "السلام عليكم ورحمة الله وبركاته\\n\\n" +
     "أنا الطالبة: " + studentName + "\\n" +
-    استاذتي سارة فضلاً أرجو تفعيل حسابي \\n" +
+    "فضلاً أرجو تفعيل حسابي\\n" +
     "وأكون شاكرة لك 🌸"
   );
   const waLink = "https://wa.me/" + WHATSAPP_NUMBER + "?text=" + msg;
 
   openModal(
     "تنبيه",
-    "حياك الله 🤗لاتقلقل/ــي حسابك مقفل مؤقتًا<br>للتفعيل تواصل/ــل مع المعلمة عبر دردشة تطبيق whatsapp",
+    "هلا والله 🌸 حسابك مقفل مؤقتًا<br>اضغط زر واتساب عشان ترسل طلب التفعيل",
     '<a class="btn whatsapp-btn" href="' + waLink + '" target="_blank">📱 مراسلة واتساب</a>' +
     '<button class="btn3" onclick="closeModal()">إغلاق</button>'
   );
 }
-
 
 async function depositToStudent(){
   const sid = $("pickStudent").value;
@@ -639,7 +638,7 @@ async function withdrawFromStudent(){
   const s = doc.data();
 
   if(!s.active){ playWelcome(); lockedModal(s.name); return; }
-  if(Number(s.balance||0) < a) return warn("رصيده لا يكفي");
+  if(Number(s.balance||0) < a) return warn("رصيده ما يكفي");
 
   const nb = Number(s.balance||0) - a;
   await ref.update({balance: nb});
@@ -681,7 +680,7 @@ async function studentLogin(){
   const s=doc.data();
 
   if(!s.active){ lockedModal(s.name); return; }
-  if($("stuPin").value.trim()!==String(s.pin||"")) return warn("الرقم السري خاطئ");
+  if($("stuPin").value.trim()!==String(s.pin||"")) return warn("الرقم السري غلط");
   if(!s.openedAt) await ref.update({openedAt: firebase.firestore.FieldValue.serverTimestamp()});
 
   playWelcome();
@@ -689,7 +688,7 @@ async function studentLogin(){
   go("studentAccountPage");
   $("studentHeader").textContent=s.name;
   $("statusBadge").className="badge "+(s.active?"on":"off");
-  $("statusBadge").textContent=s.active?"🟢 مفعل":"🔴 مقفل";
+  $("statusBadge").textContent=s.active?"🟢 مفعل":"🔴 مقفول";
   $("studentBalance").textContent=fmt(s.balance);
 
   await renderOpenedAt();
@@ -751,7 +750,7 @@ async function executeOp(){
     const toId=$("transferTo").value;
     const toRef=db.collection("students").doc(toId);
     const toDoc=await toRef.get();
-    if(!toDoc.exists) return warn("المستلم غير موجود");
+    if(!toDoc.exists) return warn("المستلم مو موجود");
     const to=toDoc.data();
 
     const batch=db.batch();
