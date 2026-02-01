@@ -377,16 +377,13 @@ async function playWelcome(){
 }
 // ===== بداية =====
 async function startApp(){
-  try{
-    await db.collection("setting").limit(1).get();
-    $("connPill").textContent="جاهز ✅";
-    $("connPill").style.background="#dff4e3";
-    $("connPill").style.color="#2e7d32";
-  }catch(e){
-    $("connPill").textContent="جاهز ✅";
-  }
+  // لا ننتظر Firestore عشان ما يعلق "جاري..."
+  $("connPill").textContent = "جاهز ✅";
+  $("connPill").style.background = "#dff4e3";
+  $("connPill").style.color = "#2e7d32";
+
   playWelcome();
-  $("startOverlay").style.display="none";
+  $("startOverlay").style.display = "none";
   go("teacherLoginPage");
 }
 
