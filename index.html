@@ -644,26 +644,23 @@ async function withdrawAll(){
   await renderStudents();
 }
 const WHATSAPP_NUMBER = "96652234335";
-function lockedModal(studentName = ""){
+function lockedModal(studentName){
+  studentName = studentName || "";
 
   const msg = encodeURIComponent(
     "السلام عليكم ورحمة الله وبركاته\n\n" +
-    "أنا الطالبة " + studentName + "\n" +
+    "أنا الطالبة: " + studentName + "\n" +
     "فضلاً أرجو تفعيل حسابي\n" +
     "وأكون شاكرة لك 🌸"
   );
 
-  const waLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`;
+  const waLink = "https://wa.me/" + WHATSAPP_NUMBER + "?text=" + msg;
 
   openModal(
     "تنبيه",
     "هلا والله 🌸 حسابك مقفل مؤقتًا<br>يمكنك مراسلة المعلمة لتفعيل الحساب",
-    `
-    <a class="btn whatsapp-btn" href="${waLink}" target="_blank">
-  📱 مراسلة واتساب
-   </a>
-    <button class="btn3" onclick="closeModal()">إغلاق</button>
-    `
+    '<a class="btn whatsapp-btn" href="' + waLink + '" target="_blank">📱 مراسلة واتساب</a>' +
+    '<button class="btn3" onclick="closeModal()">إغلاق</button>'
   );
 }
 
