@@ -601,12 +601,11 @@ function lockedModal(studentName){
   const waLink = "https://wa.me/" + WHATSAPP_NUMBER + "?text=" + msg;
 
   openModal(
-    "تنبيه",
-    "هلا والله 🌸 حسابك مقفل مؤقتًا<br>اضغط زر واتساب عشان ترسل طلب التفعيل",
-    '<a class="btn whatsapp-btn" href="' + waLink + '" target="_blank">📱 مراسلة واتساب</a>' +
-    '<button class="btn3" onclick="closeModal()">إغلاق</button>'
-  );
-}
+  "تنبيه",
+  "حياك الله 🤗🤍<br>حسابك مقفل مؤقتًا، لا تقلق/ـي.<br><br>للتفعيل تواصل/ـي مع المعلمة على دردشة تطبيق WhatsApp 👇",
+  '<a class="btn whatsapp-btn" href="' + waLink + '" target="_blank">📱 مراسلة WhatsApp</a>' +
+  '<button class="btn3" onclick="closeModal()">إغلاق</button>'
+);
 
 async function depositToStudent(){
   const sid = $("pickStudent").value;
@@ -688,7 +687,7 @@ async function studentLogin(){
   go("studentAccountPage");
   $("studentHeader").textContent=s.name;
   $("statusBadge").className="badge "+(s.active?"on":"off");
-  $("statusBadge").textContent=s.active?"🟢 مفعل":"🔴 مقفول";
+  $("statusBadge").textContent=s.active?"🟢 نشط":"🔴 مقفل";
   $("studentBalance").textContent=fmt(s.balance);
 
   await renderOpenedAt();
