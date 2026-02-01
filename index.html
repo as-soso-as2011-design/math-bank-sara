@@ -645,37 +645,52 @@ function lockedModal(){
 }
 
 async function depositToStudent(){
-  const sid=$("pickStudent").value;
-  const a=parseFloat($("pickAmount").value);
+  const sid = $("pickStudent").value;
+  const a = parseFloat($("pickAmount").value);
   if(!sid) return warn("اختر طالب");
-  if(isNaN(a)||a<=0) return warn("اكتب مبلغ");
-  const ref=db.collection("students").doc(sid);
-  const doc=await ref.get();
-  const s=doc.data();
+  if(isNaN(a) || a<=0) return warn("اكتب مبلغ");
+
+  const ref = db.collection("students").doc(sid);
+  const doc = await ref.get();
+  const s = doc.data();
+
   if(!s.active){
-  $("stuLocked").classList.add("hidden");
-  playWelcome();
-  lockedModal();
-}else{
-  $("stuLocked").classList.add("hidden");
-}
-async function withdrawFromStudent(){
-  const sid=$("pickStudent").value;
-  const a=parseFloat($("pickAmount").value);
-  if(!sid) return warn("اختر طالب");
-  if(isNaN(a)||a<=0) return warn("اكتب مبلغ");
-  const ref=db.collection("students").doc(sid);
-  const doc=await ref.get();
-  const s=doc.data();
-  if(!s.active) return lockedModal();
-  if(Number(s.balance||0) < a) return warn("رصيده ما يكفي");
-  const nb=Number(s.balance||0)-a;
-  await ref.update({balance:nb});
-  await logTxn(ref, "سحب (معلمة)", a, nb);
-  $("pickAmount").value="";
+    playWelcome();
+    lockedModal();
+    return;
+  }
+
+  const nb = Number(s.balance||0) + a;
+  await ref.update({balance: nb});
+  await logTxn(ref, "إيداع (معلمة)", a, nb);
+  $("pickAmount").value = "";
   await renderStudents();
 }
 
+async function withdrawFromStudent(){
+  const sid = $("pickStudent").value;
+  const a = parseFloat($("pickAmount").value);
+  if(!sid) return warn("اختر طالب");
+  if(isNaN(a) || a<=0) return warn("اكتب مبلغ");
+
+  const ref = db.collection("students").doc(sid);
+  const doc = await ref.get();
+  const s = doc.data();
+
+  if(!s.active){
+    playWelcome();
+    lockedModal();
+    return;
+  }
+
+  if(Number(s.balance||0) < a) return warn("رصيده ما يكفي");
+
+  const nb = Number(s.balance||0) - a;
+  await ref.update({balance: nb});
+  await logTxn(ref, "سحب (معلمة)", a, nb);
+  $("pickAmount").value = "";
+  await renderStudents();
+}
 // ===== دخول الطالب =====
 function showStudentLogin(s){
   go("studentLoginPage");
