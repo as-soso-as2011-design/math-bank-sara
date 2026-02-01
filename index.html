@@ -78,7 +78,7 @@ tr:last-child td{border-bottom:none}
 <div class="topbar">
   <img class="logo" src="school-logo.png" alt="شعار المدرسة">
   <div class="titles">
-    <div class="t1">بنك الرياضيات – المصرفي للمعلمة سارة حقوي</div>
+    <div class="t1">بنك الرياضيات المصرفي للمعلمة سارة حقوي</div>
     <div class="t2">مدرسة رواد الشرق الأهلية</div>
   </div>
   <div style="width:56px"></div>
@@ -89,7 +89,7 @@ tr:last-child td{border-bottom:none}
 <audio id="welcomeM4a" preload="auto" src="welcome.m4a"></audio>
 
 <!-- Start -->
-<div id="startOverlay">
+$("startOverlay").style.display="none";
   <div class="startBox">
     <div class="pill" id="connPill">جاري تجهيز النظام…</div>
     <h3>هلا والله! 👋</h3>
@@ -391,7 +391,7 @@ async function startApp(){
 function teacherLogin(){
   if($("tu").value.trim()==="teacher" && $("tp").value.trim()==="12345"){
     go("classesPage"); renderTabs();
-  } else warn("بيانات الدخول غلط");
+  } else warn("بيانات الدخول غيرصحيحة");
 }
 function forgotTeacher(){
   const subject=encodeURIComponent("استرجاع بيانات دخول مصرف الرياضيات");
@@ -407,9 +407,9 @@ async function ensureSeed(){
   // classes
   const c = await db.collection("classes").orderBy("order").get();
   if(c.empty){
-    await db.collection("classes").add({name:"سادس بنين",order:1});
-    await db.collection("classes").add({name:"سادس بنات",order:2});
-    await db.collection("classes").add({name:"أول متوسط",order:3});
+    await db.collection("classes").add({name:"الصف سادس بنين",order:1});
+    await db.collection("classes").add({name:"الصف سادس بنات",order:2});
+    await db.collection("classes").add({name:"الصف الأول المتوسط",order:3});
   }
   // map class name->id
   const c2 = await db.collection("classes").orderBy("order").get();
@@ -567,7 +567,7 @@ async function renderStudents(){
       <strong>${s.name}</strong>
       <div class="small">الرصيد: ${fmt(s.balance)} ر.س</div>
       <div class="small">PIN: <b>${s.pin||""}</b></div>
-      <span class="badge ${s.active?'on':'off'}">${s.active?'🟢 مفعل':'🔴 مقفول'}</span>
+      <span class="badge ${s.active?'on':'off'}">${s.active?'🟢 مفعل':'🔴 مقفل'}</span>
       <div class="row" style="margin-top:8px">
         <button class="btn2 col js-open">دخول الطالب</button>
         <button class="btn3 col js-toggle">${s.active?'إقفال':'تفعيل'}</button>
@@ -638,10 +638,9 @@ async function withdrawAll(){
 
 function lockedModal(){
   openModal(
-    "هلا والله! 👋",
-    "حسابك مقفل موقتا، أرجو مراجعة المعلمة سارة حقوي<br>اضغط زر المراسلة 🚀",
-    `<a class="btn" href="https://wa.me/${WHATSAPP_NUMBER}?text=${WHATSAPP_TEXT}" target="_blank">المراسلة واتساب</a>
-     <button class="btn3" onclick="closeModal()">رجوع</button>`
+    "تنبيه",
+    "هلا والله! حسابك مقفل موقتا، أرجو مراجعة المعلمة سارة حقوي",
+    '<button class="btn" onclick="closeModal()">موافق</button>'
   );
 }
 
