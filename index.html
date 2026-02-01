@@ -1,31 +1,806 @@
-<!DOCTYPE html>
-<html lang="ar">
+<!doctype html>
+<html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <title>بنك الرياضيات – سارة حقوي</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      direction: rtl;
-      text-align: center;
-      background: #f4f6f8;
-      padding: 60px;
-    }
-    h1 {
-      color: #0b3c6d;
-    }
-    p {
-      font-size: 18px;
-      color: #333;
-    }
-  </style>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>بنك الرياضيات – المصرفي للمعلمة سارة حقوي</title>
+
+<style>
+:root{
+  --navy:#00205B;--rajhi:#0055A4;--sky:#EAF3FB;--sky2:#CFE6F7;--beige:#FAF9F7;
+  --green:#2e7d32;--red:#b00020;--text:#1b1f23;
+}
+*{box-sizing:border-box;font-family:Tahoma,Arial,sans-serif}
+body{margin:0;background:var(--beige);color:var(--text)}
+.hidden{display:none}
+
+/* Header + Footer ثابتين */
+.topbar{
+  position:sticky;top:0;z-index:2000;
+  background:linear-gradient(90deg,var(--navy),var(--rajhi));
+  color:#fff;padding:12px 14px;display:flex;align-items:center;gap:12px;
+}
+.topbar .titles{flex:1;text-align:center;line-height:1.35}
+.topbar .t1{font-weight:800;font-size:16px}
+.topbar .t2{font-size:12px;opacity:.95}
+.logo{height:56px;width:auto;background:rgba(255,255,255,.78);border-radius:12px;padding:6px}
+.footer{text-align:center;padding:14px 12px;color:var(--navy);font-weight:700}
+
+.container{max-width:980px;margin:14px auto;padding:0 12px}
+.card{background:#fff;border-radius:14px;padding:14px;margin:10px 0;box-shadow:0 8px 18px rgba(0,0,0,.06)}
+.card.soft{background:var(--sky)}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.col{flex:1;min-width:160px}
+input,select{width:100%;padding:10px;border-radius:10px;border:1px solid #ccc;font-size:14px}
+button{border:0;border-radius:10px;padding:10px 12px;cursor:pointer;font-size:14px}
+.btn{background:var(--rajhi);color:#fff}
+.btn2{background:var(--sky2);color:#003}
+.btn3{background:#eef6fb;color:#003}
+.btnRed{background:var(--red);color:#fff}
+
+.tabs{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:10px 0}
+.tab{background:#e9f4fb;color:#003;padding:8px 12px;border-radius:999px;cursor:pointer;font-size:14px}
+.tab.active{background:var(--rajhi);color:#fff}
+
+.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+@media(max-width:760px){.grid2{grid-template-columns:1fr}}
+
+.badge{display:inline-block;padding:4px 10px;border-radius:999px;font-size:12px}
+.badge.on{background:#dff4e3;color:var(--green)}
+.badge.off{background:#fde2e2;color:var(--red)}
+.small{font-size:12px;color:#666}
+hr{border:0;border-top:1px solid #eee;margin:10px 0}
+
+/* Modal */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;padding:18px;z-index:9999}
+.modalBox{background:#fff;border-radius:16px;max-width:620px;width:100%;padding:16px;text-align:center}
+.modalBox h3{margin:0 0 8px 0;color:var(--navy)}
+.modalBox p{margin:0 0 12px 0;font-size:15px;line-height:1.7}
+.modalActions{display:flex;gap:10px;flex-wrap:wrap}
+.modalActions a,.modalActions button{flex:1;text-decoration:none}
+
+/* Start overlay */
+#startOverlay{position:fixed;inset:0;background:#0a2d66;display:flex;align-items:center;justify-content:center;padding:18px;z-index:9998}
+.startBox{max-width:560px;width:100%;background:#fff;border-radius:18px;padding:18px;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.pill{display:inline-block;background:#e9f4fb;color:#003;padding:6px 10px;border-radius:999px;font-size:12px;margin-bottom:10px}
+
+/* Statement */
+.tableWrap{overflow:auto;border-radius:12px;background:#f7fbff;border:1px solid #e6eef7}
+table{width:100%;border-collapse:collapse;min-width:640px}
+th,td{padding:10px;border-bottom:1px solid #e6eef7;text-align:center;font-size:13px;white-space:nowrap}
+th{background:#eef6ff;color:#0b2a66}
+tr:last-child td{border-bottom:none}
+</style>
 </head>
+
 <body>
 
-  <h1>🏦 بنك الرياضيات</h1>
-  <p>للمعلمة سارة حقوي</p>
-  <p>إذا تشوفين هذه الصفحة، فالموقع شغّال 100٪ 🎉</p>
+<div class="topbar">
+  <img class="logo" src="school-logo.png" alt="شعار المدرسة">
+  <div class="titles">
+    <div class="t1">بنك الرياضيات – المصرفي للمعلمة سارة حقوي</div>
+    <div class="t2">مدرسة رواد الشرق الأهلية</div>
+  </div>
+  <div style="width:56px"></div>
+</div>
+
+<!-- صوت الترحيب (ارفعي welcome.mp3 و welcome.m4a بعدين) -->
+<audio id="welcomeMp3" preload="auto" src="welcome.mp3"></audio>
+<audio id="welcomeM4a" preload="auto" src="welcome.m4a"></audio>
+
+<!-- Start -->
+<div id="startOverlay">
+  <div class="startBox">
+    <div class="pill" id="connPill">جاري تجهيز النظام…</div>
+    <h3>هلا والله! 👋</h3>
+    <p>جاهزين نبدأ رحلتنا في بنك الرياضيات؟<br>اضغط زر البداية وننطلق 🚀</p>
+    <button class="btn" onclick="startApp()">ابدأ</button>
+    <div class="small" id="connNote" style="margin-top:8px"></div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div id="modal" class="modal">
+  <div class="modalBox">
+    <h3 id="mTitle"></h3>
+    <p id="mBody"></p>
+    <div class="modalActions" id="mActions">
+      <button class="btn" onclick="closeModal()">موافق</button>
+    </div>
+  </div>
+</div>
+
+<!-- Teacher Login -->
+<div id="teacherLoginPage" class="hidden">
+  <div class="container">
+    <div class="card">
+      <h3 style="margin:0 0 10px 0;color:var(--navy)">تسجيل دخول المعلمة</h3>
+      <input id="tu" placeholder="اسم المستخدم">
+      <input id="tp" type="password" placeholder="كلمة المرور">
+      <div class="row">
+        <button class="btn col" onclick="teacherLogin()">تسجيل الدخول</button>
+        <button class="btn3 col" onclick="forgotTeacher()">نسيت اسم المستخدم؟</button>
+      </div>
+      <div class="small">الدخول: teacher / 12345</div>
+    </div>
+  </div>
+</div>
+
+<!-- Classes Page -->
+<div id="classesPage" class="hidden">
+  <div class="container">
+
+    <div class="card soft">
+      <div class="row">
+        <div class="col">
+          <div class="small">إضافة فصل</div>
+          <input id="newClassName" placeholder="مثال: خامس بنات">
+        </div>
+        <div class="col" style="align-self:flex-end">
+          <button class="btn2" onclick="addClass()">إضافة فصل</button>
+        </div>
+      </div>
+      <hr>
+      <div class="row">
+        <button class="btn2 col" onclick="renameClass()">تعديل اسم الفصل</button>
+        <button class="btnRed col" onclick="deleteClassMove()">حذف فصل + نقل الطلاب</button>
+        <button class="btn3 col" onclick="syncStudentsToClasses()">تثبيت أسماء الطلاب</button>
+      </div>
+      <div class="small">إذا كثرت مواقع الاستضافة وتخربطت الفصول، زر "تثبيت أسماء الطلاب" يرجع كل طالب لفصله الصحيح.</div>
+    </div>
+
+    <div class="tabs" id="classTabs"></div>
+
+    <div class="card">
+      <button class="btn2" onclick="openClassPage()">دخول الفصل</button>
+      <button class="btn3" onclick="logout()">تسجيل خروج</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- Class Page -->
+<div id="classPage" class="hidden">
+  <div class="container">
+
+    <div class="card soft">
+      <div class="row">
+        <div class="col">
+          <div class="small">إضافة طالب</div>
+          <input id="newStudentName" placeholder="اسم الطالب/الطالبة">
+        </div>
+        <div class="col" style="align-self:flex-end">
+          <button class="btn2" onclick="addStudent()">إضافة طالب</button>
+        </div>
+      </div>
+
+      <hr>
+
+      <div class="row">
+        <div class="col">
+          <div class="small">مبلغ الإيداع للكل</div>
+          <input id="bulkAmount" type="number" step="0.01" placeholder="مثال: 10">
+        </div>
+        <div class="col" style="align-self:flex-end">
+          <button class="btn" onclick="depositAll()">إيداع للكل</button>
+        </div>
+
+        <div class="col">
+          <div class="small">مبلغ السحب من الكل</div>
+          <input id="bulkWithdrawAmount" type="number" step="0.01" placeholder="مثال: 5">
+        </div>
+        <div class="col" style="align-self:flex-end">
+          <button class="btnRed" onclick="withdrawAll()">سحب من الكل</button>
+        </div>
+      </div>
+
+      <hr>
+
+      <div class="row">
+        <div class="col">
+          <div class="small">طالب محدد</div>
+          <select id="pickStudent"></select>
+        </div>
+        <div class="col">
+          <div class="small">المبلغ</div>
+          <input id="pickAmount" type="number" step="0.01" placeholder="مثال: 5">
+        </div>
+        <div class="col" style="align-self:flex-end">
+          <button class="btn2" onclick="depositToStudent()">إيداع لطالب</button>
+        </div>
+        <div class="col" style="align-self:flex-end">
+          <button class="btnRed" onclick="withdrawFromStudent()">سحب من طالب</button>
+        </div>
+      </div>
+
+    </div>
+
+    <div id="studentsGrid" class="grid2"></div>
+
+    <div class="card">
+      <button class="btn3" onclick="backToClasses()">رجوع للفصول</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- Student Login -->
+<div id="studentLoginPage" class="hidden">
+  <div class="container">
+    <div class="card">
+      <h3 style="margin:0 0 10px 0;color:var(--navy)" id="stuLoginTitle">دخول الطالب</h3>
+      <div id="stuLocked" class="small hidden" style="color:var(--red);font-weight:700"></div>
+      <input id="stuName" readonly>
+      <input id="stuPin" type="password" placeholder="الرقم السري (PIN)">
+      <button class="btn" onclick="studentLogin()">دخول</button>
+      <button class="btn3" onclick="backToClass()">رجوع</button>
+    </div>
+  </div>
+</div>
+
+<!-- Student Account -->
+<div id="studentAccountPage" class="hidden">
+  <div class="container">
+    <div class="card soft">
+      <h3 style="margin:0 0 10px 0;color:var(--navy)" id="studentHeader"></h3>
+      <div class="row">
+        <div class="col"><div class="small">الحالة</div><div id="statusBadge" class="badge"></div></div>
+        <div class="col"><div class="small">الرصيد</div><div style="font-size:26px;font-weight:800;color:var(--navy)"><span id="studentBalance">0</span> ر.س</div></div>
+        <div class="col"><div class="small">تاريخ فتح الحساب</div><div id="openedAt" class="small">—</div></div>
+      </div>
+
+      <hr>
+
+      <div class="row">
+        <div class="col"><div class="small">من تاريخ</div><input id="fromDate" type="date"></div>
+        <div class="col"><div class="small">إلى تاريخ</div><input id="toDate" type="date"></div>
+        <div class="col" style="align-self:flex-end"><button class="btn2" onclick="showStatement()">عرض كشف الحساب</button></div>
+      </div>
+
+      <div class="tableWrap" style="margin-top:10px">
+        <table>
+          <thead><tr><th>الوقت</th><th>العملية</th><th>المبلغ</th><th>الرصيد بعد العملية</th></tr></thead>
+          <tbody id="stmtRows"></tbody>
+        </table>
+      </div>
+
+      <hr>
+
+      <div class="row">
+        <div class="col">
+          <div class="small">العملية</div>
+          <select id="op">
+            <option value="deposit">إيداع</option>
+            <option value="withdraw">سحب</option>
+            <option value="transfer">تحويل</option>
+          </select>
+        </div>
+        <div class="col"><div class="small">المبلغ</div><input id="amt" type="number" step="0.01"></div>
+        <div class="col"><div class="small">تحويل إلى</div><select id="transferTo"></select></div>
+      </div>
+
+      <div class="row">
+        <button class="btn col" onclick="executeOp()">تنفيذ</button>
+        <button class="btn3 col" onclick="backToClass()">رجوع</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="footer">الرياضيات لغة الأذكياء ✨</div>
+
+<!-- Firebase (بدون سيرفر) -->
+<script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore-compat.js"></script>
+
+<script>
+// ===== إعداد Firebase =====
+const firebaseConfig = {
+  apiKey: "AIzaSyDP-pi0tbFQ9bNRihrLz_kUs-JBoa9Cw4Y",
+  authDomain: "sara-haywire.firebaseapp.com",
+  projectId: "sara-haywire",
+  storageBucket: "sara-haywire.firebasestorage.app",
+  messagingSenderId: "333467940977",
+  appId: "1:333467940977:web:97d056d5dbff2debbf43d0",
+  measurementId: "G-7RPQX9ER93"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+// ===== ثوابت =====
+const TEACHER_EMAIL="as-soso-as2011@hotmail.com";
+const WHATSAPP_NUMBER="966502234335";
+const WHATSAPP_TEXT=encodeURIComponent("هلا أ. سارة 🌿 حسابي مقفل مؤقتًا، ممكن تفعّلينه؟");
+
+// ===== أسماء الطلاب الافتراضية =====
+const DEFAULT_STUDENTS = {
+  "سادس بنين": ["طلال الرحيلي","علي المكرمي","عمر صواف","محمد العنزي","سالم آل مخلص","عبدالملك الجناعي","وليد المالكي","سلمان الجوهر","راكان مباركي","فيصل القحطاني","ريان القحطاني","محمد أبو صالح","نايف العصيمي"],
+  "سادس بنات": ["رهف الثبيتي","جادل الدوسري","دانة القحطاني","تالين متولي","ديما الحمادي","رهف الزهراني","كادي العتيبي","رودينا غريب","الجوهرة آل مخلص","ريم آل مشرف"],
+  "أول متوسط": ["ايمان باغريب","ديمة الشهري","نجلا القحطاني","ديم الغامدي","ميس السنامة","لارين التل","ليان المحارفي","سارة الغامدي"]
+};
+
+// ===== أدوات =====
+function $(id){return document.getElementById(id);}
+function openModal(title, bodyHtml, actionsHtml){
+  $("mTitle").textContent=title;
+  $("mBody").innerHTML=bodyHtml;
+  $("mActions").innerHTML=actionsHtml||'<button class="btn" onclick="closeModal()">موافق</button>';
+  $("modal").style.display="flex";
+}
+function closeModal(){ $("modal").style.display="none"; }
+function warn(msg){
+  try{
+    const ctx=new (window.AudioContext||window.webkitAudioContext)();
+    const o=ctx.createOscillator(), g=ctx.createGain();
+    o.type="sine"; o.frequency.value=880; g.gain.value=0.12;
+    o.connect(g); g.connect(ctx.destination); o.start();
+    setTimeout(()=>{o.stop(); ctx.close();}, 140);
+  }catch(e){}
+  openModal("تنبيه", msg);
+}
+function logout(){location.reload();}
+
+function go(page){
+  ["teacherLoginPage","classesPage","classPage","studentLoginPage","studentAccountPage"].forEach(id=>$(id).classList.add("hidden"));
+  $(page).classList.remove("hidden");
+}
+function backToClasses(){ go("classesPage"); renderTabs(); }
+function openClassPage(){ go("classPage"); renderStudents(); }
+function backToClass(){ go("classPage"); renderStudents(); }
+
+function fmt(x){ return (Math.round((Number(x||0)+Number.EPSILON)*100)/100).toFixed(2); }
+
+// ===== صوت الترحيب =====
+async function playWelcome(){
+  const m4a=$("welcomeM4a"), mp3=$("welcomeMp3");
+  async function tryPlay(a){ a.currentTime=0; await a.play(); }
+  try{ await tryPlay(m4a); }catch(e){ try{ await tryPlay(mp3); }catch(e2){} }
+}
+
+// ===== بداية =====
+async function startApp(){
+  try{
+    await db.collection("setting").limit(1).get();
+    $("connPill").textContent="جاهز ✅";
+    $("connPill").style.background="#dff4e3";
+    $("connPill").style.color="#2e7d32";
+  }catch(e){
+    $("connPill").textContent="جاهز ✅";
+  }
+  playWelcome();
+  $("startOverlay").style.display="none";
+  go("teacherLoginPage");
+}
+
+// ===== تسجيل المعلمة =====
+function teacherLogin(){
+  if($("tu").value.trim()==="teacher" && $("tp").value.trim()==="12345"){
+    go("classesPage"); renderTabs();
+  } else warn("بيانات الدخول غلط");
+}
+function forgotTeacher(){
+  const subject=encodeURIComponent("استرجاع بيانات دخول مصرف الرياضيات");
+  const body=encodeURIComponent("السلام عليكم،\nأرغب باسترجاع بيانات الدخول لمصرف الرياضيات.\nشكراً.");
+  window.location.href=`mailto:${TEACHER_EMAIL}?subject=${subject}&body=${body}`;
+}
+
+// ===== بيانات عامة =====
+let classes=[], currentClassId=null, currentStudentId=null;
+
+// ===== إنشاء بيانات افتراضية (فقط إذا ناقص) =====
+async function ensureSeed(){
+  // classes
+  const c = await db.collection("classes").orderBy("order").get();
+  if(c.empty){
+    await db.collection("classes").add({name:"سادس بنين",order:1});
+    await db.collection("classes").add({name:"سادس بنات",order:2});
+    await db.collection("classes").add({name:"أول متوسط",order:3});
+  }
+  // map class name->id
+  const c2 = await db.collection("classes").orderBy("order").get();
+  const by = {};
+  c2.forEach(d=>by[d.data().name]=d.id);
+
+  // existing students
+  const all = await db.collection("students").get();
+  const existing = new Set();
+  all.forEach(d=>{ const s=d.data(); if(s?.name) existing.add(String(s.name).trim()); });
+
+  // add missing
+  for(const clsName of Object.keys(DEFAULT_STUDENTS)){
+    const classId = by[clsName];
+    if(!classId) continue;
+    for(const n0 of DEFAULT_STUDENTS[clsName]){
+      const n = String(n0).trim();
+      if(existing.has(n)) continue;
+      const pin=String(Math.floor(1000+Math.random()*9000));
+      await db.collection("students").add({name:n,classId,active:true,balance:0,pin,openedAt:null});
+      existing.add(n);
+    }
+  }
+}
+
+// ===== تحميل الفصول =====
+async function loadClasses(){
+  const snap = await db.collection("classes").orderBy("order").get();
+  classes=[]; snap.forEach(d=>classes.push({id:d.id,...d.data()}));
+  if(!currentClassId) currentClassId = classes[0]?.id;
+}
+async function renderTabs(){
+  await loadClasses();
+  const tabs=$("classTabs"); tabs.innerHTML="";
+  classes.forEach(c=>{
+    const t=document.createElement("div");
+    t.className="tab"+(c.id===currentClassId?" active":"");
+    t.textContent=c.name;
+    t.onclick=()=>{ currentClassId=c.id; renderTabs(); };
+    tabs.appendChild(t);
+  });
+}
+
+// ===== إدارة الفصول =====
+async function addClass(){
+  const n=$("newClassName").value.trim();
+  if(!n) return warn("اكتب اسم الفصل");
+  const last=await db.collection("classes").orderBy("order","desc").limit(1).get();
+  const max= last.empty?0:(last.docs[0].data().order||0);
+  await db.collection("classes").add({name:n,order:max+1});
+  $("newClassName").value="";
+  await renderTabs();
+}
+async function renameClass(){
+  const c=classes.find(x=>x.id===currentClassId); if(!c) return;
+  const nn=prompt("الاسم الجديد للفصل:", c.name); if(!nn) return;
+  await db.collection("classes").doc(currentClassId).update({name: nn.trim()});
+  await renderTabs();
+}
+async function deleteClassMove(){
+  if(classes.length<=1) return warn("ما نقدر نحذف آخر فصل");
+  const others=classes.filter(c=>c.id!==currentClassId);
+  const destName=prompt("ننقل طلاب الفصل لأي فصل؟\n"+others.map(c=>c.name).join(" / "), others[0].name);
+  if(!destName) return;
+  const dest=classes.find(c=>c.name===destName); if(!dest) return warn("اسم الفصل غير موجود");
+  const studs=await db.collection("students").where("classId","==",currentClassId).get();
+  const batch=db.batch();
+  studs.forEach(d=>batch.update(db.collection("students").doc(d.id), {classId: dest.id}));
+  batch.delete(db.collection("classes").doc(currentClassId));
+  await batch.commit();
+  currentClassId=null;
+  await renderTabs();
+}
+
+// ===== تثبيت الطلاب على الفصول =====
+async function syncStudentsToClasses(){
+  await ensureSeed(); // يضيف الناقص أول
+  const c2 = await db.collection("classes").orderBy("order").get();
+  const by = {};
+  c2.forEach(d=>by[d.data().name]=d.id);
+
+  const nameToClass = new Map();
+  for(const cls of Object.keys(DEFAULT_STUDENTS)){
+    (DEFAULT_STUDENTS[cls]||[]).forEach(n=>nameToClass.set(String(n).trim(), cls));
+  }
+
+  const all = await db.collection("students").get();
+  let changed=0, kept=0, skipped=0;
+
+  const batch = db.batch();
+  let ops=0;
+
+  all.forEach(doc=>{
+    const s = doc.data() || {};
+    const name = String(s.name||"").trim();
+    const targetCls = nameToClass.get(name);
+    if(!targetCls){ skipped++; return; }
+    const targetId = by[targetCls];
+    if(!targetId){ skipped++; return; }
+    if(s.classId !== targetId){
+      batch.update(db.collection("students").doc(doc.id), {classId: targetId});
+      changed++; ops++;
+    } else kept++;
+  });
+
+  if(ops>0) await batch.commit();
+  openModal("تم ✅", `تم تثبيت الأسماء.\nتم تعديل: ${changed}\nموجودين صح: ${kept}\nتم تجاهل: ${skipped}`);
+  await renderTabs();
+}
+
+// ===== إدارة الطلاب =====
+async function addStudent(){
+  const n=$("newStudentName").value.trim();
+  if(!n) return warn("اكتب اسم الطالب");
+  const pin=String(Math.floor(1000+Math.random()*9000));
+  await db.collection("students").add({name:n,classId:currentClassId,active:true,balance:0,pin,openedAt:null});
+  $("newStudentName").value="";
+  await renderStudents();
+}
+
+async function deleteStudent(studentId, studentName){
+  if(!confirm("تأكيد حذف الطالب: " + studentName + " ؟")) return;
+  try{
+    const sref = db.collection("students").doc(studentId);
+    // حذف آخر 300 عملية (إن وجدت) ثم حذف الطالب
+    const tx = await sref.collection("txns").limit(300).get();
+    const batch = db.batch();
+    tx.forEach(d=>batch.delete(d.ref));
+    batch.delete(sref);
+    await batch.commit();
+  }catch(e){
+    try{ await db.collection("students").doc(studentId).delete(); }catch(_){}
+  }
+  await renderStudents();
+}
+
+async function logTxn(ref, type, amount, balanceAfter){
+  await ref.collection("txns").add({type,amount,balanceAfter,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+}
+
+async function renderStudents(){
+  const snap = await db.collection("students").where("classId","==",currentClassId).get();
+  const arr=[]; snap.forEach(d=>arr.push({id:d.id,...d.data()}));
+  arr.sort((a,b)=>(a.name||"").localeCompare(b.name||"","ar"));
+
+  // dropdown
+  const pick=$("pickStudent"); pick.innerHTML="";
+  arr.forEach(s=>{ const o=document.createElement("option"); o.value=s.id; o.textContent=s.name; pick.appendChild(o); });
+
+  const grid=$("studentsGrid"); grid.innerHTML="";
+  arr.forEach(s=>{
+    const card=document.createElement("div");
+    card.className="card";
+    card.innerHTML=`
+      <strong>${s.name}</strong>
+      <div class="small">الرصيد: ${fmt(s.balance)} ر.س</div>
+      <div class="small">PIN: <b>${s.pin||""}</b></div>
+      <span class="badge ${s.active?'on':'off'}">${s.active?'🟢 مفعل':'🔴 مقفول'}</span>
+      <div class="row" style="margin-top:8px">
+        <button class="btn2 col js-open">دخول الطالب</button>
+        <button class="btn3 col js-toggle">${s.active?'إقفال':'تفعيل'}</button>
+        <button class="btn3 col js-edit">تعديل الاسم</button>
+        <button class="btnRed col js-del">حذف</button>
+      </div>
+    `;
+    card.querySelector(".js-open").onclick=()=>{ currentStudentId=s.id; showStudentLogin(s); };
+    card.querySelector(".js-toggle").onclick=async()=>{ await db.collection("students").doc(s.id).update({active:!s.active}); await renderStudents(); };
+    card.querySelector(".js-edit").onclick=async()=>{ const nn=prompt("الاسم الجديد:", s.name); if(nn) await db.collection("students").doc(s.id).update({name:nn.trim()}); await renderStudents(); };
+    card.querySelector(".js-del").onclick=()=> deleteStudent(s.id, s.name);
+    grid.appendChild(card);
+  });
+}
+
+// ===== عمليات المعلمة =====
+async function depositAll(){
+  const a=parseFloat($("bulkAmount").value);
+  if(isNaN(a)||a<=0) return warn("اكتب مبلغ الإيداع للكل");
+  const studs=await db.collection("students").where("classId","==",currentClassId).get();
+
+  const batch=db.batch();
+  for(const d of studs.docs){
+    const s=d.data(); if(!s.active) continue;
+    const ref=db.collection("students").doc(d.id);
+    batch.update(ref, {balance:Number(s.balance||0)+a});
+  }
+  await batch.commit();
+
+  for(const d of studs.docs){
+    const s=d.data(); if(!s.active) continue;
+    const ref=db.collection("students").doc(d.id);
+    const nb=Number(s.balance||0)+a;
+    await logTxn(ref, "إيداع جماعي", a, nb);
+  }
+  $("bulkAmount").value="";
+  await renderStudents();
+}
+
+async function withdrawAll(){
+  const a=parseFloat($("bulkWithdrawAmount").value);
+  if(isNaN(a)||a<=0) return warn("اكتب مبلغ السحب من الكل");
+  const studs=await db.collection("students").where("classId","==",currentClassId).get();
+
+  for(const d of studs.docs){
+    const s=d.data(); if(!s.active) continue;
+    if(Number(s.balance||0) < a) return warn("في طالب رصيده ما يكفي… قلل المبلغ");
+  }
+
+  const batch=db.batch();
+  for(const d of studs.docs){
+    const s=d.data(); if(!s.active) continue;
+    const ref=db.collection("students").doc(d.id);
+    batch.update(ref, {balance:Number(s.balance||0)-a});
+  }
+  await batch.commit();
+
+  for(const d of studs.docs){
+    const s=d.data(); if(!s.active) continue;
+    const ref=db.collection("students").doc(d.id);
+    const nb=Number(s.balance||0)-a;
+    await logTxn(ref, "سحب جماعي (معلمة)", a, nb);
+  }
+
+  $("bulkWithdrawAmount").value="";
+  await renderStudents();
+}
+
+function lockedModal(){
+  openModal(
+    "هلا والله! 👋",
+    "حسابك مقفل موقتا، أرجو مراجعة المعلمة سارة حقوي<br>اضغط زر المراسلة 🚀",
+    `<a class="btn" href="https://wa.me/${WHATSAPP_NUMBER}?text=${WHATSAPP_TEXT}" target="_blank">المراسلة واتساب</a>
+     <button class="btn3" onclick="closeModal()">رجوع</button>`
+  );
+}
+
+async function depositToStudent(){
+  const sid=$("pickStudent").value;
+  const a=parseFloat($("pickAmount").value);
+  if(!sid) return warn("اختر طالب");
+  if(isNaN(a)||a<=0) return warn("اكتب مبلغ");
+  const ref=db.collection("students").doc(sid);
+  const doc=await ref.get();
+  const s=doc.data();
+  if(!s.active) return lockedModal();
+  const nb=Number(s.balance||0)+a;
+  await ref.update({balance:nb});
+  await logTxn(ref, "إيداع (معلمة)", a, nb);
+  $("pickAmount").value="";
+  await renderStudents();
+}
+async function withdrawFromStudent(){
+  const sid=$("pickStudent").value;
+  const a=parseFloat($("pickAmount").value);
+  if(!sid) return warn("اختر طالب");
+  if(isNaN(a)||a<=0) return warn("اكتب مبلغ");
+  const ref=db.collection("students").doc(sid);
+  const doc=await ref.get();
+  const s=doc.data();
+  if(!s.active) return lockedModal();
+  if(Number(s.balance||0) < a) return warn("رصيده ما يكفي");
+  const nb=Number(s.balance||0)-a;
+  await ref.update({balance:nb});
+  await logTxn(ref, "سحب (معلمة)", a, nb);
+  $("pickAmount").value="";
+  await renderStudents();
+}
+
+// ===== دخول الطالب =====
+function showStudentLogin(s){
+  go("studentLoginPage");
+  $("stuLoginTitle").textContent="دخول الطالب – " + (classes.find(c=>c.id===currentClassId)?.name || "");
+  $("stuName").value=s.name;
+  $("stuPin").value="";
+  if(!s.active){
+    $("stuLocked").classList.remove("hidden");
+    $("stuLocked").innerHTML='هلا والله! حسابك مقفل موقتا، أرجو مراجعة المعلمة سارة حقوي<br>اضغط زر المراسلة 🚀';
+  }else{
+    $("stuLocked").classList.add("hidden");
+  }
+}
+
+async function renderOpenedAt(){
+  const doc=await db.collection("students").doc(currentStudentId).get();
+  const s=doc.data();
+  $("openedAt").textContent = (s.openedAt && s.openedAt.toDate) ? s.openedAt.toDate().toLocaleString("ar-SA") : "—";
+}
+
+async function buildTransferList(){
+  const snap=await db.collection("students").get();
+  const arr=[]; snap.forEach(d=>arr.push({id:d.id,...d.data()}));
+  arr.sort((a,b)=>(a.name||"").localeCompare(b.name||"","ar"));
+  $("transferTo").innerHTML="";
+  arr.forEach(s=>{ if(s.id===currentStudentId) return; const o=document.createElement("option"); o.value=s.id; o.textContent=s.name; $("transferTo").appendChild(o); });
+}
+
+async function studentLogin(){
+  const ref=db.collection("students").doc(currentStudentId);
+  const doc=await ref.get();
+  const s=doc.data();
+  if(!s.active){ lockedModal(); return; }
+  if($("stuPin").value.trim()!==String(s.pin||"")) return warn("الرقم السري غلط");
+
+  if(!s.openedAt) await ref.update({openedAt: firebase.firestore.FieldValue.serverTimestamp()});
+
+  // الصوت يتكرر كل مرة يسجل الطالب دخول (اختيارك 2)
+  await playWelcome();
+
+  go("studentAccountPage");
+  $("studentHeader").textContent=s.name;
+  $("statusBadge").className="badge "+(s.active?"on":"off");
+  $("statusBadge").textContent=s.active?"🟢 مفعل":"🔴 مقفول";
+  $("studentBalance").textContent=fmt(s.balance);
+
+  await renderOpenedAt();
+  await buildTransferList();
+  await showStatement();
+}
+
+// ===== كشف الحساب بالتاريخ =====
+async function showStatement(){
+  const from=$("fromDate").value;
+  const to=$("toDate").value;
+
+  let q = db.collection("students").doc(currentStudentId).collection("txns")
+    .orderBy("createdAt","desc").limit(50);
+
+  if(from && to){
+    const fromD=new Date(from+"T00:00:00");
+    const toD=new Date(to+"T23:59:59");
+    q = db.collection("students").doc(currentStudentId).collection("txns")
+      .where("createdAt", ">=", fromD)
+      .where("createdAt", "<=", toD)
+      .orderBy("createdAt","desc")
+      .limit(100);
+  }
+
+  const snap=await q.get();
+  const rows=$("stmtRows"); rows.innerHTML="";
+  if(snap.empty){
+    rows.innerHTML='<tr><td colspan="4" class="small">ما فيه عمليات بهالفترة…</td></tr>';
+    return;
+  }
+  snap.forEach(d=>{
+    const x=d.data();
+    const t=x.createdAt?.toDate?x.createdAt.toDate().toLocaleString("ar-SA"):"";
+    const tr=document.createElement("tr");
+    tr.innerHTML=`<td>${t}</td><td>${x.type||""}</td><td>${fmt(x.amount)}</td><td>${fmt(x.balanceAfter)}</td>`;
+    rows.appendChild(tr);
+  });
+}
+
+// ===== عمليات داخل حساب الطالب =====
+async function executeOp(){
+  const ref=db.collection("students").doc(currentStudentId);
+  const doc=await ref.get();
+  const s=doc.data();
+  const op=$("op").value;
+  const amt=parseFloat($("amt").value);
+  if(isNaN(amt)||amt<=0) return warn("اكتب مبلغ صحيح");
+
+  if(op==="deposit"){
+    const nb=Number(s.balance||0)+amt;
+    await ref.update({balance:nb});
+    await logTxn(ref, "إيداع", amt, nb);
+  }else if(op==="withdraw"){
+    if(Number(s.balance||0) < amt) return warn("الرصيد ما يكفي");
+    const nb=Number(s.balance||0)-amt;
+    await ref.update({balance:nb});
+    await logTxn(ref, "سحب", amt, nb);
+  }else if(op==="transfer"){
+    if(Number(s.balance||0) < amt) return warn("الرصيد ما يكفي للتحويل");
+    const toId=$("transferTo").value;
+    const toRef=db.collection("students").doc(toId);
+    const toDoc=await toRef.get();
+    if(!toDoc.exists) return warn("المستلم مو موجود");
+    const to=toDoc.data();
+
+    const batch=db.batch();
+    batch.update(ref, {balance:Number(s.balance||0)-amt});
+    batch.update(toRef, {balance:Number(to.balance||0)+amt});
+    await batch.commit();
+
+    await logTxn(ref, "تحويل إلى "+to.name, amt, Number(s.balance||0)-amt);
+    await logTxn(toRef, "تحويل من "+(doc.data().name||"طالب"), amt, Number(to.balance||0)+amt);
+  }
+
+  $("amt").value="";
+  const updated=await ref.get();
+  $("studentBalance").textContent=fmt(updated.data().balance);
+  await showStatement();
+}
+
+// ===== تشغيل أولي =====
+(async()=>{
+  try{
+    await ensureSeed();
+    await renderTabs();
+    $("connPill").textContent="جاهز ✅";
+    $("connPill").style.background="#dff4e3";
+    $("connPill").style.color="#2e7d32";
+  }catch(e){
+    $("connPill").textContent="جاهز ✅";
+  }
+})();
+</script>
 
 </body>
 </html>
