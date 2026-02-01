@@ -10,14 +10,13 @@
   --navy:#00205B;--rajhi:#0055A4;--sky:#EAF3FB;--sky2:#CFE6F7;--beige:#FAF9F7;
   --green:#2e7d32;--red:#b00020;--text:#1b1f23;
 }
-  .whatsapp-btn{
-  background:#25D366;
-  color:#fff;
+.whatsapp-btn{
+  background:#25D366 !important;
+  color:#fff !important;
   font-weight:700;
 }
-.whatsapp-btn:hover{
-  background:#1ebe5d;
-}
+.whatsapp-btn:hover{ background:#1ebe5d !important; }
+
 *{box-sizing:border-box;font-family:Tahoma,Arial,sans-serif}
 body{margin:0;background:var(--beige);color:var(--text)}
 .hidden{display:none}
@@ -92,28 +91,19 @@ tr:last-child td{border-bottom:none}
   <div style="width:56px"></div>
 </div>
 
-<!-- صوت الترحيب (ارفعي welcome.mp3 و welcome.m4a بعدين) -->
 <audio id="welcomeMp3" preload="auto" src="welcome.mp3"></audio>
 <audio id="welcomeM4a" preload="auto" src="welcome.m4a"></audio>
 
-<!-- Start -->
 <div id="startOverlay">
   <div class="startBox">
     <div class="pill" id="connPill">...جاري تجهيز النظام...</div>
     <h3>هلا والله! 👋</h3>
-    <p>
-      جاهزين نبدأ رحلتنا في بنك الرياضيات؟
-      <br>اضغط زر البداية وننطلق 🚀
-    </p>
-    <button class="btn" onclick="
-  document.getElementById('startOverlay').style.display='none';
-  document.getElementById('teacherLoginPage').classList.remove('hidden');
-">ابدأ</button>
+    <p>جاهزين نبدأ رحلتنا في بنك الرياضيات؟<br>اضغط زر البداية وننطلق 🚀</p>
+    <button class="btn" onclick="startApp()">ابدأ</button>
     <div class="small" id="connNote" style="margin-top:8px"></div>
   </div>
 </div>
-  
-<!-- Modal -->
+
 <div id="modal" class="modal">
   <div class="modalBox">
     <h3 id="mTitle"></h3>
@@ -124,7 +114,6 @@ tr:last-child td{border-bottom:none}
   </div>
 </div>
 
-<!-- Teacher Login -->
 <div id="teacherLoginPage" class="hidden">
   <div class="container">
     <div class="card">
@@ -140,10 +129,8 @@ tr:last-child td{border-bottom:none}
   </div>
 </div>
 
-<!-- Classes Page -->
 <div id="classesPage" class="hidden">
   <div class="container">
-
     <div class="card soft">
       <div class="row">
         <div class="col">
@@ -169,14 +156,11 @@ tr:last-child td{border-bottom:none}
       <button class="btn2" onclick="openClassPage()">دخول الفصل</button>
       <button class="btn3" onclick="logout()">تسجيل خروج</button>
     </div>
-
   </div>
 </div>
 
-<!-- Class Page -->
 <div id="classPage" class="hidden">
   <div class="container">
-
     <div class="card soft">
       <div class="row">
         <div class="col">
@@ -226,7 +210,6 @@ tr:last-child td{border-bottom:none}
           <button class="btnRed" onclick="withdrawFromStudent()">سحب من طالب</button>
         </div>
       </div>
-
     </div>
 
     <div id="studentsGrid" class="grid2"></div>
@@ -234,11 +217,9 @@ tr:last-child td{border-bottom:none}
     <div class="card">
       <button class="btn3" onclick="backToClasses()">رجوع للفصول</button>
     </div>
-
   </div>
 </div>
 
-<!-- Student Login -->
 <div id="studentLoginPage" class="hidden">
   <div class="container">
     <div class="card">
@@ -252,7 +233,6 @@ tr:last-child td{border-bottom:none}
   </div>
 </div>
 
-<!-- Student Account -->
 <div id="studentAccountPage" class="hidden">
   <div class="container">
     <div class="card soft">
@@ -304,12 +284,10 @@ tr:last-child td{border-bottom:none}
 
 <div class="footer">الرياضيات لغة الأذكياء ✨</div>
 
-<!-- Firebase (بدون سيرفر) -->
 <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore-compat.js"></script>
 
 <script>
-// ===== إعداد Firebase =====
 const firebaseConfig = {
   apiKey: "AIzaSyDP-pi0tbFQ9bNRihrLz_kUs-JBoa9Cw4Y",
   authDomain: "sara-haywire.firebaseapp.com",
@@ -322,18 +300,15 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// ===== ثوابت =====
 const TEACHER_EMAIL="as-soso-as2011@hotmail.com";
+const WHATSAPP_NUMBER = "966502234335";
 
-
-// ===== أسماء الطلاب الافتراضية =====
 const DEFAULT_STUDENTS = {
   "سادس بنين": ["طلال الرحيلي","علي المكرمي","عمر صواف","محمد العنزي","سالم آل مخلص","عبدالملك الجناعي","وليد المالكي","سلمان الجوهر","راكان مباركي","فيصل القحطاني","ريان القحطاني","محمد أبو صالح","نايف العصيمي"],
   "سادس بنات": ["رهف الثبيتي","جادل الدوسري","دانة القحطاني","تالين متولي","ديما الحمادي","رهف الزهراني","كادي العتيبي","رودينا غريب","الجوهرة آل مخلص","ريم آل مشرف"],
   "أول متوسط": ["ايمان باغريب","ديمة الشهري","نجلا القحطاني","ديم الغامدي","ميس السنامة","لارين التل","ليان المحارفي","سارة الغامدي"]
 };
 
-// ===== أدوات =====
 function $(id){return document.getElementById(id);}
 function openModal(title, bodyHtml, actionsHtml){
   $("mTitle").textContent=title;
@@ -364,12 +339,9 @@ function backToClass(){ go("classPage"); renderStudents(); }
 
 function fmt(x){ return (Math.round((Number(x||0)+Number.EPSILON)*100)/100).toFixed(2); }
 
-// ===== صوت الترحيب =====
 async function playWelcome(){
   const m4a = document.getElementById("welcomeM4a");
   const mp3 = document.getElementById("welcomeMp3");
-
-  // نغمة قصيرة قبل الترحيب
   try{
     const ctx=new (window.AudioContext||window.webkitAudioContext)();
     const o=ctx.createOscillator(), g=ctx.createGain();
@@ -377,27 +349,19 @@ async function playWelcome(){
     o.connect(g); g.connect(ctx.destination); o.start();
     setTimeout(()=>{o.stop(); ctx.close();}, 220);
   }catch(e){}
-
-  try{
-    if(m4a){ m4a.currentTime=0; await m4a.play(); return; }
-  }catch(e){}
-  try{
-    if(mp3){ mp3.currentTime=0; await mp3.play(); return; }
-  }catch(e){}
+  try{ if(m4a){ m4a.currentTime=0; await m4a.play(); return; } }catch(e){}
+  try{ if(mp3){ mp3.currentTime=0; await mp3.play(); return; } }catch(e){}
 }
-// ===== بداية =====
+
 async function startApp(){
-  // لا ننتظر Firestore عشان ما يعلق "جاري..."
   $("connPill").textContent = "جاهز ✅";
   $("connPill").style.background = "#dff4e3";
   $("connPill").style.color = "#2e7d32";
-
   playWelcome();
   $("startOverlay").style.display = "none";
   go("teacherLoginPage");
 }
 
-// ===== تسجيل المعلمة =====
 function teacherLogin(){
   if($("tu").value.trim()==="teacher" && $("tp").value.trim()==="12345"){
     go("classesPage"); renderTabs();
@@ -409,29 +373,23 @@ function forgotTeacher(){
   window.location.href=`mailto:${TEACHER_EMAIL}?subject=${subject}&body=${body}`;
 }
 
-// ===== بيانات عامة =====
 let classes=[], currentClassId=null, currentStudentId=null;
 
-// ===== إنشاء بيانات افتراضية (فقط إذا ناقص) =====
 async function ensureSeed(){
-  // classes
   const c = await db.collection("classes").orderBy("order").get();
   if(c.empty){
     await db.collection("classes").add({name:"الصف سادس بنين",order:1});
     await db.collection("classes").add({name:"الصف سادس بنات",order:2});
     await db.collection("classes").add({name:"الصف الأول المتوسط",order:3});
   }
-  // map class name->id
   const c2 = await db.collection("classes").orderBy("order").get();
   const by = {};
   c2.forEach(d=>by[d.data().name]=d.id);
 
-  // existing students
   const all = await db.collection("students").get();
   const existing = new Set();
   all.forEach(d=>{ const s=d.data(); if(s?.name) existing.add(String(s.name).trim()); });
 
-  // add missing
   for(const clsName of Object.keys(DEFAULT_STUDENTS)){
     const classId = by[clsName];
     if(!classId) continue;
@@ -445,7 +403,6 @@ async function ensureSeed(){
   }
 }
 
-// ===== تحميل الفصول =====
 async function loadClasses(){
   const snap = await db.collection("classes").orderBy("order").get();
   classes=[]; snap.forEach(d=>classes.push({id:d.id,...d.data()}));
@@ -463,7 +420,6 @@ async function renderTabs(){
   });
 }
 
-// ===== إدارة الفصول =====
 async function addClass(){
   const n=$("newClassName").value.trim();
   if(!n) return warn("اكتب اسم الفصل");
@@ -494,9 +450,8 @@ async function deleteClassMove(){
   await renderTabs();
 }
 
-// ===== تثبيت الطلاب على الفصول =====
 async function syncStudentsToClasses(){
-  await ensureSeed(); // يضيف الناقص أول
+  await ensureSeed();
   const c2 = await db.collection("classes").orderBy("order").get();
   const by = {};
   c2.forEach(d=>by[d.data().name]=d.id);
@@ -526,11 +481,10 @@ async function syncStudentsToClasses(){
   });
 
   if(ops>0) await batch.commit();
-  openModal("تم ✅", `تم تثبيت الأسماء.\nتم تعديل: ${changed}\nموجودين صح: ${kept}\nتم تجاهل: ${skipped}`);
+  openModal("تم ✅", `تم تثبيت الأسماء.<br>تم تعديل: ${changed}<br>موجودين صح: ${kept}<br>تم تجاهل: ${skipped}`);
   await renderTabs();
 }
 
-// ===== إدارة الطلاب =====
 async function addStudent(){
   const n=$("newStudentName").value.trim();
   if(!n) return warn("اكتب اسم الطالب");
@@ -544,7 +498,6 @@ async function deleteStudent(studentId, studentName){
   if(!confirm("تأكيد حذف الطالب: " + studentName + " ؟")) return;
   try{
     const sref = db.collection("students").doc(studentId);
-    // حذف آخر 300 عملية (إن وجدت) ثم حذف الطالب
     const tx = await sref.collection("txns").limit(300).get();
     const batch = db.batch();
     tx.forEach(d=>batch.delete(d.ref));
@@ -565,7 +518,6 @@ async function renderStudents(){
   const arr=[]; snap.forEach(d=>arr.push({id:d.id,...d.data()}));
   arr.sort((a,b)=>(a.name||"").localeCompare(b.name||"","ar"));
 
-  // dropdown
   const pick=$("pickStudent"); pick.innerHTML="";
   arr.forEach(s=>{ const o=document.createElement("option"); o.value=s.id; o.textContent=s.name; pick.appendChild(o); });
 
@@ -593,7 +545,6 @@ async function renderStudents(){
   });
 }
 
-// ===== عمليات المعلمة =====
 async function depositAll(){
   const a=parseFloat($("bulkAmount").value);
   if(isNaN(a)||a<=0) return warn("اكتب مبلغ الإيداع للكل");
@@ -602,16 +553,13 @@ async function depositAll(){
   const batch=db.batch();
   for(const d of studs.docs){
     const s=d.data(); if(!s.active) continue;
-    const ref=db.collection("students").doc(d.id);
-    batch.update(ref, {balance:Number(s.balance||0)+a});
+    batch.update(db.collection("students").doc(d.id), {balance:Number(s.balance||0)+a});
   }
   await batch.commit();
 
   for(const d of studs.docs){
     const s=d.data(); if(!s.active) continue;
-    const ref=db.collection("students").doc(d.id);
-    const nb=Number(s.balance||0)+a;
-    await logTxn(ref, "إيداع جماعي", a, nb);
+    await logTxn(db.collection("students").doc(d.id), "إيداع جماعي", a, Number(s.balance||0)+a);
   }
   $("bulkAmount").value="";
   await renderStudents();
@@ -630,43 +578,37 @@ async function withdrawAll(){
   const batch=db.batch();
   for(const d of studs.docs){
     const s=d.data(); if(!s.active) continue;
-    const ref=db.collection("students").doc(d.id);
-    batch.update(ref, {balance:Number(s.balance||0)-a});
+    batch.update(db.collection("students").doc(d.id), {balance:Number(s.balance||0)-a});
   }
   await batch.commit();
 
   for(const d of studs.docs){
     const s=d.data(); if(!s.active) continue;
-    const ref=db.collection("students").doc(d.id);
-    const nb=Number(s.balance||0)-a;
-    await logTxn(ref, "سحب جماعي (معلمة)", a, nb);
+    await logTxn(db.collection("students").doc(d.id), "سحب جماعي (معلمة)", a, Number(s.balance||0)-a);
   }
-
   $("bulkWithdrawAmount").value="";
   await renderStudents();
 }
-const WHATSAPP_NUMBER = "96652234335";
+
 function lockedModal(studentName){
   studentName = studentName || "";
-
   const msg = encodeURIComponent(
-    "السلام عليكم ورحمة الله وبركاته\n\n" +
-    "أنا الطالبة: " + studentName + "\n" +
-    "فضلاً أرجو تفعيل حسابي\n" +
+    "السلام عليكم ورحمة الله وبركاته\\n\\n" +
+    "أنا الطالبة: " + studentName + "\\n" +
+    "فضلاً أرجو تفعيل حسابي\\n" +
     "وأكون شاكرة لك 🌸"
   );
-
   const waLink = "https://wa.me/" + WHATSAPP_NUMBER + "?text=" + msg;
 
   openModal(
     "تنبيه",
-    "هلا والله 🌸 حسابك مقفل مؤقتًا<br>يمكنك مراسلة المعلمة لتفعيل الحساب",
+    "هلا والله 🌸 حسابك مقفل مؤقتًا<br>اضغط زر واتساب عشان ترسل طلب التفعيل",
     '<a class="btn whatsapp-btn" href="' + waLink + '" target="_blank">📱 مراسلة واتساب</a>' +
     '<button class="btn3" onclick="closeModal()">إغلاق</button>'
   );
 }
 
-async function depositToStudent(lockedModal(s.name);){
+async function depositToStudent(){
   const sid = $("pickStudent").value;
   const a = parseFloat($("pickAmount").value);
   if(!sid) return warn("اختر طالب");
@@ -676,11 +618,7 @@ async function depositToStudent(lockedModal(s.name);){
   const doc = await ref.get();
   const s = doc.data();
 
-  if(!s.active){
-    playWelcome();
-    lockedModal();
-    return;
-  }
+  if(!s.active){ playWelcome(); lockedModal(s.name); return; }
 
   const nb = Number(s.balance||0) + a;
   await ref.update({balance: nb});
@@ -689,7 +627,7 @@ async function depositToStudent(lockedModal(s.name);){
   await renderStudents();
 }
 
-async function withdrawFromStudent(lockedModal(s.name);){
+async function withdrawFromStudent(){
   const sid = $("pickStudent").value;
   const a = parseFloat($("pickAmount").value);
   if(!sid) return warn("اختر طالب");
@@ -699,12 +637,7 @@ async function withdrawFromStudent(lockedModal(s.name);){
   const doc = await ref.get();
   const s = doc.data();
 
-  if(!s.active){
-    playWelcome();
-    lockedModal();
-    return;
-  }
-
+  if(!s.active){ playWelcome(); lockedModal(s.name); return; }
   if(Number(s.balance||0) < a) return warn("رصيده ما يكفي");
 
   const nb = Number(s.balance||0) - a;
@@ -713,19 +646,18 @@ async function withdrawFromStudent(lockedModal(s.name);){
   $("pickAmount").value = "";
   await renderStudents();
 }
-// ===== دخول الطالب =====
+
 function showStudentLogin(s){
   go("studentLoginPage");
   $("stuLoginTitle").textContent="دخول الطالب – " + (classes.find(c=>c.id===currentClassId)?.name || "");
   $("stuName").value=s.name;
   $("stuPin").value="";
-  if(!s.active){
-  $("stuLocked").classList.add("hidden"); // يمنع ظهور النص الأحمر نهائياً
-  playWelcome();
-  lockedModal(s.name); // نافذة منبثقة فقط
-}else{
   $("stuLocked").classList.add("hidden");
-}
+
+  if(!s.active){
+    playWelcome();
+    lockedModal(s.name);
+  }
 }
 
 async function renderOpenedAt(){
@@ -746,12 +678,11 @@ async function studentLogin(){
   const ref=db.collection("students").doc(currentStudentId);
   const doc=await ref.get();
   const s=doc.data();
+
   if(!s.active){ lockedModal(s.name); return; }
   if($("stuPin").value.trim()!==String(s.pin||"")) return warn("الرقم السري غلط");
-
   if(!s.openedAt) await ref.update({openedAt: firebase.firestore.FieldValue.serverTimestamp()});
 
-  // الصوت يتكرر كل مرة يسجل الطالب دخول (اختيارك 2)
   playWelcome();
 
   go("studentAccountPage");
@@ -765,7 +696,6 @@ async function studentLogin(){
   await showStatement();
 }
 
-// ===== كشف الحساب بالتاريخ =====
 async function showStatement(){
   const from=$("fromDate").value;
   const to=$("toDate").value;
@@ -798,7 +728,6 @@ async function showStatement(){
   });
 }
 
-// ===== عمليات داخل حساب الطالب =====
 async function executeOp(){
   const ref=db.collection("students").doc(currentStudentId);
   const doc=await ref.get();
@@ -839,32 +768,22 @@ async function executeOp(){
   await showStatement();
 }
 
-// ===== تشغيل أولي =====
 (async()=>{
   try{
-    // await ensureSeed();
-// await renderTabs();
+    await ensureSeed();
+    await renderTabs();
     $("connPill").textContent="جاهز ✅";
     $("connPill").style.background="#dff4e3";
     $("connPill").style.color="#2e7d32";
   }catch(e){
     $("connPill").textContent="جاهز ✅";
-  }    })();
-// ربط زر "ابدأ" في شاشة البداية
-document.addEventListener("DOMContentLoaded", () => {
-  const overlay = document.getElementById("startOverlay");
-  if (!overlay) return;
-
-  const btn = overlay.querySelector("button");
-  if (btn) {
-    btn.addEventListener("click", () => {
-      startApp();
-    });
   }
-});
-
+})();
 </script>
 
 </body>
 </html>
-
+"""
+out = Path("/mnt/data/index_clean_ready.html")
+out.write_text(html, encoding="utf-8")
+str(out)
