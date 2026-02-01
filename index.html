@@ -820,27 +820,26 @@ async function executeOp(){
 // ===== تشغيل أولي =====
 (async()=>{
   try{
-    await ensureSeed();
-    await renderTabs();
+    // await ensureSeed();
+// await renderTabs();
     $("connPill").textContent="جاهز ✅";
     $("connPill").style.background="#dff4e3";
     $("connPill").style.color="#2e7d32";
   }catch(e){
     $("connPill").textContent="جاهز ✅";
   }    })();
+// ربط زر "ابدأ" في شاشة البداية
+document.addEventListener("DOMContentLoaded", () => {
+  const overlay = document.getElementById("startOverlay");
+  if (!overlay) return;
 
-    // ربط زر "ابدأ" في شاشة البداية
-    document.addEventListener("DOMContentLoaded", () => {
-      const overlay = document.getElementById("startOverlay");
-      if (!overlay) return;
-
-      const btn = overlay.querySelector("button");
-      if (btn) {
-        btn.addEventListener("click", () => {
-          startApp();
-        });
-      }
+  const btn = overlay.querySelector("button");
+  if (btn) {
+    btn.addEventListener("click", () => {
+      startApp();
     });
+  }
+});
 
 </script>
 
