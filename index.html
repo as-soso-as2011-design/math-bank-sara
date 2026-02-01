@@ -10,6 +10,14 @@
   --navy:#00205B;--rajhi:#0055A4;--sky:#EAF3FB;--sky2:#CFE6F7;--beige:#FAF9F7;
   --green:#2e7d32;--red:#b00020;--text:#1b1f23;
 }
+  .whatsapp-btn{
+  background:#25D366;
+  color:#fff;
+  font-weight:700;
+}
+.whatsapp-btn:hover{
+  background:#1ebe5d;
+}
 *{box-sizing:border-box;font-family:Tahoma,Arial,sans-serif}
 body{margin:0;background:var(--beige);color:var(--text)}
 .hidden{display:none}
@@ -635,12 +643,27 @@ async function withdrawAll(){
   $("bulkWithdrawAmount").value="";
   await renderStudents();
 }
+const WHATSAPP_NUMBER = "96652234335";
+function lockedModal(studentName = ""){
 
-function lockedModal(){
+  const msg = encodeURIComponent(
+    "السلام عليكم ورحمة الله وبركاته\n\n" +
+    "أنا الطالبة " + studentName + "\n" +
+    "فضلاً أرجو تفعيل حسابي\n" +
+    "وأكون شاكرة لك 🌸"
+  );
+
+  const waLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`;
+
   openModal(
     "تنبيه",
-    "هلا والله! حسابك مقفل موقتا، أرجو مراجعة المعلمة سارة حقوي",
-    '<button class="btn" onclick="closeModal()">موافق</button>'
+    "هلا والله 🌸 حسابك مقفل مؤقتًا<br>يمكنك مراسلة المعلمة لتفعيل الحساب",
+    `
+    <a class="btn whatsapp-btn" href="${waLink}" target="_blank">
+  📱 مراسلة واتساب
+   </a>
+    <button class="btn3" onclick="closeModal()">إغلاق</button>
+    `
   );
 }
 
@@ -700,7 +723,7 @@ function showStudentLogin(s){
   if(!s.active){
   $("stuLocked").classList.add("hidden"); // يمنع ظهور النص الأحمر نهائياً
   playWelcome();
-  lockedModal(); // نافذة منبثقة فقط
+  lockedModal(s.name); // نافذة منبثقة فقط
 }else{
   $("stuLocked").classList.add("hidden");
 }
