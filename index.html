@@ -812,8 +812,21 @@ async function executeOp(){
     $("connPill").style.color="#2e7d32";
   }catch(e){
     $("connPill").textContent="جاهز ✅";
-  }
-})();
+  }    })();
+
+    // ربط زر "ابدأ" في شاشة البداية
+    document.addEventListener("DOMContentLoaded", () => {
+      const overlay = document.getElementById("startOverlay");
+      if (!overlay) return;
+
+      const btn = overlay.querySelector("button");
+      if (btn) {
+        btn.addEventListener("click", () => {
+          startApp();
+        });
+      }
+    });
+
 </script>
 
 </body>
