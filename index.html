@@ -653,12 +653,12 @@ async function depositToStudent(){
   const ref=db.collection("students").doc(sid);
   const doc=await ref.get();
   const s=doc.data();
-  if(!s.active) return lockedModal();
-  const nb=Number(s.balance||0)+a;
-  await ref.update({balance:nb});
-  await logTxn(ref, "إيداع (معلمة)", a, nb);
-  $("pickAmount").value="";
-  await renderStudents();
+  if(!s.active){
+  $("stuLocked").classList.add("hidden");   // ✅ لا نعرض نص ثابت
+  playWelcome();                           // ✅ صوت التحذير
+  lockedModal();                           // ✅ نافذة منبثقة + واتساب
+}else{
+  $("stuLocked").classList.add("hidden");
 }
 async function withdrawFromStudent(){
   const sid=$("pickStudent").value;
