@@ -324,8 +324,7 @@ const db = firebase.firestore();
 
 // ===== ثوابت =====
 const TEACHER_EMAIL="as-soso-as2011@hotmail.com";
-const WHATSAPP_NUMBER="966502234335";
-const WHATSAPP_TEXT=encodeURIComponent("هلا أ. سارة 🌿 حسابي مقفل مؤقتًا، ممكن تفعّلينه؟");
+
 
 // ===== أسماء الطلاب الافتراضية =====
 const DEFAULT_STUDENTS = {
@@ -647,7 +646,6 @@ async function withdrawAll(){
   await renderStudents();
 }
 const WHATSAPP_NUMBER = "96652234335";
-  
 function lockedModal(studentName){
   studentName = studentName || "";
 
@@ -668,7 +666,7 @@ function lockedModal(studentName){
   );
 }
 
-async function depositToStudent(){
+async function depositToStudent(lockedModal(s.name);){
   const sid = $("pickStudent").value;
   const a = parseFloat($("pickAmount").value);
   if(!sid) return warn("اختر طالب");
@@ -691,7 +689,7 @@ async function depositToStudent(){
   await renderStudents();
 }
 
-async function withdrawFromStudent(){
+async function withdrawFromStudent(lockedModal(s.name);){
   const sid = $("pickStudent").value;
   const a = parseFloat($("pickAmount").value);
   if(!sid) return warn("اختر طالب");
@@ -748,7 +746,7 @@ async function studentLogin(){
   const ref=db.collection("students").doc(currentStudentId);
   const doc=await ref.get();
   const s=doc.data();
-  if(!s.active){ lockedModal(); return; }
+  if(!s.active){ lockedModal(s.name); return; }
   if($("stuPin").value.trim()!==String(s.pin||"")) return warn("الرقم السري غلط");
 
   if(!s.openedAt) await ref.update({openedAt: firebase.firestore.FieldValue.serverTimestamp()});
