@@ -353,11 +353,25 @@ function fmt(x){ return (Math.round((Number(x||0)+Number.EPSILON)*100)/100).toFi
 
 // ===== صوت الترحيب =====
 async function playWelcome(){
-  const m4a=$("welcomeM4a"), mp3=$("welcomeMp3");
-  async function tryPlay(a){ a.currentTime=0; await a.play(); }
-  try{ await tryPlay(m4a); }catch(e){ try{ await tryPlay(mp3); }catch(e2){} }
-}
+  const m4a = document.getElementById("welcomeM4a");
+  const mp3 = document.getElementById("welcomeMp3");
 
+  // نغمة قصيرة قبل الترحيب
+  try{
+    const ctx=new (window.AudioContext||window.webkitAudioContext)();
+    const o=ctx.createOscillator(), g=ctx.createGain();
+    o.type="triangle"; o.frequency.value=740; g.gain.value=0.10;
+    o.connect(g); g.connect(ctx.destination); o.start();
+    setTimeout(()=>{o.stop(); ctx.close();}, 220);
+  }catch(e){}
+
+  try{
+    if(m4a){ m4a.currentTime=0; await m4a.play(); return; }
+  }catch(e){}
+  try{
+    if(mp3){ mp3.currentTime=0; await mp3.play(); return; }
+  }catch(e){}
+}
 // ===== بداية =====
 async function startApp(){
   try{
@@ -672,6 +686,7 @@ function showStudentLogin(s){
   if(!s.active){
     $("stuLocked").classList.remove("hidden");
     $("stuLocked").innerHTML='هلا والله! حسابك مقفل موقتا، أرجو مراجعة المعلمة سارة حقوي<br>اضغط زر المراسلة 🚀';
+     playWelcome(); 
   }else{
     $("stuLocked").classList.add("hidden");
   }
@@ -701,7 +716,7 @@ async function studentLogin(){
   if(!s.openedAt) await ref.update({openedAt: firebase.firestore.FieldValue.serverTimestamp()});
 
   // الصوت يتكرر كل مرة يسجل الطالب دخول (اختيارك 2)
-  await playWelcome();
+  playWelcome();
 
   go("studentAccountPage");
   $("studentHeader").textContent=s.name;
