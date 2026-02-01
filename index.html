@@ -698,12 +698,12 @@ function showStudentLogin(s){
   $("stuName").value=s.name;
   $("stuPin").value="";
   if(!s.active){
-    $("stuLocked").classList.remove("hidden");
-    $("stuLocked").innerHTML='هلا والله! حسابك مقفل موقتا، أرجو مراجعة المعلمة سارة حقوي<br>اضغط زر المراسلة 🚀';
-     playWelcome(); 
-  }else{
-    $("stuLocked").classList.add("hidden");
-  }
+  $("stuLocked").classList.add("hidden"); // يمنع ظهور النص الأحمر نهائياً
+  playWelcome();
+  lockedModal(); // نافذة منبثقة فقط
+}else{
+  $("stuLocked").classList.add("hidden");
+}
 }
 
 async function renderOpenedAt(){
