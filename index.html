@@ -654,9 +654,9 @@ async function depositToStudent(){
   const doc=await ref.get();
   const s=doc.data();
   if(!s.active){
-  $("stuLocked").classList.add("hidden");   // ✅ لا نعرض نص ثابت
-  playWelcome();                           // ✅ صوت التحذير
-  lockedModal();                           // ✅ نافذة منبثقة + واتساب
+  $("stuLocked").classList.add("hidden");
+  playWelcome();
+  lockedModal();
 }else{
   $("stuLocked").classList.add("hidden");
 }
