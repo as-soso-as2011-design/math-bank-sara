@@ -1,3 +1,7 @@
+أكيد ✅ هذا هو الكود كامل (index.html) جاهز للنسخ واللصق (بكل الميزات اللي اتفقنا عليها: أسباب/فلترة + أخرى + سبب في كشف الحساب + وليّ الأمر + تعديل الرقم + إرسال PIN + تعطيل/تفعيل “نسيت الرقم السري” للجميع… إلخ).
+
+انسخيه كامل والصقيه بدل محتوى index.html عندك ثم Commit changes.
+
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
@@ -131,6 +135,7 @@ tr:last-child td{border-bottom:none}
 
 <div id="classesPage" class="hidden">
   <div class="container">
+
     <div class="card soft">
       <div class="row">
         <div class="col">
@@ -146,6 +151,7 @@ tr:last-child td{border-bottom:none}
         <button class="btn2 col" onclick="renameClass()">تعديل اسم الفصل</button>
         <button class="btnRed col" onclick="deleteClassMove()">حذف فصل + نقل الطلاب</button>
         <button class="btn3 col" onclick="syncStudentsToClasses()">تثبيت أسماء الطلاب</button>
+        <button class="btn3 col" onclick="toggleForgotPinForAll()">تعطيل/تفعيل نسيت الرقم السري</button>
       </div>
       <div class="small">إذا كثرت مواقع الاستضافة وتخربطت الفصول، زر "تثبيت أسماء الطلاب" يرجع كل طالب لفصله الصحيح.</div>
     </div>
@@ -156,11 +162,13 @@ tr:last-child td{border-bottom:none}
       <button class="btn2" onclick="openClassPage()">دخول الفصل</button>
       <button class="btn3" onclick="logout()">تسجيل خروج</button>
     </div>
+
   </div>
 </div>
 
 <div id="classPage" class="hidden">
   <div class="container">
+
     <div class="card soft">
       <div class="row">
         <div class="col">
@@ -210,6 +218,17 @@ tr:last-child td{border-bottom:none}
           <button class="btnRed" onclick="withdrawFromStudent()">سحب من طالب</button>
         </div>
       </div>
+
+      <hr>
+
+      <div class="row">
+        <div class="col">
+          <div class="small">سبب العملية</div>
+          <select id="reasonTeacher"></select>
+          <input id="reasonOtherTeacher" class="hidden" placeholder="أخرى: اكتب السبب هنا..." style="margin-top:8px">
+        </div>
+      </div>
+
     </div>
 
     <div id="studentsGrid" class="grid2"></div>
@@ -217,6 +236,7 @@ tr:last-child td{border-bottom:none}
     <div class="card">
       <button class="btn3" onclick="backToClasses()">رجوع للفصول</button>
     </div>
+
   </div>
 </div>
 
@@ -227,6 +247,9 @@ tr:last-child td{border-bottom:none}
       <div id="stuLocked" class="small hidden" style="color:var(--red);font-weight:700"></div>
       <input id="stuName" readonly>
       <input id="stuPin" type="password" placeholder="الرقم السري (PIN)">
+      <div class="small" style="margin:8px 0;">
+        <a href="javascript:void(0)" onclick="forgotStudentPin()" style="color:#0055A4;font-weight:700">نسيت الرقم السري؟</a>
+      </div>
       <button class="btn" onclick="studentLogin()">دخول</button>
       <button class="btn3" onclick="backToClass()">رجوع</button>
     </div>
@@ -253,7 +276,7 @@ tr:last-child td{border-bottom:none}
 
       <div class="tableWrap" style="margin-top:10px">
         <table>
-          <thead><tr><th>الوقت</th><th>العملية</th><th>المبلغ</th><th>الرصيد بعد العملية</th></tr></thead>
+          <thead><tr><th>الوقت</th><th>العملية</th><th>السبب</th><th>المبلغ</th><th>الرصيد بعد العملية</th></tr></thead>
           <tbody id="stmtRows"></tbody>
         </table>
       </div>
@@ -269,6 +292,13 @@ tr:last-child td{border-bottom:none}
             <option value="transfer">تحويل</option>
           </select>
         </div>
+
+        <div class="col">
+          <div class="small">السبب</div>
+          <select id="reasonStudent"></select>
+          <input id="reasonOtherStudent" class="hidden" placeholder="أخرى: اكتب السبب هنا..." style="margin-top:8px">
+        </div>
+
         <div class="col"><div class="small">المبلغ</div><input id="amt" type="number" step="0.01"></div>
         <div class="col"><div class="small">تحويل إلى</div><select id="transferTo"></select></div>
       </div>
@@ -308,6 +338,236 @@ const DEFAULT_STUDENTS = {
   "سادس بنات": ["رهف الثبيتي","جادل الدوسري","دانة القحطاني","تالين متولي","ديما الحمادي","رهف الزهراني","كادي العتيبي","رودينا غريب","الجوهرة آل مخلص","ريم آل مشرف"],
   "أول متوسط": ["ايمان باغريب","ديمة الشهري","نجلا القحطاني","ديم الغامدي","ميس السنامة","لارين التل","ليان المحارفي","سارة الغامدي"]
 };
+
+const PARENTS_PHONE = {
+  "سالم آل مخلص": "0502402111",
+  "الجوهرة آل مخلص": "0502402111",
+  "تالين متولي": "0505220540",
+  "جادل الدوسري": "0538118080",
+  "دانة القحطاني": "0555952003",
+  "رهف العتيبي": "0543339829",
+  "كادي العتيبي": "0532340737",
+  "رهف الزهراني": "0562580555",
+  "ريم آل مشرف": "054565589",
+  "ديم الحمادي": "0501222335",
+  "رودينا الغريب": "0506925919",
+  "راكان مباركي": "0559591061",
+  "سلمان الجوهر": "053827904",
+  "طلال الرحيلي": "0598801283",
+  "محمد بوصالح": "0500125335",
+  "محمد العنزي": "0533264929",
+  "علي المكرمي": "0563882235",
+  "وليد المالكي": "0552582145",
+  "نايف العصيمي": "0509799783",
+  "عبدالملك الجناعي": "0568027600",
+  "فيصل القحطاني": "0507993660",
+  "ريان القحطاني": "0555078508",
+  "عمر صواف": "0599831191",
+  "ديمة الشهري": "0567509173",
+  "لارين التل": "0580662141",
+  "نجلا القحطاني": "0535952876",
+  "ايمان باغريب": "0542678280",
+  "ديم الغامدي": "0535912049",
+  "ليان المحارفي": "0568135644",
+  "ميس السنامة": "0580443424",
+  "سارة الغامدي": "0542743881"
+};
+
+// ===== أسباب العمليات (فلترة حسب العملية) =====
+const REASONS = {
+  deposit: [
+    "التفاعل والمشاركة الإيجابية",
+    "الالتزام بالقوانين الصفية",
+    "الالتزام بمتطلبات المادة والحصة",
+    "تميز في الأداء والسلوك",
+    "تحسن ملحوظ في المستوى أو السلوك",
+    "أخرى"
+  ],
+  withdraw: [
+    "عدم حل الواجب الدراسي",
+    "كثرة الكلام والحركة داخل الحصة",
+    "النوم أثناء الحصة",
+    "عدم الالتزام بالأسلوب اللائق مع الزملاء",
+    "عدم الالتزام بالأسلوب اللائق مع المعلمة",
+    "التأخر عن حصة الرياضيات دون عذر",
+    "نسيان كتاب الرياضيات",
+    "نسيان الدفتر",
+    "نسيان المذكرة",
+    "عدم إحضار أدوات الرياضيات",
+    "أخرى"
+  ],
+  transfer: [
+    "سبب تحويلي/تحويل رصيد",
+    "تسديد/إرجاع رصيد",
+    "مساعدة زميل/ـة",
+    "أخرى"
+  ]
+};
+
+function fillReasonSelect(selectEl, items){
+  if(!selectEl) return;
+  selectEl.innerHTML = "";
+  items.forEach(r=>{
+    const o = document.createElement("option");
+    o.value = r;
+    o.textContent = r;
+    selectEl.appendChild(o);
+  });
+}
+
+function setupReasonUI(mode, selectId, otherId){
+  const sel = document.getElementById(selectId);
+  const other = document.getElementById(otherId);
+  if(!sel || !other) return;
+
+  fillReasonSelect(sel, REASONS[mode] || ["أخرى"]);
+  const toggleOther = ()=>{
+    if(sel.value === "أخرى"){
+      other.classList.remove("hidden");
+    }else{
+      other.classList.add("hidden");
+      other.value = "";
+    }
+  };
+  sel.onchange = toggleOther;
+  toggleOther();
+}
+
+function getReason(selectId, otherId){
+  const sel = document.getElementById(selectId);
+  const other = document.getElementById(otherId);
+  if(!sel) return "";
+  if(sel.value === "أخرى"){
+    const t = (other?.value || "").trim();
+    return t || "أخرى";
+  }
+  return sel.value || "";
+}
+
+// ===== التحكم في "نسيت الرقم السري" للجميع =====
+let forgotPinEnabled = true;
+
+async function loadForgotSetting(){
+  try{
+    const doc = await db.collection("settings").doc("security").get();
+    if(doc.exists){
+      const d = doc.data() || {};
+      if(typeof d.forgotPinEnabled === "boolean") forgotPinEnabled = d.forgotPinEnabled;
+    }else{
+      await db.collection("settings").doc("security").set({forgotPinEnabled:true});
+      forgotPinEnabled = true;
+    }
+  }catch(e){
+    forgotPinEnabled = true;
+  }
+  const link = document.querySelector('a[onclick="forgotStudentPin()"]');
+  if(link) link.style.display = forgotPinEnabled ? "inline" : "none";
+}
+
+async function toggleForgotPinForAll(){
+  try{
+    forgotPinEnabled = !forgotPinEnabled;
+    await db.collection("settings").doc("security").set({forgotPinEnabled}, {merge:true});
+    openModal("تم ✅", forgotPinEnabled ? "تم تفعيل (نسيت الرقم السري) للجميع." : "تم تعطيل (نسيت الرقم السري) للجميع.");
+  }catch(e){
+    openModal("تنبيه", "تعذر تحديث الإعداد الآن.");
+  }
+  await loadForgotSetting();
+}
+
+function isForgotEnabled(){ return forgotPinEnabled === true; }
+
+// ===== ولي الأمر: رقم + إرسال PIN =====
+function normalizePhoneToWA(phone){
+  let p = String(phone||"").replace(/[^0-9]/g,"");
+  if(!p) return "";
+  if(p.startsWith("00")) p = p.slice(2);
+  if(p.startsWith("0")) p = "966" + p.slice(1);
+  return p;
+}
+
+async function ensureGuardianPhone(studentId, studentName){
+  const ref = db.collection("students").doc(studentId);
+  const doc = await ref.get();
+  if(!doc.exists) return "";
+  const s = doc.data() || {};
+  if(s.guardianWhats && String(s.guardianWhats).trim()) return String(s.guardianWhats).trim();
+
+  const guess = PARENTS_PHONE[studentName] || "";
+  if(guess){
+    await ref.update({guardianWhats: guess});
+    return guess;
+  }
+  return "";
+}
+
+async function editGuardianPhone(studentId, studentName){
+  const ref = db.collection("students").doc(studentId);
+  const doc = await ref.get();
+  if(!doc.exists) return;
+  const s = doc.data() || {};
+  const current = (s.guardianWhats || PARENTS_PHONE[studentName] || "").toString();
+  const nn = prompt("رقم ولي الأمر (مثال: 05xxxxxxxx):", current);
+  if(nn===null) return;
+  await ref.update({guardianWhats: nn.trim()});
+  openModal("تم ✅", "تم حفظ رقم ولي الأمر.");
+  await renderStudents();
+}
+
+async function sendPinToParent(studentId){
+  const ref = db.collection("students").doc(studentId);
+  const doc = await ref.get();
+  if(!doc.exists) return;
+  const s = doc.data() || {};
+  const parent = await ensureGuardianPhone(studentId, s.name||"");
+  const wa = normalizePhoneToWA(parent);
+  if(!wa){
+    openModal("تنبيه", "لا يوجد رقم ولي أمر مسجل. اضغط/ي (رقم ولي الأمر) لإضافته.");
+    return;
+  }
+  const msg = encodeURIComponent(
+    "السلام عليكم ورحمة الله وبركاته\n\n" +
+    "رقم الدخول (PIN) لبنك الرياضيات للطالب/ـة: " + (s.name||"") + "\n" +
+    "PIN: " + (s.pin||"") + "\n\n" +
+    "شاكرين تعاونكم 🤍"
+  );
+  const link = "https://wa.me/" + wa + "?text=" + msg;
+  window.open(link, "_blank");
+}
+
+async function forgotStudentPin(){
+  if(!isForgotEnabled()){
+    openModal("تنبيه","خدمة استرجاع الرقم السري موقوفة مؤقتًا. راجع/ي المعلمة 🌿");
+    return;
+  }
+  try{
+    const sid = currentStudentId;
+    if(!sid){
+      openModal("تنبيه", "اختار/ي الطالب أولاً.");
+      return;
+    }
+    const ref = db.collection("students").doc(sid);
+    const doc = await ref.get();
+    if(!doc.exists) return;
+    const s = doc.data() || {};
+    const parent = await ensureGuardianPhone(sid, s.name||"");
+    const wa = normalizePhoneToWA(parent);
+    if(!wa){
+      openModal("تنبيه", "لا يوجد رقم ولي أمر مسجل. راجع/ي المعلمة.");
+      return;
+    }
+    const msg = encodeURIComponent(
+      "السلام عليكم ورحمة الله وبركاته\n\n" +
+      "أنا ولي أمر الطالب/ـة: " + (s.name||"") + "\n" +
+      "أرجو تزويدي بالرقم السري (PIN) لحساب بنك الرياضيات.\n\n" +
+      "شاكرين تعاونكم 🤍"
+    );
+    const link = "https://wa.me/" + wa + "?text=" + msg;
+    window.open(link, "_blank");
+  }catch(e){
+    console.log(e);
+  }
+}
 
 function $(id){return document.getElementById(id);}
 function openModal(title, bodyHtml, actionsHtml){
@@ -397,7 +657,7 @@ async function ensureSeed(){
       const n = String(n0).trim();
       if(existing.has(n)) continue;
       const pin=String(Math.floor(1000+Math.random()*9000));
-      await db.collection("students").add({name:n,classId,active:true,balance:0,pin,openedAt:null});
+      await db.collection("students").add({name:n,classId,active:true,balance:0,pin,openedAt:null,guardianWhats:(PARENTS_PHONE[n]||"")});
       existing.add(n);
     }
   }
@@ -489,7 +749,7 @@ async function addStudent(){
   const n=$("newStudentName").value.trim();
   if(!n) return warn("اكتب اسم الطالب");
   const pin=String(Math.floor(1000+Math.random()*9000));
-  await db.collection("students").add({name:n,classId:currentClassId,active:true,balance:0,pin,openedAt:null});
+  await db.collection("students").add({name:n,classId:currentClassId,active:true,balance:0,pin,openedAt:null,guardianWhats:(PARENTS_PHONE[n]||"")});
   $("newStudentName").value="";
   await renderStudents();
 }
@@ -509,8 +769,8 @@ async function deleteStudent(studentId, studentName){
   await renderStudents();
 }
 
-async function logTxn(ref, type, amount, balanceAfter){
-  await ref.collection("txns").add({type,amount,balanceAfter,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+async function logTxn(ref, type, reason, amount, balanceAfter){
+  await ref.collection("txns").add({type,reason:reason||"",amount,balanceAfter,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
 }
 
 async function renderStudents(){
@@ -534,12 +794,16 @@ async function renderStudents(){
         <button class="btn2 col js-open">دخول الطالب</button>
         <button class="btn3 col js-toggle">${s.active?'إقفال':'تفعيل'}</button>
         <button class="btn3 col js-edit">تعديل الاسم</button>
+        <button class="btn3 col js-parent">رقم ولي الأمر</button>
+        <button class="btn whatsapp-btn col js-sendpin">إرسال PIN</button>
         <button class="btnRed col js-del">حذف</button>
       </div>
     `;
     card.querySelector(".js-open").onclick=()=>{ currentStudentId=s.id; showStudentLogin(s); };
     card.querySelector(".js-toggle").onclick=async()=>{ await db.collection("students").doc(s.id).update({active:!s.active}); await renderStudents(); };
     card.querySelector(".js-edit").onclick=async()=>{ const nn=prompt("الاسم الجديد:", s.name); if(nn) await db.collection("students").doc(s.id).update({name:nn.trim()}); await renderStudents(); };
+    if(card.querySelector(".js-parent")) card.querySelector(".js-parent").onclick=()=> editGuardianPhone(s.id, s.name);
+    if(card.querySelector(".js-sendpin")) card.querySelector(".js-sendpin").onclick=()=> sendPinToParent(s.id);
     card.querySelector(".js-del").onclick=()=> deleteStudent(s.id, s.name);
     grid.appendChild(card);
   });
@@ -559,7 +823,7 @@ async function depositAll(){
 
   for(const d of studs.docs){
     const s=d.data(); if(!s.active) continue;
-    await logTxn(db.collection("students").doc(d.id), "إيداع جماعي", a, Number(s.balance||0)+a);
+    await logTxn(db.collection("students").doc(d.id), "إيداع جماعي", getReason("reasonTeacher","reasonOtherTeacher"), a, Number(s.balance||0)+a);
   }
   $("bulkAmount").value="";
   await renderStudents();
@@ -584,7 +848,7 @@ async function withdrawAll(){
 
   for(const d of studs.docs){
     const s=d.data(); if(!s.active) continue;
-    await logTxn(db.collection("students").doc(d.id), "سحب جماعي (معلمة)", a, Number(s.balance||0)-a);
+    await logTxn(db.collection("students").doc(d.id), "سحب جماعي (معلمة)", getReason("reasonTeacher","reasonOtherTeacher"), a, Number(s.balance||0)-a);
   }
   $("bulkWithdrawAmount").value="";
   await renderStudents();
@@ -593,20 +857,21 @@ async function withdrawAll(){
 function lockedModal(studentName){
   studentName = studentName || "";
   const msg = encodeURIComponent(
-    "السلام عليكم ورحمة الله وبركاته\\n\\n" +
-    "أنا الطالبة: " + studentName + "\\n" +
-    "فضلاً أرجو تفعيل حسابي\\n" +
+    "السلام عليكم ورحمة الله وبركاته\n\n" +
+    "أنا الطالبة: " + studentName + "\n" +
+    "فضلاً أرجو تفعيل حسابي\n" +
     "وأكون شاكرة لك 🌸"
   );
   const waLink = "https://wa.me/" + WHATSAPP_NUMBER + "?text=" + msg;
 
   openModal(
-  "تنبيه",
-  "حياك الله 🤗🤍<br>حسابك مقفل مؤقتًا، لا تقلق/ـي.<br><br>للتفعيل تواصل/ـي مع المعلمة على دردشة تطبيق WhatsApp 👇",
-  '<a class="btn whatsapp-btn" href="' + waLink + '" target="_blank">📱 مراسلة WhatsApp</a>' +
-  '<button class="btn3" onclick="closeModal()">إغلاق</button>'
+    "تنبيه",
+    "حياك الله 🤗🤍<br>حسابك مقفل مؤقتًا، لا تقلق/ـي.<br><br>للتفعيل تواصل/ـي مع المعلمة على دردشة تطبيق WhatsApp 👇",
+    '<a class="btn whatsapp-btn" href="' + waLink + '" target="_blank">📱 مراسلة WhatsApp</a>' +
+    '<button class="btn3" onclick="closeModal()">إغلاق</button>'
   );
 }
+
 async function depositToStudent(){
   const sid = $("pickStudent").value;
   const a = parseFloat($("pickAmount").value);
@@ -621,7 +886,7 @@ async function depositToStudent(){
 
   const nb = Number(s.balance||0) + a;
   await ref.update({balance: nb});
-  await logTxn(ref, "إيداع (معلمة)", a, nb);
+  await logTxn(ref, "إيداع (معلمة)", getReason("reasonTeacher","reasonOtherTeacher"), a, nb);
   $("pickAmount").value = "";
   await renderStudents();
 }
@@ -641,7 +906,7 @@ async function withdrawFromStudent(){
 
   const nb = Number(s.balance||0) - a;
   await ref.update({balance: nb});
-  await logTxn(ref, "سحب (معلمة)", a, nb);
+  await logTxn(ref, "سحب (معلمة)", getReason("reasonTeacher","reasonOtherTeacher"), a, nb);
   $("pickAmount").value = "";
   await renderStudents();
 }
@@ -715,14 +980,14 @@ async function showStatement(){
   const snap=await q.get();
   const rows=$("stmtRows"); rows.innerHTML="";
   if(snap.empty){
-    rows.innerHTML='<tr><td colspan="4" class="small">ما فيه عمليات بهالفترة…</td></tr>';
+    rows.innerHTML='<tr><td colspan="5" class="small">ما فيه عمليات بهالفترة…</td></tr>';
     return;
   }
   snap.forEach(d=>{
     const x=d.data();
     const t=x.createdAt?.toDate?x.createdAt.toDate().toLocaleString("ar-SA"):"";
     const tr=document.createElement("tr");
-    tr.innerHTML=`<td>${t}</td><td>${x.type||""}</td><td>${fmt(x.amount)}</td><td>${fmt(x.balanceAfter)}</td>`;
+    tr.innerHTML=`<td>${t}</td><td>${x.type||""}</td><td>${x.reason||""}</td><td>${fmt(x.amount)}</td><td>${fmt(x.balanceAfter)}</td>`;
     rows.appendChild(tr);
   });
 }
@@ -738,12 +1003,12 @@ async function executeOp(){
   if(op==="deposit"){
     const nb=Number(s.balance||0)+amt;
     await ref.update({balance:nb});
-    await logTxn(ref, "إيداع", amt, nb);
+    await logTxn(ref, "إيداع", getReason("reasonStudent","reasonOtherStudent"), amt, nb);
   }else if(op==="withdraw"){
     if(Number(s.balance||0) < amt) return warn("الرصيد ما يكفي");
     const nb=Number(s.balance||0)-amt;
     await ref.update({balance:nb});
-    await logTxn(ref, "سحب", amt, nb);
+    await logTxn(ref, "سحب", getReason("reasonStudent","reasonOtherStudent"), amt, nb);
   }else if(op==="transfer"){
     if(Number(s.balance||0) < amt) return warn("الرصيد ما يكفي للتحويل");
     const toId=$("transferTo").value;
@@ -757,8 +1022,8 @@ async function executeOp(){
     batch.update(toRef, {balance:Number(to.balance||0)+amt});
     await batch.commit();
 
-    await logTxn(ref, "تحويل إلى "+to.name, amt, Number(s.balance||0)-amt);
-    await logTxn(toRef, "تحويل من "+(doc.data().name||"طالب"), amt, Number(to.balance||0)+amt);
+    await logTxn(ref, "تحويل إلى "+to.name, getReason("reasonStudent","reasonOtherStudent"), amt, Number(s.balance||0)-amt);
+    await logTxn(toRef, "تحويل من "+(doc.data().name||"طالب"), getReason("reasonStudent","reasonOtherStudent"), amt, Number(to.balance||0)+amt);
   }
 
   $("amt").value="";
@@ -766,6 +1031,16 @@ async function executeOp(){
   $("studentBalance").textContent=fmt(updated.data().balance);
   await showStatement();
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+  const opSel = document.getElementById('op');
+  if(opSel){
+    setupReasonUI(opSel.value, 'reasonStudent', 'reasonOtherStudent');
+    opSel.addEventListener('change', ()=> setupReasonUI(opSel.value, 'reasonStudent', 'reasonOtherStudent'));
+  }
+  setupReasonUI('withdraw', 'reasonTeacher', 'reasonOtherTeacher');
+  loadForgotSetting();
+});
 
 (async()=>{
   try{
@@ -782,4 +1057,3 @@ async function executeOp(){
 
 </body>
 </html>
-"""
