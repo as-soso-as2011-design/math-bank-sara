@@ -459,19 +459,11 @@ function startApp(){
   // إخفاء شاشة البداية
   document.getElementById("startOverlay").style.display = "none";
 
-  // إظهار صفحة تسجيل دخول المعلمة
+  // إظهار صفحة دخول المعلمة مباشرة
   document.getElementById("teacherLoginPage").classList.remove("hidden");
 
-  // تشغيل الصوت
-  try {
-    const audio = document.getElementById("welcomeMp3");
-    if (audio) {
-      audio.currentTime = 0;
-      audio.play();
-    }
-  } catch(e){}
-}
-
+  // تشغيل الصوت (إن سمح المتصفح)
+  playWelcome();
 /* ===== تسجيل المعلمة ===== */
 function teacherLogin(){
   if($("tu").value.trim()==="teacher" && $("tp").value.trim()==="12345"){
