@@ -1235,6 +1235,189 @@ document.addEventListener("DOMContentLoaded", () => {
     $("connPill").textContent="جاهز ✅";
   }
 })();
+/* ===== PATCH: رابط طلاب مستقل + دخول بالاسم + PIN (بدون تغيير التصميم/الصوت) ===== */
+(function(){
+  const params = new URLSearchParams(window.location.search);
+  const IS_STUDENT_MODE = (params.get("mode") === "student");
+
+  // نستخدم نفس دوالك الموجودة
+  const _$ = (window.$ ? window.$ : (id)=>document.getElementById(id));
+
+  // 1) override startApp: يوجه حسب الرابط
+  window.startApp = async function(){
+    try{
+      // نفس تأثيرك البصري في "ابدأ"
+      if(_$("connPill")){
+        _$("connPill").textContent = "جاهز ✅";
+        _$("connPill").style.background = "#dff4e3";
+        _$("connPill").style.color = "#2e7d32";
+      }
+      if(typeof window.playWelcome === "function"){ window.playWelcome(); }
+      if(_$("startOverlay")) _$("startOverlay").style.display = "none";
+
+      // 🔹 إذا رابط الطلاب: يفتح صفحة دخول الطالب مباشرة
+      if (IS_STUDENT_MODE) {
+  // نفس شاشة ابدأ لكن للطلاب
+  if (_$("startOverlay")) {
+    _$("startOverlay").style.display = "flex";
+  }
+  return;
+}
+        if(typeof window.go === "function") window.go("studentLoginPage");
+        // نخلي خانة الاسم قابلة للكتابة حتى لو كانت readonly في HTML
+        if(_$("stuName")){
+          _$("stuName").readOnly = false;
+          _$("stuName").value = "";
+          _$("stuName").placeholder = "اكتب اسمك كما هو مسجل بالنظام";
+        }
+        if(_$("stuPin")) _$("stuPin").value = "";
+        if(_$("stuLocked")) _$("stuLocked").classList.add("hidden");
+        return;
+      }
+
+      // 🔹 رابط المعلمة (عادي): يفتح صفحة دخول المعلمة كما هو
+      if(typeof window.go === "function") window.go("teacherLoginPage");
+    }catch(e){
+      // لو صار أي شيء: افتح الطالب كخطة بديلة
+      try{ if(typeof window.go === "function") window.go("studentLoginPage"); }catch(_){}
+    }
+  };
+
+  // 2) override studentLogin: إذا الطالب كتب اسمه بنفسه نبحث بالاسم ثم نتحقق PIN
+  window.studentLogin = async function(){
+    try{
+      const db = window.db; // من كودك
+      if(!db) { alert("قاعدة البيانات غير جاهزة"); return; }
+
+      const nameInput = _$("stuName");
+      const pinInput  = _$("stuPin");
+      const name = (nameInput ? nameInput.value.trim() : "");
+      const pin  = (pinInput ? pinInput.value.trim() : "");
+
+      // لو الطالب داخل من رابط الطلاب لازم يكتب الاسم
+      if(IS_STUDENT_MODE){
+        if(!name || !pin){
+          if(typeof window.warn === "function") window.warn("اكتب الاسم والرقم السري");
+          else alert("اكتب الاسم والرقم السري");
+          return;
+        }
+
+        // نبحث بالاسم (مطابق 100% للاسم المسجل)
+        const snap = await db.collection("students").where("name","==",name).limit(1).get();
+        if(snap.empty){
+          if(typeof window.warn === "function") window.warn("الاسم غير مسجل بالنظام");
+          else alert("الاسم غير مسجل بالنظام");
+          return;
+        }
+
+        const doc = snap.docs[0];
+        const s = doc.data();
+        window.currentStudentId = doc.id;
+
+        // مقفل؟
+        if(!s.active){
+          if(typeof window.lockedModal === "function") window.lockedModal(s.name);
+          else { if(typeof window.warn === "function") window.warn("الحساب مقفل"); else alert("الحساب مقفل"); }
+          return;
+        }
+
+        // PIN صحيح؟
+        if(String(pin) !== String(s.pin)){
+          if(typeof window.warn === "function") window.warn("الرقم السري غير صحيح");
+          else alert("الرقم السري غير صحيح");
+          return;
+        }
+
+        // أول دخول
+        if(!s.openedAt){
+          try{
+            await db.collection("students").doc(window.currentStudentId)
+              .update({openedAt: firebase.firestore.FieldValue.serverTimestamp()});
+          }catch(_){}
+        }
+
+        if(typeof window.playWelcome === "function") window.playWelcome();
+
+        // فتح الحساب
+        if(typeof window.go === "function") window.go("studentAccountPage");
+        if(_$("studentHeader")) _$("studentHeader").textContent = s.name;
+        if(_$("statusBadge")){
+          _$("statusBadge").className = "badge " + (s.active ? "on" : "off");
+          _$("statusBadge").textContent = s.active ? "🟢 نشط" : "🔴 مقفل";
+        }
+        if(_$("studentBalance") && typeof window.fmt === "function") _$("studentBalance").textContent = window.fmt(s.balance);
+
+        // بناء كشوف/تحويل إذا موجودة عندك
+        if(typeof window.renderOpenedAt === "function") await window.renderOpenedAt();
+        if(typeof window.buildTransferList === "function") await window.buildTransferList();
+        if(typeof window.showStatement === "function") await window.showStatement();
+
+        return;
+      }
+
+      // إذا المعلمة فتحت حساب طالب من لوحتها (الوضع القديم) نخلي كودك الأصلي يشتغل:
+      // (لكن بما أننا عملنا override، نعيد تنفيذ نفس منطقك القديم بأمان)
+      if(!window.currentStudentId){
+        if(typeof window.warn === "function") window.warn("افتحي حساب الطالب من لوحة المعلمة");
+        else alert("افتحي حساب الطالب من لوحة المعلمة");
+        return;
+      }
+
+      // منطق المعلمة القديم (PIN فقط)
+      const ref = db.collection("students").doc(window.currentStudentId);
+      const doc = await ref.get();
+      const s = doc.data();
+
+      if(!s.active){
+        if(typeof window.lockedModal === "function") window.lockedModal(s.name);
+        else { if(typeof window.warn === "function") window.warn("الحساب مقفل"); else alert("الحساب مقفل"); }
+        return;
+      }
+      if(String(pin) !== String(s.pin)){
+        if(typeof window.warn === "function") window.warn("الرقم السري غلط");
+        else alert("الرقم السري غلط");
+        return;
+      }
+
+      if(!s.openedAt){
+        try{ await ref.update({openedAt: firebase.firestore.FieldValue.serverTimestamp()}); }catch(_){}
+      }
+
+      if(typeof window.playWelcome === "function") window.playWelcome();
+      if(typeof window.go === "function") window.go("studentAccountPage");
+
+      if(_$("studentHeader")) _$("studentHeader").textContent = s.name;
+      if(_$("statusBadge")){
+        _$("statusBadge").className = "badge " + (s.active ? "on" : "off");
+        _$("statusBadge").textContent = s.active ? "🟢 نشط" : "🔴 مقفل";
+      }
+      if(_$("studentBalance") && typeof window.fmt === "function") _$("studentBalance").textContent = window.fmt(s.balance);
+
+      if(typeof window.renderOpenedAt === "function") await window.renderOpenedAt();
+      if(typeof window.buildTransferList === "function") await window.buildTransferList();
+      if(typeof window.showStatement === "function") await window.showStatement();
+
+    }catch(e){
+      console.log(e);
+      if(typeof window.warn === "function") window.warn("صار خطأ… جرّب/ي مرة ثانية");
+      else alert("صار خطأ… جرّب/ي مرة ثانية");
+    }
+  };
+
+  // 3) عند فتح رابط الطلاب نخفي أي أثر لصفحة المعلمة (احتياط)
+  document.addEventListener("DOMContentLoaded", ()=>{
+    if(IS_STUDENT_MODE){
+      // لو أحد ضغط دخول طالب من قبل، نخليه يكتب بنفسه
+      if(_$("stuName")){
+        _$("stuName").readOnly = false;
+        _$("stuName").value = "";
+        _$("stuName").placeholder = "اكتب اسمك كما هو مسجل بالنظام";
+      }
+    }
+  });
+
+})();
+</script>
 </script>
 
 </body>
