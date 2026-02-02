@@ -1419,6 +1419,18 @@ document.addEventListener("DOMContentLoaded", () => {
 })();
 </script>
 </script>
+<script>
+/* ✅ FIX سريع: ضمان عمل زر "ابدأ" حتى لو صار خطأ بأي سكربت ثاني */
+function startApp(){
+  try{
+    const pill = document.getElementById('connPill');
+    if(pill){
+      pill.textContent = "جاهز ✅";
+      pill.style.background = "#dff4e3";
+      pill.style.color = "#2e7d32";
+    }
+  }catch(e){}
 
+  try{ if(typeof playWelcome === "function") playWelcome(); }catch(e
 </body>
 </html>
