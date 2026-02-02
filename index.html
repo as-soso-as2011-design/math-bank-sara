@@ -95,6 +95,17 @@ tr:last-child td{border-bottom:none}
 <audio id="welcomeM4a" preload="auto" src="welcome.m4a"></audio>
 
 <div id="startOverlay">
+  <div id="studentStartOverlay" class="hidden">
+  <div class="startBox">
+    <div class="pill">جاهز ✅</div>
+    <h3>هلا والله! 👋</h3>
+    <p>
+      جاهز/ة نبدأ رحلتك في بنك الرياضيات؟<br>
+      اضغط زر البداية وننطلق 🚀
+    </p>
+    <button class="btn" onclick="enterStudentLogin()">ابدأ</button>
+  </div>
+</div>
   <div class="startBox">
     <div class="pill" id="connPill">...جاري تجهيز النظام...</div>
     <h3>هلا والله! 👋</h3>
@@ -994,11 +1005,14 @@ async function withdrawFromStudent(){
 // ===== دخول الطالب =====
 function showStudentLogin(s){
   go("studentLoginPage");
-  $("stuLoginTitle").textContent="دخول الطالب – " + (classes.find(c=>c.id===currentClassId)?.name || "");
-  $("stuName").value=s.name;
-  $("stuPin").value="";
-  $("stuLocked").classList.add("hidden");
+  document.getElementById("stuLoginTitle").textContent =
+    "دخول الطالب – " + (classes.find(c=>c.id===currentClassId)?.name || "");
+  document.getElementById("stuName").value = s.name;
+  document.getElementById("stuPin").value = "";
+  document.getElementById("stuLocked").classList.add("hidden");
 
+  showStudentStart(); // 
+}
   if(!s.active){
     playWelcome();
     lockedModal(s.name);
@@ -1235,7 +1249,18 @@ document.addEventListener("DOMContentLoaded", () => {
     $("connPill").textContent="جاهز ✅";
   }
 })();
-</script>
+
+function showStudentStart(){
+  document.getElementById("studentLoginPage").classList.add("hidden");
+  document.getElementById("studentStartOverlay").classList.remove("hidden");
+}
+
+function enterStudentLogin(){
+  document.getElementById("studentStartOverlay").classList.add("hidden");
+  document.getElementById("studentLoginPage").classList.remove("hidden");
+  playWelcome();
+}
+  
 
 </body>
 </html>
