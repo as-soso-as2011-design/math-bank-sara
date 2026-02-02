@@ -1315,40 +1315,45 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 })();
 <script>
-/* ✅ زر ابدأ مضمون (Fallback) */
+<script>
+/* ✅ زر "ابدأ" – تعريف واحد صحيح */
 (function(){
+
   function startNow(){
     try{
       const params = new URLSearchParams(window.location.search);
-      const mode = params.get("mode"); // teacher / student
+      const mode = params.get("mode"); // teacher | student
 
-      // يطفي شاشة البداية
+      // إخفاء شاشة البداية
       const ov = document.getElementById("startOverlay");
       if(ov) ov.style.display = "none";
 
       // صوت الترحيب
       try{ if(typeof playWelcome === "function") playWelcome(); }catch(e){}
 
-      // يوجه حسب الرابط
-if(mode === "student"){
-  if(typeof go === "function") go("studentLoginPage");
+      // توجيه حسب الرابط
+      if(mode === "student"){
+        if(typeof go === "function") go("studentLoginPage");
 
-  // نخلي الطالب يكتب اسمه بنفسه
-  const n = document.getElementById("stuName");
-  if(n){
-    n.readOnly = false;
-    n.value = "";
-    n.placeholder = "اكتب اسمك كما هو مسجل";
-  }
-}else{
-  if(typeof go === "function") go("teacherLoginPage");
+        // خلي الطالب يكتب اسمه بنفسه
+        const n = document.getElementById("stuName");
+        if(n){
+          n.readOnly = false;
+          n.value = "";
+          n.placeholder = "اكتب اسمك كما هو مسجل";
+        }
+        return;
+      }
+
+      // الافتراضي: المعلمة
+      if(typeof go === "function") go("teacherLoginPage");
+
+    } catch(e){
+  console.error(e);
 }
-    }catch(e){}
-  }
 
-  // ✅ نخلي الزر يشتغل بأي اسم كان (startApp أو startApp)
-  window.startApp = startNow;
-  window.startApp = startNow;
+window.startApp = startNow;
+
 })();
 </script>
       
