@@ -455,13 +455,21 @@ async function playWelcome(){
 }
 
 /* ===== بدء المعلمة ===== */
-async function startApp(){
-  $("connPill").textContent="جاهز ✅";
-  $("connPill").style.background="#dff4e3";
-  $("connPill").style.color="#2e7d32";
-  playWelcome();
-  $("startOverlay").style.display="none";
-  go("teacherLoginPage");
+function startApp(){
+  // إخفاء شاشة البداية
+  document.getElementById("startOverlay").style.display = "none";
+
+  // إظهار صفحة تسجيل دخول المعلمة
+  document.getElementById("teacherLoginPage").classList.remove("hidden");
+
+  // تشغيل الصوت (مضمون)
+  try {
+    const audio = document.getElementById("welcomeMp3");
+    if (audio) {
+      audio.currentTime = 0;
+      audio.play();
+    }
+  } catch(e){}
 }
 
 /* ===== تسجيل المعلمة ===== */
