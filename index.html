@@ -514,14 +514,37 @@ async function playWelcome(){
 }
 
 // ===== بدء =====
-async function startApp(){
-  $("connPill").textContent = "جاهز ✅";
-  $("connPill").style.background = "#dff4e3";
-  $("connPill").style.color = "#2e7d32";
-  playWelcome();
-  $("startOverlay").style.display = "none";
-  go("teacherLoginPage");
+<script>
+function startApp(){
+  const params = new URLSearchParams(window.location.search);
+  const mode = params.get("mode"); // teacher أو student
+
+  // نفس التأثير البصري
+  const pill = document.getElementById("connPill");
+  if(pill){
+    pill.textContent = "جاهز ✅";
+    pill.style.background = "#dff4e3";
+    pill.style.color = "#2e7d32";
+  }
+
+  try{ playWelcome(); }catch(e){}
+
+  document.getElementById("startOverlay").style.display = "none";
+
+  // 🔑 التوجيه الصحيح
+  if(mode === "student"){
+    go("studentLoginPage");
+    const nameInput = document.getElementById("stuName");
+    if(nameInput){
+      nameInput.readOnly = false;
+      nameInput.value = "";
+      nameInput.placeholder = "اكتب اسمك كما هو مسجل";
+    }
+  }else{
+    go("teacherLoginPage");
+  }
 }
+</script>
 
 // ===== تسجيل المعلمة =====
 function teacherLogin(){
