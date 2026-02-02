@@ -424,8 +424,9 @@ function openModal(title, bodyHtml, actionsHtml){
   $("modal").style.display="flex";
 }
 function closeModal(){ $("modal").style.display="none"; }
-function warn(msg){ openModal("تنبيه", (msg||"").replace(/
-/g,"<br>")); }
+function warn(msg){
+  openModal("تنبيه", (msg||"").replace(/\n/g,"<br>"));
+}
 function logout(){location.reload();}
 
 function go(page){
@@ -470,13 +471,14 @@ function teacherLogin(){
   }else warn("بيانات الدخول غير صحيحة");
 }
 function forgotTeacher(){
-  const subject=encodeURIComponent("استرجاع بيانات دخول مصرف الرياضيات");
-  const body=encodeURIComponent("السلام عليكم،
-أرغب باسترجاع بيانات الدخول لمصرف الرياضيات.
-شكراً.");
-  window.location.href=`mailto:${TEACHER_EMAIL}?subject=${subject}&body=${body}`;
+  const subject = encodeURIComponent("استرجاع بيانات دخول مصرف الرياضيات");
+  const body = encodeURIComponent(
+    "السلام عليكم،\n" +
+    "أرغب باسترجاع بيانات الدخول لمصرف الرياضيات.\n" +
+    "شكراً."
+  );
+  window.location.href = `mailto:${TEACHER_EMAIL}?subject=${subject}&body=${body}`;
 }
-
 /* ===== واجهة الأسباب ===== */
 function fillReasonSelect(selectEl, items){
   if(!selectEl) return;
@@ -967,19 +969,6 @@ document.addEventListener("DOMContentLoaded", ()=>{
   }
 })();
 </script>
-    <script>
-function startApp(){
-  // إخفاء شاشة البداية
-  document.getElementById("startOverlay").style.display = "none";
-
-  // إظهار صفحة دخول المعلمة
-  document.getElementById("teacherLoginPage").classList.remove("hidden");
-
-  // صوت ترحيب
-  if(typeof playWelcome === "function"){
-    playWelcome();
-  }
-}
-</script>
+    
 </body>
 </html>
