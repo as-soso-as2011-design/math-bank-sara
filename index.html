@@ -967,5 +967,19 @@ document.addEventListener("DOMContentLoaded", ()=>{
   }
 })();
 </script>
+    <script>
+function startApp(){
+  // إخفاء شاشة البداية
+  document.getElementById("startOverlay").style.display = "none";
+
+  // إظهار صفحة دخول المعلمة
+  document.getElementById("teacherLoginPage").classList.remove("hidden");
+
+  // صوت ترحيب
+  if(typeof playWelcome === "function"){
+    playWelcome();
+  }
+}
+</script>
 </body>
 </html>
