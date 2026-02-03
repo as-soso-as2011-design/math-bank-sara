@@ -151,6 +151,10 @@ tr:last-child td{border-bottom:none}
         </div>
       </div>
 
+      <div class="row" style="margin-top:10px">
+        <button class="btn3 col" onclick="fixOldTxns()">إصلاح العمليات القديمة</button>
+      </div>
+
       <div class="small" style="margin-top:8px">
         * أي عملية تُسجَّل تلقائيًا (طالب/معلمة) تظهر هنا حسب التاريخ.
       </div>
@@ -270,7 +274,7 @@ tr:last-child td{border-bottom:none}
       <input id="stuName" readonly>
       <input id="stuPin" type="password" placeholder="الرقم السري (PIN)">
       <div class="small" style="margin:8px 0;">
-        <a href="javascript:void(0)" onclick="forgotStudentPin()" style="color:#0055A4;font-weight:700">نسيت الرقم السري؟</a>
+        <a id="forgotPinLink" href="javascript:void(0)" onclick="forgotStudentPin()" style="color:#0055A4;font-weight:700">نسيت الرقم السري؟</a>
       </div>
       <button class="btn" onclick="studentLogin()">دخول</button>
       <button class="btn3" onclick="backToClass()">رجوع</button>
@@ -319,6 +323,9 @@ tr:last-child td{border-bottom:none}
           <div class="small">السبب</div>
           <select id="reasonStudent"></select>
           <input id="reasonOtherStudent" class="hidden" placeholder="أخرى: اكتب السبب هنا..." style="margin-top:8px">
+
+          <!-- ✅ سبب التحويل للطلاب (نص مفتوح وإجباري) -->
+          <input id="reasonTransferStudent" class="hidden" placeholder="سبب التحويل (إجباري)..." style="margin-top:8px">
         </div>
 
         <div class="col"><div class="small">المبلغ</div><input id="amt" type="number" step="0.01"></div>
@@ -340,13 +347,6 @@ tr:last-child td{border-bottom:none}
 <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore-compat.js"></script>
 
 <script>
-// ================== وضع الرابط (✅ فقط إضافة بدون تغيير تصميم) ==================
-const __params = new URLSearchParams(window.location.search);
-const APP_MODE = (__params.get("mode") || "teacher").toLowerCase(); // teacher | student
-const IS_STUDENT_MODE = (APP_MODE === "student");
-const STUDENT_SID = (__params.get("sid") || "").trim();
-const STUDENT_NAME_Q = (__params.get("name") || "").trim();
-
 // ================== إعدادات قابلة للتعديل للرسائل اليومية ==================
 const TEACHER_BANK_TITLE = "إدارة بنك الرياضيات – المعلمة سارة حقوي";
 
@@ -395,6 +395,11 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
+
+// ================== وضع الرابط (طالب/معلمة) ==================
+const params = new URLSearchParams(window.location.search);
+const MODE = (params.get("mode") || "teacher").toLowerCase(); // teacher | student
+const IS_STUDENT_MODE = (MODE === "student");
 
 // ================== ثوابت ==================
 const TEACHER_EMAIL="as-soso-as2011@hotmail.com";
@@ -502,7 +507,7 @@ function go(page){
 function backToClasses(){ go("classesPage"); renderTabs(); }
 function openClassPage(){ go("classPage"); renderStudents(); }
 function backToClass(){
-  // ✅ في رابط الطلاب: الرجوع يرجع لصفحة دخول الطالب
+  // في وضع الطلاب: الرجوع يعيد لصفحة الدخول
   if(IS_STUDENT_MODE){
     go("studentLoginPage");
     return;
@@ -527,7 +532,7 @@ async function playWelcome(){
   try{ if(mp3){ mp3.currentTime=0; await mp3.play(); return; } }catch(e){}
 }
 
-// ===== بدء (✅ تعديل بسيط فقط) =====
+// ===== بدء =====
 async function startApp(){
   $("connPill").textContent = "جاهز ✅";
   $("connPill").style.background = "#dff4e3";
@@ -535,55 +540,17 @@ async function startApp(){
   playWelcome();
   $("startOverlay").style.display = "none";
 
-  // ✅ رابط الطلاب
+  // ✅ توجيه حسب الرابط
   if(IS_STUDENT_MODE){
     go("studentLoginPage");
-
-    // تجهيز حقل الاسم حسب الرابط
-    const nameInput = $("stuName");
-    if(nameInput){
-      if(STUDENT_SID){
-        nameInput.readOnly = true;
-        nameInput.value = "جارٍ تحميل الاسم...";
-      }else{
-        nameInput.readOnly = false;
-        nameInput.value = STUDENT_NAME_Q ? decodeURIComponent(STUDENT_NAME_Q) : "";
-        nameInput.placeholder = "اكتب/ي اسمك كما هو مسجل";
-      }
-    }
-    $("stuPin").value = "";
-    $("stuLocked").classList.add("hidden");
-
-    // إذا sid موجود: نجيب الطالب مباشرة
-    if(STUDENT_SID){
-      try{
-        const doc = await db.collection("students").doc(STUDENT_SID).get();
-        if(doc.exists){
-          const s = doc.data() || {};
-          currentStudentId = doc.id;
-          if(nameInput){
-            nameInput.value = s.name || "";
-            nameInput.readOnly = true;
-          }
-        }else{
-          if(nameInput){
-            nameInput.value = "";
-            nameInput.readOnly = false;
-            nameInput.placeholder = "اكتب/ي اسمك كما هو مسجل";
-          }
-        }
-      }catch(e){
-        if(nameInput){
-          nameInput.value = "";
-          nameInput.readOnly = false;
-          nameInput.placeholder = "اكتب/ي اسمك كما هو مسجل";
-        }
-      }
+    // اسم الطالب يكتبه بنفسه
+    if($("stuName")){
+      $("stuName").readOnly = false;
+      $("stuName").value = "";
+      $("stuName").placeholder = "اكتب اسمك كما هو مسجل بالنظام";
     }
     return;
   }
-
-  // ✅ رابط المعلمة
   go("teacherLoginPage");
 }
 
@@ -614,7 +581,9 @@ function setupReasonUI(mode, selectId, otherId){
   const sel = document.getElementById(selectId);
   const other = document.getElementById(otherId);
   if(!sel || !other) return;
+
   fillReasonSelect(sel, REASONS[mode] || ["أخرى"]);
+
   const toggleOther = ()=>{
     if(sel.value === "أخرى"){
       other.classList.remove("hidden");
@@ -653,7 +622,7 @@ async function loadForgotSetting(){
   }catch(e){
     forgotPinEnabled = true;
   }
-  const link = document.querySelector('a[onclick="forgotStudentPin()"]');
+  const link = document.getElementById("forgotPinLink");
   if(link) link.style.display = forgotPinEnabled ? "inline" : "none";
 }
 
@@ -804,7 +773,8 @@ async function loadClasses(){
 }
 async function renderTabs(){
   await loadClasses();
-  const tabs=$("classTabs"); tabs.innerHTML="";
+  const tabs=$("classTabs"); if(!tabs) return;
+  tabs.innerHTML="";
   classes.forEach(c=>{
     const t=document.createElement("div");
     t.className="tab"+(c.id===currentClassId?" active":"");
@@ -878,9 +848,12 @@ async function deleteStudent(studentId, studentName){
   await renderStudents();
 }
 
-// ===== logTxn (✅ تم تعديلها لضمان العمليات اليومية فورًا) =====
+// ===== logTxn (✅ dateKey محلي لحل مشكلة العمليات اليومية) =====
+function localDateKey(){
+  return new Date().toLocaleDateString("en-CA"); // YYYY-MM-DD بتوقيت محلي
+}
 async function logTxn(ref, type, reason, amount, balanceAfter, studentName, guardianWhats){
-  const dateKey = new Date().toISOString().slice(0,10); // YYYY-MM-DD
+  const dateKey = localDateKey(); // ✅ محلي
   const createdAtClient = Date.now(); // ترتيب فوري
 
   await ref.collection("txns").add({
@@ -895,7 +868,7 @@ async function logTxn(ref, type, reason, amount, balanceAfter, studentName, guar
     dateKey,
     createdAtClient,
 
-    // يبقى للعرض لاحقًا
+    // للعرض
     createdAt: firebase.firestore.FieldValue.serverTimestamp()
   });
 }
@@ -905,10 +878,13 @@ async function renderStudents(){
   const arr=[]; snap.forEach(d=>arr.push({id:d.id,...d.data()}));
   arr.sort((a,b)=>(a.name||"").localeCompare(b.name||"","ar"));
 
-  const pick=$("pickStudent"); pick.innerHTML="";
-  arr.forEach(s=>{ const o=document.createElement("option"); o.value=s.id; o.textContent=s.name; pick.appendChild(o); });
+  const pick=$("pickStudent"); if(pick){
+    pick.innerHTML="";
+    arr.forEach(s=>{ const o=document.createElement("option"); o.value=s.id; o.textContent=s.name; pick.appendChild(o); });
+  }
 
-  const grid=$("studentsGrid"); grid.innerHTML="";
+  const grid=$("studentsGrid"); if(!grid) return;
+  grid.innerHTML="";
   arr.forEach(s=>{
     const card=document.createElement("div");
     card.className="card";
@@ -929,8 +905,8 @@ async function renderStudents(){
     card.querySelector(".js-open").onclick=()=>{ currentStudentId=s.id; showStudentLogin(s); };
     card.querySelector(".js-toggle").onclick=async()=>{ await db.collection("students").doc(s.id).update({active:!s.active}); await renderStudents(); };
     card.querySelector(".js-edit").onclick=async()=>{ const nn=prompt("الاسم الجديد:", s.name); if(nn) await db.collection("students").doc(s.id).update({name:nn.trim()}); await renderStudents(); };
-    if(card.querySelector(".js-parent")) card.querySelector(".js-parent").onclick=()=> editGuardianPhone(s.id, s.name);
-    if(card.querySelector(".js-sendpin")) card.querySelector(".js-sendpin").onclick=()=> sendPinToParent(s.id);
+    card.querySelector(".js-parent").onclick=()=> editGuardianPhone(s.id, s.name);
+    card.querySelector(".js-sendpin").onclick=()=> sendPinToParent(s.id);
     card.querySelector(".js-del").onclick=()=> deleteStudent(s.id, s.name);
     grid.appendChild(card);
   });
@@ -1084,56 +1060,26 @@ async function buildTransferList(){
   arr.forEach(s=>{ if(s.id===currentStudentId) return; const o=document.createElement("option"); o.value=s.id; o.textContent=s.name; $("transferTo").appendChild(o); });
 }
 
-// ===== دخول الطالب (✅ يدعم رابط الطلاب) =====
+// ✅ وضع الطلاب: الدخول بالاسم + PIN
 async function studentLogin(){
-  try{
-    // ✅ إذا رابط الطلاب: نحدد الطالب من sid أو الاسم
-    if(IS_STUDENT_MODE){
-      let sid = currentStudentId;
+  if(IS_STUDENT_MODE){
+    const name = ($("stuName").value||"").trim();
+    const pin  = ($("stuPin").value||"").trim();
+    if(!name || !pin) return warn("اكتب/ي الاسم والرقم السري");
 
-      if(!sid){
-        const name = ($("stuName").value || "").trim();
-        if(!name) return warn("اكتب/ي اسمك");
-        const snap = await db.collection("students").where("name","==",name).limit(1).get();
-        if(snap.empty) return warn("الاسم غير مسجل بالنظام");
-        sid = snap.docs[0].id;
-        currentStudentId = sid;
-      }
+    const snap = await db.collection("students").where("name","==",name).limit(1).get();
+    if(snap.empty) return warn("الاسم غير مسجل بالنظام");
 
-      const ref = db.collection("students").doc(sid);
-      const doc = await ref.get();
-      if(!doc.exists) return warn("الحساب غير موجود");
-      const s = doc.data() || {};
-
-      if(!s.active){ lockedModal(s.name); return; }
-      if($("stuPin").value.trim()!==String(s.pin||"")) return warn("الرقم السري غلط");
-      if(!s.openedAt) await ref.update({openedAt: firebase.firestore.FieldValue.serverTimestamp()});
-
-      playWelcome();
-
-      go("studentAccountPage");
-      $("studentHeader").textContent=s.name;
-      $("statusBadge").className="badge "+(s.active?"on":"off");
-      $("statusBadge").textContent=s.active?"🟢 نشط":"🔴 مقفل";
-      $("studentBalance").textContent=fmt(s.balance);
-
-      await renderOpenedAt();
-      await buildTransferList();
-      await showStatement();
-      return;
-    }
-
-    // ✅ وضع المعلمة (كما كان)
-    const ref=db.collection("students").doc(currentStudentId);
-    const doc=await ref.get();
-    const s=doc.data();
+    const doc = snap.docs[0];
+    currentStudentId = doc.id;
+    const s = doc.data() || {};
 
     if(!s.active){ lockedModal(s.name); return; }
-    if($("stuPin").value.trim()!==String(s.pin||"")) return warn("الرقم السري غلط");
-    if(!s.openedAt) await ref.update({openedAt: firebase.firestore.FieldValue.serverTimestamp()});
+    if(String(pin)!==String(s.pin||"")) return warn("الرقم السري غلط");
+
+    if(!s.openedAt) await db.collection("students").doc(currentStudentId).update({openedAt: firebase.firestore.FieldValue.serverTimestamp()});
 
     playWelcome();
-
     go("studentAccountPage");
     $("studentHeader").textContent=s.name;
     $("statusBadge").className="badge "+(s.active?"on":"off");
@@ -1143,11 +1089,29 @@ async function studentLogin(){
     await renderOpenedAt();
     await buildTransferList();
     await showStatement();
-
-  }catch(e){
-    console.log(e);
-    warn("صار خطأ… جرّبي مرة ثانية");
+    return;
   }
+
+  // ✅ وضع المعلمة (بعد اختيار طالب)
+  const ref=db.collection("students").doc(currentStudentId);
+  const doc=await ref.get();
+  const s=doc.data();
+
+  if(!s.active){ lockedModal(s.name); return; }
+  if($("stuPin").value.trim()!==String(s.pin||"")) return warn("الرقم السري غلط");
+  if(!s.openedAt) await ref.update({openedAt: firebase.firestore.FieldValue.serverTimestamp()});
+
+  playWelcome();
+
+  go("studentAccountPage");
+  $("studentHeader").textContent=s.name;
+  $("statusBadge").className="badge "+(s.active?"on":"off");
+  $("statusBadge").textContent=s.active?"🟢 نشط":"🔴 مقفل";
+  $("studentBalance").textContent=fmt(s.balance);
+
+  await renderOpenedAt();
+  await buildTransferList();
+  await showStatement();
 }
 
 // ===== كشف الحساب =====
@@ -1192,7 +1156,15 @@ async function executeOp(){
   const amt=parseFloat($("amt").value);
   if(isNaN(amt)||amt<=0) return warn("اكتب مبلغ صحيح");
 
-  const reason = getReason("reasonStudent","reasonOtherStudent");
+  // ✅ إدارة السبب
+  let reason = getReason("reasonStudent","reasonOtherStudent");
+
+  // ✅ للطلاب فقط: في التحويل السبب نص مفتوح وإجباري
+  if(IS_STUDENT_MODE && op === "transfer"){
+    const free = ($("reasonTransferStudent")?.value || "").trim();
+    if(!free) return warn("سبب التحويل (إجباري) — اكتبه قبل التنفيذ");
+    reason = free;
+  }
 
   if(op==="deposit"){
     const nb=Number(s.balance||0)+amt;
@@ -1221,6 +1193,7 @@ async function executeOp(){
   }
 
   $("amt").value="";
+  if($("reasonTransferStudent")) $("reasonTransferStudent").value = "";
   const updated=await ref.get();
   $("studentBalance").textContent=fmt(updated.data().balance);
   await showStatement();
@@ -1231,7 +1204,7 @@ let dailyOpsCache = [];
 
 async function loadDailyOps(){
   const inp = document.getElementById("dailyDate");
-  const chosenStr = inp.value ? inp.value : new Date().toISOString().slice(0,10);
+  const chosenStr = inp.value ? inp.value : localDateKey();
   if(!inp.value) inp.value = chosenStr;
 
   const snap = await db.collectionGroup("txns")
@@ -1242,12 +1215,13 @@ async function loadDailyOps(){
 
   dailyOpsCache = [];
   snap.forEach(doc => dailyOpsCache.push(doc.data() || {}));
-
   renderDailyOps();
 }
 
 function renderDailyOps(){
   const box = document.getElementById("dailyOpsList");
+  if(!box) return;
+
   if(!dailyOpsCache.length){
     box.innerHTML = '<div class="small">ما فيه عمليات في هذا التاريخ.</div>';
     return;
@@ -1320,21 +1294,86 @@ function sendDailyOpsWhats(){
   }
 }
 
+// ================== ✅ إصلاح العمليات القديمة ==================
+// يضيف dateKey و createdAtClient إذا كانت ناقصة
+async function fixOldTxns(){
+  try{
+    openModal("جاري الإصلاح…", "يتم تحديث العمليات القديمة حتى تظهر في العمليات اليومية.\nلا تغلق الصفحة.");
+
+    const snap = await db.collectionGroup("txns").limit(500).get();
+    let updatedCount = 0;
+
+    for(const d of snap.docs){
+      const x = d.data() || {};
+      const updates = {};
+
+      if(!x.createdAtClient){
+        // لو عنده createdAt (سيرفر) نحولها لملي ثانية، وإلا نحط الآن
+        if(x.createdAt && x.createdAt.toDate){
+          updates.createdAtClient = x.createdAt.toDate().getTime();
+        }else{
+          updates.createdAtClient = Date.now();
+        }
+      }
+
+      if(!x.dateKey){
+        // نشتق dateKey من createdAtClient (محلي)
+        const base = updates.createdAtClient || x.createdAtClient || Date.now();
+        updates.dateKey = new Date(base).toLocaleDateString("en-CA");
+      }
+
+      if(Object.keys(updates).length){
+        await d.ref.set(updates, {merge:true});
+        updatedCount++;
+      }
+    }
+
+    openModal("تم ✅", `تم إصلاح ${updatedCount} عملية قديمة.\nالآن افتحي (عرض العمليات) واخترِي التاريخ.`);
+  }catch(e){
+    console.log(e);
+    openModal("تنبيه", "حصل خطأ أثناء الإصلاح. جرّبي مرة ثانية.");
+  }
+}
+
 // ===== تهيئة عند التحميل =====
-document.addEventListener("DOMContentLoaded", () => {
-  // تعديل نص البداية فقط في رابط الطلاب (بدون تغيير تصميم)
-  if(IS_STUDENT_MODE){
-    const t = document.getElementById("startText");
-    if(t) t.innerHTML = "جاهزين نبدأ رحلة بنك الرياضيات للطلاب؟<br>اضغط زر البداية وننطلق 🚀";
+document.addEventListener("DOMContentLoaded", async() => {
+  // نص شاشة البداية حسب الرابط
+  const st = document.getElementById("startText");
+  if(st && IS_STUDENT_MODE){
+    st.innerHTML = "جاهزين نبدأ رحلة بنك الرياضيات للطلاب؟<br>اضغط زر البداية وننطلق 🚀";
   }
 
+  // أسباب الطالب (عادي)
   const opSel = document.getElementById('op');
   if(opSel){
-    setupReasonUI(opSel.value, 'reasonStudent', 'reasonOtherStudent');
-    opSel.addEventListener('change', ()=> setupReasonUI(opSel.value, 'reasonStudent', 'reasonOtherStudent'));
+    const applyReasonUI = ()=>{
+      const mode = opSel.value;
+
+      // الوضع الطبيعي
+      setupReasonUI(mode, 'reasonStudent', 'reasonOtherStudent');
+
+      // ✅ للطلاب فقط: في التحويل نخفي القائمة ونظهر مربع نص حر (إجباري)
+      if(IS_STUDENT_MODE && mode === "transfer"){
+        $("reasonStudent")?.classList.add("hidden");
+        $("reasonOtherStudent")?.classList.add("hidden");
+        $("reasonTransferStudent")?.classList.remove("hidden");
+      }else{
+        $("reasonStudent")?.classList.remove("hidden");
+        $("reasonTransferStudent")?.classList.add("hidden");
+        // reasonOtherStudent يتحكم فيه setupReasonUI
+      }
+    };
+
+    applyReasonUI();
+    opSel.addEventListener('change', applyReasonUI);
   }
+
+  // أسباب المعلمة
   setupReasonUI('withdraw', 'reasonTeacher', 'reasonOtherTeacher');
-  loadForgotSetting();
+
+  await loadForgotSetting();
+
+  // ✅ في وضع الطلاب: نخفي بطاقات المعلمة تلقائيًا لاحقًا بعد الدخول
 });
 
 // ===== تشغيل أولي =====
