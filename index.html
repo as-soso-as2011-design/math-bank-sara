@@ -1187,67 +1187,12 @@ async function executeOp(){
 // ================== العمليات اليومية (حل جذري بدون orderBy لتفادي أخطاء الإندكس) ==================
 let dailyOpsCache = [];
 
-<script>
 async function loadDailyOps(){
   const inp = document.getElementById("dailyDate");
   const chosenStr = inp.value ? inp.value : localTodayKey();
   if(inp && !inp.value) inp.value = chosenStr;
 
-  const box = document.getElementById("dailyOpsList");
-  box.innerHTML = '<div class="small">جاري التحميل...</div>';
-
   try{
-    // 1) الأحدث: dateKeyLocal (بدون orderBy لتفادي مشكلة الـ index)
-    let snap = await db.collectionGroup("txns")
-      .where("dateKeyLocal", "==", chosenStr)
-      .limit(300)
-      .get();
-
-    // 2) توافق قديم: dateKey (بدون orderBy)
-    if(snap.empty){
-      snap = await db.collectionGroup("txns")
-        .where("dateKey", "==", chosenStr)
-        .limit(300)
-        .get();
-    }
-
-    // 3) إصلاح عملي: لو ما لقى شيء، جرّبي اليوم السابق (فرق UTC)
-    if(snap.empty){
-      const prevKey = shiftDateKey(chosenStr, -1);
-      const snapPrev = await db.collectionGroup("txns")
-        .where("dateKey", "==", prevKey)
-        .limit(300)
-        .get();
-
-      const filtered = [];
-      snapPrev.forEach(doc=>{
-        const x = doc.data() || {};
-        if(localKeyFromMillis(x.createdAtClient) === chosenStr) filtered.push(x);
-      });
-
-      // ترتيب محلي
-      filtered.sort((a,b)=> (b.createdAtClient||0) - (a.createdAtClient||0));
-      dailyOpsCache = filtered;
-      renderDailyOps();
-      return;
-    }
-
-    // جمع النتائج
-    dailyOpsCache = [];
-    snap.forEach(doc => dailyOpsCache.push(doc.data() || {}));
-
-    // ترتيب محلي بدل orderBy
-    dailyOpsCache.sort((a,b)=> (b.createdAtClient||0) - (a.createdAtClient||0));
-
-    renderDailyOps();
-  }catch(e){
-    console.log("DailyOps error:", e);
-    dailyOpsCache = [];
-    box.innerHTML =
-      '<div class="small" style="color:#b00020;font-weight:700">تعذر تحميل العمليات. (غالبًا يحتاج إعدادات/Index) تأكد من الإنترنت ثم أعد المحاولة.</div>';
-  }
-}
-</script>
     // ✅ بدون orderBy (تفادي فشل التحميل بسبب Index)
     let snap = await db.collectionGroup("txns")
       .where("dateKeyLocal", "==", chosenStr)
