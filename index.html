@@ -340,11 +340,6 @@ tr:last-child td{border-bottom:none}
 <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore-compat.js"></script>
 
 <script>
-// ================== وضع الرابط (معلمة/طالب) ==================
-const urlParams = new URLSearchParams(window.location.search);
-const APP_MODE = (urlParams.get("mode") || "teacher").toLowerCase(); // teacher | student
-const IS_STUDENT_MODE = (APP_MODE === "student");
-
 // ================== إعدادات قابلة للتعديل للرسائل اليومية ==================
 const TEACHER_BANK_TITLE = "إدارة بنك الرياضيات – المعلمة سارة حقوي";
 
@@ -472,7 +467,7 @@ const REASONS = {
 
 function $(id){return document.getElementById(id);}
 
-// ===== تواريخ محلية =====
+// ===== تواريخ محلية/UTC (حل مشكلة اختلاف التاريخ بسبب toISOString) =====
 function localDateKeyFromDate(d){
   const yyyy = d.getFullYear();
   const mm = String(d.getMonth()+1).padStart(2,'0');
@@ -483,6 +478,13 @@ function localTodayKey(){ return localDateKeyFromDate(new Date()); }
 function localKeyFromMillis(ms){
   if(!ms) return "";
   return localDateKeyFromDate(new Date(ms));
+}
+function shiftDateKey(key, days){
+  try{
+    const d = new Date(key + "T12:00:00"); // منتصف اليوم لتفادي فروقات التوقيت
+    d.setDate(d.getDate() + (days||0));
+    return localDateKeyFromDate(d);
+  }catch(e){ return key; }
 }
 
 function openModal(title, bodyHtml, actionsHtml){
@@ -512,10 +514,7 @@ function go(page){
 }
 function backToClasses(){ go("classesPage"); renderTabs(); }
 function openClassPage(){ go("classPage"); renderStudents(); }
-function backToClass(){
-  if(IS_STUDENT_MODE){ go("studentLoginPage"); return; }
-  go("classPage"); renderStudents();
-}
+function backToClass(){ go("classPage"); renderStudents(); }
 
 function fmt(x){ return (Math.round((Number(x||0)+Number.EPSILON)*100)/100).toFixed(2); }
 
@@ -541,17 +540,6 @@ async function startApp(){
   $("connPill").style.color = "#2e7d32";
   playWelcome();
   $("startOverlay").style.display = "none";
-
-  if(IS_STUDENT_MODE){
-    go("studentLoginPage");
-    $("stuLoginTitle").textContent="دخول الطالب";
-    $("stuName").readOnly = false;
-    $("stuName").value = "";
-    $("stuName").placeholder = "اكتب اسمك كما هو مسجل بالنظام";
-    $("stuPin").value="";
-    return;
-  }
-
   go("teacherLoginPage");
 }
 
@@ -563,9 +551,7 @@ function teacherLogin(){
 }
 function forgotTeacher(){
   const subject=encodeURIComponent("استرجاع بيانات دخول مصرف الرياضيات");
-  const body=encodeURIComponent("السلام عليكم،
-أرغب باسترجاع بيانات الدخول لمصرف الرياضيات.
-شكراً.");
+  const body=encodeURIComponent("السلام عليكم،\nأرغب باسترجاع بيانات الدخول لمصرف الرياضيات.\nشكراً.");
   window.location.href=`mailto:${TEACHER_EMAIL}?subject=${subject}&body=${body}`;
 }
 
@@ -585,7 +571,9 @@ function setupReasonUI(mode, selectId, otherId){
   const other = document.getElementById(otherId);
   if(!sel || !other) return;
 
-  if(mode === "transfer" && IS_STUDENT_MODE){
+  // ✅ للطلاب فقط: سبب التحويل يكون "مربع نص" (يكتب سبب التنفيذ) ولا يظهر قائمة الأسباب
+  if((mode === "transfer") && (typeof IS_STUDENT_MODE !== "undefined") && IS_STUDENT_MODE){
+    // نخفي القائمة ونفتح مربع النص
     sel.classList.add("hidden");
     other.classList.remove("hidden");
     other.placeholder = "سبب التحويل (اكتب سبب التنفيذ هنا...)";
@@ -593,6 +581,8 @@ function setupReasonUI(mode, selectId, otherId){
     return;
   }else{
     sel.classList.remove("hidden");
+    sel.disabled = false;
+    // (باقي العمليات) قائمة أسباب عادية
     fillReasonSelect(sel, REASONS[mode] || ["أخرى"]);
   }
 
@@ -612,7 +602,8 @@ function getReason(selectId, otherId){
   const sel = document.getElementById(selectId);
   const other = document.getElementById(otherId);
 
-  if(IS_STUDENT_MODE && sel && sel.classList.contains("hidden")){
+  // ✅ للطلاب (تحويل): السبب من مربع النص فقط
+  if(sel && sel.classList.contains("hidden")){
     const t = (other?.value || "").trim();
     return t || "تحويل";
   }
@@ -705,14 +696,9 @@ async function sendPinToParent(studentId){
     return;
   }
   const msg = encodeURIComponent(
-    "السلام عليكم ورحمة الله وبركاته
-
-" +
-    "رقم الدخول (PIN) لبنك الرياضيات للطالب/ـة: " + (s.name||"") + "
-" +
-    "PIN: " + (s.pin||"") + "
-
-" +
+    "السلام عليكم ورحمة الله وبركاته\n\n" +
+    "رقم الدخول (PIN) لبنك الرياضيات للطالب/ـة: " + (s.name||"") + "\n" +
+    "PIN: " + (s.pin||"") + "\n\n" +
     "شاكرين تعاونكم 🤍"
   );
   const link = "https://wa.me/" + wa + "?text=" + msg;
@@ -741,14 +727,9 @@ async function forgotStudentPin(){
       return;
     }
     const msg = encodeURIComponent(
-      "السلام عليكم ورحمة الله وبركاته
-
-" +
-      "رقم الدخول (PIN) لبنك الرياضيات للطالب/ـة: " + (s.name||"") + "
-" +
-      "PIN: " + (s.pin||"") + "
-
-" +
+      "السلام عليكم ورحمة الله وبركاته\n\n" +
+      "رقم الدخول (PIN) لبنك الرياضيات للطالب/ـة: " + (s.name||"") + "\n" +
+      "PIN: " + (s.pin||"") + "\n\n" +
       "شاكرين تعاونكم 🤍"
     );
     const link = "https://wa.me/" + wa + "?text=" + msg;
@@ -831,8 +812,7 @@ async function renameClass(){
 async function deleteClassMove(){
   if(classes.length<=1) return warn("ما نقدر نحذف آخر فصل");
   const others=classes.filter(c=>c.id!==currentClassId);
-  const destName=prompt("ننقل طلاب الفصل لأي فصل؟
-"+others.map(c=>c.name).join(" / "), others[0].name);
+  const destName=prompt("ننقل طلاب الفصل لأي فصل؟\n"+others.map(c=>c.name).join(" / "), others[0].name);
   if(!destName) return;
   const dest=classes.find(c=>c.name===destName); if(!dest) return warn("اسم الفصل غير موجود");
   const studs=await db.collection("students").where("classId","==",currentClassId).get();
@@ -877,10 +857,12 @@ async function deleteStudent(studentId, studentName){
   await renderStudents();
 }
 
-// ===== logTxn (dateKey + createdAtClient) =====
+// ===== logTxn (✅ تم تعديلها لضمان العمليات اليومية فورًا) =====
 async function logTxn(ref, type, reason, amount, balanceAfter, studentName, guardianWhats){
-  const dateKey = localTodayKey();
-  const createdAtClient = Date.now();
+  const dateKeyLocal = localTodayKey(); // YYYY-MM-DD (local)
+  const dateKeyUTC = new Date().toISOString().slice(0,10); // YYYY-MM-DD (utc)
+  const dateKey = dateKeyLocal; // توافق: نخليه محلي من الآن فصاعدًا
+  const createdAtClient = Date.now(); // ترتيب فوري
 
   await ref.collection("txns").add({
     type,
@@ -889,8 +871,14 @@ async function logTxn(ref, type, reason, amount, balanceAfter, studentName, guar
     balanceAfter,
     studentName: studentName || "",
     guardianWhats: guardianWhats || "",
+
+    // ✅ مهم جدًا للعمليات اليومية
     dateKey,
+    dateKeyLocal,
+    dateKeyUTC,
     createdAtClient,
+
+    // يبقى للعرض لاحقًا
     createdAt: firebase.firestore.FieldValue.serverTimestamp()
   });
 }
@@ -946,7 +934,15 @@ async function depositAll(){
 
   for(const d of studs.docs){
     const s=d.data(); if(!s.active) continue;
-    await logTxn(db.collection("students").doc(d.id),"إيداع جماعي",getReason("reasonTeacher","reasonOtherTeacher"),a,Number(s.balance||0)+a,s.name,s.guardianWhats||"");
+    await logTxn(
+      db.collection("students").doc(d.id),
+      "إيداع جماعي",
+      getReason("reasonTeacher","reasonOtherTeacher"),
+      a,
+      Number(s.balance||0)+a,
+      s.name,
+      s.guardianWhats||""
+    );
   }
   $("bulkAmount").value="";
   await renderStudents();
@@ -971,7 +967,15 @@ async function withdrawAll(){
 
   for(const d of studs.docs){
     const s=d.data(); if(!s.active) continue;
-    await logTxn(db.collection("students").doc(d.id),"سحب جماعي (معلمة)",getReason("reasonTeacher","reasonOtherTeacher"),a,Number(s.balance||0)-a,s.name,s.guardianWhats||"");
+    await logTxn(
+      db.collection("students").doc(d.id),
+      "سحب جماعي (معلمة)",
+      getReason("reasonTeacher","reasonOtherTeacher"),
+      a,
+      Number(s.balance||0)-a,
+      s.name,
+      s.guardianWhats||""
+    );
   }
   $("bulkWithdrawAmount").value="";
   await renderStudents();
@@ -980,13 +984,9 @@ async function withdrawAll(){
 function lockedModal(studentName){
   studentName = studentName || "";
   const msg = encodeURIComponent(
-    "السلام عليكم ورحمة الله وبركاته
-
-" +
-    "أنا الطالبة: " + studentName + "
-" +
-    "فضلاً أرجو تفعيل حسابي
-" +
+    "السلام عليكم ورحمة الله وبركاته\n\n" +
+    "أنا الطالبة: " + studentName + "\n" +
+    "فضلاً أرجو تفعيل حسابي\n" +
     "وأكون شاكرة لك 🌸"
   );
   const waLink = "https://wa.me/" + WHATSAPP_NUMBER + "?text=" + msg;
@@ -1042,7 +1042,6 @@ async function withdrawFromStudent(){
 function showStudentLogin(s){
   go("studentLoginPage");
   $("stuLoginTitle").textContent="دخول الطالب – " + (classes.find(c=>c.id===currentClassId)?.name || "");
-  $("stuName").readOnly = true;
   $("stuName").value=s.name;
   $("stuPin").value="";
   $("stuLocked").classList.add("hidden");
@@ -1067,36 +1066,13 @@ async function buildTransferList(){
   arr.forEach(s=>{ if(s.id===currentStudentId) return; const o=document.createElement("option"); o.value=s.id; o.textContent=s.name; $("transferTo").appendChild(o); });
 }
 
-// دعم الدخول المباشر للطلاب
-async function resolveStudentByNameAndPin(name, pin){
-  const nm = (name||"").trim();
-  const pn = (pin||"").trim();
-  if(!nm || !pn) return null;
-  const snap = await db.collection("students").where("name","==",nm).limit(5).get();
-  if(snap.empty) return null;
-  for(const d of snap.docs){
-    const s = d.data() || {};
-    if(String(s.pin||"").trim() === pn){
-      return {id:d.id, ...s};
-    }
-  }
-  return null;
-}
-
 async function studentLogin(){
-  if(IS_STUDENT_MODE){
-    const found = await resolveStudentByNameAndPin($("stuName").value, $("stuPin").value);
-    if(!found) return warn("الاسم أو الرقم السري غير صحيح");
-    currentStudentId = found.id;
-  }
-
   const ref=db.collection("students").doc(currentStudentId);
   const doc=await ref.get();
   const s=doc.data();
 
   if(!s.active){ lockedModal(s.name); return; }
-  if(!IS_STUDENT_MODE && $("stuPin").value.trim()!==String(s.pin||"")) return warn("الرقم السري غلط");
-
+  if($("stuPin").value.trim()!==String(s.pin||"")) return warn("الرقم السري غلط");
   if(!s.openedAt) await ref.update({openedAt: firebase.firestore.FieldValue.serverTimestamp()});
 
   playWelcome();
@@ -1112,23 +1088,22 @@ async function studentLogin(){
   await showStatement();
 }
 
-// كشف الحساب (ترتيب createdAtClient)
+// ===== كشف الحساب =====
 async function showStatement(){
   const from=$("fromDate").value;
   const to=$("toDate").value;
 
   let q = db.collection("students").doc(currentStudentId).collection("txns")
-    .orderBy("createdAtClient","desc")
-    .limit(80);
+    .orderBy("createdAt","desc").limit(50);
 
   if(from && to){
-    const fromMs = new Date(from+"T00:00:00").getTime();
-    const toMs   = new Date(to+"T23:59:59").getTime();
+    const fromD=new Date(from+"T00:00:00");
+    const toD=new Date(to+"T23:59:59");
     q = db.collection("students").doc(currentStudentId).collection("txns")
-      .where("createdAtClient", ">=", fromMs)
-      .where("createdAtClient", "<=", toMs)
-      .orderBy("createdAtClient","desc")
-      .limit(120);
+      .where("createdAt", ">=", fromD)
+      .where("createdAt", "<=", toD)
+      .orderBy("createdAt","desc")
+      .limit(100);
   }
 
   const snap=await q.get();
@@ -1139,16 +1114,14 @@ async function showStatement(){
   }
   snap.forEach(d=>{
     const x=d.data();
-    const t = x.createdAt?.toDate
-      ? x.createdAt.toDate().toLocaleString("ar-SA")
-      : (x.createdAtClient ? new Date(x.createdAtClient).toLocaleString("ar-SA") : "");
+    const t=x.createdAt?.toDate?x.createdAt.toDate().toLocaleString("ar-SA"):"";
     const tr=document.createElement("tr");
     tr.innerHTML=`<td>${t}</td><td>${x.type||""}</td><td>${x.reason||""}</td><td>${fmt(x.amount)}</td><td>${fmt(x.balanceAfter)}</td>`;
     rows.appendChild(tr);
   });
 }
 
-// عمليات داخل حساب الطالب
+// ===== عمليات داخل حساب الطالب =====
 async function executeOp(){
   const ref=db.collection("students").doc(currentStudentId);
   const doc=await ref.get();
@@ -1191,7 +1164,7 @@ async function executeOp(){
   await showStatement();
 }
 
-// العمليات اليومية (مطابقة الإندكس: dateKey + createdAtClient)
+// ================== العمليات اليومية (✅ تعديل كامل) ==================
 let dailyOpsCache = [];
 
 async function loadDailyOps(){
@@ -1200,23 +1173,32 @@ async function loadDailyOps(){
   if(inp && !inp.value) inp.value = chosenStr;
 
   try{
+    // 1) الأحدث: dateKeyLocal
     let snap = await db.collectionGroup("txns")
-      .where("dateKey", "==", chosenStr)
+      .where("dateKeyLocal", "==", chosenStr)
       .orderBy("createdAtClient","desc")
       .limit(300)
       .get();
 
+    // 2) توافق قديم: dateKey (قد يكون محلي أو UTC حسب النسخ السابقة)
     if(snap.empty){
-      const prev = new Date(chosenStr + "T12:00:00");
-      prev.setDate(prev.getDate()-1);
-      const prevKey = localDateKeyFromDate(prev);
+      snap = await db.collectionGroup("txns")
+        .where("dateKey", "==", chosenStr)
+        .orderBy("createdAtClient","desc")
+        .limit(300)
+        .get();
+    }
 
+    // 3) إصلاح عملي: إذا ما لقى شيء، جرّبي اليوم السابق (بسبب اختلاف UTC)
+    if(snap.empty){
+      const prevKey = shiftDateKey(chosenStr, -1);
       const snapPrev = await db.collectionGroup("txns")
         .where("dateKey", "==", prevKey)
         .orderBy("createdAtClient","desc")
         .limit(300)
         .get();
 
+      // نفلتر بالوقت المحلي الفعلي للعمليات
       const filtered = [];
       snapPrev.forEach(doc=>{
         const x = doc.data() || {};
@@ -1287,6 +1269,7 @@ function waLinkForOp(op){
 }
 
 function sendDailyOpsWhats(){
+  // إذا ما تم الضغط على (عرض العمليات) قبل الإرسال
   if(!dailyOpsCache.length){
     loadDailyOps().then(()=>{
       if(!dailyOpsCache.length){
@@ -1311,8 +1294,7 @@ function sendDailyOpsWhats(){
 
   if(links.length > maxOpen){
     openModal("ملاحظة",
-      `تم فتح ${maxOpen} رسائل واتساب الآن.
-اضغط الزر مرة ثانية لإكمال الباقي.`,
+      `تم فتح ${maxOpen} رسائل واتساب الآن.\nاضغط الزر مرة ثانية لإكمال الباقي.`,
       '<button class="btn" onclick="closeModal()">موافق</button>'
     );
     dailyOpsCache = dailyOpsCache.slice(maxOpen);
@@ -1320,7 +1302,7 @@ function sendDailyOpsWhats(){
   }
 }
 
-// تهيئة عند التحميل
+// ===== تهيئة عند التحميل =====
 document.addEventListener("DOMContentLoaded", () => {
   const opSel = document.getElementById('op');
   if(opSel){
@@ -1331,7 +1313,7 @@ document.addEventListener("DOMContentLoaded", () => {
   loadForgotSetting();
 });
 
-// تشغيل أولي
+// ===== تشغيل أولي =====
 (async()=>{
   try{
     await ensureSeed();
