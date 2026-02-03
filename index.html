@@ -389,6 +389,11 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
+// ================== وضع الرابط (معلمة / طالب) ==================
+const urlParams = new URLSearchParams(window.location.search);
+const APP_MODE = (urlParams.get("mode") || "teacher").toLowerCase(); // teacher | student
+const IS_STUDENT_MODE = (APP_MODE === "student");
+
 // ================== ثوابت ==================
 const TEACHER_EMAIL="as-soso-as2011@hotmail.com";
 const WHATSAPP_NUMBER = "966502234335";
@@ -514,7 +519,14 @@ function go(page){
 }
 function backToClasses(){ go("classesPage"); renderTabs(); }
 function openClassPage(){ go("classPage"); renderStudents(); }
-function backToClass(){ go("classPage"); renderStudents(); }
+function backToClass(){
+  // في رابط الطلاب: الرجوع يرجع لصفحة تسجيل الطالب
+  if(typeof IS_STUDENT_MODE !== "undefined" && IS_STUDENT_MODE){
+    go("studentLoginPage");
+    return;
+  }
+  go("classPage"); renderStudents();
+}
 
 function fmt(x){ return (Math.round((Number(x||0)+Number.EPSILON)*100)/100).toFixed(2); }
 
@@ -540,6 +552,21 @@ async function startApp(){
   $("connPill").style.color = "#2e7d32";
   playWelcome();
   $("startOverlay").style.display = "none";
+
+  // ✅ رابط الطلاب
+  if(IS_STUDENT_MODE){
+    go("studentLoginPage");
+    if($("stuName")){
+      $("stuName").readOnly = false;
+      $("stuName").value = "";
+      $("stuName").placeholder = "اكتب اسمك كما هو مسجل بالنظام";
+    }
+    if($("stuPin")) $("stuPin").value = "";
+    if($("stuLocked")) $("stuLocked").classList.add("hidden");
+    return;
+  }
+
+  // ✅ رابط المعلمة
   go("teacherLoginPage");
 }
 
@@ -1066,26 +1093,64 @@ async function buildTransferList(){
   arr.forEach(s=>{ if(s.id===currentStudentId) return; const o=document.createElement("option"); o.value=s.id; o.textContent=s.name; $("transferTo").appendChild(o); });
 }
 
+async function resolveStudentByNameAndPin(nameInput, pinInput){
+  const name = String(nameInput||"").trim();
+  const pin  = String(pinInput||"").trim();
+  if(!name || !pin) return null;
+
+  const snap = await db.collection("students").where("name","==",name).limit(1).get();
+  if(snap.empty) return null;
+
+  const doc = snap.docs[0];
+  const s = doc.data() || {};
+  if(String(s.pin||"") !== pin) return null;
+
+  return {id: doc.id};
+}
+
 async function studentLogin(){
-  const ref=db.collection("students").doc(currentStudentId);
-  const doc=await ref.get();
-  const s=doc.data();
+  try{
+    // ✅ رابط الطلاب: الاسم + PIN
+    if(IS_STUDENT_MODE){
+      const name = ($("stuName")?.value || "").trim();
+      const pin  = ($("stuPin")?.value || "").trim();
+      if(!name || !pin) return warn("اكتب/ي الاسم والرقم السري");
 
-  if(!s.active){ lockedModal(s.name); return; }
-  if($("stuPin").value.trim()!==String(s.pin||"")) return warn("الرقم السري غلط");
-  if(!s.openedAt) await ref.update({openedAt: firebase.firestore.FieldValue.serverTimestamp()});
+      const resolved = await resolveStudentByNameAndPin(name, pin);
+      if(!resolved) return warn("بيانات الدخول غير صحيحة");
 
-  playWelcome();
+      currentStudentId = resolved.id;
+    }
 
-  go("studentAccountPage");
-  $("studentHeader").textContent=s.name;
-  $("statusBadge").className="badge "+(s.active?"on":"off");
-  $("statusBadge").textContent=s.active?"🟢 نشط":"🔴 مقفل";
-  $("studentBalance").textContent=fmt(s.balance);
+    // (المعلمة أو بعد ما تم تحديد الطالب)
+    const ref=db.collection("students").doc(currentStudentId);
+    const doc=await ref.get();
+    const s=doc.data();
 
-  await renderOpenedAt();
-  await buildTransferList();
-  await showStatement();
+    if(!s.active){ lockedModal(s.name); return; }
+
+    // في رابط المعلمة فقط: تحقق PIN
+    if(!IS_STUDENT_MODE){
+      if($("stuPin").value.trim()!==String(s.pin||"")) return warn("الرقم السري غلط");
+    }
+
+    if(!s.openedAt) await ref.update({openedAt: firebase.firestore.FieldValue.serverTimestamp()});
+
+    playWelcome();
+
+    go("studentAccountPage");
+    $("studentHeader").textContent=s.name;
+    $("statusBadge").className="badge "+(s.active?"on":"off");
+    $("statusBadge").textContent=s.active?"🟢 نشط":"🔴 مقفل";
+    $("studentBalance").textContent=fmt(s.balance);
+
+    await renderOpenedAt();
+    await buildTransferList();
+    await showStatement();
+  }catch(e){
+    console.log(e);
+    warn("صار خطأ… جرّب/ي مرة ثانية");
+  }
 }
 
 // ===== كشف الحساب =====
