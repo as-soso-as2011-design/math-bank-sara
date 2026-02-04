@@ -10,7 +10,11 @@
   --navy:#00205B;--rajhi:#0055A4;--sky:#EAF3FB;--sky2:#CFE6F7;--beige:#FAF9F7;
   --green:#2e7d32;--red:#b00020;--text:#1b1f23;
 }
-.whatsapp-btn{ background:#25D366 !important; color:#fff !important; font-weight:700; }
+.whatsapp-btn{
+  background:#25D366 !important;
+  color:#fff !important;
+  font-weight:700;
+}
 .whatsapp-btn:hover{ background:#1ebe5d !important; }
 
 *{box-sizing:border-box;font-family:Tahoma,Arial,sans-serif}
@@ -76,10 +80,7 @@ tr:last-child td{border-bottom:none}
 
 /* Stats */
 .statsBox{display:flex; gap:10px; flex-wrap:wrap;}
-.statCard{
-  flex:1; min-width:180px;
-  background:#f7fbff;border:1px solid #e6eef7;border-radius:14px;padding:12px;
-}
+.statCard{flex:1; min-width:180px;background:#f7fbff;border:1px solid #e6eef7;border-radius:14px;padding:12px;}
 .statCard b{color:var(--navy)}
 </style>
 </head>
@@ -95,6 +96,7 @@ tr:last-child td{border-bottom:none}
   <div style="width:56px"></div>
 </div>
 
+<!-- لو ملفات الصوت غير موجودة على الاستضافة، النظام بيشتغل وبيطلع beep احتياطي -->
 <audio id="welcomeMp3" preload="auto" src="welcome.mp3"></audio>
 <audio id="welcomeM4a" preload="auto" src="welcome.m4a"></audio>
 
@@ -143,12 +145,12 @@ tr:last-child td{border-bottom:none}
       <div class="row">
         <label class="col small" style="display:flex;gap:8px;align-items:center">
           <input type="checkbox" id="autoWA" checked>
-          تفعيل الإرسال الفوري بنقرة واحدة (يفتح واتساب بزنس بعد العملية مباشرة)
+          تفعيل الإرسال الفوري بنقرة واحدة
         </label>
 
         <label class="col small" style="display:flex;gap:8px;align-items:center">
           <input type="checkbox" id="copyToTeacher" checked>
-          إرسال نسخة للمعلمة (في نفس الواتساب)
+          إرسال نسخة للمعلمة
         </label>
       </div>
 
@@ -170,7 +172,7 @@ tr:last-child td{border-bottom:none}
       <button class="btn2" style="margin-top:10px" onclick="refreshTeacherStats()">تحديث الإحصاءات</button>
     </div>
 
-    <!-- العمليات اليومية (مُصححة) -->
+    <!-- ✅ العمليات اليومية (مُصححة بالكامل) -->
     <div class="card soft" id="dailyOpsCard">
       <h3 style="margin:0 0 8px 0;color:var(--navy)">العمليات اليومية</h3>
 
@@ -189,10 +191,13 @@ tr:last-child td{border-bottom:none}
         </div>
       </div>
 
+      <div id="dailyOpsError" class="small" style="margin-top:8px;color:var(--red);font-weight:700"></div>
+
       <div class="small" style="margin-top:8px">
         * أي عملية تُسجَّل تلقائيًا (طالب/معلمة) تظهر هنا حسب التاريخ.
       </div>
 
+      <!-- ✅ واحد فقط -->
       <div id="dailyOpsList" style="margin-top:10px"></div>
     </div>
 
@@ -213,7 +218,7 @@ tr:last-child td{border-bottom:none}
         <button class="btn3 col" onclick="syncStudentsToClasses()">تثبيت أسماء الطلاب</button>
         <button class="btn3 col" onclick="toggleForgotPinForAll()">تعطيل/تفعيل نسيت الرقم السري</button>
       </div>
-      <div class="small">إذا كثرت مواقع الاستضافة وتخربطت الفصول، زر "تثبيت أسماء الطلاب" يرجع كل طالب لفصله الصحيح.</div>
+      <div class="small">زر "تثبيت أسماء الطلاب" يرجع كل طالب لفصله الصحيح.</div>
     </div>
 
     <div class="tabs" id="classTabs"></div>
@@ -399,11 +404,11 @@ const urlParams = new URLSearchParams(window.location.search);
 const APP_MODE = (urlParams.get("mode") || "teacher").toLowerCase(); // teacher | student
 const IS_STUDENT_ENTRY = (APP_MODE === "student");
 
-// ================== إعدادات الرسائل (رسمية + تحذير + تلقائية) ==================
+// ================== إعدادات الرسائل ==================
 const TEACHER_BANK_TITLE = "بنك الرياضيات – المصرفي";
 const SIGNATURE = "المعلمة: سارة حقوي";
-const CONTACT_PRIMARY = "966502234335"; // زر/رابط تواصل (رقمك الأساسي)
-const WHATSAPP_BUSINESS_FROM = "966556891201"; // رقم واتساب بزنس
+const CONTACT_PRIMARY = "966502234335";
+const WHATSAPP_BUSINESS_FROM = "966556891201";
 
 function contactLink(){ return "https://wa.me/" + CONTACT_PRIMARY; }
 function normalizePhoneToWA(phone){
@@ -460,11 +465,11 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// ================== ثوابت ==================
 const TEACHER_EMAIL="as-soso-as2011@hotmail.com";
 
 // ================== Helpers UI ==================
 function $(id){return document.getElementById(id);}
+
 function openModal(title, bodyHtml, actionsHtml){
   $("mTitle").textContent=title;
   $("mBody").innerHTML=bodyHtml;
@@ -489,8 +494,7 @@ function fmt(x){ return (Math.round((Number(x||0)+Number.EPSILON)*100)/100).toFi
 
 // ===== صوت الترحيب =====
 async function playWelcome(){
-  const m4a = document.getElementById("welcomeM4a");
-  const mp3 = document.getElementById("welcomeMp3");
+  // beep احتياطي (يشتغل دائمًا بعد نقرة)
   try{
     const ctx=new (window.AudioContext||window.webkitAudioContext)();
     const o=ctx.createOscillator(), g=ctx.createGain();
@@ -498,6 +502,10 @@ async function playWelcome(){
     o.connect(g); g.connect(ctx.destination); o.start();
     setTimeout(()=>{o.stop(); ctx.close();}, 220);
   }catch(e){}
+
+  // ملفات صوت (إذا موجودة على الاستضافة)
+  const m4a = document.getElementById("welcomeM4a");
+  const mp3 = document.getElementById("welcomeMp3");
   try{ if(m4a){ m4a.currentTime=0; await m4a.play(); return; } }catch(e){}
   try{ if(mp3){ mp3.currentTime=0; await mp3.play(); return; } }catch(e){}
 }
@@ -534,21 +542,24 @@ const REASONS = {
 };
 
 let currentAccess = "teacher"; // teacher | student
+
 function fillReasonSelect(selectEl, items){
   if(!selectEl) return;
   selectEl.innerHTML = "";
   items.forEach(r=>{
     const o = document.createElement("option");
-    o.value = r; o.textContent = r;
+    o.value = r;
+    o.textContent = r;
     selectEl.appendChild(o);
   });
 }
+
 function setupReasonUI(mode, selectId, otherId){
   const sel = document.getElementById(selectId);
   const other = document.getElementById(otherId);
   if(!sel || !other) return;
 
-  // ✅ تقييد سبب التحويل للطالب: فقط “أخرى” + مربع نص
+  // ✅ التحويل للطالب: نص فقط (حماية)
   if(mode === "transfer" && currentAccess === "student"){
     sel.classList.add("hidden");
     other.classList.remove("hidden");
@@ -572,6 +583,7 @@ function setupReasonUI(mode, selectId, otherId){
   sel.onchange = toggleOther;
   toggleOther();
 }
+
 function getReason(selectId, otherId){
   const sel = document.getElementById(selectId);
   const other = document.getElementById(otherId);
@@ -596,7 +608,6 @@ async function startApp(){
   try{ await playWelcome(); }catch(e){}
   $("startOverlay").style.display = "none";
 
-  // وضع الطلاب
   if(IS_STUDENT_ENTRY){
     go("studentLoginPage");
     $("stuLoginTitle").textContent = "دخول الطالب";
@@ -609,7 +620,6 @@ async function startApp(){
     return;
   }
 
-  // وضع المعلمة
   go("teacherLoginPage");
   currentAccess = "teacher";
 }
@@ -630,7 +640,7 @@ function forgotTeacher(){
 // ================== بيانات عامة ==================
 let classes=[], currentClassId=null, currentStudentId=null;
 
-// ================== Seed (مُصحح الأسماء حتى يشتغل) ==================
+// ================== Seed ==================
 const DEFAULT_STUDENTS = {
   "سادس بنين": ["طلال الرحيلي","علي المكرمي","عمر صواف","محمد العنزي","سالم آل مخلص","عبدالملك الجناعي","وليد المالكي","سلمان الجوهر","راكان مباركي","فيصل القحطاني","ريان القحطاني","محمد أبو صالح","نايف العصيمي"],
   "سادس بنات": ["رهف الثبيتي","جادل الدوسري","دانة القحطاني","تالين متولي","ديما الحمادي","رهف الزهراني","كادي العتيبي","رودينا غريب","الجوهرة آل مخلص","ريم آل مشرف"],
@@ -663,7 +673,7 @@ const PARENTS_PHONE = {
   "عمر صواف": "0599831191",
   "ديمة الشهري": "0567509173",
   "لارين التل": "0580662141",
-  "نجلا القحطani": "0535952876",
+  "نجلا القحطاني": "0535952876",
   "ايمان باغريب": "0542678280",
   "ديم الغامدي": "0535912049",
   "ليان المحارفي": "0568135644",
@@ -674,9 +684,9 @@ const PARENTS_PHONE = {
 async function ensureSeed(){
   const c = await db.collection("classes").orderBy("order").get();
   if(c.empty){
-    await db.collection("classes").add({name:"سادس بنين",order:1});
-    await db.collection("classes").add({name:"سادس بنات",order:2});
-    await db.collection("classes").add({name:"أول متوسط",order:3});
+    await db.collection("classes").add({name:"الصف سادس بنين",order:1});
+    await db.collection("classes").add({name:"الصف سادس بنات",order:2});
+    await db.collection("classes").add({name:"الصف الأول المتوسط",order:3});
   }
 
   const c2 = await db.collection("classes").orderBy("order").get();
@@ -789,13 +799,8 @@ async function toggleForgotPinForAll(){
 function isForgotEnabled(){ return forgotPinEnabled === true; }
 
 function forgotStudentPin(){
-  if(!isForgotEnabled()){
-    return openModal("تنبيه","ميزة (نسيت الرقم السري) متوقفة حاليًا من المعلمة.");
-  }
-  openModal("استرجاع الرقم السري (PIN)",
-    "في حال نسيان الرقم السري (PIN) يرجى التواصل مع المعلمة عبر واتساب.",
-    `<a class="btn whatsapp-btn" href="${contactLink()}" target="_blank">تواصل واتساب</a><button class="btn2" onclick="closeModal()">إغلاق</button>`
-  );
+  if(!isForgotEnabled()) return openModal("تنبيه","ميزة (نسيت الرقم السري) معطلة حاليًا.");
+  openModal("تنبيه","في حال نسيان الرقم السري (PIN) يرجى التواصل مع المعلمة.\n\nالمعلمة: سارة حقوي");
 }
 
 async function ensureGuardianPhone(studentId, studentName){
@@ -811,6 +816,7 @@ async function ensureGuardianPhone(studentId, studentName){
   }
   return "";
 }
+
 async function sendPinToParent(studentId){
   const ref = db.collection("students").doc(studentId);
   const doc = await ref.get();
@@ -830,7 +836,7 @@ async function sendPinToParent(studentId){
   openWABusinessFast(wa, msg);
 }
 
-// ================== logTxn (مع createdAtClient) ==================
+// ================== logTxn ==================
 async function logTxn(ref, type, reason, amount, balanceAfter, studentName, guardianWhats){
   await ref.collection("txns").add({
     type,
@@ -927,12 +933,19 @@ function isCopyEnabled(){ return !!document.getElementById("copyToTeacher")?.che
 
 async function smartAutoSendWhats({type, studentName, amount, reason, guardianWhats}){
   if(!isAutoWAEnabled()) return;
+
   const parent = normalizePhoneToWA(guardianWhats || "");
-  if(!parent){ openModal("تنبيه","لا يوجد رقم ولي أمر مسجل لهذه العملية."); return; }
+  if(!parent){
+    openModal("تنبيه","لا يوجد رقم ولي أمر مسجل لهذه العملية.");
+    return;
+  }
   const msg = buildOfficialMessage(type, studentName, amount, reason);
   openWABusinessFast(parent, msg);
+
   if(isCopyEnabled()){
-    setTimeout(()=>{ openWABusinessFast(CONTACT_PRIMARY, "نسخة للمعلمة ✅\n\n" + msg); }, 1200);
+    setTimeout(()=>{
+      openWABusinessFast(CONTACT_PRIMARY, "نسخة للمعلمة ✅\n\n" + msg);
+    }, 1200);
   }
 }
 
@@ -1042,13 +1055,11 @@ function showStudentLogin(s){
   $("stuName").readOnly = true;
   $("stuPin").value="";
   $("stuLocked").classList.add("hidden");
-  if(!s.active){
-    $("stuLocked").textContent = "🔒 الحساب مقفل — يرجى مراجعة المعلمة.";
-    $("stuLocked").classList.remove("hidden");
-  }
+  $("stuLocked").textContent = "الحساب مقفل 🔴";
+  if(!s.active) $("stuLocked").classList.remove("hidden");
 }
 
-// ================== دخول الطالب (وضع الطلاب) ==================
+// ================== دخول الطالب ==================
 async function studentLogin(){
   try{
     if(IS_STUDENT_ENTRY){
@@ -1095,7 +1106,6 @@ async function studentLogin(){
     if($("stuPin").value.trim()!==String(s.pin||"")) return warn("الرقم السري غلط");
 
     if(!s.openedAt) await ref.update({openedAt: firebase.firestore.FieldValue.serverTimestamp()});
-
     await playWelcome();
 
     go("studentAccountPage");
@@ -1121,6 +1131,7 @@ async function renderOpenedAt(){
   const s=doc.data();
   $("openedAt").textContent = (s.openedAt && s.openedAt.toDate) ? s.openedAt.toDate().toLocaleString("ar-SA") : "—";
 }
+
 async function buildTransferList(){
   const snap=await db.collection("students").get();
   const arr=[]; snap.forEach(d=>arr.push({id:d.id,...d.data()}));
@@ -1169,8 +1180,8 @@ async function executeOp(){
   const s=doc.data();
   const op=$("op").value;
   const amt=parseFloat($("amt").value);
-
   if(isNaN(amt) || (op==="withdraw" ? amt<0 : amt<=0)) return warn("اكتب مبلغ صحيح");
+
   const reason = getReason("reasonStudent","reasonOtherStudent");
 
   if(op==="deposit"){
@@ -1207,21 +1218,24 @@ async function executeOp(){
   refreshTeacherStats();
 }
 
-// ================== العمليات اليومية (مُصححة + رسالة خطأ واضحة) ==================
+// ================== ✅ العمليات اليومية (مُصلح + رسالة خطأ واضحة) ==================
 let dailyOpsCache = [];
 
 async function loadDailyOps(){
-  const inp = document.getElementById("dailyDate");
-  const chosenStr = inp.value ? inp.value : new Date().toISOString().slice(0,10);
-  if(!inp.value) inp.value = chosenStr;
-
-  const box = document.getElementById("dailyOpsList");
-  box.innerHTML = '<div class="small">جاري التحميل...</div>';
+  const err = $("dailyOpsError");
+  if(err) err.textContent = "";
+  const box = $("dailyOpsList");
+  if(box) box.innerHTML = '<div class="small">جاري التحميل...</div>';
 
   try{
+    const inp = $("dailyDate");
+    const chosenStr = inp.value ? inp.value : new Date().toISOString().slice(0,10);
+    if(!inp.value) inp.value = chosenStr;
+
+    // نجلب آخر 500 عملية ثم نفلتر محليًا (أضمن وأسهل من فهارس معقدة)
     const snap = await db.collectionGroup("txns")
       .orderBy("createdAtClient","desc")
-      .limit(300)
+      .limit(500)
       .get();
 
     dailyOpsCache = [];
@@ -1236,14 +1250,24 @@ async function loadDailyOps(){
     renderDailyOps();
   }catch(e){
     console.log(e);
-    box.innerHTML = `<div class="small" style="color:#b00020;font-weight:700">
-      تعذر تحميل العمليات.<br>السبب: ${String(e?.message || e)}
-    </div>`;
+    // لو Index مطلوب من Firestore
+    const msg = String(e?.message || e || "");
+    if($("dailyOpsError")){
+      if(msg.toLowerCase().includes("index")){
+        $("dailyOpsError").textContent =
+          "تعذر تحميل العمليات: يلزم إنشاء فهرس (Index) في Firestore لهذا الاستعلام. افتحي Firebase Console وستظهر لك رسالة فيها رابط Create Index.";
+      }else{
+        $("dailyOpsError").textContent = "تعذر تحميل العمليات: " + msg;
+      }
+    }
+    if($("dailyOpsList")) $("dailyOpsList").innerHTML = "";
   }
 }
 
 function renderDailyOps(){
-  const box = document.getElementById("dailyOpsList");
+  const box = $("dailyOpsList");
+  if(!box) return;
+
   if(!dailyOpsCache.length){
     box.innerHTML = '<div class="small">ما فيه عمليات في هذا التاريخ.</div>';
     return;
@@ -1256,7 +1280,7 @@ function renderDailyOps(){
         <div><b>${x.studentName || "—"}</b></div>
         <div class="small">الوقت: ${t}</div>
         <div class="small">العملية: ${x.type || "—"}</div>
-        <div class="small">المبلغ: ${x.amount ?? ""} ر.س</div>
+        <div class="small">المبلغ: ${fmt(x.amount ?? 0)} ر.س</div>
         <div class="small">السبب: ${x.reason || "—"}</div>
       </div>
     `;
@@ -1268,27 +1292,27 @@ function sendDailyOpsWhats(){
     openModal("تنبيه","لا توجد عمليات للإرسال. اضغطي (عرض العمليات) أولًا.");
     return;
   }
-  const op = dailyOpsCache[0];
+  const op = dailyOpsCache[0]; // أول عملية فقط لتجنب قيود المتصفح
   const phone = normalizePhoneToWA(op.guardianWhats || "");
   if(!phone){ openModal("تنبيه","لا يوجد رقم ولي أمر مسجل."); return; }
+
   const msg = buildOfficialMessage(op.type||"عملية", op.studentName||"—", op.amount, op.reason);
   openWABusinessFast(phone, msg);
 }
 
-// ================== إحصاءات المعلمة (آخر 500 عملية) ==================
+// ================== إحصاءات المعلمة ==================
 function dayKey(ms){
   const d = new Date(ms);
   return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,'0')+"-"+String(d.getDate()).padStart(2,'0');
 }
 function startOfWeek(d){
   const x = new Date(d);
-  const day = x.getDay(); // 0 Sun
-  const diff = (day===6?0:day+1); // السبت كبداية تقريبية
+  const day = x.getDay();
+  const diff = (day===6?0:day+1);
   x.setDate(x.getDate()-diff);
   x.setHours(0,0,0,0);
   return x;
 }
-
 async function refreshTeacherStats(){
   try{
     const stToday = $("stToday"), stWeek=$("stWeek"), stMonth=$("stMonth"), stTop=$("stTop");
@@ -1356,14 +1380,13 @@ async function refreshStudentStats(){
 
 // ================== تهيئة عند التحميل ==================
 document.addEventListener("DOMContentLoaded", () => {
-  const opSel = document.getElementById('op');
+  const opSel = $("op");
   if(opSel){
     setupReasonUI(opSel.value, 'reasonStudent', 'reasonOtherStudent');
     opSel.addEventListener('change', ()=> setupReasonUI(opSel.value, 'reasonStudent', 'reasonOtherStudent'));
   }
   setupReasonUI('withdraw', 'reasonTeacher', 'reasonOtherTeacher');
   loadForgotSetting();
-
   if(IS_STUDENT_ENTRY){
     $("startP").innerHTML = "جاهزين نبدأ رحلة بنك الرياضيات للطلاب؟<br>اضغط زر البداية وننطلق 🚀";
   }
