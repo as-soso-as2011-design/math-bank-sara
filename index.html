@@ -776,9 +776,9 @@ const PARENTS_PHONE = {
 async function ensureSeed(){
   const c = await db.collection("classes").orderBy("order").get();
   if(c.empty){
-    await db.collection("classes").add({name:"الصف سادس بنين",order:1});
-    await db.collection("classes").add({name:"الصف سادس بنات",order:2});
-    await db.collection("classes").add({name:"الصف الأول المتوسط",order:3});
+    await db.collection("classes").add({name:"سادس بنين",order:1});
+    await db.collection("classes").add({name:"سادس بنات",order:2});
+    await db.collection("classes").add({name:"أول متوسط",order:3});
   }
 
   const c2 = await db.collection("classes").orderBy("order").get();
@@ -792,12 +792,19 @@ async function ensureSeed(){
   for(const clsName of Object.keys(DEFAULT_STUDENTS)){
     const classId = by[clsName];
     if(!classId) continue;
+
     for(const n0 of DEFAULT_STUDENTS[clsName]){
       const n = String(n0).trim();
       if(existing.has(n)) continue;
-      const pin=String(Math.floor(1000+Math.random()*9000));
+
+      const pin = String(Math.floor(1000 + Math.random()*9000));
       await db.collection("students").add({
-        name:n,classId,active:true,balance:0,pin,openedAt:null,
+        name:n,
+        classId,
+        active:true,
+        balance:0,
+        pin,
+        openedAt:null,
         guardianWhats:(PARENTS_PHONE[n]||"")
       });
       existing.add(n);
@@ -1439,40 +1446,28 @@ async function loadDailyOps(){
   const chosenStr = inp.value ? inp.value : localTodayKey();
   if(inp && !inp.value) inp.value = chosenStr;
 
+  const box = $("dailyOpsList");
+  box.innerHTML = '<div class="small">جاري التحميل...</div>';
+
   try{
-    // أساس: dateKeyLocal
-    let snap = await db.collectionGroup("txns")
-      .where("dateKeyLocal", "==", chosenStr)
+    const snap = await db.collectionGroup("txns")
       .orderBy("createdAtClient","desc")
-      .limit(400)
+      .limit(800)
       .get();
 
-    // إصلاح فرق يوم (UTC) لو كان قديم
-    if(snap.empty){
-      const prevKey = shiftDateKey(chosenStr, -1);
-      snap = await db.collectionGroup("txns")
-        .where("dateKeyLocal", "==", prevKey)
-        .orderBy("createdAtClient","desc")
-        .limit(400)
-        .get();
-      // فلترة لليوم المطلوب فعلياً
-      const filtered=[];
-      snap.forEach(d=>{
-        const x=d.data()||{};
-        const k = localDateKeyFromDate(new Date(Number(x.createdAtClient||0)));
-        if(k===chosenStr) filtered.push(x);
-      });
-      dailyOpsCache = filtered;
-      renderDailyOps();
-      return;
-    }
+    dailyOpsCache = [];
+    snap.forEach(d=>{
+      const x = d.data() || {};
+      if(x.dateKeyLocal === chosenStr) dailyOpsCache.push(x);
+    });
 
-    dailyOpsCache=[];
-    snap.forEach(d=>dailyOpsCache.push(d.data()||{}));
     renderDailyOps();
   }catch(e){
     console.log(e);
-    $("dailyOpsList").innerHTML = '<div class="small" style="color:#b00020;font-weight:700">تعذر تحميل العمليات.</div>';
+    box.innerHTML = `<div class="small" style="color:#b00020;font-weight:700">
+      تعذر تحميل العمليات.<br>
+      السبب: ${String(e?.message || e)}
+    </div>`;
   }
 }
 
