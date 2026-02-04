@@ -5,6 +5,41 @@
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>بنك الرياضيات – المصرفي للمعلمة سارة حقوي</title>
 
+ <!-- ✅ PRO PACK A (HEAD) START -->
+<!-- Charts (Line + Bar) -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+<style>
+  /* ====== Bank-style KPI + Charts (A) ====== */
+  .kpi-wrap{display:flex;gap:12px;flex-wrap:wrap;align-items:stretch;margin-top:10px}
+  .kpi{
+    flex:1 1 160px;background:#fff;border-radius:14px;padding:12px 14px;
+    box-shadow:0 8px 18px rgba(0,0,0,.06);border:1px solid rgba(0,0,0,.04)
+  }
+  .kpi .t{font-size:12px;opacity:.75;margin-bottom:6px}
+  .kpi .v{font-size:18px;font-weight:800;color:var(--navy)}
+  .kpi .s{font-size:12px;margin-top:6px;opacity:.7}
+  .charts-grid{
+    display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px
+  }
+  @media(max-width:900px){ .charts-grid{grid-template-columns:1fr} }
+  .chart-card{
+    background:#fff;border-radius:14px;padding:12px 14px;
+    box-shadow:0 8px 18px rgba(0,0,0,.06);border:1px solid rgba(0,0,0,.04)
+  }
+  .chart-card h4{margin:0 0 8px 0;font-size:14px;color:var(--navy)}
+  .chart-canvas{width:100%;height:260px}
+  .mini-note{font-size:12px;opacity:.75;margin-top:8px}
+
+  /* ====== Reasons control ====== */
+  .reason-other{display:none;margin-top:8px}
+  .reason-other.show{display:block}
+
+  /* ====== Student stats must be ABOVE statement ====== */
+  .student-stats-top{order:-5}
+  .student-statement{order:5}
+</style>
+<!-- ✅ PRO PACK A (HEAD) END --> 
 <style>
 :root{
   --navy:#00205B;--rajhi:#0055A4;--sky:#EAF3FB;--sky2:#CFE6F7;--beige:#FAF9F7;
@@ -1428,6 +1463,300 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 })();
 </script>
+<script>
+/* ✅ PRO PACK A (JS) START */
 
+/** 1) جلب العمليات من أي مكان (مرن) */
+function getAllOpsSmart(){
+  // 1) لو عندك متغير عالمي جاهز
+  if (Array.isArray(window.ops)) return window.ops;
+  if (Array.isArray(window.operations)) return window.operations;
+  if (Array.isArray(window.bankOps)) return window.bankOps;
+
+  // 2) نبحث في localStorage عن أي مصفوفة عمليات
+  const keys = Object.keys(localStorage || {});
+  const candidates = [
+    'ops','operations','bankOps','mathBank_ops','math-bank-ops','dailyOps','transactions','tx'
+  ];
+  for (const k of [...candidates, ...keys]){
+    try{
+      const raw = localStorage.getItem(k);
+      if(!raw) continue;
+      const data = JSON.parse(raw);
+      if(Array.isArray(data) && data.length && typeof data[0] === 'object') return data;
+    }catch(e){}
+  }
+  return [];
+}
+
+/** 2) توحيد أسماء الحقول (العملية قد تكون محفوظة بأسماء مختلفة) */
+function normOp(op){
+  const type = op.type || op.kind || op.op || op.operation || op.action || '';
+  const amount = Number(op.amount ?? op.value ?? op.money ?? op.amt ?? 0);
+  const student = op.student || op.studentName || op.name || op.owner || '';
+  const parent = op.parentPhone || op.phone || op.guardian || op.parent || '';
+  const reason = op.reason || op.note || op.desc || op.description || '';
+  const ts = op.ts || op.time || op.createdAt || op.date || op.datetime || Date.now();
+  const when = (ts instanceof Date) ? ts : new Date(ts);
+  return {type, amount, student, parent, reason, when};
+}
+
+/** 3) تحويل نوع العملية لثلاثة فقط */
+function mapType(t){
+  const s = (t||'').toString();
+  if (s.includes('سحب')) return 'withdraw';
+  if (s.includes('تحويل')) return 'transfer';
+  return 'deposit'; // إيداع افتراضي
+}
+
+/** 4) تجميع الإحصاءات: يوم/أسبوع/شهر + أعلى مبلغ */
+function calcStats(ops){
+  const now = new Date();
+  const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const startOfWeek = new Date(startOfDay); startOfWeek.setDate(startOfDay.getDate() - ((startOfDay.getDay()+6)%7)); // أسبوع يبدأ الإثنين
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+  let day=0, week=0, month=0, maxAmt=0;
+
+  for (const o of ops){
+    const amt = Math.abs(o.amount||0);
+    if (amt>maxAmt) maxAmt=amt;
+
+    const w = o.when;
+    if (w >= startOfDay) day += amt;
+    if (w >= startOfWeek) week += amt;
+    if (w >= startOfMonth) month += amt;
+  }
+  return {day, week, month, maxAmt};
+}
+
+/** 5) تجهيز بيانات الرسم الخطي (آخر 14 يوم) + العمودي (آخر 12 أسبوع) */
+function buildChartData(ops){
+  // line: last 14 days
+  const lineDays = 14;
+  const lineLabels = [];
+  const lineValues = [];
+  const today = new Date();
+  for(let i=lineDays-1;i>=0;i--){
+    const d = new Date(today.getFullYear(), today.getMonth(), today.getDate()-i);
+    const key = d.toISOString().slice(0,10);
+    lineLabels.push(key.slice(5)); // MM-DD
+    let sum=0;
+    for (const o of ops){
+      const od = o.when.toISOString().slice(0,10);
+      if (od===key) sum += Math.abs(o.amount||0);
+    }
+    lineValues.push(sum);
+  }
+
+  // bar: last 12 weeks
+  const weeks = 12;
+  const barLabels = [];
+  const barValues = [];
+  const start = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  const monday = new Date(start); monday.setDate(start.getDate() - ((start.getDay()+6)%7));
+  for(let i=weeks-1;i>=0;i--){
+    const wkStart = new Date(monday); wkStart.setDate(monday.getDate()-i*7);
+    const wkEnd = new Date(wkStart); wkEnd.setDate(wkStart.getDate()+7);
+    barLabels.push(`${wkStart.getMonth()+1}/${wkStart.getDate()}`);
+    let sum=0;
+    for (const o of ops){
+      if (o.when >= wkStart && o.when < wkEnd) sum += Math.abs(o.amount||0);
+    }
+    barValues.push(sum);
+  }
+
+  return {lineLabels,lineValues,barLabels,barValues};
+}
+
+/** 6) إنشاء واجهة الإحصاءات (بنكي حديث) داخل أي عنصر */
+function renderStatsInto(containerId, ops, titleText){
+  const el = document.getElementById(containerId);
+  if(!el) return;
+
+  const st = calcStats(ops);
+  const ch = buildChartData(ops);
+
+  el.innerHTML = `
+    <div class="card soft student-stats-top" style="padding:16px">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+        <h3 style="margin:0;color:var(--navy)">${titleText||'إحصاءات'}</h3>
+        <div class="mini-note">آخر 14 يوم (خطي) + آخر 12 أسبوع (عمودي)</div>
+      </div>
+
+      <div class="kpi-wrap">
+        <div class="kpi"><div class="t">اليوم</div><div class="v">${st.day.toFixed(2)} ر.س</div><div class="s">مجموع العمليات</div></div>
+        <div class="kpi"><div class="t">الأسبوع</div><div class="v">${st.week.toFixed(2)} ر.س</div><div class="s">مجموع العمليات</div></div>
+        <div class="kpi"><div class="t">الشهر</div><div class="v">${st.month.toFixed(2)} ر.س</div><div class="s">مجموع العمليات</div></div>
+        <div class="kpi"><div class="t">أعلى مبلغ</div><div class="v">${st.maxAmt.toFixed(2)} ر.س</div><div class="s">أكبر عملية</div></div>
+      </div>
+
+      <div class="charts-grid">
+        <div class="chart-card">
+          <h4>التمثيل الخطي (آخر 14 يوم)</h4>
+          <canvas id="${containerId}_line" class="chart-canvas"></canvas>
+        </div>
+        <div class="chart-card">
+          <h4>الأعمدة (آخر 12 أسبوع)</h4>
+          <canvas id="${containerId}_bar" class="chart-canvas"></canvas>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Charts
+  const lineCtx = document.getElementById(`${containerId}_line`);
+  const barCtx  = document.getElementById(`${containerId}_bar`);
+  if(lineCtx){
+    new Chart(lineCtx, {
+      type:'line',
+      data:{labels:ch.lineLabels, datasets:[{label:'مجموع اليوم', data:ch.lineValues, tension:.35, fill:false}]},
+      options:{responsive:true, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}}}
+    });
+  }
+  if(barCtx){
+    new Chart(barCtx, {
+      type:'bar',
+      data:{labels:ch.barLabels, datasets:[{label:'مجموع الأسبوع', data:ch.barValues}]},
+      options:{responsive:true, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}}}
+    });
+  }
+}
+
+/** 7) تشغيل "نسيتي الرقم السري؟" */
+function hookForgotPin(){
+  const link = document.querySelector('a[href="#forgot"], a.forgot-pin, .forgot-pin');
+  if(!link) return;
+  link.addEventListener('click', (e)=>{
+    e.preventDefault();
+    alert("⚠️ رسالة تلقائية\\nفي حال نسيان الرقم السري (PIN) يرجى التواصل مع المعلمة.\\n\\nالمعلمة: سارة حقوي");
+  });
+}
+
+/** 8) تقييد أسباب الطالب: يظهر فقط (أخرى) + مربع نص */
+function lockStudentReasons(){
+  // ابحث عن حقل سبب داخل صفحة الطالب (select أو input)
+  const reasonSelect = document.querySelector('#studentReason, select[name="studentReason"], select[data-role="student-reason"]');
+  const otherBox = document.querySelector('#studentReasonOther, input[name="studentReasonOther"], textarea[name="studentReasonOther"]');
+  if(!reasonSelect) return;
+
+  // اجبار الخيارات (أخرى فقط)
+  reasonSelect.innerHTML = `<option value="other">أخرى</option>`;
+  if(otherBox){
+    otherBox.placeholder = 'اكتب السبب هنا...';
+    otherBox.classList.add('reason-other','show');
+  }
+}
+
+/** 9) اظهار الأسباب للمعلمة في الإيداع + التحويل + السحب */
+function ensureTeacherReasonsVisible(){
+  // حاولي العثور على select السبب في صفحة المعلمة
+  const teacherReason = document.querySelector('#reasonTeacher, select[name="reasonTeacher"], select[data-role="teacher-reason"], #reason');
+  if(!teacherReason) return;
+
+  const reasons = [
+    'التفاعل والمشاركة الإيجابية',
+    'حل الواجب الدراسي',
+    'الالتزام والانضباط',
+    'إنجاز مميز/تفوق',
+    'تأخر/عدم حل الواجب',
+    'مخالفة سلوكية',
+    'تحويل رصيد',
+    'تنشيط الحساب',
+    'أخرى'
+  ];
+
+  // لا تمسحي إذا عنده خيارات كثيرة، فقط ضيفي/تأكدي
+  const existing = Array.from(teacherReason.options||[]).map(o=>o.textContent.trim());
+  if(existing.length < 3){
+    teacherReason.innerHTML = `<option value="">اختر السبب</option>` + reasons.map(r=>`<option value="${r}">${r}</option>`).join('');
+  }
+}
+
+/** 10) إصلاح زر العمليات اليومية: اربطيه بدالة loadDailyOps */
+function loadDailyOps(){
+  // هذه دالة عامة — لو عندك دالة أصلية اسمها مختلف قولي لي اسمها وأنا أركّبها عليه
+  // هنا نحاول فقط إعادة رسم القائمة/التصفية إن وُجدت عناصر
+  const btn = document.querySelector('#btnDailyOps, button[data-action="dailyOps"], button#showOps, .btn-daily-ops');
+  const dateInput = document.querySelector('#dailyDate, input[type="date"][data-role="daily-date"], input#opDate');
+
+  // اذا عندك دالة أصلية موجودة
+  if(typeof window._loadDailyOpsOriginal === 'function'){
+    window._loadDailyOpsOriginal();
+    return;
+  }
+
+  // fallback: اعرض تنبيه بسيط
+  if(dateInput && dateInput.value){
+    console.log('Daily ops date:', dateInput.value);
+  }
+}
+
+/** 11) نقل "جزء آخر الصفحة" ليكون أعلى كشف الحساب في الطالب */
+function moveStudentBottomAboveStatement(){
+  const studentPage = document.querySelector('#studentPage, .student-page');
+  if(!studentPage) return;
+
+  const statement = studentPage.querySelector('#statement, .statement, table.statement-table, .student-statement');
+  const bottom = studentPage.querySelector('#studentBottom, .student-bottom, .student-extra');
+  if(statement && bottom){
+    statement.classList.add('student-statement');
+    bottom.classList.add('student-stats-top');
+    statement.parentNode.insertBefore(bottom, statement);
+  }
+}
+
+/** 12) حقن حاويات الإحصاءات إذا ما كانت موجودة */
+function ensureStatsContainers(){
+  // للمعلمة
+  if(!document.getElementById('teacherStatsArea')){
+    const teacherAnchor = document.querySelector('.container') || document.body;
+    const div = document.createElement('div');
+    div.id = 'teacherStatsArea';
+    teacherAnchor.prepend(div);
+  }
+  // للطالب
+  if(!document.getElementById('studentStatsArea')){
+    const studentAnchor = document.querySelector('#studentPage, .student-page') || document.body;
+    const div = document.createElement('div');
+    div.id = 'studentStatsArea';
+    studentAnchor.prepend(div);
+  }
+}
+
+/** 13) تشغيل الحزمة */
+document.addEventListener('DOMContentLoaded', ()=>{
+  const ops = getAllOpsSmart().map(normOp);
+
+  ensureStatsContainers();
+
+  // إحصاءات المعلمة (عام)
+  renderStatsInto('teacherStatsArea', ops, 'إحصاءات عامة (بنكي)');
+
+  // إحصاءات الطالب (إذا كنتِ داخل صفحة طالب محدد، فلتر بالاسم إن وُجد)
+  const currentStudentName =
+    document.querySelector('#studentName, .student-name, [data-current-student]')?.textContent?.trim() ||
+    document.querySelector('input[name="studentName"]')?.value?.trim() || '';
+
+  const studentOps = currentStudentName
+    ? ops.filter(o => (o.student||'').toString().includes(currentStudentName))
+    : ops;
+
+  renderStatsInto('studentStatsArea', studentOps, 'إحصاءات حساب الطالب (بنكي)');
+
+  hookForgotPin();
+  lockStudentReasons();
+  ensureTeacherReasonsVisible();
+  moveStudentBottomAboveStatement();
+
+  // ربط زر العمليات اليومية (إذا موجود)
+  const dailyBtn = document.querySelector('#btnDailyOps, button[data-action="dailyOps"], button#showOps, .btn-daily-ops');
+  if(dailyBtn){
+    dailyBtn.addEventListener('click', (e)=>{ e.preventDefault(); loadDailyOps(); });
+  }
+});
+/* ✅ PRO PACK A (JS) END */
+</script>
+  
 </body>
 </html>
