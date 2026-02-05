@@ -76,6 +76,12 @@ tr:last-child td{border-bottom:none}
 .selRow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}
 .selTag{display:flex;gap:8px;align-items:center;background:#eef6ff;border:1px solid #dfeaff;border-radius:999px;padding:6px 10px;font-size:12px;color:#003}
 .selTag input{width:auto}
+
+/* ✅ اختيار عملية يومية */
+.dailyPickRow{display:flex;align-items:center;gap:10px;justify-content:space-between;flex-wrap:wrap}
+.dailyPickLeft{display:flex;align-items:center;gap:10px}
+.dailyPickLeft input{width:auto}
+.dailySelectedHint{color:var(--green);font-weight:800}
 </style>
 </head>
 
@@ -150,7 +156,7 @@ tr:last-child td{border-bottom:none}
       </div>
     </div>
 
-    <!-- ✅ العمليات اليومية (بدون Index) -->
+    <!-- ✅ العمليات اليومية -->
     <div class="card soft" id="dailyOpsCard">
       <h3 style="margin:0 0 8px 0;color:var(--navy)">العمليات اليومية</h3>
 
@@ -163,11 +169,15 @@ tr:last-child td{border-bottom:none}
           <button class="btn2" onclick="loadDailyOps()">عرض العمليات</button>
         </div>
         <div class="col" style="align-self:flex-end">
-          <button class="btn whatsapp-btn" onclick="sendDailyOpsWhats()">فتح واتساب للأمهات</button>
+          <button class="btn whatsapp-btn" onclick="sendDailyOpsWhats()">فتح واتساب للعملية المحددة</button>
         </div>
       </div>
 
-      <div class="small" style="margin-top:8px">* أي عملية تُسجَّل تظهر هنا حسب التاريخ.</div>
+      <div class="small" style="margin-top:8px">
+        * اختاري العملية من (○) ثم اضغطي زر واتساب.
+        <span id="dailyPickHint" class="dailySelectedHint"></span>
+      </div>
+
       <div id="dailyOpsList" style="margin-top:10px"></div>
     </div>
 
@@ -232,7 +242,7 @@ tr:last-child td{border-bottom:none}
           <input id="bulkWithdrawAmount" type="number" step="0.01" placeholder="مثال: 5">
         </div>
         <div class="col" style="align-self:flex-end">
-          <button class="btnRed" onclick="withdrawAll()">سحب من الكل</button>
+          <button class="btnRed" onclick="withdrawAll()">سحب للكل</button>
         </div>
       </div>
 
@@ -258,7 +268,7 @@ tr:last-child td{border-bottom:none}
 
       <hr>
 
-      <!-- سبب العملية للمعلمة (يظهر دائمًا) -->
+      <!-- سبب العملية للمعلمة -->
       <div class="row">
         <div class="col">
           <div class="small">سبب العملية</div>
@@ -380,8 +390,8 @@ const IS_STUDENT_ENTRY = (APP_MODE === "student");
 // ================== أرقام واتساب ==================
 const SIGNATURE = "المعلمة: سارة حقوي";
 const TEACHER_BANK_TITLE = "بنك الرياضيات – المصرفي";
-const CONTACT_PRIMARY = "0502234335";    // زر تواصل للأمهات
-const WHATSAPP_BUSINESS = "0556891201";  // واتساب بزنس (المرسل)
+const CONTACT_PRIMARY = "0502234335";    // رابط تواصل للأمهات (يظهر في الرسالة)
+const WHATSAPP_BUSINESS = "0556891201";  // رقم بزنس (معلومة فقط - واتساب لا يغير المُرسل برقم من رابط)
 
 // ================== Firebase ==================
 const firebaseConfig = {
@@ -411,12 +421,12 @@ function warn(msg){ openModal("تنبيه", msg); }
 function logout(){location.reload();}
 
 function go(page){
-  ["teacherLoginPage","classesPage","classPage","studentLoginPage","studentAccountPage"].forEach(id=>$(id).classList.add("hidden"));
-  $(page).classList.remove("hidden");
+  ["teacherLoginPage","classesPage","classPage","studentLoginPage","studentAccountPage"].forEach(id=>$(id)?.classList.add("hidden"));
+  $(page)?.classList.remove("hidden");
 }
 function fmt(x){ return (Math.round((Number(x||0)+Number.EPSILON)*100)/100).toFixed(2); }
 
-// ================== صوت الترحيب (مع احتياط) ==================
+// ================== صوت الترحيب ==================
 async function beep(){
   try{
     const ctx=new (window.AudioContext||window.webkitAudioContext)();
@@ -440,7 +450,6 @@ function normalizePhoneToWA(phone){
   if(!p) return "";
   if(p.startsWith("00")) p = p.slice(2);
   if(p.startsWith("0")) p = "966" + p.slice(1);
-  if(p.startsWith("966") && p.length===12) return p;
   return p;
 }
 function contactLink(){ return "https://wa.me/" + normalizePhoneToWA(CONTACT_PRIMARY); }
@@ -466,23 +475,17 @@ ${SIGNATURE}`
   );
 }
 
+// ✅ يفتح واتساب بزنس أولاً، ثم احتياط wa.me
 function openWABusinessFast(toPhone, messageText){
   const phone = normalizePhoneToWA(toPhone);
   if(!phone) return;
 
   const msg = encodeURIComponent(messageText || "");
-
-  // يفتح واتساب بزنس مباشرة
   const businessScheme = "whatsapp-business://send?phone=" + phone + "&text=" + msg;
-
-  // احتياط لو الجهاز ما يدعم البروتوكول
   const fallback = "https://wa.me/" + phone + "?text=" + msg;
 
   window.location.href = businessScheme;
-
-  setTimeout(()=>{
-    window.location.href = fallback;
-  }, 600);
+  setTimeout(()=>{ window.location.href = fallback; }, 600);
 }
 
 function isAutoWAEnabled(){ return !!document.getElementById("autoWA")?.checked; }
@@ -887,7 +890,7 @@ async function forgotStudentPin(){
   openWABusinessFast(wa, msg);
 }
 
-// ================== ✅ مفاتيح تاريخ محلي + تسجيل عملية (يكتب dateKey + dateKeyLocal) ==================
+// ================== ✅ تسجيل عملية ==================
 function localDateKeyFromDate(d){
   const yyyy = d.getFullYear();
   const mm = String(d.getMonth()+1).padStart(2,'0');
@@ -897,9 +900,8 @@ function localDateKeyFromDate(d){
 function localTodayKey(){ return localDateKeyFromDate(new Date()); }
 
 async function logTxn(ref, type, reason, amount, balanceAfter, studentName, guardianWhats){
-  const dateKey = localTodayKey();     // ✅ نفس اللي نبحث به في العمليات اليومية
-  const dateKeyLocal = dateKey;        // ✅ للتوافق مع نسخ أخرى
-  const createdAtClient = Date.now();  // ✅ ترتيب فوري
+  const dateKey = localTodayKey();
+  const createdAtClient = Date.now();
 
   await ref.collection("txns").add({
     type,
@@ -909,7 +911,6 @@ async function logTxn(ref, type, reason, amount, balanceAfter, studentName, guar
     studentName: studentName || "",
     guardianWhats: guardianWhats || "",
     dateKey,
-    dateKeyLocal,
     createdAtClient,
     createdAt: firebase.firestore.FieldValue.serverTimestamp()
   });
@@ -965,10 +966,17 @@ async function renderStudents(){
   const arr=[]; snap.forEach(d=>arr.push({id:d.id,...d.data()}));
   arr.sort((a,b)=>(a.name||"").localeCompare(b.name||"","ar"));
 
-  const pick=$("pickStudent"); pick.innerHTML="";
-  arr.forEach(s=>{ const o=document.createElement("option"); o.value=s.id; o.textContent=s.name; pick.appendChild(o); });
+  const pick=$("pickStudent"); if(pick){ pick.innerHTML=""; }
+  arr.forEach(s=>{
+    if(pick){
+      const o=document.createElement("option");
+      o.value=s.id; o.textContent=s.name;
+      pick.appendChild(o);
+    }
+  });
 
-  const grid=$("studentsGrid"); grid.innerHTML="";
+  const grid=$("studentsGrid"); if(!grid) return;
+  grid.innerHTML="";
   arr.forEach(s=>{
     const card=document.createElement("div");
     card.className="card";
@@ -1025,11 +1033,8 @@ async function smartAutoSendWhats({type, studentName, amount, reason, guardianWh
   }
 
   const msg = buildOfficialMessage(type, studentName, amount, reason);
-
-  // ولي الأمر
   openWABusinessFast(parent, msg);
 
-  // نسخة للمعلمة
   if(isCopyEnabled()){
     setTimeout(()=>{
       openWABusinessFast(CONTACT_PRIMARY, "نسخة للمعلمة ✅\n\n" + msg);
@@ -1062,7 +1067,7 @@ async function depositAll(){
 
 async function withdrawAll(){
   const a=parseFloat($("bulkWithdrawAmount").value);
-  if(isNaN(a)||a<0) return warn("اكتب مبلغ السحب من الكل");
+  if(isNaN(a)||a<=0) return warn("اكتب مبلغ السحب من الكل");
   const studs=await db.collection("students").where("classId","==",currentClassId).get();
 
   for(const d of studs.docs){
@@ -1112,7 +1117,7 @@ async function withdrawFromStudent(){
   const sid = $("pickStudent").value;
   const a = parseFloat($("pickAmount").value);
   if(!sid) return warn("اختر طالب");
-  if(isNaN(a) || a<0) return warn("اكتب مبلغ");
+  if(isNaN(a) || a<=0) return warn("اكتب مبلغ");
 
   const ref = db.collection("students").doc(sid);
   const doc = await ref.get();
@@ -1154,7 +1159,7 @@ async function depositSelected(){
 
 async function withdrawSelected(){
   const a = parseFloat($("pickAmount").value);
-  if(isNaN(a) || a<0) return warn("اكتب مبلغ (في خانة المبلغ) للسحب من المحددين");
+  if(isNaN(a) || a<=0) return warn("اكتب مبلغ (في خانة المبلغ) للسحب من المحددين");
   if(selectedIds.size===0) return warn("ما تم اختيار طلاب");
 
   const reason = getReason("reasonTeacher","reasonOtherTeacher");
@@ -1271,7 +1276,7 @@ async function studentLogin(){
   }
 }
 
-// ================== ✅ كشف الحساب (بدون Index مركّب) ==================
+// ================== ✅ كشف الحساب ==================
 async function showStatement(){
   const from=$("fromDate").value;
   const to=$("toDate").value;
@@ -1279,7 +1284,6 @@ async function showStatement(){
   let q = db.collection("students").doc(currentStudentId).collection("txns")
     .orderBy("createdAtClient","desc").limit(80);
 
-  // ✅ فلترة بالميلي ثانية بدل dateKeyLocal (عشان ما يطلب Index مركّب)
   if(from && to){
     const fromMs = new Date(from + "T00:00:00").getTime();
     const toMs   = new Date(to   + "T23:59:59").getTime();
@@ -1314,7 +1318,7 @@ async function executeOp(){
   const op=$("op").value;
   const amt=parseFloat($("amt").value);
 
-  if(isNaN(amt) || (op==="withdraw" ? amt<0 : amt<=0)) return warn("اكتب مبلغ صحيح");
+  if(isNaN(amt) || amt<=0) return warn("اكتب مبلغ صحيح");
 
   const reason = getReason("reasonStudent","reasonOtherStudent");
 
@@ -1352,8 +1356,19 @@ async function executeOp(){
   await showStatement();
 }
 
-// ================== العمليات اليومية (حل فوري بدون collectionGroup) ==================
+// ================== ✅ العمليات اليومية (بدون collectionGroup) ==================
 let dailyOpsCache = [];
+let dailySelectedIndex = null;
+
+function setDailyPick(idx){
+  dailySelectedIndex = Number(idx);
+  const hint = $("dailyPickHint");
+  if(hint){
+    const op = dailyOpsCache[dailySelectedIndex];
+    const name = op?.studentName ? `✅ تم تحديد: ${op.studentName}` : "✅ تم تحديد عملية";
+    hint.textContent = " " + name;
+  }
+}
 
 async function loadDailyOps(){
   const inp = document.getElementById("dailyDate");
@@ -1362,11 +1377,11 @@ async function loadDailyOps(){
 
   try{
     dailyOpsCache = [];
+    dailySelectedIndex = null;
+    if($("dailyPickHint")) $("dailyPickHint").textContent = "";
 
-    // 1) نجلب كل الطلاب (أو تقدرين تقيدينها بفصل محدد لو تبين)
     const studentsSnap = await db.collection("students").get();
 
-    // 2) لكل طالب: نجيب عملياته في هذا التاريخ
     const promises = studentsSnap.docs.map(async (stuDoc) => {
       const s = stuDoc.data() || {};
       const txSnap = await db.collection("students")
@@ -1378,7 +1393,6 @@ async function loadDailyOps(){
 
       txSnap.forEach(tx => {
         const x = tx.data() || {};
-        // نضمن وجود اسم الطالب ورقم ولي الأمر حتى لو ما انحفظوا داخل العملية
         if(!x.studentName) x.studentName = s.name || "";
         if(!x.guardianWhats) x.guardianWhats = s.guardianWhats || "";
         dailyOpsCache.push(x);
@@ -1386,8 +1400,6 @@ async function loadDailyOps(){
     });
 
     await Promise.all(promises);
-
-    // 3) ترتيب محلي (بدون orderBy من Firestore)
     dailyOpsCache.sort((a,b)=> (b.createdAtClient||0) - (a.createdAtClient||0));
 
     renderDailyOps();
@@ -1399,64 +1411,39 @@ async function loadDailyOps(){
 }
 
 function renderDailyOps(){
-  const box = document.getElementById("dailyOpsList");
-  if(!dailyOpsCache.length){
-    box.innerHTML = '<div class="small">ما فيه عمليات في هذا التاريخ.</div>';
-    return;
-  }
-
-  box.innerHTML = dailyOpsCache.map(x=>{
-    const t = x.createdAtClient ? new Date(x.createdAtClient).toLocaleString("ar-SA") : "";
-    return `
-      <div class="card" style="margin:8px 0">
-        <div><b>${x.studentName || "—"}</b></div>
-        <div class="small">الوقت: ${t}</div>
-        <div class="small">العملية: ${x.type || "—"}</div>
-        <div class="small">المبلغ: ${x.amount ?? ""} ر.س</div>
-        <div class="small">السبب: ${x.reason || "—"}</div>
-      </div>
-    `;
-  }).join("");
-}
-
-function openWABusinessFast(toPhone, messageText){
-  const phone = normalizePhoneToWA(toPhone);
-  if(!phone) return;
-
-  const msg = encodeURIComponent(messageText || "");
-
-  // يفتح واتساب بزنس مباشرة
-  const businessScheme = "whatsapp-business://send?phone=" + phone + "&text=" + msg;
-
-  // احتياط لو الجهاز ما يدعم البروتوكول
-  const fallback = "https://wa.me/" + phone + "?text=" + msg;
-
-  window.location.href = businessScheme;
-
-  setTimeout(()=>{
-    window.location.href = fallback;
-  }, 600);
-}
-
-function renderDailyOps(){
   const box = $("dailyOpsList");
   if(!dailyOpsCache.length){
     box.innerHTML = '<div class="small">ما فيه عمليات في هذا التاريخ.</div>';
     return;
   }
 
-  box.innerHTML = dailyOpsCache.map(x=>{
+  box.innerHTML = dailyOpsCache.map((x, idx)=>{
     const t = x.createdAtClient ? new Date(x.createdAtClient).toLocaleString("ar-SA") : "";
+    const checked = (dailySelectedIndex === idx) ? "checked" : "";
     return `
       <div class="card" style="margin:8px 0">
-        <div><b>${x.studentName || "—"}</b></div>
-        <div class="small">الوقت: ${t}</div>
+        <div class="dailyPickRow">
+          <div class="dailyPickLeft">
+            <input type="radio" name="dailyPick" value="${idx}" ${checked}
+              onchange="setDailyPick(${idx})">
+            <b>${x.studentName || "—"}</b>
+          </div>
+          <div class="small">الوقت: ${t}</div>
+        </div>
         <div class="small">العملية: ${x.type || "—"}</div>
         <div class="small">المبلغ: ${x.amount ?? ""} ر.س</div>
         <div class="small">السبب: ${x.reason || "—"}</div>
       </div>
     `;
   }).join("");
+
+  // ✅ لو فيه عمليات ولم يتم اختيار: نختار أول عملية تلقائيًا
+  if(dailySelectedIndex === null && dailyOpsCache.length){
+    dailySelectedIndex = 0;
+    setDailyPick(0);
+    const firstRadio = document.querySelector('input[name="dailyPick"][value="0"]');
+    if(firstRadio) firstRadio.checked = true;
+  }
 }
 
 function sendDailyOpsWhats(){
@@ -1465,10 +1452,17 @@ function sendDailyOpsWhats(){
     return;
   }
 
-  // iOS قد يمنع فتح عدة نوافذ — نفتح أول عملية فقط
-  const op = dailyOpsCache[0];
+  if(dailySelectedIndex === null){
+    openModal("تنبيه","اختاري العملية أولاً من (○) ثم اضغطي زر واتساب.");
+    return;
+  }
+
+  const op = dailyOpsCache[dailySelectedIndex];
   const phone = normalizePhoneToWA(op.guardianWhats || "");
-  if(!phone){ openModal("تنبيه","لا يوجد رقم ولي أمر مسجل لهذه العملية."); return; }
+  if(!phone){
+    openModal("تنبيه","لا يوجد رقم ولي أمر مسجل لهذه العملية.");
+    return;
+  }
 
   const msg = buildOfficialMessage(op.type||"عملية", op.studentName||"—", op.amount, op.reason);
   openWABusinessFast(phone, msg);
