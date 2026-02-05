@@ -1348,30 +1348,104 @@ async function executeOp(){
   await showStatement();
 }
 
-// ================== ✅ العمليات اليومية (بدون orderBy لتفادي Index) ==================
+// ================== العمليات اليومية (حل فوري بدون collectionGroup) ==================
 let dailyOpsCache = [];
 
 async function loadDailyOps(){
-  const inp = $("dailyDate");
-  const chosenStr = inp.value ? inp.value : localTodayKey();
-  if(inp && !inp.value) inp.value = chosenStr;
+  const inp = document.getElementById("dailyDate");
+  const chosenStr = inp.value ? inp.value : new Date().toISOString().slice(0,10);
+  if(!inp.value) inp.value = chosenStr;
 
   try{
-    const snap = await db.collectionGroup("txns")
-      .where("dateKey", "==", chosenStr) // ✅ نفس الحقل اللي نكتب فيه
-      .limit(400)
-      .get();
+    dailyOpsCache = [];
 
-    dailyOpsCache=[];
-    snap.forEach(d=>dailyOpsCache.push(d.data()||{}));
+    // 1) نجلب كل الطلاب (أو تقدرين تقيدينها بفصل محدد لو تبين)
+    const studentsSnap = await db.collection("students").get();
 
-    // ✅ ترتيب محلي داخل الصفحة (بدون orderBy على Firebase)
+    // 2) لكل طالب: نجيب عملياته في هذا التاريخ
+    const promises = studentsSnap.docs.map(async (stuDoc) => {
+      const s = stuDoc.data() || {};
+      const txSnap = await db.collection("students")
+        .doc(stuDoc.id)
+        .collection("txns")
+        .where("dateKey", "==", chosenStr)
+        .limit(200)
+        .get();
+
+      txSnap.forEach(tx => {
+        const x = tx.data() || {};
+        // نضمن وجود اسم الطالب ورقم ولي الأمر حتى لو ما انحفظوا داخل العملية
+        if(!x.studentName) x.studentName = s.name || "";
+        if(!x.guardianWhats) x.guardianWhats = s.guardianWhats || "";
+        dailyOpsCache.push(x);
+      });
+    });
+
+    await Promise.all(promises);
+
+    // 3) ترتيب محلي (بدون orderBy من Firestore)
     dailyOpsCache.sort((a,b)=> (b.createdAtClient||0) - (a.createdAtClient||0));
 
     renderDailyOps();
   }catch(e){
     console.log(e);
-    $("dailyOpsList").innerHTML = '<div class="small" style="color:#b00020;font-weight:700">تعذر تحميل العمليات.</div>';
+    document.getElementById("dailyOpsList").innerHTML =
+      '<div class="small" style="color:#b00020;font-weight:700">تعذر تحميل العمليات.</div>';
+  }
+}
+
+function renderDailyOps(){
+  const box = document.getElementById("dailyOpsList");
+  if(!dailyOpsCache.length){
+    box.innerHTML = '<div class="small">ما فيه عمليات في هذا التاريخ.</div>';
+    return;
+  }
+
+  box.innerHTML = dailyOpsCache.map(x=>{
+    const t = x.createdAtClient ? new Date(x.createdAtClient).toLocaleString("ar-SA") : "";
+    return `
+      <div class="card" style="margin:8px 0">
+        <div><b>${x.studentName || "—"}</b></div>
+        <div class="small">الوقت: ${t}</div>
+        <div class="small">العملية: ${x.type || "—"}</div>
+        <div class="small">المبلغ: ${x.amount ?? ""} ر.س</div>
+        <div class="small">السبب: ${x.reason || "—"}</div>
+      </div>
+    `;
+  }).join("");
+}
+
+function sendDailyOpsWhats(){
+  if(!dailyOpsCache.length){
+    openModal("تنبيه","لا توجد عمليات للإرسال. اضغطي (عرض العمليات) أولاً.");
+    return;
+  }
+
+  // نفتح الرسائل واحدة واحدة (iOS يمنع فتح عشرات مرة وحدة أحيانًا)
+  const links = dailyOpsCache
+    .map(op=>{
+      const phone = normalizePhoneToWA(op.guardianWhats || "");
+      if(!phone) return "";
+      const msg = buildDailyMessage(op); // إذا عندك buildDailyMessage
+      return "https://wa.me/" + phone + "?text=" + encodeURIComponent(msg);
+    })
+    .filter(Boolean);
+
+  if(!links.length){
+    openModal("تنبيه","لا توجد أرقام أولياء أمور مسجلة لهذه العمليات.");
+    return;
+  }
+
+  const maxOpen = 10;
+  links.slice(0, maxOpen).forEach((l,i)=>{
+    setTimeout(()=> window.open(l, "_blank"), i*450);
+  });
+
+  if(links.length > maxOpen){
+    openModal("ملاحظة", `تم فتح ${maxOpen} رسائل الآن.\nاضغطي الزر مرة ثانية لإكمال الباقي.`);
+    // نخزن الباقي
+    dailyOpsCache = dailyOpsCache.slice(maxOpen);
+    renderDailyOps();
   }
 }
 
