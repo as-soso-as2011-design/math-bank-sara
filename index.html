@@ -77,7 +77,6 @@ tr:last-child td{border-bottom:none}
 .selTag{display:flex;gap:8px;align-items:center;background:#eef6ff;border:1px solid #dfeaff;border-radius:999px;padding:6px 10px;font-size:12px;color:#003}
 .selTag input{width:auto}
 
-/* student operation block above statement */
 #studentOpCard{margin-top:10px}
 </style>
 </head>
@@ -153,7 +152,7 @@ tr:last-child td{border-bottom:none}
       </div>
     </div>
 
-    <!-- العمليات اليومية (بدون Index) -->
+    <!-- ✅ العمليات اليومية (مُصلّحة نهائيًا بدون Index) -->
     <div class="card soft" id="dailyOpsCard">
       <h3 style="margin:0 0 8px 0;color:var(--navy)">العمليات اليومية</h3>
 
@@ -261,7 +260,7 @@ tr:last-child td{border-bottom:none}
 
       <hr>
 
-      <!-- سبب العملية للمعلمة (يظهر دائمًا) -->
+      <!-- سبب العملية للمعلمة -->
       <div class="row">
         <div class="col">
           <div class="small">سبب العملية</div>
@@ -291,7 +290,7 @@ tr:last-child td{border-bottom:none}
   </div>
 </div>
 
-<!-- ===== صفحة الطالب (وضع الطلاب) ===== -->
+<!-- ===== صفحة الطالب ===== -->
 <div id="studentLoginPage" class="hidden">
   <div class="container">
     <div class="card">
@@ -375,18 +374,15 @@ tr:last-child td{border-bottom:none}
 <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore-compat.js"></script>
 
 <script>
-// ================== وضع الدخول: teacher / student ==================
 const urlParams = new URLSearchParams(window.location.search);
-const APP_MODE = (urlParams.get("mode") || "teacher").toLowerCase(); // teacher | student
+const APP_MODE = (urlParams.get("mode") || "teacher").toLowerCase();
 const IS_STUDENT_ENTRY = (APP_MODE === "student");
 
-// ================== أرقام واتساب ==================
 const SIGNATURE = "المعلمة: سارة حقوي";
 const TEACHER_BANK_TITLE = "بنك الرياضيات – المصرفي";
-const CONTACT_PRIMARY = "0502234335";    // زر تواصل للأمهات
-const WHATSAPP_BUSINESS = "0556891201";  // واتساب بزنس (المرسل)
+const CONTACT_PRIMARY = "0502234335";
+const WHATSAPP_BUSINESS = "0556891201";
 
-// ================== Firebase ==================
 const firebaseConfig = {
   apiKey: "AIzaSyDP-pi0tbFQ9bNRihrLz_kUs-JBoa9Cw4Y",
   authDomain: "sara-haywire.firebaseapp.com",
@@ -402,7 +398,6 @@ const db = firebase.firestore();
 const TEACHER_EMAIL="as-soso-as2011@hotmail.com";
 function $(id){return document.getElementById(id);}
 
-// ================== أدوات ==================
 function openModal(title, bodyHtml, actionsHtml){
   $("mTitle").textContent=title;
   $("mBody").innerHTML=bodyHtml;
@@ -412,14 +407,13 @@ function openModal(title, bodyHtml, actionsHtml){
 function closeModal(){ $("modal").style.display="none"; }
 function warn(msg){ openModal("تنبيه", msg); }
 function logout(){location.reload();}
-
 function go(page){
   ["teacherLoginPage","classesPage","classPage","studentLoginPage","studentAccountPage"].forEach(id=>$(id).classList.add("hidden"));
   $(page).classList.remove("hidden");
 }
 function fmt(x){ return (Math.round((Number(x||0)+Number.EPSILON)*100)/100).toFixed(2); }
 
-// ================== صوت الترحيب (مع احتياط) ==================
+// صوت الترحيب (مع احتياط)
 async function beep(){
   try{
     const ctx=new (window.AudioContext||window.webkitAudioContext)();
@@ -437,7 +431,7 @@ async function playWelcome(){
   try{ if(mp3){ mp3.currentTime=0; await mp3.play(); return; } }catch(e){}
 }
 
-// ================== WhatsApp helpers ==================
+// WhatsApp
 function normalizePhoneToWA(phone){
   let p = String(phone||"").replace(/[^0-9]/g,"");
   if(!p) return "";
@@ -487,34 +481,11 @@ function openWABusinessFast(toPhone, messageText){
 function isAutoWAEnabled(){ return !!document.getElementById("autoWA")?.checked; }
 function isCopyEnabled(){ return !!document.getElementById("copyToTeacher")?.checked; }
 
-// ================== أسباب العمليات ==================
+// أسباب العمليات
 const REASONS = {
-  deposit: [
-    "التفاعل والمشاركة الإيجابية",
-    "الالتزام بالقوانين الصفية",
-    "الالتزام بمتطلبات المادة والحصة",
-    "تميز في الأداء والسلوك",
-    "تحسن ملحوظ في المستوى أو السلوك",
-    "أخرى"
-  ],
-  withdraw: [
-    "عدم حل الواجب الدراسي",
-    "كثرة الكلام والحركة داخل الحصة",
-    "النوم أثناء الحصة",
-    "عدم الالتزام بالأسلوب اللائق مع الزملاء",
-    "عدم الالتزام بالأسلوب اللائق مع المعلمة",
-    "التأخر عن حصة الرياضيات دون عذر",
-    "نسيان كتاب الرياضيات",
-    "نسيان الدفتر",
-    "نسيان المذكرة",
-    "عدم إحضار أدوات الرياضيات",
-    "أخرى"
-  ],
-  transfer: [
-    "تسديد/إرجاع رصيد",
-    "مساعدة زميل/ـة",
-    "أخرى"
-  ]
+  deposit: ["التفاعل والمشاركة الإيجابية","الالتزام بالقوانين الصفية","الالتزام بمتطلبات المادة والحصة","تميز في الأداء والسلوك","تحسن ملحوظ في المستوى أو السلوك","أخرى"],
+  withdraw: ["عدم حل الواجب الدراسي","كثرة الكلام والحركة داخل الحصة","النوم أثناء الحصة","عدم الالتزام بالأسلوب اللائق مع الزملاء","عدم الالتزام بالأسلوب اللائق مع المعلمة","التأخر عن حصة الرياضيات دون عذر","نسيان كتاب الرياضيات","نسيان الدفتر","نسيان المذكرة","عدم إحضار أدوات الرياضيات","أخرى"],
+  transfer: ["تسديد/إرجاع رصيد","مساعدة زميل/ـة","أخرى"]
 };
 
 function fillReasonSelect(selectEl, items){
@@ -522,13 +493,12 @@ function fillReasonSelect(selectEl, items){
   selectEl.innerHTML = "";
   items.forEach(r=>{
     const o = document.createElement("option");
-    o.value = r;
-    o.textContent = r;
+    o.value = r; o.textContent = r;
     selectEl.appendChild(o);
   });
 }
 
-let currentAccess = "teacher"; // teacher | student
+let currentAccess = "teacher";
 
 function setupReasonUI(mode, selectId, otherId){
   const sel = document.getElementById(selectId);
@@ -592,7 +562,7 @@ function initTeacherReasonAlways(){
   toggleOther();
 }
 
-// ================== زر البدء ==================
+// زر البدء
 async function startApp(){
   $("connPill").textContent = "جاهز ✅";
   $("connPill").style.background = "#dff4e3";
@@ -616,7 +586,7 @@ async function startApp(){
   currentAccess = "teacher";
 }
 
-// ================== تسجيل المعلمة ==================
+// تسجيل المعلمة
 function teacherLogin(){
   if($("tu").value.trim()==="teacher" && $("tp").value.trim()==="12345"){
     currentAccess = "teacher";
@@ -630,7 +600,7 @@ function forgotTeacher(){
   window.location.href=`mailto:${TEACHER_EMAIL}?subject=${subject}&body=${body}`;
 }
 
-// ================== التحكم في “نسيت الرقم السري” ==================
+// إعداد نسيت الرقم السري
 let forgotPinEnabled = true;
 
 async function loadForgotSetting(){
@@ -662,11 +632,11 @@ async function toggleForgotPinForAll(){
 }
 function isForgotEnabled(){ return forgotPinEnabled === true; }
 
-// ================== بيانات عامة ==================
+// بيانات عامة
 let classes=[], currentClassId=null, currentStudentId=null;
 let selectedIds = new Set();
 
-// ================== أسماء الطلاب الافتراضية ==================
+// بيانات افتراضية
 const DEFAULT_STUDENTS = {
   "سادس بنين": ["طلال الرحيلي","علي المكرمي","عمر صواف","محمد العنزي","سالم آل مخلص","عبدالملك الجناعي","وليد المالكي","سلمان الجوهر","راكان مباركي","فيصل القحطاني","ريان القحطاني","محمد أبو صالح","نايف العصيمي"],
   "سادس بنات": ["رهف الثبيتي","جادل الدوسري","دانة القحطاني","تالين متولي","ديما الحمادي","رهف الزهراني","كادي العتيبي","رودينا غريب","الجوهرة آل مخلص","ريم آل مشرف"],
@@ -739,7 +709,7 @@ async function ensureSeed(){
   }
 }
 
-// ================== تحميل الفصول ==================
+// تحميل الفصول
 async function loadClasses(){
   const snap = await db.collection("classes").orderBy("order").get();
   classes=[]; snap.forEach(d=>classes.push({id:d.id,...d.data()}));
@@ -758,7 +728,7 @@ async function renderTabs(){
   });
 }
 
-// ================== إدارة الفصول ==================
+// إدارة الفصول
 async function addClass(){
   const n=$("newClassName").value.trim();
   if(!n) return warn("اكتب اسم الفصل");
@@ -794,7 +764,7 @@ async function syncStudentsToClasses(){
   await renderTabs();
 }
 
-// ================== ولي الأمر ==================
+// ولي الأمر
 async function ensureGuardianPhone(studentId, studentName){
   const ref = db.collection("students").doc(studentId);
   const doc = await ref.get();
@@ -843,7 +813,7 @@ async function sendPinToParent(studentId){
   openWABusinessFast(wa, msg);
 }
 
-// ================== نسيان PIN ==================
+// نسيان PIN
 async function forgotStudentPin(){
   if(!isForgotEnabled()){
     openModal("تنبيه","خدمة استرجاع الرقم السري موقوفة مؤقتًا. راجع/ي المعلمة 🌿");
@@ -884,7 +854,7 @@ async function forgotStudentPin(){
   openWABusinessFast(wa, msg);
 }
 
-// ================== إنشاء عملية ==================
+// إنشاء عملية (dateKeyLocal)
 function localDateKeyFromDate(d){
   const yyyy = d.getFullYear();
   const mm = String(d.getMonth()+1).padStart(2,'0');
@@ -892,11 +862,6 @@ function localDateKeyFromDate(d){
   return `${yyyy}-${mm}-${dd}`;
 }
 function localTodayKey(){ return localDateKeyFromDate(new Date()); }
-function shiftDateKey(key, days){
-  const d = new Date(key + "T12:00:00");
-  d.setDate(d.getDate() + (days||0));
-  return localDateKeyFromDate(d);
-}
 
 async function logTxn(ref, type, reason, amount, balanceAfter, studentName, guardianWhats){
   const dateKeyLocal = localTodayKey();
@@ -913,7 +878,7 @@ async function logTxn(ref, type, reason, amount, balanceAfter, studentName, guar
   });
 }
 
-// ================== الطلاب (لوحة المعلمة) ==================
+// الطلاب (لوحة المعلمة)
 async function addStudent(){
   const n=$("newStudentName").value.trim();
   if(!n) return warn("اكتب اسم الطالب");
@@ -1012,7 +977,7 @@ async function renderStudents(){
   updateSelCount();
 }
 
-// ================== إرسال فوري بنقرة واحدة ==================
+// إرسال فوري
 async function smartAutoSendWhats({type, studentName, amount, reason, guardianWhats}){
   if(!isAutoWAEnabled()) return;
 
@@ -1023,7 +988,6 @@ async function smartAutoSendWhats({type, studentName, amount, reason, guardianWh
   }
 
   const msg = buildOfficialMessage(type, studentName, amount, reason);
-
   openWABusinessFast(parent, msg);
 
   if(isCopyEnabled()){
@@ -1033,7 +997,7 @@ async function smartAutoSendWhats({type, studentName, amount, reason, guardianWh
   }
 }
 
-// ================== عمليات المعلمة ==================
+// عمليات المعلمة
 async function depositAll(){
   const a=parseFloat($("bulkAmount").value);
   if(isNaN(a)||a<=0) return warn("اكتب مبلغ الإيداع للكل");
@@ -1126,7 +1090,6 @@ async function withdrawFromStudent(){
   await renderStudents();
 }
 
-// دفعة واحدة للمحددين
 async function depositSelected(){
   const a = parseFloat($("pickAmount").value);
   if(isNaN(a) || a<=0) return warn("اكتب مبلغ (في خانة المبلغ) للإيداع للمحددين");
@@ -1170,7 +1133,7 @@ async function withdrawSelected(){
   await renderStudents();
 }
 
-// ================== التنقل ==================
+// التنقل
 function backToClasses(){ go("classesPage"); renderTabs(); }
 function openClassPage(){ go("classPage"); selectedIds.clear(); $("selAll").checked=false; renderStudents(); initTeacherReasonAlways(); }
 function backToClass(){
@@ -1178,7 +1141,7 @@ function backToClass(){
   go("classPage"); renderStudents();
 }
 
-// ================== دخول الطالب من المعلمة ==================
+// دخول الطالب من المعلمة
 function showStudentLogin(s){
   currentAccess = "teacher";
   go("studentLoginPage");
@@ -1190,7 +1153,7 @@ function showStudentLogin(s){
   if(!s.active) $("stuLocked").classList.remove("hidden");
 }
 
-// ================== كشف الحساب + تحويل القائمة ==================
+// كشف الحساب + تحويل
 async function renderOpenedAt(){
   const doc=await db.collection("students").doc(currentStudentId).get();
   const s=doc.data();
@@ -1204,7 +1167,7 @@ async function buildTransferList(){
   arr.forEach(s=>{ if(s.id===currentStudentId) return; const o=document.createElement("option"); o.value=s.id; o.textContent=s.name; $("transferTo").appendChild(o); });
 }
 
-// ================== تسجيل دخول الطالب ==================
+// تسجيل دخول الطالب
 async function studentLogin(){
   try{
     if(IS_STUDENT_ENTRY){
@@ -1267,7 +1230,7 @@ async function studentLogin(){
   }
 }
 
-// ================== كشف الحساب ==================
+// كشف الحساب
 async function showStatement(){
   const from=$("fromDate").value;
   const to=$("toDate").value;
@@ -1301,7 +1264,7 @@ async function showStatement(){
   });
 }
 
-// ================== تنفيذ عملية داخل حساب الطالب ==================
+// تنفيذ عملية
 async function executeOp(){
   const ref=db.collection("students").doc(currentStudentId);
   const doc=await ref.get();
@@ -1310,6 +1273,7 @@ async function executeOp(){
   const amt=parseFloat($("amt").value);
 
   if(isNaN(amt) || (op==="withdraw" ? amt<0 : amt<=0)) return warn("اكتب مبلغ صحيح");
+
   const reason = getReason("reasonStudent","reasonOtherStudent");
 
   if(op==="deposit"){
@@ -1346,7 +1310,7 @@ async function executeOp(){
   await showStatement();
 }
 
-// ================== العمليات اليومية (بدون orderBy لتفادي Index) ==================
+// ================== ✅ العمليات اليومية (مُصلّحة بدون orderBy على collectionGroup) ==================
 let dailyOpsCache = [];
 
 async function loadDailyOps(){
@@ -1355,37 +1319,16 @@ async function loadDailyOps(){
   if(inp && !inp.value) inp.value = chosenStr;
 
   try{
-    // ✅ بدون orderBy (هذا اللي كان يطلب Index)
-    let snap = await db.collectionGroup("txns")
+    // ✅ لا orderBy هنا إطلاقًا (عشان ما يطلب Index)
+    const snap = await db.collectionGroup("txns")
       .where("dateKeyLocal", "==", chosenStr)
-      .limit(500)
+      .limit(400)
       .get();
-
-    if(snap.empty){
-      const prevKey = shiftDateKey(chosenStr, -1);
-      snap = await db.collectionGroup("txns")
-        .where("dateKeyLocal", "==", prevKey)
-        .limit(500)
-        .get();
-
-      const filtered=[];
-      snap.forEach(d=>{
-        const x=d.data()||{};
-        const k = localDateKeyFromDate(new Date(Number(x.createdAtClient||0)));
-        if(k===chosenStr) filtered.push(x);
-      });
-
-      // ترتيب محلي
-      filtered.sort((a,b)=>Number(b.createdAtClient||0)-Number(a.createdAtClient||0));
-      dailyOpsCache = filtered;
-      renderDailyOps();
-      return;
-    }
 
     dailyOpsCache=[];
     snap.forEach(d=>dailyOpsCache.push(d.data()||{}));
 
-    // ترتيب محلي
+    // ✅ ترتيب محلي حسب createdAtClient
     dailyOpsCache.sort((a,b)=>Number(b.createdAtClient||0)-Number(a.createdAtClient||0));
 
     renderDailyOps();
@@ -1422,6 +1365,7 @@ function sendDailyOpsWhats(){
     return;
   }
 
+  // iOS يكره فتح نوافذ كثيرة — نفتح أول عملية
   const op = dailyOpsCache[0];
   const phone = normalizePhoneToWA(op.guardianWhats || "");
   if(!phone){ openModal("تنبيه","لا يوجد رقم ولي أمر مسجل لهذه العملية."); return; }
@@ -1430,7 +1374,7 @@ function sendDailyOpsWhats(){
   openWABusinessFast(phone, msg);
 }
 
-// ================== تهيئة عند التحميل ==================
+// تهيئة
 document.addEventListener("DOMContentLoaded", async () => {
   const link = $("forgotPinLink");
   if(link) link.addEventListener("click", (e)=>{ e.preventDefault(); forgotStudentPin(); });
