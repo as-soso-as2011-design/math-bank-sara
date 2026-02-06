@@ -184,40 +184,45 @@
   overflow:hidden;
   width:100%;
   position:relative;
+  direction:ltr; /* مهم عشان السحب والترجمة يشتغلون صح */
 }
 
-/* نخلي التراك LTR عشان translateX يشتغل صح حتى لو الصفحة RTL */
 .onbTrack{
   display:flex;
   width:300%;
-  direction:ltr;
   transition:transform .45s ease;
 }
 
 .onbSlide{
-  width:100%;
+  flex:0 0 100%;
   min-height:260px;
-  background:linear-gradient(160deg,#061a3d,#0b2a66);
+  background:#061c45;            /* لون واحد فخم */
   color:#fff;
-  border-radius:16px;
+  border-radius:20px;
   padding:28px 20px;
   display:flex;
   flex-direction:column;
   justify-content:center;
   align-items:center;
   text-align:center;
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,.10);
+  direction:rtl;                  /* النص عربي داخل السلايد */
+  box-shadow:0 14px 34px rgba(0,0,0,.22);
 }
 
-.onbIcon{margin-bottom:10px; color:#fff;}
-.onbIcon svg *{stroke:currentColor;}
+.onbTitle{
+  font-size:18px;
+  font-weight:900;
+  color:#fff;
+  margin-top:10px;
+}
 
-.onbTitle{font-size:18px; font-weight:900; color:#fff;}
-.onbText{font-size:14px; line-height:1.9; margin-top:8px; color:rgba(255,255,255,.92);}
-
-.onbDots{display:flex; justify-content:center; gap:6px; margin-top:12px;}
-.onbDot{width:8px; height:8px; border-radius:20px; background:rgba(255,255,255,.30);}
-.onbDot.active{width:22px; background:#fff;}
+.onbText{
+  font-size:14px;
+  line-height:1.9;
+  margin-top:8px;
+  color:rgba(255,255,255,.9);
+  max-width:520px;
+}
   </style>
 </head>
 
@@ -587,6 +592,7 @@
   </div>
 
   <div class="footer">الرياضيات لغة الأذكياء ✨</div>
+  .footer{color:#fff;opacity:.95}    
 
   <!-- libs -->
   <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-app-compat.js"></script>
@@ -1888,15 +1894,16 @@ showOnboardingIfNeeded(()=>{
     // ================== Onboarding Logic (يظهر دائمًا) ==================
 let onbIndex = 0;
 let onbAfterDone = null;
-let onbSwipeBound = false;
 
 function showOnboardingIfNeeded(afterDone){
   onbAfterDone = (typeof afterDone === "function") ? afterDone : null;
+
   onbIndex = 0;
   updateOnbUI();
+
   const ov = document.getElementById("onboardOverlay");
   if(ov){
-    ov.style.display="flex";
+    ov.style.display = "flex";
     ov.setAttribute("aria-hidden","false");
   }
   enableOnbSwipe();
@@ -1905,15 +1912,18 @@ function showOnboardingIfNeeded(afterDone){
 function finishOnboarding(){
   const ov = document.getElementById("onboardOverlay");
   if(ov){
-    ov.style.display="none";
+    ov.style.display = "none";
     ov.setAttribute("aria-hidden","true");
   }
-  if(typeof onbAfterDone === "function") onbAfterDone();
+  const cb = onbAfterDone;
+  onbAfterDone = null;
+  if(typeof cb === "function") cb();
 }
 
 function updateOnbUI(){
   const track = document.getElementById("onbTrack");
   const dotsWrap = document.getElementById("onbDots");
+
   if(track) track.style.transform = `translateX(-${onbIndex * 100}%)`;
 
   if(dotsWrap){
@@ -1921,7 +1931,6 @@ function updateOnbUI(){
     dots.forEach((d,i)=> d.classList.toggle("active", i===onbIndex));
   }
 }
-
 function onbNext(){
   if(onbIndex >= 2) return finishOnboarding();
   onbIndex++;
@@ -2008,6 +2017,7 @@ function enableOnbSwipe(){
         const start=document.getElementById("startOverlay");
         if(start) start.style.display="flex";
       },2800);
+     showOnboardingIfNeeded(); 
     });
   </script>
 
