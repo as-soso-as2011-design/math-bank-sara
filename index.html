@@ -1114,7 +1114,15 @@ async function renderStudents(){
         <button class="btnRed col js-del">حذف</button>
       </div>
     `;
-
+<div class="row" style="margin-top:8px">
+  <button class="btn2 col js-open">دخول الطالب</button>
+  <button class="btn3 col js-toggle">${s.active?'إقفال':'تفعيل'}</button>
+  <button class="btn3 col js-edit">تعديل الاسم</button>
+  <button class="btn3 col js-parent">رقم ولي الأمر</button>
+  <button class="btn whatsapp-btn col js-sendpin">إرسال PIN</button>
+  <button class="btn2 col js-pdf">تقرير أسبوعي PDF</button>
+  <button class="btnRed col js-del">حذف</button>
+</div>
     const cb = card.querySelector('input[data-sel="stu"]');
     cb.onchange = ()=>{
       if(cb.checked) selectedIds.add(s.id);
@@ -1128,7 +1136,8 @@ async function renderStudents(){
     card.querySelector(".js-parent").onclick=()=> editGuardianPhone(s.id, s.name);
     card.querySelector(".js-sendpin").onclick=()=> sendPinToParent(s.id);
     card.querySelector(".js-del").onclick=()=> deleteStudent(s.id, s.name);
-
+  
+card.querySelector(".js-pdf").onclick = ()=> downloadWeeklyStudentPDFForId(s.id);
     grid.appendChild(card);
   });
 
@@ -1488,6 +1497,99 @@ function setDailyPick(idx){
   }
 }
 
+ // ================== 📄 التقرير الأسبوعي PDF ================== 
+  async function buildWeeklyStudentPaperFor(studentId, endStr){
+  const {startMs, endMs, start, end} = getWeekRange(endStr);
+
+  const studDoc = await db.collection("students").doc(studentId).get();
+  if(!studDoc.exists) throw new Error("Student not found");
+  const s = studDoc.data() || {};
+  const tier = s.tier || calcTier(s.balance);
+  const rangeText = `${start.toLocaleDateString("ar-SA")} → ${end.toLocaleDateString("ar-SA")}`;
+
+  const q = db.collection("students").doc(studentId).collection("txns")
+    .where("createdAtClient", ">=", startMs)
+    .where("createdAtClient", "<=", endMs)
+    .orderBy("createdAtClient","desc")
+    .limit(400);
+
+  const snap = await q.get();
+  const txns = [];
+  snap.forEach(d=>txns.push(d.data()||{}));
+
+  const S = sumWeekly(txns);
+
+  const rowsHtml = txns.slice(0,120).map(x=>{
+    const t=x.createdAtClient ? new Date(x.createdAtClient).toLocaleString("ar-SA") : "";
+    return `<tr>
+      <td>${t}</td>
+      <td>${x.type||""}</td>
+      <td>${x.reason||""}</td>
+      <td>${fmt(x.amount)}</td>
+      <td>${fmt(x.balanceAfter)}</td>
+    </tr>`;
+  }).join("");
+
+  const temp = document.getElementById("pdfTemp");
+  temp.classList.remove("hidden");
+  temp.innerHTML = `
+    <div id="weeklyStudentReportPaper" style="background:#fff;padding:12px;border-radius:14px">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+        <div>
+          <div style="font-weight:900;color:#00205B">📌 التقرير الأسبوعي للطالب</div>
+          <div style="font-size:12px;color:#666">الطالب: <b>${s.name||"—"}</b></div>
+          <div style="font-size:12px;color:#666">الفترة: ${rangeText}</div>
+        </div>
+        <div class="tierBadge">${tier}</div>
+      </div>
+
+      <hr style="border:0;border-top:1px solid #eee;margin:10px 0">
+
+      <div class="reportGrid">
+        <div class="reportKpi"><div class="k">عدد العمليات</div><div class="v">${S.count}</div></div>
+        <div class="reportKpi"><div class="k">إجمالي الإيداع</div><div class="v">${fmt(S.dep)}</div></div>
+        <div class="reportKpi"><div class="k">إجمالي السحب</div><div class="v">${fmt(S.wit)}</div></div>
+        <div class="reportKpi"><div class="k">إجمالي التحويلات</div><div class="v">${fmt(S.tr)}</div></div>
+        <div class="reportKpi"><div class="k">الصافي</div><div class="v">${fmt(S.net)}</div></div>
+        <div class="reportKpi"><div class="k">الرصيد الحالي</div><div class="v">${fmt(s.balance)}</div></div>
+      </div>
+
+      <hr style="border:0;border-top:1px solid #eee;margin:10px 0">
+
+      <div class="tableWrap" style="margin-top:10px">
+        <table>
+          <thead><tr><th>الوقت</th><th>العملية</th><th>السبب</th><th>المبلغ</th><th>الرصيد بعد العملية</th></tr></thead>
+          <tbody>
+            ${rowsHtml || `<tr><td colspan="5" class="small">لا توجد عمليات خلال الأسبوع.</td></tr>`}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="small" style="margin-top:8px">
+        ${TEACHER_BANK_TITLE} — ${SIGNATURE}
+      </div>
+    </div>
+  `;
+
+  return document.getElementById("weeklyStudentReportPaper");
+}
+
+async function downloadWeeklyStudentPDFForId(studentId){
+  try{
+    const endStr = ""; // لو تبين تاريخ محدد لكل طالب لاحقاً نضيفه
+    const paper = await buildWeeklyStudentPaperFor(studentId, endStr);
+    const studDoc = await db.collection("students").doc(studentId).get();
+    const s = studDoc.data() || {};
+    const name = (s.name || "student").replace(/\s+/g,"_");
+    await elementToPDF(paper, `Weekly_Report_${name}.pdf`);
+  }catch(e){
+    console.log(e);
+    openModal("تنبيه","تعذر إنشاء PDF لهذا الطالب الآن.");
+  }finally{
+    const temp = document.getElementById("pdfTemp");
+    if(temp){ temp.innerHTML=""; temp.classList.add("hidden"); }
+  }
+}
 async function loadDailyOps(){
   const inp = document.getElementById("dailyDate");
   const chosenStr = inp.value ? inp.value : new Date().toISOString().slice(0,10);
@@ -1637,6 +1739,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   },2800);
 });
 </script>
-
+<div id="pdfTemp" class="hidden"></div>
 </body>
 </html>
