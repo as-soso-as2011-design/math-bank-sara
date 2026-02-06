@@ -1079,29 +1079,38 @@ async function renderStudents(){
   const arr=[]; snap.forEach(d=>arr.push({id:d.id,...d.data()}));
   arr.sort((a,b)=>(a.name||"").localeCompare(b.name||"","ar"));
 
-  const pick=$("pickStudent"); if(pick){ pick.innerHTML=""; }
-  arr.forEach(s=>{
-    if(pick){
+  const pick = $("pickStudent");
+  if(pick){
+    pick.innerHTML="";
+    arr.forEach(s=>{
       const o=document.createElement("option");
       o.value=s.id; o.textContent=s.name;
       pick.appendChild(o);
-    }
-  });
+    });
+  }
 
-  const grid=$("studentsGrid"); if(!grid) return;
+  const grid = $("studentsGrid");
+  if(!grid) return;
   grid.innerHTML="";
+
   arr.forEach(s=>{
-    const card=document.createElement("div");
+    const card = document.createElement("div");
     card.className="card";
     const isChecked = selectedIds.has(s.id);
 
-    card.innerHTML=`
+    const tierText = (s.tier || (typeof calcTier==="function" ? calcTier(s.balance) : "")) || "";
+
+    card.innerHTML = `
       <div class="selRow" style="justify-content:space-between;margin:0 0 6px 0">
-        <span class="selTag"><input type="checkbox" data-sel="stu" data-id="${s.id}" ${isChecked?'checked':''}> اختيار</span>
+        <span class="selTag">
+          <input type="checkbox" data-sel="stu" data-id="${s.id}" ${isChecked?'checked':''}>
+          اختيار
+        </span>
         <span class="badge ${s.active?'on':'off'}">${s.active?'🟢 مفعل':'🔴 مقفل'}</span>
       </div>
 
-      <strong>${s.name}</strong>
+      <strong>${s.name || ""}</strong>
+      <div class="small">نوع الحساب: <b>${tierText || "—"}</b></div>
       <div class="small">الرصيد: ${fmt(s.balance)} ر.س</div>
       <div class="small">PIN: <b>${s.pin||""}</b></div>
 
@@ -1111,18 +1120,12 @@ async function renderStudents(){
         <button class="btn3 col js-edit">تعديل الاسم</button>
         <button class="btn3 col js-parent">رقم ولي الأمر</button>
         <button class="btn whatsapp-btn col js-sendpin">إرسال PIN</button>
+        <button class="btn2 col js-pdf">تقرير أسبوعي PDF</button>
         <button class="btnRed col js-del">حذف</button>
       </div>
     `;
-<div class="row" style="margin-top:8px">
-  <button class="btn2 col js-open">دخول الطالب</button>
-  <button class="btn3 col js-toggle">${s.active?'إقفال':'تفعيل'}</button>
-  <button class="btn3 col js-edit">تعديل الاسم</button>
-  <button class="btn3 col js-parent">رقم ولي الأمر</button>
-  <button class="btn whatsapp-btn col js-sendpin">إرسال PIN</button>
-  <button class="btn2 col js-pdf">تقرير أسبوعي PDF</button>
-  <button class="btnRed col js-del">حذف</button>
-</div>
+
+    // ✅ اختيار الطلاب
     const cb = card.querySelector('input[data-sel="stu"]');
     cb.onchange = ()=>{
       if(cb.checked) selectedIds.add(s.id);
@@ -1130,14 +1133,27 @@ async function renderStudents(){
       updateSelCount();
     };
 
-    card.querySelector(".js-open").onclick=()=>{ currentStudentId=s.id; showStudentLogin(s); };
-    card.querySelector(".js-toggle").onclick=async()=>{ await db.collection("students").doc(s.id).update({active:!s.active}); await renderStudents(); };
-    card.querySelector(".js-edit").onclick=async()=>{ const nn=prompt("الاسم الجديد:", s.name); if(nn) await db.collection("students").doc(s.id).update({name:nn.trim()}); await renderStudents(); };
-    card.querySelector(".js-parent").onclick=()=> editGuardianPhone(s.id, s.name);
-    card.querySelector(".js-sendpin").onclick=()=> sendPinToParent(s.id);
-    card.querySelector(".js-del").onclick=()=> deleteStudent(s.id, s.name);
-  
-card.querySelector(".js-pdf").onclick = ()=> downloadWeeklyStudentPDFForId(s.id);
+    // ✅ ربط الأزرار
+    card.querySelector(".js-open").onclick = ()=>{ currentStudentId=s.id; showStudentLogin(s); };
+    card.querySelector(".js-toggle").onclick = async()=>{
+      await db.collection("students").doc(s.id).update({active:!s.active});
+      await renderStudents();
+    };
+    card.querySelector(".js-edit").onclick = async()=>{
+      const nn = prompt("الاسم الجديد:", s.name);
+      if(nn) await db.collection("students").doc(s.id).update({name:nn.trim()});
+      await renderStudents();
+    };
+    card.querySelector(".js-parent").onclick = ()=> editGuardianPhone(s.id, s.name);
+    card.querySelector(".js-sendpin").onclick = ()=> sendPinToParent(s.id);
+    card.querySelector(".js-del").onclick = ()=> deleteStudent(s.id, s.name);
+
+    // ✅ زر PDF
+    const pdfBtn = card.querySelector(".js-pdf");
+    if(pdfBtn){
+      pdfBtn.onclick = ()=> downloadWeeklyStudentPDFForId(s.id);
+    }
+
     grid.appendChild(card);
   });
 
