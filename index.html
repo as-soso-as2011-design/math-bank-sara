@@ -1463,17 +1463,13 @@ let dailySelectedIndex = null;
 function setDailyPick(idx){
   dailySelectedIndex = Number(idx);
 
+  // تمييز البطاقة المحددة
   document.querySelectorAll(".opCard").forEach(el=>{
     const i = Number(el.getAttribute("data-idx"));
     el.classList.toggle("selected", i === dailySelectedIndex);
   });
-}
 
-  // تلوين البطاقات
-  document.querySelectorAll(".opCard").forEach(el=>el.classList.remove("selected"));
-  const el = document.querySelector(`.opCard[data-idx="${dailySelectedIndex}"]`);
-  if(el) el.classList.add("selected");
-
+  // تلميح اسم الطالب
   const hint = $("dailyPickHint");
   if(hint){
     const op = dailyOpsCache[dailySelectedIndex];
@@ -1524,27 +1520,40 @@ async function loadDailyOps(){
 
 function renderDailyOps(){
   const box = $("dailyOpsList");
+
   if(!dailyOpsCache.length){
-    box.innerHTML = dailyOpsCache.map((x, idx)=>{
-  const t = x.createdAtClient ? new Date(x.createdAtClient).toLocaleString("ar-SA") : "";
-  const checked = (dailySelectedIndex === idx) ? "checked" : "";
-  return `
-    <div class="card opCard" data-idx="${idx}" style="margin:8px 0;cursor:pointer"
-         onclick="setDailyPick(${idx}); const r=document.querySelector('input[name=dailyPick][value=\\'${idx}\\']'); if(r) r.checked=true;">
-      <div class="dailyPickRow">
-        <div class="dailyPickLeft">
-          <input type="radio" name="dailyPick" value="${idx}" ${checked}
-            onchange="setDailyPick(${idx})">
-          <b>${x.studentName || "—"}</b>
+    box.innerHTML = '<div class="small">ما فيه عمليات في هذا التاريخ.</div>';
+    return;
+  }
+
+  box.innerHTML = dailyOpsCache.map((x, idx)=>{
+    const t = x.createdAtClient ? new Date(x.createdAtClient).toLocaleString("ar-SA") : "";
+    const checked = (dailySelectedIndex === idx) ? "checked" : "";
+    return `
+      <div class="card opCard" data-idx="${idx}" style="margin:8px 0;cursor:pointer"
+           onclick="setDailyPick(${idx}); const r=document.querySelector('input[name=dailyPick][value=\\'${idx}\\']'); if(r) r.checked=true;">
+        <div class="dailyPickRow">
+          <div class="dailyPickLeft">
+            <input type="radio" name="dailyPick" value="${idx}" ${checked}
+              onchange="setDailyPick(${idx})">
+            <b>${x.studentName || "—"}</b>
+          </div>
+          <div class="small">الوقت: ${t}</div>
         </div>
-        <div class="small">الوقت: ${t}</div>
+        <div class="small">العملية: ${x.type || "—"}</div>
+        <div class="small">المبلغ: ${x.amount ?? ""} ر.س</div>
+        <div class="small">السبب: ${x.reason || "—"}</div>
       </div>
-      <div class="small">العملية: ${x.type || "—"}</div>
-      <div class="small">المبلغ: ${x.amount ?? ""} ر.س</div>
-      <div class="small">السبب: ${x.reason || "—"}</div>
-    </div>
-  `;
-}).join("");
+    `;
+  }).join("");
+
+  // اختيار أول عملية تلقائيًا إذا ما فيه اختيار
+  if(dailySelectedIndex === null){
+    setDailyPick(0);
+    const firstRadio = document.querySelector('input[name="dailyPick"][value="0"]');
+    if(firstRadio) firstRadio.checked = true;
+  }
+}
 
   box.innerHTML = dailyOpsCache.map((x, idx)=>{
   const t = x.createdAtClient ? new Date(x.createdAtClient).toLocaleString("ar-SA") : "";
@@ -1696,48 +1705,6 @@ overflow:hidden">
 
   </div>
 </div>
-<!-- Splash Screen -->
-<div id="splashScreen" style="
-position:fixed;
-inset:0;
-z-index:10000;
-background:#061c45;
-display:flex;
-align-items:center;
-justify-content:center;
-overflow:hidden">
-
-  <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;justify-content:center">
-
-    <div id="splashLogo" style="
-      transform:translateX(120vw) scale(2);
-      transition:all 1.2s cubic-bezier(.2,.9,.2,1)">
-      <img src="logo.png" style="
-        width:260px;
-        height:260px;
-        border-radius:50%;
-        background:white;
-        padding:14px">
-    </div>
-
-    <div id="splashText" style="
-      color:white;
-      text-align:center;
-      transform:translateX(-120vw);
-      opacity:0;
-      transition:all 1.2s cubic-bezier(.2,.9,.2,1)">
-
-      <div style="font-size:34px;font-weight:900">بنك الرياضيات</div>
-      <div style="font-size:18px;margin-top:6px">Math Bank</div>
-      <div style="font-size:16px;margin-top:6px">أ. سارة حقوي</div>
-      <div style="font-size:13px;margin-top:14px;opacity:.85">جاري التحميل...</div>
-
-    </div>
-
-  </div>
-</div>
-</body>
-</html>
 
 </body>
   
