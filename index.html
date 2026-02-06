@@ -1626,7 +1626,68 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   initTeacherReasonAlways();
 });
+
+setTimeout(()=>{
+  document.getElementById("splashLogo").style.transform="translateX(0) scale(1)";
+  const t=document.getElementById("splashText");
+  t.style.transform="translateX(0)";
+  t.style.opacity="1";
+},200);
+
+setTimeout(()=>{
+  const s=document.getElementById("splashScreen");
+  if(s) s.style.display="none";
+},2800);
+
+</script>
 </script>
 
+<!-- Splash Screen -->
+<div id="splashScreen" style="
+position:fixed;
+inset:0;
+z-index:10000;
+background:#061c45;
+display:flex;
+align-items:center;
+justify-content:center;
+overflow:hidden">
+
+  <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;justify-content:center">
+
+    <!-- الشعار -->
+    <div id="splashLogo" style="
+      transform:translateX(120vw) scale(2);
+      transition:all 1.2s cubic-bezier(.2,.9,.2,1)">
+      <img src="logo.png" style="
+        width:260px;
+        height:260px;
+        border-radius:50%;
+        background:white;
+        padding:14px">
+    </div>
+
+    <!-- النص -->
+    <div id="splashText" style="
+      color:white;
+      text-align:center;
+      transform:translateX(-120vw);
+      opacity:0;
+      transition:all 1.2s cubic-bezier(.2,.9,.2,1)">
+
+      <div style="font-size:34px;font-weight:900">بنك الرياضيات</div>
+      <div style="font-size:18px;margin-top:6px">Math Bank</div>
+      <div style="font-size:16px;margin-top:6px">أ. سارة حقوي</div>
+      <div style="font-size:13px;margin-top:14px;opacity:.85">جاري التحميل...</div>
+
+    </div>
+
+  </div>
+</div>
+
 </body>
+</html>
+
+</body>
+  
 </html>
