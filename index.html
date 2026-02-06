@@ -111,7 +111,12 @@ table{width:100%;border-collapse:collapse;min-width:740px}
 th,td{padding:10px;border-bottom:1px solid #e6eef7;text-align:center;font-size:13px;white-space:nowrap}
 th{background:#eef6ff;color:#0b2a66}
 tr:last-child td{border-bottom:none}
-
+/* تمييز العملية المحددة */
+.opCard.selected{
+  border:2px solid #0055A4;
+  background:#eef6ff;
+}
+  
 /* checkbox select students */
 .selRow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}
 .selTag{display:flex;gap:8px;align-items:center;background:#eef6ff;border:1px solid #dfeaff;border-radius:999px;padding:6px 10px;font-size:12px;color:#003}
@@ -1458,6 +1463,12 @@ let dailySelectedIndex = null;
 function setDailyPick(idx){
   dailySelectedIndex = Number(idx);
 
+  document.querySelectorAll(".opCard").forEach(el=>{
+    const i = Number(el.getAttribute("data-idx"));
+    el.classList.toggle("selected", i === dailySelectedIndex);
+  });
+}
+
   // تلوين البطاقات
   document.querySelectorAll(".opCard").forEach(el=>el.classList.remove("selected"));
   const el = document.querySelector(`.opCard[data-idx="${dailySelectedIndex}"]`);
@@ -1536,24 +1547,25 @@ function renderDailyOps(){
 }).join("");
 
   box.innerHTML = dailyOpsCache.map((x, idx)=>{
-    const t = x.createdAtClient ? new Date(x.createdAtClient).toLocaleString("ar-SA") : "";
-    const checked = (dailySelectedIndex === idx) ? "checked" : "";
-    return `
-      <div class="card" style="margin:8px 0">
-        <div class="dailyPickRow">
-          <div class="dailyPickLeft">
-            <input type="radio" name="dailyPick" value="${idx}" ${checked}
-              onchange="setDailyPick(${idx})">
-            <b>${x.studentName || "—"}</b>
-          </div>
-          <div class="small">الوقت: ${t}</div>
+  const t = x.createdAtClient ? new Date(x.createdAtClient).toLocaleString("ar-SA") : "";
+  const checked = (dailySelectedIndex === idx) ? "checked" : "";
+  return `
+    <div class="card opCard ${checked ? "selected":""}" data-idx="${idx}" style="margin:8px 0;cursor:pointer"
+         onclick="setDailyPick(${idx}); const r=document.querySelector('input[name=dailyPick][value=\\'${idx}\\']'); if(r) r.checked=true;">
+      <div class="dailyPickRow">
+        <div class="dailyPickLeft">
+          <input type="radio" name="dailyPick" value="${idx}" ${checked}
+            onchange="setDailyPick(${idx})">
+          <b>${x.studentName || "—"}</b>
         </div>
-        <div class="small">العملية: ${x.type || "—"}</div>
-        <div class="small">المبلغ: ${x.amount ?? ""} ر.س</div>
-        <div class="small">السبب: ${x.reason || "—"}</div>
+        <div class="small">الوقت: ${t}</div>
       </div>
-    `;
-  }).join("");
+      <div class="small">العملية: ${x.type || "—"}</div>
+      <div class="small">المبلغ: ${x.amount ?? ""} ر.س</div>
+      <div class="small">السبب: ${x.reason || "—"}</div>
+    </div>
+  `;
+}).join("");
 
   // ✅ لو فيه عمليات ولم يتم اختيار: نختار أول عملية تلقائيًا
   if(dailySelectedIndex === null && dailyOpsCache.length){
