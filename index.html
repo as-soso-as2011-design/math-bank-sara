@@ -1513,6 +1513,59 @@ function setDailyPick(idx){
   }
 }
 
+  function calcTier(balance){
+  const b = Number(balance||0);
+  if(b >= 500) return "💎 ألماسي";
+  if(b >= 300) return "🔷 ماسي";
+  if(b >= 150) return "🥇 ذهبي";
+  if(b >= 70)  return "🥈 فضي";
+  return "🥉 برونزي";
+}
+
+function getWeekRange(endStr){
+  const end = endStr ? new Date(endStr+"T23:59:59") : new Date();
+  const day = end.getDay(); // 0 Sun
+  const diffToSat = (day - 6 + 7) % 7; // Saturday as end of week
+  end.setDate(end.getDate() - diffToSat);
+
+  const start = new Date(end);
+  start.setDate(end.getDate() - 6);
+  start.setHours(0,0,0,0);
+
+  const end2 = new Date(end);
+  end2.setHours(23,59,59,999);
+
+  return { 
+    startMs: start.getTime(), 
+    endMs: end2.getTime(), 
+    start, 
+    end: end2 
+  };
+}
+
+function sumWeekly(txns){
+  let dep=0,wit=0,tr=0;
+  txns.forEach(x=>{
+    const a = Number(x.amount||0);
+    const t = String(x.type||"");
+    if(t.includes("إيداع")) dep += a;
+    else if(t.includes("سحب")) wit += a;
+    else if(t.includes("تحويل")) tr += a;
+  });
+  return { count: txns.length, dep, wit, tr, net: dep - wit, };
+}
+
+async function elementToPDF(el, filename){
+  const opt = {
+    margin: 8,
+    filename,
+    image: { type: "jpeg", quality: 0.98 },
+    html2canvas: { scale: 2, useCORS: true },
+    jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
+  };
+  await html2pdf().set(opt).from(el).save();
+}
+  
  // ================== 📄 التقرير الأسبوعي PDF ================== 
   async function buildWeeklyStudentPaperFor(studentId, endStr){
   const {startMs, endMs, start, end} = getWeekRange(endStr);
