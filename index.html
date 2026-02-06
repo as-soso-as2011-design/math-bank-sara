@@ -11,81 +11,7 @@
   --green:#2e7d32;--red:#b00020;--text:#1b1f23;
 }
 
-  <!-- ✅ Onboarding بعد ابدأ (سحب يمين/يسار) -->
-<div id="onboardOverlay" aria-hidden="true">
-  <div class="onbBox">
-    <div class="onbTop">
-      <div class="t">تعريف بنك الرياضيات</div>
-      <button class="onbSkip" onclick="finishOnboarding()">تخطي</button>
-    </div>
-
-    <div class="onbBody">
-      <div class="onbViewport" id="onbViewport">
-        <div class="onbTrack" id="onbTrack">
-
-          <!-- Slide 1 -->
-          <div class="onbSlide">
-            <div class="onbIcon">
-              <!-- SVG أيقونة بنك -->
-              <svg width="46" height="46" viewBox="0 0 24 24" fill="none">
-                <path d="M3 10.5L12 5l9 5.5" stroke="#00205B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M5 10.5V19h14v-8.5" stroke="#0055A4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M8 19v-6M12 19v-6M16 19v-6" stroke="#00205B" stroke-width="2" stroke-linecap="round"/>
-              </svg>
-            </div>
-            <div class="onbTitle">منصة متابعة سلوكية وتعليمية</div>
-            <div class="onbText">
-              بنك الرياضيات نظام مدرسي رسمي لتوثيق العمليات التحفيزية والتعليمية للطالب/ـة بشكل منظم، مع رصد الرصيد وتاريخ العمليات.
-            </div>
-          </div>
-
-          <!-- Slide 2 -->
-          <div class="onbSlide">
-            <div class="onbIcon">
-              <!-- SVG أيقونة تقرير -->
-              <svg width="46" height="46" viewBox="0 0 24 24" fill="none">
-                <path d="M7 3h7l3 3v15H7V3Z" stroke="#00205B" stroke-width="2" stroke-linejoin="round"/>
-                <path d="M14 3v4h4" stroke="#0055A4" stroke-width="2" stroke-linejoin="round"/>
-                <path d="M9 12h6M9 16h6" stroke="#00205B" stroke-width="2" stroke-linecap="round"/>
-              </svg>
-            </div>
-            <div class="onbTitle">تقارير أسبوعية وشفافية عالية</div>
-            <div class="onbText">
-              يتيح النظام عرض العمليات خلال الأسبوع وإصدار تقارير منظمة، بما يدعم المتابعة الدقيقة وتوثيق الأداء بصورة احترافية.
-            </div>
-          </div>
-
-          <!-- Slide 3 -->
-          <div class="onbSlide">
-            <div class="onbIcon">
-              <!-- SVG أيقونة حماية -->
-              <svg width="46" height="46" viewBox="0 0 24 24" fill="none">
-                <path d="M12 3l7 4v6c0 5-3 8-7 8s-7-3-7-8V7l7-4Z" stroke="#00205B" stroke-width="2" stroke-linejoin="round"/>
-                <path d="M9.5 12l1.8 1.8L15 10" stroke="#0055A4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </div>
-            <div class="onbTitle">ضوابط استخدام واضحة</div>
-            <div class="onbText">
-              النظام مخصص للاستخدام المدرسي فقط. جميع العمليات مسجلة بتاريخها وسببها، بهدف تعزيز الانضباط والتحفيز وفق سياسات المدرسة.
-            </div>
-          </div>
-
-        </div>
-      </div>
-
-      <div class="onbDots" id="onbDots">
-        <div class="onbDot active"></div>
-        <div class="onbDot"></div>
-        <div class="onbDot"></div>
-      </div>
-    </div>
-
-    <div class="onbActions">
-      <button class="onbPrev" onclick="onbPrev()">السابق</button>
-      <button class="onbNext" onclick="onbNext()">التالي</button>
-    </div>
-  </div>
-</div>
+  
   /* ================== Onboarding (بعد ابدأ) ================== */
 #onboardOverlay{
   position:fixed; inset:0; z-index:9997;
@@ -359,7 +285,83 @@ tr:last-child td{border-bottom:none}
     </div>
   </div>
 </div>
+  
+<!-- ✅ Onboarding بعد ابدأ (سحب يمين/يسار) -->
+<div id="onboardOverlay" aria-hidden="true">
+  <div class="onbBox">
+    <div class="onbTop">
+      <div class="t">تعريف بنك الرياضيات</div>
+      <button class="onbSkip" onclick="finishOnboarding()">تخطي</button>
+    </div>
 
+    <div class="onbBody">
+      <div class="onbViewport" id="onbViewport">
+        <div class="onbTrack" id="onbTrack">
+
+          <!-- Slide 1 -->
+          <div class="onbSlide">
+            <div class="onbIcon">
+              <!-- SVG أيقونة بنك -->
+              <svg width="46" height="46" viewBox="0 0 24 24" fill="none">
+                <path d="M3 10.5L12 5l9 5.5" stroke="#00205B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M5 10.5V19h14v-8.5" stroke="#0055A4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M8 19v-6M12 19v-6M16 19v-6" stroke="#00205B" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="onbTitle">منصة متابعة سلوكية وتعليمية</div>
+            <div class="onbText">
+              بنك الرياضيات نظام مدرسي رسمي لتوثيق العمليات التحفيزية والتعليمية للطالب/ـة بشكل منظم، مع رصد الرصيد وتاريخ العمليات.
+            </div>
+          </div>
+
+          <!-- Slide 2 -->
+          <div class="onbSlide">
+            <div class="onbIcon">
+              <!-- SVG أيقونة تقرير -->
+              <svg width="46" height="46" viewBox="0 0 24 24" fill="none">
+                <path d="M7 3h7l3 3v15H7V3Z" stroke="#00205B" stroke-width="2" stroke-linejoin="round"/>
+                <path d="M14 3v4h4" stroke="#0055A4" stroke-width="2" stroke-linejoin="round"/>
+                <path d="M9 12h6M9 16h6" stroke="#00205B" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="onbTitle">تقارير أسبوعية وشفافية عالية</div>
+            <div class="onbText">
+              يتيح النظام عرض العمليات خلال الأسبوع وإصدار تقارير منظمة، بما يدعم المتابعة الدقيقة وتوثيق الأداء بصورة احترافية.
+            </div>
+          </div>
+
+          <!-- Slide 3 -->
+          <div class="onbSlide">
+            <div class="onbIcon">
+              <!-- SVG أيقونة حماية -->
+              <svg width="46" height="46" viewBox="0 0 24 24" fill="none">
+                <path d="M12 3l7 4v6c0 5-3 8-7 8s-7-3-7-8V7l7-4Z" stroke="#00205B" stroke-width="2" stroke-linejoin="round"/>
+                <path d="M9.5 12l1.8 1.8L15 10" stroke="#0055A4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="onbTitle">ضوابط استخدام واضحة</div>
+            <div class="onbText">
+              النظام مخصص للاستخدام المدرسي فقط. جميع العمليات مسجلة بتاريخها وسببها، بهدف تعزيز الانضباط والتحفيز وفق سياسات المدرسة.
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="onbDots" id="onbDots">
+        <div class="onbDot active"></div>
+        <div class="onbDot"></div>
+        <div class="onbDot"></div>
+      </div>
+    </div>
+
+    <div class="onbActions">
+      <button class="onbPrev" onclick="onbPrev()">السابق</button>
+      <button class="onbNext" onclick="onbNext()">التالي</button>
+    </div>
+  </div>
+</div>
+  
 <!-- ===== صفحة المعلمة ===== -->
 <div id="teacherLoginPage" class="hidden">
   <div class="container">
@@ -2006,7 +2008,7 @@ function finishOnboarding(){
 function updateOnbUI(){
   const track = document.getElementById("onbTrack");
   const dotsWrap = document.getElementById("onbDots");
-  if(track) track.style.transform = `translateX(${onbIndex * 100}%)`;
+  if(track) track.style.transform = `translateX(-${onbIndex * 100}%)`;
 
   if(dotsWrap){
     const dots = dotsWrap.querySelectorAll(".onbDot");
