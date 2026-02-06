@@ -60,11 +60,51 @@ hr{border:0;border-top:1px solid #eee;margin:10px 0}
 .modalActions{display:flex;gap:10px;flex-wrap:wrap}
 .modalActions a,.modalActions button{flex:1;text-decoration:none}
 
-/* Start overlay */
-#startOverlay{position:fixed;inset:0;background:#0a2d66;display:flex;align-items:center;justify-content:center;padding:18px;z-index:9998}
-.startBox{max-width:560px;width:100%;background:#fff;border-radius:18px;padding:18px;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+/* Start overlay (واجهة بداية مطوّرة + حركة الشعار) */
+#startOverlay{
+  position:fixed;inset:0;
+  background: radial-gradient(circle at top, #0b2a66 0%, #061a3d 55%, #04112a 100%);
+  display:flex;align-items:center;justify-content:center;padding:18px;z-index:9998
+}
+.startBox{
+  max-width:560px;width:100%;
+  background:rgba(255,255,255,.94);
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:18px;padding:18px;text-align:center;
+  box-shadow:0 10px 30px rgba(0,0,0,.25)
+}
 .pill{display:inline-block;background:#e9f4fb;color:#003;padding:6px 10px;border-radius:999px;font-size:12px;margin-bottom:10px}
 
+.splashWrap{display:flex;align-items:center;justify-content:center;gap:14px;margin:8px 0 2px 0;flex-wrap:wrap}
+.splashLogo{
+  width:96px;height:96px;border-radius:50%;
+  background:#fff;border:2px solid rgba(0,32,91,.12);
+  box-shadow:0 12px 24px rgba(0,0,0,.18);
+  overflow:hidden;display:flex;align-items:center;justify-content:center;
+  transform: translateX(42px);opacity:0;
+  animation: slideInR .7s ease-out forwards;
+}
+.splashLogo img{width:100%;height:100%;object-fit:cover}
+.splashText{
+  text-align:right;
+  transform: translateX(-42px);opacity:0;
+  animation: slideInL .7s ease-out forwards;
+  animation-delay:.08s;
+}
+.splashText .ar{font-weight:900;color:#00205B;font-size:20px;line-height:1.2}
+.splashText .en{font-weight:800;color:#0055A4;font-size:14px;margin-top:2px}
+.splashText .name{font-weight:800;color:#1b1f23;font-size:13px;margin-top:4px}
+@keyframes slideInR{to{transform:translateX(0);opacity:1}}
+@keyframes slideInL{to{transform:translateX(0);opacity:1}}
+
+@media(max-width:520px){
+  .startBox{padding:14px}
+  button{padding:12px 12px;font-size:15px}
+  input,select{padding:12px;font-size:15px}
+}
+
+/* تمييز العملية اليومية المحددة */
+.opCard.selected{outline:2px solid var(--rajhi); background:#f3f9ff}
 /* Statement */
 .tableWrap{overflow:auto;border-radius:12px;background:#f7fbff;border:1px solid #e6eef7}
 table{width:100%;border-collapse:collapse;min-width:740px}
@@ -76,7 +116,11 @@ tr:last-child td{border-bottom:none}
 .selRow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}
 .selTag{display:flex;gap:8px;align-items:center;background:#eef6ff;border:1px solid #dfeaff;border-radius:999px;padding:6px 10px;font-size:12px;color:#003}
 .selTag input{width:auto}
-
+.opCard:has(input:checked){
+  border:2px solid #0055A4;
+  background:#eef6ff;
+}
+  
 /* ✅ اختيار عملية يومية */
 .dailyPickRow{display:flex;align-items:center;gap:10px;justify-content:space-between;flex-wrap:wrap}
 .dailyPickLeft{display:flex;align-items:center;gap:10px}
@@ -102,7 +146,18 @@ tr:last-child td{border-bottom:none}
 <div id="startOverlay">
   <div class="startBox">
     <div class="pill" id="connPill">...جاري تجهيز النظام...</div>
-    <h3>هلا والله! 👋</h3>
+
+    <!-- ✅ ضعي شعارك الدائري باسم: logo.png بجانب index.html -->
+    <div class="splashWrap">
+      <div class="splashLogo"><img src="logo.png" alt="Math Bank Logo"></div>
+      <div class="splashText">
+        <div class="ar">بنك الرياضيات</div>
+        <div class="en">Math Bank</div>
+        <div class="name">أ. سارة حقوي</div>
+      </div>
+    </div>
+
+    <h3 style="margin:8px 0 6px 0;color:var(--navy)">هلا والله! 👋</h3>
     <p id="startP">جاهزين نبدأ رحلتنا في بنك الرياضيات؟<br>اضغط زر البداية وننطلق 🚀</p>
     <button class="btn" onclick="startApp()">ابدأ</button>
     <div class="small" id="connNote" style="margin-top:8px"></div>
@@ -475,17 +530,57 @@ ${SIGNATURE}`
   );
 }
 
-// ✅ يفتح واتساب بزنس أولاً، ثم احتياط wa.me
+/**
+ * ✅ الإرسال "دائمًا" عبر واتساب بزنس:
+ * - نستخدم whatsapp-business:// فقط
+ * - بدون wa.me حتى لا يفتح الواتساب العادي
+ * - لو ما فتح، نطلع نافذة فيها: (نسخ الرسالة) + (محاولة فتح بزنس مرة ثانية)
+ */
 function openWABusinessFast(toPhone, messageText){
   const phone = normalizePhoneToWA(toPhone);
   if(!phone) return;
 
-  const msg = encodeURIComponent(messageText || "");
-  const businessScheme = "whatsapp-business://send?phone=" + phone + "&text=" + msg;
-  const fallback = "https://wa.me/" + phone + "?text=" + msg;
+  const msg = (messageText || "");
+  const enc = encodeURIComponent(msg);
+  const businessScheme = "whatsapp-business://send?phone=" + phone + "&text=" + enc;
 
+  // محاولة فتح بزنس
   window.location.href = businessScheme;
-  setTimeout(()=>{ window.location.href = fallback; }, 600);
+
+  // لو ما اشتغل: نسخ + محاولة ثانية (بدون wa.me)
+  setTimeout(()=>{
+    const actions = `
+      <button class="btn" onclick="tryOpenBusinessAgain('${phone}','${enc.replace(/'/g,"%27")}')">فتح واتساب بزنس</button>
+      <button class="btn3" onclick="copyTextToClipboard(decodeURIComponent('${enc.replace(/'/g,"%27")}'))">نسخ الرسالة</button>
+      <button class="btn2" onclick="closeModal()">إغلاق</button>
+    `;
+    openModal(
+      "واتساب بزنس",
+      "إذا ما فتح واتساب بزنس تلقائيًا:\\n1) اضغطي (فتح واتساب بزنس)\\n2) أو (نسخ الرسالة) ثم افتحي واتساب بزنس والصقيها.",
+      actions
+    );
+  }, 900);
+}
+
+function tryOpenBusinessAgain(phone, encMsg){
+  window.location.href = "whatsapp-business://send?phone=" + phone + "&text=" + encMsg;
+}
+
+async function copyTextToClipboard(text){
+  try{
+    await navigator.clipboard.writeText(text);
+    openModal("تم ✅","تم نسخ الرسالة للحافظة.");
+  }catch(e){
+    try{
+      const ta=document.createElement("textarea");
+      ta.value=text; document.body.appendChild(ta);
+      ta.select(); document.execCommand("copy");
+      document.body.removeChild(ta);
+      openModal("تم ✅","تم نسخ الرسالة للحافظة.");
+    }catch(_){
+      openModal("تنبيه","تعذر النسخ… انسخي يدويًا من الرسالة.");
+    }
+  }
 }
 
 function isAutoWAEnabled(){ return !!document.getElementById("autoWA")?.checked; }
@@ -1362,6 +1457,12 @@ let dailySelectedIndex = null;
 
 function setDailyPick(idx){
   dailySelectedIndex = Number(idx);
+
+  // تلوين البطاقات
+  document.querySelectorAll(".opCard").forEach(el=>el.classList.remove("selected"));
+  const el = document.querySelector(`.opCard[data-idx="${dailySelectedIndex}"]`);
+  if(el) el.classList.add("selected");
+
   const hint = $("dailyPickHint");
   if(hint){
     const op = dailyOpsCache[dailySelectedIndex];
@@ -1413,9 +1514,26 @@ async function loadDailyOps(){
 function renderDailyOps(){
   const box = $("dailyOpsList");
   if(!dailyOpsCache.length){
-    box.innerHTML = '<div class="small">ما فيه عمليات في هذا التاريخ.</div>';
-    return;
-  }
+    box.innerHTML = dailyOpsCache.map((x, idx)=>{
+  const t = x.createdAtClient ? new Date(x.createdAtClient).toLocaleString("ar-SA") : "";
+  const checked = (dailySelectedIndex === idx) ? "checked" : "";
+  return `
+    <div class="card opCard" data-idx="${idx}" style="margin:8px 0;cursor:pointer"
+         onclick="setDailyPick(${idx}); const r=document.querySelector('input[name=dailyPick][value=\\'${idx}\\']'); if(r) r.checked=true;">
+      <div class="dailyPickRow">
+        <div class="dailyPickLeft">
+          <input type="radio" name="dailyPick" value="${idx}" ${checked}
+            onchange="setDailyPick(${idx})">
+          <b>${x.studentName || "—"}</b>
+        </div>
+        <div class="small">الوقت: ${t}</div>
+      </div>
+      <div class="small">العملية: ${x.type || "—"}</div>
+      <div class="small">المبلغ: ${x.amount ?? ""} ر.س</div>
+      <div class="small">السبب: ${x.reason || "—"}</div>
+    </div>
+  `;
+}).join("");
 
   box.innerHTML = dailyOpsCache.map((x, idx)=>{
     const t = x.createdAtClient ? new Date(x.createdAtClient).toLocaleString("ar-SA") : "";
