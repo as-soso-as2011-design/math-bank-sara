@@ -863,7 +863,7 @@ function initTeacherReasonAlways(){
   toggleOther();
 }
 
-// ================== زر البدء (✅ مصحح) ==================
+// ================== زر البدء ==================
 async function startApp(){
   $("connPill").textContent = "جاهز ✅";
   $("connPill").style.background = "#dff4e3";
@@ -880,10 +880,10 @@ async function startApp(){
       $("stuName").value = "";
       $("stuName").placeholder = "اكتب اسمك كما هو مسجل بالنظام";
       currentAccess = "student";
-      return;
+    }else{
+      go("teacherLoginPage");
+      currentAccess = "teacher";
     }
-    go("teacherLoginPage");
-    currentAccess = "teacher";
   });
 }
 
