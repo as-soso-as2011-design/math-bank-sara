@@ -60,7 +60,7 @@ hr{border:0;border-top:1px solid #eee;margin:10px 0}
 .modalActions{display:flex;gap:10px;flex-wrap:wrap}
 .modalActions a,.modalActions button{flex:1;text-decoration:none}
 
-/* Start overlay (واجهة بداية مطوّرة + حركة الشعار) */
+/* Start overlay */
 #startOverlay{
   position:fixed;inset:0;
   background: radial-gradient(circle at top, #0b2a66 0%, #061a3d 55%, #04112a 100%);
@@ -105,27 +105,19 @@ hr{border:0;border-top:1px solid #eee;margin:10px 0}
 
 /* تمييز العملية اليومية المحددة */
 .opCard.selected{outline:2px solid var(--rajhi); background:#f3f9ff}
+
 /* Statement */
 .tableWrap{overflow:auto;border-radius:12px;background:#f7fbff;border:1px solid #e6eef7}
 table{width:100%;border-collapse:collapse;min-width:740px}
 th,td{padding:10px;border-bottom:1px solid #e6eef7;text-align:center;font-size:13px;white-space:nowrap}
 th{background:#eef6ff;color:#0b2a66}
 tr:last-child td{border-bottom:none}
-/* تمييز العملية المحددة */
-.opCard.selected{
-  border:2px solid #0055A4;
-  background:#eef6ff;
-}
-  
+
 /* checkbox select students */
 .selRow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}
 .selTag{display:flex;gap:8px;align-items:center;background:#eef6ff;border:1px solid #dfeaff;border-radius:999px;padding:6px 10px;font-size:12px;color:#003}
 .selTag input{width:auto}
-.opCard:has(input:checked){
-  border:2px solid #0055A4;
-  background:#eef6ff;
-}
-  
+
 /* ✅ اختيار عملية يومية */
 .dailyPickRow{display:flex;align-items:center;gap:10px;justify-content:space-between;flex-wrap:wrap}
 .dailyPickLeft{display:flex;align-items:center;gap:10px}
@@ -152,7 +144,6 @@ tr:last-child td{border-bottom:none}
   <div class="startBox">
     <div class="pill" id="connPill">...جاري تجهيز النظام...</div>
 
-    <!-- ✅ ضعي شعارك الدائري باسم: logo.png بجانب index.html -->
     <div class="splashWrap">
       <div class="splashLogo"><img src="logo.png" alt="Math Bank Logo"></div>
       <div class="splashText">
@@ -198,7 +189,6 @@ tr:last-child td{border-bottom:none}
 <div id="classesPage" class="hidden">
   <div class="container">
 
-    <!-- إعدادات الإرسال السريع -->
     <div class="card soft">
       <h3 style="margin:0 0 8px 0;color:var(--navy)">إعدادات الإرسال السريع (WhatsApp Business)</h3>
       <div class="row">
@@ -287,7 +277,6 @@ tr:last-child td{border-bottom:none}
 
       <hr>
 
-      <!-- دفعة واحدة للكل -->
       <div class="row">
         <div class="col">
           <div class="small">مبلغ الإيداع للكل</div>
@@ -308,7 +297,6 @@ tr:last-child td{border-bottom:none}
 
       <hr>
 
-      <!-- طالب محدد -->
       <div class="row">
         <div class="col">
           <div class="small">طالب محدد</div>
@@ -328,7 +316,6 @@ tr:last-child td{border-bottom:none}
 
       <hr>
 
-      <!-- سبب العملية للمعلمة -->
       <div class="row">
         <div class="col">
           <div class="small">سبب العملية</div>
@@ -339,7 +326,6 @@ tr:last-child td{border-bottom:none}
 
       <hr>
 
-      <!-- اختيار الطلاب -->
       <div class="selRow">
         <span class="selTag"><input type="checkbox" id="selAll" onchange="toggleSelectAll()"> تحديد الكل</span>
         <button class="btn2" onclick="depositSelected()">إيداع للمحددين</button>
@@ -358,7 +344,7 @@ tr:last-child td{border-bottom:none}
   </div>
 </div>
 
-<!-- ===== صفحة الطالب (وضع الطلاب) ===== -->
+<!-- ===== صفحة الطالب ===== -->
 <div id="studentLoginPage" class="hidden">
   <div class="container">
     <div class="card">
@@ -386,7 +372,6 @@ tr:last-child td{border-bottom:none}
         <div class="col"><div class="small">تاريخ فتح الحساب</div><div id="openedAt" class="small">—</div></div>
       </div>
 
-      <!-- تنفيذ عملية -->
       <div class="card" style="margin:12px 0 0 0">
         <h3 style="margin:0 0 10px 0;color:var(--navy);font-size:15px">تنفيذ عملية</h3>
 
@@ -418,7 +403,6 @@ tr:last-child td{border-bottom:none}
 
       <hr>
 
-      <!-- كشف الحساب -->
       <div class="row">
         <div class="col"><div class="small">من تاريخ</div><input id="fromDate" type="date"></div>
         <div class="col"><div class="small">إلى تاريخ</div><input id="toDate" type="date"></div>
@@ -450,8 +434,8 @@ const IS_STUDENT_ENTRY = (APP_MODE === "student");
 // ================== أرقام واتساب ==================
 const SIGNATURE = "المعلمة: سارة حقوي";
 const TEACHER_BANK_TITLE = "بنك الرياضيات – المصرفي";
-const CONTACT_PRIMARY = "0502234335";    // رابط تواصل للأمهات (يظهر في الرسالة)
-const WHATSAPP_BUSINESS = "0556891201";  // رقم بزنس (معلومة فقط - واتساب لا يغير المُرسل برقم من رابط)
+const CONTACT_PRIMARY = "0502234335";
+const WHATSAPP_BUSINESS = "0556891201";
 
 // ================== Firebase ==================
 const firebaseConfig = {
@@ -535,12 +519,6 @@ ${SIGNATURE}`
   );
 }
 
-/**
- * ✅ الإرسال "دائمًا" عبر واتساب بزنس:
- * - نستخدم whatsapp-business:// فقط
- * - بدون wa.me حتى لا يفتح الواتساب العادي
- * - لو ما فتح، نطلع نافذة فيها: (نسخ الرسالة) + (محاولة فتح بزنس مرة ثانية)
- */
 function openWABusinessFast(toPhone, messageText){
   const phone = normalizePhoneToWA(toPhone);
   if(!phone) return;
@@ -549,10 +527,8 @@ function openWABusinessFast(toPhone, messageText){
   const enc = encodeURIComponent(msg);
   const businessScheme = "whatsapp-business://send?phone=" + phone + "&text=" + enc;
 
-  // محاولة فتح بزنس
   window.location.href = businessScheme;
 
-  // لو ما اشتغل: نسخ + محاولة ثانية (بدون wa.me)
   setTimeout(()=>{
     const actions = `
       <button class="btn" onclick="tryOpenBusinessAgain('${phone}','${enc.replace(/'/g,"%27")}')">فتح واتساب بزنس</button>
@@ -639,7 +615,6 @@ function setupReasonUI(mode, selectId, otherId){
   const other = document.getElementById(otherId);
   if(!sel || !other) return;
 
-  // الطالب في التحويل: فقط مربع نص
   if(mode === "transfer" && currentAccess === "student"){
     sel.classList.add("hidden");
     sel.innerHTML = "";
@@ -668,7 +643,6 @@ function getReason(selectId, otherId){
   const sel = document.getElementById(selectId);
   const other = document.getElementById(otherId);
 
-  // التحويل للطالب: من مربع النص فقط
   if(sel && sel.classList.contains("hidden")){
     const t = (other?.value || "").trim();
     return t || "تحويل";
@@ -682,7 +656,6 @@ function getReason(selectId, otherId){
   return sel.value || "";
 }
 
-// سبب المعلمة يظهر دائمًا: نجمع كل الأسباب
 function initTeacherReasonAlways(){
   const sel = $("reasonTeacher");
   if(!sel) return;
@@ -1122,7 +1095,7 @@ async function renderStudents(){
   updateSelCount();
 }
 
-// ================== إرسال فوري بنقرة واحدة ==================
+// ================== إرسال فوري ==================
 async function smartAutoSendWhats({type, studentName, amount, reason, guardianWhats}){
   if(!isAutoWAEnabled()) return;
 
@@ -1235,7 +1208,6 @@ async function withdrawFromStudent(){
   await renderStudents();
 }
 
-// دفعة واحدة للمحددين
 async function depositSelected(){
   const a = parseFloat($("pickAmount").value);
   if(isNaN(a) || a<=0) return warn("اكتب مبلغ (في خانة المبلغ) للإيداع للمحددين");
@@ -1456,20 +1428,18 @@ async function executeOp(){
   await showStatement();
 }
 
-// ================== ✅ العمليات اليومية (بدون collectionGroup) ==================
+// ================== ✅ العمليات اليومية ==================
 let dailyOpsCache = [];
 let dailySelectedIndex = null;
 
 function setDailyPick(idx){
   dailySelectedIndex = Number(idx);
 
-  // تمييز البطاقة المحددة
   document.querySelectorAll(".opCard").forEach(el=>{
     const i = Number(el.getAttribute("data-idx"));
     el.classList.toggle("selected", i === dailySelectedIndex);
   });
 
-  // تلميح اسم الطالب
   const hint = $("dailyPickHint");
   if(hint){
     const op = dailyOpsCache[dailySelectedIndex];
@@ -1530,7 +1500,7 @@ function renderDailyOps(){
     const t = x.createdAtClient ? new Date(x.createdAtClient).toLocaleString("ar-SA") : "";
     const checked = (dailySelectedIndex === idx) ? "checked" : "";
     return `
-      <div class="card opCard" data-idx="${idx}" style="margin:8px 0;cursor:pointer"
+      <div class="card opCard ${checked ? "selected":""}" data-idx="${idx}" style="margin:8px 0;cursor:pointer"
            onclick="setDailyPick(${idx}); const r=document.querySelector('input[name=dailyPick][value=\\'${idx}\\']'); if(r) r.checked=true;">
         <div class="dailyPickRow">
           <div class="dailyPickLeft">
@@ -1547,36 +1517,6 @@ function renderDailyOps(){
     `;
   }).join("");
 
-  // اختيار أول عملية تلقائيًا إذا ما فيه اختيار
-  if(dailySelectedIndex === null){
-    setDailyPick(0);
-    const firstRadio = document.querySelector('input[name="dailyPick"][value="0"]');
-    if(firstRadio) firstRadio.checked = true;
-  }
-}
-
-  box.innerHTML = dailyOpsCache.map((x, idx)=>{
-  const t = x.createdAtClient ? new Date(x.createdAtClient).toLocaleString("ar-SA") : "";
-  const checked = (dailySelectedIndex === idx) ? "checked" : "";
-  return `
-    <div class="card opCard ${checked ? "selected":""}" data-idx="${idx}" style="margin:8px 0;cursor:pointer"
-         onclick="setDailyPick(${idx}); const r=document.querySelector('input[name=dailyPick][value=\\'${idx}\\']'); if(r) r.checked=true;">
-      <div class="dailyPickRow">
-        <div class="dailyPickLeft">
-          <input type="radio" name="dailyPick" value="${idx}" ${checked}
-            onchange="setDailyPick(${idx})">
-          <b>${x.studentName || "—"}</b>
-        </div>
-        <div class="small">الوقت: ${t}</div>
-      </div>
-      <div class="small">العملية: ${x.type || "—"}</div>
-      <div class="small">المبلغ: ${x.amount ?? ""} ر.س</div>
-      <div class="small">السبب: ${x.reason || "—"}</div>
-    </div>
-  `;
-}).join("");
-
-  // ✅ لو فيه عمليات ولم يتم اختيار: نختار أول عملية تلقائيًا
   if(dailySelectedIndex === null && dailyOpsCache.length){
     dailySelectedIndex = 0;
     setDailyPick(0);
@@ -1635,77 +1575,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   initTeacherReasonAlways();
 });
-
-setTimeout(()=>{
-  document.getElementById("splashLogo").style.transform="translateX(0) scale(1)";
-  const t=document.getElementById("splashText");
-  t.style.transform="translateX(0)";
-  t.style.opacity="1";
-},200);
-
-setTimeout(()=>{
-  const s=document.getElementById("splashScreen");
-  if(s) s.style.display="none";
-},2800);
-
-// Splash animation
-setTimeout(()=>{
-  document.getElementById("splashLogo").style.transform="translateX(0) scale(1)";
-  const t=document.getElementById("splashText");
-  t.style.transform="translateX(0)";
-  t.style.opacity="1";
-},200);
-
-setTimeout(()=>{
-  const s=document.getElementById("splashScreen");
-  if(s) s.style.display="none";
-},2800);  
 </script>
-</script>
-
-<!-- Splash Screen -->
-<div id="splashScreen" style="
-position:fixed;
-inset:0;
-z-index:10000;
-background:#061c45;
-display:flex;
-align-items:center;
-justify-content:center;
-overflow:hidden">
-
-  <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;justify-content:center">
-
-    <!-- الشعار -->
-    <div id="splashLogo" style="
-      transform:translateX(120vw) scale(2);
-      transition:all 1.2s cubic-bezier(.2,.9,.2,1)">
-      <img src="logo.png" style="
-        width:260px;
-        height:260px;
-        border-radius:50%;
-        background:white;
-        padding:14px">
-    </div>
-
-    <!-- النص -->
-    <div id="splashText" style="
-      color:white;
-      text-align:center;
-      transform:translateX(-120vw);
-      opacity:0;
-      transition:all 1.2s cubic-bezier(.2,.9,.2,1)">
-
-      <div style="font-size:34px;font-weight:900">بنك الرياضيات</div>
-      <div style="font-size:18px;margin-top:6px">Math Bank</div>
-      <div style="font-size:16px;margin-top:6px">أ. سارة حقوي</div>
-      <div style="font-size:13px;margin-top:14px;opacity:.85">جاري التحميل...</div>
-
-    </div>
-
-  </div>
-</div>
 
 </body>
-  
 </html>
