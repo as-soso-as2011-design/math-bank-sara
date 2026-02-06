@@ -2017,8 +2017,15 @@ function enableOnbSwipe(){
         const start=document.getElementById("startOverlay");
         if(start) start.style.display="flex";
       },2800);
-     showOnboardingIfNeeded(); 
-    });
+     showOnboardingIfNeeded(()=>{
+  if(IS_STUDENT_ENTRY){
+    go("studentLoginPage");
+    currentAccess="student";
+  }else{
+    go("teacherLoginPage");
+    currentAccess="teacher";
+  }
+});
   </script>
 
   <div id="pdfTemp" class="hidden"></div>
