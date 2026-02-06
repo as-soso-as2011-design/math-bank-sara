@@ -874,19 +874,22 @@ async function startApp(){
   await playWelcome();
   $("startOverlay").style.display = "none";
 
-  $("startOverlay").style.display = "none";
+  // ✅ عرض التعريف مرة واحدة ثم تحويل الدخول
+  showOnboardingIfNeeded(()=>{
+    if(IS_STUDENT_ENTRY){
+      go("studentLoginPage");
+      $("stuLoginTitle").textContent = "دخول الطالب";
+      $("stuName").readOnly = false;
+      $("stuName").value = "";
+      $("stuName").placeholder = "اكتب اسمك كما هو مسجل بالنظام";
+      currentAccess = "student";
+      return;
+    }
 
-// بدل ما يروح مباشرة للدخول… نعرض التعريف مرة واحدة
-showOnboardingIfNeeded(()=>{
-  if(IS_STUDENT_ENTRY){
-    go("studentLoginPage");
-    $("stuLoginTitle").textContent = "دخول الطالب";
-    $("stuName").readOnly = false;
-    $("stuName").value = "";
-    $("stuName").placeholder = "اكتب اسمك كما هو مسجل بالنظام";
-    currentAccess = "student";
-    return;
-  }
+    go("teacherLoginPage");
+    currentAccess = "teacher";
+  });
+}
 
   go("teacherLoginPage");
   currentAccess = "teacher";
