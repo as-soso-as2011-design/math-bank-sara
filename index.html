@@ -842,13 +842,7 @@ ${SIGNATURE}`
 
     // ================== زر البدء ==================
     async function startApp(){
-      $("connPill").textContent = "جاهز ✅";
-      $("connPill").style.background = "#dff4e3";
-      $("connPill").style.color = "#2e7d32";
-
-      await playWelcome();
-      $("startOverlay").style.display = "none";
-
+      // ✅ عرض التعريف كل مرة بعد زر (ابدأ) ثم تحويل الدخول
 showOnboardingIfNeeded(()=>{
   if(IS_STUDENT_ENTRY){
     go("studentLoginPage");
@@ -859,11 +853,9 @@ showOnboardingIfNeeded(()=>{
     currentAccess = "student";
     return;
   }
-
   go("teacherLoginPage");
   currentAccess = "teacher";
 });
-    }
 
     // ================== تسجيل المعلمة ==================
     function teacherLogin(){
