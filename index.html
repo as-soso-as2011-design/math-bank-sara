@@ -1880,13 +1880,17 @@ ${SIGNATURE}`
     let onbIndex = 0;
     let onbAfterDone = null;
 
-    function showOnboardingIfNeeded(afterDone){
-      onbAfterDone = afterDone;
-      const done = localStorage.getItem(ONBOARD_KEY) === "1";
-      if(done){
-        if(typeof onbAfterDone === "function") onbAfterDone();
-        return;
-      }
+    function showOnboardingIfNeeded(){
+  onbIndex = 0;
+  updateOnbUI();
+  const ov = document.getElementById("onboardOverlay");
+  if(ov){
+    ov.style.display="flex";
+    ov.setAttribute("aria-hidden","false");
+  }
+  enableOnbSwipe();
+}
+      
       onbIndex = 0;
       updateOnbUI();
       const ov = document.getElementById("onboardOverlay");
@@ -1895,7 +1899,6 @@ ${SIGNATURE}`
     }
 
     function finishOnboarding(){
-      localStorage.setItem(ONBOARD_KEY, "1");
       const ov = document.getElementById("onboardOverlay");
       if(ov){ ov.style.display="none"; ov.setAttribute("aria-hidden","true"); }
       if(typeof onbAfterDone === "function") onbAfterDone();
