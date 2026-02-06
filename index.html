@@ -1794,6 +1794,7 @@ showOnboardingIfNeeded(()=>{
         html2canvas: { scale: 2, useCORS: true },
         jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
       };
+      await new Promise(r=>setTimeout(r,80));
       await html2pdf().set(opt).from(el).save();
     }
 
