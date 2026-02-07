@@ -1,226 +1,28 @@
-<!doctype html>
-<html lang="ar" dir="rtl">
-<head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-  <title>بنك الرياضيات – المصرفي للمعلمة سارة حقوي</title>
+التعديل  في صفحة الطالب 
+لايوجد الصوت الترحيبي ولا صوت النقر 
+هل تحتاج إلى مساعدة ؟ يحذف النص الداخلي فيه بيانات المعلمة للدخول تعديل على الكلام بحيث يكون مناسب 
+ترقيه الحساب لابد 
+ان تكون 
+برونزي 10 آلاف وأقل 
+فضي من 11 آلاف إلى ١٥ ألف 
+ذهبي من ١٦ ألف إلى 20 الف 
+ماسي من 21 ألف إلى 30 الف 
+الماسيّ اكثر من 30 ألف
 
-  <style>
-    :root{
-      --navy:#00205B; --rajhi:#0055A4; --sky:#EAF3FB; --sky2:#CFE6F7; --beige:#FAF9F7;
-      --green:#2e7d32; --red:#b00020; --text:#1b1f23;
-      --card:#ffffff; --line:rgba(0,0,0,.08); --shadow2:0 8px 18px rgba(0,0,0,.08);
-    }
-    *{box-sizing:border-box;font-family:Tahoma,Arial,sans-serif}
-    body{margin:0;background:linear-gradient(180deg,#061a3d 0%, #071f4a 24%, var(--beige) 24%);color:var(--text)}
-    .hidden{display:none !important}
+تفاصيل البطاقة : الحوالات يحذف 
+كشف الحساب pdf  اماً ان يكون بعض الحساب فارغ أو ناقص ولايوجد به التوقيع ولا الختم
 
-    /* Topbar */
-    .topbar{
-      position:sticky;top:0;z-index:2000;
-      background:linear-gradient(90deg,#061c45,#07336f);
-      color:#fff;padding:12px 14px;display:flex;align-items:center;gap:12px;
-      border-bottom:1px solid rgba(255,255,255,.12);
-    }
-    .topbar .titles{flex:1;text-align:center;line-height:1.35}
-    .topbar .t1{font-weight:900;font-size:16px}
-    .topbar .t2{font-size:12px;opacity:.92}
-    .logo{height:54px;width:auto;background:rgba(255,255,255,.85);border-radius:12px;padding:6px}
 
-    /* ===== Splash (Intro) ===== */
-    #splash{
-      position:fixed;inset:0;z-index:10000;
-      display:flex;align-items:center;justify-content:center;padding:18px;
-      background: radial-gradient(circle at top, #0b2a66 0%, #061a3d 55%, #04112a 100%);
-      overflow:hidden;
-    }
-    .splashBox{
-      width:min(900px,100%);
-      border-radius:26px;
-      border:1px solid rgba(255,255,255,.18);
-      background:rgba(255,255,255,.06);
-      backdrop-filter: blur(12px);
-      box-shadow:0 18px 60px rgba(0,0,0,.45);
-      padding:22px 18px;
-      display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;
-    }
-    /* الشعار يدخل من اليمين */
-    .splashLogoWrap{
-      flex:1;min-width:260px;
-      display:flex;justify-content:center;align-items:center;
-      opacity:0; transform:translateX(160px) scale(1.12);
-      animation:logoIn .9s ease forwards;
-    }
-    .splashLogo{
-      width:210px;height:210px;border-radius:28px;
-      background:rgba(255,255,255,.92);
-      border:1px solid rgba(255,255,255,.25);
-      box-shadow:0 18px 44px rgba(0,0,0,.25);
-      overflow:hidden;display:flex;align-items:center;justify-content:center;
-    }
-    .splashLogo img{width:100%;height:100%;object-fit:contain}
+التعديل في صفحة الفصول للمعلمة
+لايوجد زر  العمليات اليومية واتساب للأمهات تحديد عملية وارسلها للوتساب الأعمال 
+نص رساله استرجاع كلمة السر أو اسم المستخدم  غير مرتب 
 
-    /* النص يدخل من اليسار */
-    .splashText{
-      flex:1;min-width:260px;
-      color:#fff;text-align:right;
-      opacity:0; transform:translateX(-160px);
-      animation:textIn .9s ease forwards;
-      animation-delay:.12s;
-    }
-    .splashText .tEn{font-weight:1000;font-size:38px;letter-spacing:1.4px}
-    .splashText .name{font-weight:900;font-size:16px;opacity:.96;margin-top:8px}
-    .splashText .hint{margin-top:12px;font-size:12px;opacity:.86;line-height:1.9}
-    @keyframes logoIn {to{opacity:1;transform:translateX(0) scale(1)}}
-    @keyframes textIn {to{opacity:1;transform:translateX(0)}}
-    .splashFadeOut{animation:splashOut .55s ease forwards}
-    @keyframes splashOut {to{opacity:0;transform:scale(.985)}}
 
-    /* ===== Start overlay ===== */
-    #startOverlay{
-      position:fixed;inset:0;z-index:9998;
-      display:flex;align-items:center;justify-content:center;padding:18px;
-      background: radial-gradient(circle at top, #0b2a66 0%, #061a3d 55%, #04112a 100%);
-    }
-    .startBox{
-      width:min(720px,100%);
-      border-radius:22px;
-      border:1px solid rgba(255,255,255,.18);
-      background:rgba(255,255,255,.08);
-      backdrop-filter: blur(12px);
-      box-shadow:0 18px 60px rgba(0,0,0,.40);
-      overflow:hidden;
-    }
-    .startTop{
-      display:flex;justify-content:space-between;align-items:center;
-      padding:14px 14px;color:#fff;
-      background:linear-gradient(90deg,rgba(255,255,255,.10),rgba(0,0,0,.08));
-      border-bottom:1px solid rgba(255,255,255,.12);
-    }
-    .pill{display:inline-block;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.18);
-      color:#fff;padding:6px 12px;border-radius:999px;font-size:12px;font-weight:900}
-    .startBody{padding:18px}
-    .heroRow{display:flex;gap:14px;align-items:center;justify-content:center;flex-wrap:wrap}
-    .heroLogo{
-      width:94px;height:94px;border-radius:18px;
-      background:rgba(255,255,255,.92);
-      border:1px solid rgba(255,255,255,.25);
-      overflow:hidden;display:flex;align-items:center;justify-content:center;
-      box-shadow:0 14px 34px rgba(0,0,0,.25);
-    }
-    .heroLogo img{width:100%;height:100%;object-fit:contain}
-    .heroText{color:#fff;text-align:right}
-    .heroText .ar{font-weight:1000;font-size:22px}
-    .heroText .en{font-weight:900;opacity:.90;margin-top:2px}
-    .heroText .name{font-weight:900;opacity:.92;margin-top:6px;font-size:13px}
-    .startMsg{
-      margin-top:14px;
-      padding:14px;border-radius:18px;
-      background:rgba(0,0,0,.14);
-      border:1px solid rgba(255,255,255,.14);
-      color:#fff;line-height:1.9
-    }
-    .startActions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
-    .startActions button{flex:1}
-    button{border:0;border-radius:12px;padding:12px 12px;cursor:pointer;font-size:14px;font-weight:900}
-    .btn{background:var(--rajhi);color:#fff}
-    .ghostBtn{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.18)}
 
-    /* ===== Onboarding simplified ===== */
-    #onboardOverlay{
-      position:fixed; inset:0; z-index:9997;
-      background: radial-gradient(circle at top, #0b2a66 0%, #061a3d 55%, #04112a 100%);
-      display:none; align-items:center; justify-content:center; padding:18px;
-    }
-    .onbBox{
-      width:min(720px, 100%);
-      background:rgba(255,255,255,.10);
-      border:1px solid rgba(255,255,255,.14);
-      border-radius:22px;
-      box-shadow:0 18px 60px rgba(0,0,0,.45);
-      overflow:hidden;
-      backdrop-filter: blur(12px);
-    }
-    .onbTop{
-      display:flex; justify-content:space-between; align-items:center;
-      padding:12px 14px;background:rgba(0,0,0,.18);
-      color:#fff;font-weight:1000;
-    }
-    .onbSkip{
-      background:rgba(255,255,255,.16);color:#fff;border-radius:999px;padding:8px 12px;cursor:pointer;
-      border:1px solid rgba(255,255,255,.18);font-weight:1000
-    }
-    .onbBody{padding:14px}
-    .onbViewport{overflow:hidden;width:100%;position:relative;direction:ltr;touch-action:pan-y}
-    .onbTrack{display:flex;width:300%;transition:transform .45s ease}
-    .onbSlide{
-      flex:0 0 100%;
-      min-height:260px;border-radius:20px;padding:22px 16px;
-      display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;
-      direction:rtl;
-      background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(0,0,0,.10));
-      border:1px solid rgba(255,255,255,.16);
-      box-shadow:0 14px 34px rgba(0,0,0,.22);
-    }
-    .onbTitle{font-size:18px;font-weight:1000;color:#fff;margin-top:12px}
-    .onbText{font-size:14px;line-height:1.95;margin-top:8px;color:rgba(255,255,255,.92);max-width:560px}
-    .onbDots{display:flex;gap:8px;justify-content:center;margin-top:10px}
-    .onbDot{width:9px;height:9px;border-radius:999px;background:rgba(255,255,255,.35)}
-    .onbDot.active{background:#fff}
-    .onbControls{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
-    .onbControls button{flex:1}
 
-    /* Modal */
-    .modal{position:fixed;inset:0;background:rgba(0,0,0,.50);display:none;align-items:center;justify-content:center;padding:18px;z-index:9999}
-    .modalBox{background:#fff;border-radius:18px;max-width:760px;width:100%;padding:16px;box-shadow:var(--shadow2)}
-    .modalHead{display:flex;justify-content:space-between;align-items:center;gap:10px}
-    .modalHead h3{margin:0;color:var(--navy);font-weight:1000}
-    .xBtn{background:#eef2f7;border:1px solid rgba(0,0,0,.10);padding:10px 12px;border-radius:12px;font-weight:1000}
-    .modalBody{margin-top:10px;line-height:1.85;color:#111827}
-    .modalActions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
-  </style>
-</head>
+ 
 
-<body>
-  <div class="topbar">
-    <img class="logo" src="school-logo.png" alt="شعار المدرسة">
-    <div class="titles">
-      <div class="t1">بنك الرياضيات – المصرفي للمعلمة سارة حقوي</div>
-      <div class="t2">مدرسة رواد الشرق الأهلية</div>
-    </div>
-    <div style="width:54px"></div>
-  </div>
-  
-  <!-- Start -->
-  <div id="startOverlay" class="hidden">
-    <div class="startBox">
-      <div class="startTop">
-        <div class="pill" id="connPill">...جاري فتح النظام...</div>
-        <div class="pill" id="modePill">وضع: المعلمة</div>
-      </div>
-      <div class="startBody">
-        <div class="heroRow">
-          <div class="heroLogo"><img src="logo.png" alt="logo"></div>
-          <div class="heroText">
-            <div class="ar">بنك الرياضيات</div>
-            <div class="en">Math Bank</div>
-            <div class="name">أ. سارة حقوي</div>
-          </div>
-        </div>
 
-        <div class="startMsg" id="startMsg">
-          هلا والله 🌿<br>
-          جاري فتح النظام…<br>
-          بعد الضغط على (ابدأ) تظهر صفحة التعريف السريعة (٣ شاشات فقط) ثم يتم الدخول.
-        </div>
-
-        <div class="startActions">
-          <button class="btn" onclick="startApp()">ابدأ الآن</button>
-          <button class="ghostBtn" onclick="openHelp()">هل تحتاج إلى مساعدة؟</button>
-        </div>
-      </div>
-    </div>
-  </div>
 
 from pathlib import Path, PurePosixPath
 path = Path("/mnt/data/index_new.html")
@@ -2567,7 +2369,10 @@ ${SIGNATURE}`
       initTeacherReasonAlways();
       // keep start overlay visible until user presses start
       // public footer visible always (under start overlay it's behind)
-      
+    });
   </script>
 </body>
 </html>
+"""
+path.write_text(html, encoding="utf-8")
+str(path), path.stat().st_size
