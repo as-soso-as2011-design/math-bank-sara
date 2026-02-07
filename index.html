@@ -846,31 +846,31 @@ html = """<!doctype html>
               <div class="col">
                 <div class="card soft">
                   <div style="font-weight:1000;color:#0b2a66">🥉 برونزي</div>
-                  <div class="small">من 0 إلى أقل من 70</div>
+                  <div class="small">من 10000 إلى أقل من 10000</div>
                 </div>
               </div>
               <div class="col">
                 <div class="card soft">
                   <div style="font-weight:1000;color:#0b2a66">🥈 فضي</div>
-                  <div class="small">من 70 إلى أقل من 150</div>
+                  <div class="small">من 11000 إلى أقل من 14000</div>
                 </div>
               </div>
               <div class="col">
                 <div class="card soft">
                   <div style="font-weight:1000;color:#0b2a66">🥇 ذهبي</div>
-                  <div class="small">من 150 إلى أقل من 300</div>
+                  <div class="small">من 15000 إلى أقل من 20000</div>
                 </div>
               </div>
               <div class="col">
                 <div class="card soft">
                   <div style="font-weight:1000;color:#0b2a66">🔷 ماسي</div>
-                  <div class="small">من 300 إلى أقل من 500</div>
+                  <div class="small">من 20000 إلى أقل من 29000</div>
                 </div>
               </div>
               <div class="col">
                 <div class="card soft">
                   <div style="font-weight:1000;color:#0b2a66">💎 ألماسي</div>
-                  <div class="small">500 فأكثر</div>
+                  <div class="small">30000 فأكثر</div>
                 </div>
               </div>
             </div>
@@ -962,7 +962,7 @@ html = """<!doctype html>
     const SIGNATURE = "المعلمة: سارة حقوي";
     const TEACHER_BANK_TITLE = "بنك الرياضيات – المصرفي";
     const CONTACT_PRIMARY = "0502234335"; // خدمة الطلاب
-    const WHATSAPP_BUSINESS = "0556891201"; // شكاوى / بزنس
+    const WHATSAPP_BUSINESS = "0556891201"; // شكاوى  
     const ADMIN_EMAIL = "saramathss@hotmail.com";
     const TEACHER_EMAIL = "as-soso-as2011@hotmail.com";
 
@@ -1085,7 +1085,7 @@ ${SIGNATURE}`
         <div class="card soft" style="margin:0">
           <div style="font-weight:1000;color:#0b2a66">📞 خدمة الطلاب</div>
           <div class="small" style="direction:ltr;text-align:left">${CONTACT_PRIMARY}</div>
-          <div style="margin-top:10px;font-weight:1000;color:#0b2a66">💬 للشكاوى (واتساب بزنس)</div>
+          <div style="margin-top:10px;font-weight:1000;color:#0b2a66">💬 للشكاوى (واتساب )</div>
           <div class="small" style="direction:ltr;text-align:left">${WHATSAPP_BUSINESS}</div>
           <div style="margin-top:10px;font-weight:1000;color:#0b2a66">🏛️ الإدارة العامة</div>
           <div class="small" style="direction:ltr;text-align:left">${CONTACT_PRIMARY}</div>
@@ -1110,7 +1110,7 @@ ${SIGNATURE}`
           <div style="font-weight:1000;color:#0b2a66">المسؤولة</div>
           <div class="small">${SIGNATURE}</div>
           <div style="margin-top:10px;font-weight:1000;color:#0b2a66">تاريخ افتتاح البنك</div>
-          <div class="small">يُحدّث حسب اعتماد المدرسة</div>
+          <div class="small">شعبان هـ1447-2026فبراير</div>
           <div style="margin-top:10px;font-weight:1000;color:#0b2a66">الأهداف</div>
           <ul class="small" style="line-height:1.9;margin:8px 0 0 0">
             <li>رفع الانضباط والالتزام داخل الحصة.</li>
@@ -1129,9 +1129,7 @@ ${SIGNATURE}`
         <div style="font-weight:1000;color:#0b2a66;font-size:16px">هل تحتاج إلى مساعدة؟</div>
         <hr>
         <div class="small" style="line-height:1.9">
-          • للطلاب: ادخل الاسم + PIN ثم نفذ العملية أو اعرض كشف الحساب.\\n
-          • للمعلمة: teacher / 12345 (تجريبي) ثم اختاري الفصل.\\n
-          • مشكلة الصوت: لازم يتم التشغيل بعد تفاعل (مثل زر دخول).\\n
+          • للطلاب: ادخل الاسم + PIN ثم نفذ العملية أو اعرض كشف الحساب.
           • مشكلة واتساب: إذا ما فتح التطبيق، يتحول تلقائيًا لصفحة wa.me.
         </div>
       `;
@@ -1533,10 +1531,10 @@ ${SIGNATURE}`
       const wa = normalizePhoneToWA(parent);
       if(!wa) return openModal("تنبيه","لا يوجد رقم ولي أمر مسجل. تواصل/ي مع المعلمة.");
       const msg =
-        "⚠️ رسالة تلقائية\\n" + TEACHER_BANK_TITLE + "\\n\\n" +
-        "استرجاع الرقم السري (PIN) للطالب/ـة:\\n" + (s.name||"") + "\\n" +
-        "PIN: " + (s.pin||"") + "\\n\\n" +
-        "للتواصل مع المعلمة:\\n" + contactLink() + "\\n\\n" + SIGNATURE;
+        "⚠️ رسالة تلقائية TEACHER_BANK_TITLE
+        "استرجاع الرقم السري (PIN) للطالب/ـة:(s.name||"") 
+        "PIN: " + (s.pin||"") 
+        "للتواصل مع المعلمة: contactLink() SIGNATURE;
 
       openWA(wa, msg);
     }
@@ -1570,10 +1568,10 @@ ${SIGNATURE}`
 
     function calcTier(balance){
       const b = Number(balance||0);
-      if(b >= 500) return "💎 ألماسي";
-      if(b >= 300) return "🔷 ماسي";
-      if(b >= 150) return "🥇 ذهبي";
-      if(b >= 70)  return "🥈 فضي";
+      if(b >= 30000) return "💎 ألماسي";
+      if(b >= 25000) return "🔷 ماسي";
+      if(b >= 20000) return "🥇 ذهبي";
+      if(b >= 15000)  return "🥈 فضي";
       return "🥉 برونزي";
     }
 
