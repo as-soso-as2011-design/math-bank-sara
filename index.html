@@ -27,7 +27,8 @@
     .topbar .t1{font-weight:800;font-size:16px}
     .topbar .t2{font-size:12px;opacity:.95}
     .logo{height:56px;width:auto;background:rgba(255,255,255,.78);border-radius:12px;padding:6px}
-    .footer{text-align:center;padding:14px 12px;color:var(--navy);font-weight:700}
+    .footer{text-align:center;padding:14px 12px;font-weight:700}
+    .footer{color:#fff;opacity:.95} /* ✅ تم نقلها داخل style */
 
     .container{max-width:980px;margin:14px auto;padding:0 12px}
     .card{background:#fff;border-radius:14px;padding:14px;margin:10px 0;box-shadow:0 8px 18px rgba(0,0,0,.06)}
@@ -149,80 +150,81 @@
     .dailySelectedHint{color:var(--green);font-weight:800}
 
     /* ================== Onboarding (بعد ابدأ) ================== */
-#onboardOverlay{
-  position:fixed; inset:0; z-index:9997;
-  background: radial-gradient(circle at top, #0b2a66 0%, #061a3d 55%, #04112a 100%);
-  display:none; align-items:center; justify-content:center; padding:18px;
-}
-.onbBox{
-  width:min(640px, 100%);
-  background:rgba(255,255,255,.10);
-  border:1px solid rgba(255,255,255,.14);
-  border-radius:18px;
-  box-shadow:0 14px 40px rgba(0,0,0,.35);
-  overflow:hidden;
-  backdrop-filter: blur(10px);
-}
-.onbTop{
-  display:flex; justify-content:space-between; align-items:center;
-  padding:12px 14px;
-  background:rgba(0,0,0,.18);
-  color:#fff;
-  font-weight:900;
-}
-.onbSkip{
-  background:rgba(255,255,255,.16);
-  color:#fff;
-  border-radius:999px;
-  padding:6px 12px;
-  cursor:pointer;
-  border:1px solid rgba(255,255,255,.18);
-}
-.onbBody{padding:14px}
+    #onboardOverlay{
+      position:fixed; inset:0; z-index:9997;
+      background: radial-gradient(circle at top, #0b2a66 0%, #061a3d 55%, #04112a 100%);
+      display:none; align-items:center; justify-content:center; padding:18px;
+    }
+    .onbBox{
+      width:min(640px, 100%);
+      background:rgba(255,255,255,.10);
+      border:1px solid rgba(255,255,255,.14);
+      border-radius:18px;
+      box-shadow:0 14px 40px rgba(0,0,0,.35);
+      overflow:hidden;
+      backdrop-filter: blur(10px);
+    }
+    .onbTop{
+      display:flex; justify-content:space-between; align-items:center;
+      padding:12px 14px;
+      background:rgba(0,0,0,.18);
+      color:#fff;
+      font-weight:900;
+    }
+    .onbSkip{
+      background:rgba(255,255,255,.16);
+      color:#fff;
+      border-radius:999px;
+      padding:6px 12px;
+      cursor:pointer;
+      border:1px solid rgba(255,255,255,.18);
+    }
+    .onbBody{padding:14px}
 
-.onbViewport{
-  overflow:hidden;
-  width:100%;
-  position:relative;
-  direction:ltr; /* مهم عشان السحب والترجمة يشتغلون صح */
-}
+    .onbViewport{
+      overflow:hidden;
+      width:100%;
+      position:relative;
+      direction:ltr; /* مهم */
+    }
+    .onbTrack{
+      display:flex;
+      width:300%;
+      transition:transform .45s ease;
+    }
+    .onbSlide{
+      flex:0 0 100%;
+      min-height:260px;
+      background:#061c45;
+      color:#fff;
+      border-radius:20px;
+      padding:28px 20px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      align-items:center;
+      text-align:center;
+      direction:rtl;
+      box-shadow:0 14px 34px rgba(0,0,0,.22);
+    }
+    .onbTitle{
+      font-size:18px;
+      font-weight:900;
+      color:#fff;
+      margin-top:10px;
+    }
+    .onbText{
+      font-size:14px;
+      line-height:1.9;
+      margin-top:8px;
+      color:rgba(255,255,255,.9);
+      max-width:520px;
+    }
 
-.onbTrack{
-  display:flex;
-  width:300%;
-  transition:transform .45s ease;
-}
-
-.onbSlide{
-  flex:0 0 100%;
-  min-height:260px;
-  background:#061c45;            /* لون واحد فخم */
-  color:#fff;
-  border-radius:20px;
-  padding:28px 20px;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-  text-align:center;
-  direction:rtl;                  /* النص عربي داخل السلايد */
-  box-shadow:0 14px 34px rgba(0,0,0,.22);
-}
-
-.onbTitle{
-  font-size:18px;
-  font-weight:900;
-  color:#fff;
-  margin-top:10px;
-}
-
-.onbText{
-  font-size:14px;
-  line-height:1.9;
-  margin-top:8px;
-  color:rgba(255,255,255,.9);
-  max-width:520px;
-}
+    /* ✅ نقاط التعريف */
+    .onbDots{display:flex;gap:8px;justify-content:center;margin-top:12px}
+    .onbDot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.35)}
+    .onbDot.active{background:#fff}
   </style>
 </head>
 
@@ -298,9 +300,9 @@
             <div class="onbSlide">
               <div class="onbIcon">
                 <svg width="46" height="46" viewBox="0 0 24 24" fill="none">
-                  <path d="M3 10.5L12 5l9 5.5" stroke="#00205B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  <path d="M5 10.5V19h14v-8.5" stroke="#0055A4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  <path d="M8 19v-6M12 19v-6M16 19v-6" stroke="#00205B" stroke-width="2" stroke-linecap="round"/>
+                  <path d="M3 10.5L12 5l9 5.5" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M5 10.5V19h14v-8.5" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M8 19v-6M12 19v-6M16 19v-6" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
                 </svg>
               </div>
               <div class="onbTitle">منصة متابعة سلوكية وتعليمية</div>
@@ -312,9 +314,9 @@
             <div class="onbSlide">
               <div class="onbIcon">
                 <svg width="46" height="46" viewBox="0 0 24 24" fill="none">
-                  <path d="M7 3h7l3 3v15H7V3Z" stroke="#00205B" stroke-width="2" stroke-linejoin="round"/>
-                  <path d="M14 3v4h4" stroke="#0055A4" stroke-width="2" stroke-linejoin="round"/>
-                  <path d="M9 12h6M9 16h6" stroke="#00205B" stroke-width="2" stroke-linecap="round"/>
+                  <path d="M7 3h7l3 3v15H7V3Z" stroke="#ffffff" stroke-width="2" stroke-linejoin="round"/>
+                  <path d="M14 3v4h4" stroke="#ffffff" stroke-width="2" stroke-linejoin="round"/>
+                  <path d="M9 12h6M9 16h6" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
                 </svg>
               </div>
               <div class="onbTitle">تقارير أسبوعية وشفافية عالية</div>
@@ -326,8 +328,8 @@
             <div class="onbSlide">
               <div class="onbIcon">
                 <svg width="46" height="46" viewBox="0 0 24 24" fill="none">
-                  <path d="M12 3l7 4v6c0 5-3 8-7 8s-7-3-7-8V7l7-4Z" stroke="#00205B" stroke-width="2" stroke-linejoin="round"/>
-                  <path d="M9.5 12l1.8 1.8L15 10" stroke="#0055A4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M12 3l7 4v6c0 5-3 8-7 8s-7-3-7-8V7l7-4Z" stroke="#ffffff" stroke-width="2" stroke-linejoin="round"/>
+                  <path d="M9.5 12l1.8 1.8L15 10" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
               </div>
               <div class="onbTitle">ضوابط استخدام واضحة</div>
@@ -343,8 +345,9 @@
           <div class="onbDot"></div>
           <div class="onbDot"></div>
         </div>
-      </div>
-
+      </div> <!-- onbBody -->
+    </div>   <!-- onbBox -->
+  </div>     <!-- onboardOverlay -->
 
   <!-- ===== صفحة المعلمة ===== -->
   <div id="teacherLoginPage" class="hidden">
@@ -592,7 +595,6 @@
   </div>
 
   <div class="footer">الرياضيات لغة الأذكياء ✨</div>
-  .footer{color:#fff;opacity:.95}    
 
   <!-- libs -->
   <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-app-compat.js"></script>
@@ -848,20 +850,25 @@ ${SIGNATURE}`
 
     // ================== زر البدء ==================
     async function startApp(){
-      // ✅ عرض التعريف كل مرة بعد زر (ابدأ) ثم تحويل الدخول
-showOnboardingIfNeeded(()=>{
-  if(IS_STUDENT_ENTRY){
-    go("studentLoginPage");
-    $("stuLoginTitle").textContent = "دخول الطالب";
-    $("stuName").readOnly = false;
-    $("stuName").value = "";
-    $("stuName").placeholder = "اكتب اسمك كما هو مسجل بالنظام";
-    currentAccess = "student";
-    return;
-  }
-  go("teacherLoginPage");
-  currentAccess = "teacher";
-});
+      // ✅ اخفاء واجهة ابدأ
+      const start = document.getElementById("startOverlay");
+      if(start) start.style.display = "none";
+
+      // ✅ عرض التعريف ثم تحويل الدخول
+      showOnboardingIfNeeded(()=>{
+        if(IS_STUDENT_ENTRY){
+          go("studentLoginPage");
+          $("stuLoginTitle").textContent = "دخول الطالب";
+          $("stuName").readOnly = false;
+          $("stuName").value = "";
+          $("stuName").placeholder = "اكتب اسمك كما هو مسجل بالنظام";
+          currentAccess = "student";
+          return;
+        }
+        go("teacherLoginPage");
+        currentAccess = "teacher";
+      });
+    }
 
     // ================== تسجيل المعلمة ==================
     function teacherLogin(){
@@ -971,7 +978,6 @@ showOnboardingIfNeeded(()=>{
       all.forEach(d=>{ const s=d.data(); if(s?.name) existing.add(String(s.name).trim()); });
 
       for(const clsName of Object.keys(DEFAULT_STUDENTS)){
-        // دعم الاسمين: "سادس بنين" و "الصف سادس بنين"
         const classId = by[clsName] || by[("الصف " + clsName)] || by[("الصف " + clsName.replace("أول","الأول"))];
         if(!classId) continue;
 
@@ -1057,6 +1063,7 @@ showOnboardingIfNeeded(()=>{
       }
       return "";
     }
+
     async function editGuardianPhone(studentId, studentName){
       const ref = db.collection("students").doc(studentId);
       const doc = await ref.get();
@@ -1760,8 +1767,8 @@ showOnboardingIfNeeded(()=>{
     // ================== PDF أسبوعي ==================
     function getWeekRange(endStr){
       const end = endStr ? new Date(endStr+"T23:59:59") : new Date();
-      const day = end.getDay(); // 0 Sun
-      const diffToSat = (day - 6 + 7) % 7; // Saturday as end of week
+      const day = end.getDay();
+      const diffToSat = (day - 6 + 7) % 7;
       end.setDate(end.getDate() - diffToSat);
 
       const start = new Date(end);
@@ -1892,87 +1899,88 @@ showOnboardingIfNeeded(()=>{
       }
     }
 
-    // ================== Onboarding Logic (يظهر دائمًا) ==================
-let onbIndex = 0;
-let onbAfterDone = null;
+    // ================== Onboarding Logic (يظهر بعد ابدأ) ==================
+    let onbIndex = 0;
+    let onbAfterDone = null;
+    let onbSwipeBound = false; // ✅ كان ناقص
 
-function showOnboardingIfNeeded(afterDone){
-  onbAfterDone = (typeof afterDone === "function") ? afterDone : null;
+    function showOnboardingIfNeeded(afterDone){
+      onbAfterDone = (typeof afterDone === "function") ? afterDone : null;
 
-  onbIndex = 0;
-  updateOnbUI();
+      onbIndex = 0;
+      updateOnbUI();
 
-  const ov = document.getElementById("onboardOverlay");
-  if(ov){
-    ov.style.display = "flex";
-    ov.setAttribute("aria-hidden","false");
-  }
-  enableOnbSwipe();
-}
-
-function finishOnboarding(){
-  const ov = document.getElementById("onboardOverlay");
-  if(ov){
-    ov.style.display = "none";
-    ov.setAttribute("aria-hidden","true");
-  }
-  const cb = onbAfterDone;
-  onbAfterDone = null;
-  if(typeof cb === "function") cb();
-}
-
-function updateOnbUI(){
-  const track = document.getElementById("onbTrack");
-  const dotsWrap = document.getElementById("onbDots");
-
-  if(track) track.style.transform = `translateX(-${onbIndex * 100}%)`;
-
-  if(dotsWrap){
-    const dots = dotsWrap.querySelectorAll(".onbDot");
-    dots.forEach((d,i)=> d.classList.toggle("active", i===onbIndex));
-  }
-}
-function onbNext(){
-  if(onbIndex >= 2) return finishOnboarding();
-  onbIndex++;
-  updateOnbUI();
-}
-function onbPrev(){
-  if(onbIndex <= 0) return;
-  onbIndex--;
-  updateOnbUI();
-}
-
-function enableOnbSwipe(){
-  if(onbSwipeBound) return;
-  const vp = document.getElementById("onbViewport");
-  if(!vp) return;
-  onbSwipeBound = true;
-
-  let startX = 0, dx = 0, dragging=false;
-
-  const onDown = (x)=>{ dragging=true; startX=x; dx=0; };
-  const onMove = (x)=>{ if(!dragging) return; dx = x-startX; };
-  const onUp = ()=>{
-    if(!dragging) return;
-    dragging=false;
-    if(Math.abs(dx) > 45){
-      // RTL UX: سحب يمين = السابق، سحب يسار = التالي
-      if(dx > 0) onbPrev();
-      else onbNext();
+      const ov = document.getElementById("onboardOverlay");
+      if(ov){
+        ov.style.display = "flex";
+        ov.setAttribute("aria-hidden","false");
+      }
+      enableOnbSwipe();
     }
-    dx=0;
-  };
 
-  vp.onpointerdown = (e)=> onDown(e.clientX);
-  vp.onpointermove = (e)=> onMove(e.clientX);
-  vp.onpointerup = ()=> onUp();
-  vp.onpointercancel = ()=> onUp();
+    function finishOnboarding(){
+      const ov = document.getElementById("onboardOverlay");
+      if(ov){
+        ov.style.display = "none";
+        ov.setAttribute("aria-hidden","true");
+      }
+      const cb = onbAfterDone;
+      onbAfterDone = null;
+      if(typeof cb === "function") cb();
+    }
 
-  vp.ontouchstart = (e)=> onDown(e.touches[0].clientX);
-  vp.ontouchmove  = (e)=> onMove(e.touches[0].clientX);
-  vp.ontouchend   = ()=> onUp();
-}
+    function updateOnbUI(){
+      const track = document.getElementById("onbTrack");
+      const dotsWrap = document.getElementById("onbDots");
+
+      if(track) track.style.transform = `translateX(-${onbIndex * 100}%)`;
+
+      if(dotsWrap){
+        const dots = dotsWrap.querySelectorAll(".onbDot");
+        dots.forEach((d,i)=> d.classList.toggle("active", i===onbIndex));
+      }
+    }
+    function onbNext(){
+      if(onbIndex >= 2) return finishOnboarding();
+      onbIndex++;
+      updateOnbUI();
+    }
+    function onbPrev(){
+      if(onbIndex <= 0) return;
+      onbIndex--;
+      updateOnbUI();
+    }
+
+    function enableOnbSwipe(){
+      if(onbSwipeBound) return;
+      const vp = document.getElementById("onbViewport");
+      if(!vp) return;
+      onbSwipeBound = true;
+
+      let startX = 0, dx = 0, dragging=false;
+
+      const onDown = (x)=>{ dragging=true; startX=x; dx=0; };
+      const onMove = (x)=>{ if(!dragging) return; dx = x-startX; };
+      const onUp = ()=>{
+        if(!dragging) return;
+        dragging=false;
+        if(Math.abs(dx) > 45){
+          // RTL UX: سحب يمين = السابق، سحب يسار = التالي
+          if(dx > 0) onbPrev();
+          else onbNext();
+        }
+        dx=0;
+      };
+
+      vp.onpointerdown = (e)=> onDown(e.clientX);
+      vp.onpointermove = (e)=> onMove(e.clientX);
+      vp.onpointerup = ()=> onUp();
+      vp.onpointercancel = ()=> onUp();
+
+      vp.ontouchstart = (e)=> onDown(e.touches[0].clientX);
+      vp.ontouchmove  = (e)=> onMove(e.touches[0].clientX);
+      vp.ontouchend   = ()=> onUp();
+    }
 
     // ================== ✅ تهيئة عند التحميل + Splash ثم startOverlay ==================
     document.addEventListener("DOMContentLoaded", async () => {
@@ -2018,15 +2026,9 @@ function enableOnbSwipe(){
         const start=document.getElementById("startOverlay");
         if(start) start.style.display="flex";
       },2800);
-     showOnboardingIfNeeded(()=>{
-  if(IS_STUDENT_ENTRY){
-    go("studentLoginPage");
-    currentAccess="student";
-  }else{
-    go("teacherLoginPage");
-    currentAccess="teacher";
-  }
-});
+
+      // ❌ تم حذف showOnboardingIfNeeded من هنا (صار يظهر فقط بعد زر ابدأ)
+    });
   </script>
 
   <div id="pdfTemp" class="hidden"></div>
