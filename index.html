@@ -365,12 +365,29 @@
       $("modal").setAttribute("aria-hidden","true");
     }
     function openHelp(){
-      openModal("مساعدة", `
-        <div style="font-size:13px;line-height:1.95">
-          إذا ما اشتغل الصوت: لازم تضغط/ي أي زر أولاً لأن بعض الأجهزة تمنع الصوت تلقائياً.<br>
-          صفحة التعريف: 3 شاشات فقط ويمكن تخطيها.
+      const isStudent = IS_STUDENT_ENTRY || currentAccess === "student";
+      const body = isStudent ? `
+        <div style="font-weight:1000;color:#0b2a66;font-size:16px">مساعدة الطلاب</div>
+        <hr>
+        <div class="small" style="line-height:1.95">
+          • اكتب/ي اسم الطالب/ـة كما هو مسجل ثم الرقم السري (PIN).<br>
+          • إذا نسيت/ي الرقم السري: استخدم/ي زر (نسيت الرقم السري) إذا كان مفعّلًا.<br>
+          • لتنفيذ عملية: اختر العملية والسبب ثم اكتب المبلغ واضغط (تنفيذ).<br>
+          • لتحميل كشف الحساب: اضغط (PDF رسمي).<br>
+          • مشكلة الصوت: لازم يكون بعد ضغط زر (تفاعل) داخل الصفحة.<br>
+          • مشكلة واتساب: إذا ما فتح التطبيق، يتحول تلقائيًا إلى صفحة wa.me.
         </div>
-      `);
+      ` : `
+        <div style="font-weight:1000;color:#0b2a66;font-size:16px">مساعدة المعلمة</div>
+        <hr>
+        <div class="small" style="line-height:1.95">
+          • سجّل/ي الدخول ثم اختاري الفصل لعرض الطلاب وإدارة العمليات.<br>
+          • تفعيل (فتح واتساب بعد العملية) يجهز الرسالة تلقائيًا لولي الأمر — ويتطلب نقرة إرسال أخيرة ✅<br>
+          • تقارير PDF: من داخل الطالب (PDF رسمي) أو (تقرير PDF) من قائمة الطلاب.<br>
+          • في حال تعذر الدخول استخدم/ي (نسيت كلمة المرور) وسيتم التواصل عبر البريد.
+        </div>
+      `;
+      openModal("مساعدة", body, '<button class="btn" onclick="closeModal()">تمام</button>');
     }
 
     // ===== Splash -> Start auto =====
