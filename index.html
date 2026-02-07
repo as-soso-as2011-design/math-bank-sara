@@ -27,8 +27,16 @@
     .topbar .t1{font-weight:800;font-size:16px}
     .topbar .t2{font-size:12px;opacity:.95}
     .logo{height:56px;width:auto;background:rgba(255,255,255,.78);border-radius:12px;padding:6px}
-    .footer{text-align:center;padding:14px 12px;font-weight:700}
-    .footer{color:#fff;opacity:.95} /* ✅ تم نقلها داخل style */
+
+    .footer{
+      text-align:center;
+      padding:14px 12px;
+      color:#fff;
+      opacity:.95;
+      font-weight:800;
+      background:linear-gradient(90deg,var(--navy),var(--rajhi));
+      margin-top:12px;
+    }
 
     .container{max-width:980px;margin:14px auto;padding:0 12px}
     .card{background:#fff;border-radius:14px;padding:14px;margin:10px 0;box-shadow:0 8px 18px rgba(0,0,0,.06)}
@@ -185,13 +193,19 @@
       overflow:hidden;
       width:100%;
       position:relative;
-      direction:ltr; /* مهم */
+      direction:ltr;
+      touch-action: pan-y; /* يمنع سحب الصفحة ويثبت السلايد */
+      -webkit-user-select:none;
+      user-select:none;
     }
+
     .onbTrack{
       display:flex;
       width:300%;
-      transition:transform .45s ease;
+      transition:transform .35s ease;
+      will-change: transform;
     }
+
     .onbSlide{
       flex:0 0 100%;
       min-height:260px;
@@ -207,24 +221,45 @@
       direction:rtl;
       box-shadow:0 14px 34px rgba(0,0,0,.22);
     }
+
+    .onbIcon{
+      width:72px;height:72px;
+      border-radius:18px;
+      background:rgba(255,255,255,.12);
+      display:flex;align-items:center;justify-content:center;
+      border:1px solid rgba(255,255,255,.12);
+    }
+    .onbIcon svg path{ stroke:#fff !important; } /* ✅ عشان الأيقونات ما تختفي */
+
     .onbTitle{
       font-size:18px;
       font-weight:900;
       color:#fff;
-      margin-top:10px;
+      margin-top:12px;
     }
+
     .onbText{
       font-size:14px;
       line-height:1.9;
       margin-top:8px;
-      color:rgba(255,255,255,.9);
+      color:rgba(255,255,255,.92);
       max-width:520px;
     }
 
-    /* ✅ نقاط التعريف */
-    .onbDots{display:flex;gap:8px;justify-content:center;margin-top:12px}
-    .onbDot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.35)}
-    .onbDot.active{background:#fff}
+    .onbDots{
+      display:flex;
+      gap:6px;
+      justify-content:center;
+      margin-top:12px;
+    }
+    .onbDot{
+      width:7px;height:7px;border-radius:999px;
+      background:rgba(255,255,255,.35);
+    }
+    .onbDot.active{
+      width:18px;
+      background:#fff;
+    }
   </style>
 </head>
 
@@ -300,9 +335,9 @@
             <div class="onbSlide">
               <div class="onbIcon">
                 <svg width="46" height="46" viewBox="0 0 24 24" fill="none">
-                  <path d="M3 10.5L12 5l9 5.5" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  <path d="M5 10.5V19h14v-8.5" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  <path d="M8 19v-6M12 19v-6M16 19v-6" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+                  <path d="M3 10.5L12 5l9 5.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M5 10.5V19h14v-8.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M8 19v-6M12 19v-6M16 19v-6" stroke-width="2" stroke-linecap="round"/>
                 </svg>
               </div>
               <div class="onbTitle">منصة متابعة سلوكية وتعليمية</div>
@@ -314,9 +349,9 @@
             <div class="onbSlide">
               <div class="onbIcon">
                 <svg width="46" height="46" viewBox="0 0 24 24" fill="none">
-                  <path d="M7 3h7l3 3v15H7V3Z" stroke="#ffffff" stroke-width="2" stroke-linejoin="round"/>
-                  <path d="M14 3v4h4" stroke="#ffffff" stroke-width="2" stroke-linejoin="round"/>
-                  <path d="M9 12h6M9 16h6" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+                  <path d="M7 3h7l3 3v15H7V3Z" stroke-width="2" stroke-linejoin="round"/>
+                  <path d="M14 3v4h4" stroke-width="2" stroke-linejoin="round"/>
+                  <path d="M9 12h6M9 16h6" stroke-width="2" stroke-linecap="round"/>
                 </svg>
               </div>
               <div class="onbTitle">تقارير أسبوعية وشفافية عالية</div>
@@ -328,8 +363,8 @@
             <div class="onbSlide">
               <div class="onbIcon">
                 <svg width="46" height="46" viewBox="0 0 24 24" fill="none">
-                  <path d="M12 3l7 4v6c0 5-3 8-7 8s-7-3-7-8V7l7-4Z" stroke="#ffffff" stroke-width="2" stroke-linejoin="round"/>
-                  <path d="M9.5 12l1.8 1.8L15 10" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M12 3l7 4v6c0 5-3 8-7 8s-7-3-7-8V7l7-4Z" stroke-width="2" stroke-linejoin="round"/>
+                  <path d="M9.5 12l1.8 1.8L15 10" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
               </div>
               <div class="onbTitle">ضوابط استخدام واضحة</div>
@@ -345,9 +380,10 @@
           <div class="onbDot"></div>
           <div class="onbDot"></div>
         </div>
-      </div> <!-- onbBody -->
-    </div>   <!-- onbBox -->
-  </div>     <!-- onboardOverlay -->
+      </div>
+    </div>
+  </div>
+  <!-- ✅ انتهت شاشة التعريف بشكل صحيح (بدون تداخل يسبب صفحة بيضاء) -->
 
   <!-- ===== صفحة المعلمة ===== -->
   <div id="teacherLoginPage" class="hidden">
@@ -718,11 +754,9 @@ ${SIGNATURE}`
         );
       }, 900);
     }
-
     function tryOpenBusinessAgain(phone, encMsg){
       window.location.href = "whatsapp-business://send?phone=" + phone + "&text=" + encMsg;
     }
-
     async function copyTextToClipboard(text){
       try{
         await navigator.clipboard.writeText(text);
@@ -848,13 +882,96 @@ ${SIGNATURE}`
       toggleOther();
     }
 
-    // ================== زر البدء ==================
-    async function startApp(){
-      // ✅ اخفاء واجهة ابدأ
-      const start = document.getElementById("startOverlay");
-      if(start) start.style.display = "none";
+    // ================== Onboarding Logic (يظهر بعد زر ابدأ) ==================
+    let onbIndex = 0;
+    let onbAfterDone = null;
+    let onbSwipeBound = false;
 
-      // ✅ عرض التعريف ثم تحويل الدخول
+    function showOnboardingIfNeeded(afterDone){
+      onbAfterDone = (typeof afterDone === "function") ? afterDone : null;
+
+      onbIndex = 0;
+      updateOnbUI();
+
+      const ov = document.getElementById("onboardOverlay");
+      if(ov){
+        ov.style.display = "flex";
+        ov.setAttribute("aria-hidden","false");
+      }
+      enableOnbSwipe();
+    }
+
+    function finishOnboarding(){
+      const ov = document.getElementById("onboardOverlay");
+      if(ov){
+        ov.style.display = "none";
+        ov.setAttribute("aria-hidden","true");
+      }
+      const cb = onbAfterDone;
+      onbAfterDone = null;
+      if(typeof cb === "function") cb();
+    }
+
+    function updateOnbUI(){
+      const track = document.getElementById("onbTrack");
+      const dotsWrap = document.getElementById("onbDots");
+
+      if(track) track.style.transform = `translateX(-${onbIndex * 100}%)`;
+
+      if(dotsWrap){
+        const dots = dotsWrap.querySelectorAll(".onbDot");
+        dots.forEach((d,i)=> d.classList.toggle("active", i===onbIndex));
+      }
+    }
+    function onbNext(){
+      if(onbIndex >= 2) return finishOnboarding();
+      onbIndex++;
+      updateOnbUI();
+    }
+    function onbPrev(){
+      if(onbIndex <= 0) return;
+      onbIndex--;
+      updateOnbUI();
+    }
+
+    function enableOnbSwipe(){
+      if(onbSwipeBound) return;
+      const vp = document.getElementById("onbViewport");
+      if(!vp) return;
+      onbSwipeBound = true;
+
+      let startX = 0, dx = 0, dragging=false;
+
+      const down = (x)=>{ dragging=true; startX=x; dx=0; };
+      const move = (x)=>{ if(!dragging) return; dx = x-startX; };
+      const up = ()=>{
+        if(!dragging) return;
+        dragging=false;
+        if(Math.abs(dx) > 45){
+          // RTL UX: سحب يمين = السابق، سحب يسار = التالي
+          if(dx > 0) onbPrev();
+          else onbNext();
+        }
+        dx=0;
+      };
+
+      vp.addEventListener("touchstart", (e)=> down(e.touches[0].clientX), {passive:true});
+      vp.addEventListener("touchmove",  (e)=>{ e.preventDefault(); move(e.touches[0].clientX); }, {passive:false});
+      vp.addEventListener("touchend",   ()=> up(), {passive:true});
+
+      vp.addEventListener("pointerdown", (e)=> down(e.clientX));
+      vp.addEventListener("pointermove", (e)=> move(e.clientX));
+      vp.addEventListener("pointerup",   ()=> up());
+      vp.addEventListener("pointercancel",()=> up());
+    }
+
+    // ================== زر البدء (✅ هنا مكان showOnboarding الصحيح) ==================
+    async function startApp(){
+      // نخفي شاشة ابدأ
+      const st = document.getElementById("startOverlay");
+      if(st) st.style.display = "none";
+
+      // عرض التعريف ثم تحويل الدخول
       showOnboardingIfNeeded(()=>{
         if(IS_STUDENT_ENTRY){
           go("studentLoginPage");
