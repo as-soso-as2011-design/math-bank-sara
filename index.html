@@ -1,2376 +1,1371 @@
-التعديل  في صفحة الطالب 
-لايوجد الصوت الترحيبي ولا صوت النقر 
-هل تحتاج إلى مساعدة ؟ يحذف النص الداخلي فيه بيانات المعلمة للدخول تعديل على الكلام بحيث يكون مناسب 
-ترقيه الحساب لابد 
-ان تكون 
-برونزي 10 آلاف وأقل 
-فضي من 11 آلاف إلى ١٥ ألف 
-ذهبي من ١٦ ألف إلى 20 الف 
-ماسي من 21 ألف إلى 30 الف 
-الماسيّ اكثر من 30 ألف
-
-تفاصيل البطاقة : الحوالات يحذف 
-كشف الحساب pdf  اماً ان يكون بعض الحساب فارغ أو ناقص ولايوجد به التوقيع ولا الختم
-
-
-التعديل في صفحة الفصول للمعلمة
-لايوجد زر  العمليات اليومية واتساب للأمهات تحديد عملية وارسلها للوتساب الأعمال 
-نص رساله استرجاع كلمة السر أو اسم المستخدم  غير مرتب 
-
-
-
-
- 
-
-
-
-from pathlib import Path, PurePosixPath
-path = Path("/mnt/data/index_new.html")
-html = """<!doctype html>
+<!doctype html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-  <title>بنك الرياضيات – المصرفي للمعلمة سارة حقوي</title>
+  <!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#00205B">
 
-  <style>
-    :root{
-      --navy:#00205B; --rajhi:#0055A4; --sky:#EAF3FB; --sky2:#CFE6F7; --beige:#FAF9F7;
-      --green:#2e7d32; --red:#b00020; --text:#1b1f23;
-      --card:#ffffff;
-      --line:rgba(0,0,0,.08);
-      --shadow:0 14px 34px rgba(0,0,0,.10);
-      --shadow2:0 8px 18px rgba(0,0,0,.08);
-      --muted:rgba(255,255,255,.75);
-      --glass:rgba(255,255,255,.10);
-    }
-    *{box-sizing:border-box;font-family:Tahoma,Arial,sans-serif}
-    body{margin:0;background:linear-gradient(180deg,#061a3d 0%, #071f4a 24%, var(--beige) 24%);color:var(--text)}
-    a{color:inherit}
-    .hidden{display:none !important}
+<!-- iOS PWA -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="بنك الرياضيات المصرفي">
 
-    /* Topbar */
-    .topbar{
-      position:sticky;top:0;z-index:2000;
-      background:linear-gradient(90deg,#061c45,#07336f);
-      color:#fff;padding:12px 14px;display:flex;align-items:center;gap:12px;
-      border-bottom:1px solid rgba(255,255,255,.12);
-    }
-    .topbar .titles{flex:1;text-align:center;line-height:1.35}
-    .topbar .t1{font-weight:900;font-size:16px;letter-spacing:.2px}
-    .topbar .t2{font-size:12px;opacity:.92}
-    .logo{height:54px;width:auto;background:rgba(255,255,255,.85);border-radius:12px;padding:6px}
-    .container{max-width:1040px;margin:14px auto;padding:0 12px}
-    .card{background:var(--card);border-radius:16px;padding:14px;margin:10px 0;box-shadow:var(--shadow2);border:1px solid var(--line)}
-    .card.soft{background:linear-gradient(180deg,#f7fbff,#ffffff)}
-    .row{display:flex;gap:10px;flex-wrap:wrap}
-    .col{flex:1;min-width:170px}
-    input,select{width:100%;padding:12px 12px;border-radius:12px;border:1px solid rgba(0,0,0,.18);font-size:14px;outline:none;background:#fff}
-    input:focus,select:focus{border-color:rgba(0,85,164,.55);box-shadow:0 0 0 3px rgba(0,85,164,.12)}
-    button{border:0;border-radius:12px;padding:12px 12px;cursor:pointer;font-size:14px;font-weight:800}
-    .btn{background:var(--rajhi);color:#fff}
-    .btn2{background:var(--sky2);color:#003;font-weight:800}
-    .btn3{background:#eef6fb;color:#003;font-weight:800}
-    .btnRed{background:var(--red);color:#fff}
-    .whatsapp-btn{background:#25D366 !important;color:#fff !important;font-weight:900;}
-    .whatsapp-btn:hover{filter:brightness(.97)}
-    .small{font-size:12px;color:#6b7280}
-    hr{border:0;border-top:1px solid rgba(0,0,0,.08);margin:12px 0}
+<link rel="apple-touch-icon" href="icon-512.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
 
-    /* Footer */
-    .footerBar{
-      max-width:1040px;margin:14px auto 26px auto;padding:0 12px;
-      color:rgba(255,255,255,.92)
-    }
-    .footerLinks{
-      display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;
-      padding:10px 12px;border-radius:14px;border:1px solid rgba(255,255,255,.14);
-      background:rgba(255,255,255,.06);backdrop-filter: blur(10px);
-    }
-    .footerLinks a{
-      text-decoration:none;
-      font-weight:900;font-size:13px;
-      opacity:.95;
-      padding:8px 10px;border-radius:12px;
-      border:1px solid rgba(255,255,255,.10);
-      background:rgba(0,0,0,.08);
-    }
-    .footerNote{
-      margin-top:10px;text-align:center;font-weight:900;letter-spacing:.2px;
-    }
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>بنك الرياضيات – المصرفي للمعلمة سارة حقوي</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>بنك الرياضيات – المصرفي للمعلمة سارة حقوي</title>
 
-    /* Modal / Drawer */
-    .modal{position:fixed;inset:0;background:rgba(0,0,0,.50);display:none;align-items:center;justify-content:center;padding:18px;z-index:9999}
-    .modalBox{background:#fff;border-radius:18px;max-width:760px;width:100%;padding:16px}
-    .modalHead{display:flex;justify-content:space-between;align-items:center;gap:10px}
-    .modalHead h3{margin:0;color:var(--navy);font-weight:900}
-    .xBtn{background:#eef2f7;border:1px solid rgba(0,0,0,.10);padding:10px 12px;border-radius:12px;font-weight:900}
-    .modalBody{margin-top:10px;line-height:1.85;color:#111827}
-    .modalActions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
-    .modalActions a,.modalActions button{flex:1;text-decoration:none}
+<style>
+:root{
+  --navy:#00205B;--rajhi:#0055A4;--sky:#EAF3FB;--sky2:#CFE6F7;--beige:#FAF9F7;
+  --green:#2e7d32;--red:#b00020;--text:#1b1f23;
+}
+.whatsapp-btn{
+  background:#25D366 !important;
+  color:#fff !important;
+  font-weight:700;
+}
+.whatsapp-btn:hover{ background:#1ebe5d !important; }
 
-    /* Start */
-    #startOverlay{
-      position:fixed;inset:0;z-index:9998;
-      display:flex;align-items:center;justify-content:center;padding:18px;
-      background: radial-gradient(circle at top, #0b2a66 0%, #061a3d 55%, #04112a 100%);
-    }
-    .startBox{
-      width:min(720px,100%);
-      border-radius:22px;
-      border:1px solid rgba(255,255,255,.18);
-      background:rgba(255,255,255,.08);
-      backdrop-filter: blur(12px);
-      box-shadow:0 18px 60px rgba(0,0,0,.40);
-      overflow:hidden;
-    }
-    .startTop{
-      display:flex;justify-content:space-between;align-items:center;
-      padding:14px 14px;color:#fff;
-      background:linear-gradient(90deg,rgba(255,255,255,.10),rgba(0,0,0,.08));
-      border-bottom:1px solid rgba(255,255,255,.12);
-    }
-    .pill{display:inline-block;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.18);
-      color:#fff;padding:6px 12px;border-radius:999px;font-size:12px;font-weight:900}
-    .startBody{padding:18px}
-    .heroRow{display:flex;gap:14px;align-items:center;justify-content:center;flex-wrap:wrap}
-    .heroLogo{
-      width:94px;height:94px;border-radius:18px;
-      background:rgba(255,255,255,.92);
-      border:1px solid rgba(255,255,255,.25);
-      overflow:hidden;display:flex;align-items:center;justify-content:center;
-      box-shadow:0 14px 34px rgba(0,0,0,.25);
-    }
-    .heroLogo img{width:100%;height:100%;object-fit:cover}
-    .heroText{color:#fff;text-align:right}
-    .heroText .ar{font-weight:1000;font-size:22px;letter-spacing:.2px}
-    .heroText .en{font-weight:900;opacity:.90;margin-top:2px}
-    .heroText .name{font-weight:900;opacity:.92;margin-top:6px;font-size:13px}
-    .startMsg{
-      margin-top:14px;
-      padding:14px;border-radius:18px;
-      background:rgba(0,0,0,.14);
-      border:1px solid rgba(255,255,255,.14);
-      color:#fff;line-height:1.8
-    }
-    .startActions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
-    .startActions button{flex:1}
-    .ghostBtn{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.18)}
-    .ghostBtn:hover{filter:brightness(1.02)}
+*{box-sizing:border-box;font-family:Tahoma,Arial,sans-serif}
+body{margin:0;background:var(--beige);color:var(--text)}
+.hidden{display:none}
 
-    /* Auth pages */
-    .authWrap{display:flex;justify-content:center}
-    .authCard{
-      width:min(520px,100%);
-      border-radius:22px;
-      background:rgba(255,255,255,.94);
-      border:1px solid rgba(255,255,255,.40);
-      box-shadow:0 18px 60px rgba(0,0,0,.20);
-      overflow:hidden;
-    }
-    .authHead{
-      padding:14px 14px;
-      background:linear-gradient(90deg,#061c45,#07336f);
-      color:#fff;
-    }
-    .authHead .t{font-weight:1000;font-size:18px}
-    .authHead .s{opacity:.92;font-weight:800;font-size:12px;margin-top:4px}
-    .authBody{padding:14px}
-    .field{
-      display:flex;align-items:center;gap:10px;
-      border:1px solid rgba(0,0,0,.14);
-      border-radius:14px;padding:10px 12px;background:#fff;
-      margin:10px 0;
-    }
-    .field svg{flex:0 0 auto;opacity:.9}
-    .field input{border:0;padding:4px 0;border-radius:0;outline:none}
-    .eyeBtn{background:#eef2f7;border:1px solid rgba(0,0,0,.10);padding:10px 12px;border-radius:12px;font-weight:900}
-    .forgotRow{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:6px}
-    .forgotRow a{color:#0b5bb5;font-weight:900;text-decoration:none}
+/* Header + Footer ثابتين */
+.topbar{
+  position:sticky;top:0;z-index:2000;
+  background:linear-gradient(90deg,var(--navy),var(--rajhi));
+  color:#fff;padding:12px 14px;display:flex;align-items:center;gap:12px;
+}
+.topbar .titles{flex:1;text-align:center;line-height:1.35}
+.topbar .t1{font-weight:800;font-size:16px}
+.topbar .t2{font-size:12px;opacity:.95}
+.logo{height:56px;width:auto;background:rgba(255,255,255,.78);border-radius:12px;padding:6px}
+.footer{text-align:center;padding:14px 12px;color:var(--navy);font-weight:700}
 
-    /* Bank layout */
-    .tabs{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:10px 0}
-    .tab{background:#e9f4fb;color:#003;padding:8px 12px;border-radius:999px;cursor:pointer;font-size:14px;font-weight:900;border:1px solid rgba(0,0,0,.06)}
-    .tab.active{background:var(--rajhi);color:#fff}
+.container{max-width:980px;margin:14px auto;padding:0 12px}
+.card{background:#fff;border-radius:14px;padding:14px;margin:10px 0;box-shadow:0 8px 18px rgba(0,0,0,.06)}
+.card.soft{background:var(--sky)}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.col{flex:1;min-width:160px}
+input,select{width:100%;padding:10px;border-radius:10px;border:1px solid #ccc;font-size:14px}
+button{border:0;border-radius:10px;padding:10px 12px;cursor:pointer;font-size:14px}
+.btn{background:var(--rajhi);color:#fff}
+.btn2{background:var(--sky2);color:#003}
+.btn3{background:#eef6fb;color:#003}
+.btnRed{background:var(--red);color:#fff}
 
-    .grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-    @media(max-width:820px){.grid2{grid-template-columns:1fr}}
+.tabs{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:10px 0}
+.tab{background:#e9f4fb;color:#003;padding:8px 12px;border-radius:999px;cursor:pointer;font-size:14px}
+.tab.active{background:var(--rajhi);color:#fff}
 
-    .badge{display:inline-block;padding:5px 10px;border-radius:999px;font-size:12px;font-weight:900}
-    .badge.on{background:#dff4e3;color:var(--green)}
-    .badge.off{background:#fde2e2;color:var(--red)}
+.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+@media(max-width:760px){.grid2{grid-template-columns:1fr}}
 
-    /* Classic geometric card (inspired by classic bank geometric style; no logos) */
-    .bankCard{
-      position:relative;
-      border-radius:18px;
-      overflow:hidden;
-      border:1px solid rgba(0,0,0,.10);
-      background:linear-gradient(180deg,#ffffff,#f5f7fb);
-      box-shadow:0 16px 40px rgba(0,0,0,.14);
-      min-height:210px;
-    }
-    .bankCard:before{
-      content:"";
-      position:absolute;inset:-40px;
-      background:
-        radial-gradient(circle at 12% 18%, rgba(0,85,164,.28) 0%, rgba(0,85,164,0) 45%),
-        radial-gradient(circle at 88% 72%, rgba(0,32,91,.22) 0%, rgba(0,32,91,0) 48%),
-        linear-gradient(135deg, rgba(0,0,0,.00) 0%, rgba(0,0,0,.03) 100%);
-      pointer-events:none;
-    }
-    .geo{
-      position:absolute;inset:0;opacity:.70;pointer-events:none;
-      background:
-        linear-gradient(140deg, rgba(0,85,164,.16) 0 2px, transparent 2px 100%),
-        linear-gradient(40deg, rgba(0,32,91,.14) 0 2px, transparent 2px 100%);
-      background-size: 190px 190px, 240px 240px;
-      mix-blend-mode:multiply;
-    }
-    .bankCard .inner{position:relative;padding:16px}
-    .bankBrand{
-      display:flex;justify-content:space-between;align-items:flex-start;gap:10px;
-      color:#0b2a66;
-    }
-    .bankBrand .b1{font-weight:1000;font-size:14px}
-    .bankBrand .b2{font-weight:900;font-size:11px;opacity:.8;margin-top:2px}
-    .chip{
-      width:54px;height:40px;border-radius:10px;
-      background:linear-gradient(180deg,#f4d48a,#d7a841);
-      border:1px solid rgba(0,0,0,.18);
-      box-shadow:0 10px 18px rgba(0,0,0,.12);
-      position:relative;
-    }
-    .chip:before,.chip:after{
-      content:"";position:absolute;left:8px;right:8px;height:1px;background:rgba(0,0,0,.18)
-    }
-    .chip:before{top:14px}
-    .chip:after{top:26px}
-    .cardNum{
-      margin-top:18px;
-      font-weight:1000;
-      letter-spacing:2px;
-      font-size:18px;
-      color:#0b2a66;
-      direction:ltr;
-      text-align:left;
-    }
-    .cardMeta{
-      margin-top:12px;
-      display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;
-      color:#0b2a66;
-    }
-    .metaItem{font-size:12px;font-weight:900}
-    .metaItem span{display:block;font-size:10px;opacity:.75;font-weight:900;margin-bottom:2px}
-    .holder{
-      margin-top:10px;
-      font-weight:1000;color:#0b2a66;font-size:13px
-    }
-    .cardHint{
-      margin-top:10px;
-      font-size:11px;font-weight:900;color:rgba(11,42,102,.78)
-    }
+.badge{display:inline-block;padding:4px 10px;border-radius:999px;font-size:12px}
+.badge.on{background:#dff4e3;color:var(--green)}
+.badge.off{background:#fde2e2;color:var(--red)}
+.small{font-size:12px;color:#666}
+hr{border:0;border-top:1px solid #eee;margin:10px 0}
 
-    /* Student account tabs */
-    .miniTabs{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-    .miniTab{flex:1;min-width:150px;background:#f0f7ff;border:1px solid rgba(0,0,0,.06);
-      border-radius:14px;padding:10px;cursor:pointer;font-weight:1000;display:flex;align-items:center;gap:10px;justify-content:center}
-    .miniTab.active{background:linear-gradient(90deg,#0b2a66,#0b5bb5);color:#fff}
-    .miniPane{display:none}
-    .miniPane.active{display:block}
+/* Modal */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;padding:18px;z-index:9999}
+.modalBox{background:#fff;border-radius:16px;max-width:680px;width:100%;padding:16px;text-align:center}
+.modalBox h3{margin:0 0 8px 0;color:var(--navy)}
+.modalBox p{margin:0 0 12px 0;font-size:15px;line-height:1.7;white-space:pre-line}
+.modalActions{display:flex;gap:10px;flex-wrap:wrap}
+.modalActions a,.modalActions button{flex:1;text-decoration:none}
 
-    .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:10px}
-    .kpi{border-radius:16px;background:linear-gradient(180deg,#ffffff,#f7fbff);
-      border:1px solid rgba(0,0,0,.06);padding:10px;box-shadow:0 10px 18px rgba(0,0,0,.06)}
-    .kpi .k{font-size:11px;color:#6b7280;font-weight:1000}
-    .kpi .v{font-size:18px;font-weight:1000;color:#0b2a66;margin-top:4px}
-    @media(max-width:860px){.kpis{grid-template-columns:repeat(2,1fr)}}
+/* Start overlay */
+#startOverlay{position:fixed;inset:0;background:#0a2d66;display:flex;align-items:center;justify-content:center;padding:18px;z-index:9998}
+.startBox{max-width:560px;width:100%;background:#fff;border-radius:18px;padding:18px;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.pill{display:inline-block;background:#e9f4fb;color:#003;padding:6px 10px;border-radius:999px;font-size:12px;margin-bottom:10px}
 
-    /* Statement */
-    .tableWrap{overflow:auto;border-radius:14px;background:#f7fbff;border:1px solid #e6eef7}
-    table{width:100%;border-collapse:collapse;min-width:760px}
-    th,td{padding:10px;border-bottom:1px solid #e6eef7;text-align:center;font-size:13px;white-space:nowrap}
-    th{background:#eef6ff;color:#0b2a66;font-weight:1000}
-    tr:last-child td{border-bottom:none}
-
-    /* Onboarding */
-    #onboardOverlay{
-      position:fixed; inset:0; z-index:9997;
-      background: radial-gradient(circle at top, #0b2a66 0%, #061a3d 55%, #04112a 100%);
-      display:none; align-items:center; justify-content:center; padding:18px;
-    }
-    .onbBox{
-      width:min(720px, 100%);
-      background:rgba(255,255,255,.10);
-      border:1px solid rgba(255,255,255,.14);
-      border-radius:22px;
-      box-shadow:0 18px 60px rgba(0,0,0,.45);
-      overflow:hidden;
-      backdrop-filter: blur(12px);
-    }
-    .onbTop{
-      display:flex; justify-content:space-between; align-items:center;
-      padding:12px 14px;
-      background:rgba(0,0,0,.18);
-      color:#fff;
-      font-weight:1000;
-    }
-    .onbSkip{
-      background:rgba(255,255,255,.16);
-      color:#fff;border-radius:999px;padding:8px 12px;cursor:pointer;
-      border:1px solid rgba(255,255,255,.18);font-weight:1000
-    }
-    .onbBody{padding:14px}
-    .onbViewport{
-      overflow:hidden;width:100%;position:relative;direction:ltr;
-      /* منع سحب النص */
-      user-select:none; -webkit-user-select:none;
-      -webkit-touch-callout:none;
-      touch-action:pan-y;
-    }
-    .onbTrack{display:flex;width:300%;transition:transform .45s ease}
-    .onbSlide{
-      flex:0 0 100%;
-      min-height:280px;
-      border-radius:20px;
-      padding:26px 18px;
-      display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;
-      direction:rtl;
-      background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(0,0,0,.10));
-      border:1px solid rgba(255,255,255,.16);
-      box-shadow:0 14px 34px rgba(0,0,0,.22);
-    }
-    .onbArt{
-      width:92px;height:92px;border-radius:22px;
-      display:flex;align-items:center;justify-content:center;
-      background:rgba(255,255,255,.92);
-      border:1px solid rgba(255,255,255,.25);
-      box-shadow:0 12px 26px rgba(0,0,0,.25);
-      overflow:hidden;
-    }
-    .onbArt svg{width:62px;height:62px}
-    .onbTitle{font-size:18px;font-weight:1000;color:#fff;margin-top:12px}
-    .onbText{font-size:14px;line-height:1.95;margin-top:8px;color:rgba(255,255,255,.92);max-width:560px}
-    .onbDots{display:flex;gap:8px;justify-content:center;margin-top:10px}
-    .onbDot{width:9px;height:9px;border-radius:999px;background:rgba(255,255,255,.35)}
-    .onbDot.active{background:#fff}
-    .onbControls{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
-    .onbControls button{flex:1}
-
-    /* PDF paper */
-    #pdfTemp{position:fixed;left:-9999px;top:-9999px;width:794px;} /* A4-ish width px */
-    .pdfPaper{background:#fff;border:1px solid #e5e7eb;border-radius:18px;padding:14px}
-    .pdfHead{display:flex;justify-content:space-between;align-items:center;gap:12px}
-    .pdfBrand{display:flex;align-items:center;gap:10px}
-    .pdfLogo{
-      width:56px;height:56px;border-radius:14px;overflow:hidden;border:1px solid rgba(0,0,0,.10);
-      background:#fff;display:flex;align-items:center;justify-content:center
-    }
-    .pdfLogo img{width:100%;height:100%;object-fit:cover}
-    .pdfTitle{font-weight:1000;color:#0b2a66}
-    .pdfSub{font-size:12px;color:#6b7280;font-weight:900;margin-top:2px}
-    .seal{
-      width:86px;height:86px;border-radius:999px;
-      border:2px dashed rgba(11,42,102,.55);
-      display:flex;align-items:center;justify-content:center;
-      color:#0b2a66;font-weight:1000;font-size:10px;text-align:center;line-height:1.2;
-      transform:rotate(-8deg);
-    }
-    .sigRow{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin-top:12px}
-    .sigBox{border-top:1px dashed #9ca3af;padding-top:8px;font-size:12px;color:#111827;font-weight:900;min-width:240px}
-  </style>
+/* Statement */
+.tableWrap{overflow:auto;border-radius:12px;background:#f7fbff;border:1px solid #e6eef7}
+table{width:100%;border-collapse:collapse;min-width:740px}
+th,td{padding:10px;border-bottom:1px solid #e6eef7;text-align:center;font-size:13px;white-space:nowrap}
+th{background:#eef6ff;color:#0b2a66}
+tr:last-child td{border-bottom:none}
+</style>
 </head>
 
 <body>
-  <div class="topbar">
-    <img class="logo" src="school-logo.png" alt="شعار المدرسة">
-    <div class="titles">
-      <div class="t1">بنك الرياضيات – المصرفي للمعلمة سارة حقوي</div>
-      <div class="t2">مدرسة رواد الشرق الأهلية</div>
-    </div>
-    <div style="width:54px"></div>
+
+<div class="topbar">
+  <img class="logo" src="school-logo.png" alt="شعار المدرسة">
+  <div class="titles">
+    <div class="t1">بنك الرياضيات – المصرفي للمعلمة سارة حقوي</div>
+    <div class="t2">مدرسة رواد الشرق الأهلية</div>
   </div>
+  <div style="width:56px"></div>
+</div>
 
-  <!-- ===== Start ===== -->
-  <div id="startOverlay">
-    <div class="startBox">
-      <div class="startTop">
-        <div class="pill" id="connPill">...جاري تجهيز النظام...</div>
-        <div class="pill" id="modePill">وضع: المعلمة</div>
-      </div>
-      <div class="startBody">
-        <div class="heroRow">
-          <div class="heroLogo"><img src="logo.png" alt="logo"></div>
-          <div class="heroText">
-            <div class="ar">بنك الرياضيات</div>
-            <div class="en">Math Bank</div>
-            <div class="name">أ. سارة حقوي</div>
-          </div>
-        </div>
+<audio id="welcomeMp3" preload="auto" src="welcome.mp3"></audio>
+<audio id="welcomeM4a" preload="auto" src="welcome.m4a"></audio>
 
-        <div class="startMsg" id="startMsg">
-          جاهزين نبدأ؟ 🌿<br>
-          نظام بنكي مدرسي احترافي لمتابعة الرصيد، العمليات، الإحصاءات، والحوافز.
-        </div>
+<div id="startOverlay">
+  <div class="startBox">
+    <div class="pill" id="connPill">...جاري تجهيز النظام...</div>
+    <h3>هلا والله! 👋</h3>
+    <p id="startText">جاهزين نبدأ رحلتنا في بنك الرياضيات؟<br>اضغط زر البداية وننطلق 🚀</p>
+    <button class="btn" onclick="startApp()">ابدأ</button>
+    <div class="small" id="connNote" style="margin-top:8px"></div>
+  </div>
+</div>
 
-        <div class="startActions">
-          <button class="btn" onclick="startApp()">ابدأ الآن</button>
-          <button class="ghostBtn" onclick="openHelp()">هل تحتاج إلى مساعدة؟</button>
-        </div>
-      </div>
+<div id="modal" class="modal">
+  <div class="modalBox">
+    <h3 id="mTitle"></h3>
+    <p id="mBody"></p>
+    <div class="modalActions" id="mActions">
+      <button class="btn" onclick="closeModal()">موافق</button>
     </div>
   </div>
+</div>
 
-  <!-- ===== Onboarding ===== -->
-  <div id="onboardOverlay" aria-hidden="true">
-    <div class="onbBox">
-      <div class="onbTop">
-        <div>تعريف بنك الرياضيات</div>
-        <button class="onbSkip" onclick="finishOnboarding()">تخطي</button>
+<div id="teacherLoginPage" class="hidden">
+  <div class="container">
+    <div class="card">
+      <h3 style="margin:0 0 10px 0;color:var(--navy)">تسجيل دخول المعلمة</h3>
+      <input id="tu" placeholder="اسم المستخدم">
+      <input id="tp" type="password" placeholder="كلمة المرور">
+      <div class="row">
+        <button class="btn col" onclick="teacherLogin()">تسجيل الدخول</button>
+        <button class="btn3 col" onclick="forgotTeacher()">نسيت اسم المستخدم؟</button>
       </div>
-
-      <div class="onbBody">
-        <div class="onbViewport" id="onbViewport">
-          <div class="onbTrack" id="onbTrack">
-            <div class="onbSlide">
-              <div class="onbArt" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none">
-                  <path d="M3 10.5L12 5l9 5.5" stroke="#00205B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  <path d="M5 10.5V19h14v-8.5" stroke="#0055A4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  <path d="M8 19v-6M12 19v-6M16 19v-6" stroke="#00205B" stroke-width="2" stroke-linecap="round"/>
-                </svg>
-              </div>
-              <div class="onbTitle">منصة متابعة سلوكية وتعليمية</div>
-              <div class="onbText">يوثق العمليات التحفيزية والتعليمية للطالب/ـة ويرصد الرصيد وتاريخ العمليات بصورة منظمة.</div>
-            </div>
-
-            <div class="onbSlide">
-              <div class="onbArt" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none">
-                  <path d="M7 3h7l3 3v15H7V3Z" stroke="#00205B" stroke-width="2" stroke-linejoin="round"/>
-                  <path d="M14 3v4h4" stroke="#0055A4" stroke-width="2" stroke-linejoin="round"/>
-                  <path d="M9 12h6M9 16h6" stroke="#00205B" stroke-width="2" stroke-linecap="round"/>
-                </svg>
-              </div>
-              <div class="onbTitle">إحصاءات وتقارير PDF</div>
-              <div class="onbText">كشف حساب + مؤشرات أداء + تقرير أسبوعي احترافي بختم وتوقيع، لدعم متابعة ولي الأمر والمدرسة.</div>
-            </div>
-
-            <div class="onbSlide">
-              <div class="onbArt" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none">
-                  <path d="M12 3l7 4v6c0 5-3 8-7 8s-7-3-7-8V7l7-4Z" stroke="#00205B" stroke-width="2" stroke-linejoin="round"/>
-                  <path d="M9.5 12l1.8 1.8L15 10" stroke="#0055A4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-              </div>
-              <div class="onbTitle">جوائز وترقيات حساب</div>
-              <div class="onbText">نظام درجات حسابات (برونزي/فضي/ذهبي/ماسي/ألماسي) + جوائز موسمية لتحفيز السلوك والتفاعل.</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="onbDots" id="onbDots">
-          <div class="onbDot active"></div>
-          <div class="onbDot"></div>
-          <div class="onbDot"></div>
-        </div>
-
-        <div class="onbControls">
-          <button class="btn3" onclick="onbPrev()">السابق</button>
-          <button class="btn" onclick="onbNext()">التالي</button>
-        </div>
-      </div>
+      <div class="small">الدخول: teacher / 12345</div>
     </div>
   </div>
+</div>
 
-  <!-- ===== Modal ===== -->
-  <div id="modal" class="modal" aria-hidden="true">
-    <div class="modalBox">
-      <div class="modalHead">
-        <h3 id="mTitle"></h3>
-        <button class="xBtn" onclick="closeModal()">✕</button>
+<div id="classesPage" class="hidden">
+  <div class="container">
+
+    <!-- العمليات اليومية -->
+    <div class="card soft" id="dailyOpsCard">
+      <h3 style="margin:0 0 8px 0;color:var(--navy)">العمليات اليومية</h3>
+
+      <div class="row">
+        <div class="col">
+          <div class="small">اختر التاريخ</div>
+          <input id="dailyDate" type="date">
+        </div>
+
+        <div class="col" style="align-self:flex-end">
+          <button class="btn2" onclick="loadDailyOps()">عرض العمليات</button>
+        </div>
+
+        <div class="col" style="align-self:flex-end">
+          <button class="btn whatsapp-btn" onclick="sendDailyOpsWhats()">فتح واتساب للأمهات</button>
+        </div>
       </div>
-      <div class="modalBody" id="mBody"></div>
-      <div class="modalActions" id="mActions"></div>
+
+      <div class="small" style="margin-top:8px">
+        * أي عملية تُسجَّل تلقائيًا (طالب/معلمة) تظهر هنا حسب التاريخ.
+      </div>
+
+      <div id="dailyOpsList" style="margin-top:10px"></div>
+    </div>
+
+    <div class="card soft">
+      <div class="row">
+        <div class="col">
+          <div class="small">إضافة فصل</div>
+          <input id="newClassName" placeholder="مثال: خامس بنات">
+        </div>
+        <div class="col" style="align-self:flex-end">
+          <button class="btn2" onclick="addClass()">إضافة فصل</button>
+        </div>
+      </div>
+      <hr>
+      <div class="row">
+        <button class="btn2 col" onclick="renameClass()">تعديل اسم الفصل</button>
+        <button class="btnRed col" onclick="deleteClassMove()">حذف فصل + نقل الطلاب</button>
+        <button class="btn3 col" onclick="syncStudentsToClasses()">تثبيت أسماء الطلاب</button>
+        <button class="btn3 col" onclick="toggleForgotPinForAll()">تعطيل/تفعيل نسيت الرقم السري</button>
+      </div>
+      <div class="small">إذا كثرت مواقع الاستضافة وتخربطت الفصول، زر "تثبيت أسماء الطلاب" يرجع كل طالب لفصله الصحيح.</div>
+    </div>
+
+    <div class="tabs" id="classTabs"></div>
+
+    <div class="card">
+      <button class="btn2" onclick="openClassPage()">دخول الفصل</button>
+      <button class="btn3" onclick="logout()">تسجيل خروج</button>
+    </div>
+
+  </div>
+</div>
+
+<div id="classPage" class="hidden">
+  <div class="container">
+
+    <div class="card soft">
+      <div class="row">
+        <div class="col">
+          <div class="small">إضافة طالب</div>
+          <input id="newStudentName" placeholder="اسم الطالب/الطالبة">
+        </div>
+        <div class="col" style="align-self:flex-end">
+          <button class="btn2" onclick="addStudent()">إضافة طالب</button>
+        </div>
+      </div>
+
+      <hr>
+
+      <div class="row">
+        <div class="col">
+          <div class="small">مبلغ الإيداع للكل</div>
+          <input id="bulkAmount" type="number" step="0.01" placeholder="مثال: 10">
+        </div>
+        <div class="col" style="align-self:flex-end">
+          <button class="btn" onclick="depositAll()">إيداع للكل</button>
+        </div>
+
+        <div class="col">
+          <div class="small">مبلغ السحب من الكل</div>
+          <input id="bulkWithdrawAmount" type="number" step="0.01" placeholder="مثال: 5">
+        </div>
+        <div class="col" style="align-self:flex-end">
+          <button class="btnRed" onclick="withdrawAll()">سحب من الكل</button>
+        </div>
+      </div>
+
+      <hr>
+
+      <div class="row">
+        <div class="col">
+          <div class="small">طالب محدد</div>
+          <select id="pickStudent"></select>
+        </div>
+        <div class="col">
+          <div class="small">المبلغ</div>
+          <input id="pickAmount" type="number" step="0.01" placeholder="مثال: 5">
+        </div>
+        <div class="col" style="align-self:flex-end">
+          <button class="btn2" onclick="depositToStudent()">إيداع لطالب</button>
+        </div>
+        <div class="col" style="align-self:flex-end">
+          <button class="btnRed" onclick="withdrawFromStudent()">سحب من طالب</button>
+        </div>
+      </div>
+
+      <hr>
+
+      <div class="row">
+        <div class="col">
+          <div class="small">سبب العملية</div>
+          <select id="reasonTeacher"></select>
+          <input id="reasonOtherTeacher" class="hidden" placeholder="أخرى: اكتب السبب هنا..." style="margin-top:8px">
+        </div>
+      </div>
+
+    </div>
+
+    <div id="studentsGrid" class="grid2"></div>
+
+    <div class="card">
+      <button class="btn3" onclick="backToClasses()">رجوع للفصول</button>
+    </div>
+
+  </div>
+</div>
+
+<div id="studentLoginPage" class="hidden">
+  <div class="container">
+    <div class="card">
+      <h3 style="margin:0 0 10px 0;color:var(--navy)" id="stuLoginTitle">دخول الطالب</h3>
+      <div id="stuLocked" class="small hidden" style="color:var(--red);font-weight:700"></div>
+      <input id="stuName" readonly>
+      <input id="stuPin" type="password" placeholder="الرقم السري (PIN)">
+      <div class="small" style="margin:8px 0;">
+        <a href="javascript:void(0)" onclick="forgotStudentPin()" style="color:#0055A4;font-weight:700">نسيت الرقم السري؟</a>
+      </div>
+      <button class="btn" onclick="studentLogin()">دخول</button>
+      <button class="btn3" onclick="backToClass()">رجوع</button>
     </div>
   </div>
+</div>
 
-  <!-- ===== Auth (Teacher) ===== -->
-  <div id="teacherLoginPage" class="hidden">
-    <div class="container authWrap">
-      <div class="authCard">
-        <div class="authHead">
-          <div class="t">أهلًا بعودتك 👋</div>
-          <div class="s">تسجيل دخول المعلمة إلى بنك الرياضيات</div>
-        </div>
-        <div class="authBody">
-          <div class="field">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <path d="M4 20h16" stroke="#0b2a66" stroke-width="2" stroke-linecap="round"/>
-              <path d="M6 20v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2" stroke="#0b2a66" stroke-width="2" stroke-linecap="round"/>
-              <circle cx="12" cy="8" r="3" stroke="#0b5bb5" stroke-width="2"/>
-            </svg>
-            <input id="tu" placeholder="أدخل رقم الحساب / اسم المستخدم" autocomplete="username"/>
-          </div>
-
-          <div class="field">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <path d="M7 10V8a5 5 0 0 1 10 0v2" stroke="#0b2a66" stroke-width="2" stroke-linecap="round"/>
-              <rect x="6" y="10" width="12" height="10" rx="2" stroke="#0b5bb5" stroke-width="2"/>
-            </svg>
-            <input id="tp" type="password" placeholder="أدخل كلمة المرور" autocomplete="current-password"/>
-            <button class="eyeBtn" type="button" onclick="togglePass('tp',this)">👁️</button>
-          </div>
-
-          <div class="forgotRow">
-            <a href="javascript:void(0)" onclick="forgotTeacher()">تذكرني / نسيت كلمة المرور؟</a>
-            <span class="small">الدخول التجريبي: teacher / 12345</span>
-          </div>
-
-          <div class="row" style="margin-top:12px">
-            <button class="btn col" onclick="teacherLogin()">تسجيل الدخول</button>
-            <button class="btn3 col" onclick="goPublic()">رجوع</button>
-          </div>
-        </div>
+<div id="studentAccountPage" class="hidden">
+  <div class="container">
+    <div class="card soft">
+      <h3 style="margin:0 0 10px 0;color:var(--navy)" id="studentHeader"></h3>
+      <div class="row">
+        <div class="col"><div class="small">الحالة</div><div id="statusBadge" class="badge"></div></div>
+        <div class="col"><div class="small">الرصيد</div><div style="font-size:26px;font-weight:800;color:var(--navy)"><span id="studentBalance">0</span> ر.س</div></div>
+        <div class="col"><div class="small">تاريخ فتح الحساب</div><div id="openedAt" class="small">—</div></div>
       </div>
+
+      <hr>
+
+      <div class="row">
+        <div class="col"><div class="small">من تاريخ</div><input id="fromDate" type="date"></div>
+        <div class="col"><div class="small">إلى تاريخ</div><input id="toDate" type="date"></div>
+        <div class="col" style="align-self:flex-end"><button class="btn2" onclick="showStatement()">عرض كشف الحساب</button></div>
+      </div>
+
+      <div class="tableWrap" style="margin-top:10px">
+        <table>
+          <thead><tr><th>الوقت</th><th>العملية</th><th>السبب</th><th>المبلغ</th><th>الرصيد بعد العملية</th></tr></thead>
+          <tbody id="stmtRows"></tbody>
+        </table>
+      </div>
+
+      <hr>
+
+      <div class="row">
+        <div class="col">
+          <div class="small">العملية</div>
+          <select id="op">
+            <option value="deposit">إيداع</option>
+            <option value="withdraw">سحب</option>
+            <option value="transfer">تحويل</option>
+          </select>
+        </div>
+
+        <div class="col">
+          <div class="small">السبب</div>
+          <select id="reasonStudent"></select>
+          <input id="reasonOtherStudent" class="hidden" placeholder="أخرى: اكتب السبب هنا..." style="margin-top:8px">
+        </div>
+
+        <div class="col"><div class="small">المبلغ</div><input id="amt" type="number" step="0.01"></div>
+        <div class="col"><div class="small">تحويل إلى</div><select id="transferTo"></select></div>
+      </div>
+
+      <div class="row">
+        <button class="btn col" onclick="executeOp()">تنفيذ</button>
+        <button class="btn3 col" onclick="backToClass()">رجوع</button>
+      </div>
+
     </div>
   </div>
-
-  <!-- ===== Auth (Student) ===== -->
-  <div id="studentLoginPage" class="hidden">
-    <div class="container authWrap">
-      <div class="authCard">
-        <div class="authHead">
-          <div class="t">أهلًا بعودتك 👋</div>
-          <div class="s">بوابة دخول الطلاب إلى بنك الرياضيات</div>
-        </div>
-        <div class="authBody">
-          <div id="stuLocked" class="small hidden" style="color:var(--red);font-weight:1000"></div>
-
-          <div class="field">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <path d="M4 20h16" stroke="#0b2a66" stroke-width="2" stroke-linecap="round"/>
-              <path d="M6 20v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2" stroke="#0b2a66" stroke-width="2" stroke-linecap="round"/>
-              <circle cx="12" cy="8" r="3" stroke="#0b5bb5" stroke-width="2"/>
-            </svg>
-            <input id="stuName" placeholder="اسم الطالب/ـة كما هو مسجل" autocomplete="username"/>
-          </div>
-
-          <div class="field">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <path d="M7 10V8a5 5 0 0 1 10 0v2" stroke="#0b2a66" stroke-width="2" stroke-linecap="round"/>
-              <rect x="6" y="10" width="12" height="10" rx="2" stroke="#0b5bb5" stroke-width="2"/>
-            </svg>
-            <input id="stuPin" type="password" placeholder="الرقم السري (PIN)" autocomplete="current-password"/>
-            <button class="eyeBtn" type="button" onclick="togglePass('stuPin',this)">👁️</button>
-          </div>
-
-          <div class="forgotRow">
-            <a href="javascript:void(0)" id="forgotPinLink">نسيت الرقم السري؟</a>
-            <span class="small">اطلبه من ولي أمرك أو المعلمة</span>
-          </div>
-
-          <div class="row" style="margin-top:12px">
-            <button class="btn col" onclick="studentLogin()">دخول</button>
-            <button class="btn3 col" onclick="goPublic()">رجوع</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== Teacher home (classes) ===== -->
-  <div id="classesPage" class="hidden">
-    <div class="container">
-      <div class="card soft">
-        <div class="row" style="align-items:center">
-          <div class="col">
-            <div style="font-weight:1000;color:#0b2a66">لوحة المعلمة</div>
-            <div class="small">إدارة الفصول والطلاب + إرسال إشعار واتساب + تقارير PDF</div>
-          </div>
-          <div class="col" style="text-align:left">
-            <button class="btn3" onclick="logout()">تسجيل خروج</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="card soft">
-        <h3 style="margin:0 0 8px 0;color:#0b2a66">إعدادات الإرسال السريع (WhatsApp)</h3>
-        <div class="row">
-          <label class="col small" style="display:flex;gap:8px;align-items:center">
-            <input type="checkbox" id="autoWA" checked style="width:auto">
-            فتح واتساب بعد العملية مباشرة
-          </label>
-          <label class="col small" style="display:flex;gap:8px;align-items:center">
-            <input type="checkbox" id="copyToTeacher" checked style="width:auto">
-            إرسال نسخة للمعلمة
-          </label>
-        </div>
-        <div class="small" style="margin-top:6px">
-          * يتطلب واتساب «نقرة إرسال» أخيرة ✅
-        </div>
-      </div>
-
-      <div class="card soft">
-        <div class="row">
-          <div class="col">
-            <div class="small">إضافة فصل</div>
-            <input id="newClassName" placeholder="مثال: خامس بنات">
-          </div>
-          <div class="col" style="align-self:flex-end">
-            <button class="btn2" onclick="addClass()">إضافة فصل</button>
-          </div>
-        </div>
-        <hr>
-        <div class="row">
-          <button class="btn2 col" onclick="renameClass()">تعديل اسم الفصل</button>
-          <button class="btnRed col" onclick="deleteClassMove()">حذف فصل + نقل الطلاب</button>
-          <button class="btn3 col" onclick="syncStudentsToClasses()">تثبيت أسماء الطلاب</button>
-          <button class="btn3 col" onclick="toggleForgotPinForAll()">تعطيل/تفعيل نسيت الرقم السري</button>
-        </div>
-        <div class="small">زر "تثبيت أسماء الطلاب" يرجع كل طالب لفصله الصحيح + يضيف الناقص.</div>
-      </div>
-
-      <div class="tabs" id="classTabs"></div>
-
-      <div class="card">
-        <button class="btn" onclick="openClassPage()">دخول الفصل</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== Class page ===== -->
-  <div id="classPage" class="hidden">
-    <div class="container">
-      <div class="card soft">
-        <div class="row" style="align-items:center">
-          <div class="col">
-            <div style="font-weight:1000;color:#0b2a66" id="classTitle">الفصل</div>
-            <div class="small">الإيداع/السحب/التحويل مع الأسباب ثابتة</div>
-          </div>
-          <div class="col" style="text-align:left">
-            <button class="btn3" onclick="backToClasses()">رجوع للفصول</button>
-          </div>
-        </div>
-
-        <hr>
-
-        <div class="row">
-          <div class="col">
-            <div class="small">إضافة طالب</div>
-            <input id="newStudentName" placeholder="اسم الطالب/الطالبة">
-          </div>
-          <div class="col" style="align-self:flex-end">
-            <button class="btn2" onclick="addStudent()">إضافة طالب</button>
-          </div>
-        </div>
-
-        <hr>
-
-        <div class="row">
-          <div class="col">
-            <div class="small">مبلغ الإيداع للكل</div>
-            <input id="bulkAmount" type="number" step="0.01" placeholder="مثال: 10">
-          </div>
-          <div class="col" style="align-self:flex-end">
-            <button class="btn" onclick="depositAll()">إيداع للكل</button>
-          </div>
-
-          <div class="col">
-            <div class="small">مبلغ السحب من الكل</div>
-            <input id="bulkWithdrawAmount" type="number" step="0.01" placeholder="مثال: 5">
-          </div>
-          <div class="col" style="align-self:flex-end">
-            <button class="btnRed" onclick="withdrawAll()">سحب للكل</button>
-          </div>
-        </div>
-
-        <hr>
-
-        <div class="row">
-          <div class="col">
-            <div class="small">طالب محدد</div>
-            <select id="pickStudent"></select>
-          </div>
-          <div class="col">
-            <div class="small">المبلغ</div>
-            <input id="pickAmount" type="number" step="0.01" placeholder="مثال: 5">
-          </div>
-          <div class="col" style="align-self:flex-end">
-            <button class="btn2" onclick="depositToStudent()">إيداع لطالب</button>
-          </div>
-          <div class="col" style="align-self:flex-end">
-            <button class="btnRed" onclick="withdrawFromStudent()">سحب من طالب</button>
-          </div>
-        </div>
-
-        <hr>
-
-        <div class="row">
-          <div class="col">
-            <div class="small">سبب العملية (ثابت)</div>
-            <select id="reasonTeacher"></select>
-            <input id="reasonOtherTeacher" class="hidden" placeholder="أخرى: اكتب السبب هنا..." style="margin-top:8px">
-          </div>
-        </div>
-
-        <hr>
-
-        <div class="row" style="align-items:center">
-          <label class="small" style="display:flex;gap:8px;align-items:center">
-            <input type="checkbox" id="selAll" onchange="toggleSelectAll()" style="width:auto"> تحديد الكل
-          </label>
-          <button class="btn2" onclick="depositSelected()">إيداع للمحددين</button>
-          <button class="btnRed" onclick="withdrawSelected()">سحب للمحددين</button>
-          <div class="small" id="selCount">المحدد: 0</div>
-        </div>
-      </div>
-
-      <div id="studentsGrid" class="grid2"></div>
-    </div>
-  </div>
-
-  <!-- ===== Student account ===== -->
-  <div id="studentAccountPage" class="hidden">
-    <div class="container">
-      <div class="card soft">
-        <div class="row" style="align-items:center">
-          <div class="col">
-            <div style="font-weight:1000;color:#0b2a66" id="studentHeader">—</div>
-            <div class="small" id="studentSub">حساب الطالب</div>
-          </div>
-          <div class="col" style="text-align:left">
-            <button class="btn3" onclick="backAfterStudent()">رجوع</button>
-          </div>
-        </div>
-
-        <div class="row" style="margin-top:10px;align-items:center">
-          <div class="col"><div class="small">الحالة</div><div id="statusBadge" class="badge"></div></div>
-          <div class="col"><div class="small">الرصيد</div><div style="font-size:26px;font-weight:1000;color:#0b2a66"><span id="studentBalance">0</span> ر.س</div></div>
-          <div class="col"><div class="small">نوع الحساب</div><div style="font-weight:1000;color:#0b2a66" id="tierLabel">—</div></div>
-          <div class="col"><div class="small">تاريخ فتح الحساب</div><div id="openedAt" class="small">—</div></div>
-        </div>
-
-        <!-- Card -->
-        <div class="bankCard" style="margin-top:12px">
-          <div class="geo"></div>
-          <div class="inner">
-            <div class="bankBrand">
-              <div>
-                <div class="b1">Math Bank Card</div>
-                <div class="b2">بطاقة بنك الرياضيات – إصدار مدرسي</div>
-              </div>
-              <div class="chip" aria-hidden="true"></div>
-            </div>
-
-            <div class="cardNum" id="cardNumber">0000 0000 0000 0000</div>
-
-            <div class="cardMeta">
-              <div class="metaItem"><span>EXP</span><div id="cardExp">12/29</div></div>
-              <div class="metaItem"><span>PIN</span><div id="cardPin">••••</div></div>
-              <div class="metaItem"><span>Account</span><div id="cardAcc">MB-0000000000</div></div>
-            </div>
-
-            <div class="holder" id="cardHolder">—</div>
-            <div class="cardHint">حافظ على بطاقتك وبياناتك ولا تشارك الرقم السري مع الآخرين.</div>
-          </div>
-        </div>
-
-        <!-- Mini Tabs -->
-        <div class="miniTabs" style="margin-top:12px">
-          <div class="miniTab active" onclick="setMiniTab('paneStmt',this)">📄 كشف الحساب</div>
-          <div class="miniTab" onclick="setMiniTab('paneUpgrade',this)">⬆️ ترقية الحساب</div>
-          <div class="miniTab" onclick="setMiniTab('paneRewards',this)">🎁 الجوائز والحوافز</div>
-          <div class="miniTab" onclick="setMiniTab('paneCard',this)">💳 تفاصيل البطاقة</div>
-        </div>
-
-        <!-- Pane: Statement -->
-        <div id="paneStmt" class="miniPane active">
-          <div class="kpis">
-            <div class="kpi"><div class="k">عمليات الأسبوع</div><div class="v" id="kpiWeekCount">0</div></div>
-            <div class="kpi"><div class="k">إجمالي الإيداع</div><div class="v" id="kpiWeekDep">0</div></div>
-            <div class="kpi"><div class="k">إجمالي السحب</div><div class="v" id="kpiWeekWith">0</div></div>
-            <div class="kpi"><div class="k">الصافي</div><div class="v" id="kpiWeekNet">0</div></div>
-          </div>
-
-          <div class="card" style="margin:12px 0 0 0">
-            <h3 style="margin:0 0 10px 0;color:#0b2a66;font-size:15px">تنفيذ عملية</h3>
-
-            <!-- ✅ نفس الواجهة الحالية + لا نغير الأسباب -->
-            <div class="row">
-              <div class="col">
-                <div class="small">العملية</div>
-                <select id="op">
-                  <option value="deposit">إيداع</option>
-                  <option value="withdraw">سحب</option>
-                  <option value="transfer">تحويل</option>
-                </select>
-              </div>
-
-              <div class="col">
-                <div class="small">السبب</div>
-                <select id="reasonStudent"></select>
-                <input id="reasonOtherStudent" class="hidden" placeholder="أخرى: اكتب السبب هنا..." style="margin-top:8px">
-              </div>
-
-              <div class="col"><div class="small">المبلغ</div><input id="amt" type="number" step="0.01"></div>
-              <div class="col"><div class="small">تحويل إلى</div><select id="transferTo"></select></div>
-            </div>
-
-            <div class="row">
-              <button class="btn col" onclick="executeOp()">تنفيذ</button>
-              <button class="btn2 col" onclick="downloadStudentStatementPDF()">PDF رسمي</button>
-            </div>
-          </div>
-
-          <div class="row" style="margin-top:12px">
-            <div class="col"><div class="small">من تاريخ</div><input id="fromDate" type="date"></div>
-            <div class="col"><div class="small">إلى تاريخ</div><input id="toDate" type="date"></div>
-            <div class="col" style="align-self:flex-end"><button class="btn3" onclick="showStatement()">عرض كشف الحساب</button></div>
-          </div>
-
-          <div class="tableWrap" style="margin-top:10px">
-            <table>
-              <thead><tr><th>الوقت</th><th>العملية</th><th>السبب</th><th>المبلغ</th><th>الرصيد بعد العملية</th></tr></thead>
-              <tbody id="stmtRows"></tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- Pane: Upgrade -->
-        <div id="paneUpgrade" class="miniPane">
-          <div class="card" style="margin-top:12px">
-            <h3 style="margin:0;color:#0b2a66">نظام ترقية الحساب</h3>
-            <div class="small" style="margin-top:6px">الترقية تلقائية حسب الرصيد (قابل للتعديل لاحقًا):</div>
-            <div class="row" style="margin-top:10px">
-              <div class="col">
-                <div class="card soft">
-                  <div style="font-weight:1000;color:#0b2a66">🥉 برونزي</div>
-                  <div class="small">من 10000 إلى أقل من 10000</div>
-                </div>
-              </div>
-              <div class="col">
-                <div class="card soft">
-                  <div style="font-weight:1000;color:#0b2a66">🥈 فضي</div>
-                  <div class="small">من 11000 إلى أقل من 14000</div>
-                </div>
-              </div>
-              <div class="col">
-                <div class="card soft">
-                  <div style="font-weight:1000;color:#0b2a66">🥇 ذهبي</div>
-                  <div class="small">من 15000 إلى أقل من 20000</div>
-                </div>
-              </div>
-              <div class="col">
-                <div class="card soft">
-                  <div style="font-weight:1000;color:#0b2a66">🔷 ماسي</div>
-                  <div class="small">من 20000 إلى أقل من 29000</div>
-                </div>
-              </div>
-              <div class="col">
-                <div class="card soft">
-                  <div style="font-weight:1000;color:#0b2a66">💎 ألماسي</div>
-                  <div class="small">30000 فأكثر</div>
-                </div>
-              </div>
-            </div>
-            <div class="small" style="margin-top:8px">ملاحظة: إذا تبين (10,000 ثم +3,000 لكل مسمى) قولي وأعدّلها مباشرة.</div>
-          </div>
-        </div>
-
-        <!-- Pane: Rewards -->
-        <div id="paneRewards" class="miniPane">
-          <div class="card" style="margin-top:12px">
-            <h3 style="margin:0;color:#0b2a66">🎁 الجوائز والحوافز</h3>
-            <div class="small" style="margin-top:6px">اقتراح نظام جوائز جاهز (قابل للتخصيص):</div>
-            <div class="row" style="margin-top:10px">
-              <div class="col"><div class="card soft"><div style="font-weight:1000;color:#0b2a66">🏆 بطل الأسبوع</div><div class="small">أعلى صافي نقاط خلال الأسبوع</div></div></div>
-              <div class="col"><div class="card soft"><div style="font-weight:1000;color:#0b2a66">🎖️ نجم الالتزام</div><div class="small">0 مخالفات خلال 5 أيام</div></div></div>
-              <div class="col"><div class="card soft"><div style="font-weight:1000;color:#0b2a66">🎯 نجم المشاركة</div><div class="small">تفاعل مستمر في الحصص</div></div></div>
-            </div>
-            <div class="small">سيتم لاحقًا ربطها آليًا من سجل العمليات.</div>
-          </div>
-        </div>
-
-        <!-- Pane: Card details -->
-        <div id="paneCard" class="miniPane">
-          <div class="card" style="margin-top:12px">
-            <h3 style="margin:0;color:#0b2a66">تفاصيل البطاقة</h3>
-            <div class="row" style="margin-top:10px">
-              <div class="col">
-                <div class="small">اسم صاحب البطاقة</div>
-                <div style="font-weight:1000;color:#0b2a66" id="detailName">—</div>
-              </div>
-              <div class="col">
-                <div class="small">رقم الحساب</div>
-                <div style="font-weight:1000;color:#0b2a66;direction:ltr;text-align:left" id="detailAcc">—</div>
-              </div>
-              <div class="col">
-                <div class="small">تاريخ الانتهاء</div>
-                <div style="font-weight:1000;color:#0b2a66" id="detailExp">—</div>
-              </div>
-              <div class="col">
-                <div class="small">الرقم السري (PIN)</div>
-                <div style="font-weight:1000;color:#0b2a66" id="detailPin">—</div>
-              </div>
-            </div>
-            <div class="cardHint" style="margin-top:12px">⚠️ حافظ على بطاقتك وبياناتك ولا تُظهر الرقم السري للآخرين.</div>
-          </div>
-
-          <div class="card">
-            <h3 style="margin:0;color:#0b2a66">الحوالات</h3>
-            <div class="small" style="margin-top:6px">سيظهر داخل التحويل:</div>
-            <ul class="small" style="line-height:1.9;margin:10px 0 0 0">
-              <li>بين حساباتي (لنفس الطالب) — قادمًا</li>
-              <li>داخل الفصل (يظهر أسماء زملاء نفس الفصل)</li>
-              <li>حوالة محلية لفصل آخر (كل الطلاب)</li>
-            </ul>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== Footer links (public) ===== -->
-  <div class="footerBar" id="publicFooter">
-    <div class="footerLinks">
-      <a href="javascript:void(0)" onclick="openContact()">اتصل بنا</a>
-      <a href="javascript:void(0)" onclick="openAbout()">تعريف بالبنك</a>
-      <a href="javascript:void(0)" onclick="openHelp()">هل تحتاج إلى مساعدة</a>
-    </div>
-    <div class="footerNote">الرياضيات لغة الأذكياء ✨</div>
-  </div>
-
-  <audio id="welcomeMp3" preload="auto" src="welcome.mp3"></audio>
-  <audio id="welcomeM4a" preload="auto" src="welcome.m4a"></audio>
-
-  <!-- libs -->
-  <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore-compat.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
-  <div id="pdfTemp"></div>
-
-  <script>
-    // ================== Mode ==================
-    const urlParams = new URLSearchParams(window.location.search);
-    const APP_MODE = (urlParams.get("mode") || "teacher").toLowerCase(); // teacher|student
-    const IS_STUDENT_ENTRY = (APP_MODE === "student");
-
-    // ================== WhatsApp / Contacts ==================
-    const SIGNATURE = "المعلمة: سارة حقوي";
-    const TEACHER_BANK_TITLE = "بنك الرياضيات – المصرفي";
-    const CONTACT_PRIMARY = "0502234335"; // خدمة الطلاب
-    const WHATSAPP_BUSINESS = "0556891201"; // شكاوى  
-    const ADMIN_EMAIL = "saramathss@hotmail.com";
-    const TEACHER_EMAIL = "as-soso-as2011@hotmail.com";
-
-    // ================== Firebase ==================
-    const firebaseConfig = {
-      apiKey: "AIzaSyDP-pi0tbFQ9bNRihrLz_kUs-JBoa9Cw4Y",
-      authDomain: "sara-haywire.firebaseapp.com",
-      projectId: "sara-haywire",
-      storageBucket: "sara-haywire.firebasestorage.app",
-      messagingSenderId: "333467940977",
-      appId: "1:333467940977:web:97d056d5dbff2debbf43d0",
-      measurementId: "G-7RPQX9ER93"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-
-    // ================== Helpers ==================
-    function $(id){return document.getElementById(id);}
-    function fmt(x){ return (Math.round((Number(x||0)+Number.EPSILON)*100)/100).toFixed(2); }
-
-    function openModal(title, bodyHtml, actionsHtml){
-      $("mTitle").textContent = title;
-      $("mBody").innerHTML = bodyHtml;
-      $("mActions").innerHTML = actionsHtml || '<button class="btn" onclick="closeModal()">موافق</button>';
-      $("modal").style.display="flex";
-      $("modal").setAttribute("aria-hidden","false");
-    }
-    function closeModal(){
-      $("modal").style.display="none";
-      $("modal").setAttribute("aria-hidden","true");
-    }
-    function warn(msg){ openModal("تنبيه", msg); }
-
-    function togglePass(id, btn){
-      const el = $(id);
-      if(!el) return;
-      el.type = (el.type === "password") ? "text" : "password";
-      btn.textContent = (el.type === "password") ? "👁️" : "🙈";
-    }
-
-    function normalizePhoneToWA(phone){
-      let p = String(phone||"").replace(/[^0-9]/g,"");
-      if(!p) return "";
-      if(p.startsWith("00")) p = p.slice(2);
-      if(p.startsWith("0")) p = "966" + p.slice(1);
-      return p;
-    }
-    function contactLink(){ return "https://wa.me/" + normalizePhoneToWA(CONTACT_PRIMARY); }
-
-    function openWA(toPhone, messageText){
-      const phone = normalizePhoneToWA(toPhone);
-      if(!phone) return;
-
-      const enc = encodeURIComponent(messageText || "");
-      // iOS: whatsapp-business:// often fails; use whatsapp:// then https fallback
-      const scheme1 = "whatsapp://send?phone=" + phone + "&text=" + enc;
-      const web1 = "https://wa.me/" + phone + "?text=" + enc;
-
-      // try scheme
-      window.location.href = scheme1;
-
-      // fallback
-      setTimeout(()=>{
-        // if still here, open web
-        window.location.href = web1;
-      }, 900);
-    }
-
-    function buildOfficialMessage(type, student, amount, reason){
-      const warnLine = "⚠️ رسالة تلقائية";
-      return (
-`${warnLine}
-${TEACHER_BANK_TITLE}
-
-تم تسجيل عملية على حساب الطالب/ـة:
-${student}
-
-نوع العملية: ${type}
-المبلغ: ${String(amount ?? "")} ريال
-السبب: ${reason || "—"}
-
-* هنا لا نستطيع استقبال رسائل.
-للتواصل مع المعلمة اضغط الرابط:
-${contactLink()}
-
-${SIGNATURE}`
-      );
-    }
-
-    function isAutoWAEnabled(){ return !!$("autoWA")?.checked; }
-    function isCopyEnabled(){ return !!$("copyToTeacher")?.checked; }
-
-    async function beep(){
-      try{
-        const ctx=new (window.AudioContext||window.webkitAudioContext)();
-        const o=ctx.createOscillator(), g=ctx.createGain();
-        o.type="triangle"; o.frequency.value=740; g.gain.value=0.12;
-        o.connect(g); g.connect(ctx.destination); o.start();
-        setTimeout(()=>{o.stop(); ctx.close();}, 220);
-      }catch(e){}
-    }
-    async function playWelcome(){
-      const m4a = $("welcomeM4a");
-      const mp3 = $("welcomeMp3");
-      await beep();
-      try{ if(m4a){ m4a.currentTime=0; await m4a.play(); return; } }catch(e){}
-      try{ if(mp3){ mp3.currentTime=0; await mp3.play(); return; } }catch(e){}
-    }
-
-    // ================== Public footer sections ==================
-    function openContact(){
-      const body = `
-        <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap">
-          <div>
-            <div style="font-weight:1000;color:#0b2a66;font-size:16px">اتصل بنا</div>
-            <div class="small">نحن هنا لخدمتك</div>
-          </div>
-        </div>
-        <hr>
-        <div class="card soft" style="margin:0">
-          <div style="font-weight:1000;color:#0b2a66">📞 خدمة الطلاب</div>
-          <div class="small" style="direction:ltr;text-align:left">${CONTACT_PRIMARY}</div>
-          <div style="margin-top:10px;font-weight:1000;color:#0b2a66">💬 للشكاوى (واتساب )</div>
-          <div class="small" style="direction:ltr;text-align:left">${WHATSAPP_BUSINESS}</div>
-          <div style="margin-top:10px;font-weight:1000;color:#0b2a66">🏛️ الإدارة العامة</div>
-          <div class="small" style="direction:ltr;text-align:left">${CONTACT_PRIMARY}</div>
-          <div class="small" style="direction:ltr;text-align:left">${ADMIN_EMAIL}</div>
-        </div>
-        <hr>
-        <div class="row">
-          <button class="btn2 col" onclick="openPolicy('privacy')">سياسة الخصوصية ➜</button>
-          <button class="btn2 col" onclick="openPolicy('disclaimer')">إخلاء المسؤولية ➜</button>
-          <button class="btn2 col" onclick="openPolicy('terms')">الأحكام والشروط ➜</button>
-        </div>
-      `;
-      openModal("اتصل بنا", body, '<button class="btn" onclick="closeModal()">رجوع</button>');
-    }
-
-    function openAbout(){
-      const body = `
-        <div style="font-weight:1000;color:#0b2a66;font-size:16px">تعريف بالبنك</div>
-        <div class="small" style="margin-top:4px">نظام مدرسي رسمي – متابعة، تحفيز، وشفافية</div>
-        <hr>
-        <div class="card soft" style="margin:0">
-          <div style="font-weight:1000;color:#0b2a66">المسؤولة</div>
-          <div class="small">${SIGNATURE}</div>
-          <div style="margin-top:10px;font-weight:1000;color:#0b2a66">تاريخ افتتاح البنك</div>
-          <div class="small">شعبان هـ1447-2026فبراير</div>
-          <div style="margin-top:10px;font-weight:1000;color:#0b2a66">الأهداف</div>
-          <ul class="small" style="line-height:1.9;margin:8px 0 0 0">
-            <li>رفع الانضباط والالتزام داخل الحصة.</li>
-            <li>تعزيز التفاعل والمشاركة الإيجابية.</li>
-            <li>توفير تقارير واضحة لأولياء الأمور.</li>
-            <li>دعم جودة الممارسات التعليمية المتماشية مع رؤية 2030.</li>
-            <li>يسهم في توثيق مؤشرات الأداء المهني للمعلمات.</li>
-          </ul>
-        </div>
-      `;
-      openModal("تعريف بالبنك", body, '<button class="btn" onclick="closeModal()">رجوع</button>');
-    }
-
-    function openHelp(){
-      const body = `
-        <div style="font-weight:1000;color:#0b2a66;font-size:16px">هل تحتاج إلى مساعدة؟</div>
-        <hr>
-        <div class="small" style="line-height:1.9">
-          • للطلاب: ادخل الاسم + PIN ثم نفذ العملية أو اعرض كشف الحساب.
-          • مشكلة واتساب: إذا ما فتح التطبيق، يتحول تلقائيًا لصفحة wa.me.
-        </div>
-      `;
-      openModal("مساعدة", body, '<button class="btn" onclick="closeModal()">تمام</button>');
-    }
-
-    function openPolicy(which){
-      let title=""; let body="";
-      if(which==="privacy"){
-        title="سياسة الخصوصية";
-        body = `<div class="small" style="line-height:1.9">
-          يلتزم بنك الرياضيات بحماية خصوصية الطالب/ـة. يتم استخدام البيانات لأغراض مدرسية تعليمية فقط، وتشمل: الاسم، الرصيد، وسجل العمليات.
-          لا يتم مشاركة البيانات خارج نطاق المدرسة إلا بإشعار ولي الأمر عند تفعيل الإرسال عبر واتساب.
-        </div>`;
-      }else if(which==="disclaimer"){
-        title="إخلاء المسؤولية";
-        body = `<div class="small" style="line-height:1.9">
-          هذا النظام أداة مدرسية تحفيزية، ولا يمثل نظامًا مصرفيًا حقيقيًا أو معاملات مالية حقيقية. الرصيد رمزي للتعزيز والتحفيز.
-        </div>`;
+</div>
+
+<div class="footer">الرياضيات لغة الأذكياء ✨</div>
+
+<script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore-compat.js"></script>
+
+<script>
+// ================== وضع الرابط (✅ فقط إضافة بدون تغيير تصميم) ==================
+const __params = new URLSearchParams(window.location.search);
+const APP_MODE = (__params.get("mode") || "teacher").toLowerCase(); // teacher | student
+const IS_STUDENT_MODE = (APP_MODE === "student");
+const STUDENT_SID = (__params.get("sid") || "").trim();
+const STUDENT_NAME_Q = (__params.get("name") || "").trim();
+
+// ================== إعدادات قابلة للتعديل للرسائل اليومية ==================
+const TEACHER_BANK_TITLE = "إدارة بنك الرياضيات – المعلمة سارة حقوي";
+
+const TEMPLATE_DEPOSIT =
+`🌿 ${TEACHER_BANK_TITLE}
+
+تم إيداع (تعزيز) في حساب الطالب/ـة:
+{student}
+
+المبلغ: {amount} ريال
+السبب: {reason}
+
+شاكرين تعاونكم 🤍`;
+
+const TEMPLATE_WITHDRAW =
+`⚠️ ${TEACHER_BANK_TITLE}
+
+تم سحب (تنبيه) من حساب الطالب/ـة:
+{student}
+
+المبلغ: {amount} ريال
+السبب: {reason}
+
+للتنبيه والمتابعة 🌿`;
+
+const TEMPLATE_TRANSFER =
+`📌 ${TEACHER_BANK_TITLE}
+
+تم تحويل في حساب الطالب/ـة:
+{student}
+
+المبلغ: {amount} ريال
+السبب: {reason}
+
+شاكرين تعاونكم 🤍`;
+
+// ================== Firebase ==================
+const firebaseConfig = {
+  apiKey: "AIzaSyDP-pi0tbFQ9bNRihrLz_kUs-JBoa9Cw4Y",
+  authDomain: "sara-haywire.firebaseapp.com",
+  projectId: "sara-haywire",
+  storageBucket: "sara-haywire.firebasestorage.app",
+  messagingSenderId: "333467940977",
+  appId: "1:333467940977:web:97d056d5dbff2debbf43d0",
+  measurementId: "G-7RPQX9ER93"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+// ================== ثوابت ==================
+const TEACHER_EMAIL="as-soso-as2011@hotmail.com";
+const WHATSAPP_NUMBER = "966502234335";
+
+// ================== أسماء الطلاب الافتراضية ==================
+const DEFAULT_STUDENTS = {
+  "سادس بنين": ["طلال الرحيلي","علي المكرمي","عمر صواف","محمد العنزي","سالم آل مخلص","عبدالملك الجناعي","وليد المالكي","سلمان الجوهر","راكان مباركي","فيصل القحطاني","ريان القحطاني","محمد أبو صالح","نايف العصيمي"],
+  "سادس بنات": ["رهف الثبيتي","جادل الدوسري","دانة القحطاني","تالين متولي","ديما الحمادي","رهف الزهراني","كادي العتيبي","رودينا غريب","الجوهرة آل مخلص","ريم آل مشرف"],
+  "أول متوسط": ["ايمان باغريب","ديمة الشهري","نجلا القحطاني","ديم الغامدي","ميس السنامة","لارين التل","ليان المحارفي","سارة الغامدي"]
+};
+
+const PARENTS_PHONE = {
+  "سالم آل مخلص": "0502402111",
+  "الجوهرة آل مخلص": "0502402111",
+  "تالين متولي": "0505220540",
+  "جادل الدوسري": "0538118080",
+  "دانة القحطاني": "0555952003",
+  "رهف العتيبي": "0543339829",
+  "كادي العتيبي": "0532340737",
+  "رهف الزهراني": "0562580555",
+  "ريم آل مشرف": "054565589",
+  "ديم الحمادي": "0501222335",
+  "رودينا الغريب": "0506925919",
+  "راكان مباركي": "0559591061",
+  "سلمان الجوهر": "053827904",
+  "طلال الرحيلي": "0598801283",
+  "محمد بوصالح": "0500125335",
+  "محمد العنزي": "0533264929",
+  "علي المكرمي": "0563882235",
+  "وليد المالكي": "0552582145",
+  "نايف العصيمي": "0509799783",
+  "عبدالملك الجناعي": "0568027600",
+  "فيصل القحطاني": "0507993660",
+  "ريان القحطاني": "0555078508",
+  "عمر صواف": "0599831191",
+  "ديمة الشهري": "0567509173",
+  "لارين التل": "0580662141",
+  "نجلا القحطاني": "0535952876",
+  "ايمان باغريب": "0542678280",
+  "ديم الغامدي": "0535912049",
+  "ليان المحارفي": "0568135644",
+  "ميس السنامة": "0580443424",
+  "سارة الغامدي": "0542743881"
+};
+
+// ================== أسباب العمليات (فلترة) ==================
+const REASONS = {
+  deposit: [
+    "التفاعل والمشاركة الإيجابية",
+    "الالتزام بالقوانين الصفية",
+    "الالتزام بمتطلبات المادة والحصة",
+    "تميز في الأداء والسلوك",
+    "تحسن ملحوظ في المستوى أو السلوك",
+    "أخرى"
+  ],
+  withdraw: [
+    "عدم حل الواجب الدراسي",
+    "كثرة الكلام والحركة داخل الحصة",
+    "النوم أثناء الحصة",
+    "عدم الالتزام بالأسلوب اللائق مع الزملاء",
+    "عدم الالتزام بالأسلوب اللائق مع المعلمة",
+    "التأخر عن حصة الرياضيات دون عذر",
+    "نسيان كتاب الرياضيات",
+    "نسيان الدفتر",
+    "نسيان المذكرة",
+    "عدم إحضار أدوات الرياضيات",
+    "أخرى"
+  ],
+  transfer: [
+    "سبب تحويلي/تحويل رصيد",
+    "تسديد/إرجاع رصيد",
+    "مساعدة زميل/ـة",
+    "أخرى"
+  ]
+};
+
+function $(id){return document.getElementById(id);}
+
+function openModal(title, bodyHtml, actionsHtml){
+  $("mTitle").textContent=title;
+  $("mBody").innerHTML=bodyHtml;
+  $("mActions").innerHTML=actionsHtml||'<button class="btn" onclick="closeModal()">موافق</button>';
+  $("modal").style.display="flex";
+}
+function closeModal(){ $("modal").style.display="none"; }
+
+function warn(msg){
+  try{
+    const ctx=new (window.AudioContext||window.webkitAudioContext)();
+    const o=ctx.createOscillator(), g=ctx.createGain();
+    o.type="sine"; o.frequency.value=880; g.gain.value=0.12;
+    o.connect(g); g.connect(ctx.destination); o.start();
+    setTimeout(()=>{o.stop(); ctx.close();}, 140);
+  }catch(e){}
+  openModal("تنبيه", msg);
+}
+
+function logout(){location.reload();}
+
+function go(page){
+  ["teacherLoginPage","classesPage","classPage","studentLoginPage","studentAccountPage"].forEach(id=>$(id)?.classList.add("hidden"));
+  $(page)?.classList.remove("hidden");
+}
+function backToClasses(){ go("classesPage"); renderTabs(); }
+function openClassPage(){ go("classPage"); renderStudents(); }
+function backToClass(){
+  // ✅ في رابط الطلاب: الرجوع يرجع لصفحة دخول الطالب
+  if(IS_STUDENT_MODE){
+    go("studentLoginPage");
+    return;
+  }
+  go("classPage"); renderStudents();
+}
+
+function fmt(x){ return (Math.round((Number(x||0)+Number.EPSILON)*100)/100).toFixed(2); }
+
+// ===== صوت الترحيب =====
+async function playWelcome(){
+  const m4a = document.getElementById("welcomeM4a");
+  const mp3 = document.getElementById("welcomeMp3");
+  try{
+    const ctx=new (window.AudioContext||window.webkitAudioContext)();
+    const o=ctx.createOscillator(), g=ctx.createGain();
+    o.type="triangle"; o.frequency.value=740; g.gain.value=0.10;
+    o.connect(g); g.connect(ctx.destination); o.start();
+    setTimeout(()=>{o.stop(); ctx.close();}, 220);
+  }catch(e){}
+  try{ if(m4a){ m4a.currentTime=0; await m4a.play(); return; } }catch(e){}
+  try{ if(mp3){ mp3.currentTime=0; await mp3.play(); return; } }catch(e){}
+}
+
+// ===== بدء (✅ تعديل بسيط فقط) =====
+async function startApp(){
+  $("connPill").textContent = "جاهز ✅";
+  $("connPill").style.background = "#dff4e3";
+  $("connPill").style.color = "#2e7d32";
+  playWelcome();
+  $("startOverlay").style.display = "none";
+
+  // ✅ رابط الطلاب
+  if(IS_STUDENT_MODE){
+    go("studentLoginPage");
+
+    // تجهيز حقل الاسم حسب الرابط
+    const nameInput = $("stuName");
+    if(nameInput){
+      if(STUDENT_SID){
+        nameInput.readOnly = true;
+        nameInput.value = "جارٍ تحميل الاسم...";
       }else{
-        title="الأحكام والشروط";
-        body = `<div class="small" style="line-height:1.9">
-          باستخدام النظام فأنت توافق على: الالتزام بضوابط المدرسة، عدم إساءة الاستخدام، وعدم مشاركة الرقم السري.
-          للمدرسة الحق في إيقاف الحساب عند مخالفة السياسات.
-        </div>`;
-      }
-      openModal(title, body, '<button class="btn" onclick="closeModal()">رجوع</button>');
-    }
-
-    // ================== Navigation ==================
-    function hideAllPages(){
-      ["startOverlay","onboardOverlay","teacherLoginPage","studentLoginPage","classesPage","classPage","studentAccountPage"].forEach(id=>{
-        const el=$(id); if(el) el.classList.add("hidden");
-      });
-    }
-    function show(id){
-      const el=$(id); if(el) el.classList.remove("hidden");
-    }
-    function goPublic(){
-      hideAllPages();
-      show("startOverlay");
-    }
-    function logout(){ location.reload(); }
-
-    // ================== Reasons (unchanged) ==================
-    const REASONS = {
-      deposit: [
-        "التفاعل والمشاركة الإيجابية",
-        "الالتزام بالقوانين الصفية",
-        "الالتزام بمتطلبات المادة والحصة",
-        "تميز في الأداء والسلوك",
-        "تحسن ملحوظ في المستوى أو السلوك",
-        "أخرى"
-      ],
-      withdraw: [
-        "عدم حل الواجب الدراسي",
-        "كثرة الكلام والحركة داخل الحصة",
-        "النوم أثناء الحصة",
-        "عدم الالتزام بالأسلوب اللائق مع الزملاء",
-        "عدم الالتزام بالأسلوب اللائق مع المعلمة",
-        "التأخر عن حصة الرياضيات دون عذر",
-        "نسيان كتاب الرياضيات",
-        "نسيان الدفتر",
-        "نسيان المذكرة",
-        "عدم إحضار أدوات الرياضيات",
-        "أخرى"
-      ],
-      transfer: [
-        "تسديد/إرجاع رصيد",
-        "مساعدة زميل/ـة",
-        "أخرى"
-      ]
-    };
-
-    function fillReasonSelect(selectEl, items){
-      if(!selectEl) return;
-      selectEl.innerHTML = "";
-      items.forEach(r=>{
-        const o = document.createElement("option");
-        o.value = r; o.textContent = r;
-        selectEl.appendChild(o);
-      });
-    }
-
-    let currentAccess = "teacher"; // teacher|student
-    function setupReasonUI(mode, selectId, otherId){
-      const sel = $(selectId);
-      const other = $(otherId);
-      if(!sel || !other) return;
-
-      if(mode === "transfer" && currentAccess === "student"){
-        sel.classList.add("hidden");
-        sel.innerHTML = "";
-        other.classList.remove("hidden");
-        other.placeholder = "سبب التحويل (اكتب سبب التنفيذ هنا...)";
-        return;
-      }
-
-      sel.classList.remove("hidden");
-      fillReasonSelect(sel, REASONS[mode] || ["أخرى"]);
-
-      const toggleOther = ()=>{
-        if(sel.value === "أخرى"){
-          other.classList.remove("hidden");
-          other.placeholder = "أخرى: اكتب السبب هنا...";
-        }else{
-          other.classList.add("hidden");
-          other.value = "";
-        }
-      };
-      sel.onchange = toggleOther;
-      toggleOther();
-    }
-
-    function getReason(selectId, otherId){
-      const sel = $(selectId);
-      const other = $(otherId);
-      if(sel && sel.classList.contains("hidden")){
-        const t=(other?.value||"").trim();
-        return t || "تحويل";
-      }
-      if(!sel) return "";
-      if(sel.value === "أخرى"){
-        const t=(other?.value||"").trim();
-        return t || "أخرى";
-      }
-      return sel.value || "";
-    }
-
-    function initTeacherReasonAlways(){
-      const sel = $("reasonTeacher");
-      if(!sel) return;
-      const union = Array.from(new Set([ ...REASONS.deposit, ...REASONS.withdraw, ...REASONS.transfer ]));
-      fillReasonSelect(sel, union);
-      const other = $("reasonOtherTeacher");
-      const toggleOther = ()=>{
-        if(sel.value === "أخرى"){ other.classList.remove("hidden"); }
-        else { other.classList.add("hidden"); other.value=""; }
-      };
-      sel.onchange = toggleOther;
-      toggleOther();
-    }
-
-    // ================== Onboarding (fixed swipe: no dragging text) ==================
-    let onbIndex = 0;
-    let onbAfterDone = null;
-    let onbSwipeBound = false;
-
-    function showOnboarding(afterDone){
-      onbAfterDone = (typeof afterDone === "function") ? afterDone : null;
-      onbIndex = 0;
-      updateOnbUI();
-
-      const ov = $("onboardOverlay");
-      ov.classList.remove("hidden");
-      ov.style.display = "flex";
-      ov.setAttribute("aria-hidden","false");
-      enableOnbSwipe();
-    }
-    function finishOnboarding(){
-      const ov = $("onboardOverlay");
-      ov.style.display="none";
-      ov.setAttribute("aria-hidden","true");
-      ov.classList.add("hidden");
-      const cb = onbAfterDone;
-      onbAfterDone = null;
-      if(typeof cb === "function") cb();
-    }
-    function updateOnbUI(){
-      const track = $("onbTrack");
-      const dotsWrap = $("onbDots");
-      if(track) track.style.transform = `translateX(-${onbIndex * 100}%)`;
-      if(dotsWrap){
-        const dots = dotsWrap.querySelectorAll(".onbDot");
-        dots.forEach((d,i)=> d.classList.toggle("active", i===onbIndex));
+        nameInput.readOnly = false;
+        nameInput.value = STUDENT_NAME_Q ? decodeURIComponent(STUDENT_NAME_Q) : "";
+        nameInput.placeholder = "اكتب/ي اسمك كما هو مسجل";
       }
     }
-    function onbNext(){ if(onbIndex >= 2) return finishOnboarding(); onbIndex++; updateOnbUI(); }
-    function onbPrev(){ if(onbIndex <= 0) return; onbIndex--; updateOnbUI(); }
+    $("stuPin").value = "";
+    $("stuLocked").classList.add("hidden");
 
-    function enableOnbSwipe(){
-      if(onbSwipeBound) return;
-      const vp = $("onbViewport");
-      if(!vp) return;
-      onbSwipeBound = true;
-
-      let startX = 0, dx = 0, dragging=false;
-
-      const onDown = (x)=>{ dragging=true; startX=x; dx=0; };
-      const onMove = (x)=>{ if(!dragging) return; dx = x-startX; };
-      const onUp = ()=>{
-        if(!dragging) return;
-        dragging=false;
-        // no dragging transform => prevents "text moves with swipe"
-        if(Math.abs(dx) > 45){
-          if(dx > 0) onbPrev(); else onbNext();
-        }
-        dx=0;
-      };
-
-      vp.addEventListener("pointerdown",(e)=>{ vp.setPointerCapture?.(e.pointerId); onDown(e.clientX); });
-      vp.addEventListener("pointermove",(e)=> onMove(e.clientX));
-      vp.addEventListener("pointerup",()=> onUp());
-      vp.addEventListener("pointercancel",()=> onUp());
-
-      vp.addEventListener("touchstart",(e)=>{ if(e.touches?.[0]) onDown(e.touches[0].clientX); },{passive:true});
-      vp.addEventListener("touchmove",(e)=>{ if(e.touches?.[0]) onMove(e.touches[0].clientX); },{passive:true});
-      vp.addEventListener("touchend",()=> onUp());
-    }
-
-    // ================== Seed data (same as before) ==================
-    const DEFAULT_STUDENTS = {
-      "سادس بنين": ["طلال الرحيلي","علي المكرمي","عمر صواف","محمد العنزي","سالم آل مخلص","عبدالملك الجناعي","وليد المالكي","سلمان الجوهر","راكان مباركي","فيصل القحطاني","ريان القحطاني","محمد أبو صالح","نايف العصيمي"],
-      "سادس بنات": ["رهف الثبيتي","جادل الدوسري","دانة القحطاني","تالين متولي","ديما الحمادي","رهف الزهراني","كادي العتيبي","رودينا غريب","الجوهرة آل مخلص","ريم آل مشرف"],
-      "أول متوسط": ["ايمان باغريب","ديمة الشهري","نجلا القحطاني","ديم الغامدي","ميس السنامة","لارين التل","ليان المحارفي","سارة الغامدي"]
-    };
-    const PARENTS_PHONE = {
-      "سالم آل مخلص": "0502402111",
-      "الجوهرة آل مخلص": "0502402111",
-      "تالين متولي": "0505220540",
-      "جادل الدوسري": "0538118080",
-      "دانة القحطاني": "0555952003",
-      "رهف العتيبي": "0543339829",
-      "كادي العتيبي": "0532340737",
-      "رهف الزهراني": "0562580555",
-      "ريم آل مشرف": "054565589",
-      "ديم الحمادي": "0501222335",
-      "رودينا الغريب": "0506925919",
-      "راكان مباركي": "0559591061",
-      "سلمان الجوهر": "053827904",
-      "طلال الرحيلي": "0598801283",
-      "محمد بوصالح": "0500125335",
-      "محمد العنزي": "0533264929",
-      "علي المكرمي": "0563882235",
-      "وليد المالكي": "0552582145",
-      "نايف العصيمي": "0509799783",
-      "عبدالملك الجناعي": "0568027600",
-      "فيصل القحطاني": "0507993660",
-      "ريان القحطاني": "0555078508",
-      "عمر صواف": "0599831191",
-      "ديمة الشهري": "0567509173",
-      "لارين التل": "0580662141",
-      "نجلا القحطاني": "0535952876",
-      "ايمان باغريب": "0542678280",
-      "ديم الغامدي": "0535912049",
-      "ليان المحارفي": "0568135644",
-      "ميس السنامة": "0580443424",
-      "سارة الغامدي": "0542743881"
-    };
-
-    let forgotPinEnabled = true;
-    async function loadForgotSetting(){
+    // إذا sid موجود: نجيب الطالب مباشرة
+    if(STUDENT_SID){
       try{
-        const doc = await db.collection("settings").doc("security").get();
+        const doc = await db.collection("students").doc(STUDENT_SID).get();
         if(doc.exists){
-          const d = doc.data() || {};
-          if(typeof d.forgotPinEnabled === "boolean") forgotPinEnabled = d.forgotPinEnabled;
+          const s = doc.data() || {};
+          currentStudentId = doc.id;
+          if(nameInput){
+            nameInput.value = s.name || "";
+            nameInput.readOnly = true;
+          }
         }else{
-          await db.collection("settings").doc("security").set({forgotPinEnabled:true});
-          forgotPinEnabled = true;
+          if(nameInput){
+            nameInput.value = "";
+            nameInput.readOnly = false;
+            nameInput.placeholder = "اكتب/ي اسمك كما هو مسجل";
+          }
         }
-      }catch(e){ forgotPinEnabled = true; }
-    }
-    function isForgotEnabled(){ return forgotPinEnabled === true; }
-
-    async function toggleForgotPinForAll(){
-      try{
-        forgotPinEnabled = !forgotPinEnabled;
-        await db.collection("settings").doc("security").set({forgotPinEnabled}, {merge:true});
-        openModal("تم ✅", forgotPinEnabled ? "تم تفعيل (نسيت الرقم السري) للجميع." : "تم تعطيل (نسيت الرقم السري) للجميع.",
-          '<button class="btn" onclick="closeModal()">تمام</button>');
       }catch(e){
-        openModal("تنبيه", "تعذر تحديث الإعداد الآن.");
-      }
-      await loadForgotSetting();
-    }
-
-    async function ensureSeed(){
-      const c = await db.collection("classes").orderBy("order").get();
-      if(c.empty){
-        await db.collection("classes").add({name:"الصف سادس بنين",order:1});
-        await db.collection("classes").add({name:"الصف سادس بنات",order:2});
-        await db.collection("classes").add({name:"الصف الأول المتوسط",order:3});
-      }
-
-      const c2 = await db.collection("classes").orderBy("order").get();
-      const by = {};
-      c2.forEach(d=>by[d.data().name]=d.id);
-
-      const all = await db.collection("students").get();
-      const existing = new Set();
-      all.forEach(d=>{ const s=d.data(); if(s?.name) existing.add(String(s.name).trim()); });
-
-      for(const clsName of Object.keys(DEFAULT_STUDENTS)){
-        const classId = by[clsName] || by[("الصف " + clsName)] || by[("الصف " + clsName.replace("أول","الأول"))];
-        if(!classId) continue;
-
-        for(const n0 of DEFAULT_STUDENTS[clsName]){
-          const n = String(n0).trim();
-          if(existing.has(n)) continue;
-          const pin=String(Math.floor(1000+Math.random()*9000));
-          await db.collection("students").add({
-            name:n,classId,active:true,balance:0,pin,openedAt:null,
-            guardianWhats:(PARENTS_PHONE[n]||"")
-          });
-          existing.add(n);
+        if(nameInput){
+          nameInput.value = "";
+          nameInput.readOnly = false;
+          nameInput.placeholder = "اكتب/ي اسمك كما هو مسجل";
         }
       }
     }
+    return;
+  }
 
-    // ================== Classes ==================
-    let classes=[], currentClassId=null, currentStudentId=null;
-    let selectedIds = new Set();
+  // ✅ رابط المعلمة
+  go("teacherLoginPage");
+}
 
-    async function loadClasses(){
-      const snap = await db.collection("classes").orderBy("order").get();
-      classes=[]; snap.forEach(d=>classes.push({id:d.id,...d.data()}));
-      if(!currentClassId) currentClassId = classes[0]?.id;
+// ===== تسجيل المعلمة =====
+function teacherLogin(){
+  if($("tu").value.trim()==="teacher" && $("tp").value.trim()==="12345"){
+    go("classesPage"); renderTabs();
+  } else warn("بيانات الدخول غير صحيحة");
+}
+function forgotTeacher(){
+  const subject=encodeURIComponent("استرجاع بيانات دخول مصرف الرياضيات");
+  const body=encodeURIComponent("السلام عليكم،\nأرغب باسترجاع بيانات الدخول لمصرف الرياضيات.\nشكراً.");
+  window.location.href=`mailto:${TEACHER_EMAIL}?subject=${subject}&body=${body}`;
+}
+
+// ===== واجهة الأسباب =====
+function fillReasonSelect(selectEl, items){
+  if(!selectEl) return;
+  selectEl.innerHTML = "";
+  items.forEach(r=>{
+    const o = document.createElement("option");
+    o.value = r;
+    o.textContent = r;
+    selectEl.appendChild(o);
+  });
+}
+function setupReasonUI(mode, selectId, otherId){
+  const sel = document.getElementById(selectId);
+  const other = document.getElementById(otherId);
+  if(!sel || !other) return;
+  fillReasonSelect(sel, REASONS[mode] || ["أخرى"]);
+  const toggleOther = ()=>{
+    if(sel.value === "أخرى"){
+      other.classList.remove("hidden");
+    }else{
+      other.classList.add("hidden");
+      other.value = "";
     }
+  };
+  sel.onchange = toggleOther;
+  toggleOther();
+}
+function getReason(selectId, otherId){
+  const sel = document.getElementById(selectId);
+  const other = document.getElementById(otherId);
+  if(!sel) return "";
+  if(sel.value === "أخرى"){
+    const t = (other?.value || "").trim();
+    return t || "أخرى";
+  }
+  return sel.value || "";
+}
 
-    async function renderTabs(){
-      await loadClasses();
-      const tabs=$("classTabs"); if(!tabs) return;
-      tabs.innerHTML="";
-      classes.forEach(c=>{
-        const t=document.createElement("div");
-        t.className="tab"+(c.id===currentClassId?" active":"");
-        t.textContent=c.name;
-        t.onclick=()=>{ currentClassId=c.id; renderTabs(); };
-        tabs.appendChild(t);
+// ===== التحكم في "نسيت الرقم السري" للجميع =====
+let forgotPinEnabled = true;
+
+async function loadForgotSetting(){
+  try{
+    const doc = await db.collection("settings").doc("security").get();
+    if(doc.exists){
+      const d = doc.data() || {};
+      if(typeof d.forgotPinEnabled === "boolean") forgotPinEnabled = d.forgotPinEnabled;
+    }else{
+      await db.collection("settings").doc("security").set({forgotPinEnabled:true});
+      forgotPinEnabled = true;
+    }
+  }catch(e){
+    forgotPinEnabled = true;
+  }
+  const link = document.querySelector('a[onclick="forgotStudentPin()"]');
+  if(link) link.style.display = forgotPinEnabled ? "inline" : "none";
+}
+
+async function toggleForgotPinForAll(){
+  try{
+    forgotPinEnabled = !forgotPinEnabled;
+    await db.collection("settings").doc("security").set({forgotPinEnabled}, {merge:true});
+    openModal("تم ✅", forgotPinEnabled ? "تم تفعيل (نسيت الرقم السري) للجميع." : "تم تعطيل (نسيت الرقم السري) للجميع.");
+  }catch(e){
+    openModal("تنبيه", "تعذر تحديث الإعداد الآن.");
+  }
+  await loadForgotSetting();
+}
+function isForgotEnabled(){ return forgotPinEnabled === true; }
+
+// ===== ولي الأمر =====
+function normalizePhoneToWA(phone){
+  let p = String(phone||"").replace(/[^0-9]/g,"");
+  if(!p) return "";
+  if(p.startsWith("00")) p = p.slice(2);
+  if(p.startsWith("0")) p = "966" + p.slice(1);
+  return p;
+}
+
+async function ensureGuardianPhone(studentId, studentName){
+  const ref = db.collection("students").doc(studentId);
+  const doc = await ref.get();
+  if(!doc.exists) return "";
+  const s = doc.data() || {};
+  if(s.guardianWhats && String(s.guardianWhats).trim()) return String(s.guardianWhats).trim();
+  const guess = PARENTS_PHONE[studentName] || "";
+  if(guess){
+    await ref.update({guardianWhats: guess});
+    return guess;
+  }
+  return "";
+}
+
+async function editGuardianPhone(studentId, studentName){
+  const ref = db.collection("students").doc(studentId);
+  const doc = await ref.get();
+  if(!doc.exists) return;
+  const s = doc.data() || {};
+  const current = (s.guardianWhats || PARENTS_PHONE[studentName] || "").toString();
+  const nn = prompt("رقم ولي الأمر (مثال: 05xxxxxxxx):", current);
+  if(nn===null) return;
+  await ref.update({guardianWhats: nn.trim()});
+  openModal("تم ✅", "تم حفظ رقم ولي الأمر.");
+  await renderStudents();
+}
+
+async function sendPinToParent(studentId){
+  const ref = db.collection("students").doc(studentId);
+  const doc = await ref.get();
+  if(!doc.exists) return;
+  const s = doc.data() || {};
+  const parent = await ensureGuardianPhone(studentId, s.name||"");
+  const wa = normalizePhoneToWA(parent);
+  if(!wa){
+    openModal("تنبيه", "لا يوجد رقم ولي أمر مسجل. اضغط/ي (رقم ولي الأمر) لإضافته.");
+    return;
+  }
+  const msg = encodeURIComponent(
+    "السلام عليكم ورحمة الله وبركاته\n\n" +
+    "رقم الدخول (PIN) لبنك الرياضيات للطالب/ـة: " + (s.name||"") + "\n" +
+    "PIN: " + (s.pin||"") + "\n\n" +
+    "شاكرين تعاونكم 🤍"
+  );
+  const link = "https://wa.me/" + wa + "?text=" + msg;
+  window.open(link, "_blank");
+}
+
+async function forgotStudentPin(){
+  if(!isForgotEnabled()){
+    openModal("تنبيه","خدمة استرجاع الرقم السري موقوفة مؤقتًا. راجع/ي المعلمة 🌿");
+    return;
+  }
+  try{
+    const sid = currentStudentId;
+    if(!sid){
+      openModal("تنبيه", "اختار/ي الطالب أولاً.");
+      return;
+    }
+    const ref = db.collection("students").doc(sid);
+    const doc = await ref.get();
+    if(!doc.exists) return;
+    const s = doc.data() || {};
+    const parent = await ensureGuardianPhone(sid, s.name||"");
+    const wa = normalizePhoneToWA(parent);
+    if(!wa){
+      openModal("تنبيه", "لا يوجد رقم ولي أمر مسجل. راجع/ي المعلمة.");
+      return;
+    }
+    const msg = encodeURIComponent(
+      "السلام عليكم ورحمة الله وبركاته\n\n" +
+      "رقم الدخول (PIN) لبنك الرياضيات للطالب/ـة: " + (s.name||"") + "\n" +
+      "PIN: " + (s.pin||"") + "\n\n" +
+      "شاكرين تعاونكم 🤍"
+    );
+    const link = "https://wa.me/" + wa + "?text=" + msg;
+    window.open(link, "_blank");
+  }catch(e){
+    console.log(e);
+  }
+}
+
+// ===== بيانات عامة =====
+let classes=[], currentClassId=null, currentStudentId=null;
+
+// ===== إنشاء بيانات افتراضية =====
+async function ensureSeed(){
+  const c = await db.collection("classes").orderBy("order").get();
+  if(c.empty){
+    await db.collection("classes").add({name:"الصف سادس بنين",order:1});
+    await db.collection("classes").add({name:"الصف سادس بنات",order:2});
+    await db.collection("classes").add({name:"الصف الأول المتوسط",order:3});
+  }
+
+  const c2 = await db.collection("classes").orderBy("order").get();
+  const by = {};
+  c2.forEach(d=>by[d.data().name]=d.id);
+
+  const all = await db.collection("students").get();
+  const existing = new Set();
+  all.forEach(d=>{ const s=d.data(); if(s?.name) existing.add(String(s.name).trim()); });
+
+  for(const clsName of Object.keys(DEFAULT_STUDENTS)){
+    const classId = by[clsName];
+    if(!classId) continue;
+    for(const n0 of DEFAULT_STUDENTS[clsName]){
+      const n = String(n0).trim();
+      if(existing.has(n)) continue;
+      const pin=String(Math.floor(1000+Math.random()*9000));
+      await db.collection("students").add({
+        name:n,classId,active:true,balance:0,pin,openedAt:null,
+        guardianWhats:(PARENTS_PHONE[n]||"")
       });
-      const c = classes.find(x=>x.id===currentClassId);
-      if($("classTitle")) $("classTitle").textContent = c ? c.name : "الفصل";
+      existing.add(n);
     }
+  }
+}
 
-    async function addClass(){
-      const n=$("newClassName").value.trim();
-      if(!n) return warn("اكتب اسم الفصل");
-      const last=await db.collection("classes").orderBy("order","desc").limit(1).get();
-      const max= last.empty?0:(last.docs[0].data().order||0);
-      await db.collection("classes").add({name:n,order:max+1});
-      $("newClassName").value="";
-      await renderTabs();
-    }
-    async function renameClass(){
-      const c=classes.find(x=>x.id===currentClassId); if(!c) return;
-      const nn=prompt("الاسم الجديد للفصل:", c.name); if(!nn) return;
-      await db.collection("classes").doc(currentClassId).update({name: nn.trim()});
-      await renderTabs();
-    }
-    async function deleteClassMove(){
-      if(classes.length<=1) return warn("ما نقدر نحذف آخر فصل");
-      const others=classes.filter(c=>c.id!==currentClassId);
-      const destName=prompt("ننقل طلاب الفصل لأي فصل?\\n"+others.map(c=>c.name).join(" / "), others[0].name);
-      if(!destName) return;
-      const dest=classes.find(c=>c.name===destName); if(!dest) return warn("اسم الفصل غير موجود");
-      const studs=await db.collection("students").where("classId","==",currentClassId).get();
-      const batch=db.batch();
-      studs.forEach(d=>batch.update(db.collection("students").doc(d.id), {classId: dest.id}));
-      batch.delete(db.collection("classes").doc(currentClassId));
-      await batch.commit();
-      currentClassId=null;
-      await renderTabs();
-    }
-    async function syncStudentsToClasses(){
-      await ensureSeed();
-      openModal("تم ✅","تم تثبيت الأسماء (أو إضافة الناقص).",'<button class="btn" onclick="closeModal()">تمام</button>');
-      await renderTabs();
-    }
+// ===== تحميل الفصول =====
+async function loadClasses(){
+  const snap = await db.collection("classes").orderBy("order").get();
+  classes=[]; snap.forEach(d=>classes.push({id:d.id,...d.data()}));
+  if(!currentClassId) currentClassId = classes[0]?.id;
+}
+async function renderTabs(){
+  await loadClasses();
+  const tabs=$("classTabs"); tabs.innerHTML="";
+  classes.forEach(c=>{
+    const t=document.createElement("div");
+    t.className="tab"+(c.id===currentClassId?" active":"");
+    t.textContent=c.name;
+    t.onclick=()=>{ currentClassId=c.id; renderTabs(); };
+    tabs.appendChild(t);
+  });
+}
 
-    // ================== Teacher login ==================
-    function teacherLogin(){
-      if(($("tu").value||"").trim()==="teacher" && ($("tp").value||"").trim()==="12345"){
-        currentAccess="teacher";
-        hideAllPages();
-        show("classesPage");
-        renderTabs();
-      } else warn("بيانات الدخول غير صحيحة");
-    }
-    function forgotTeacher(){
-      const subject=encodeURIComponent("استرجاع بيانات دخول بنك الرياضيات");
-      const body=encodeURIComponent("السلام عليكم،\\nأرغب باسترجاع بيانات الدخول لبنك الرياضيات.\\nشكراً.");
-      window.location.href=`mailto:${TEACHER_EMAIL}?subject=${subject}&body=${body}`;
-    }
+// ===== إدارة الفصول =====
+async function addClass(){
+  const n=$("newClassName").value.trim();
+  if(!n) return warn("اكتب اسم الفصل");
+  const last=await db.collection("classes").orderBy("order","desc").limit(1).get();
+  const max= last.empty?0:(last.docs[0].data().order||0);
+  await db.collection("classes").add({name:n,order:max+1});
+  $("newClassName").value="";
+  await renderTabs();
+}
+async function renameClass(){
+  const c=classes.find(x=>x.id===currentClassId); if(!c) return;
+  const nn=prompt("الاسم الجديد للفصل:", c.name); if(!nn) return;
+  await db.collection("classes").doc(currentClassId).update({name: nn.trim()});
+  await renderTabs();
+}
+async function deleteClassMove(){
+  if(classes.length<=1) return warn("ما نقدر نحذف آخر فصل");
+  const others=classes.filter(c=>c.id!==currentClassId);
+  const destName=prompt("ننقل طلاب الفصل لأي فصل؟\n"+others.map(c=>c.name).join(" / "), others[0].name);
+  if(!destName) return;
+  const dest=classes.find(c=>c.name===destName); if(!dest) return warn("اسم الفصل غير موجود");
+  const studs=await db.collection("students").where("classId","==",currentClassId).get();
+  const batch=db.batch();
+  studs.forEach(d=>batch.update(db.collection("students").doc(d.id), {classId: dest.id}));
+  batch.delete(db.collection("classes").doc(currentClassId));
+  await batch.commit();
+  currentClassId=null;
+  await renderTabs();
+}
+async function syncStudentsToClasses(){
+  await ensureSeed();
+  openModal("تم ✅","تم تثبيت الأسماء (أو إضافة الناقص).");
+  await renderTabs();
+}
 
-    // ================== Student login ==================
-    async function forgotStudentPin(){
-      if(!isForgotEnabled()){
-        openModal("تنبيه","خدمة استرجاع الرقم السري موقوفة مؤقتًا. راجع/ي المعلمة 🌿");
-        return;
-      }
-      const name = ($("stuName")?.value || "").trim();
-      if(!name) return warn("اكتب/ي الاسم أولاً");
-      const snap = await db.collection("students").where("name","==",name).limit(1).get();
-      if(snap.empty) return warn("الاسم غير موجود");
-      const doc = snap.docs[0];
-      const s = doc.data() || {};
-      const parent = s.guardianWhats || (PARENTS_PHONE[s.name]||"");
-      const wa = normalizePhoneToWA(parent);
-      if(!wa) return openModal("تنبيه","لا يوجد رقم ولي أمر مسجل. تواصل/ي مع المعلمة.");
-      const msg =
-        "⚠️ رسالة تلقائية TEACHER_BANK_TITLE
-        "استرجاع الرقم السري (PIN) للطالب/ـة:(s.name||"") 
-        "PIN: " + (s.pin||"") 
-        "للتواصل مع المعلمة: contactLink() SIGNATURE;
+// ===== إدارة الطلاب =====
+async function addStudent(){
+  const n=$("newStudentName").value.trim();
+  if(!n) return warn("اكتب اسم الطالب");
+  const pin=String(Math.floor(1000+Math.random()*9000));
+  await db.collection("students").add({
+    name:n,classId:currentClassId,active:true,balance:0,pin,openedAt:null,
+    guardianWhats:(PARENTS_PHONE[n]||"")
+  });
+  $("newStudentName").value="";
+  await renderStudents();
+}
 
-      openWA(wa, msg);
-    }
+async function deleteStudent(studentId, studentName){
+  if(!confirm("تأكيد حذف الطالب: " + studentName + " ؟")) return;
+  try{
+    const sref = db.collection("students").doc(studentId);
+    const tx = await sref.collection("txns").limit(300).get();
+    const batch = db.batch();
+    tx.forEach(d=>batch.delete(d.ref));
+    batch.delete(sref);
+    await batch.commit();
+  }catch(e){
+    try{ await db.collection("students").doc(studentId).delete(); }catch(_){}
+  }
+  await renderStudents();
+}
 
-    async function studentLogin(){
-      try{
-        currentAccess="student";
-        const name = ($("stuName")?.value || "").trim();
-        const pin  = ($("stuPin")?.value || "").trim();
-        if(!name || !pin) return warn("اكتب/ي الاسم والرقم السري");
+// ===== logTxn (✅ تم تعديلها لضمان العمليات اليومية فورًا) =====
+async function logTxn(ref, type, reason, amount, balanceAfter, studentName, guardianWhats){
+  const dateKey = new Date().toISOString().slice(0,10); // YYYY-MM-DD
+  const createdAtClient = Date.now(); // ترتيب فوري
 
+  await ref.collection("txns").add({
+    type,
+    reason: reason || "",
+    amount,
+    balanceAfter,
+    studentName: studentName || "",
+    guardianWhats: guardianWhats || "",
+
+    // ✅ مهم جدًا للعمليات اليومية
+    dateKey,
+    createdAtClient,
+
+    // يبقى للعرض لاحقًا
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  });
+}
+
+async function renderStudents(){
+  const snap = await db.collection("students").where("classId","==",currentClassId).get();
+  const arr=[]; snap.forEach(d=>arr.push({id:d.id,...d.data()}));
+  arr.sort((a,b)=>(a.name||"").localeCompare(b.name||"","ar"));
+
+  const pick=$("pickStudent"); pick.innerHTML="";
+  arr.forEach(s=>{ const o=document.createElement("option"); o.value=s.id; o.textContent=s.name; pick.appendChild(o); });
+
+  const grid=$("studentsGrid"); grid.innerHTML="";
+  arr.forEach(s=>{
+    const card=document.createElement("div");
+    card.className="card";
+    card.innerHTML=`
+      <strong>${s.name}</strong>
+      <div class="small">الرصيد: ${fmt(s.balance)} ر.س</div>
+      <div class="small">PIN: <b>${s.pin||""}</b></div>
+      <span class="badge ${s.active?'on':'off'}">${s.active?'🟢 مفعل':'🔴 مقفل'}</span>
+      <div class="row" style="margin-top:8px">
+        <button class="btn2 col js-open">دخول الطالب</button>
+        <button class="btn3 col js-toggle">${s.active?'إقفال':'تفعيل'}</button>
+        <button class="btn3 col js-edit">تعديل الاسم</button>
+        <button class="btn3 col js-parent">رقم ولي الأمر</button>
+        <button class="btn whatsapp-btn col js-sendpin">إرسال PIN</button>
+        <button class="btnRed col js-del">حذف</button>
+      </div>
+    `;
+    card.querySelector(".js-open").onclick=()=>{ currentStudentId=s.id; showStudentLogin(s); };
+    card.querySelector(".js-toggle").onclick=async()=>{ await db.collection("students").doc(s.id).update({active:!s.active}); await renderStudents(); };
+    card.querySelector(".js-edit").onclick=async()=>{ const nn=prompt("الاسم الجديد:", s.name); if(nn) await db.collection("students").doc(s.id).update({name:nn.trim()}); await renderStudents(); };
+    if(card.querySelector(".js-parent")) card.querySelector(".js-parent").onclick=()=> editGuardianPhone(s.id, s.name);
+    if(card.querySelector(".js-sendpin")) card.querySelector(".js-sendpin").onclick=()=> sendPinToParent(s.id);
+    card.querySelector(".js-del").onclick=()=> deleteStudent(s.id, s.name);
+    grid.appendChild(card);
+  });
+}
+
+// ===== عمليات المعلمة =====
+async function depositAll(){
+  const a=parseFloat($("bulkAmount").value);
+  if(isNaN(a)||a<=0) return warn("اكتب مبلغ الإيداع للكل");
+  const studs=await db.collection("students").where("classId","==",currentClassId).get();
+
+  const batch=db.batch();
+  for(const d of studs.docs){
+    const s=d.data(); if(!s.active) continue;
+    batch.update(db.collection("students").doc(d.id), {balance:Number(s.balance||0)+a});
+  }
+  await batch.commit();
+
+  for(const d of studs.docs){
+    const s=d.data(); if(!s.active) continue;
+    await logTxn(
+      db.collection("students").doc(d.id),
+      "إيداع جماعي",
+      getReason("reasonTeacher","reasonOtherTeacher"),
+      a,
+      Number(s.balance||0)+a,
+      s.name,
+      s.guardianWhats||""
+    );
+  }
+  $("bulkAmount").value="";
+  await renderStudents();
+}
+
+async function withdrawAll(){
+  const a=parseFloat($("bulkWithdrawAmount").value);
+  if(isNaN(a)||a<=0) return warn("اكتب مبلغ السحب من الكل");
+  const studs=await db.collection("students").where("classId","==",currentClassId).get();
+
+  for(const d of studs.docs){
+    const s=d.data(); if(!s.active) continue;
+    if(Number(s.balance||0) < a) return warn("في طالب رصيده ما يكفي… قلل المبلغ");
+  }
+
+  const batch=db.batch();
+  for(const d of studs.docs){
+    const s=d.data(); if(!s.active) continue;
+    batch.update(db.collection("students").doc(d.id), {balance:Number(s.balance||0)-a});
+  }
+  await batch.commit();
+
+  for(const d of studs.docs){
+    const s=d.data(); if(!s.active) continue;
+    await logTxn(
+      db.collection("students").doc(d.id),
+      "سحب جماعي (معلمة)",
+      getReason("reasonTeacher","reasonOtherTeacher"),
+      a,
+      Number(s.balance||0)-a,
+      s.name,
+      s.guardianWhats||""
+    );
+  }
+  $("bulkWithdrawAmount").value="";
+  await renderStudents();
+}
+
+function lockedModal(studentName){
+  studentName = studentName || "";
+  const msg = encodeURIComponent(
+    "السلام عليكم ورحمة الله وبركاته\n\n" +
+    "أنا الطالبة/الطالب: " + studentName + "\n" +
+    "فضلاً أرجو تفعيل حسابي\n" +
+    "وأكون شاكرة لك 🌸"
+  );
+  const waLink = "https://wa.me/" + WHATSAPP_NUMBER + "?text=" + msg;
+
+  openModal(
+    "تنبيه",
+    "حياك الله 🤗🤍<br>حسابك مقفل مؤقتًا، لا تقلق/ـي.<br><br>للتفعيل تواصل/ـي مع المعلمة على دردشة تطبيق WhatsApp 👇",
+    '<a class="btn whatsapp-btn" href="' + waLink + '" target="_blank">📱 مراسلة WhatsApp</a>' +
+    '<button class="btn3" onclick="closeModal()">إغلاق</button>'
+  );
+}
+
+async function depositToStudent(){
+  const sid = $("pickStudent").value;
+  const a = parseFloat($("pickAmount").value);
+  if(!sid) return warn("اختر طالب");
+  if(isNaN(a) || a<=0) return warn("اكتب مبلغ");
+
+  const ref = db.collection("students").doc(sid);
+  const doc = await ref.get();
+  const s = doc.data();
+
+  if(!s.active){ playWelcome(); lockedModal(s.name); return; }
+
+  const nb = Number(s.balance||0) + a;
+  await ref.update({balance: nb});
+  await logTxn(ref, "إيداع (معلمة)", getReason("reasonTeacher","reasonOtherTeacher"), a, nb, s.name, s.guardianWhats||"");
+  $("pickAmount").value = "";
+  await renderStudents();
+}
+
+async function withdrawFromStudent(){
+  const sid = $("pickStudent").value;
+  const a = parseFloat($("pickAmount").value);
+  if(!sid) return warn("اختر طالب");
+  if(isNaN(a) || a<=0) return warn("اكتب مبلغ");
+
+  const ref = db.collection("students").doc(sid);
+  const doc = await ref.get();
+  const s = doc.data();
+
+  if(!s.active){ playWelcome(); lockedModal(s.name); return; }
+  if(Number(s.balance||0) < a) return warn("رصيده ما يكفي");
+
+  const nb = Number(s.balance||0) - a;
+  await ref.update({balance: nb});
+  await logTxn(ref, "سحب (معلمة)", getReason("reasonTeacher","reasonOtherTeacher"), a, nb, s.name, s.guardianWhats||"");
+  $("pickAmount").value = "";
+  await renderStudents();
+}
+
+// ===== دخول الطالب =====
+function showStudentLogin(s){
+  go("studentLoginPage");
+  $("stuLoginTitle").textContent="دخول الطالب – " + (classes.find(c=>c.id===currentClassId)?.name || "");
+  $("stuName").value=s.name;
+  $("stuName").readOnly = true;
+  $("stuPin").value="";
+  $("stuLocked").classList.add("hidden");
+
+  if(!s.active){
+    playWelcome();
+    lockedModal(s.name);
+  }
+}
+
+async function renderOpenedAt(){
+  const doc=await db.collection("students").doc(currentStudentId).get();
+  const s=doc.data();
+  $("openedAt").textContent = (s.openedAt && s.openedAt.toDate) ? s.openedAt.toDate().toLocaleString("ar-SA") : "—";
+}
+
+async function buildTransferList(){
+  const snap=await db.collection("students").get();
+  const arr=[]; snap.forEach(d=>arr.push({id:d.id,...d.data()}));
+  arr.sort((a,b)=>(a.name||"").localeCompare(b.name||"","ar"));
+  $("transferTo").innerHTML="";
+  arr.forEach(s=>{ if(s.id===currentStudentId) return; const o=document.createElement("option"); o.value=s.id; o.textContent=s.name; $("transferTo").appendChild(o); });
+}
+
+// ===== دخول الطالب (✅ يدعم رابط الطلاب) =====
+async function studentLogin(){
+  try{
+    // ✅ إذا رابط الطلاب: نحدد الطالب من sid أو الاسم
+    if(IS_STUDENT_MODE){
+      let sid = currentStudentId;
+
+      if(!sid){
+        const name = ($("stuName").value || "").trim();
+        if(!name) return warn("اكتب/ي اسمك");
         const snap = await db.collection("students").where("name","==",name).limit(1).get();
         if(snap.empty) return warn("الاسم غير مسجل بالنظام");
-        const doc = snap.docs[0];
-        currentStudentId = doc.id;
-        const s = doc.data() || {};
-
-        if(!s.active) return warn("الحساب مقفل");
-        if(String(pin) !== String(s.pin||"")) return warn("الرقم السري غلط");
-        if(!s.openedAt) await db.collection("students").doc(currentStudentId)
-          .update({openedAt: firebase.firestore.FieldValue.serverTimestamp()});
-
-        await playWelcome();
-
-        await openStudentAccount(s);
-      }catch(e){
-        console.log(e);
-        warn("صار خطأ… جرّبي مرة ثانية");
+        sid = snap.docs[0].id;
+        currentStudentId = sid;
       }
-    }
 
-    function calcTier(balance){
-      const b = Number(balance||0);
-      if(b >= 30000) return "💎 ألماسي";
-      if(b >= 25000) return "🔷 ماسي";
-      if(b >= 20000) return "🥇 ذهبي";
-      if(b >= 15000)  return "🥈 فضي";
-      return "🥉 برونزي";
-    }
+      const ref = db.collection("students").doc(sid);
+      const doc = await ref.get();
+      if(!doc.exists) return warn("الحساب غير موجود");
+      const s = doc.data() || {};
 
-    function makeBankCardNumber(studentId){
-      // produce deterministic-ish 16 digits from doc id
-      const raw = String(studentId||"").replace(/[^a-zA-Z0-9]/g,"");
-      let digits = "";
-      for(let i=0;i<raw.length;i++){
-        const c = raw.charCodeAt(i);
-        digits += String((c % 10));
-      }
-      while(digits.length < 16) digits += String(Math.floor(Math.random()*10));
-      digits = digits.slice(0,16);
-      return digits.replace(/(.{4})/g,"$1 ").trim();
-    }
+      if(!s.active){ lockedModal(s.name); return; }
+      if($("stuPin").value.trim()!==String(s.pin||"")) return warn("الرقم السري غلط");
+      if(!s.openedAt) await ref.update({openedAt: firebase.firestore.FieldValue.serverTimestamp()});
 
-    function makeAccountNumber(studentId){
-      const raw = String(studentId||"").slice(0,10).toUpperCase();
-      let out = raw.replace(/[^A-Z0-9]/g,"");
-      while(out.length < 10) out += String(Math.floor(Math.random()*10));
-      return "MB-" + out;
-    }
+      playWelcome();
 
-    function makeExp(){
-      const d = new Date();
-      const mm = String(((d.getMonth()+1)+11)%12 + 1).padStart(2,'0'); // 12 months ahead-ish
-      const yy = String((d.getFullYear()+1)%100).padStart(2,'0');
-      return mm + "/" + yy;
-    }
-
-    async function renderOpenedAt(){
-      const doc=await db.collection("students").doc(currentStudentId).get();
-      const s=doc.data() || {};
-      $("openedAt").textContent = (s.openedAt && s.openedAt.toDate) ? s.openedAt.toDate().toLocaleString("ar-SA") : "—";
-    }
-
-    async function buildTransferList(){
-      const snap=await db.collection("students").get();
-      const arr=[]; snap.forEach(d=>arr.push({id:d.id,...d.data()}));
-      arr.sort((a,b)=>(a.name||"").localeCompare(b.name||"","ar"));
-      $("transferTo").innerHTML="";
-      arr.forEach(s=>{ if(s.id===currentStudentId) return; const o=document.createElement("option"); o.value=s.id; o.textContent=s.name; $("transferTo").appendChild(o); });
-    }
-
-    async function openStudentAccount(s){
-      hideAllPages();
-      show("studentAccountPage");
-
-      $("studentHeader").textContent = s.name || "—";
-      $("studentSub").textContent = "حساب الطالب – واجهة بنكية";
-      $("statusBadge").className = "badge " + (s.active ? "on":"off");
-      $("statusBadge").textContent = s.active ? "🟢 نشط" : "🔴 مقفل";
-      $("studentBalance").textContent = fmt(s.balance);
-      const tier = s.tier || calcTier(s.balance);
-      $("tierLabel").textContent = tier;
-
-      // Card details
-      const cardNum = makeBankCardNumber(currentStudentId);
-      const exp = makeExp();
-      $("cardNumber").textContent = cardNum;
-      $("cardPin").textContent = "••••";
-      $("cardAcc").textContent = makeAccountNumber(currentStudentId);
-      $("cardHolder").textContent = (s.name || "—").toUpperCase();
-
-      $("detailName").textContent = s.name || "—";
-      $("detailAcc").textContent = makeAccountNumber(currentStudentId);
-      $("detailExp").textContent = exp;
-      $("detailPin").textContent = String(s.pin || "—");
+      go("studentAccountPage");
+      $("studentHeader").textContent=s.name;
+      $("statusBadge").className="badge "+(s.active?"on":"off");
+      $("statusBadge").textContent=s.active?"🟢 نشط":"🔴 مقفل";
+      $("studentBalance").textContent=fmt(s.balance);
 
       await renderOpenedAt();
       await buildTransferList();
-
-      setupReasonUI($("op").value,'reasonStudent','reasonOtherStudent');
       await showStatement();
-      await refreshWeekKPIs();
+      return;
     }
 
-    function backAfterStudent(){
-      // if student entered via link => back to student login; else teacher flow returns to class page
-      if(currentAccess === "student"){
-        hideAllPages();
-        show("studentLoginPage");
-        return;
-      }
-      hideAllPages();
-      show("classPage");
-      renderStudents();
-    }
-
-    function setMiniTab(paneId, el){
-      document.querySelectorAll(".miniTab").forEach(t=>t.classList.remove("active"));
-      el.classList.add("active");
-      document.querySelectorAll(".miniPane").forEach(p=>p.classList.remove("active"));
-      $(paneId).classList.add("active");
-    }
-
-    // ================== Teacher -> open class ==================
-    function backToClasses(){ hideAllPages(); show("classesPage"); renderTabs(); }
-    async function openClassPage(){
-      hideAllPages();
-      show("classPage");
-      selectedIds.clear();
-      if($("selAll")) $("selAll").checked=false;
-      await renderTabs();
-      await renderStudents();
-      initTeacherReasonAlways();
-    }
-
-    // ================== Student list (teacher) ==================
-    async function addStudent(){
-      const n=$("newStudentName").value.trim();
-      if(!n) return warn("اكتب اسم الطالب");
-      const pin=String(Math.floor(1000+Math.random()*9000));
-      await db.collection("students").add({
-        name:n,classId:currentClassId,active:true,balance:0,pin,openedAt:null,
-        guardianWhats:(PARENTS_PHONE[n]||"")
-      });
-      $("newStudentName").value="";
-      await renderStudents();
-    }
-
-    function updateSelCount(){
-      const el = $("selCount");
-      if(el) el.textContent = "المحدد: " + selectedIds.size;
-    }
-    function toggleSelectAll(){
-      const all = $("selAll")?.checked;
-      document.querySelectorAll('input[data-sel="stu"]').forEach(cb=>{
-        cb.checked = !!all;
-        const id = cb.getAttribute("data-id");
-        if(all) selectedIds.add(id); else selectedIds.delete(id);
-      });
-      updateSelCount();
-    }
-
-    async function deleteStudent(studentId, studentName){
-      if(!confirm("تأكيد حذف الطالب: " + studentName + " ؟")) return;
-      try{
-        const sref = db.collection("students").doc(studentId);
-        const tx = await sref.collection("txns").limit(300).get();
-        const batch = db.batch();
-        tx.forEach(d=>batch.delete(d.ref));
-        batch.delete(sref);
-        await batch.commit();
-      }catch(e){
-        try{ await db.collection("students").doc(studentId).delete(); }catch(_){}
-      }
-      selectedIds.delete(studentId);
-      updateSelCount();
-      await renderStudents();
-    }
-
-    async function renderStudents(){
-      const snap = await db.collection("students").where("classId","==",currentClassId).get();
-      const arr=[]; snap.forEach(d=>arr.push({id:d.id,...d.data()}));
-      arr.sort((a,b)=>(a.name||"").localeCompare(b.name||"","ar"));
-
-      const pick = $("pickStudent");
-      if(pick){
-        pick.innerHTML="";
-        arr.forEach(s=>{
-          const o=document.createElement("option");
-          o.value=s.id; o.textContent=s.name;
-          pick.appendChild(o);
-        });
-      }
-
-      const grid = $("studentsGrid");
-      if(!grid) return;
-      grid.innerHTML="";
-
-      arr.forEach(s=>{
-        const card = document.createElement("div");
-        card.className="card";
-        const isChecked = selectedIds.has(s.id);
-        const tierText = (s.tier || calcTier(s.balance)) || "";
-
-        card.innerHTML = `
-          <div class="row" style="align-items:center;justify-content:space-between">
-            <div style="display:flex;gap:10px;align-items:center">
-              <label class="small" style="display:flex;gap:8px;align-items:center">
-                <input type="checkbox" data-sel="stu" data-id="${s.id}" ${isChecked?'checked':''} style="width:auto"> اختيار
-              </label>
-              <span class="badge ${s.active?'on':'off'}">${s.active?'🟢 مفعل':'🔴 مقفل'}</span>
-            </div>
-            <div class="small" style="font-weight:1000;color:#0b2a66">${tierText}</div>
-          </div>
-
-          <div style="margin-top:8px">
-            <strong>${s.name || ""}</strong>
-            <div class="small">الرصيد: ${fmt(s.balance)} ر.س</div>
-            <div class="small">PIN: <b>${s.pin||""}</b></div>
-          </div>
-
-          <div class="row" style="margin-top:10px">
-            <button class="btn2 col js-open">دخول الطالب</button>
-            <button class="btn3 col js-toggle">${s.active?'إقفال':'تفعيل'}</button>
-            <button class="btn3 col js-edit">تعديل الاسم</button>
-            <button class="whatsapp-btn col js-sendpin">إرسال PIN</button>
-            <button class="btn2 col js-pdf">تقرير PDF</button>
-            <button class="btnRed col js-del">حذف</button>
-          </div>
-        `;
-
-        const cb = card.querySelector('input[data-sel="stu"]');
-        cb.onchange = ()=>{
-          if(cb.checked) selectedIds.add(s.id);
-          else selectedIds.delete(s.id);
-          updateSelCount();
-        };
-
-        card.querySelector(".js-open").onclick = async()=>{
-          currentAccess="teacher";
-          currentStudentId=s.id;
-          await openStudentAccount(s);
-        };
-        card.querySelector(".js-toggle").onclick = async()=>{
-          await db.collection("students").doc(s.id).update({active:!s.active});
-          await renderStudents();
-        };
-        card.querySelector(".js-edit").onclick = async()=>{
-          const nn = prompt("الاسم الجديد:", s.name);
-          if(nn) await db.collection("students").doc(s.id).update({name:nn.trim()});
-          await renderStudents();
-        };
-        card.querySelector(".js-sendpin").onclick = ()=> sendPinToParent(s.id);
-        card.querySelector(".js-pdf").onclick = ()=> downloadWeeklyStudentPDFForId(s.id);
-        card.querySelector(".js-del").onclick = ()=> deleteStudent(s.id, s.name);
-
-        grid.appendChild(card);
-      });
-
-      updateSelCount();
-    }
-
-    // ================== Parent phone + PIN ==================
-    async function ensureGuardianPhone(studentId, studentName){
-      const ref = db.collection("students").doc(studentId);
-      const doc = await ref.get();
-      if(!doc.exists) return "";
-      const s = doc.data() || {};
-      if(s.guardianWhats && String(s.guardianWhats).trim()) return String(s.guardianWhats).trim();
-      const guess = PARENTS_PHONE[studentName] || "";
-      if(guess){
-        await ref.update({guardianWhats: guess});
-        return guess;
-      }
-      return "";
-    }
-
-    async function sendPinToParent(studentId){
-      const ref = db.collection("students").doc(studentId);
-      const doc = await ref.get();
-      if(!doc.exists) return;
-      const s = doc.data() || {};
-      const parent = await ensureGuardianPhone(studentId, s.name||"");
-      const wa = normalizePhoneToWA(parent);
-      if(!wa){
-        openModal("تنبيه", "لا يوجد رقم ولي أمر مسجل.", '<button class="btn" onclick="closeModal()">تمام</button>');
-        return;
-      }
-      const msg =
-        "⚠️ رسالة تلقائية\\n" +
-        TEACHER_BANK_TITLE + "\\n\\n" +
-        "رقم الدخول (PIN) للطالب/ـة:\\n" + (s.name||"") + "\\n" +
-        "PIN: " + (s.pin||"") + "\\n\\n" +
-        "للتواصل مع المعلمة:\\n" + contactLink() + "\\n\\n" +
-        SIGNATURE;
-
-      openWA(wa, msg);
-    }
-
-    // ================== Txn log ==================
-    function localDateKeyFromDate(d){
-      const yyyy = d.getFullYear();
-      const mm = String(d.getMonth()+1).padStart(2,'0');
-      const dd = String(d.getDate()).padStart(2,'0');
-      return `${yyyy}-${mm}-${dd}`;
-    }
-    function localTodayKey(){ return localDateKeyFromDate(new Date()); }
-
-    async function logTxn(ref, type, reason, amount, balanceAfter, studentName, guardianWhats){
-      const dateKey = localTodayKey();
-      const createdAtClient = Date.now();
-
-      await ref.collection("txns").add({
-        type,
-        reason: reason || "",
-        amount,
-        balanceAfter,
-        studentName: studentName || "",
-        guardianWhats: guardianWhats || "",
-        dateKey,
-        createdAtClient,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      });
-    }
-
-    async function smartAutoSendWhats({type, studentName, amount, reason, guardianWhats}){
-      if(!isAutoWAEnabled()) return;
-
-      const parent = normalizePhoneToWA(guardianWhats || "");
-      if(!parent){
-        openModal("تنبيه","لا يوجد رقم ولي أمر مسجل لهذه العملية.", '<button class="btn" onclick="closeModal()">تمام</button>');
-        return;
-      }
-
-      const msg = buildOfficialMessage(type, studentName, amount, reason);
-      openWA(parent, msg);
-
-      if(isCopyEnabled()){
-        setTimeout(()=>{
-          openWA(CONTACT_PRIMARY, "نسخة للمعلمة ✅\\n\\n" + msg);
-        }, 1200);
-      }
-    }
-
-    // ================== Teacher ops ==================
-    async function depositAll(){
-      const a=parseFloat($("bulkAmount").value);
-      if(isNaN(a)||a<=0) return warn("اكتب مبلغ الإيداع للكل");
-      const studs=await db.collection("students").where("classId","==",currentClassId).get();
-
-      const batch=db.batch();
-      for(const d of studs.docs){
-        const s=d.data(); if(!s.active) continue;
-        batch.update(db.collection("students").doc(d.id), {balance:Number(s.balance||0)+a});
-      }
-      await batch.commit();
-
-      for(const d of studs.docs){
-        const s=d.data(); if(!s.active) continue;
-        const reason = getReason("reasonTeacher","reasonOtherTeacher");
-        await logTxn(db.collection("students").doc(d.id),"إيداع (معلمة)",reason,a,Number(s.balance||0)+a,s.name,s.guardianWhats||"");
-        await smartAutoSendWhats({type:"إيداع", studentName:s.name, amount:a, reason, guardianWhats:(s.guardianWhats||"")});
-      }
-      $("bulkAmount").value="";
-      await renderStudents();
-    }
-
-    async function withdrawAll(){
-      const a=parseFloat($("bulkWithdrawAmount").value);
-      if(isNaN(a)||a<=0) return warn("اكتب مبلغ السحب من الكل");
-      const studs=await db.collection("students").where("classId","==",currentClassId).get();
-
-      for(const d of studs.docs){
-        const s=d.data(); if(!s.active) continue;
-        if(Number(s.balance||0) < a) return warn("في طالب رصيده ما يكفي… قلل المبلغ");
-      }
-
-      const batch=db.batch();
-      for(const d of studs.docs){
-        const s=d.data(); if(!s.active) continue;
-        batch.update(db.collection("students").doc(d.id), {balance:Number(s.balance||0)-a});
-      }
-      await batch.commit();
-
-      for(const d of studs.docs){
-        const s=d.data(); if(!s.active) continue;
-        const reason = getReason("reasonTeacher","reasonOtherTeacher");
-        await logTxn(db.collection("students").doc(d.id),"سحب (معلمة)",reason,a,Number(s.balance||0)-a,s.name,s.guardianWhats||"");
-        await smartAutoSendWhats({type:"سحب", studentName:s.name, amount:a, reason, guardianWhats:(s.guardianWhats||"")});
-      }
-      $("bulkWithdrawAmount").value="";
-      await renderStudents();
-    }
-
-    async function depositToStudent(){
-      const sid = $("pickStudent").value;
-      const a = parseFloat($("pickAmount").value);
-      if(!sid) return warn("اختر طالب");
-      if(isNaN(a) || a<=0) return warn("اكتب مبلغ");
-
-      const ref = db.collection("students").doc(sid);
-      const doc = await ref.get();
-      const s = doc.data();
-      if(!s.active) return warn("حساب الطالب مقفل");
-
-      const nb = Number(s.balance||0) + a;
-      const reason = getReason("reasonTeacher","reasonOtherTeacher");
-      await ref.update({balance: nb});
-      await logTxn(ref,"إيداع (معلمة)",reason,a,nb,s.name,s.guardianWhats||"");
-      await smartAutoSendWhats({type:"إيداع", studentName:s.name, amount:a, reason, guardianWhats:(s.guardianWhats||"")});
-
-      $("pickAmount").value = "";
-      await renderStudents();
-    }
-
-    async function withdrawFromStudent(){
-      const sid = $("pickStudent").value;
-      const a = parseFloat($("pickAmount").value);
-      if(!sid) return warn("اختر طالب");
-      if(isNaN(a) || a<=0) return warn("اكتب مبلغ");
-
-      const ref = db.collection("students").doc(sid);
-      const doc = await ref.get();
-      const s = doc.data();
-      if(!s.active) return warn("حساب الطالب مقفل");
-      if(Number(s.balance||0) < a) return warn("رصيده ما يكفي");
-
-      const nb = Number(s.balance||0) - a;
-      const reason = getReason("reasonTeacher","reasonOtherTeacher");
-      await ref.update({balance: nb});
-      await logTxn(ref,"سحب (معلمة)",reason,a,nb,s.name,s.guardianWhats||"");
-      await smartAutoSendWhats({type:"سحب", studentName:s.name, amount:a, reason, guardianWhats:(s.guardianWhats||"")});
-
-      $("pickAmount").value = "";
-      await renderStudents();
-    }
-
-    async function depositSelected(){
-      const a = parseFloat($("pickAmount").value);
-      if(isNaN(a) || a<=0) return warn("اكتب مبلغ (في خانة المبلغ) للإيداع للمحددين");
-      if(selectedIds.size===0) return warn("ما تم اختيار طلاب");
-
-      const reason = getReason("reasonTeacher","reasonOtherTeacher");
-
-      for(const sid of selectedIds){
-        const ref = db.collection("students").doc(sid);
-        const doc = await ref.get();
-        if(!doc.exists) continue;
-        const s = doc.data();
-        if(!s.active) continue;
-        const nb = Number(s.balance||0) + a;
-        await ref.update({balance: nb});
-        await logTxn(ref,"إيداع (معلمة)",reason,a,nb,s.name,s.guardianWhats||"");
-        await smartAutoSendWhats({type:"إيداع", studentName:s.name, amount:a, reason, guardianWhats:(s.guardianWhats||"")});
-      }
-      await renderStudents();
-    }
-
-    async function withdrawSelected(){
-      const a = parseFloat($("pickAmount").value);
-      if(isNaN(a) || a<=0) return warn("اكتب مبلغ (في خانة المبلغ) للسحب من المحددين");
-      if(selectedIds.size===0) return warn("ما تم اختيار طلاب");
-
-      const reason = getReason("reasonTeacher","reasonOtherTeacher");
-
-      for(const sid of selectedIds){
-        const ref = db.collection("students").doc(sid);
-        const doc = await ref.get();
-        if(!doc.exists) continue;
-        const s = doc.data();
-        if(!s.active) continue;
-        if(Number(s.balance||0) < a) continue;
-        const nb = Number(s.balance||0) - a;
-        await ref.update({balance: nb});
-        await logTxn(ref,"سحب (معلمة)",reason,a,nb,s.name,s.guardianWhats||"");
-        await smartAutoSendWhats({type:"سحب", studentName:s.name, amount:a, reason, guardianWhats:(s.guardianWhats||"")});
-      }
-      await renderStudents();
-    }
-
-    // ================== Statement ==================
-    async function showStatement(){
-      const from=$("fromDate").value;
-      const to=$("toDate").value;
-
-      let q = db.collection("students").doc(currentStudentId).collection("txns")
-        .orderBy("createdAtClient","desc").limit(80);
-
-      if(from && to){
-        const fromMs = new Date(from + "T00:00:00").getTime();
-        const toMs   = new Date(to   + "T23:59:59").getTime();
-
-        q = db.collection("students").doc(currentStudentId).collection("txns")
-          .where("createdAtClient", ">=", fromMs)
-          .where("createdAtClient", "<=", toMs)
-          .orderBy("createdAtClient","desc")
-          .limit(250);
-      }
-
-      const snap=await q.get();
-      const rows=$("stmtRows"); rows.innerHTML="";
-      if(snap.empty){
-        rows.innerHTML='<tr><td colspan="5" class="small">ما فيه عمليات بهالفترة…</td></tr>';
-        return;
-      }
-      snap.forEach(d=>{
-        const x=d.data();
-        const t=x.createdAtClient ? new Date(x.createdAtClient).toLocaleString("ar-SA") : "";
-        const tr=document.createElement("tr");
-        tr.innerHTML=`<td>${t}</td><td>${x.type||""}</td><td>${x.reason||""}</td><td>${fmt(x.amount)}</td><td>${fmt(x.balanceAfter)}</td>`;
-        rows.appendChild(tr);
-      });
-    }
-
-    async function executeOp(){
-      const ref=db.collection("students").doc(currentStudentId);
-      const doc=await ref.get();
-      const s=doc.data();
-      const op=$("op").value;
-      const amt=parseFloat($("amt").value);
-
-      if(isNaN(amt) || amt<=0) return warn("اكتب مبلغ صحيح");
-      const reason = getReason("reasonStudent","reasonOtherStudent");
-
-      if(op==="deposit"){
-        const nb=Number(s.balance||0)+amt;
-        await ref.update({balance:nb});
-        await logTxn(ref, "إيداع", reason, amt, nb, s.name, s.guardianWhats||"");
-      }else if(op==="withdraw"){
-        if(Number(s.balance||0) < amt) return warn("الرصيد ما يكفي");
-        const nb=Number(s.balance||0)-amt;
-        await ref.update({balance:nb});
-        await logTxn(ref, "سحب", reason, amt, nb, s.name, s.guardianWhats||"");
-      }else if(op==="transfer"){
-        if(Number(s.balance||0) < amt) return warn("الرصيد ما يكفي للتحويل");
-        const toId=$("transferTo").value;
-        const toRef=db.collection("students").doc(toId);
-        const toDoc=await toRef.get();
-        if(!toDoc.exists) return warn("المستلم مو موجود");
-        const to=toDoc.data();
-
-        const batch=db.batch();
-        batch.update(ref, {balance:Number(s.balance||0)-amt});
-        batch.update(toRef, {balance:Number(to.balance||0)+amt});
-        await batch.commit();
-
-        await logTxn(ref, "تحويل إلى "+to.name, reason, amt, Number(s.balance||0)-amt, s.name, s.guardianWhats||"");
-        await logTxn(toRef, "تحويل من "+(s.name||"طالب"), reason, amt, Number(to.balance||0)+amt, to.name, to.guardianWhats||"");
-      }
-
-      $("amt").value="";
-      const updated=await ref.get();
-      $("studentBalance").textContent=fmt(updated.data().balance);
-      $("tierLabel").textContent = calcTier(updated.data().balance);
-
-      setupReasonUI($("op").value,'reasonStudent','reasonOtherStudent');
-      await showStatement();
-      await refreshWeekKPIs();
-    }
-
-    // ================== Stats (simple) ==================
-    function getWeekRange(endStr){
-      const end = endStr ? new Date(endStr+"T23:59:59") : new Date();
-      const day = end.getDay();
-      const diffToSat = (day - 6 + 7) % 7;
-      end.setDate(end.getDate() - diffToSat);
-
-      const start = new Date(end);
-      start.setDate(end.getDate() - 6);
-      start.setHours(0,0,0,0);
-
-      const end2 = new Date(end);
-      end2.setHours(23,59,59,999);
-      return { startMs: start.getTime(), endMs: end2.getTime() };
-    }
-
-    async function refreshWeekKPIs(){
-      const {startMs,endMs} = getWeekRange("");
-      const q = db.collection("students").doc(currentStudentId).collection("txns")
-        .where("createdAtClient", ">=", startMs)
-        .where("createdAtClient", "<=", endMs)
-        .orderBy("createdAtClient","desc")
-        .limit(400);
-
-      const snap = await q.get();
-      let dep=0,wit=0,count=0;
-      snap.forEach(d=>{
-        const x=d.data()||{};
-        count++;
-        const a=Number(x.amount||0);
-        const t=String(x.type||"");
-        if(t.includes("إيداع")) dep += a;
-        else if(t.includes("سحب")) wit += a;
-      });
-      const net = dep - wit;
-      $("kpiWeekCount").textContent = String(count);
-      $("kpiWeekDep").textContent = fmt(dep);
-      $("kpiWeekWith").textContent = fmt(wit);
-      $("kpiWeekNet").textContent = fmt(net);
-    }
-
-    // ================== PDF (fixed: always render visible in offscreen container) ==================
-    async function elementToPDF(el, filename){
-      const opt = {
-        margin: [8,8,8,8],
-        filename,
-        image: { type: "jpeg", quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, backgroundColor:"#ffffff" },
-        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
-      };
-      await new Promise(r=>setTimeout(r,120));
-      await html2pdf().set(opt).from(el).save();
-    }
-
-    async function buildStudentStatementPaper(){
-      const studDoc = await db.collection("students").doc(currentStudentId).get();
-      const s = studDoc.data() || {};
-      const tier = s.tier || calcTier(s.balance);
-
-      // get recent statement (limit 120)
-      const snap = await db.collection("students").doc(currentStudentId).collection("txns")
-        .orderBy("createdAtClient","desc").limit(120).get();
-
-      let rowsHtml="";
-      snap.forEach(d=>{
-        const x=d.data()||{};
-        const t=x.createdAtClient ? new Date(x.createdAtClient).toLocaleString("ar-SA") : "";
-        rowsHtml += `<tr>
-          <td>${t}</td>
-          <td>${x.type||""}</td>
-          <td>${x.reason||""}</td>
-          <td>${fmt(x.amount)}</td>
-          <td>${fmt(x.balanceAfter)}</td>
-        </tr>`;
-      });
-
-      const paper = document.createElement("div");
-      paper.className="pdfPaper";
-      paper.innerHTML = `
-        <div class="pdfHead">
-          <div class="pdfBrand">
-            <div class="pdfLogo"><img src="logo.png" alt="logo"></div>
-            <div>
-              <div class="pdfTitle">كشف حساب الطالب – بنك الرياضيات</div>
-              <div class="pdfSub">مدرسة رواد الشرق الأهلية • ${SIGNATURE}</div>
-              <div class="pdfSub">الطالب: <b>${s.name||"—"}</b> • نوع الحساب: <b>${tier}</b> • الرصيد الحالي: <b>${fmt(s.balance)}</b> ر.س</div>
-            </div>
-          </div>
-          <div class="seal">BANK<br>SEAL</div>
-        </div>
-
-        <hr style="border:0;border-top:1px solid #e5e7eb;margin:12px 0">
-
-        <div class="tableWrap">
-          <table>
-            <thead><tr><th>الوقت</th><th>العملية</th><th>السبب</th><th>المبلغ</th><th>الرصيد بعد العملية</th></tr></thead>
-            <tbody>
-              ${rowsHtml || `<tr><td colspan="5" style="padding:18px;color:#6b7280;font-weight:900">لا توجد عمليات.</td></tr>`}
-            </tbody>
-          </table>
-        </div>
-
-        <div class="sigRow">
-          <div class="sigBox">توقيع المعلمة<br>${SIGNATURE}</div>
-          <div class="sigBox" style="text-align:left;direction:ltr">Date<br>${new Date().toLocaleDateString("ar-SA")}</div>
-        </div>
-      `;
-      return paper;
-    }
-
-    async function downloadStudentStatementPDF(){
-      try{
-        const temp = $("pdfTemp");
-        temp.innerHTML="";
-        const paper = await buildStudentStatementPaper();
-        temp.appendChild(paper);
-        await elementToPDF(paper, `Statement_${($("studentHeader").textContent||"student").replace(/\\s+/g,"_")}.pdf`);
-        temp.innerHTML="";
-      }catch(e){
-        console.log(e);
-        openModal("تنبيه","تعذر إنشاء PDF الآن. تأكد/ي من السماح بفتح النوافذ أو جرب/ي مرة ثانية.",
-          '<button class="btn" onclick="closeModal()">تمام</button>');
-      }
-    }
-
-    // weekly PDF for teacher list
-    async function buildWeeklyStudentPaperFor(studentId, endStr){
-      const {startMs, endMs} = getWeekRange(endStr);
-      const studDoc = await db.collection("students").doc(studentId).get();
-      if(!studDoc.exists) throw new Error("Student not found");
-      const s = studDoc.data() || {};
-      const tier = s.tier || calcTier(s.balance);
-
-      const q = db.collection("students").doc(studentId).collection("txns")
-        .where("createdAtClient", ">=", startMs)
-        .where("createdAtClient", "<=", endMs)
-        .orderBy("createdAtClient","desc")
-        .limit(400);
-
-      const snap = await q.get();
-      let dep=0,wit=0,tr=0,count=0;
-      const rows = [];
-      snap.forEach(d=>{
-        const x=d.data()||{};
-        count++;
-        const a=Number(x.amount||0);
-        const t=String(x.type||"");
-        if(t.includes("إيداع")) dep += a;
-        else if(t.includes("سحب")) wit += a;
-        else if(t.includes("تحويل")) tr += a;
-        const time = x.createdAtClient ? new Date(x.createdAtClient).toLocaleString("ar-SA") : "";
-        rows.push(`<tr><td>${time}</td><td>${x.type||""}</td><td>${x.reason||""}</td><td>${fmt(x.amount)}</td><td>${fmt(x.balanceAfter)}</td></tr>`);
-      });
-      const net = dep - wit;
-
-      const paper = document.createElement("div");
-      paper.className="pdfPaper";
-      paper.innerHTML = `
-        <div class="pdfHead">
-          <div class="pdfBrand">
-            <div class="pdfLogo"><img src="logo.png" alt="logo"></div>
-            <div>
-              <div class="pdfTitle">التقرير الأسبوعي – بنك الرياضيات</div>
-              <div class="pdfSub">مدرسة رواد الشرق الأهلية • ${SIGNATURE}</div>
-              <div class="pdfSub">الطالب: <b>${s.name||"—"}</b> • نوع الحساب: <b>${tier}</b></div>
-            </div>
-          </div>
-          <div class="seal">BANK<br>SEAL</div>
-        </div>
-
-        <hr style="border:0;border-top:1px solid #e5e7eb;margin:12px 0">
-
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
-          <div class="card soft" style="margin:0"><div class="small">عدد العمليات</div><div style="font-weight:1000;color:#0b2a66;font-size:18px">${count}</div></div>
-          <div class="card soft" style="margin:0"><div class="small">إجمالي الإيداع</div><div style="font-weight:1000;color:#0b2a66;font-size:18px">${fmt(dep)}</div></div>
-          <div class="card soft" style="margin:0"><div class="small">إجمالي السحب</div><div style="font-weight:1000;color:#0b2a66;font-size:18px">${fmt(wit)}</div></div>
-          <div class="card soft" style="margin:0"><div class="small">إجمالي التحويلات</div><div style="font-weight:1000;color:#0b2a66;font-size:18px">${fmt(tr)}</div></div>
-          <div class="card soft" style="margin:0"><div class="small">الصافي</div><div style="font-weight:1000;color:#0b2a66;font-size:18px">${fmt(net)}</div></div>
-          <div class="card soft" style="margin:0"><div class="small">الرصيد الحالي</div><div style="font-weight:1000;color:#0b2a66;font-size:18px">${fmt(s.balance)}</div></div>
-        </div>
-
-        <hr style="border:0;border-top:1px solid #e5e7eb;margin:12px 0">
-
-        <div class="tableWrap">
-          <table>
-            <thead><tr><th>الوقت</th><th>العملية</th><th>السبب</th><th>المبلغ</th><th>الرصيد بعد العملية</th></tr></thead>
-            <tbody>
-              ${rows.slice(0,120).join("") || `<tr><td colspan="5" style="padding:18px;color:#6b7280;font-weight:900">لا توجد عمليات.</td></tr>`}
-            </tbody>
-          </table>
-        </div>
-
-        <div class="sigRow">
-          <div class="sigBox">توقيع المعلمة<br>${SIGNATURE}</div>
-          <div class="sigBox" style="text-align:left;direction:ltr">Date<br>${new Date().toLocaleDateString("ar-SA")}</div>
-        </div>
-      `;
-      return paper;
-    }
-
-    async function downloadWeeklyStudentPDFForId(studentId){
-      try{
-        const temp = $("pdfTemp");
-        temp.innerHTML="";
-        const paper = await buildWeeklyStudentPaperFor(studentId,"");
-        temp.appendChild(paper);
-        const studDoc = await db.collection("students").doc(studentId).get();
-        const s = studDoc.data() || {};
-        const name = (s.name || "student").replace(/\\s+/g,"_");
-        await elementToPDF(paper, `Weekly_Report_${name}.pdf`);
-        temp.innerHTML="";
-      }catch(e){
-        console.log(e);
-        openModal("تنبيه","تعذر إنشاء PDF لهذا الطالب الآن.", '<button class="btn" onclick="closeModal()">تمام</button>');
-      }
-    }
-
-    // ================== Start app ==================
-    async function startApp(){
-      // hide start overlay, show onboarding then go to login
-      $("startOverlay").classList.add("hidden");
-      showOnboarding(()=>{
-        hideAllPages();
-        if(IS_STUDENT_ENTRY){
-          show("studentLoginPage");
-          currentAccess="student";
-        }else{
-          show("teacherLoginPage");
-          currentAccess="teacher";
-        }
-      });
-    }
-
-    // ================== DOMContentLoaded ==================
-    document.addEventListener("DOMContentLoaded", async()=>{
-      // mode pill
-      $("modePill").textContent = IS_STUDENT_ENTRY ? "وضع: الطالب" : "وضع: المعلمة";
-      if(IS_STUDENT_ENTRY){
-        $("startMsg").innerHTML = "بوابة دخول الطلاب 👇<br>اضغط زر البداية ثم تابعي التعريف السريع.";
-      }
-
-      // forgot pin handler
-      const f = $("forgotPinLink");
-      if(f) f.addEventListener("click",(e)=>{ e.preventDefault(); forgotStudentPin(); });
-
-      const opSel = $("op");
-      if(opSel) opSel.addEventListener("change", ()=> setupReasonUI(opSel.value, "reasonStudent", "reasonOtherStudent"));
-
-      await loadForgotSetting();
-
-      try{
-        await ensureSeed();
-        await renderTabs();
-        $("connPill").textContent="جاهز ✅";
-      }catch(e){
-        console.log(e);
-        $("connPill").textContent="جاهز ✅";
-      }
-
-      initTeacherReasonAlways();
-      // keep start overlay visible until user presses start
-      // public footer visible always (under start overlay it's behind)
-    });
-  </script>
+    // ✅ وضع المعلمة (كما كان)
+    const ref=db.collection("students").doc(currentStudentId);
+    const doc=await ref.get();
+    const s=doc.data();
+
+    if(!s.active){ lockedModal(s.name); return; }
+    if($("stuPin").value.trim()!==String(s.pin||"")) return warn("الرقم السري غلط");
+    if(!s.openedAt) await ref.update({openedAt: firebase.firestore.FieldValue.serverTimestamp()});
+
+    playWelcome();
+
+    go("studentAccountPage");
+    $("studentHeader").textContent=s.name;
+    $("statusBadge").className="badge "+(s.active?"on":"off");
+    $("statusBadge").textContent=s.active?"🟢 نشط":"🔴 مقفل";
+    $("studentBalance").textContent=fmt(s.balance);
+
+    await renderOpenedAt();
+    await buildTransferList();
+    await showStatement();
+
+  }catch(e){
+    console.log(e);
+    warn("صار خطأ… جرّبي مرة ثانية");
+  }
+}
+
+// ===== كشف الحساب =====
+async function showStatement(){
+  const from=$("fromDate").value;
+  const to=$("toDate").value;
+
+  let q = db.collection("students").doc(currentStudentId).collection("txns")
+    .orderBy("createdAt","desc").limit(50);
+
+  if(from && to){
+    const fromD=new Date(from+"T00:00:00");
+    const toD=new Date(to+"T23:59:59");
+    q = db.collection("students").doc(currentStudentId).collection("txns")
+      .where("createdAt", ">=", fromD)
+      .where("createdAt", "<=", toD)
+      .orderBy("createdAt","desc")
+      .limit(100);
+  }
+
+  const snap=await q.get();
+  const rows=$("stmtRows"); rows.innerHTML="";
+  if(snap.empty){
+    rows.innerHTML='<tr><td colspan="5" class="small">ما فيه عمليات بهالفترة…</td></tr>';
+    return;
+  }
+  snap.forEach(d=>{
+    const x=d.data();
+    const t=x.createdAt?.toDate?x.createdAt.toDate().toLocaleString("ar-SA"):"";
+    const tr=document.createElement("tr");
+    tr.innerHTML=`<td>${t}</td><td>${x.type||""}</td><td>${x.reason||""}</td><td>${fmt(x.amount)}</td><td>${fmt(x.balanceAfter)}</td>`;
+    rows.appendChild(tr);
+  });
+}
+
+// ===== عمليات داخل حساب الطالب =====
+async function executeOp(){
+  const ref=db.collection("students").doc(currentStudentId);
+  const doc=await ref.get();
+  const s=doc.data();
+  const op=$("op").value;
+  const amt=parseFloat($("amt").value);
+  if(isNaN(amt)||amt<=0) return warn("اكتب مبلغ صحيح");
+
+  const reason = getReason("reasonStudent","reasonOtherStudent");
+
+  if(op==="deposit"){
+    const nb=Number(s.balance||0)+amt;
+    await ref.update({balance:nb});
+    await logTxn(ref, "إيداع", reason, amt, nb, s.name, s.guardianWhats||"");
+  }else if(op==="withdraw"){
+    if(Number(s.balance||0) < amt) return warn("الرصيد ما يكفي");
+    const nb=Number(s.balance||0)-amt;
+    await ref.update({balance:nb});
+    await logTxn(ref, "سحب", reason, amt, nb, s.name, s.guardianWhats||"");
+  }else if(op==="transfer"){
+    if(Number(s.balance||0) < amt) return warn("الرصيد ما يكفي للتحويل");
+    const toId=$("transferTo").value;
+    const toRef=db.collection("students").doc(toId);
+    const toDoc=await toRef.get();
+    if(!toDoc.exists) return warn("المستلم مو موجود");
+    const to=toDoc.data();
+
+    const batch=db.batch();
+    batch.update(ref, {balance:Number(s.balance||0)-amt});
+    batch.update(toRef, {balance:Number(to.balance||0)+amt});
+    await batch.commit();
+
+    await logTxn(ref, "تحويل إلى "+to.name, reason, amt, Number(s.balance||0)-amt, s.name, s.guardianWhats||"");
+    await logTxn(toRef, "تحويل من "+(doc.data().name||"طالب"), reason, amt, Number(to.balance||0)+amt, to.name, to.guardianWhats||"");
+  }
+
+  $("amt").value="";
+  const updated=await ref.get();
+  $("studentBalance").textContent=fmt(updated.data().balance);
+  await showStatement();
+}
+
+// ================== العمليات اليومية ==================
+let dailyOpsCache = [];
+
+async function loadDailyOps(){
+  const inp = document.getElementById("dailyDate");
+  const chosenStr = inp.value ? inp.value : new Date().toISOString().slice(0,10);
+  if(!inp.value) inp.value = chosenStr;
+
+  const snap = await db.collectionGroup("txns")
+    .where("dateKey", "==", chosenStr)
+    .orderBy("createdAtClient","desc")
+    .limit(300)
+    .get();
+
+  dailyOpsCache = [];
+  snap.forEach(doc => dailyOpsCache.push(doc.data() || {}));
+
+  renderDailyOps();
+}
+
+function renderDailyOps(){
+  const box = document.getElementById("dailyOpsList");
+  if(!dailyOpsCache.length){
+    box.innerHTML = '<div class="small">ما فيه عمليات في هذا التاريخ.</div>';
+    return;
+  }
+
+  box.innerHTML = dailyOpsCache.map(x=>{
+    const t = x.createdAt?.toDate
+      ? x.createdAt.toDate().toLocaleString("ar-SA")
+      : (x.createdAtClient ? new Date(x.createdAtClient).toLocaleString("ar-SA") : "");
+
+    return `
+      <div class="card" style="margin:8px 0">
+        <div><b>${x.studentName || "—"}</b></div>
+        <div class="small">الوقت: ${t}</div>
+        <div class="small">العملية: ${x.type || "—"}</div>
+        <div class="small">المبلغ: ${x.amount ?? ""} ر.س</div>
+        <div class="small">السبب: ${x.reason || "—"}</div>
+      </div>
+    `;
+  }).join("");
+}
+
+function formatTemplate(tpl, data){
+  return tpl
+    .replaceAll("{student}", data.student || "")
+    .replaceAll("{amount}", String(data.amount ?? ""))
+    .replaceAll("{reason}", data.reason || "—");
+}
+
+function buildDailyMessage(op){
+  const type = (op.type || "");
+  const data = {student: op.studentName || "", amount: op.amount, reason: op.reason || "—"};
+  if(type.includes("إيداع")) return formatTemplate(TEMPLATE_DEPOSIT, data);
+  if(type.includes("سحب")) return formatTemplate(TEMPLATE_WITHDRAW, data);
+  if(type.includes("تحويل")) return formatTemplate(TEMPLATE_TRANSFER, data);
+  return formatTemplate(TEMPLATE_TRANSFER, data);
+}
+
+function waLinkForOp(op){
+  const phone = normalizePhoneToWA(op.guardianWhats || "");
+  if(!phone) return "";
+  const msg = buildDailyMessage(op);
+  return "https://wa.me/" + phone + "?text=" + encodeURIComponent(msg);
+}
+
+function sendDailyOpsWhats(){
+  if(!dailyOpsCache.length){
+    openModal("تنبيه","لا توجد عمليات للإرسال.");
+    return;
+  }
+
+  const links = dailyOpsCache.map(waLinkForOp).filter(Boolean);
+  if(!links.length){
+    openModal("تنبيه","لا توجد أرقام أولياء أمور مسجلة لهذه العمليات.");
+    return;
+  }
+
+  const maxOpen = 10;
+  links.slice(0, maxOpen).forEach((l,i)=>{
+    setTimeout(()=> window.open(l, "_blank"), i*450);
+  });
+
+  if(links.length > maxOpen){
+    openModal("ملاحظة",
+      `تم فتح ${maxOpen} رسائل واتساب الآن.\nاضغط الزر مرة ثانية لإكمال الباقي.`,
+      '<button class="btn" onclick="closeModal()">موافق</button>'
+    );
+    dailyOpsCache = dailyOpsCache.slice(maxOpen);
+    renderDailyOps();
+  }
+}
+
+// ===== تهيئة عند التحميل =====
+document.addEventListener("DOMContentLoaded", () => {
+  // تعديل نص البداية فقط في رابط الطلاب (بدون تغيير تصميم)
+  if(IS_STUDENT_MODE){
+    const t = document.getElementById("startText");
+    if(t) t.innerHTML = "جاهزين نبدأ رحلة بنك الرياضيات للطلاب؟<br>اضغط زر البداية وننطلق 🚀";
+  }
+
+  const opSel = document.getElementById('op');
+  if(opSel){
+    setupReasonUI(opSel.value, 'reasonStudent', 'reasonOtherStudent');
+    opSel.addEventListener('change', ()=> setupReasonUI(opSel.value, 'reasonStudent', 'reasonOtherStudent'));
+  }
+  setupReasonUI('withdraw', 'reasonTeacher', 'reasonOtherTeacher');
+  loadForgotSetting();
+});
+
+// ===== تشغيل أولي =====
+(async()=>{
+  try{
+    await ensureSeed();
+    await renderTabs();
+    $("connPill").textContent="جاهز ✅";
+    $("connPill").style.background="#dff4e3";
+    $("connPill").style.color="#2e7d32";
+  }catch(e){
+    $("connPill").textContent="جاهز ✅";
+  }
+})();
+</script>
+
 </body>
 </html>
-"""
-path.write_text(html, encoding="utf-8")
-str(path), path.stat().st_size
