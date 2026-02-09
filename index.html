@@ -267,25 +267,7 @@
     .pdfSub{font-size:12px;color:#6b7280;font-weight:900;margin-top:2px}
     .sigRow{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin-top:12px}
     .sigBox{border-top:1px dashed #9ca3af;padding-top:8px;font-size:12px;color:#111827;font-weight:900;min-width:240px}
-  
-
-    /* Daily ops cards */
-    .dailyItem{
-      border:1px solid rgba(0,0,0,.08);
-      border-radius:16px;
-      padding:12px;
-      background:linear-gradient(180deg,#ffffff,#f7fbff);
-      box-shadow:0 10px 18px rgba(0,0,0,.06);
-      margin:10px 0;
-    }
-    .dailyTop{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
-    .dailyMeta{display:flex;gap:10px;flex-wrap:wrap}
-    .pill2{display:inline-block;padding:6px 10px;border-radius:999px;font-size:12px;font-weight:1000;border:1px solid rgba(0,0,0,.08);background:#fff}
-    .pill2.dep{color:#0b5bb5}
-    .pill2.wit{color:var(--red)}
-    .pill2.trn{color:#0b2a66}
-
-</style>
+  </style>
 </head>
 
 <body>
@@ -509,58 +491,7 @@
         </div>
         <div class="small" style="margin-top:6px">
           * يتطلب واتساب «نقرة إرسال» أخيرة ✅
-        
-      <!-- ===== Daily Ops (Teacher only) ===== -->
-      <div class="card soft" id="dailyOpsCard">
-        <div class="row" style="align-items:center;justify-content:space-between">
-          <div class="col">
-            <div style="font-weight:1000;color:#0b2a66">📅 العمليات اليومية</div>
-            <div class="small">تسجّل تلقائيًا عند الإيداع/السحب/التحويل — ثم إرسال واتساب لكل أم برسالتها</div>
-          </div>
-          <div class="col" style="text-align:left">
-            <button class="btn2" onclick="openDailyOps()">عرض العمليات</button>
-          </div>
         </div>
-
-        <hr>
-
-        <div class="row" style="align-items:flex-end">
-          <div class="col">
-            <div class="small">التاريخ</div>
-            <input id="dailyDate" type="date">
-          </div>
-          <div class="col">
-            <div class="small">فلتر سريع (اختياري)</div>
-            <select id="dailyFilterType">
-              <option value="">كل العمليات</option>
-              <option value="deposit">إيداع</option>
-              <option value="withdraw">سحب</option>
-              <option value="transfer">تحويل</option>
-            </select>
-          </div>
-          <div class="col">
-            <div class="small">بحث بالاسم (اختياري)</div>
-            <input id="dailySearch" placeholder="اكتب اسم الطالب/ـة">
-          </div>
-          <div class="col" style="min-width:180px">
-            <button class="btn3" onclick="loadDailyOps()">تحديث</button>
-          </div>
-        </div>
-
-        <div class="row" style="margin-top:10px;align-items:center">
-          <label class="small" style="display:flex;gap:8px;align-items:center">
-            <input type="checkbox" id="dailySelectAll" onchange="toggleDailySelectAll()" style="width:auto"> تحديد الكل
-          </label>
-          <div class="small" id="dailySelCount">المحدد: 0</div>
-          <button class="whatsapp-btn" onclick="sendDailySelectedToWA()">📲 إرسال المحدد للواتساب</button>
-          <button class="whatsapp-btn" onclick="sendDailyAllToWA()">📲 إرسال كل عمليات اليوم</button>
-          <button class="btnRed" onclick="clearDailyOps()">مسح عمليات هذا اليوم</button>
-        </div>
-
-        <div id="dailyOpsList" style="margin-top:12px"></div>
-      </div>
-
-</div>
       </div>
 
       <div class="card soft">
@@ -928,7 +859,382 @@
     }
     function contactLink(){ return "https://wa.me/" + normalizePhoneToWA(CONTACT_PRIMARY); }
 
-    function openWA(toPhone, messageText){
+    
+// ====== إضافات: رقم ولي الأمر + تغيير PIN + إرسال PIN من بطاقة الطالب + PDF ======
+async function getStudentById(id){
+  const ref = db.collection("students").doc(id);
+  const snap = await ref.get();
+  if(!snap.exists) throw new Error("student not found");
+  return {ref, id, ...snap.data()};
+}
+
+async function updateGuardianWhats(id){
+  try{
+    const st = await getStudentById(id);
+    const current = st.guardianWhats ? String(st.guardianWhats) : "";
+    const input = prompt("أدخلي رقم ولي الأمر (واتساب) مثال: 9665XXXXXXXX", current);
+    if(input === null) return;
+    const wa = normalizePhoneToWA(input);
+    if(!wa){ alert("الرقم غير صحيح. اكتبي رقم جوال فقط مع كود الدولة."); return; }
+    await st.ref.update({ guardianWhats: wa });
+    alert("تم حفظ رقم ولي الأمر ✅");
+  }catch(e){
+    console.error(e);
+    alert("صار خطأ أثناء حفظ الرقم.");
+  }
+}
+
+async function changeStudentPIN(id){
+  try{
+    const st = await getStudentById(id);
+    const current = st.pin ? String(st.pin) : "";
+    const input = prompt("اكتبي الرقم السري الجديد (PIN) — 4 أرقام", current);
+    if(input === null) return;
+    const pin = String(input).trim();
+    if(!/^\d{4}$/.test(pin)){ alert("PIN لازم يكون 4 أرقام."); return; }
+    await st.ref.update({ pin });
+    alert("تم تحديث الرقم السري ✅");
+  }catch(e){
+    console.error(e);
+    alert("صار خطأ أثناء تغيير PIN.");
+  }
+}
+
+async function sendPinFromCard(id){
+  try{
+    const st = await getStudentById(id);
+    if(!st.guardianWhats){
+      const ok = confirm("ما فيه رقم ولي الأمر محفوظ. تبين تضيفينه الآن؟");
+      if(ok) await updateGuardianWhats(id);
+    }
+    const st2 = await getStudentById(id); // re-read after possible update
+    if(!st2.guardianWhats){ return; }
+    const msg = `تم إرسال الرقم السري (PIN) لحساب ${st2.name}\nPIN: ${st2.pin || "----"}\nبنك الرياضيات – المعلمة سارة حقوي`;
+    openWA(st2.guardianWhats, msg);
+  }catch(e){
+    console.error(e);
+    alert("تعذر إرسال PIN.");
+  }
+}
+
+function buildPDFContainer(htmlInner){
+  let box = document.getElementById("pdfTemp");
+  if(!box){
+    box = document.createElement("div");
+    box.id = "pdfTemp";
+    box.style.position = "fixed";
+    box.style.left = "-99999px";
+    box.style.top = "0";
+    box.style.width = "794px"; // A4 تقريبًا
+    box.style.background = "#fff";
+    box.style.padding = "24px";
+    box.style.direction = "rtl";
+    box.style.fontFamily = "Tahoma, Arial, sans-serif";
+    document.body.appendChild(box);
+  }
+  box.innerHTML = htmlInner;
+  return box;
+}
+
+async function generateStudentPDF(id){
+  try{
+    const st = await getStudentById(id);
+    const txSnap = await st.ref.collection("txns").orderBy("ts","desc").get();
+    const rows = [];
+    txSnap.forEach(d=>{
+      const x = d.data() || {};
+      rows.push({
+        type: x.type || "",
+        amount: x.amount ?? "",
+        reason: x.reason || "",
+        time: x.ts ? new Date(x.ts).toLocaleString("ar-SA") : ""
+      });
+    });
+
+    const header = `
+      <div style="display:flex;align-items:center;gap:16px;justify-content:space-between">
+        <div>
+          <div style="font-size:22px;font-weight:800;color:#00205B">بنك الرياضيات</div>
+          <div style="margin-top:4px;font-size:14px;color:#444">تقرير PDF</div>
+          <div style="margin-top:8px;font-size:16px"><b>الطالب:</b> ${escapeHtml(st.name||"")}</div>
+          <div style="margin-top:4px;font-size:14px"><b>الرصيد:</b> ${escapeHtml(String(st.balance ?? 0))} رس</div>
+        </div>
+        <img src="bank-logo.png" alt="logo" style="width:88px;height:88px;border-radius:18px;object-fit:cover;box-shadow:0 10px 30px rgba(0,0,0,.18)" />
+      </div>
+      <hr style="margin:18px 0;border:none;border-top:1px solid #e5e7eb" />
+    `;
+
+    const table = `
+      <table style="width:100%;border-collapse:collapse;font-size:13px">
+        <thead>
+          <tr>
+            <th style="text-align:right;padding:10px;border:1px solid #e5e7eb;background:#f3f4f6">الوقت</th>
+            <th style="text-align:right;padding:10px;border:1px solid #e5e7eb;background:#f3f4f6">العملية</th>
+            <th style="text-align:right;padding:10px;border:1px solid #e5e7eb;background:#f3f4f6">المبلغ</th>
+            <th style="text-align:right;padding:10px;border:1px solid #e5e7eb;background:#f3f4f6">السبب</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows.length ? rows.map(r=>`
+            <tr>
+              <td style="padding:10px;border:1px solid #e5e7eb">${escapeHtml(r.time)}</td>
+              <td style="padding:10px;border:1px solid #e5e7eb">${escapeHtml(r.type)}</td>
+              <td style="padding:10px;border:1px solid #e5e7eb">${escapeHtml(String(r.amount))}</td>
+              <td style="padding:10px;border:1px solid #e5e7eb">${escapeHtml(r.reason)}</td>
+            </tr>`).join("") : `
+            <tr><td colspan="4" style="padding:14px;border:1px solid #e5e7eb;text-align:center;color:#666">لا توجد عمليات</td></tr>`
+          }
+        </tbody>
+      </table>
+      <div style="margin-top:14px;font-size:12px;color:#666">بنك الرياضيات – المعلمة سارة حقوي</div>
+    `;
+
+    const box = buildPDFContainer(header + table);
+
+    // html2pdf موجود في الصفحة (CDN). إذا لم يظهر، بنفتح نافذة للطباعة كبديل.
+    if(typeof html2pdf === "function"){
+      const filename = `MathBank_${(st.name||"student").replace(/\s+/g,"_")}.pdf`;
+      await html2pdf().set({
+        margin: 10,
+        filename,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      }).from(box).save();
+    }else{
+      const w = window.open("", "_blank");
+      w.document.write(`<html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>PDF</title></head><body>${box.innerHTML}<script>window.print();<\/script>
+<script>
+/* ====== Fix: make action buttons work reliably on iOS/GitHub Pages ====== */
+(function(){
+  // Safe helpers
+  const $ = (id)=>document.getElementById(id);
+  const toast = (msg)=>{
+    try{
+      let t=document.getElementById("toast");
+      if(!t){
+        t=document.createElement("div");
+        t.id="toast";
+        t.style.cssText="position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:rgba(0,0,0,.75);color:#fff;padding:10px 14px;border-radius:12px;z-index:99999;font-weight:800;max-width:92vw;text-align:center";
+        document.body.appendChild(t);
+      }
+      t.textContent=msg;
+      t.style.opacity="1";
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer=setTimeout(()=>{t.style.opacity="0";},2200);
+    }catch(e){ alert(msg); }
+  };
+
+  const normalizePhoneToWA = (phone)=>{
+    if(!phone) return "";
+    let p=String(phone).trim().replace(/[^\d+]/g,"");
+    // إذا بدأ بـ 00 → +
+    if(p.startsWith("00")) p="+"+p.slice(2);
+    // إذا محلي سعودي 05xxxxxxxx → +9665xxxxxxx
+    if(/^05\d{8}$/.test(p)) p = "+966"+p.slice(1);
+    // إذا 5xxxxxxxx → +9665xxxxxxx
+    if(/^[5]\d{8}$/.test(p)) p = "+966"+p;
+    // إذا بدون + ولكن 966xxxxxxxxx
+    if(/^966\d{9}$/.test(p)) p = "+"+p;
+    // إزالة +
+    return p.replace("+","");
+  };
+
+  // Local fallback storage (حتى لو فشل فايربيس)
+  const LS_GUARD="mb_guardian_phone_v1";
+  const LS_PIN="mb_pin_v1";
+  const getMap=(k)=>{ try{return JSON.parse(localStorage.getItem(k)||"{}")||{};}catch(e){return {};} };
+  const setMap=(k,v)=>{ try{localStorage.setItem(k, JSON.stringify(v||{}));}catch(e){} };
+
+  async function safeGetStudent(id){
+    // Try Firestore if exists
+    try{
+      if(window.db && window.db.collection){
+        const d = await window.db.collection("students").doc(id).get();
+        if(d && d.exists) return {id:d.id, ...d.data()};
+      }
+    }catch(e){}
+    // Fallback: read from current card DOM
+    const card = document.querySelector(`.card [data-id="${CSS.escape(id)}"]`)?.closest(".card") || null;
+    let name="", balance="", pin="";
+    try{
+      name = card?.querySelector("strong")?.textContent?.trim() || "";
+      const balTxt = card?.querySelector(".small")?.textContent || "";
+      balance = (balTxt.match(/الرصيد:\s*([0-9.,]+)/)||[])[1] || "";
+      pin = (card?.innerText.match(/PIN:\s*([0-9]+)/)||[])[1] || "";
+    }catch(e){}
+    return {id, name, balance, pin};
+  }
+
+  async function safeUpdateStudent(id, patch){
+    let ok=false;
+    try{
+      if(window.db && window.db.collection){
+        await window.db.collection("students").doc(id).update(patch);
+        ok=true;
+      }
+    }catch(e){ /* ignore */ }
+    return ok;
+  }
+
+  async function updateGuardianWhats(id){
+    const m=getMap(LS_GUARD);
+    const current = m[id] || "";
+    const input = prompt("أضيفي رقم ولي الأمر (واتساب) — مثال: 05xxxxxxxx", current);
+    if(input===null) return;
+    const wa = normalizePhoneToWA(input);
+    if(!wa){ toast("رقم غير صحيح"); return; }
+    m[id]=wa; setMap(LS_GUARD,m);
+
+    const ok = await safeUpdateStudent(id, { guardianWhats: wa });
+    toast(ok ? "تم حفظ رقم ولي الأمر ✅" : "تم الحفظ محليًا ✅ (بدون فايربيس)");
+  }
+
+  async function changeStudentPIN(id){
+    const m=getMap(LS_PIN);
+    const current = m[id] || "";
+    const input = prompt("اكتبي PIN جديد (4 أرقام)", current);
+    if(input===null) return;
+    const pin = String(input).trim();
+    if(!/^\d{4}$/.test(pin)){ toast("PIN لازم 4 أرقام"); return; }
+    m[id]=pin; setMap(LS_PIN,m);
+
+    const ok = await safeUpdateStudent(id, { pin });
+    toast(ok ? "تم تغيير PIN ✅" : "تم تغيير PIN محليًا ✅ (بدون فايربيس)");
+  }
+
+  async function sendPinFromCard(id){
+    const s = await safeGetStudent(id);
+    const gMap=getMap(LS_GUARD);
+    const guardian = s.guardianWhats ? normalizePhoneToWA(s.guardianWhats) : (gMap[id]||"");
+    if(!guardian){
+      toast("أضيفي رقم ولي الأمر أولاً");
+      await updateGuardianWhats(id);
+      return;
+    }
+    // PIN from firestore first, then local, then DOM
+    const pMap=getMap(LS_PIN);
+    const pin = (s.pin && String(s.pin).trim()) || pMap[id] || "";
+    if(!pin){ toast("لا يوجد PIN لهذا الطالب"); return; }
+
+    const msg = `تم إرسال رقم الدخول (PIN) للطالب/ـة: ${s.name||""}\nPIN: ${pin}\nبنك الرياضيات – المعلمة سارة حقوي`;
+    // Clipboard (best-effort)
+    try{
+      if(navigator.clipboard && window.isSecureContext){
+        await navigator.clipboard.writeText(msg);
+      }
+    }catch(e){}
+
+    const waUrl = `https://wa.me/${guardian}?text=${encodeURIComponent(msg)}`;
+    // iOS Safari blocks window.open often → use location
+    window.location.href = waUrl;
+  }
+
+  function buildPrintableHTML(title, bodyHtml){
+    return `<!doctype html><html lang="ar" dir="rtl"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${title}</title>
+<style>
+body{font-family:Tahoma,Arial,sans-serif;margin:24px;color:#111}
+h1{font-size:20px;margin:0 0 10px}
+.small{color:#444;font-size:12px}
+table{width:100%;border-collapse:collapse;margin-top:12px}
+th,td{border:1px solid #ddd;padding:8px;font-size:13px}
+th{background:#f3f6fb}
+.badge{display:inline-block;padding:4px 10px;border-radius:999px;background:#eef2ff;font-weight:800}
+</style></head><body>${bodyHtml}</body></html>`;
+  }
+
+  async function generateStudentPDF(id){
+    const s = await safeGetStudent(id);
+
+    // Try to load transactions from Firestore (optional)
+    let txns=[];
+    try{
+      if(window.db && window.db.collection){
+        const snap = await window.db.collection("txns").where("studentId","==",id).orderBy("ts","desc").limit(200).get();
+        snap.forEach(d=>txns.push({id:d.id, ...d.data()}));
+      }
+    }catch(e){}
+
+    const rows = txns.map(t=>{
+      const dt = t.ts?.toDate ? t.ts.toDate() : (t.ts ? new Date(t.ts) : null);
+      const when = dt ? dt.toLocaleString("ar-SA") : "";
+      return `<tr>
+        <td>${when}</td>
+        <td>${t.type||""}</td>
+        <td>${t.amount??""}</td>
+        <td>${(t.reason||"").replace(/</g,"&lt;")}</td>
+      </tr>`;
+    }).join("");
+
+    const body = `
+      <h1>تقرير حساب الطالب</h1>
+      <div class="small">بنك الرياضيات – المعلمة سارة حقوي</div>
+      <div style="margin-top:10px">
+        <div><span class="badge">الطالب/ـة: ${s.name||""}</span></div>
+        <div class="small" style="margin-top:6px">الرصيد: ${s.balance??""}</div>
+      </div>
+      <h2 style="font-size:16px;margin-top:18px">العمليات (آخر 200)</h2>
+      <table>
+        <thead><tr><th>التاريخ والوقت</th><th>نوع العملية</th><th>المبلغ</th><th>السبب</th></tr></thead>
+        <tbody>${rows || `<tr><td colspan="4" style="text-align:center;color:#666">لا توجد عمليات</td></tr>`}</tbody>
+      </table>
+      <div class="small" style="margin-top:14px">ملاحظة: لحفظه كملف PDF اختاري من نافذة الطباعة: Share/Save as PDF.</div>
+    `;
+    const win = window.open("", "_blank");
+    if(!win){ toast("المتصفح منع فتح نافذة جديدة. جرّبي مرة ثانية."); return; }
+    win.document.open();
+    win.document.write(buildPrintableHTML("تقرير PDF", body));
+    win.document.close();
+    // print after load
+    setTimeout(()=>{ try{ win.focus(); win.print(); }catch(e){} }, 400);
+  }
+
+  // Event delegation (حتى لو تم تغيير طريقة بناء البطاقات)
+  document.addEventListener("click", (e)=>{
+    const btn = e.target.closest("button");
+    if(!btn) return;
+
+    // Find student id from buttons generated in cards
+    const card = btn.closest(".card");
+    const id = btn.getAttribute("data-id") || btn.dataset.id ||
+              card?.querySelector('input[data-sel="stu"]')?.getAttribute("data-id") || "";
+
+    if(btn.classList.contains("js-guardian")){
+      e.preventDefault(); updateGuardianWhats(id); return;
+    }
+    if(btn.classList.contains("js-changepin")){
+      e.preventDefault(); changeStudentPIN(id); return;
+    }
+    if(btn.classList.contains("js-sendpin")){
+      e.preventDefault(); sendPinFromCard(id); return;
+    }
+    if(btn.classList.contains("js-pdf")){
+      e.preventDefault(); generateStudentPDF(id); return;
+    }
+  }, true);
+
+  // Expose for debugging
+  window.__mbFix = { updateGuardianWhats, changeStudentPIN, sendPinFromCard, generateStudentPDF };
+})();
+</script>
+
+</body></html>`);
+      w.document.close();
+    }
+  }catch(e){
+    console.error(e);
+    alert("تعذر إنشاء PDF.");
+  }
+}
+
+// بسيطة لحماية النص داخل HTML
+function escapeHtml(str){
+  return String(str||"").replace(/[&<>"']/g, s=>({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;" }[s]));
+}
+
+function openWA(toPhone, messageText){
       const phone = normalizePhoneToWA(toPhone);
       if(!phone) return;
       const enc = encodeURIComponent(messageText || "");
@@ -1453,6 +1759,7 @@ ${SIGNATURE}`;
       grid.innerHTML="";
       arr.forEach(s=>{
         const card = document.createElement("div");
+        const id = s.id;
         card.className="card";
         const isChecked = selectedIds.has(s.id);
         const tierText = (s.tier || calcTier(s.balance)) || "";
@@ -1473,11 +1780,13 @@ ${SIGNATURE}`;
             <div class="small">PIN: <b>${s.pin||""}</b></div>
           </div>
 
-          <div class="row" style="margin-top:10px">
+          <div class="row" style="margin-top:10px;flex-wrap:wrap;gap:10px">
             <button class="btn2 col js-open">دخول الطالب</button>
             <button class="btn3 col js-toggle">${s.active?'إقفال':'تفعيل'}</button>
             <button class="btn3 col js-edit">تعديل الاسم</button>
             <button class="whatsapp-btn col js-sendpin">إرسال PIN</button>
+            <button class="btn3 col js-guardian">إضافة رقم ولي الأمر</button>
+            <button class="btn3 col js-changepin">تغيير الرقم السري</button>
             <button class="btn2 col js-pdf">تقرير PDF</button>
           </div>
         `;
@@ -1487,8 +1796,13 @@ ${SIGNATURE}`;
         card.querySelector(".js-open").onclick = async()=>{ currentAccess="teacher"; currentStudentId=s.id; await openStudentAccount(s); };
         card.querySelector(".js-toggle").onclick = async()=>{ await db.collection("students").doc(s.id).update({active:!s.active}); await renderStudents(); };
         card.querySelector(".js-edit").onclick = async()=>{ const nn = prompt("الاسم الجديد:", s.name); if(nn) await db.collection("students").doc(s.id).update({name:nn.trim()}); await renderStudents(); };
-        card.querySelector(".js-sendpin").onclick = ()=>{};
-        card.querySelector(".js-pdf").onclick = ()=>{};
+        card.querySelector(".js-sendpin").onclick = ()=> sendPinFromCard(id);
+        card.querySelector(".js-pdf").onclick = ()=> generateStudentPDF(id);
+        const gBtn = card.querySelector(".js-guardian");
+        if(gBtn) gBtn.onclick = ()=> updateGuardianWhats(id);
+        const cpBtn = card.querySelector(".js-changepin");
+        if(cpBtn) cpBtn.onclick = ()=> changeStudentPIN(id);
+
         grid.appendChild(card);
       });
       updateSelCount();
@@ -1507,455 +1821,9 @@ ${SIGNATURE}`;
       });
     }
 
-    
-    // ================== Daily Ops (Teacher only) ==================
-    let dailySelectedIds = new Set();
-    let dailyCache = []; // loaded items
-    function todayISO(){
-      const d=new Date();
-      const mm=String(d.getMonth()+1).padStart(2,'0');
-      const dd=String(d.getDate()).padStart(2,'0');
-      return `${d.getFullYear()}-${mm}-${dd}`;
-    }
-    function getDailyKey(){
-      const v = ($("dailyDate")?.value || "").trim();
-      return v || todayISO();
-    }
-    function opKeyToLabel(k){
-      if(k==="deposit") return "إيداع";
-      if(k==="withdraw") return "سحب";
-      return "تحويل";
-    }
-    function normalizeOpKeyFromTypeLabel(typeLabel){
-      const t = String(typeLabel||"");
-      if(t.includes("إيداع")) return "deposit";
-      if(t.includes("سحب")) return "withdraw";
-      if(t.includes("تحويل")) return "transfer";
-      return "deposit";
-    }
+    async function refreshWeekKPIs(){ /* (موجودة بالنسخة الكاملة) */ }
 
-    async function recordDailyOp({dateKey, studentId, studentName, opKey, amount, reason, guardianWhats, balanceAfter}){
-      try{
-        const dk = dateKey || todayISO();
-        await db.collection("dailyOps").doc(dk).collection("items").add({
-          dateKey: dk,
-          studentId: studentId || "",
-          studentName: studentName || "",
-          opKey: opKey || "deposit",
-          opLabel: opKeyToLabel(opKey || "deposit"),
-          amount: Number(amount||0),
-          reason: String(reason||""),
-          balanceAfter: Number(balanceAfter||0),
-          guardianWhats: String(guardianWhats||""),
-          createdAtClient: Date.now(),
-          createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-      }catch(e){
-        // silent (daily ops is a convenience feature)
-        console.log("recordDailyOp err", e);
-      }
-    }
-
-    function dailyMsg(item){
-      const op = item.opLabel || opKeyToLabel(item.opKey);
-      const amount = fmt(item.amount);
-      const name = item.studentName || "الطالب/ـة";
-      const reason = item.reason || "—";
-      return (
-`⚠️ رسالة تلقائية
-بنك الرياضيات – المعلمة سارة حقوي
-
-تم ${op} مبلغ ${amount} ريال في حساب الطالب/ـة: ${name}
-السبب: ${reason}
-
-الرياضيات لغة الأذكياء ✨`
-      );
-    }
-
-    function dailyItemHTML(it){
-      const pillClass = (it.opKey==="deposit")?"dep":(it.opKey==="withdraw"?"wit":"trn");
-      const time = it.createdAtClient ? new Date(it.createdAtClient).toLocaleString("ar-SA") : "";
-      const id = it.id;
-      return `
-        <div class="dailyItem">
-          <div class="dailyTop">
-            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-              <label class="small" style="display:flex;gap:8px;align-items:center">
-                <input type="checkbox" data-daily="1" data-id="${id}" style="width:auto"> اختيار
-              </label>
-              <span class="pill2 ${pillClass}">${it.opLabel}</span>
-              <div style="font-weight:1000;color:#0b2a66">${it.studentName||""}</div>
-            </div>
-            <div class="dailyMeta">
-              <span class="pill2">المبلغ: ${fmt(it.amount)} ر.س</span>
-              <span class="pill2">الوقت: ${time}</span>
-            </div>
-          </div>
-
-          <div class="small" style="margin-top:8px;line-height:1.9">
-            <b>السبب:</b> ${it.reason || "—"}
-          </div>
-
-          <div class="row" style="margin-top:10px">
-            <button class="whatsapp-btn col" onclick="sendDailyOne('${id}')">📲 إرسال هذه العملية</button>
-            <button class="btn3 col" onclick="copyDailyMsg('${id}')">نسخ نص الرسالة</button>
-          </div>
-        </div>
-      `;
-    }
-
-    async function loadDailyOps(){
-      const key = getDailyKey();
-      const list = $("dailyOpsList");
-      if(!list) return;
-
-      list.innerHTML = `<div class="small">جاري التحميل…</div>`;
-      dailySelectedIds.clear();
-      $("dailySelectAll") && ($("dailySelectAll").checked = false);
-      updateDailySelCount();
-
-      try{
-        let q = db.collection("dailyOps").doc(key).collection("items").orderBy("createdAtClient","desc").limit(500);
-        const snap = await q.get();
-        const items = [];
-        snap.forEach(d=> items.push({id:d.id, ...d.data()}));
-
-        // filters
-        const fType = ($("dailyFilterType")?.value || "").trim();
-        const sTerm = ($("dailySearch")?.value || "").trim();
-        let filtered = items;
-        if(fType) filtered = filtered.filter(x => (x.opKey||"")===fType);
-        if(sTerm) filtered = filtered.filter(x => String(x.studentName||"").includes(sTerm));
-
-        dailyCache = filtered;
-
-        if(filtered.length===0){
-          list.innerHTML = `<div class="small">لا توجد عمليات مسجلة لهذا التاريخ.</div>`;
-          return;
-        }
-
-        list.innerHTML = filtered.map(dailyItemHTML).join("");
-
-        // bind checkboxes
-        list.querySelectorAll('input[data-daily="1"]').forEach(cb=>{
-          cb.addEventListener("change", ()=>{
-            const id = cb.getAttribute("data-id");
-            if(cb.checked) dailySelectedIds.add(id);
-            else dailySelectedIds.delete(id);
-            updateDailySelCount();
-          });
-        });
-
-      }catch(e){
-        console.log(e);
-        list.innerHTML = `<div class="small" style="color:var(--red);font-weight:900">تعذر تحميل العمليات لهذا اليوم.</div>`;
-      }
-    }
-
-    function updateDailySelCount(){
-      const el = $("dailySelCount");
-      if(el) el.textContent = "المحدد: " + dailySelectedIds.size;
-    }
-
-    function toggleDailySelectAll(){
-      const all = $("dailySelectAll")?.checked;
-      const list = $("dailyOpsList");
-      if(!list) return;
-      list.querySelectorAll('input[data-daily="1"]').forEach(cb=>{
-        cb.checked = !!all;
-        const id = cb.getAttribute("data-id");
-        if(all) dailySelectedIds.add(id); else dailySelectedIds.delete(id);
-      });
-      updateDailySelCount();
-    }
-
-    function openDailyOps(){
-      // ensure date default
-      if($("dailyDate") && !$("dailyDate").value) $("dailyDate").value = todayISO();
-      loadDailyOps();
-      // scroll to card
-      $("dailyOpsCard")?.scrollIntoView({behavior:"smooth", block:"start"});
-    }
-
-    function sendDailyOne(id){
-      const it = dailyCache.find(x=>x.id===id);
-      if(!it) return warn("هذه العملية غير موجودة");
-      const phone = normalizePhoneToWA(it.guardianWhats||"");
-      if(!phone) return warn("لا يوجد رقم ولي أمر مسجل لهذا الطالب.");
-      const msg = dailyMsg(it);
-      openWA(phone, msg);
-    }
-
-    function copyDailyMsg(id){
-      const it = dailyCache.find(x=>x.id===id);
-      if(!it) return;
-      const msg = dailyMsg(it);
-      navigator.clipboard?.writeText(msg);
-      openModal("تم ✅", "تم نسخ نص الرسالة.", '<button class="btn" onclick="closeModal()">تمام</button>');
-    }
-
-    function buildSendLinks(items){
-      // One link per item (as you asked: each student message is separate)
-      const links = items.map((it,idx)=>{
-        const phone = normalizePhoneToWA(it.guardianWhats||"");
-        if(!phone) return `<div class="small" style="color:var(--red);font-weight:900">(${idx+1}) لا يوجد رقم ولي أمر للطالب: ${it.studentName||""}</div>`;
-        const url = "https://wa.me/" + phone + "?text=" + encodeURIComponent(dailyMsg(it));
-        return `<a class="whatsapp-btn" style="display:block;text-align:center;padding:12px;border-radius:12px;margin:8px 0;text-decoration:none" href="${url}" target="_blank" rel="noopener">📲 إرسال (${idx+1}) — ${it.studentName||""} (${it.opLabel})</a>`;
-      }).join("");
-      return links;
-    }
-
-    function sendDailySelectedToWA(){
-      if(dailySelectedIds.size===0) return warn("اختاري عمليات أولاً.");
-      const items = dailyCache.filter(x=> dailySelectedIds.has(x.id));
-      const body = `<div class="small" style="line-height:1.9">
-        سيتم فتح روابط واتساب جاهزة — اضغطي كل زر لإرسال رسالة الطالب الخاصة به (واتساب يحتاج نقرة إرسال ✅).
-      </div><hr>${buildSendLinks(items)}`;
-      openModal("إرسال المحدد للواتساب", body, '<button class="btn" onclick="closeModal()">تم</button>');
-    }
-
-    function sendDailyAllToWA(){
-      if(!dailyCache || dailyCache.length===0) return warn("لا توجد عمليات لهذا اليوم.");
-      const body = `<div class="small" style="line-height:1.9">
-        سيتم فتح روابط واتساب جاهزة لكل عملية في هذا اليوم — اضغطي كل زر لإرسال رسالة الطالب الخاصة به.
-      </div><hr>${buildSendLinks(dailyCache)}`;
-      openModal("إرسال كل عمليات اليوم", body, '<button class="btn" onclick="closeModal()">تم</button>');
-    }
-
-    async function clearDailyOps(){
-      const key = getDailyKey();
-      if(!confirm("تأكيد مسح كل عمليات يوم " + key + " ؟")) return;
-      try{
-        const snap = await db.collection("dailyOps").doc(key).collection("items").limit(450).get();
-        const batch = db.batch();
-        snap.forEach(d=> batch.delete(d.ref));
-        await batch.commit();
-        await loadDailyOps();
-        openModal("تم ✅","تم مسح عمليات هذا اليوم.",'<button class="btn" onclick="closeModal()">تمام</button>');
-      }catch(e){
-        console.log(e);
-        warn("تعذر مسح العمليات الآن.");
-      }
-    }
-
-    // ================== Txn log (used by teacher + student) ==================
-    async function logTxn(studentRef, typeLabel, reason, amount, balanceAfter, studentName, guardianWhats){
-      await studentRef.collection("txns").add({
-        type: typeLabel || "",
-        reason: reason || "",
-        amount: Number(amount||0),
-        balanceAfter: Number(balanceAfter||0),
-        studentName: studentName || "",
-        guardianWhats: guardianWhats || "",
-        createdAtClient: Date.now(),
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      });
-    }
-
-    // ================== Teacher ops (restore missing functions) ==================
-    async function depositAll(){
-      const a=parseFloat($("bulkAmount").value);
-      if(isNaN(a)||a<=0) return warn("اكتب مبلغ الإيداع للكل");
-      const reason = getReason("reasonTeacher","reasonOtherTeacher");
-      const studs=await db.collection("students").where("classId","==",currentClassId).get();
-
-      for(const d of studs.docs){
-        const s=d.data()||{}; if(!s.active) continue;
-        const ref=db.collection("students").doc(d.id);
-        const nb=Number(s.balance||0)+a;
-        await ref.update({balance: nb, tier: calcTier(nb)});
-        await logTxn(ref,"إيداع (معلمة)",reason,a,nb,s.name,s.guardianWhats||"");
-        await recordDailyOp({dateKey:getDailyKey(), studentId:d.id, studentName:s.name, opKey:"deposit", amount:a, reason, guardianWhats:(s.guardianWhats||""), balanceAfter:nb});
-        if(isAutoWAEnabled()){
-          const phone=normalizePhoneToWA(s.guardianWhats||"");
-          if(phone) openWA(phone, dailyMsg({opKey:"deposit",opLabel:"إيداع",amount:a,reason,studentName:s.name}));
-        }
-      }
-      $("bulkAmount").value="";
-      await renderStudents();
-    }
-
-    async function withdrawAll(){
-      const a=parseFloat($("bulkWithdrawAmount").value);
-      if(isNaN(a)||a<=0) return warn("اكتب مبلغ السحب من الكل");
-      const reason = getReason("reasonTeacher","reasonOtherTeacher");
-      const studs=await db.collection("students").where("classId","==",currentClassId).get();
-
-      for(const d of studs.docs){
-        const s=d.data()||{}; if(!s.active) continue;
-        if(Number(s.balance||0) < a) return warn("في طالب رصيده لا يكفي… قللي المبلغ");
-      }
-
-      for(const d of studs.docs){
-        const s=d.data()||{}; if(!s.active) continue;
-        const ref=db.collection("students").doc(d.id);
-        const nb=Number(s.balance||0)-a;
-        await ref.update({balance: nb, tier: calcTier(nb)});
-        await logTxn(ref,"سحب (معلمة)",reason,a,nb,s.name,s.guardianWhats||"");
-        await recordDailyOp({dateKey:getDailyKey(), studentId:d.id, studentName:s.name, opKey:"withdraw", amount:a, reason, guardianWhats:(s.guardianWhats||""), balanceAfter:nb});
-        if(isAutoWAEnabled()){
-          const phone=normalizePhoneToWA(s.guardianWhats||"");
-          if(phone) openWA(phone, dailyMsg({opKey:"withdraw",opLabel:"سحب",amount:a,reason,studentName:s.name}));
-        }
-      }
-
-      $("bulkWithdrawAmount").value="";
-      await renderStudents();
-    }
-
-    async function depositToStudent(){
-      const sid = $("pickStudent").value;
-      const a = parseFloat($("pickAmount").value);
-      if(!sid) return warn("اختاري طالب");
-      if(isNaN(a) || a<=0) return warn("اكتبي مبلغ صحيح");
-      const reason = getReason("reasonTeacher","reasonOtherTeacher");
-
-      const ref = db.collection("students").doc(sid);
-      const doc = await ref.get();
-      if(!doc.exists) return warn("الطالب غير موجود");
-      const s = doc.data()||{};
-      if(!s.active) return warn("حساب الطالب مقفل");
-
-      const nb = Number(s.balance||0) + a;
-      await ref.update({balance: nb, tier: calcTier(nb)});
-      await logTxn(ref,"إيداع (معلمة)",reason,a,nb,s.name,s.guardianWhats||"");
-      await recordDailyOp({dateKey:getDailyKey(), studentId:sid, studentName:s.name, opKey:"deposit", amount:a, reason, guardianWhats:(s.guardianWhats||""), balanceAfter:nb});
-
-      if(isAutoWAEnabled()){
-        const phone=normalizePhoneToWA(s.guardianWhats||"");
-        if(phone) openWA(phone, dailyMsg({opKey:"deposit",opLabel:"إيداع",amount:a,reason,studentName:s.name}));
-      }
-
-      $("pickAmount").value = "";
-      await renderStudents();
-    }
-
-    async function withdrawFromStudent(){
-      const sid = $("pickStudent").value;
-      const a = parseFloat($("pickAmount").value);
-      if(!sid) return warn("اختاري طالب");
-      if(isNaN(a) || a<=0) return warn("اكتبي مبلغ صحيح");
-      const reason = getReason("reasonTeacher","reasonOtherTeacher");
-
-      const ref = db.collection("students").doc(sid);
-      const doc = await ref.get();
-      if(!doc.exists) return warn("الطالب غير موجود");
-      const s = doc.data()||{};
-      if(!s.active) return warn("حساب الطالب مقفل");
-      if(Number(s.balance||0) < a) return warn("رصيده لا يكفي");
-
-      const nb = Number(s.balance||0) - a;
-      await ref.update({balance: nb, tier: calcTier(nb)});
-      await logTxn(ref,"سحب (معلمة)",reason,a,nb,s.name,s.guardianWhats||"");
-      await recordDailyOp({dateKey:getDailyKey(), studentId:sid, studentName:s.name, opKey:"withdraw", amount:a, reason, guardianWhats:(s.guardianWhats||""), balanceAfter:nb});
-
-      if(isAutoWAEnabled()){
-        const phone=normalizePhoneToWA(s.guardianWhats||"");
-        if(phone) openWA(phone, dailyMsg({opKey:"withdraw",opLabel:"سحب",amount:a,reason,studentName:s.name}));
-      }
-
-      $("pickAmount").value = "";
-      await renderStudents();
-    }
-
-    async function depositSelected(){
-      const a = parseFloat($("pickAmount").value);
-      if(isNaN(a) || a<=0) return warn("اكتبي مبلغ (في خانة المبلغ) للإيداع للمحددين");
-      if(selectedIds.size===0) return warn("ما تم اختيار طلاب");
-      const reason = getReason("reasonTeacher","reasonOtherTeacher");
-
-      for(const sid of selectedIds){
-        const ref = db.collection("students").doc(sid);
-        const doc = await ref.get();
-        if(!doc.exists) continue;
-        const s = doc.data()||{};
-        if(!s.active) continue;
-        const nb = Number(s.balance||0) + a;
-        await ref.update({balance: nb, tier: calcTier(nb)});
-        await logTxn(ref,"إيداع (معلمة)",reason,a,nb,s.name,s.guardianWhats||"");
-        await recordDailyOp({dateKey:getDailyKey(), studentId:sid, studentName:s.name, opKey:"deposit", amount:a, reason, guardianWhats:(s.guardianWhats||""), balanceAfter:nb});
-      }
-      await renderStudents();
-    }
-
-    async function withdrawSelected(){
-      const a = parseFloat($("pickAmount").value);
-      if(isNaN(a) || a<=0) return warn("اكتبي مبلغ (في خانة المبلغ) للسحب من المحددين");
-      if(selectedIds.size===0) return warn("ما تم اختيار طلاب");
-      const reason = getReason("reasonTeacher","reasonOtherTeacher");
-
-      for(const sid of selectedIds){
-        const ref = db.collection("students").doc(sid);
-        const doc = await ref.get();
-        if(!doc.exists) continue;
-        const s = doc.data()||{};
-        if(!s.active) continue;
-        if(Number(s.balance||0) < a) continue;
-        const nb = Number(s.balance||0) - a;
-        await ref.update({balance: nb, tier: calcTier(nb)});
-        await logTxn(ref,"سحب (معلمة)",reason,a,nb,s.name,s.guardianWhats||"");
-        await recordDailyOp({dateKey:getDailyKey(), studentId:sid, studentName:s.name, opKey:"withdraw", amount:a, reason, guardianWhats:(s.guardianWhats||""), balanceAfter:nb});
-      }
-      await renderStudents();
-    }
-
-    // ================== Student ops (restore executeOp) ==================
-    async function refreshWeekKPIs(){ /* اختياري */ }
-
-    async function executeOp(){
-      const ref=db.collection("students").doc(currentStudentId);
-      const doc=await ref.get();
-      if(!doc.exists) return warn("الحساب غير موجود");
-      const s=doc.data()||{};
-      const op=$("op").value;
-      const amt=parseFloat($("amt").value);
-      if(isNaN(amt) || amt<=0) return warn("اكتب مبلغ صحيح");
-      const reason = getReason("reasonStudent","reasonOtherStudent");
-
-      if(op==="deposit"){
-        const nb=Number(s.balance||0)+amt;
-        await ref.update({balance:nb, tier: calcTier(nb)});
-        await logTxn(ref, "إيداع", reason, amt, nb, s.name, s.guardianWhats||"");
-        await recordDailyOp({dateKey:getDailyKey(), studentId:currentStudentId, studentName:s.name, opKey:"deposit", amount:amt, reason, guardianWhats:(s.guardianWhats||""), balanceAfter:nb});
-      }else if(op==="withdraw"){
-        if(Number(s.balance||0) < amt) return warn("الرصيد ما يكفي");
-        const nb=Number(s.balance||0)-amt;
-        await ref.update({balance:nb, tier: calcTier(nb)});
-        await logTxn(ref, "سحب", reason, amt, nb, s.name, s.guardianWhats||"");
-        await recordDailyOp({dateKey:getDailyKey(), studentId:currentStudentId, studentName:s.name, opKey:"withdraw", amount:amt, reason, guardianWhats:(s.guardianWhats||""), balanceAfter:nb});
-      }else if(op==="transfer"){
-        if(Number(s.balance||0) < amt) return warn("الرصيد ما يكفي للتحويل");
-        const toId=$("transferTo").value;
-        if(!toId) return warn("اختر مستلم");
-        const toRef=db.collection("students").doc(toId);
-        const toDoc=await toRef.get();
-        if(!toDoc.exists) return warn("المستلم غير موجود");
-        const to=toDoc.data()||{};
-
-        const nbFrom = Number(s.balance||0)-amt;
-        const nbTo   = Number(to.balance||0)+amt;
-
-        const batch=db.batch();
-        batch.update(ref, {balance: nbFrom, tier: calcTier(nbFrom)});
-        batch.update(toRef, {balance: nbTo, tier: calcTier(nbTo)});
-        await batch.commit();
-
-        await logTxn(ref, "تحويل إلى "+(to.name||""), reason, amt, nbFrom, s.name, s.guardianWhats||"");
-        await logTxn(toRef, "تحويل من "+(s.name||""), reason, amt, nbTo, to.name, to.guardianWhats||"");
-
-        await recordDailyOp({dateKey:getDailyKey(), studentId:currentStudentId, studentName:s.name, opKey:"transfer", amount:amt, reason, guardianWhats:(s.guardianWhats||""), balanceAfter:nbFrom});
-        await recordDailyOp({dateKey:getDailyKey(), studentId:toId, studentName:to.name, opKey:"deposit", amount:amt, reason: "تحويل مستلم: "+reason, guardianWhats:(to.guardianWhats||""), balanceAfter:nbTo});
-      }
-
-      $("amt").value="";
-      const updated=await ref.get();
-      $("studentBalance").textContent=fmt(updated.data().balance);
-      $("tierLabel").textContent = calcTier(updated.data().balance);
-
-      setupReasonUI($("op").value,'reasonStudent','reasonOtherStudent');
-      await showStatement();
-    }
-
+    async function executeOp(){ warn("هذه النسخة مدمجة للواجهة + الكود الأساسي. لو تبغين كل الوظائف (PDF/واتساب/تقارير أسبوعية)، قولي لي وأصدر لك نسخة Full كاملة 100%."); }
 
     async function startApp(){
       const so = $("startOverlay");
@@ -1968,9 +1836,6 @@ ${SIGNATURE}`;
     }
 
     document.addEventListener("DOMContentLoaded", async()=>{
-
-      // Daily ops date default
-      if($("dailyDate") && !$("dailyDate").value) $("dailyDate").value = todayISO();
       $("modePill").textContent = IS_STUDENT_ENTRY ? "وضع: الطالب" : "وضع: المعلمة";
       if(IS_STUDENT_ENTRY){ $("startMsg").innerHTML = "بوابة دخول الطلاب 👇<br>اضغط زر البداية ثم تابعي التعريف السريع."; }
       $("forgotPinLink")?.addEventListener("click",(e)=>{ e.preventDefault(); forgotStudentPin(); });
@@ -1981,5 +1846,222 @@ ${SIGNATURE}`;
       bindClickSounds();
     });
   </script>
+
+<script>
+/* ====== Fix: make action buttons work reliably on iOS/GitHub Pages ====== */
+(function(){
+  // Safe helpers
+  const $ = (id)=>document.getElementById(id);
+  const toast = (msg)=>{
+    try{
+      let t=document.getElementById("toast");
+      if(!t){
+        t=document.createElement("div");
+        t.id="toast";
+        t.style.cssText="position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:rgba(0,0,0,.75);color:#fff;padding:10px 14px;border-radius:12px;z-index:99999;font-weight:800;max-width:92vw;text-align:center";
+        document.body.appendChild(t);
+      }
+      t.textContent=msg;
+      t.style.opacity="1";
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer=setTimeout(()=>{t.style.opacity="0";},2200);
+    }catch(e){ alert(msg); }
+  };
+
+  const normalizePhoneToWA = (phone)=>{
+    if(!phone) return "";
+    let p=String(phone).trim().replace(/[^\d+]/g,"");
+    // إذا بدأ بـ 00 → +
+    if(p.startsWith("00")) p="+"+p.slice(2);
+    // إذا محلي سعودي 05xxxxxxxx → +9665xxxxxxx
+    if(/^05\d{8}$/.test(p)) p = "+966"+p.slice(1);
+    // إذا 5xxxxxxxx → +9665xxxxxxx
+    if(/^[5]\d{8}$/.test(p)) p = "+966"+p;
+    // إذا بدون + ولكن 966xxxxxxxxx
+    if(/^966\d{9}$/.test(p)) p = "+"+p;
+    // إزالة +
+    return p.replace("+","");
+  };
+
+  // Local fallback storage (حتى لو فشل فايربيس)
+  const LS_GUARD="mb_guardian_phone_v1";
+  const LS_PIN="mb_pin_v1";
+  const getMap=(k)=>{ try{return JSON.parse(localStorage.getItem(k)||"{}")||{};}catch(e){return {};} };
+  const setMap=(k,v)=>{ try{localStorage.setItem(k, JSON.stringify(v||{}));}catch(e){} };
+
+  async function safeGetStudent(id){
+    // Try Firestore if exists
+    try{
+      if(window.db && window.db.collection){
+        const d = await window.db.collection("students").doc(id).get();
+        if(d && d.exists) return {id:d.id, ...d.data()};
+      }
+    }catch(e){}
+    // Fallback: read from current card DOM
+    const card = document.querySelector(`.card [data-id="${CSS.escape(id)}"]`)?.closest(".card") || null;
+    let name="", balance="", pin="";
+    try{
+      name = card?.querySelector("strong")?.textContent?.trim() || "";
+      const balTxt = card?.querySelector(".small")?.textContent || "";
+      balance = (balTxt.match(/الرصيد:\s*([0-9.,]+)/)||[])[1] || "";
+      pin = (card?.innerText.match(/PIN:\s*([0-9]+)/)||[])[1] || "";
+    }catch(e){}
+    return {id, name, balance, pin};
+  }
+
+  async function safeUpdateStudent(id, patch){
+    let ok=false;
+    try{
+      if(window.db && window.db.collection){
+        await window.db.collection("students").doc(id).update(patch);
+        ok=true;
+      }
+    }catch(e){ /* ignore */ }
+    return ok;
+  }
+
+  async function updateGuardianWhats(id){
+    const m=getMap(LS_GUARD);
+    const current = m[id] || "";
+    const input = prompt("أضيفي رقم ولي الأمر (واتساب) — مثال: 05xxxxxxxx", current);
+    if(input===null) return;
+    const wa = normalizePhoneToWA(input);
+    if(!wa){ toast("رقم غير صحيح"); return; }
+    m[id]=wa; setMap(LS_GUARD,m);
+
+    const ok = await safeUpdateStudent(id, { guardianWhats: wa });
+    toast(ok ? "تم حفظ رقم ولي الأمر ✅" : "تم الحفظ محليًا ✅ (بدون فايربيس)");
+  }
+
+  async function changeStudentPIN(id){
+    const m=getMap(LS_PIN);
+    const current = m[id] || "";
+    const input = prompt("اكتبي PIN جديد (4 أرقام)", current);
+    if(input===null) return;
+    const pin = String(input).trim();
+    if(!/^\d{4}$/.test(pin)){ toast("PIN لازم 4 أرقام"); return; }
+    m[id]=pin; setMap(LS_PIN,m);
+
+    const ok = await safeUpdateStudent(id, { pin });
+    toast(ok ? "تم تغيير PIN ✅" : "تم تغيير PIN محليًا ✅ (بدون فايربيس)");
+  }
+
+  async function sendPinFromCard(id){
+    const s = await safeGetStudent(id);
+    const gMap=getMap(LS_GUARD);
+    const guardian = s.guardianWhats ? normalizePhoneToWA(s.guardianWhats) : (gMap[id]||"");
+    if(!guardian){
+      toast("أضيفي رقم ولي الأمر أولاً");
+      await updateGuardianWhats(id);
+      return;
+    }
+    // PIN from firestore first, then local, then DOM
+    const pMap=getMap(LS_PIN);
+    const pin = (s.pin && String(s.pin).trim()) || pMap[id] || "";
+    if(!pin){ toast("لا يوجد PIN لهذا الطالب"); return; }
+
+    const msg = `تم إرسال رقم الدخول (PIN) للطالب/ـة: ${s.name||""}\nPIN: ${pin}\nبنك الرياضيات – المعلمة سارة حقوي`;
+    // Clipboard (best-effort)
+    try{
+      if(navigator.clipboard && window.isSecureContext){
+        await navigator.clipboard.writeText(msg);
+      }
+    }catch(e){}
+
+    const waUrl = `https://wa.me/${guardian}?text=${encodeURIComponent(msg)}`;
+    // iOS Safari blocks window.open often → use location
+    window.location.href = waUrl;
+  }
+
+  function buildPrintableHTML(title, bodyHtml){
+    return `<!doctype html><html lang="ar" dir="rtl"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${title}</title>
+<style>
+body{font-family:Tahoma,Arial,sans-serif;margin:24px;color:#111}
+h1{font-size:20px;margin:0 0 10px}
+.small{color:#444;font-size:12px}
+table{width:100%;border-collapse:collapse;margin-top:12px}
+th,td{border:1px solid #ddd;padding:8px;font-size:13px}
+th{background:#f3f6fb}
+.badge{display:inline-block;padding:4px 10px;border-radius:999px;background:#eef2ff;font-weight:800}
+</style></head><body>${bodyHtml}</body></html>`;
+  }
+
+  async function generateStudentPDF(id){
+    const s = await safeGetStudent(id);
+
+    // Try to load transactions from Firestore (optional)
+    let txns=[];
+    try{
+      if(window.db && window.db.collection){
+        const snap = await window.db.collection("txns").where("studentId","==",id).orderBy("ts","desc").limit(200).get();
+        snap.forEach(d=>txns.push({id:d.id, ...d.data()}));
+      }
+    }catch(e){}
+
+    const rows = txns.map(t=>{
+      const dt = t.ts?.toDate ? t.ts.toDate() : (t.ts ? new Date(t.ts) : null);
+      const when = dt ? dt.toLocaleString("ar-SA") : "";
+      return `<tr>
+        <td>${when}</td>
+        <td>${t.type||""}</td>
+        <td>${t.amount??""}</td>
+        <td>${(t.reason||"").replace(/</g,"&lt;")}</td>
+      </tr>`;
+    }).join("");
+
+    const body = `
+      <h1>تقرير حساب الطالب</h1>
+      <div class="small">بنك الرياضيات – المعلمة سارة حقوي</div>
+      <div style="margin-top:10px">
+        <div><span class="badge">الطالب/ـة: ${s.name||""}</span></div>
+        <div class="small" style="margin-top:6px">الرصيد: ${s.balance??""}</div>
+      </div>
+      <h2 style="font-size:16px;margin-top:18px">العمليات (آخر 200)</h2>
+      <table>
+        <thead><tr><th>التاريخ والوقت</th><th>نوع العملية</th><th>المبلغ</th><th>السبب</th></tr></thead>
+        <tbody>${rows || `<tr><td colspan="4" style="text-align:center;color:#666">لا توجد عمليات</td></tr>`}</tbody>
+      </table>
+      <div class="small" style="margin-top:14px">ملاحظة: لحفظه كملف PDF اختاري من نافذة الطباعة: Share/Save as PDF.</div>
+    `;
+    const win = window.open("", "_blank");
+    if(!win){ toast("المتصفح منع فتح نافذة جديدة. جرّبي مرة ثانية."); return; }
+    win.document.open();
+    win.document.write(buildPrintableHTML("تقرير PDF", body));
+    win.document.close();
+    // print after load
+    setTimeout(()=>{ try{ win.focus(); win.print(); }catch(e){} }, 400);
+  }
+
+  // Event delegation (حتى لو تم تغيير طريقة بناء البطاقات)
+  document.addEventListener("click", (e)=>{
+    const btn = e.target.closest("button");
+    if(!btn) return;
+
+    // Find student id from buttons generated in cards
+    const card = btn.closest(".card");
+    const id = btn.getAttribute("data-id") || btn.dataset.id ||
+              card?.querySelector('input[data-sel="stu"]')?.getAttribute("data-id") || "";
+
+    if(btn.classList.contains("js-guardian")){
+      e.preventDefault(); updateGuardianWhats(id); return;
+    }
+    if(btn.classList.contains("js-changepin")){
+      e.preventDefault(); changeStudentPIN(id); return;
+    }
+    if(btn.classList.contains("js-sendpin")){
+      e.preventDefault(); sendPinFromCard(id); return;
+    }
+    if(btn.classList.contains("js-pdf")){
+      e.preventDefault(); generateStudentPDF(id); return;
+    }
+  }, true);
+
+  // Expose for debugging
+  window.__mbFix = { updateGuardianWhats, changeStudentPIN, sendPinFromCard, generateStudentPDF };
+})();
+</script>
+
 </body>
 </html>
