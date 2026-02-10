@@ -469,7 +469,6 @@
 
           <div class="forgotRow">
             <a href="javascript:void(0)" id="forgotPinLink">نسيت الرقم السري؟</a>
-            <a href="javascript:void(0)" id="changePinLink" style="color:#0b5bb5;font-weight:900;text-decoration:none">تغيير الرقم السري</a>
             <span class="small">اطلبه من ولي أمرك أو المعلمة</span>
           </div>
 
@@ -491,7 +490,7 @@
             <div class="small">إدارة الفصول والطلاب + إرسال إشعار واتساب + تقارير PDF</div>
           </div>
           <div class="col" style="text-align:left">
-            <button class="btn2" style="margin-left:8px" onclick="downloadBankReportPDF()">📄 تقرير شامل PDF</button><button class="btn3" onclick="logout()">تسجيل خروج</button>
+            <button class="btn3" onclick="logout()">تسجيل خروج</button>
           </div>
         </div>
       </div>
@@ -1471,31 +1470,25 @@ ${SIGNATURE}`;
           <div style="margin-top:8px">
             <strong>${s.name || ""}</strong>
             <div class="small">الرصيد: ${fmt(s.balance)} ر.س</div>
-            <div class="small">PIN: <b>${s.pin||""}</b> <span class="small" style="opacity:.8">(يمكن تغييره)</span></div>
-            <div class="small">ولي الأمر: <b style="direction:ltr;display:inline-block">${(s.guardianWhats||"—")}</b></div>
+            <div class="small">PIN: <b>${s.pin||""}</b></div>
           </div>
 
           <div class="row" style="margin-top:10px">
-            <div class="row" style="margin-top:10px">
             <button class="btn2 col js-open">دخول الطالب</button>
             <button class="btn3 col js-toggle">${s.active?'إقفال':'تفعيل'}</button>
             <button class="btn3 col js-edit">تعديل الاسم</button>
-            <button class="btn3 col js-phone">📞 رقم ولي الأمر</button>
-            <button class="btn3 col js-pin">🔐 تغيير PIN</button>
             <button class="whatsapp-btn col js-sendpin">إرسال PIN</button>
-            <button class="btn2 col js-pdf">📄 PDF الطالب</button>
+            <button class="btn2 col js-pdf">تقرير PDF</button>
           </div>
         `;
-        const cb = = card.querySelector('input[data-sel="stu"]');
+        const cb = card.querySelector('input[data-sel="stu"]');
         cb.onchange = ()=>{ cb.checked ? selectedIds.add(s.id) : selectedIds.delete(s.id); updateSelCount(); };
 
         card.querySelector(".js-open").onclick = async()=>{ currentAccess="teacher"; currentStudentId=s.id; await openStudentAccount(s); };
         card.querySelector(".js-toggle").onclick = async()=>{ await db.collection("students").doc(s.id).update({active:!s.active}); await renderStudents(); };
         card.querySelector(".js-edit").onclick = async()=>{ const nn = prompt("الاسم الجديد:", s.name); if(nn) await db.collection("students").doc(s.id).update({name:nn.trim()}); await renderStudents(); };
-        card.querySelector(".js-sendpin").onclick = ()=> sendPinToParent(s.id);
-        card.querySelector(".js-pdf").onclick = ()=> downloadStudentReportPDF(s.id);
-        card.querySelector(".js-phone").onclick = ()=> editGuardianPhone(s.id, s.name, s.guardianWhats||"");
-        card.querySelector(".js-pin").onclick = ()=> changeStudentPinAsTeacher(s.id, s.name);
+        card.querySelector(".js-sendpin").onclick = ()=>{};
+        card.querySelector(".js-pdf").onclick = ()=>{};
         grid.appendChild(card);
       });
       updateSelCount();
@@ -1965,370 +1958,16 @@ ${SIGNATURE}`;
 
 
     async function startApp(){
-      try{
-        const so = $("startOverlay");
-        if(so){ so.classList.add("hidden"); so.style.display="none"; }
-
-        const goNext = ()=>{
-          try{
-            hideAllPages();
-            if(IS_STUDENT_ENTRY){
-              show("studentLoginPage"); currentAccess="student";
-              setTimeout(()=>$("stuName")?.focus(),200);
-            }else{
-              show("teacherLoginPage"); currentAccess="teacher";
-              setTimeout(()=>$("tUser")?.focus(),200);
-            }
-          }catch(e){
-            console.log(e);
-            // fallback: show student login
-            document.querySelectorAll("main .page").forEach(p=>p.classList.add("hidden"));
-            $("studentLoginPage")?.classList.remove("hidden");
-          }
-        };
-
-        // onboarding may fail on some hosts—never block الدخول
-        try{ showOnboarding(goNext); }catch(e){ console.log(e); goNext(); }
-      }catch(e){
-        console.log(e);
-        document.querySelectorAll("main .page").forEach(p=>p.classList.add("hidden"));
-        $("studentLoginPage")?.classList.remove("hidden");
-      }
+      const so = $("startOverlay");
+      if(so){ so.classList.add("hidden"); so.style.display="none"; }
+      showOnboarding(()=>{
+        hideAllPages();
+        if(IS_STUDENT_ENTRY){ show("studentLoginPage"); currentAccess="student"; }
+        else{ show("teacherLoginPage"); currentAccess="teacher"; }
+      });
     }
 
-    
-    // ================== NEW: Guardian phone + PIN editing ==================
-    async function editGuardianPhone(studentId, studentName, current){
-      try{
-        const v = prompt("أدخلي رقم ولي الأمر (مثل 05xxxxxxxx):", current || "");
-        if(v===null) return;
-        const phone = String(v).trim();
-        await db.collection("students").doc(studentId).update({guardianWhats: phone});
-        openModal("تم ✅", "تم حفظ رقم ولي الأمر للطالب/ـة: " + (studentName||""), '<button class="btn" onclick="closeModal()">تمام</button>');
-        await renderStudents();
-      }catch(e){
-        console.log(e);
-        warn("تعذر حفظ رقم ولي الأمر الآن.");
-      }
-    }
-
-    async function changeStudentPinAsTeacher(studentId, studentName){
-      try{
-        const v = prompt("تغيير الرقم السري (PIN) للطالب/ـة: " + (studentName||"") + "\nاكتبي 4 أرقام:", "");
-        if(v===null) return;
-        const pin = String(v).trim();
-        if(!/^\d{4}$/.test(pin)) return warn("PIN يجب أن يكون 4 أرقام.");
-        await db.collection("students").doc(studentId).update({pin});
-        openModal("تم ✅", "تم تغيير PIN للطالب/ـة: " + (studentName||""), '<button class="btn" onclick="closeModal()">تمام</button>');
-        await renderStudents();
-      }catch(e){
-        console.log(e);
-        warn("تعذر تغيير PIN الآن.");
-      }
-    }
-
-    
-    async function sendPinToParent(studentId){
-      try{
-        const studDoc = await db.collection("students").doc(studentId).get();
-        if(!studDoc.exists) return warn("الطالب غير موجود");
-        const s = studDoc.data() || {};
-        const phoneRaw = (s.guardianWhats||"").trim();
-        if(!phoneRaw) return warn("لا يوجد رقم ولي أمر محفوظ لهذا الطالب.");
-        const wa = normalizePhoneToWA(phoneRaw);
-        if(!wa) return warn("رقم ولي الأمر غير صحيح.");
-        const msg =
-`🔐 بيانات دخول بنك الرياضيات
-الطالب/ـة: ${s.name||""}
-PIN: ${s.pin||""}
-
-بنك الرياضيات – ${SIGNATURE}`;
-        openWA(wa, msg);
-      }catch(e){
-        console.log(e);
-        warn("تعذر إرسال PIN الآن.");
-      }
-    }
-
-async function changePinSelf(){
-      try{
-        const name = ($("stuName")?.value || "").trim();
-        const oldPin = ($("stuPin")?.value || "").trim();
-        if(!name || !oldPin) return warn("اكتب/ي الاسم والرقم السري الحالي أولاً.");
-        const snap = await db.collection("students").where("name","==",name).limit(1).get();
-        if(snap.empty) return warn("الاسم غير مسجل بالنظام");
-        const doc = snap.docs[0];
-        const s = doc.data() || {};
-        if(String(oldPin) !== String(s.pin||"")) return warn("الرقم السري الحالي غير صحيح");
-        const v = prompt("اكتب/ي الرقم السري الجديد (PIN) — 4 أرقام:", "");
-        if(v===null) return;
-        const pin = String(v).trim();
-        if(!/^\d{4}$/.test(pin)) return warn("PIN يجب أن يكون 4 أرقام.");
-        await db.collection("students").doc(doc.id).update({pin});
-        openModal("تم ✅","تم تغيير الرقم السري بنجاح.", '<button class="btn" onclick="closeModal()">تمام</button>');
-        $("stuPin").value = "";
-      }catch(e){
-        console.log(e);
-        warn("تعذر تغيير الرقم السري الآن.");
-      }
-    }
-
-    // ================== NEW: Dates (Hijri + Gregorian) ==================
-    function getGregorianStr(d=new Date()){
-      try{ return d.toLocaleDateString("ar-SA", {year:"numeric", month:"long", day:"numeric"}); }catch(e){ return d.toLocaleDateString(); }
-    }
-    function getHijriStr(d=new Date()){
-      try{
-        // Islamic calendar in many browsers: ar-SA with islamic calendar extension
-        return new Intl.DateTimeFormat("ar-SA-u-ca-islamic", {year:"numeric", month:"long", day:"numeric"}).format(d);
-      }catch(e){
-        try{ return new Intl.DateTimeFormat("ar-SA", {year:"numeric", month:"long", day:"numeric"}).format(d); }catch(_){ return ""; }
-      }
-    }
-
-    // ================== NEW: PDF helpers (logo + stamp + signature) ==================
-    function ensurePdfTemp(){ const t = $("pdfTemp"); if(!t) throw new Error("pdfTemp missing"); t.innerHTML=""; return t; }
-
-    async function toPDF(node, filename){
-      const opt = {
-        margin: [8,8,8,8],
-        filename,
-        image: { type: "jpeg", quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, backgroundColor:"#ffffff" },
-        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
-      };
-      await new Promise(r=>setTimeout(r,120));
-      await html2pdf().set(opt).from(node).save();
-    }
-
-    function buildPdfHeader(title){
-      const now = new Date();
-      const greg = getGregorianStr(now);
-      const hijri = getHijriStr(now);
-      return `
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
-          <div style="display:flex;gap:10px;align-items:center">
-            <div style="width:64px;height:64px;border-radius:14px;overflow:hidden;border:1px solid rgba(0,0,0,.10);background:#fff;display:flex;align-items:center;justify-content:center">
-              <img src="logo.png" alt="logo" style="width:100%;height:100%;object-fit:cover">
-            </div>
-            <div>
-              <div style="font-weight:1000;color:#0b2a66;font-size:16px">${title}</div>
-              <div style="font-weight:900;color:#6b7280;font-size:12px;margin-top:2px">مدرسة رواد الشرق الأهلية • ${SIGNATURE}</div>
-              <div style="font-weight:900;color:#6b7280;font-size:12px;margin-top:2px">التاريخ: ${hijri} • ${greg}</div>
-            </div>
-          </div>
-          <div style="width:92px;height:92px;border-radius:999px;overflow:hidden;display:flex;align-items:center;justify-content:center">
-            <img src="stamp.png" alt="stamp" style="width:100%;height:100%;object-fit:contain;transform:rotate(-10deg)">
-          </div>
-        </div>
-      `;
-    }
-
-    function buildPdfFooter(){
-      return `
-        <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin-top:14px">
-          <div style="border-top:1px dashed #9ca3af;padding-top:8px;min-width:220px;font-weight:900;color:#111827;font-size:12px">
-            توقيع المعلمة
-            <div style="margin-top:6px;max-width:220px">
-              <img src="signature.png" alt="signature" style="width:100%;height:auto;object-fit:contain">
-            </div>
-          </div>
-          <div style="border-top:1px dashed #9ca3af;padding-top:8px;min-width:220px;font-weight:900;color:#111827;font-size:12px;text-align:left;direction:ltr">
-            Official Report
-          </div>
-        </div>
-      `;
-    }
-
-    async function downloadStudentReportPDF(studentId){
-      try{
-        const studDoc = await db.collection("students").doc(studentId).get();
-        if(!studDoc.exists) return warn("الطالب غير موجود");
-        const s = studDoc.data() || {};
-        const tier = s.tier || calcTier(s.balance);
-
-        const txSnap = await db.collection("students").doc(studentId).collection("txns")
-          .orderBy("createdAtClient","desc").limit(250).get();
-
-        let rows = "";
-        txSnap.forEach(d=>{
-          const x=d.data()||{};
-          const t=x.createdAtClient ? new Date(x.createdAtClient).toLocaleString("ar-SA") : "";
-          rows += `<tr>
-            <td style="padding:8px;border-bottom:1px solid #e5e7eb">${t}</td>
-            <td style="padding:8px;border-bottom:1px solid #e5e7eb">${x.type||""}</td>
-            <td style="padding:8px;border-bottom:1px solid #e5e7eb">${x.reason||""}</td>
-            <td style="padding:8px;border-bottom:1px solid #e5e7eb">${fmt(x.amount)}</td>
-            <td style="padding:8px;border-bottom:1px solid #e5e7eb">${fmt(x.balanceAfter)}</td>
-          </tr>`;
-        });
-
-        const wrap = document.createElement("div");
-        wrap.style.background="#fff";
-        wrap.style.border="1px solid #e5e7eb";
-        wrap.style.borderRadius="18px";
-        wrap.style.padding="14px";
-        wrap.style.fontFamily="Tahoma,Arial,sans-serif";
-        wrap.innerHTML = `
-          ${buildPdfHeader("تقرير الطالب – بنك الرياضيات")}
-          <hr style="border:0;border-top:1px solid #e5e7eb;margin:12px 0">
-          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px">
-            <div style="border:1px solid #eef2f7;border-radius:14px;padding:10px;background:#f7fbff">
-              <div style="font-weight:900;color:#6b7280;font-size:12px">اسم الطالب/ـة</div>
-              <div style="font-weight:1000;color:#0b2a66;font-size:16px;margin-top:4px">${s.name||"—"}</div>
-            </div>
-            <div style="border:1px solid #eef2f7;border-radius:14px;padding:10px;background:#f7fbff">
-              <div style="font-weight:900;color:#6b7280;font-size:12px">نوع الحساب</div>
-              <div style="font-weight:1000;color:#0b2a66;font-size:16px;margin-top:4px">${tier}</div>
-            </div>
-            <div style="border:1px solid #eef2f7;border-radius:14px;padding:10px;background:#f7fbff">
-              <div style="font-weight:900;color:#6b7280;font-size:12px">الرصيد الحالي</div>
-              <div style="font-weight:1000;color:#0b2a66;font-size:18px;margin-top:4px">${fmt(s.balance)} ر.س</div>
-            </div>
-            <div style="border:1px solid #eef2f7;border-radius:14px;padding:10px;background:#f7fbff">
-              <div style="font-weight:900;color:#6b7280;font-size:12px">رقم ولي الأمر</div>
-              <div style="font-weight:1000;color:#0b2a66;font-size:14px;margin-top:4px;direction:ltr;text-align:left">${(s.guardianWhats||"—")}</div>
-            </div>
-          </div>
-
-          <div style="margin-top:12px;border:1px solid #e6eef7;border-radius:14px;overflow:hidden">
-            <div style="padding:10px;background:#eef6ff;font-weight:1000;color:#0b2a66">سجل العمليات (آخر 250)</div>
-            <table style="width:100%;border-collapse:collapse;font-size:12px;text-align:center">
-              <thead>
-                <tr style="background:#f7fbff;color:#0b2a66">
-                  <th style="padding:8px;border-bottom:1px solid #e5e7eb">الوقت</th>
-                  <th style="padding:8px;border-bottom:1px solid #e5e7eb">العملية</th>
-                  <th style="padding:8px;border-bottom:1px solid #e5e7eb">السبب</th>
-                  <th style="padding:8px;border-bottom:1px solid #e5e7eb">المبلغ</th>
-                  <th style="padding:8px;border-bottom:1px solid #e5e7eb">الرصيد بعد العملية</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${rows || `<tr><td colspan="5" style="padding:14px;color:#6b7280;font-weight:900">لا توجد عمليات.</td></tr>`}
-              </tbody>
-            </table>
-          </div>
-
-          ${buildPdfFooter()}
-        `;
-
-        const temp = ensurePdfTemp();
-        temp.appendChild(wrap);
-        const file = `Student_Report_${(s.name||"student").replace(/\s+/g,"_")}.pdf`;
-        await toPDF(wrap, file);
-        temp.innerHTML="";
-      }catch(e){
-        console.log(e);
-        warn("تعذر إنشاء PDF الآن. تأكد/ي من السماح بفتح النوافذ أو جرّبي مرة ثانية.");
-      }
-    }
-
-    async function downloadBankReportPDF(){
-      try{
-        const clsSnap = await db.collection("classes").orderBy("order").get();
-        const clsById = {};
-        clsSnap.forEach(d=>{ clsById[d.id]=d.data()?.name||""; });
-
-        const studSnap = await db.collection("students").get();
-        const students = [];
-        studSnap.forEach(d=>students.push({id:d.id, ...(d.data()||{})}));
-        students.sort((a,b)=>(a.name||"").localeCompare(b.name||"","ar"));
-
-        let rows = "";
-        students.forEach(s=>{
-          rows += `<tr>
-            <td style="padding:8px;border-bottom:1px solid #e5e7eb">${clsById[s.classId]||"—"}</td>
-            <td style="padding:8px;border-bottom:1px solid #e5e7eb">${s.name||""}</td>
-            <td style="padding:8px;border-bottom:1px solid #e5e7eb">${calcTier(s.balance)}</td>
-            <td style="padding:8px;border-bottom:1px solid #e5e7eb">${fmt(s.balance)}</td>
-            <td style="padding:8px;border-bottom:1px solid #e5e7eb;direction:ltr;text-align:left">${(s.guardianWhats||"—")}</td>
-          </tr>`;
-        });
-
-        // Daily operations (today by dateKey if available)
-        const todayKey = (function(){
-          const d=new Date();
-          const yyyy=d.getFullYear(), mm=String(d.getMonth()+1).padStart(2,'0'), dd=String(d.getDate()).padStart(2,'0');
-          return `${yyyy}-${mm}-${dd}`;
-        })();
-
-        let dayRows = "";
-        try{
-          const tx = await db.collectionGroup("txns").where("dateKey","==",todayKey).orderBy("createdAtClient","desc").limit(250).get();
-          tx.forEach(d=>{
-            const x=d.data()||{};
-            const t=x.createdAtClient ? new Date(x.createdAtClient).toLocaleString("ar-SA") : "";
-            dayRows += `<tr>
-              <td style="padding:8px;border-bottom:1px solid #e5e7eb">${t}</td>
-              <td style="padding:8px;border-bottom:1px solid #e5e7eb">${x.studentName||""}</td>
-              <td style="padding:8px;border-bottom:1px solid #e5e7eb">${x.type||""}</td>
-              <td style="padding:8px;border-bottom:1px solid #e5e7eb">${x.reason||""}</td>
-              <td style="padding:8px;border-bottom:1px solid #e5e7eb">${fmt(x.amount)}</td>
-            </tr>`;
-          });
-        }catch(_){ /* ignore */ }
-
-        const wrap = document.createElement("div");
-        wrap.style.background="#fff";
-        wrap.style.border="1px solid #e5e7eb";
-        wrap.style.borderRadius="18px";
-        wrap.style.padding="14px";
-        wrap.style.fontFamily="Tahoma,Arial,sans-serif";
-        wrap.innerHTML = `
-          ${buildPdfHeader("تقرير شامل – بنك الرياضيات")}
-          <hr style="border:0;border-top:1px solid #e5e7eb;margin:12px 0">
-
-          <div style="border:1px solid #e6eef7;border-radius:14px;overflow:hidden">
-            <div style="padding:10px;background:#eef6ff;font-weight:1000;color:#0b2a66">ملخص الطلاب (كل البنك)</div>
-            <table style="width:100%;border-collapse:collapse;font-size:12px;text-align:center">
-              <thead>
-                <tr style="background:#f7fbff;color:#0b2a66">
-                  <th style="padding:8px;border-bottom:1px solid #e5e7eb">الفصل</th>
-                  <th style="padding:8px;border-bottom:1px solid #e5e7eb">الطالب/ـة</th>
-                  <th style="padding:8px;border-bottom:1px solid #e5e7eb">نوع الحساب</th>
-                  <th style="padding:8px;border-bottom:1px solid #e5e7eb">الرصيد</th>
-                  <th style="padding:8px;border-bottom:1px solid #e5e7eb">رقم ولي الأمر</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${rows || `<tr><td colspan="5" style="padding:14px;color:#6b7280;font-weight:900">لا توجد بيانات.</td></tr>`}
-              </tbody>
-            </table>
-          </div>
-
-          <div style="margin-top:12px;border:1px solid #e6eef7;border-radius:14px;overflow:hidden">
-            <div style="padding:10px;background:#eef6ff;font-weight:1000;color:#0b2a66">عمليات اليوم (${todayKey}) – آخر 250</div>
-            <table style="width:100%;border-collapse:collapse;font-size:12px;text-align:center">
-              <thead>
-                <tr style="background:#f7fbff;color:#0b2a66">
-                  <th style="padding:8px;border-bottom:1px solid #e5e7eb">الوقت</th>
-                  <th style="padding:8px;border-bottom:1px solid #e5e7eb">الطالب/ـة</th>
-                  <th style="padding:8px;border-bottom:1px solid #e5e7eb">العملية</th>
-                  <th style="padding:8px;border-bottom:1px solid #e5e7eb">السبب</th>
-                  <th style="padding:8px;border-bottom:1px solid #e5e7eb">المبلغ</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${dayRows || `<tr><td colspan="5" style="padding:14px;color:#6b7280;font-weight:900">لا توجد عمليات مسجلة اليوم.</td></tr>`}
-              </tbody>
-            </table>
-          </div>
-
-          ${buildPdfFooter()}
-        `;
-
-        const temp = ensurePdfTemp();
-        temp.appendChild(wrap);
-        await toPDF(wrap, `Bank_Report_MathBank.pdf`);
-        temp.innerHTML="";
-      }catch(e){
-        console.log(e);
-        warn("تعذر إنشاء تقرير البنك الآن.");
-      }
-    }
-
-
-document.addEventListener("DOMContentLoaded", async()=>{
+    document.addEventListener("DOMContentLoaded", async()=>{
 
       // Daily ops date default
       if($("dailyDate") && !$("dailyDate").value) $("dailyDate").value = todayISO();
