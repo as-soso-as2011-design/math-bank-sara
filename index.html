@@ -778,7 +778,7 @@
 
           <div class="tableWrap" style="margin-top:10px">
             <table>
-              <thead><tr><th>الوقت</th><th>العملية</th><th>السبب</th><th>المبلغ</th><th>الرصيد بعد العملية</th></tr></thead>
+              <thead><tr><th>اليوم</th><th>التاريخ</th><th>الوقت</th><th>العملية</th><th>السبب</th><th>المبلغ</th><th>الرصيد</th></tr></thead>
               <tbody id="stmtRows"></tbody>
             </table>
           </div>
@@ -1829,6 +1829,19 @@ document.addEventListener("DOMContentLoaded", async()=>{
       }catch(_){
         hijri = "";
       }
+
+    function dayDateTime(ms){
+      try{
+        const d = new Date(ms);
+        const day = new Intl.DateTimeFormat("ar-SA", {weekday:"long"}).format(d);
+        const date = new Intl.DateTimeFormat("ar-SA", {year:"numeric", month:"long", day:"numeric"}).format(d);
+        const time = new Intl.DateTimeFormat("ar-SA", {hour:"2-digit", minute:"2-digit"}).format(d);
+        return {day, date, time};
+      }catch(_){
+        return {day:"", date:"", time:""};
+      }
+    }
+
       return {greg, hijri};
     }
 
@@ -1858,11 +1871,16 @@ document.addEventListener("DOMContentLoaded", async()=>{
   table{width:100%;border-collapse:collapse}
   th,td{border-bottom:1px solid #eef2f7;padding:10px;text-align:center;font-size:13px;white-space:nowrap}
   th{background:#eef6ff;color:#0b2a66;font-weight:1000}
+  tbody tr:nth-child(even){background:#f9fafb}
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:12px 0}
+  .kpi{border:1px solid #e5e7eb;border-radius:12px;padding:10px;background:#fbfdff}
+  .kpi .k{font-size:11px;color:#6b7280;font-weight:1000}
+  .kpi .v{font-size:16px;color:#0b2a66;font-weight:1000;margin-top:4px}
   .sigRow{display:flex;justify-content:space-between;gap:12px;align-items:flex-end;margin-top:18px;flex-wrap:wrap}
   .sigBox{min-width:260px;border-top:1px dashed #9ca3af;padding-top:8px;font-weight:900;font-size:12px}
   .sigBox img{height:46px;object-fit:contain;display:block;margin-top:6px}
   .muted{color:#6b7280}
-  @media print{ body{background:#fff} .paper{border:0;margin:0;border-radius:0} }
+  @media print{ body{background:#fff} .paper{border:0;margin:0;border-radius:0;max-width:none} table{page-break-inside:auto} tr{page-break-inside:avoid;page-break-after:auto} }
 
     /* Daily ops list */
     .opCard{
@@ -1916,24 +1934,46 @@ document.addEventListener("DOMContentLoaded", async()=>{
         let rows="";
         txSnap.forEach(d=>{
           const x=d.data()||{};
-          const t = x.createdAtClient ? new Date(x.createdAtClient).toLocaleString("ar-SA") : "";
+          const ms = x.createdAtClient || 0;
+          const p = ms ? dayDateTime(ms) : {day:"",date:"",time:""};
           rows += `<tr>
-            <td>${t}</td>
+            <td>${p.day}</td>
+            <td>${p.date}</td>
+            <td>${p.time}</td>
             <td>${x.type||""}</td>
             <td>${x.reason||""}</td>
             <td>${fmt(x.amount)}</td>
             <td>${fmt(x.balanceAfter)}</td>
           </tr>`;
         });
-        if(!rows) rows = `<tr><td colspan="5" class="muted" style="padding:18px">لا توجد عمليات.</td></tr>`;
+        
+        // ملخص بسيط (إيداع/سحب/تحويل)
+        let dep=0, wit=0, tr=0;
+        txSnap.forEach(d=>{
+          const x=d.data()||{};
+          const a=Number(x.amount||0);
+          const t=String(x.type||"");
+          if(t.includes("إيداع")) dep += a;
+          else if(t.includes("سحب")) wit += a;
+          else if(t.includes("تحويل")) tr += a;
+        });
+        const net = dep - wit;
+if(!rows) rows = `<tr><td colspan="7" class="muted" style="padding:18px">لا توجد عمليات.</td></tr>`;
 
         const inner = `
           <div style="font-weight:1000;color:#0b2a66;margin-bottom:8px">تقرير الطالب</div>
+          <div class="kpis">
+            <div class="kpi"><div class="k">إجمالي الإيداعات</div><div class="v">${fmt(dep)}</div></div>
+            <div class="kpi"><div class="k">إجمالي السحوبات</div><div class="v">${fmt(wit)}</div></div>
+            <div class="kpi"><div class="k">إجمالي التحويلات</div><div class="v">${fmt(tr)}</div></div>
+            <div class="kpi"><div class="k">الصافي</div><div class="v">${fmt(net)}</div></div>
+          </div>
+
           <div class="muted" style="font-weight:900;margin-bottom:10px">
             الاسم: <b>${s.name||"—"}</b> • الرصيد: <b>${fmt(s.balance)}</b> ر.س • PIN: <b>${s.pin||"—"}</b>
           </div>
           <table>
-            <thead><tr><th>الوقت</th><th>العملية</th><th>السبب</th><th>المبلغ</th><th>الرصيد بعد العملية</th></tr></thead>
+            <thead><tr><th>اليوم</th><th>التاريخ</th><th>الوقت</th><th>العملية</th><th>السبب</th><th>المبلغ</th><th>الرصيد</th></tr></thead>
             <tbody>${rows}</tbody>
           </table>
         `;
