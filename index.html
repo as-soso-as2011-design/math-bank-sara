@@ -267,6 +267,22 @@
     .pdfSub{font-size:12px;color:#6b7280;font-weight:900;margin-top:2px}
     .sigRow{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin-top:12px}
     .sigBox{border-top:1px dashed #9ca3af;padding-top:8px;font-size:12px;color:#111827;font-weight:900;min-width:240px}
+  
+    /* Daily ops list */
+    .opCard{
+      border:1px solid rgba(0,0,0,.08);
+      border-radius:16px;
+      padding:12px;
+      background:linear-gradient(180deg,#ffffff,#f8fbff);
+      box-shadow:0 10px 18px rgba(0,0,0,.05);
+      margin:10px 0;
+    }
+    .opTop{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+    .opName{font-weight:1000;color:#0b2a66}
+    .opMeta{font-size:12px;color:#6b7280;font-weight:900}
+    .opLine{margin-top:8px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .pill2{display:inline-block;background:#eef6ff;border:1px solid rgba(0,0,0,.06);padding:6px 10px;border-radius:999px;font-weight:1000;font-size:12px;color:#0b2a66}
+
   </style>
 </head>
 
@@ -475,6 +491,7 @@
           </div>
           <div class="col" style="text-align:left">
             <button class="btn3" onclick="logout()">تسجيل خروج</button>
+            <button class="btn2" style="margin-top:8px" onclick="openDailyOps()">📅 العمليات اليومية</button>
             <button class="btn2" style="margin-right:8px" onclick="pdfBankReport()">تقرير PDF شامل</button>
           </div>
         </div>
@@ -494,33 +511,6 @@
         </div>
         <div class="small" style="margin-top:6px">
           * يتطلب واتساب «نقرة إرسال» أخيرة ✅
-        </div>
-      </div>
-
-      <div class="card soft">
-        <h3 style="margin:0 0 8px 0;color:#0b2a66">📲 العمليات اليومية – واتساب للأمهات (واتساب الأعمال)</h3>
-        <div class="row">
-          <div class="col">
-            <div class="small">نوع العملية</div>
-            <select id="dailyOp">
-              <option value="إيداع">إيداع</option>
-              <option value="سحب">سحب</option>
-            </select>
-          </div>
-          <div class="col">
-            <div class="small">المبلغ</div>
-            <input id="dailyAmt" type="number" step="0.01" placeholder="مثال: 5">
-          </div>
-          <div class="col">
-            <div class="small">السبب</div>
-            <input id="dailyReason" placeholder="مثال: التفاعل والمشاركة">
-          </div>
-        </div>
-        <div class="row" style="margin-top:10px">
-          <button class="whatsapp-btn col" onclick="sendDailyToBusinessWA()">إرسال لواتساب الأعمال</button>
-        </div>
-        <div class="small" style="margin-top:8px">
-          * يفتح واتساب برسالة جاهزة — وتبقى نقرة الإرسال الأخيرة ✅
         </div>
       </div>
 
@@ -641,6 +631,58 @@
       <div id="studentsGrid" class="grid2"></div>
     </div>
   </div>
+
+
+  <!-- ===== Daily Ops (Teacher) ===== -->
+  <div id="dailyOpsPage" class="hidden">
+    <div class="container">
+      <div class="card soft">
+        <div class="row" style="align-items:center">
+          <div class="col">
+            <div style="font-weight:1000;color:#0b2a66">📅 العمليات اليومية</div>
+            <div class="small">عرض كل عمليات اليوم/تاريخ سابق + إرسال المحدد لواتساب أولياء الأمور</div>
+          </div>
+          <div class="col" style="text-align:left">
+            <button class="btn3" onclick="backToClasses()">رجوع</button>
+          </div>
+        </div>
+
+        <hr>
+
+        <div class="row">
+          <div class="col">
+            <div class="small">اختيار التاريخ</div>
+            <input id="dailyDate" type="date">
+          </div>
+          <div class="col" style="align-self:flex-end">
+            <button class="btn2" onclick="loadDailyOps()">عرض العمليات</button>
+          </div>
+          <div class="col" style="align-self:flex-end">
+            <button class="btn" onclick="sendSelectedDailyOps()">📲 إرسال المحدد</button>
+          </div>
+          <div class="col" style="align-self:flex-end">
+            <button class="whatsapp-btn" onclick="sendAllDailyOps()">📲 إرسال الكل</button>
+          </div>
+        </div>
+
+        <div class="small" style="margin-top:8px">
+          * يتم تسجيل كل عملية تلقائيًا مع (الطالب/العملية/المبلغ/السبب/الوقت). اختر/ي المطلوب ثم إرسال.
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="row" style="align-items:center;justify-content:space-between">
+          <div class="small" id="dailyCount">—</div>
+          <label class="small" style="display:flex;gap:8px;align-items:center">
+            <input type="checkbox" id="dailySelAll" onchange="toggleDailySelectAll()" style="width:auto"> تحديد الكل
+          </label>
+        </div>
+        <hr>
+        <div id="dailyOpsList"></div>
+      </div>
+    </div>
+  </div>
+
 
   <div id="studentAccountPage" class="hidden">
     <div class="container">
@@ -872,7 +914,21 @@
       setTimeout(()=>{ window.location.href = web1; }, 900);
     }
 
-    function buildOfficialMessage(type, student, amount, reason){
+    
+    function openWABusiness(toPhone, messageText){
+      const phone = normalizePhoneToWA(toPhone);
+      if(!phone) return;
+      const enc = encodeURIComponent(messageText || "");
+      const schemeBiz = "whatsapp-business://send?phone=" + phone + "&text=" + enc;
+      const scheme = "whatsapp://send?phone=" + phone + "&text=" + enc;
+      const web = "https://wa.me/" + phone + "?text=" + enc;
+
+      // try WhatsApp Business first
+      window.location.href = schemeBiz;
+      setTimeout(()=>{ window.location.href = scheme; }, 500);
+      setTimeout(()=>{ window.location.href = web; }, 1200);
+    }
+function buildOfficialMessage(type, student, amount, reason){
       const warnLine = "⚠️ رسالة تلقائية";
       return (
 `${warnLine}
@@ -988,7 +1044,7 @@ ${SIGNATURE}`
     }
 
     function hideAllPages(){
-      ["startOverlay","onboardOverlay","teacherLoginPage","studentLoginPage","classesPage","classPage","studentAccountPage"].forEach(id=>{
+      ["startOverlay","onboardOverlay","teacherLoginPage","studentLoginPage","classesPage","classPage","studentAccountPage","dailyOpsPage"].forEach(id=>{
         const el=$(id); if(!el) return;
         if(id==="startOverlay"){ el.classList.add("hidden"); return; }
         el.classList.add("hidden");
@@ -1463,7 +1519,166 @@ ${SIGNATURE}`;
       });
     }
 
-    document.addEventListener("DOMContentLoaded", async()=>{
+    
+    // ================== Daily Ops (Teacher) ==================
+    let dailyOpsCache = [];         // [{id, studentName, type, amount, reason, createdAtClient, guardianWhats}]
+    let dailySelected = new Set();  // ids
+
+    function openDailyOps(){
+      hideAllPages();
+      show("dailyOpsPage");
+      dailySelected.clear();
+      const inp = $("dailyDate");
+      if(inp){
+        const d = new Date();
+        const yyyy = d.getFullYear();
+        const mm = String(d.getMonth()+1).padStart(2,"0");
+        const dd = String(d.getDate()).padStart(2,"0");
+        inp.value = `${yyyy}-${mm}-${dd}`;
+      }
+      loadDailyOps();
+    }
+
+    function dailyKeyFromInput(){
+      const v = $("dailyDate")?.value;
+      if(v) return v;
+      return localTodayKey();
+    }
+
+    async function loadDailyOps(){
+      try{
+        dailySelected.clear();
+        if($("dailySelAll")) $("dailySelAll").checked = false;
+
+        const dateKey = dailyKeyFromInput();
+        const list = $("dailyOpsList");
+        if(list) list.innerHTML = '<div class="small">جاري التحميل…</div>';
+
+        // collectionGroup requires Firestore rules allow it; uses saved dateKey created during logTxn
+        const snap = await db.collectionGroup("txns")
+          .where("dateKey","==",dateKey)
+          .orderBy("createdAtClient","desc")
+          .limit(500)
+          .get();
+
+        dailyOpsCache = [];
+        snap.forEach(d=>{
+          const x = d.data() || {};
+          dailyOpsCache.push({
+            id: d.id,
+            studentName: x.studentName || "",
+            type: x.type || "",
+            amount: Number(x.amount||0),
+            reason: x.reason || "",
+            createdAtClient: x.createdAtClient || 0,
+            guardianWhats: x.guardianWhats || ""
+          });
+        });
+
+        renderDailyOps();
+      }catch(e){
+        console.log(e);
+        const list = $("dailyOpsList");
+        if(list) list.innerHTML = '<div class="small" style="color:var(--red);font-weight:1000">تعذر تحميل العمليات اليومية. تأكد/ي من اتصال Firebase.</div>';
+      }
+    }
+
+    function renderDailyOps(){
+      const list = $("dailyOpsList");
+      if(!list) return;
+
+      if(!dailyOpsCache.length){
+        list.innerHTML = '<div class="small">لا توجد عمليات في هذا التاريخ.</div>';
+        if($("dailyCount")) $("dailyCount").textContent = "عدد العمليات: 0";
+        return;
+      }
+
+      if($("dailyCount")) $("dailyCount").textContent = "عدد العمليات: " + dailyOpsCache.length;
+
+      list.innerHTML = "";
+      dailyOpsCache.forEach((x, idx)=>{
+        const t = x.createdAtClient ? new Date(x.createdAtClient).toLocaleString("ar-SA") : "—";
+        const phone = String(x.guardianWhats||"").trim();
+        const card = document.createElement("div");
+        card.className = "opCard";
+        card.innerHTML = `
+          <div class="opTop">
+            <label class="small" style="display:flex;gap:8px;align-items:center">
+              <input type="checkbox" data-daily="1" data-id="${x.id}" style="width:auto">
+              تحديد
+            </label>
+            <div class="opName">${x.studentName || "—"}</div>
+            <div class="opMeta">${t}</div>
+          </div>
+          <div class="opLine">
+            <span class="pill2">${x.type || "—"}</span>
+            <span class="pill2">المبلغ: ${fmt(x.amount)} ر.س</span>
+            <span class="pill2">السبب: ${x.reason || "—"}</span>
+            <span class="pill2" style="direction:ltr;text-align:left">📞 ${phone || "—"}</span>
+            <button class="whatsapp-btn" style="padding:10px 12px" onclick="sendOneDailyOp('${x.id}')">إرسال</button>
+          </div>
+        `;
+        const cb = card.querySelector('input[data-daily="1"]');
+        cb.onchange = ()=>{
+          if(cb.checked) dailySelected.add(x.id);
+          else dailySelected.delete(x.id);
+        };
+        list.appendChild(card);
+      });
+    }
+
+    function toggleDailySelectAll(){
+      const all = $("dailySelAll")?.checked;
+      dailySelected.clear();
+      document.querySelectorAll('input[data-daily="1"]').forEach(cb=>{
+        cb.checked = !!all;
+        const id = cb.getAttribute("data-id");
+        if(all) dailySelected.add(id);
+      });
+    }
+
+    function buildDailyMsg(x){
+      return buildOfficialMessage(
+        x.type || "عملية",
+        x.studentName || "—",
+        fmt(x.amount),
+        x.reason || "—"
+      );
+    }
+
+    function sendOneDailyOp(id){
+      const x = dailyOpsCache.find(o=>o.id===id);
+      if(!x) return;
+      if(!x.guardianWhats) return openModal("تنبيه","لا يوجد رقم ولي أمر لهذه العملية.", '<button class="btn" onclick="closeModal()">تمام</button>');
+      const msg = buildDailyMsg(x);
+      // send via WhatsApp Business preferred
+      openWABusiness(x.guardianWhats, msg);
+    }
+
+    function sendSelectedDailyOps(){
+      if(!dailySelected.size) return warn("اختاري عملية واحدة على الأقل");
+      const arr = dailyOpsCache.filter(x=>dailySelected.has(x.id));
+      // send sequentially with small delays to avoid iOS blocking
+      let i=0;
+      const sendNext=()=>{
+        if(i>=arr.length) return;
+        const x=arr[i++];
+        if(x.guardianWhats){
+          openWABusiness(x.guardianWhats, buildDailyMsg(x));
+        }
+        setTimeout(sendNext, 1400);
+      };
+      sendNext();
+    }
+
+    function sendAllDailyOps(){
+      if(!dailyOpsCache.length) return warn("لا توجد عمليات لإرسالها");
+      dailySelected = new Set(dailyOpsCache.map(x=>x.id));
+      if($("dailySelAll")) $("dailySelAll").checked = true;
+      sendSelectedDailyOps();
+    }
+
+document.addEventListener("DOMContentLoaded", async()=>{
       $("modePill").textContent = IS_STUDENT_ENTRY ? "وضع: الطالب" : "وضع: المعلمة";
       if(IS_STUDENT_ENTRY){ $("startMsg").innerHTML = "بوابة دخول الطلاب 👇<br>اضغط زر البداية ثم تابعي التعريف السريع."; }
       $("forgotPinLink")?.addEventListener("click",(e)=>{ e.preventDefault(); forgotStudentPin(); });
@@ -1648,7 +1863,23 @@ ${SIGNATURE}`;
   .sigBox img{height:46px;object-fit:contain;display:block;margin-top:6px}
   .muted{color:#6b7280}
   @media print{ body{background:#fff} .paper{border:0;margin:0;border-radius:0} }
-</style>
+
+    /* Daily ops list */
+    .opCard{
+      border:1px solid rgba(0,0,0,.08);
+      border-radius:16px;
+      padding:12px;
+      background:linear-gradient(180deg,#ffffff,#f8fbff);
+      box-shadow:0 10px 18px rgba(0,0,0,.05);
+      margin:10px 0;
+    }
+    .opTop{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+    .opName{font-weight:1000;color:#0b2a66}
+    .opMeta{font-size:12px;color:#6b7280;font-weight:900}
+    .opLine{margin-top:8px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .pill2{display:inline-block;background:#eef6ff;border:1px solid rgba(0,0,0,.06);padding:6px 10px;border-radius:999px;font-weight:1000;font-size:12px;color:#0b2a66}
+
+  </style>
 </head><body>
 <div class="paper">
   <div class="head">
