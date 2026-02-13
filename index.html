@@ -267,22 +267,6 @@
     .pdfSub{font-size:12px;color:#6b7280;font-weight:900;margin-top:2px}
     .sigRow{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin-top:12px}
     .sigBox{border-top:1px dashed #9ca3af;padding-top:8px;font-size:12px;color:#111827;font-weight:900;min-width:240px}
-  
-    /* Daily ops list */
-    .opCard{
-      border:1px solid rgba(0,0,0,.08);
-      border-radius:16px;
-      padding:12px;
-      background:linear-gradient(180deg,#ffffff,#f8fbff);
-      box-shadow:0 10px 18px rgba(0,0,0,.05);
-      margin:10px 0;
-    }
-    .opTop{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
-    .opName{font-weight:1000;color:#0b2a66}
-    .opMeta{font-size:12px;color:#6b7280;font-weight:900}
-    .opLine{margin-top:8px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-    .pill2{display:inline-block;background:#eef6ff;border:1px solid rgba(0,0,0,.06);padding:6px 10px;border-radius:999px;font-weight:1000;font-size:12px;color:#0b2a66}
-
   </style>
 </head>
 
@@ -426,8 +410,6 @@
           <div class="forgotRow">
             <a href="javascript:void(0)" onclick="forgotTeacher()">تذكرني / نسيت كلمة المرور؟</a>
             <span class="small">الدخول التجريبي: teacher / 12345</span>
-          
-            <a href="javascript:void(0)" id="changePinLink">تغيير الرقم السري</a>
           </div>
 
           <div class="row" style="margin-top:12px">
@@ -491,8 +473,6 @@
           </div>
           <div class="col" style="text-align:left">
             <button class="btn3" onclick="logout()">تسجيل خروج</button>
-            <button class="btn2" style="margin-top:8px" onclick="openDailyOps()">📅 العمليات اليومية</button>
-            <button class="btn2" style="margin-right:8px" onclick="pdfBankReport()">تقرير PDF شامل</button>
           </div>
         </div>
       </div>
@@ -511,6 +491,33 @@
         </div>
         <div class="small" style="margin-top:6px">
           * يتطلب واتساب «نقرة إرسال» أخيرة ✅
+        </div>
+      </div>
+
+      <div class="card soft">
+        <h3 style="margin:0 0 8px 0;color:#0b2a66">📲 العمليات اليومية – واتساب للأمهات (واتساب الأعمال)</h3>
+        <div class="row">
+          <div class="col">
+            <div class="small">نوع العملية</div>
+            <select id="dailyOp">
+              <option value="إيداع">إيداع</option>
+              <option value="سحب">سحب</option>
+            </select>
+          </div>
+          <div class="col">
+            <div class="small">المبلغ</div>
+            <input id="dailyAmt" type="number" step="0.01" placeholder="مثال: 5">
+          </div>
+          <div class="col">
+            <div class="small">السبب</div>
+            <input id="dailyReason" placeholder="مثال: التفاعل والمشاركة">
+          </div>
+        </div>
+        <div class="row" style="margin-top:10px">
+          <button class="whatsapp-btn col" onclick="sendDailyToBusinessWA()">إرسال لواتساب الأعمال</button>
+        </div>
+        <div class="small" style="margin-top:8px">
+          * يفتح واتساب برسالة جاهزة — وتبقى نقرة الإرسال الأخيرة ✅
         </div>
       </div>
 
@@ -632,58 +639,6 @@
     </div>
   </div>
 
-
-  <!-- ===== Daily Ops (Teacher) ===== -->
-  <div id="dailyOpsPage" class="hidden">
-    <div class="container">
-      <div class="card soft">
-        <div class="row" style="align-items:center">
-          <div class="col">
-            <div style="font-weight:1000;color:#0b2a66">📅 العمليات اليومية</div>
-            <div class="small">عرض كل عمليات اليوم/تاريخ سابق + إرسال المحدد لواتساب أولياء الأمور</div>
-          </div>
-          <div class="col" style="text-align:left">
-            <button class="btn3" onclick="backToClasses()">رجوع</button>
-          </div>
-        </div>
-
-        <hr>
-
-        <div class="row">
-          <div class="col">
-            <div class="small">اختيار التاريخ</div>
-            <input id="dailyDate" type="date">
-          </div>
-          <div class="col" style="align-self:flex-end">
-            <button class="btn2" onclick="loadDailyOps()">عرض العمليات</button>
-          </div>
-          <div class="col" style="align-self:flex-end">
-            <button class="btn" onclick="sendSelectedDailyOps()">📲 إرسال المحدد</button>
-          </div>
-          <div class="col" style="align-self:flex-end">
-            <button class="whatsapp-btn" onclick="sendAllDailyOps()">📲 إرسال الكل</button>
-          </div>
-        </div>
-
-        <div class="small" style="margin-top:8px">
-          * يتم تسجيل كل عملية تلقائيًا مع (الطالب/العملية/المبلغ/السبب/الوقت). اختر/ي المطلوب ثم إرسال.
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="row" style="align-items:center;justify-content:space-between">
-          <div class="small" id="dailyCount">—</div>
-          <label class="small" style="display:flex;gap:8px;align-items:center">
-            <input type="checkbox" id="dailySelAll" onchange="toggleDailySelectAll()" style="width:auto"> تحديد الكل
-          </label>
-        </div>
-        <hr>
-        <div id="dailyOpsList"></div>
-      </div>
-    </div>
-  </div>
-
-
   <div id="studentAccountPage" class="hidden">
     <div class="container">
       <div class="card soft">
@@ -766,7 +721,7 @@
 
             <div class="row">
               <button class="btn col" onclick="executeOp()">تنفيذ</button>
-              <button class="btn2 col" onclick="pdfStudentReport(currentStudentId)">PDF رسمي</button>
+              <button class="btn2 col" onclick="downloadStudentStatementPDF()">PDF رسمي</button>
             </div>
           </div>
 
@@ -914,21 +869,7 @@
       setTimeout(()=>{ window.location.href = web1; }, 900);
     }
 
-    
-    function openWABusiness(toPhone, messageText){
-      const phone = normalizePhoneToWA(toPhone);
-      if(!phone) return;
-      const enc = encodeURIComponent(messageText || "");
-      const schemeBiz = "whatsapp-business://send?phone=" + phone + "&text=" + enc;
-      const scheme = "whatsapp://send?phone=" + phone + "&text=" + enc;
-      const web = "https://wa.me/" + phone + "?text=" + enc;
-
-      // try WhatsApp Business first
-      window.location.href = schemeBiz;
-      setTimeout(()=>{ window.location.href = scheme; }, 500);
-      setTimeout(()=>{ window.location.href = web; }, 1200);
-    }
-function buildOfficialMessage(type, student, amount, reason){
+    function buildOfficialMessage(type, student, amount, reason){
       const warnLine = "⚠️ رسالة تلقائية";
       return (
 `${warnLine}
@@ -1044,7 +985,7 @@ ${SIGNATURE}`
     }
 
     function hideAllPages(){
-      ["startOverlay","onboardOverlay","teacherLoginPage","studentLoginPage","classesPage","classPage","studentAccountPage","dailyOpsPage"].forEach(id=>{
+      ["startOverlay","onboardOverlay","teacherLoginPage","studentLoginPage","classesPage","classPage","studentAccountPage"].forEach(id=>{
         const el=$(id); if(!el) return;
         if(id==="startOverlay"){ el.classList.add("hidden"); return; }
         el.classList.add("hidden");
@@ -1457,23 +1398,18 @@ ${SIGNATURE}`;
             <div class="small" style="font-weight:1000;color:#0b2a66">${tierText}</div>
           </div>
 
-          
           <div style="margin-top:8px">
             <strong>${s.name || ""}</strong>
             <div class="small">الرصيد: ${fmt(s.balance)} ر.س</div>
             <div class="small">PIN: <b>${s.pin||""}</b></div>
-            <div class="small">ولي الأمر: <b style="direction:ltr;display:inline-block">${(s.guardianWhats||"—")}</b></div>
           </div>
 
           <div class="row" style="margin-top:10px">
             <button class="btn2 col js-open">دخول الطالب</button>
             <button class="btn3 col js-toggle">${s.active?'إقفال':'تفعيل'}</button>
             <button class="btn3 col js-edit">تعديل الاسم</button>
-            <button class="btn3 col js-phone">📞 رقم ولي الأمر</button>
-            <button class="btn3 col js-pin">🔐 تغيير PIN</button>
-            <button class="whatsapp-btn col js-sendpin">📲 إرسال PIN</button>
+            <button class="whatsapp-btn col js-sendpin">إرسال PIN</button>
             <button class="btn2 col js-pdf">تقرير PDF</button>
-
           </div>
         `;
         const cb = card.querySelector('input[data-sel="stu"]');
@@ -1482,11 +1418,8 @@ ${SIGNATURE}`;
         card.querySelector(".js-open").onclick = async()=>{ currentAccess="teacher"; currentStudentId=s.id; await openStudentAccount(s); };
         card.querySelector(".js-toggle").onclick = async()=>{ await db.collection("students").doc(s.id).update({active:!s.active}); await renderStudents(); };
         card.querySelector(".js-edit").onclick = async()=>{ const nn = prompt("الاسم الجديد:", s.name); if(nn) await db.collection("students").doc(s.id).update({name:nn.trim()}); await renderStudents(); };
-        card.querySelector(".js-phone").onclick = ()=> editGuardianPhone(s.id);
-        card.querySelector(".js-pin").onclick = ()=> changePinTeacher(s.id);
-
-        card.querySelector(".js-sendpin").onclick = ()=> sendPinToGuardian(s.id);
-        card.querySelector(".js-pdf").onclick = ()=> pdfStudentReport(s.id);
+        card.querySelector(".js-sendpin").onclick = ()=>{};
+        card.querySelector(".js-pdf").onclick = ()=>{};
         grid.appendChild(card);
       });
       updateSelCount();
@@ -1519,487 +1452,277 @@ ${SIGNATURE}`;
       });
     }
 
-    
-    // ================== Daily Ops (Teacher) ==================
-    let dailyOpsCache = [];         // [{id, studentName, type, amount, reason, createdAtClient, guardianWhats}]
-    let dailySelected = new Set();  // ids
-
-    function openDailyOps(){
-      hideAllPages();
-      show("dailyOpsPage");
-      dailySelected.clear();
-      const inp = $("dailyDate");
-      if(inp){
-        const d = new Date();
-        const yyyy = d.getFullYear();
-        const mm = String(d.getMonth()+1).padStart(2,"0");
-        const dd = String(d.getDate()).padStart(2,"0");
-        inp.value = `${yyyy}-${mm}-${dd}`;
-      }
-      loadDailyOps();
-    }
-
-    function dailyKeyFromInput(){
-      const v = $("dailyDate")?.value;
-      if(v) return v;
-      return localTodayKey();
-    }
-
-    async function loadDailyOps(){
-      try{
-        dailySelected.clear();
-        if($("dailySelAll")) $("dailySelAll").checked = false;
-
-        const dateKey = dailyKeyFromInput();
-        const list = $("dailyOpsList");
-        if(list) list.innerHTML = '<div class="small">جاري التحميل…</div>';
-
-        // collectionGroup requires Firestore rules allow it; uses saved dateKey created during logTxn
-        const snap = await db.collectionGroup("txns")
-          .where("dateKey","==",dateKey)
-          .orderBy("createdAtClient","desc")
-          .limit(500)
-          .get();
-
-        dailyOpsCache = [];
-        snap.forEach(d=>{
-          const x = d.data() || {};
-          dailyOpsCache.push({
-            id: d.id,
-            studentName: x.studentName || "",
-            type: x.type || "",
-            amount: Number(x.amount||0),
-            reason: x.reason || "",
-            createdAtClient: x.createdAtClient || 0,
-            guardianWhats: x.guardianWhats || ""
-          });
-        });
-
-        renderDailyOps();
-      }catch(e){
-        console.log(e);
-        const list = $("dailyOpsList");
-        if(list) list.innerHTML = '<div class="small" style="color:var(--red);font-weight:1000">تعذر تحميل العمليات اليومية. تأكد/ي من اتصال Firebase.</div>';
-      }
-    }
-
-    function renderDailyOps(){
-      const list = $("dailyOpsList");
-      if(!list) return;
-
-      if(!dailyOpsCache.length){
-        list.innerHTML = '<div class="small">لا توجد عمليات في هذا التاريخ.</div>';
-        if($("dailyCount")) $("dailyCount").textContent = "عدد العمليات: 0";
-        return;
-      }
-
-      if($("dailyCount")) $("dailyCount").textContent = "عدد العمليات: " + dailyOpsCache.length;
-
-      list.innerHTML = "";
-      dailyOpsCache.forEach((x, idx)=>{
-        const t = x.createdAtClient ? new Date(x.createdAtClient).toLocaleString("ar-SA") : "—";
-        const phone = String(x.guardianWhats||"").trim();
-        const card = document.createElement("div");
-        card.className = "opCard";
-        card.innerHTML = `
-          <div class="opTop">
-            <label class="small" style="display:flex;gap:8px;align-items:center">
-              <input type="checkbox" data-daily="1" data-id="${x.id}" style="width:auto">
-              تحديد
-            </label>
-            <div class="opName">${x.studentName || "—"}</div>
-            <div class="opMeta">${t}</div>
-          </div>
-          <div class="opLine">
-            <span class="pill2">${x.type || "—"}</span>
-            <span class="pill2">المبلغ: ${fmt(x.amount)} ر.س</span>
-            <span class="pill2">السبب: ${x.reason || "—"}</span>
-            <span class="pill2" style="direction:ltr;text-align:left">📞 ${phone || "—"}</span>
-            <button class="whatsapp-btn" style="padding:10px 12px" onclick="sendOneDailyOp('${x.id}')">إرسال</button>
-          </div>
-        `;
-        const cb = card.querySelector('input[data-daily="1"]');
-        cb.onchange = ()=>{
-          if(cb.checked) dailySelected.add(x.id);
-          else dailySelected.delete(x.id);
-        };
-        list.appendChild(card);
-      });
-    }
-
-    function toggleDailySelectAll(){
-      const all = $("dailySelAll")?.checked;
-      dailySelected.clear();
-      document.querySelectorAll('input[data-daily="1"]').forEach(cb=>{
-        cb.checked = !!all;
-        const id = cb.getAttribute("data-id");
-        if(all) dailySelected.add(id);
-      });
-    }
-
-    function buildDailyMsg(x){
-      return buildOfficialMessage(
-        x.type || "عملية",
-        x.studentName || "—",
-        fmt(x.amount),
-        x.reason || "—"
-      );
-    }
-
-    function sendOneDailyOp(id){
-      const x = dailyOpsCache.find(o=>o.id===id);
-      if(!x) return;
-      if(!x.guardianWhats) return openModal("تنبيه","لا يوجد رقم ولي أمر لهذه العملية.", '<button class="btn" onclick="closeModal()">تمام</button>');
-      const msg = buildDailyMsg(x);
-      // send via WhatsApp Business preferred
-      openWABusiness(x.guardianWhats, msg);
-    }
-
-    function sendSelectedDailyOps(){
-      if(!dailySelected.size) return warn("اختاري عملية واحدة على الأقل");
-      const arr = dailyOpsCache.filter(x=>dailySelected.has(x.id));
-      // send sequentially with small delays to avoid iOS blocking
-      let i=0;
-      const sendNext=()=>{
-        if(i>=arr.length) return;
-        const x=arr[i++];
-        if(x.guardianWhats){
-          openWABusiness(x.guardianWhats, buildDailyMsg(x));
-        }
-        setTimeout(sendNext, 1400);
-      };
-      sendNext();
-    }
-
-    function sendAllDailyOps(){
-      if(!dailyOpsCache.length) return warn("لا توجد عمليات لإرسالها");
-      dailySelected = new Set(dailyOpsCache.map(x=>x.id));
-      if($("dailySelAll")) $("dailySelAll").checked = true;
-      sendSelectedDailyOps();
-    }
-
-document.addEventListener("DOMContentLoaded", async()=>{
+    document.addEventListener("DOMContentLoaded", async()=>{
       $("modePill").textContent = IS_STUDENT_ENTRY ? "وضع: الطالب" : "وضع: المعلمة";
       if(IS_STUDENT_ENTRY){ $("startMsg").innerHTML = "بوابة دخول الطلاب 👇<br>اضغط زر البداية ثم تابعي التعريف السريع."; }
       $("forgotPinLink")?.addEventListener("click",(e)=>{ e.preventDefault(); forgotStudentPin(); });
-      $("changePinLink")?.addEventListener("click",(e)=>{ e.preventDefault(); changePinStudentFlow(); });
       $("op")?.addEventListener("change", ()=> setupReasonUI($("op").value, "reasonStudent", "reasonOtherStudent"));
       await loadForgotSetting();
       try{ await ensureSeed(); await renderTabs(); $("connPill").textContent="جاهز ✅"; }catch(e){ $("connPill").textContent="جاهز ✅"; }
       initTeacherReasonAlways();
       bindClickSounds();
     });
-  
-    // ================== Added: Guardian phone / PIN / PDF ==================
-    function isValidPin(p){ return /^[0-9]{4}$/.test(String(p||"").trim()); }
+  </script>
 
-    async function getStudentById(studentId){
-      const doc = await db.collection("students").doc(studentId).get();
-      if(!doc.exists) throw new Error("Student not found");
-      return { id: doc.id, ...doc.data() };
-    }
-
-    async function sendPinToGuardian(studentId){
-      try{
-        const s = await getStudentById(studentId);
-        let phone = String(s.guardianWhats||"").trim();
-        if(!phone){
-          const nn = prompt("اكتب رقم ولي الأمر (مثال: 05xxxxxxxx):", "");
-          if(!nn) return;
-          phone = nn.trim();
-          await db.collection("students").doc(studentId).update({guardianWhats: phone});
-        }
-        const wa = normalizePhoneToWA(phone);
-        if(!wa) return warn("رقم ولي الأمر غير صحيح");
-
-        const msg =
-          "⚠️ رسالة تلقائية\n" + TEACHER_BANK_TITLE + "\n\n" +
-          "رقم الدخول (PIN) للطالب/ـة:\n" + (s.name||"") + "\n" +
-          "PIN: " + (s.pin||"") + "\n\n" +
-          "للتواصل مع المعلمة:\n" + contactLink() + "\n\n" +
-          SIGNATURE;
-
-        openWA(wa, msg);
-        await renderStudents();
-      }catch(e){
-        console.log(e);
-        warn("تعذر إرسال PIN الآن.");
-      }
-    }
-
-    async function editGuardianPhone(studentId){
-      try{
-        const s = await getStudentById(studentId);
-        const body = `
-          <div class="small" style="margin-bottom:8px">تعديل رقم ولي الأمر للطالب/ـة: <b>${s.name||""}</b></div>
-          <div class="field" style="margin:0">
-            <input id="gpInput" placeholder="05xxxxxxxx" value="${String(s.guardianWhats||"").replace(/"/g,'&quot;')}">
-          </div>
-          <div class="small" style="margin-top:8px">نصيحة: اكتبي الرقم بصيغة <b>05xxxxxxxx</b></div>
-        `;
-        openModal("رقم ولي الأمر", body, `
-          <button class="btn2" onclick="closeModal()">إلغاء</button>
-          <button class="btn" onclick="(async()=>{
-            const v = (document.getElementById('gpInput').value||'').trim();
-            await db.collection('students').doc('${studentId}').update({guardianWhats: v});
-            closeModal();
-            await renderStudents();
-          })()">حفظ</button>
-        `);
-      }catch(e){
-        console.log(e);
-        warn("تعذر فتح تعديل الرقم.");
-      }
-    }
-
-    async function changePinTeacher(studentId){
-      try{
-        const s = await getStudentById(studentId);
-        const body = `
-          <div class="small" style="margin-bottom:8px">تغيير PIN للطالب/ـة: <b>${s.name||""}</b></div>
-          <div class="field" style="margin:0">
-            <input id="pinNew" inputmode="numeric" maxlength="4" placeholder="PIN جديد (4 أرقام)">
-          </div>
-          <div class="small" style="margin-top:8px">مثال: 1234</div>
-        `;
-        openModal("تغيير PIN", body, `
-          <button class="btn2" onclick="closeModal()">إلغاء</button>
-          <button class="btn" onclick="(async()=>{
-            const v = (document.getElementById('pinNew').value||'').trim();
-            if(!/^[0-9]{4}$/.test(v)){ return warn('PIN لازم يكون 4 أرقام'); }
-            await db.collection('students').doc('${studentId}').update({pin: v});
-            closeModal();
-            await renderStudents();
-          })()">حفظ</button>
-        `);
-      }catch(e){
-        console.log(e);
-        warn("تعذر تغيير PIN.");
-      }
-    }
-
-    async function changePinStudentFlow(){
-      try{
-        const name = (document.getElementById("stuName")?.value || "").trim();
-        if(!name) return warn("اكتب/ي الاسم أولًا في خانة الدخول");
-        const snap = await db.collection("students").where("name","==",name).limit(1).get();
-        if(snap.empty) return warn("الاسم غير موجود");
-
-        const doc = snap.docs[0];
-        const s = doc.data() || {};
-        const body = `
-          <div class="small">تغيير الرقم السري للطالب/ـة: <b>${s.name||""}</b></div>
-          <hr>
-          <div class="row">
-            <div class="col">
-              <div class="small">PIN الحالي</div>
-              <input id="oldPin" inputmode="numeric" maxlength="4" placeholder="****">
-            </div>
-            <div class="col">
-              <div class="small">PIN الجديد</div>
-              <input id="newPin" inputmode="numeric" maxlength="4" placeholder="****">
-            </div>
-          </div>
-          <div class="small" style="margin-top:8px">شرط: 4 أرقام</div>
-        `;
-        openModal("تغيير الرقم السري", body, `
-          <button class="btn2" onclick="closeModal()">إلغاء</button>
-          <button class="btn" onclick="(async()=>{
-            const oldP = (document.getElementById('oldPin').value||'').trim();
-            const newP = (document.getElementById('newPin').value||'').trim();
-            if(String(oldP)!==String(s.pin||'')) return warn('PIN الحالي غير صحيح');
-            if(!/^[0-9]{4}$/.test(newP)) return warn('PIN الجديد لازم يكون 4 أرقام');
-            await db.collection('students').doc('${doc.id}').update({pin:newP});
-            closeModal();
-            warn('تم تغيير PIN بنجاح ✅');
-          })()">تأكيد</button>
-        `);
-      }catch(e){
-        console.log(e);
-        warn("تعذر تغيير PIN الآن.");
-      }
-    }
-
-    function hijriAndGregToday(){
-      const now = new Date();
-      const greg = new Intl.DateTimeFormat("ar-SA", {year:"numeric", month:"long", day:"numeric"}).format(now);
-      let hijri = "";
-      try{
-        hijri = new Intl.DateTimeFormat("ar-SA-u-ca-islamic", {year:"numeric", month:"long", day:"numeric"}).format(now);
-      }catch(_){
-        hijri = "";
-      }
-      return {greg, hijri};
-    }
-
-    function openPrintWindow(title, innerHtml){
-      const w = window.open("", "_blank");
-      if(!w) return warn("المتصفح منع فتح نافذة التقرير. فعّلي Pop-ups ثم جربي.");
-      const {greg, hijri} = hijriAndGregToday();
-      w.document.open();
-      w.document.write(`
-<!doctype html><html lang="ar" dir="rtl"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>${title}</title>
-<style>
-  *{box-sizing:border-box;font-family:Tahoma,Arial,sans-serif}
-  body{margin:0;background:#f5f7fb;color:#111827}
-  .paper{max-width:900px;margin:18px auto;background:#fff;border:1px solid #e5e7eb;border-radius:16px;padding:18px}
-  .head{display:flex;justify-content:space-between;gap:14px;align-items:center;flex-wrap:wrap}
-  .brand{display:flex;gap:12px;align-items:center}
-  .logo{width:66px;height:66px;border-radius:14px;overflow:hidden;border:1px solid rgba(0,0,0,.12);background:#fff}
-  .logo img{width:100%;height:100%;object-fit:contain}
-  .t1{font-weight:1000;color:#0b2a66;font-size:18px}
-  .t2{font-weight:900;color:#6b7280;font-size:12px;margin-top:4px}
-  .dates{font-size:12px;color:#6b7280;font-weight:900;line-height:1.7;text-align:left;direction:ltr}
-  .stamp{width:92px;height:92px;opacity:.98}
-  .stamp img{width:92px;height:92px;object-fit:contain}
-  hr{border:0;border-top:1px solid #e5e7eb;margin:14px 0}
-  table{width:100%;border-collapse:collapse}
-  th,td{border-bottom:1px solid #eef2f7;padding:10px;text-align:center;font-size:13px;white-space:nowrap}
-  th{background:#eef6ff;color:#0b2a66;font-weight:1000}
-  .sigRow{display:flex;justify-content:space-between;gap:12px;align-items:flex-end;margin-top:18px;flex-wrap:wrap}
-  .sigBox{min-width:260px;border-top:1px dashed #9ca3af;padding-top:8px;font-weight:900;font-size:12px}
-  .sigBox img{height:46px;object-fit:contain;display:block;margin-top:6px}
-  .muted{color:#6b7280}
-  @media print{ body{background:#fff} .paper{border:0;margin:0;border-radius:0} }
-
-    /* Daily ops list */
-    .opCard{
-      border:1px solid rgba(0,0,0,.08);
-      border-radius:16px;
-      padding:12px;
-      background:linear-gradient(180deg,#ffffff,#f8fbff);
-      box-shadow:0 10px 18px rgba(0,0,0,.05);
-      margin:10px 0;
-    }
-    .opTop{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
-    .opName{font-weight:1000;color:#0b2a66}
-    .opMeta{font-size:12px;color:#6b7280;font-weight:900}
-    .opLine{margin-top:8px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-    .pill2{display:inline-block;background:#eef6ff;border:1px solid rgba(0,0,0,.06);padding:6px 10px;border-radius:999px;font-weight:1000;font-size:12px;color:#0b2a66}
-
-  </style>
-</head><body>
-<div class="paper">
-  <div class="head">
-    <div class="brand">
-      <div class="logo"><img src="logo.png" alt="logo"></div>
-      <div>
-        <div class="t1">بنك الرياضيات – المعلمة سارة حقوي</div>
-        <div class="t2">مدرسة رواد الشرق الأهلية</div>
-        <div class="t2 muted">${hijri ? ("التاريخ الهجري: " + hijri + " • ") : ""}التاريخ الميلادي: ${greg}</div>
-      </div>
-    </div>
-    <div class="stamp"><img src="stamp.png" alt="stamp"></div>
-  </div>
-  <hr>
-  ${innerHtml}
-  <div class="sigRow">
-    <div class="sigBox">توقيع المعلمة<br>${SIGNATURE}<img src="signature.png" alt="signature"></div>
-    <div class="sigBox" style="text-align:left;direction:ltr">التاريخ<br>${greg}</div>
-  </div>
-</div>
 <script>
-  window.onload = ()=>{ setTimeout(()=>window.print(), 300); };
-<\/script>
-</body></html>`);
-      w.document.close();
+/* ===== PATCH: تفعيل الإيداع/السحب + إضافة التحويل + تحسين PDF ===== */
+(function(){
+  // helper
+  const $ = (id)=>document.getElementById(id);
+  const qs = (s)=>document.querySelector(s);
+
+  // Ensure transfer option exists in operation select (student page)
+  function ensureTransferUI(){
+    const opSel = $("op");
+    if(opSel && ![...opSel.options].some(o=>o.value==="transfer")){
+      const opt = document.createElement("option");
+      opt.value="transfer"; opt.textContent="تحويل";
+      opSel.appendChild(opt);
     }
-
-    async function pdfStudentReport(studentId){
-      try{
-        const s = await getStudentById(studentId);
-        const txSnap = await db.collection("students").doc(studentId).collection("txns")
-          .orderBy("createdAtClient","desc").limit(200).get();
-
-        let rows="";
-        txSnap.forEach(d=>{
-          const x=d.data()||{};
-          const t = x.createdAtClient ? new Date(x.createdAtClient).toLocaleString("ar-SA") : "";
-          rows += `<tr>
-            <td>${t}</td>
-            <td>${x.type||""}</td>
-            <td>${x.reason||""}</td>
-            <td>${fmt(x.amount)}</td>
-            <td>${fmt(x.balanceAfter)}</td>
-          </tr>`;
-        });
-        if(!rows) rows = `<tr><td colspan="5" class="muted" style="padding:18px">لا توجد عمليات.</td></tr>`;
-
-        const inner = `
-          <div style="font-weight:1000;color:#0b2a66;margin-bottom:8px">تقرير الطالب</div>
-          <div class="muted" style="font-weight:900;margin-bottom:10px">
-            الاسم: <b>${s.name||"—"}</b> • الرصيد: <b>${fmt(s.balance)}</b> ر.س • PIN: <b>${s.pin||"—"}</b>
-          </div>
-          <table>
-            <thead><tr><th>الوقت</th><th>العملية</th><th>السبب</th><th>المبلغ</th><th>الرصيد بعد العملية</th></tr></thead>
-            <tbody>${rows}</tbody>
-          </table>
-        `;
-        openPrintWindow(`تقرير الطالب - ${s.name||""}`, inner);
-      }catch(e){
-        console.log(e);
-        warn("تعذر إنشاء تقرير الطالب الآن.");
+    // add transferTo select if missing
+    if(opSel && !$("transferToWrap")){
+      const wrap = document.createElement("div");
+      wrap.id="transferToWrap";
+      wrap.style.display="none";
+      wrap.innerHTML = `
+        <label class="muted" style="font-weight:900;display:block;margin:0 0 6px">تحويل إلى</label>
+        <select id="transferTo" class="inp"></select>
+      `;
+      // place after reason field if possible
+      const reason = $("reason");
+      if(reason && reason.parentElement){
+        reason.parentElement.insertAdjacentElement("afterend", wrap);
+      }else{
+        opSel.insertAdjacentElement("afterend", wrap);
       }
     }
+    opSel?.addEventListener("change", ()=>{
+      const wrap = $("transferToWrap");
+      if(!wrap) return;
+      wrap.style.display = (opSel.value==="transfer") ? "block" : "none";
+    });
+  }
 
-    async function pdfBankReport(){
-      try{
-        // report per current classes list
-        const clsSnap = await db.collection("classes").orderBy("order").get();
-        const classesArr = [];
-        clsSnap.forEach(d=>classesArr.push({id:d.id, ...d.data()}));
+  async function fillTransferTargets(currentId){
+    const sel = $("transferTo");
+    if(!sel) return;
+    sel.innerHTML = "";
+    try{
+      const snap = await db.collection("students").orderBy("name").get();
+      snap.forEach(d=>{
+        if(d.id===currentId) return;
+        const s=d.data()||{};
+        if(s.active===false) return;
+        const opt=document.createElement("option");
+        opt.value=d.id;
+        opt.textContent = `${s.name||"طالب"} (${fmt(s.balance||0)} ر.س)`;
+        sel.appendChild(opt);
+      });
+      if(!sel.options.length){
+        const opt=document.createElement("option");
+        opt.value=""; opt.textContent="لا يوجد طلاب متاحون";
+        sel.appendChild(opt);
+      }
+    }catch(e){
+      console.log(e);
+    }
+  }
 
-        const stuSnap = await db.collection("students").get();
-        const students = [];
-        stuSnap.forEach(d=>students.push({id:d.id, ...d.data()}));
-        students.sort((a,b)=>(a.name||"").localeCompare(b.name||"","ar"));
+  // override executeOp with full implementation
+  window.executeOp = async function(){
+    try{
+      if(!window.currentStudent){ warn("اختاري طالبًا أولاً."); return; }
+      const studentId = window.currentStudent;
+      const op = ($("op")?.value||"deposit");
+      const amount = Number(($("amount")?.value||"").toString().replace(/[^\d.]/g,""));
+      let reason = ($("reason")?.value||"").trim();
+      const reasonOther = ($("reasonOther")?.value||"").trim();
+      if(reason==="أخرى" && reasonOther) reason = reasonOther;
+      if(!amount || amount<=0){ warn("اكتبي مبلغ صحيح."); return; }
+      if(!reason) reason = "—";
 
-        const byClass = {};
-        classesArr.forEach(c=> byClass[c.id] = []);
-        students.forEach(s=>{ (byClass[s.classId] ||= []).push(s); });
+      const sRef = db.collection("students").doc(studentId);
 
-        let sections = "";
-        let totalBal = 0;
-        let totalStudents = students.length;
+      // Transfer
+      if(op==="transfer"){
+        const toId = ($("transferTo")?.value||"").trim();
+        if(!toId){ warn("اختاري المستلم للتحويل."); return; }
+        if(toId===studentId){ warn("لا يمكن التحويل لنفس الطالب."); return; }
+        const toRef = db.collection("students").doc(toId);
 
-        classesArr.forEach(c=>{
-          const arr = byClass[c.id] || [];
-          if(!arr.length) return;
-          sections += `<div style="margin:12px 0 6px;font-weight:1000;color:#0b2a66">${c.name||"فصل"}</div>`;
-          sections += `<table><thead><tr><th>الطالب</th><th>الرصيد</th><th>PIN</th><th>ولي الأمر</th><th>الحالة</th></tr></thead><tbody>`;
-          arr.forEach(s=>{
-            totalBal += Number(s.balance||0);
-            sections += `<tr>
-              <td>${s.name||""}</td>
-              <td>${fmt(s.balance)}</td>
-              <td>${String(s.pin||"—")}</td>
-              <td style="direction:ltr">${String(s.guardianWhats||"—")}</td>
-              <td>${s.active ? "🟢 مفعل" : "🔴 مقفل"}</td>
-            </tr>`;
+        await db.runTransaction(async (tx)=>{
+          const sDoc = await tx.get(sRef);
+          const tDoc = await tx.get(toRef);
+          if(!sDoc.exists) throw new Error("student missing");
+          if(!tDoc.exists) throw new Error("target missing");
+          const s = sDoc.data()||{};
+          const t = tDoc.data()||{};
+          const sBal = Number(s.balance||0);
+          if(sBal < amount) throw new Error("insufficient");
+          const newSBal = sBal - amount;
+          const newTBal = Number(t.balance||0) + amount;
+
+          tx.update(sRef,{ balance:newSBal, lastUpdated: firebase.firestore.FieldValue.serverTimestamp() });
+          tx.update(toRef,{ balance:newTBal, lastUpdated: firebase.firestore.FieldValue.serverTimestamp() });
+
+          const nowClient = Date.now();
+          const base = {
+            amount, reason,
+            ts: firebase.firestore.FieldValue.serverTimestamp(),
+            createdAtClient: nowClient,
+            by: window.currentAccess || "teacher",
+          };
+
+          // sender log
+          tx.set(sRef.collection("txns").doc(),{
+            ...base,
+            type:"تحويل",
+            note:`تحويل إلى: ${t.name||"طالب"}`,
+            balanceAfter:newSBal
           });
-          sections += `</tbody></table>`;
+          // receiver log
+          tx.set(toRef.collection("txns").doc(),{
+            ...base,
+            type:"استلام تحويل",
+            note:`تحويل من: ${s.name||"طالب"}`,
+            balanceAfter:newTBal
+          });
         });
 
-        if(!sections){
-          sections = `<div class="muted">لا توجد بيانات طلاب.</div>`;
+        ok("تم التحويل بنجاح.");
+        await window.refreshStudent?.();
+        await window.refreshWeekKPIs?.();
+        return;
+      }
+
+      // Deposit/Withdraw
+      await db.runTransaction(async (tx)=>{
+        const doc = await tx.get(sRef);
+        if(!doc.exists) throw new Error("student missing");
+        const s = doc.data()||{};
+        const bal = Number(s.balance||0);
+        let newBal = bal;
+
+        if(op==="withdraw"){
+          if(bal < amount) throw new Error("insufficient");
+          newBal = bal - amount;
+        }else{
+          newBal = bal + amount;
         }
 
-        const inner = `
-          <div style="font-weight:1000;color:#0b2a66;margin-bottom:8px">تقرير شامل للبنك</div>
-          <div class="muted" style="font-weight:900;margin-bottom:12px">
-            إجمالي الطلاب: <b>${totalStudents}</b> • إجمالي الأرصدة: <b>${fmt(totalBal)}</b> ر.س
-          </div>
-          ${sections}
-        `;
-        openPrintWindow("تقرير شامل - بنك الرياضيات", inner);
-      }catch(e){
-        console.log(e);
-        warn("تعذر إنشاء تقرير البنك الآن.");
-      }
-    }
+        tx.update(sRef,{ balance:newBal, lastUpdated: firebase.firestore.FieldValue.serverTimestamp() });
 
+        tx.set(sRef.collection("txns").doc(),{
+          type: op==="withdraw" ? "سحب" : "إيداع",
+          amount,
+          reason,
+          ts: firebase.firestore.FieldValue.serverTimestamp(),
+          createdAtClient: Date.now(),
+          by: window.currentAccess || "teacher",
+          balanceAfter: newBal
+        });
+      });
+
+      ok(op==="withdraw" ? "تم السحب." : "تم الإيداع.");
+      await window.refreshStudent?.();
+      await window.refreshWeekKPIs?.();
+
+    }catch(e){
+      console.log(e);
+      if(String(e.message||"").includes("insufficient")) warn("الرصيد غير كافٍ.");
+      else warn("تعذر تنفيذ العملية الآن.");
+    }
+  };
+
+  // More robust weekly KPIs (safe even if query fails)
+  window.refreshWeekKPIs = async function(){
+    try{
+      if(!window.currentStudent) return;
+      const ref = db.collection("students").doc(window.currentStudent).collection("txns");
+      const from = new Date(); from.setDate(from.getDate()-7);
+      const snap = await ref.where("createdAtClient",">=",from.getTime()).get();
+      let dep=0, wdr=0, net=0;
+      snap.forEach(d=>{
+        const x=d.data()||{};
+        const amt=Number(x.amount||0);
+        if(x.type==="إيداع") dep+=amt;
+        if(x.type==="سحب") wdr+=amt;
+      });
+      net = dep - wdr;
+      const el1=$("weekDep"), el2=$("weekWdr"), el3=$("weekNet"), el4=$("weekCount");
+      if(el1) el1.textContent = fmt(dep);
+      if(el2) el2.textContent = fmt(wdr);
+      if(el3) el3.textContent = fmt(net);
+      if(el4) el4.textContent = String(snap.size||0);
+    }catch(e){
+      console.log(e);
+    }
+  };
+
+  // Patch PDF queries to avoid orderBy error when createdAtClient missing
+  const _pdfStudentReport = window.pdfStudentReport;
+  window.pdfStudentReport = async function(studentId){
+    try{
+      const s = await getStudentById(studentId);
+      let txSnap;
+      try{
+        txSnap = await db.collection("students").doc(studentId).collection("txns")
+          .orderBy("ts","desc").limit(200).get();
+      }catch(_){
+        txSnap = await db.collection("students").doc(studentId).collection("txns")
+          .orderBy("createdAtClient","desc").limit(200).get();
+      }
+      let rows="";
+      txSnap.forEach(d=>{
+        const x=d.data()||{};
+        const t = x.createdAtClient ? new Date(x.createdAtClient).toLocaleString("ar-SA") : "";
+        rows += `<tr>
+          <td>${t}</td>
+          <td>${x.type||""}</td>
+          <td>${x.reason||x.note||""}</td>
+          <td>${fmt(x.amount)}</td>
+          <td>${(x.balanceAfter!=null)?fmt(x.balanceAfter):""}</td>
+        </tr>`;
+      });
+      if(!rows) rows = `<tr><td colspan="5" class="muted" style="padding:18px">لا توجد عمليات.</td></tr>`;
+      const inner = `
+        <div style="font-weight:1000;color:#0b2a66;margin-bottom:8px">تقرير الطالب</div>
+        <div class="muted" style="font-weight:900;margin-bottom:10px">
+          الاسم: <b>${s.name||"—"}</b> • الرصيد: <b>${fmt(s.balance)}</b> ر.س • PIN: <b>${s.pin||"—"}</b>
+        </div>
+        <table>
+          <thead><tr><th>الوقت</th><th>العملية</th><th>السبب</th><th>المبلغ</th><th>الرصيد بعد العملية</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>`;
+      openPrintWindow(`تقرير الطالب - ${s.name||""}`, inner);
+    }catch(e){
+      console.log(e);
+      warn("تعذر إنشاء تقرير الطالب الآن.");
+      // fallback old if existed
+      try{ if(typeof _pdfStudentReport==="function") return _pdfStudentReport(studentId); }catch(_){}
+    }
+  };
+
+  // Rebind buttons if some are not wired
+  function bind(){
+    const execBtn = qs(".js-exec");
+    execBtn && (execBtn.onclick = ()=>window.executeOp());
+    ensureTransferUI();
+  }
+
+  document.addEventListener("DOMContentLoaded", ()=>{
+    bind();
+  });
+
+  // When opening a student page, fill transfer targets
+  const _openStudent = window.openStudent;
+  window.openStudent = async function(id){
+    const r = _openStudent ? await _openStudent(id) : undefined;
+    try{ await fillTransferTargets(id); }catch(e){}
+    return r;
+  };
+})();
 </script>
+
 </body>
 </html>
