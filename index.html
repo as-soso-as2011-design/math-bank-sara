@@ -1440,7 +1440,68 @@ ${SIGNATURE}`;
 
     async function refreshWeekKPIs(){ /* (موجودة بالنسخة الكاملة) */ }
 
-    async function executeOp(){ warn("هذه النسخة مدمجة للواجهة + الكود الأساسي. لو تبغين كل الوظائف (PDF/واتساب/تقارير أسبوعية)، قولي لي وأصدر لك نسخة Full كاملة 100%."); }
+    
+async function executeOp(){
+
+  const op = document.getElementById("op").value;
+  const amt = parseFloat(document.getElementById("amt").value);
+  const reason = getReason("reasonStudent","reasonOtherStudent");
+
+  if(isNaN(amt) || amt <= 0){
+    warn("أدخلي مبلغ صحيح");
+    return;
+  }
+
+  const ref = db.collection("students").doc(currentStudentId);
+  const doc = await ref.get();
+  const s = doc.data();
+
+  if(!s.active){
+    warn("الحساب موقوف");
+    return;
+  }
+
+  if(op === "deposit"){
+    const newBal = Number(s.balance || 0) + amt;
+    await ref.update({ balance:newBal });
+    await logTxn(ref,"إيداع",reason,amt,newBal,s.name,s.guardianWhats||"");
+  }
+
+  if(op === "withdraw"){
+    if(Number(s.balance||0) < amt){
+      warn("الرصيد غير كافي");
+      return;
+    }
+    const newBal = Number(s.balance || 0) - amt;
+    await ref.update({ balance:newBal });
+    await logTxn(ref,"سحب",reason,amt,newBal,s.name,s.guardianWhats||"");
+  }
+
+  if(op === "transfer"){
+    if(Number(s.balance||0) < amt){
+      warn("الرصيد غير كافي للتحويل");
+      return;
+    }
+
+    const toId = document.getElementById("transferTo").value;
+    const toRef = db.collection("students").doc(toId);
+    const toDoc = await toRef.get();
+    const to = toDoc.data();
+
+    const batch = db.batch();
+    batch.update(ref,{ balance:Number(s.balance)-amt });
+    batch.update(toRef,{ balance:Number(to.balance||0)+amt });
+    await batch.commit();
+
+    await logTxn(ref,"تحويل إلى "+to.name,reason,amt,Number(s.balance)-amt,s.name,s.guardianWhats||"");
+    await logTxn(toRef,"تحويل من "+s.name,reason,amt,Number(to.balance||0)+amt,to.name,to.guardianWhats||"");
+  }
+
+  document.getElementById("amt").value = "";
+  await showStatement();
+  await refreshWeekKPIs();
+}
+
 
     async function startApp(){
       const so = $("startOverlay");
@@ -1463,266 +1524,5 @@ ${SIGNATURE}`;
       bindClickSounds();
     });
   </script>
-
-<script>
-/* ===== PATCH: تفعيل الإيداع/السحب + إضافة التحويل + تحسين PDF ===== */
-(function(){
-  // helper
-  const $ = (id)=>document.getElementById(id);
-  const qs = (s)=>document.querySelector(s);
-
-  // Ensure transfer option exists in operation select (student page)
-  function ensureTransferUI(){
-    const opSel = $("op");
-    if(opSel && ![...opSel.options].some(o=>o.value==="transfer")){
-      const opt = document.createElement("option");
-      opt.value="transfer"; opt.textContent="تحويل";
-      opSel.appendChild(opt);
-    }
-    // add transferTo select if missing
-    if(opSel && !$("transferToWrap")){
-      const wrap = document.createElement("div");
-      wrap.id="transferToWrap";
-      wrap.style.display="none";
-      wrap.innerHTML = `
-        <label class="muted" style="font-weight:900;display:block;margin:0 0 6px">تحويل إلى</label>
-        <select id="transferTo" class="inp"></select>
-      `;
-      // place after reason field if possible
-      const reason = $("reason");
-      if(reason && reason.parentElement){
-        reason.parentElement.insertAdjacentElement("afterend", wrap);
-      }else{
-        opSel.insertAdjacentElement("afterend", wrap);
-      }
-    }
-    opSel?.addEventListener("change", ()=>{
-      const wrap = $("transferToWrap");
-      if(!wrap) return;
-      wrap.style.display = (opSel.value==="transfer") ? "block" : "none";
-    });
-  }
-
-  async function fillTransferTargets(currentId){
-    const sel = $("transferTo");
-    if(!sel) return;
-    sel.innerHTML = "";
-    try{
-      const snap = await db.collection("students").orderBy("name").get();
-      snap.forEach(d=>{
-        if(d.id===currentId) return;
-        const s=d.data()||{};
-        if(s.active===false) return;
-        const opt=document.createElement("option");
-        opt.value=d.id;
-        opt.textContent = `${s.name||"طالب"} (${fmt(s.balance||0)} ر.س)`;
-        sel.appendChild(opt);
-      });
-      if(!sel.options.length){
-        const opt=document.createElement("option");
-        opt.value=""; opt.textContent="لا يوجد طلاب متاحون";
-        sel.appendChild(opt);
-      }
-    }catch(e){
-      console.log(e);
-    }
-  }
-
-  // override executeOp with full implementation
-  window.executeOp = async function(){
-    try{
-      if(!window.currentStudent){ warn("اختاري طالبًا أولاً."); return; }
-      const studentId = window.currentStudent;
-      const op = ($("op")?.value||"deposit");
-      const amount = Number(($("amount")?.value||"").toString().replace(/[^\d.]/g,""));
-      let reason = ($("reason")?.value||"").trim();
-      const reasonOther = ($("reasonOther")?.value||"").trim();
-      if(reason==="أخرى" && reasonOther) reason = reasonOther;
-      if(!amount || amount<=0){ warn("اكتبي مبلغ صحيح."); return; }
-      if(!reason) reason = "—";
-
-      const sRef = db.collection("students").doc(studentId);
-
-      // Transfer
-      if(op==="transfer"){
-        const toId = ($("transferTo")?.value||"").trim();
-        if(!toId){ warn("اختاري المستلم للتحويل."); return; }
-        if(toId===studentId){ warn("لا يمكن التحويل لنفس الطالب."); return; }
-        const toRef = db.collection("students").doc(toId);
-
-        await db.runTransaction(async (tx)=>{
-          const sDoc = await tx.get(sRef);
-          const tDoc = await tx.get(toRef);
-          if(!sDoc.exists) throw new Error("student missing");
-          if(!tDoc.exists) throw new Error("target missing");
-          const s = sDoc.data()||{};
-          const t = tDoc.data()||{};
-          const sBal = Number(s.balance||0);
-          if(sBal < amount) throw new Error("insufficient");
-          const newSBal = sBal - amount;
-          const newTBal = Number(t.balance||0) + amount;
-
-          tx.update(sRef,{ balance:newSBal, lastUpdated: firebase.firestore.FieldValue.serverTimestamp() });
-          tx.update(toRef,{ balance:newTBal, lastUpdated: firebase.firestore.FieldValue.serverTimestamp() });
-
-          const nowClient = Date.now();
-          const base = {
-            amount, reason,
-            ts: firebase.firestore.FieldValue.serverTimestamp(),
-            createdAtClient: nowClient,
-            by: window.currentAccess || "teacher",
-          };
-
-          // sender log
-          tx.set(sRef.collection("txns").doc(),{
-            ...base,
-            type:"تحويل",
-            note:`تحويل إلى: ${t.name||"طالب"}`,
-            balanceAfter:newSBal
-          });
-          // receiver log
-          tx.set(toRef.collection("txns").doc(),{
-            ...base,
-            type:"استلام تحويل",
-            note:`تحويل من: ${s.name||"طالب"}`,
-            balanceAfter:newTBal
-          });
-        });
-
-        ok("تم التحويل بنجاح.");
-        await window.refreshStudent?.();
-        await window.refreshWeekKPIs?.();
-        return;
-      }
-
-      // Deposit/Withdraw
-      await db.runTransaction(async (tx)=>{
-        const doc = await tx.get(sRef);
-        if(!doc.exists) throw new Error("student missing");
-        const s = doc.data()||{};
-        const bal = Number(s.balance||0);
-        let newBal = bal;
-
-        if(op==="withdraw"){
-          if(bal < amount) throw new Error("insufficient");
-          newBal = bal - amount;
-        }else{
-          newBal = bal + amount;
-        }
-
-        tx.update(sRef,{ balance:newBal, lastUpdated: firebase.firestore.FieldValue.serverTimestamp() });
-
-        tx.set(sRef.collection("txns").doc(),{
-          type: op==="withdraw" ? "سحب" : "إيداع",
-          amount,
-          reason,
-          ts: firebase.firestore.FieldValue.serverTimestamp(),
-          createdAtClient: Date.now(),
-          by: window.currentAccess || "teacher",
-          balanceAfter: newBal
-        });
-      });
-
-      ok(op==="withdraw" ? "تم السحب." : "تم الإيداع.");
-      await window.refreshStudent?.();
-      await window.refreshWeekKPIs?.();
-
-    }catch(e){
-      console.log(e);
-      if(String(e.message||"").includes("insufficient")) warn("الرصيد غير كافٍ.");
-      else warn("تعذر تنفيذ العملية الآن.");
-    }
-  };
-
-  // More robust weekly KPIs (safe even if query fails)
-  window.refreshWeekKPIs = async function(){
-    try{
-      if(!window.currentStudent) return;
-      const ref = db.collection("students").doc(window.currentStudent).collection("txns");
-      const from = new Date(); from.setDate(from.getDate()-7);
-      const snap = await ref.where("createdAtClient",">=",from.getTime()).get();
-      let dep=0, wdr=0, net=0;
-      snap.forEach(d=>{
-        const x=d.data()||{};
-        const amt=Number(x.amount||0);
-        if(x.type==="إيداع") dep+=amt;
-        if(x.type==="سحب") wdr+=amt;
-      });
-      net = dep - wdr;
-      const el1=$("weekDep"), el2=$("weekWdr"), el3=$("weekNet"), el4=$("weekCount");
-      if(el1) el1.textContent = fmt(dep);
-      if(el2) el2.textContent = fmt(wdr);
-      if(el3) el3.textContent = fmt(net);
-      if(el4) el4.textContent = String(snap.size||0);
-    }catch(e){
-      console.log(e);
-    }
-  };
-
-  // Patch PDF queries to avoid orderBy error when createdAtClient missing
-  const _pdfStudentReport = window.pdfStudentReport;
-  window.pdfStudentReport = async function(studentId){
-    try{
-      const s = await getStudentById(studentId);
-      let txSnap;
-      try{
-        txSnap = await db.collection("students").doc(studentId).collection("txns")
-          .orderBy("ts","desc").limit(200).get();
-      }catch(_){
-        txSnap = await db.collection("students").doc(studentId).collection("txns")
-          .orderBy("createdAtClient","desc").limit(200).get();
-      }
-      let rows="";
-      txSnap.forEach(d=>{
-        const x=d.data()||{};
-        const t = x.createdAtClient ? new Date(x.createdAtClient).toLocaleString("ar-SA") : "";
-        rows += `<tr>
-          <td>${t}</td>
-          <td>${x.type||""}</td>
-          <td>${x.reason||x.note||""}</td>
-          <td>${fmt(x.amount)}</td>
-          <td>${(x.balanceAfter!=null)?fmt(x.balanceAfter):""}</td>
-        </tr>`;
-      });
-      if(!rows) rows = `<tr><td colspan="5" class="muted" style="padding:18px">لا توجد عمليات.</td></tr>`;
-      const inner = `
-        <div style="font-weight:1000;color:#0b2a66;margin-bottom:8px">تقرير الطالب</div>
-        <div class="muted" style="font-weight:900;margin-bottom:10px">
-          الاسم: <b>${s.name||"—"}</b> • الرصيد: <b>${fmt(s.balance)}</b> ر.س • PIN: <b>${s.pin||"—"}</b>
-        </div>
-        <table>
-          <thead><tr><th>الوقت</th><th>العملية</th><th>السبب</th><th>المبلغ</th><th>الرصيد بعد العملية</th></tr></thead>
-          <tbody>${rows}</tbody>
-        </table>`;
-      openPrintWindow(`تقرير الطالب - ${s.name||""}`, inner);
-    }catch(e){
-      console.log(e);
-      warn("تعذر إنشاء تقرير الطالب الآن.");
-      // fallback old if existed
-      try{ if(typeof _pdfStudentReport==="function") return _pdfStudentReport(studentId); }catch(_){}
-    }
-  };
-
-  // Rebind buttons if some are not wired
-  function bind(){
-    const execBtn = qs(".js-exec");
-    execBtn && (execBtn.onclick = ()=>window.executeOp());
-    ensureTransferUI();
-  }
-
-  document.addEventListener("DOMContentLoaded", ()=>{
-    bind();
-  });
-
-  // When opening a student page, fill transfer targets
-  const _openStudent = window.openStudent;
-  window.openStudent = async function(id){
-    const r = _openStudent ? await _openStudent(id) : undefined;
-    try{ await fillTransferTargets(id); }catch(e){}
-    return r;
-  };
-})();
-</script>
-
 </body>
 </html>
