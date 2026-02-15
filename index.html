@@ -2095,7 +2095,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
       w.document.close();
     }
 
-    async function pdfStudentReport(studentId){
+    async async function pdfStudentReport(studentId){
       try{
         const s = await getStudentById(studentId);
         const txSnap = await db.collection("students").doc(studentId).collection("txns")
@@ -2794,6 +2794,237 @@ document.addEventListener("DOMContentLoaded", async()=>{
         console.log("withdrawSelected error", e);
         warn("تعذر تنفيذ السحب الآن");
       }
+    };
+
+
+    // ====== إضافات: PDF من تاريخ إلى تاريخ + رسم بياني بدون مكتبات خارجية ======
+
+    function safeDateMs(val, endOfDay=false){
+      if(!val) return null;
+      const d = new Date(val + "T00:00:00");
+      if(endOfDay) d.setHours(23,59,59,999);
+      return d.getTime();
+    }
+
+    async function exportPdfTeacher(){
+      try{
+        const sid = $('repPickStudentTeacher')?.value;
+        if(!sid) return warn("اختاري الطالب/الطالبة أولًا.");
+        const fromMs = safeDateMs($('repFromTeacher')?.value, false);
+        const toMs   = safeDateMs($('repToTeacher')?.value, true);
+        if(!fromMs || !toMs) return warn("اختاري من تاريخ وإلى تاريخ.");
+        if(fromMs>toMs) return warn("تاريخ البداية أكبر من تاريخ النهاية.");
+        await pdfRangeReport(sid, fromMs, toMs, "تقرير (من تاريخ إلى تاريخ)");
+      }catch(e){
+        console.log(e);
+        warn("تعذر إصدار التقرير الآن.");
+      }
+    }
+
+    async function exportPdfStudent(){
+      try{
+        if(!currentStudentId) return warn("لم يتم تحديد الطالب.");
+        const fromMs = safeDateMs($('repFromStudent')?.value, false);
+        const toMs   = safeDateMs($('repToStudent')?.value, true);
+        if(!fromMs || !toMs) return warn("اختاري من تاريخ وإلى تاريخ.");
+        if(fromMs>toMs) return warn("تاريخ البداية أكبر من تاريخ النهاية.");
+        await pdfRangeReport(currentStudentId, fromMs, toMs, "تقرير (من تاريخ إلى تاريخ)");
+      }catch(e){
+        console.log(e);
+        warn("تعذر إصدار التقرير الآن.");
+      }
+    }
+
+    async function pdfRangeReport(studentId, fromMs, toMs, titleLabel){
+      const s = await getStudentById(studentId);
+      // نجلب آخر 600 عملية ثم نفلتر (بدون تعقيد فهارس Firestore)
+      const snap = await db.collection("students").doc(studentId).collection("txns")
+        .orderBy("createdAtClient","desc").limit(600).get();
+
+      let rows = "";
+      let count = 0;
+      let sumIn = 0, sumOut = 0;
+
+      const items = [];
+      snap.forEach(d=>{
+        const x = d.data() || {};
+        const tms = Number(x.createdAtClient || x.createdAt || 0);
+        if(!tms) return;
+        if(tms < fromMs || tms > toMs) return;
+        items.push(x);
+      });
+      items.sort((a,b)=>Number(a.createdAtClient||0)-Number(b.createdAtClient||0));
+
+      items.forEach(x=>{
+        const t = x.createdAtClient ? new Date(x.createdAtClient).toLocaleString("ar-SA") : "";
+        const amt = Number(x.amount||0);
+        const typ = x.type || "";
+        // تصنيف دخول/خروج
+        const isIn = (typ.includes("إيداع") || typ.includes("تحويل وارد") || typ==="deposit" || typ==="transfer_in");
+        const isOut = (typ.includes("سحب") || typ.includes("تحويل صادر") || typ==="withdraw" || typ==="transfer_out");
+        if(isIn) sumIn += amt;
+        if(isOut) sumOut += amt;
+
+        rows += `<tr>
+          <td>${t}</td>
+          <td>${typ}</td>
+          <td>${x.reason||""}</td>
+          <td>${fmt(amt)}</td>
+          <td>${fmt(x.balanceAfter)}</td>
+        </tr>`;
+        count++;
+      });
+
+      if(!rows) rows = `<tr><td colspan="5" class="muted" style="padding:18px">لا توجد عمليات ضمن الفترة المحددة.</td></tr>`;
+
+      const fromTxt = new Date(fromMs).toLocaleDateString("ar-SA");
+      const toTxt   = new Date(toMs).toLocaleDateString("ar-SA");
+
+      const inner = `
+        <div style="font-weight:1000;color:#0b2a66;margin-bottom:8px">${titleLabel}</div>
+        <div class="muted" style="font-weight:900;margin-bottom:10px">
+          الاسم: <b>${s.name||"—"}</b> • الرصيد الحالي: <b>${fmt(s.balance)}</b> ر.س • الفترة: <b>${fromTxt}</b> إلى <b>${toTxt}</b>
+        </div>
+
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px">
+          <div style="flex:1;min-width:160px;border:1px solid #e5e7eb;border-radius:14px;padding:10px">
+            <div class="muted" style="font-weight:900">عدد العمليات</div>
+            <div style="font-weight:1000;color:#0b2a66">${count}</div>
+          </div>
+          <div style="flex:1;min-width:160px;border:1px solid #e5e7eb;border-radius:14px;padding:10px">
+            <div class="muted" style="font-weight:900">إجمالي الدخول</div>
+            <div style="font-weight:1000;color:#0b2a66">${fmt(sumIn)} ر.س</div>
+          </div>
+          <div style="flex:1;min-width:160px;border:1px solid #e5e7eb;border-radius:14px;padding:10px">
+            <div class="muted" style="font-weight:900">إجمالي الخروج</div>
+            <div style="font-weight:1000;color:#0b2a66">${fmt(sumOut)} ر.س</div>
+          </div>
+          <div style="flex:1;min-width:160px;border:1px solid #e5e7eb;border-radius:14px;padding:10px">
+            <div class="muted" style="font-weight:900">الصافي</div>
+            <div style="font-weight:1000;color:#0b2a66">${fmt(sumIn - sumOut)} ر.س</div>
+          </div>
+        </div>
+
+        <table>
+          <thead><tr><th>الوقت</th><th>العملية</th><th>السبب</th><th>المبلغ</th><th>الرصيد بعد العملية</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      `;
+      openPrintWindow(`${titleLabel} - ${s.name||""}`, inner);
+    }
+
+    // رسم بياني لتطور الرصيد: آخر 30 يوم (خط بسيط عبر Canvas API)
+    async function renderBalanceChartLast30(){
+      try{
+        if(!currentStudentId) return;
+        const canvas = document.getElementById("balanceChart");
+        if(!canvas) return;
+        // ضمان عرض صحيح
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = Math.max(600, Math.floor(rect.width || 600));
+        canvas.height = 220;
+
+        const now = Date.now();
+        const fromMs = now - 30*24*60*60*1000;
+
+        const snap = await db.collection("students").doc(currentStudentId).collection("txns")
+          .orderBy("createdAtClient","desc").limit(700).get();
+
+        const pts = [];
+        snap.forEach(d=>{
+          const x=d.data()||{};
+          const tms = Number(x.createdAtClient || 0);
+          if(!tms || tms < fromMs || tms > now) return;
+          pts.push({t:tms, y:Number(x.balanceAfter||0)});
+        });
+        pts.sort((a,b)=>a.t-b.t);
+
+        // إذا ما فيه عمليات، نرسم خط ثابت على الرصيد الحالي
+        if(!pts.length){
+          const s = await getStudentById(currentStudentId);
+          const y = Number(s.balance||0);
+          drawLineChart(canvas, [{t:fromMs,y},{t:now,y}], "آخر 30 يوم");
+          return;
+        }
+        // إضافة نقطة بداية لو ما فيه نقطة عند البداية
+        if(pts[0].t > fromMs){
+          pts.unshift({t:fromMs, y:pts[0].y});
+        }
+        drawLineChart(canvas, pts, "آخر 30 يوم");
+      }catch(e){
+        console.log("renderBalanceChartLast30 error", e);
+      }
+    }
+
+    function drawLineChart(canvas, pts, subtitle){
+      const ctx = canvas.getContext("2d");
+      const w = canvas.width, h = canvas.height;
+
+      // خلفية
+      ctx.clearRect(0,0,w,h);
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0,0,w,h);
+
+      const padL=52, padR=16, padT=18, padB=40;
+      const iw=w-padL-padR, ih=h-padT-padB;
+
+      let ymin = Math.min(...pts.map(p=>p.y));
+      let ymax = Math.max(...pts.map(p=>p.y));
+      if(ymin===ymax){ ymin -= 1; ymax += 1; }
+      const tmin = pts[0].t, tmax = pts[pts.length-1].t || (tmin+1);
+
+      const xOf = (t)=> padL + ( (t - tmin) / (tmax - tmin) ) * iw;
+      const yOf = (y)=> padT + (1 - (y - ymin)/(ymax - ymin)) * ih;
+
+      // Grid
+      ctx.strokeStyle = "rgba(0,0,0,.08)";
+      ctx.lineWidth = 1;
+      for(let i=0;i<=4;i++){
+        const y = padT + (ih/4)*i;
+        ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(w-padR, y); ctx.stroke();
+      }
+
+      // Axes labels (min/max)
+      ctx.fillStyle = "rgba(11,42,102,.9)";
+      ctx.font = "bold 12px Tahoma, Arial";
+      ctx.fillText(String(Math.round(ymax)), 6, padT+12);
+      ctx.fillText(String(Math.round(ymin)), 6, padT+ih);
+
+      // Title
+      ctx.fillStyle = "rgba(11,42,102,1)";
+      ctx.font = "bold 13px Tahoma, Arial";
+      ctx.fillText("تطور الرصيد", padL, 14);
+      ctx.fillStyle = "rgba(71,96,126,1)";
+      ctx.font = "bold 11px Tahoma, Arial";
+      ctx.fillText(subtitle||"", padL, h-10);
+
+      // Line
+      ctx.strokeStyle = "rgba(0,85,164,.95)";
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      pts.forEach((p,i)=>{
+        const x=xOf(p.t), y=yOf(p.y);
+        if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+      });
+      ctx.stroke();
+
+      // Dots (last point)
+      const last = pts[pts.length-1];
+      const lx=xOf(last.t), ly=yOf(last.y);
+      ctx.fillStyle = "rgba(0,85,164,1)";
+      ctx.beginPath(); ctx.arc(lx, ly, 4, 0, Math.PI*2); ctx.fill();
+
+      // Last value
+      ctx.fillStyle = "rgba(11,42,102,1)";
+      ctx.font = "bold 12px Tahoma, Arial";
+      ctx.fillText(`${Math.round(last.y)} ر.س`, Math.min(w-90, lx+8), Math.max(22, ly-8));
+    }
+
+    // نضمن التحديث عند فتح صفحة الطالب
+    const _origEnterStudent = window.enterStudent || null;
+    window.enterStudent = async function(studentId){
+      if(_origEnterStudent) await _origEnterStudent(studentId);
+      try{ await renderBalanceChartLast30(); }catch(e){}
     };
 
 </script>
