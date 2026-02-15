@@ -610,6 +610,27 @@
 
         <div class="row">
           <div class="col">
+            <div class="small">تحويل من</div>
+            <select id="transferFromTeacher"></select>
+          </div>
+          <div class="col">
+            <div class="small">تحويل إلى</div>
+            <select id="transferToTeacher"></select>
+            <div class="small" id="transferTeacherPreview" style="margin-top:6px;color:#0b2a66;font-weight:1000"></div>
+          </div>
+          <div class="col">
+            <div class="small">المبلغ</div>
+            <input id="transferAmtTeacher" type="number" step="0.01" placeholder="مثال: 5">
+          </div>
+          <div class="col" style="align-self:flex-end">
+            <button class="btn" onclick="teacherTransfer()">تحويل</button>
+          </div>
+        </div>
+
+        <hr>
+
+        <div class="row">
+          <div class="col">
             <div class="small">سبب العملية (ثابت)</div>
             <select id="reasonTeacher"></select>
             <input id="reasonOtherTeacher" class="hidden" placeholder="أخرى: اكتب السبب هنا..." style="margin-top:8px">
@@ -752,6 +773,7 @@
                 <select id="op">
                   <option value="deposit">إيداع</option>
                   <option value="withdraw">سحب</option>
+                  <option value="transfer">تحويل</option>
                 </select>
               </div>
 
@@ -762,6 +784,11 @@
               </div>
 
               <div class="col"><div class="small">المبلغ</div><input id="amt" type="number" step="0.01"></div>
+              <div class="col hidden" id="transferWrap">
+                <div class="small">تحويل إلى</div>
+                <select id="transferTo"></select>
+                <div class="small" id="transferToPreview" style="margin-top:6px;color:#0b2a66;font-weight:1000"></div>
+              </div>
             </div>
 
             <div class="row">
@@ -1439,6 +1466,8 @@ ${SIGNATURE}`;
       pick.innerHTML="";
       arr.forEach(s=>{ const o=document.createElement("option"); o.value=s.id; o.textContent=s.name; pick.appendChild(o); });
 
+      _populateTeacherTransferSelects(arr);
+
       const grid = $("studentsGrid");
       grid.innerHTML="";
       arr.forEach(s=>{
@@ -1683,7 +1712,10 @@ document.addEventListener("DOMContentLoaded", async()=>{
       if(IS_STUDENT_ENTRY){ $("startMsg").innerHTML = "بوابة دخول الطلاب 👇<br>اضغط زر البداية ثم تابعي التعريف السريع."; }
       $("forgotPinLink")?.addEventListener("click",(e)=>{ e.preventDefault(); forgotStudentPin(); });
       $("changePinLink")?.addEventListener("click",(e)=>{ e.preventDefault(); changePinStudentFlow(); });
-      $("op")?.addEventListener("change", ()=> setupReasonUI($("op").value, "reasonStudent", "reasonOtherStudent"));
+      $("op")?.addEventListener("change", ()=>{
+        setupReasonUI($("op").value, "reasonStudent", "reasonOtherStudent");
+        toggleStudentOpUI();
+      });
       await loadForgotSetting();
       try{ await ensureSeed(); await renderTabs(); $("connPill").textContent="جاهز ✅"; }catch(e){ $("connPill").textContent="جاهز ✅"; }
       initTeacherReasonAlways();
@@ -2056,7 +2088,35 @@ document.addEventListener("DOMContentLoaded", async()=>{
     openStudentAccount = async function(s){
       await __openStudentAccount_original(s);
       await buildTransferList();
+      toggleStudentOpUI();
+      updateTransferPreview();
     };
+
+    function updateTransferPreview(){
+      const prev = $("transferToPreview");
+      const sel = $("transferTo");
+      if(!prev) return;
+      const opt = sel?.selectedOptions?.[0];
+      const name = opt ? opt.textContent : "";
+      if(name){
+        prev.textContent = "المستلم: " + name;
+      }else{
+        prev.textContent = "";
+      }
+    }
+
+    function toggleStudentOpUI(){
+      const op = $("op")?.value || "deposit";
+      const wrap = $("transferWrap");
+      if(!wrap) return;
+      if(op === "transfer"){
+        wrap.classList.remove("hidden");
+        buildTransferList().then(()=>{ if($("transferTo")) $("transferTo").onchange = updateTransferPreview; updateTransferPreview(); });
+      }else{
+        wrap.classList.add("hidden");
+      }
+    }
+
 
     // KPI weekly (simple implementation)
     refreshWeekKPIs = async function(){
@@ -2284,6 +2344,105 @@ document.addEventListener("DOMContentLoaded", async()=>{
         warn("تعذر تنفيذ السحب الآن");
       }
     };
+
+    function _populateTeacherTransferSelects(arr){
+      const tf = $("transferFromTeacher");
+      const tt = $("transferToTeacher");
+      if(!tf || !tt) return;
+
+      const curFrom = tf.value || "";
+      const curTo = tt.value || "";
+
+      tf.innerHTML = "";
+      tt.innerHTML = "";
+
+      arr.forEach(s=>{
+        const o=document.createElement("option");
+        o.value=s.id; o.textContent=s.name || "—";
+        tf.appendChild(o);
+      });
+      arr.forEach(s=>{
+        const o=document.createElement("option");
+        o.value=s.id; o.textContent=s.name || "—";
+        tt.appendChild(o);
+      });
+
+      // restore previous if possible
+      if(curFrom) tf.value = curFrom;
+      if(curTo) tt.value = curTo;
+
+      // if same, shift "to"
+      if(tf.value && tt.value && tf.value===tt.value){
+        if(tt.options.length>1){
+          tt.selectedIndex = (tt.selectedIndex===0?1:0);
+        }
+      }
+
+      tf.onchange = ()=>{ 
+        // avoid same
+        if(tf.value===tt.value && tt.options.length>1){
+          tt.selectedIndex = (tt.selectedIndex===0?1:0);
+        }
+        updateTeacherTransferPreview();
+      };
+      tt.onchange = updateTeacherTransferPreview;
+      $("transferAmtTeacher")?.addEventListener("input", updateTeacherTransferPreview);
+      $("reasonTeacher")?.addEventListener("change", updateTeacherTransferPreview);
+
+      updateTeacherTransferPreview();
+    }
+
+    function updateTeacherTransferPreview(){
+      const prev = $("transferTeacherPreview");
+      const tf = $("transferFromTeacher");
+      const tt = $("transferToTeacher");
+      if(!prev || !tf || !tt) return;
+      const fromName = tf.selectedOptions?.[0]?.textContent || "";
+      const toName = tt.selectedOptions?.[0]?.textContent || "";
+      const reason = getReason("reasonTeacher","reasonOtherTeacher");
+      prev.textContent = (fromName && toName) ? (`من: ${fromName}  →  إلى: ${toName}  |  السبب: ${reason}`) : "";
+    }
+
+    async function teacherTransfer(){
+      try{
+        await _ensureTeacherContext();
+        const fromId = $("transferFromTeacher")?.value;
+        const toId = $("transferToTeacher")?.value;
+        const amt = parseFloat($("transferAmtTeacher")?.value || "");
+        if(!fromId || !toId) return warn("اختاري الطالب المُرسِل والمستلم");
+        if(fromId===toId) return warn("لا يمكن التحويل لنفس الطالب");
+        if(isNaN(amt) || amt<=0) return warn("اكتبي مبلغ صحيح للتحويل");
+        const reason = getReason("reasonTeacher","reasonOtherTeacher");
+
+        const fromRef = db.collection("students").doc(fromId);
+        const toRef = db.collection("students").doc(toId);
+
+        const [fromDoc,toDoc] = await Promise.all([fromRef.get(), toRef.get()]);
+        if(!fromDoc.exists || !toDoc.exists) return warn("تعذر العثور على أحد الحسابات");
+        const from = fromDoc.data() || {};
+        const to = toDoc.data() || {};
+
+        if(from.active===false) return warn("حساب المُرسِل غير مُفعل");
+        if(to.active===false) return warn("حساب المستلم غير مُفعل");
+        if(Number(from.balance||0) < amt) return warn("رصيد المُرسِل لا يكفي للتحويل");
+
+        const batch = db.batch();
+        batch.update(fromRef, {balance: Number(from.balance||0) - amt});
+        batch.update(toRef, {balance: Number(to.balance||0) + amt});
+        await batch.commit();
+
+        await logTxn(fromRef, "تحويل إلى " + (to.name||"—"), reason, amt, Number(from.balance||0) - amt);
+        await logTxn(toRef, "تحويل من " + (from.name||"طالب/ـة"), reason, amt, Number(to.balance||0) + amt);
+
+        if($("transferAmtTeacher")) $("transferAmtTeacher").value = "";
+        updateTeacherTransferPreview();
+        await renderStudents();
+      }catch(e){
+        console.log("teacherTransfer error", e);
+        warn("صار خطأ… جرّبي مرة ثانية");
+      }
+    }
+
 
     depositSelected = async function(){
       try{
