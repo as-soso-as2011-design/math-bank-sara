@@ -1590,17 +1590,29 @@ ${SIGNATURE}`;
           .limit(500)
           .get();
 
+        // build quick lookup for guardian numbers (fixes old txns that didn't store the number)
+        const studsSnap = await db.collection("students").get();
+        const guardianById = {};
+        const nameById = {};
+        studsSnap.forEach(sd=>{
+          const v = sd.data() || {};
+          guardianById[sd.id] = (v.guardianWhats||"").trim();
+          nameById[sd.id] = (v.name||"").trim();
+        });
+
         dailyOpsCache = [];
         snap.forEach(d=>{
           const x = d.data() || {};
+          const sid = (d.ref && d.ref.parent && d.ref.parent.parent) ? d.ref.parent.parent.id : "";
           dailyOpsCache.push({
             id: d.id,
-            studentName: x.studentName || "",
+            studentId: sid,
+            studentName: x.studentName || nameById[sid] || "",
             type: x.type || "",
             amount: Number(x.amount||0),
             reason: x.reason || "",
             createdAtClient: x.createdAtClient || 0,
-            guardianWhats: x.guardianWhats || ""
+            guardianWhats: (x.guardianWhats || guardianById[sid] || "").trim()
           });
         });
 
@@ -2046,9 +2058,13 @@ document.addEventListener("DOMContentLoaded", async()=>{
     }
     function localTodayKey(){ return localDateKeyFromDate(new Date()); }
 
-    async function logTxn(studentRef, type, reason, amount, balanceAfter){
+    async function logTxn(studentRef, type, reason, amount, balanceAfter, meta){
       try{
+        const m = meta || {};
         await studentRef.collection("txns").add({
+          studentId: studentRef.id || "",
+          studentName: m.name || m.studentName || "",
+          guardianWhats: m.guardianWhats || m.guardian || "",
           type: type || "",
           reason: reason || "",
           amount: Number(amount||0),
@@ -2058,6 +2074,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
           createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
       }catch(e){
+
         // ignore logging errors to avoid blocking UI
         console.log("logTxn error", e);
       }
@@ -2168,13 +2185,13 @@ document.addEventListener("DOMContentLoaded", async()=>{
         if(op === "deposit"){
           const nb = Number(s.balance||0) + amt;
           await ref.update({balance: nb});
-          await logTxn(ref, "إيداع", reason, amt, nb);
+          await logTxn(ref, "إيداع", reason, amt, nb, s);
 
         }else if(op === "withdraw"){
           if(Number(s.balance||0) < amt) return warn("الرصيد ما يكفي");
           const nb = Number(s.balance||0) - amt;
           await ref.update({balance: nb});
-          await logTxn(ref, "سحب", reason, amt, nb);
+          await logTxn(ref, "سحب", reason, amt, nb, s);
 
         }else if(op === "transfer"){
           if(Number(s.balance||0) < amt) return warn("الرصيد ما يكفي للتحويل");
@@ -2192,8 +2209,8 @@ document.addEventListener("DOMContentLoaded", async()=>{
           batch.update(toRef, {balance: Number(to.balance||0) + amt});
           await batch.commit();
 
-          await logTxn(ref, "تحويل إلى " + (to.name||"—"), reason, amt, Number(s.balance||0) - amt);
-          await logTxn(toRef, "تحويل من " + (s.name||"طالب/ـة"), reason, amt, Number(to.balance||0) + amt);
+          await logTxn(ref, "تحويل إلى " + (to.name||"—"), reason, amt, Number(s.balance||0) - amt, s);
+          await logTxn(toRef, "تحويل من " + (s.name||"طالب/ـة"), reason, amt, Number(to.balance||0) + amt, to);
         }
 
         // refresh UI
@@ -2232,14 +2249,14 @@ document.addEventListener("DOMContentLoaded", async()=>{
           if(s.active===false) return;
           const nb = Number(s.balance||0) + a;
           batch.update(db.collection("students").doc(d.id), {balance: nb});
-          updates.push({id:d.id, nb});
+          updates.push({id:d.id, nb, name:(s.name||""), guardianWhats:(s.guardianWhats||"")});
         });
         await batch.commit();
 
         // log after commit
         for(const u of updates){
           const ref = db.collection("students").doc(u.id);
-          await logTxn(ref, "إيداع (معلمة)", reason, a, u.nb);
+          await logTxn(ref, "إيداع (معلمة)", reason, a, u.nb, u);
         }
 
         $("bulkAmount") && ($("bulkAmount").value="");
@@ -2275,13 +2292,13 @@ document.addEventListener("DOMContentLoaded", async()=>{
           if(s.active===false) return;
           const nb = Number(s.balance||0) - a;
           batch.update(db.collection("students").doc(d.id), {balance: nb});
-          updates.push({id:d.id, nb});
+          updates.push({id:d.id, nb, name:(s.name||""), guardianWhats:(s.guardianWhats||"")});
         });
         await batch.commit();
 
         for(const u of updates){
           const ref = db.collection("students").doc(u.id);
-          await logTxn(ref, "سحب (معلمة)", reason, a, u.nb);
+          await logTxn(ref, "سحب (معلمة)", reason, a, u.nb, u);
         }
 
         $("bulkWithdrawAmount") && ($("bulkWithdrawAmount").value="");
@@ -2308,7 +2325,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
 
         const nb = Number(s.balance||0) + a;
         await ref.update({balance: nb});
-        await logTxn(ref, "إيداع (معلمة)", reason, a, nb);
+        await logTxn(ref, "إيداع (معلمة)", reason, a, nb, s);
 
         $("pickAmount") && ($("pickAmount").value="");
         await renderStudents();
@@ -2335,7 +2352,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
 
         const nb = Number(s.balance||0) - a;
         await ref.update({balance: nb});
-        await logTxn(ref, "سحب (معلمة)", reason, a, nb);
+        await logTxn(ref, "سحب (معلمة)", reason, a, nb, s);
 
         $("pickAmount") && ($("pickAmount").value="");
         await renderStudents();
@@ -2431,8 +2448,8 @@ document.addEventListener("DOMContentLoaded", async()=>{
         batch.update(toRef, {balance: Number(to.balance||0) + amt});
         await batch.commit();
 
-        await logTxn(fromRef, "تحويل إلى " + (to.name||"—"), reason, amt, Number(from.balance||0) - amt);
-        await logTxn(toRef, "تحويل من " + (from.name||"طالب/ـة"), reason, amt, Number(to.balance||0) + amt);
+        await logTxn(fromRef, "تحويل إلى " + (to.name||"—"), reason, amt, Number(from.balance||0) - amt, from);
+        await logTxn(toRef, "تحويل من " + (from.name||"طالب/ـة"), reason, amt, Number(to.balance||0) + amt, to);
 
         if($("transferAmtTeacher")) $("transferAmtTeacher").value = "";
         updateTeacherTransferPreview();
@@ -2459,7 +2476,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
           if(s.active===false) continue;
           const nb = Number(s.balance||0) + a;
           await ref.update({balance: nb});
-          await logTxn(ref, "إيداع (معلمة)", reason, a, nb);
+          await logTxn(ref, "إيداع (معلمة)", reason, a, nb, s);
         }
         await renderStudents();
       }catch(e){
@@ -2484,7 +2501,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
           if(Number(s.balance||0) < a) continue;
           const nb = Number(s.balance||0) - a;
           await ref.update({balance: nb});
-          await logTxn(ref, "سحب (معلمة)", reason, a, nb);
+          await logTxn(ref, "سحب (معلمة)", reason, a, nb, s);
         }
         await renderStudents();
       }catch(e){
