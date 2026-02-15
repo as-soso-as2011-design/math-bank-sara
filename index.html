@@ -831,11 +831,32 @@
             <h3 style="margin:0;color:#0b2a66">🎁 الجوائز والحوافز</h3>
             <div class="small" style="margin-top:6px">اقتراح نظام جوائز جاهز (قابل للتخصيص):</div>
             <div class="row" style="margin-top:10px">
-              <div class="col"><div class="card soft"><div style="font-weight:1000;color:#0b2a66">🏆 بطل الأسبوع</div><div class="small">أعلى صافي نقاط خلال الأسبوع</div></div></div>
-              <div class="col"><div class="card soft"><div style="font-weight:1000;color:#0b2a66">🎖️ نجم الالتزام</div><div class="small">0 مخالفات خلال 5 أيام</div></div></div>
-              <div class="col"><div class="card soft"><div style="font-weight:1000;color:#0b2a66">🎯 نجم المشاركة</div><div class="small">تفاعل مستمر في الحصص</div></div></div>
+            <div class="row" style="margin-top:10px">
+              <div class="col">
+                <div class="card soft">
+                  <div style="font-weight:1000;color:#0b2a66">🏆 بطل الأسبوع</div>
+                  <div class="small" id="rwChampion">—</div>
+                </div>
+              </div>
+              <div class="col">
+                <div class="card soft">
+                  <div style="font-weight:1000;color:#0b2a66">🎖️ نجم الالتزام</div>
+                  <div class="small" id="rwCommit">—</div>
+                </div>
+              </div>
+              <div class="col">
+                <div class="card soft">
+                  <div style="font-weight:1000;color:#0b2a66">🎯 نجم المشاركة</div>
+                  <div class="small" id="rwPart">—</div>
+                </div>
+              </div>
             </div>
-            <div class="small">سيتم لاحقًا ربطها آليًا من سجل العمليات.</div>
+
+            <div class="cardHint" style="margin-top:10px">
+              صافي الأسبوع: <b id="rwWeekNet">0</b> ر.س • ترتيبك داخل الفصل: <b id="rwRank">—</b>
+            </div>
+</div>
+            <div class="small">يتم احتسابها تلقائيًا من سجل العمليات اليومية ✅</div>
           </div>
         </div>
 
@@ -1420,6 +1441,7 @@ ${SIGNATURE}`;
       setupReasonUI($("op").value,'reasonStudent','reasonOtherStudent');
       await showStatement();
       await refreshWeekKPIs();
+      await refreshRewards();
     }
 
     function backAfterStudent(){
@@ -1429,6 +1451,7 @@ ${SIGNATURE}`;
     }
 
     function setMiniTab(paneId, el){
+      try{ if(paneId==='paneRewards' && typeof refreshRewards==='function'){ refreshRewards(); } }catch(e){}
       document.querySelectorAll(".miniTab").forEach(t=>t.classList.remove("active"));
       el.classList.add("active");
       document.querySelectorAll(".miniPane").forEach(p=>p.classList.remove("active"));
@@ -2168,7 +2191,122 @@ document.addEventListener("DOMContentLoaded", async()=>{
       }
     };
 
-    // ===== Student operations (deposit/withdraw/transfer) =====
+    
+    // ===== Rewards (linked to daily operations / txns) =====
+    async function refreshRewards(){
+      try{
+        if(!currentStudentId) return;
+
+        const now = Date.now();
+        const weekStart = now - 7*24*60*60*1000;
+        const fiveStart = now - 5*24*60*60*1000;
+
+        const sRef = db.collection("students").doc(currentStudentId);
+
+        // Student weekly net (deposit + transfer in) - (withdraw + transfer out)
+        const weekSnap = await sRef.collection("txns")
+          .where("createdAtClient", ">=", weekStart)
+          .orderBy("createdAtClient","desc")
+          .limit(600)
+          .get();
+
+        let net=0, partCount=0, violations=0;
+        weekSnap.forEach(d=>{
+          const x=d.data()||{};
+          const t=String(x.type||"");
+          const reason=String(x.reason||"");
+          const a=Number(x.amount||0);
+
+          if(t.startsWith("إيداع") || t.startsWith("تحويل من")) net += a;
+          else if(t.startsWith("سحب") || t.startsWith("تحويل إلى")) net -= a;
+
+          // participation heuristic
+          if(t.startsWith("إيداع")){
+            const r = reason.replace(/\s+/g,'');
+            if(r.includes("مشاركة") || r.includes("تفاعل") || r.includes("إجابة") || r.includes("حل") || r.includes("واجب") || r.includes("نشاط")){
+              partCount++;
+            }
+          }
+        });
+
+        // Commitment: "0 مخالفات خلال 5 أيام"
+        const fiveSnap = await sRef.collection("txns")
+          .where("createdAtClient", ">=", fiveStart)
+          .orderBy("createdAtClient","desc")
+          .limit(600)
+          .get();
+
+        const violWords = ["مخالفة","سلوك","غياب","تأخر","عدم","انضباط","تنبيه"];
+        fiveSnap.forEach(d=>{
+          const x=d.data()||{};
+          const t=String(x.type||"");
+          const reason=String(x.reason||"");
+          if(!t.startsWith("سحب")) return;
+          const rr = reason || "";
+          if(violWords.some(w=>rr.includes(w))) violations++;
+        });
+
+        // Champion: rank by weekly net inside class
+        let rankText = "—";
+        let champText = "—";
+
+        if(currentClassId){
+          const studs = await db.collection("students").where("classId","==",currentClassId).get();
+          const nets = [];
+          for(const sd of studs.docs){
+            const sid = sd.id;
+            const ref = db.collection("students").doc(sid);
+            const snap = await ref.collection("txns")
+              .where("createdAtClient", ">=", weekStart)
+              .orderBy("createdAtClient","desc")
+              .limit(600)
+              .get();
+            let n=0;
+            snap.forEach(d=>{
+              const x=d.data()||{};
+              const t=String(x.type||"");
+              const a=Number(x.amount||0);
+              if(t.startsWith("إيداع") || t.startsWith("تحويل من")) n += a;
+              else if(t.startsWith("سحب") || t.startsWith("تحويل إلى")) n -= a;
+            });
+            nets.push({id:sid, name:(sd.data()||{}).name||"—", net:n});
+          }
+          nets.sort((a,b)=>b.net-a.net);
+          const idx = nets.findIndex(x=>x.id===currentStudentId);
+          if(idx>=0){
+            rankText = `${idx+1} / ${nets.length}`;
+          }
+          if(nets.length){
+            const top = nets[0];
+            champText = (top.id===currentStudentId)
+              ? "مستحق ✅ (أنت/ي الأعلى هذا الأسبوع)"
+              : `غير مستحق — المتصدر: ${top.name}`;
+          }
+        }else{
+          champText = "—";
+        }
+
+        // Participation: require >= 3 deposits tagged as participation during week
+        const partOk = (partCount >= 3);
+
+        // Update UI
+        $("rwWeekNet") && ($("rwWeekNet").textContent = fmt(net));
+        $("rwRank") && ($("rwRank").textContent = rankText);
+
+        $("rwChampion") && ($("rwChampion").textContent = champText);
+        $("rwCommit") && ($("rwCommit").textContent = (violations===0) ? "مستحق ✅ (0 مخالفات خلال 5 أيام)" : `غير مستحق — مخالفات: ${violations}`);
+        $("rwPart") && ($("rwPart").textContent = partOk ? `مستحق ✅ (مشاركات: ${partCount})` : `غير مستحق — مشاركات: ${partCount} (الحد 3)`);
+
+      }catch(e){
+        console.log("refreshRewards error", e);
+        $("rwChampion") && ($("rwChampion").textContent = "تعذر الحساب");
+        $("rwCommit") && ($("rwCommit").textContent = "تعذر الحساب");
+        $("rwPart") && ($("rwPart").textContent = "تعذر الحساب");
+      }
+    }
+
+
+// ===== Student operations (deposit/withdraw/transfer) =====
     executeOp = async function(){
       try{
         const ref = db.collection("students").doc(currentStudentId);
@@ -2222,6 +2360,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
         setupReasonUI($("op")?.value || "deposit",'reasonStudent','reasonOtherStudent');
         await showStatement();
         await refreshWeekKPIs();
+      await refreshRewards();
       }catch(e){
         console.log("executeOp error", e);
         warn("صار خطأ… جرّبي مرة ثانية");
