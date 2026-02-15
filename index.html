@@ -2095,7 +2095,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
       w.document.close();
     }
 
-    async async function pdfStudentReport(studentId){
+    async function pdfStudentReport(studentId){
       try{
         const s = await getStudentById(studentId);
         const txSnap = await db.collection("students").doc(studentId).collection("txns")
