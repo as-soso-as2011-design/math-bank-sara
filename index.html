@@ -2538,10 +2538,6 @@ document.addEventListener("DOMContentLoaded", async()=>{
         }else{
           champText = "—";
         }
-
-        // Participation: require >= 3 deposits tagged as participation during week
-        const partOk = (partCount >= 3);
-
         // Update UI (Rewards Pro)
         const rangeTxt = `${formatYMD(weekStart)} → ${formatYMD(weekEnd)}`;
         $("rwWeekRange") && ($("rwWeekRange").textContent = rangeTxt);
@@ -2722,7 +2718,6 @@ document.addEventListener("DOMContentLoaded", async()=>{
         }catch(e){}
 
         // Auto WhatsApp congratulations (once per week per award)
- (once per week per award)
         try{
           const champOk = String(champText||"").startsWith("مستحق");
           const commitOk = (violations===0);
