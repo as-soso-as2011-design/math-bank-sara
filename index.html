@@ -649,6 +649,41 @@
         </div>
       </div>
 
+      
+      <div class="card soft" style="margin-top:12px">
+        <div class="row" style="align-items:center;gap:10px;flex-wrap:wrap">
+          <div style="font-weight:1000;color:#0b2a66">🏅 لوحة شرف الأسبوع (الأحد → الخميس)</div>
+          <div class="small" id="honorWeekLabel" style="margin-right:auto;color:#47607e"></div>
+          <label class="small" style="display:flex;gap:8px;align-items:center">
+            <input type="checkbox" id="autoCongrats" style="width:auto"> إرسال تهنئة تلقائية للفائزات
+          </label>
+          <button class="btn2" onclick="renderHonorRoll()">تحديث اللوحة</button>
+        </div>
+        <div id="honorRollList" style="margin-top:10px"></div>
+      </div>
+
+      <div class="card soft" style="margin-top:12px">
+        <div style="font-weight:1000;color:#0b2a66">📄 تقرير PDF (من تاريخ إلى تاريخ)</div>
+        <div class="row" style="margin-top:10px;gap:10px;flex-wrap:wrap;align-items:flex-end">
+          <div class="col" style="min-width:200px">
+            <div class="small">اختر الطالب/الطالبة</div>
+            <select id="repPickStudentTeacher"></select>
+          </div>
+          <div class="col" style="min-width:160px">
+            <div class="small">من تاريخ</div>
+            <input id="repFromTeacher" type="date">
+          </div>
+          <div class="col" style="min-width:160px">
+            <div class="small">إلى تاريخ</div>
+            <input id="repToTeacher" type="date">
+          </div>
+          <div class="col" style="align-self:flex-end">
+            <button class="btn" onclick="exportPdfTeacher()">إصدار PDF</button>
+          </div>
+        </div>
+        <div class="small" style="margin-top:8px;color:#47607e">* يتم استخراج التقرير حسب العمليات المسجلة ضمن الفترة المحددة.</div>
+      </div>
+
       <div id="studentsGrid" class="grid2"></div>
     </div>
   </div>
@@ -764,7 +799,34 @@
             <div class="kpi"><div class="k">الصافي</div><div class="v" id="kpiWeekNet">0</div></div>
           </div>
 
-          <div class="card" style="margin:12px 0 0 0">
+          
+          <div class="card soft" style="margin:12px 0 0 0">
+            <div class="row" style="align-items:center;gap:10px;flex-wrap:wrap">
+              <div style="font-weight:1000;color:#0b2a66">📄 تقرير PDF (من تاريخ إلى تاريخ)</div>
+              <div class="small" style="margin-right:auto;color:#47607e">اختر الفترة ثم اضغط إصدار PDF</div>
+            </div>
+            <div class="row" style="margin-top:10px;gap:10px;flex-wrap:wrap;align-items:flex-end">
+              <div class="col" style="min-width:160px">
+                <div class="small">من تاريخ</div>
+                <input id="repFromStudent" type="date">
+              </div>
+              <div class="col" style="min-width:160px">
+                <div class="small">إلى تاريخ</div>
+                <input id="repToStudent" type="date">
+              </div>
+              <div class="col" style="align-self:flex-end">
+                <button class="btn" onclick="exportPdfStudent()">إصدار PDF</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card soft" style="margin:12px 0 0 0">
+            <div style="font-weight:1000;color:#0b2a66">📈 رسم بياني لتطور الرصيد</div>
+            <div class="small" style="margin-top:6px;color:#47607e">آخر 30 يوم (يتحدث تلقائيًا)</div>
+            <canvas id="balanceChart" height="120" style="margin-top:10px;width:100%"></canvas>
+          </div>
+
+<div class="card" style="margin:12px 0 0 0">
             <h3 style="margin:0 0 10px 0;color:#0b2a66;font-size:15px">تنفيذ عملية</h3>
 
             <div class="row">
@@ -951,6 +1013,37 @@
       return p;
     }
     function contactLink(){ return "https://wa.me/" + normalizePhoneToWA(CONTACT_PRIMARY); }
+
+    // === Week range (School week: Sunday -> Thursday) ===
+    function getSchoolWeekRangeMs(baseDate){
+      const d = baseDate ? new Date(baseDate) : new Date();
+      const day = d.getDay(); // 0=Sun ... 6=Sat
+      const start = new Date(d);
+      start.setHours(0,0,0,0);
+      start.setDate(start.getDate() - day); // back to Sunday
+      const end = new Date(start);
+      end.setDate(start.getDate() + 4); // Thursday
+      end.setHours(23,59,59,999);
+      return {startMs:start.getTime(), endMs:end.getTime(), start, end};
+    }
+
+    function parseDateInputToMs(id, endOfDay){
+      const v = $(id)?.value;
+      if(!v) return null;
+      const d = new Date(v + "T00:00:00");
+      if(endOfDay) d.setHours(23,59,59,999);
+      else d.setHours(0,0,0,0);
+      return d.getTime();
+    }
+
+    function formatYMD(ms){
+      const d = new Date(ms);
+      const y=d.getFullYear();
+      const m=String(d.getMonth()+1).padStart(2,'0');
+      const da=String(d.getDate()).padStart(2,'0');
+      return `${y}-${m}-${da}`;
+    }
+
 
     function openWA(toPhone, messageText){
       const phone = normalizePhoneToWA(toPhone);
@@ -1254,6 +1347,7 @@ ${SIGNATURE}`
     }
 
     let classes=[], currentClassId=null, currentStudentId=null;
+    let currentStudentObj=null;
     let selectedIds = new Set();
 
     async function loadClasses(){
@@ -1420,6 +1514,7 @@ ${SIGNATURE}`;
     }
 
     async function openStudentAccount(s){
+      currentStudentObj = s || null;
       hideAllPages(); show("studentAccountPage");
       $("studentHeader").textContent = s.name || "—";
       $("statusBadge").className = "badge " + (s.active ? "on":"off");
@@ -1440,8 +1535,16 @@ ${SIGNATURE}`;
 
       setupReasonUI($("op").value,'reasonStudent','reasonOtherStudent');
       await showStatement();
+      // default report dates (this week) if empty
+      try{
+        const wk = getSchoolWeekRangeMs(new Date());
+        if($('repFromStudent') && !$('repFromStudent').value) $('repFromStudent').value = formatYMD(wk.startMs);
+        if($('repToStudent') && !$('repToStudent').value) $('repToStudent').value = formatYMD(Math.min(Date.now(), wk.endMs));
+      }catch(e){}
+
       await refreshWeekKPIs();
       await refreshRewards();
+      try{ await renderBalanceChartLast30(); }catch(e){}
     }
 
     function backAfterStudent(){
@@ -1488,6 +1591,23 @@ ${SIGNATURE}`;
       const pick = $("pickStudent");
       pick.innerHTML="";
       arr.forEach(s=>{ const o=document.createElement("option"); o.value=s.id; o.textContent=s.name; pick.appendChild(o); });
+
+      // report picker (teacher)
+      const repPick = $("repPickStudentTeacher");
+      if(repPick){
+        repPick.innerHTML="";
+        arr.forEach(s=>{ const o=document.createElement("option"); o.value=s.id; o.textContent=s.name; repPick.appendChild(o); });
+      }
+
+      // default report dates (this week) if empty
+      try{
+        const wk = getSchoolWeekRangeMs(new Date());
+        if($("repFromTeacher") && !$("repFromTeacher").value) $("repFromTeacher").value = formatYMD(wk.startMs);
+        if($("repToTeacher") && !$("repToTeacher").value) $("repToTeacher").value = formatYMD(Math.min(Date.now(), wk.endMs));
+        if($("honorWeekLabel")) $("honorWeekLabel").textContent = `${formatYMD(wk.startMs)} → ${formatYMD(wk.endMs)}`;
+        const auto = $("autoCongrats");
+        if(auto){ auto.checked = getAutoCongratsEnabled(); }
+      }catch(e){}
 
       _populateTeacherTransferSelects(arr);
 
@@ -1788,6 +1908,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
 
         openWA(wa, msg);
         await renderStudents();
+      try{ await renderHonorRoll(); }catch(e){}
       }catch(e){
         console.log(e);
         warn("تعذر إرسال PIN الآن.");
@@ -2158,16 +2279,15 @@ document.addEventListener("DOMContentLoaded", async()=>{
     }
 
 
-    // KPI weekly (simple implementation)
+    // KPI weekly (School week: Sunday -> Thursday)
     refreshWeekKPIs = async function(){
       try{
-        const end = new Date();
-        // أسبوع (آخر 7 أيام)
-        const start = new Date(end); start.setDate(end.getDate()-6);
-        start.setHours(0,0,0,0);
+        const range = getSchoolWeekRangeMs(new Date());
+        const startMs = range.startMs, endMs = range.endMs;
+
         const q = db.collection("students").doc(currentStudentId).collection("txns")
-          .where("createdAtClient", ">=", start.getTime())
-          .where("createdAtClient", "<=", end.getTime())
+          .where("createdAtClient", ">=", startMs)
+          .where("createdAtClient", "<=", endMs)
           .orderBy("createdAtClient","desc")
           .limit(600);
 
@@ -2198,7 +2318,9 @@ document.addEventListener("DOMContentLoaded", async()=>{
         if(!currentStudentId) return;
 
         const now = Date.now();
-        const weekStart = now - 7*24*60*60*1000;
+        const wk = getSchoolWeekRangeMs(new Date());
+        const weekStart = wk.startMs;
+        const weekEnd = wk.endMs;
         const fiveStart = now - 5*24*60*60*1000;
 
         const sRef = db.collection("students").doc(currentStudentId);
@@ -2206,6 +2328,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
         // Student weekly net (deposit + transfer in) - (withdraw + transfer out)
         const weekSnap = await sRef.collection("txns")
           .where("createdAtClient", ">=", weekStart)
+          .where("createdAtClient", "<=", weekEnd)
           .orderBy("createdAtClient","desc")
           .limit(600)
           .get();
@@ -2258,6 +2381,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
             const ref = db.collection("students").doc(sid);
             const snap = await ref.collection("txns")
               .where("createdAtClient", ">=", weekStart)
+              .where("createdAtClient", "<=", weekEnd)
               .orderBy("createdAtClient","desc")
               .limit(600)
               .get();
@@ -2296,6 +2420,29 @@ document.addEventListener("DOMContentLoaded", async()=>{
         $("rwChampion") && ($("rwChampion").textContent = champText);
         $("rwCommit") && ($("rwCommit").textContent = (violations===0) ? "مستحق ✅ (0 مخالفات خلال 5 أيام)" : `غير مستحق — مخالفات: ${violations}`);
         $("rwPart") && ($("rwPart").textContent = partOk ? `مستحق ✅ (مشاركات: ${partCount})` : `غير مستحق — مشاركات: ${partCount} (الحد 3)`);
+
+        // Auto WhatsApp congratulations (once per week per award)
+        try{
+          const champOk = String(champText||"").startsWith("مستحق");
+          const commitOk = (violations===0);
+          const key = `awardState_${currentStudentId}_${formatYMD(weekStart)}`;
+          const prev = JSON.parse(localStorage.getItem(key) || "{}");
+          const nowState = {champ:champOk, commit:commitOk, part:partOk};
+          localStorage.setItem(key, JSON.stringify(nowState));
+
+          const newly = [];
+          if(champOk && !prev.champ) newly.push("بطل الأسبوع 🏆");
+          if(commitOk && !prev.commit) newly.push("نجم الالتزام 🥇");
+          if(partOk && !prev.part) newly.push("نجم المشاركة 🎯");
+
+          const autoOn = (currentAccess!=="student") && getAutoCongratsEnabled();
+          const phone = (currentStudentObj && currentStudentObj.guardianWhats) ? currentStudentObj.guardianWhats : "";
+          if(autoOn && phone && newly.length){
+            const rangeTxt = `${formatYMD(weekStart)} إلى ${formatYMD(weekEnd)}`;
+            const msg = `تهانينا 🌟\nنفيدكم بفوز الطالبة/الطالب: ${(currentStudentObj&&currentStudentObj.name)||"—"}\nبالجوائز التالية: ${newly.join("، ")}\nأسبوع: ${rangeTxt}\nضمن بنك الرياضيات.\nمع تحيات: أ. سارة حقوي`;
+            openWA(phone, msg);
+          }
+        }catch(e){}
 
       }catch(e){
         console.log("refreshRewards error", e);
