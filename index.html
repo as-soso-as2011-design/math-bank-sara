@@ -1104,8 +1104,18 @@
       appId: "1:333467940977:web:97d056d5dbff2debbf43d0",
       measurementId: "G-7RPQX9ER93"
     };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
+    let db = null;
+    try{
+      if(window.firebase){
+        firebase.initializeApp(firebaseConfig);
+        db = firebase.firestore();
+      } else {
+        console.warn("Firebase not loaded; running in local-only mode.");
+      }
+    }catch(e){
+      console.warn("Firebase init failed; running in local-only mode.", e);
+      db = null;
+    }
 
     function $(id){return document.getElementById(id);}
     function fmt(x){ return (Math.round((Number(x||0)+Number.EPSILON)*100)/100).toFixed(2); }
