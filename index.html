@@ -283,7 +283,40 @@
     .opLine{margin-top:8px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
     .pill2{display:inline-block;background:#eef6ff;border:1px solid rgba(0,0,0,.06);padding:6px 10px;border-radius:999px;font-weight:1000;font-size:12px;color:#0b2a66}
 
-  </style>
+  
+/* ===== Rewards Pro UI ===== */
+.awardKpis{display:grid;grid-template-columns:repeat(4,minmax(160px,1fr));gap:10px}
+@media(max-width:900px){.awardKpis{grid-template-columns:repeat(2,minmax(160px,1fr));}}
+.awardKpi{background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:14px;padding:10px 12px;backdrop-filter:blur(8px)}
+.awardKpi .kLabel{font-size:12px;color:#4b5563}
+.awardKpi .kValue{font-size:22px;font-weight:1000;color:#0b2a66;margin-top:2px}
+.awardKpi .kUnit{font-size:12px;font-weight:800;color:#64748b}
+
+.awardGrid{display:grid;grid-template-columns:repeat(3,minmax(220px,1fr));gap:12px}
+@media(max-width:1000px){.awardGrid{grid-template-columns:repeat(2,minmax(220px,1fr));}}
+@media(max-width:680px){.awardGrid{grid-template-columns:1fr;}}
+.awardCard{background:rgba(255,255,255,.78);border:1px solid rgba(0,0,0,.07);border-radius:18px;padding:12px;box-shadow:0 6px 18px rgba(0,0,0,.06);position:relative;overflow:hidden}
+.awardCard::after{content:"";position:absolute;inset:-40px -60px auto auto;width:140px;height:140px;background:radial-gradient(circle, rgba(0,85,164,.15), transparent 62%);transform:rotate(18deg)}
+.aTop{display:flex;align-items:center;gap:10px}
+.aIcon{width:38px;height:38px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:rgba(0,85,164,.10);font-size:20px}
+.aTitle{font-weight:1000;color:#0b2a66}
+.aBadge{margin-inline-start:auto;font-size:12px;font-weight:900;padding:6px 10px;border-radius:999px;background:rgba(2,132,199,.12);color:#0b2a66;border:1px solid rgba(2,132,199,.18)}
+.aBadge.ok{background:rgba(34,197,94,.14);border-color:rgba(34,197,94,.22);color:#065f46}
+.aBadge.no{background:rgba(239,68,68,.10);border-color:rgba(239,68,68,.20);color:#7f1d1d}
+.aDesc{margin-top:8px;color:#334155;font-size:13px;line-height:1.5;min-height:38px}
+.aProg{margin-top:10px}
+.pRow{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:#64748b}
+.pBar{height:10px;background:rgba(148,163,184,.25);border-radius:999px;overflow:hidden;margin-top:6px}
+.pBar>div{height:100%;background:linear-gradient(90deg, rgba(0,85,164,.95), rgba(46,125,50,.85));border-radius:999px;width:0%}
+
+.leaderWrap{background:rgba(255,255,255,.70);border:1px solid rgba(0,0,0,.06);border-radius:18px;padding:12px}
+.leaderList{display:flex;flex-direction:column;gap:8px}
+.lbRow{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.75);border:1px solid rgba(0,0,0,.06);border-radius:14px;padding:10px}
+.lbRank{width:30px;height:30px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:1000;color:#0b2a66;background:rgba(0,85,164,.10)}
+.lbName{font-weight:900;color:#0b2a66}
+.lbMeta{margin-inline-start:auto;display:flex;gap:8px;align-items:center}
+.lbPill{font-size:12px;font-weight:900;padding:6px 10px;border-radius:999px;background:rgba(2,132,199,.10);border:1px solid rgba(2,132,199,.18);color:#0b2a66}
+</style>
 </head>
 
 <body>
@@ -888,41 +921,131 @@
           </div>
         </div>
 
-        <div id="paneRewards" class="miniPane">
-          <div class="card" style="margin-top:12px">
-            <h3 style="margin:0;color:#0b2a66">🎁 الجوائز والحوافز</h3>
-            <div class="small" style="margin-top:6px">اقتراح نظام جوائز جاهز (قابل للتخصيص):</div>
-            <div class="row" style="margin-top:10px">
-            <div class="row" style="margin-top:10px">
-              <div class="col">
-                <div class="card soft">
-                  <div style="font-weight:1000;color:#0b2a66">🏆 بطل الأسبوع</div>
-                  <div class="small" id="rwChampion">—</div>
-                </div>
-              </div>
-              <div class="col">
-                <div class="card soft">
-                  <div style="font-weight:1000;color:#0b2a66">🎖️ نجم الالتزام</div>
-                  <div class="small" id="rwCommit">—</div>
-                </div>
-              </div>
-              <div class="col">
-                <div class="card soft">
-                  <div style="font-weight:1000;color:#0b2a66">🎯 نجم المشاركة</div>
-                  <div class="small" id="rwPart">—</div>
-                </div>
-              </div>
-            </div>
+        
+<div id="paneRewards" class="miniPane">
+  <div class="card" style="margin-top:12px">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap">
+      <div>
+        <h3 style="margin:0;color:#0b2a66">🎁 الجوائز والحوافز</h3>
+        <div class="small" style="margin-top:6px">احتساب الجوائز حسب <b>أسبوع المدرسة (الأحد → الخميس)</b>، وتتحدث تلقائيًا من سجل العمليات.</div>
+      </div>
+      <div class="chip" id="rwWeekRange" style="margin-top:2px">—</div>
+    </div>
 
-            <div class="cardHint" style="margin-top:10px">
-              صافي الأسبوع: <b id="rwWeekNet">0</b> ر.س • ترتيبك داخل الفصل: <b id="rwRank">—</b>
-            </div>
-</div>
-            <div class="small">يتم احتسابها تلقائيًا من سجل العمليات اليومية ✅</div>
-          </div>
+    <div class="awardKpis" style="margin-top:12px">
+      <div class="awardKpi">
+        <div class="kLabel">صافي الأسبوع</div>
+        <div class="kValue"><span id="rwWeekNet">0</span> <span class="kUnit">ر.س</span></div>
+      </div>
+      <div class="awardKpi">
+        <div class="kLabel">نقاط الأسبوع</div>
+        <div class="kValue"><span id="rwPoints">0</span> <span class="kUnit">نقطة</span></div>
+      </div>
+      <div class="awardKpi">
+        <div class="kLabel">ترتيبك داخل الفصل</div>
+        <div class="kValue"><span id="rwRank">—</span></div>
+      </div>
+      <div class="awardKpi">
+        <div class="kLabel">مشاركات الأسبوع</div>
+        <div class="kValue"><span id="rwPartCount">0</span></div>
+      </div>
+    </div>
+
+    <div class="awardGrid" style="margin-top:12px">
+      <div class="awardCard" id="acChampion">
+        <div class="aTop">
+          <div class="aIcon">🏆</div>
+          <div class="aTitle">بطل الأسبوع</div>
+          <div class="aBadge" id="rwChampionBadge">—</div>
         </div>
+        <div class="aDesc" id="rwChampion">—</div>
+        <div class="aProg">
+          <div class="pRow"><span>تقدّمك</span><span id="rwChampionProgTxt">—</span></div>
+          <div class="pBar"><div id="rwChampionProg" style="width:0%"></div></div>
+        </div>
+      </div>
 
-        <div id="paneCard" class="miniPane">
+      <div class="awardCard" id="acCommit">
+        <div class="aTop">
+          <div class="aIcon">🎖️</div>
+          <div class="aTitle">نجم الالتزام</div>
+          <div class="aBadge" id="rwCommitBadge">—</div>
+        </div>
+        <div class="aDesc" id="rwCommit">—</div>
+        <div class="aProg">
+          <div class="pRow"><span>آخر 5 أيام</span><span id="rwCommitProgTxt">—</span></div>
+          <div class="pBar"><div id="rwCommitProg" style="width:0%"></div></div>
+        </div>
+      </div>
+
+      <div class="awardCard" id="acPart">
+        <div class="aTop">
+          <div class="aIcon">🎯</div>
+          <div class="aTitle">نجم المشاركة</div>
+          <div class="aBadge" id="rwPartBadge">—</div>
+        </div>
+        <div class="aDesc" id="rwPart">—</div>
+        <div class="aProg">
+          <div class="pRow"><span>الهدف</span><span id="rwPartProgTxt">—</span></div>
+          <div class="pBar"><div id="rwPartProg" style="width:0%"></div></div>
+        </div>
+      </div>
+
+      <div class="awardCard" id="acImpro">
+        <div class="aTop">
+          <div class="aIcon">📈</div>
+          <div class="aTitle">نجم التحسّن</div>
+          <div class="aBadge" id="rwImproBadge">—</div>
+        </div>
+        <div class="aDesc" id="rwImpro">—</div>
+        <div class="aProg">
+          <div class="pRow"><span>مقارنة بالأسبوع السابق</span><span id="rwImproProgTxt">—</span></div>
+          <div class="pBar"><div id="rwImproProg" style="width:0%"></div></div>
+        </div>
+      </div>
+
+      <div class="awardCard" id="acSave">
+        <div class="aTop">
+          <div class="aIcon">💰</div>
+          <div class="aTitle">بطل الادخار</div>
+          <div class="aBadge" id="rwSaveBadge">—</div>
+        </div>
+        <div class="aDesc" id="rwSave">—</div>
+        <div class="aProg">
+          <div class="pRow"><span>إجمالي الإيداعات</span><span id="rwSaveProgTxt">—</span></div>
+          <div class="pBar"><div id="rwSaveProg" style="width:0%"></div></div>
+        </div>
+      </div>
+
+      <div class="awardCard" id="acHelper">
+        <div class="aTop">
+          <div class="aIcon">🤝</div>
+          <div class="aTitle">نجم التعاون</div>
+          <div class="aBadge" id="rwHelpBadge">—</div>
+        </div>
+        <div class="aDesc" id="rwHelp">—</div>
+        <div class="aProg">
+          <div class="pRow"><span>تحويلات مساعدة</span><span id="rwHelpProgTxt">—</span></div>
+          <div class="pBar"><div id="rwHelpProg" style="width:0%"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="leaderWrap" style="margin-top:12px">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+        <div style="font-weight:900;color:#0b2a66">🏅 لوحة الشرف الأسبوعية</div>
+        <button class="btn ghost" onclick="refreshRewards()">تحديث اللوحة</button>
+      </div>
+      <div class="small" style="margin-top:6px">أعلى النقاط في الفصل لهذا الأسبوع (الأحد → الخميس).</div>
+      <div id="rwLeader" class="leaderList" style="margin-top:10px"></div>
+    </div>
+
+    <div class="cardHint" style="margin-top:12px">
+      ✅ يتم احتساب الجوائز تلقائيًا من العمليات اليومية • التهنئة التلقائية لولي الأمر تعمل عند تفعيلها من صفحة المعلمة.
+    </div>
+  </div>
+</div>
+<div id="paneCard" class="miniPane">
           <div class="card" style="margin-top:12px">
             <h3 style="margin:0;color:#0b2a66">تفاصيل البطاقة</h3>
             <div class="row" style="margin-top:10px">
@@ -1005,7 +1128,11 @@
       btn.textContent = (el.type === "password") ? "👁️" : "🙈";
     }
 
-    function normalizePhoneToWA(phone){
+    
+    function escapeHtml(str){
+      return String(str||"").replace(/[&<>"']/g, s=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[s]));
+    }
+function normalizePhoneToWA(phone){
       let p = String(phone||"").replace(/[^0-9]/g,"");
       if(!p) return "";
       if(p.startsWith("00")) p = p.slice(2);
@@ -2372,6 +2499,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
         // Champion: rank by weekly net inside class
         let rankText = "—";
         let champText = "—";
+        let topNetValue = null;
 
         if(currentClassId){
           const studs = await db.collection("students").where("classId","==",currentClassId).get();
@@ -2402,6 +2530,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
           }
           if(nets.length){
             const top = nets[0];
+            topNetValue = Number(top.net||0);
             champText = (top.id===currentStudentId)
               ? "مستحق ✅ (أنت/ي الأعلى هذا الأسبوع)"
               : `غير مستحق — المتصدر: ${top.name}`;
@@ -2409,17 +2538,184 @@ document.addEventListener("DOMContentLoaded", async()=>{
         }else{
           champText = "—";
         }
+        // Update UI (Rewards Pro)
+        const rangeTxt = `${formatYMD(weekStart)} → ${formatYMD(weekEnd)}`;
+        $("rwWeekRange") && ($("rwWeekRange").textContent = rangeTxt);
 
-        // Participation: require >= 3 deposits tagged as participation during week
-        const partOk = (partCount >= 3);
+        // Points + extra metrics
+        let depTotal=0, witTotal=0, helpCount=0, transferOut=0;
+        weekSnap.forEach(d=>{
+          const x=d.data()||{};
+          const t=String(x.type||"");
+          const a=Number(x.amount||0);
+          const reason=String(x.reason||"");
+          if(t.startsWith("إيداع")) depTotal += a;
+          if(t.startsWith("سحب")) witTotal += a;
+          if(t.startsWith("تحويل إلى")) {
+            transferOut++;
+            const rr = reason || "";
+            if(rr.includes("مساعدة") || rr.includes("تعاون") || rr.includes("إعانة") || rr.includes("مساندة")) helpCount++;
+          }
+        });
 
-        // Update UI
+        const partTarget = 3;
+        const saveTarget = 1000; // ر.س
+        const helpTarget = 2;    // تحويلات مساعدة
+
+        // Base points
+        const points = Math.max(0,
+          Math.round(
+            (depTotal>0 ? (depTotal*0.05) : 0) +          // كل 20 ريال ≈ 1 نقطة
+            (partCount*12) +                               // المشاركة وزنها عالي
+            (transferOut*2) -                              // تعاون بسيط
+            (violations*15)                                // مخالفات تقلل
+          )
+        );
+
         $("rwWeekNet") && ($("rwWeekNet").textContent = fmt(net));
+        $("rwPoints") && ($("rwPoints").textContent = String(points));
         $("rwRank") && ($("rwRank").textContent = rankText);
+        $("rwPartCount") && ($("rwPartCount").textContent = String(partCount));
 
+        // Badges helper
+        function setBadge(id, ok){
+          const el=$(id); if(!el) return;
+          el.classList.remove("ok","no");
+          if(ok===true){ el.textContent="مستحق ✅"; el.classList.add("ok"); }
+          else if(ok===false){ el.textContent="غير مستحق"; el.classList.add("no"); }
+          else { el.textContent="—"; }
+        }
+        function setProg(barId, txtId, val, target){
+          const bar=$(barId), txt=$(txtId);
+          const pct = (target<=0) ? 0 : Math.max(0, Math.min(100, Math.round((val/target)*100)));
+          if(bar) bar.style.width = pct + "%";
+          if(txt) txt.textContent = `${Math.round(val)} / ${Math.round(target)}`;
+        }
+
+        // Champion
+        const champOk = String(champText||"").startsWith("مستحق");
         $("rwChampion") && ($("rwChampion").textContent = champText);
-        $("rwCommit") && ($("rwCommit").textContent = (violations===0) ? "مستحق ✅ (0 مخالفات خلال 5 أيام)" : `غير مستحق — مخالفات: ${violations}`);
-        $("rwPart") && ($("rwPart").textContent = partOk ? `مستحق ✅ (مشاركات: ${partCount})` : `غير مستحق — مشاركات: ${partCount} (الحد 3)`);
+        setBadge("rwChampionBadge", champOk);
+        // progress: compare to top net (if available)
+        const topNetVal = (typeof topNetValue!=="undefined" && topNetValue!==null) ? Number(topNetValue) : null;
+        if(topNetVal!==null && topNetVal>0){
+          $("rwChampionProgTxt") && ($("rwChampionProgTxt").textContent = `${fmt(net)} / ${fmt(topNetVal)} ر.س`);
+          const bar=$("rwChampionProg");
+          if(bar) bar.style.width = Math.max(0, Math.min(100, Math.round((net/topNetVal)*100))) + "%";
+        }else{
+          $("rwChampionProgTxt") && ($("rwChampionProgTxt").textContent = "—");
+          $("rwChampionProg") && ($("rwChampionProg").style.width = "0%");
+        }
+
+        // Commitment (5 days)
+        const commitOk = (violations===0);
+        $("rwCommit") && ($("rwCommit").textContent = commitOk ? "مستحق ✅ (0 مخالفات خلال آخر 5 أيام)" : `غير مستحق — مخالفات: ${violations}`);
+        setBadge("rwCommitBadge", commitOk);
+        setProg("rwCommitProg","rwCommitProgTxt", Math.max(0,5-violations), 5);
+
+        // Participation
+        const partOk = (partCount >= partTarget);
+        $("rwPart") && ($("rwPart").textContent = partOk ? `مستحق ✅ (مشاركات: ${partCount})` : `غير مستحق — مشاركات: ${partCount} (الحد ${partTarget})`);
+        setBadge("rwPartBadge", partOk);
+        setProg("rwPartProg","rwPartProgTxt", partCount, partTarget);
+
+        // Improvement (vs previous school week)
+        const prev = getPrevSchoolWeekRangeMs(new Date());
+        const prevSnap = await sRef.collection("txns")
+          .where("createdAtClient", ">=", prev.startMs)
+          .where("createdAtClient", "<=", prev.endMs)
+          .orderBy("createdAtClient","desc")
+          .limit(600)
+          .get();
+        let prevNet=0;
+        prevSnap.forEach(d=>{
+          const x=d.data()||{};
+          const t=String(x.type||"");
+          const a=Number(x.amount||0);
+          if(t.startsWith("إيداع") || t.startsWith("تحويل من")) prevNet += a;
+          else if(t.startsWith("سحب") || t.startsWith("تحويل إلى")) prevNet -= a;
+        });
+        const delta = net - prevNet;
+        const improTarget = 200; // ر.س تحسن
+        const improOk = (delta >= improTarget);
+        $("rwImpro") && ($("rwImpro").textContent = improOk ? `مستحق ✅ (تحسّن: +${fmt(delta)} ر.س)` : `غير مستحق — تحسّن: ${fmt(delta)} ر.س (الهدف +${improTarget})`);
+        setBadge("rwImproBadge", improOk);
+        setProg("rwImproProg","rwImproProgTxt", Math.max(0,delta), improTarget);
+
+        // Savings
+        const saveOk = (depTotal >= saveTarget);
+        $("rwSave") && ($("rwSave").textContent = saveOk ? `مستحق ✅ (إيداعات: ${fmt(depTotal)} ر.س)` : `غير مستحق — إيداعات: ${fmt(depTotal)} ر.س (الهدف ${saveTarget})`);
+        setBadge("rwSaveBadge", saveOk);
+        setProg("rwSaveProg","rwSaveProgTxt", depTotal, saveTarget);
+
+        // Helper
+        const helpOk = (helpCount >= helpTarget);
+        $("rwHelp") && ($("rwHelp").textContent = helpOk ? `مستحق ✅ (مساعدات: ${helpCount})` : `غير مستحق — مساعدات: ${helpCount} (الهدف ${helpTarget})`);
+        setBadge("rwHelpBadge", helpOk);
+        setProg("rwHelpProg","rwHelpProgTxt", helpCount, helpTarget);
+
+        // Leaderboard (Top points in class)
+        try{
+          const box = $("rwLeader");
+          if(box){
+            box.innerHTML = "";
+            if(currentClassId){
+              const studs = await db.collection("students").where("classId","==",currentClassId).get();
+              const rows = [];
+              for(const sd of studs.docs){
+                const sid = sd.id;
+                const ref = db.collection("students").doc(sid);
+                const snap2 = await ref.collection("txns")
+                  .where("createdAtClient", ">=", weekStart)
+                  .where("createdAtClient", "<=", weekEnd)
+                  .orderBy("createdAtClient","desc")
+                  .limit(600)
+                  .get();
+                let dep2=0, part2=0, vio2=0, trOut2=0, net2=0;
+                snap2.forEach(d=>{
+                  const x=d.data()||{};
+                  const t=String(x.type||"");
+                  const a=Number(x.amount||0);
+                  const reason=String(x.reason||"");
+                  if(t.startsWith("إيداع") || t.startsWith("تحويل من")) net2 += a;
+                  else if(t.startsWith("سحب") || t.startsWith("تحويل إلى")) net2 -= a;
+                  if(t.startsWith("إيداع")) dep2 += a;
+                  if(t.startsWith("تحويل إلى")) trOut2++;
+                  if(t.startsWith("إيداع")){
+                    const r = String(reason||"").replace(/\s+/g,'');
+                    if(r.includes("مشاركة") || r.includes("تفاعل") || r.includes("إجابة") || r.includes("حل") || r.includes("واجب") || r.includes("نشاط")) part2++;
+                  }
+                  if(t.startsWith("سحب")){
+                    const rr = String(reason||"");
+                    if(violWords.some(w=>rr.includes(w))) vio2++;
+                  }
+                });
+                const pts = Math.max(0, Math.round((dep2*0.05) + (part2*12) + (trOut2*2) - (vio2*15)));
+                rows.push({id:sid,name:(sd.data()||{}).name||"—",pts,net:net2});
+              }
+              rows.sort((a,b)=>b.pts-a.pts);
+              const top = rows.slice(0,5);
+              top.forEach((r,i)=>{
+                const el=document.createElement("div");
+                el.className="lbRow";
+                el.innerHTML = `<div class="lbRank">${i+1}</div>
+                  <div>
+                    <div class="lbName">${escapeHtml(r.name)}</div>
+                    <div class="small">صافي: ${fmt(r.net)} ر.س</div>
+                  </div>
+                  <div class="lbMeta">
+                    <div class="lbPill">${r.pts} نقطة</div>
+                  </div>`;
+                box.appendChild(el);
+              });
+              if(!top.length){
+                box.innerHTML = '<div class="small">لا توجد بيانات لهذا الأسبوع.</div>';
+              }
+            }else{
+              box.innerHTML = '<div class="small">لم يتم تعيين فصل لهذا الحساب.</div>';
+            }
+          }
+        }catch(e){}
 
         // Auto WhatsApp congratulations (once per week per award)
         try{
