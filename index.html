@@ -1104,8 +1104,8 @@
     </div>
     <div class="footerNote">الرياضيات لغة الأذكياء ✨</div>
   </div>
-<script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
   <div id="pdfTemp"></div>
@@ -1136,8 +1136,16 @@
       appId: "1:333467940977:web:97d056d5dbff2debbf43d0",
       measurementId: "G-7RPQX9ER93"
     };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
+    let db = null;
+    try{
+      if(typeof firebase==="undefined") throw new Error("Firebase SDK لم يتم تحميله");
+      firebase.initializeApp(firebaseConfig);
+      db = firebase.firestore();
+    }catch(e){
+      console.warn("Firebase init error:", e);
+      // لا نوقف النظام بالكامل حتى تعمل صفحة البداية/الدخول
+      db = null;
+    }
 
     function $(id){return document.getElementById(id);}
     function fmt(x){ return (Math.round((Number(x||0)+Number.EPSILON)*100)/100).toFixed(2); }
