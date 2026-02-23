@@ -267,7 +267,56 @@
     .pdfSub{font-size:12px;color:#6b7280;font-weight:900;margin-top:2px}
     .sigRow{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin-top:12px}
     .sigBox{border-top:1px dashed #9ca3af;padding-top:8px;font-size:12px;color:#111827;font-weight:900;min-width:240px}
-  </style>
+  
+    /* Daily ops list */
+    .opCard{
+      border:1px solid rgba(0,0,0,.08);
+      border-radius:16px;
+      padding:12px;
+      background:linear-gradient(180deg,#ffffff,#f8fbff);
+      box-shadow:0 10px 18px rgba(0,0,0,.05);
+      margin:10px 0;
+    }
+    .opTop{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+    .opName{font-weight:1000;color:#0b2a66}
+    .opMeta{font-size:12px;color:#6b7280;font-weight:900}
+    .opLine{margin-top:8px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .pill2{display:inline-block;background:#eef6ff;border:1px solid rgba(0,0,0,.06);padding:6px 10px;border-radius:999px;font-weight:1000;font-size:12px;color:#0b2a66}
+
+  
+/* ===== Rewards Pro UI ===== */
+.awardKpis{display:grid;grid-template-columns:repeat(4,minmax(160px,1fr));gap:10px}
+@media(max-width:900px){.awardKpis{grid-template-columns:repeat(2,minmax(160px,1fr));}}
+.awardKpi{background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:14px;padding:10px 12px;backdrop-filter:blur(8px)}
+.awardKpi .kLabel{font-size:12px;color:#4b5563}
+.awardKpi .kValue{font-size:22px;font-weight:1000;color:#0b2a66;margin-top:2px}
+.awardKpi .kUnit{font-size:12px;font-weight:800;color:#64748b}
+
+.awardGrid{display:grid;grid-template-columns:repeat(3,minmax(220px,1fr));gap:12px}
+@media(max-width:1000px){.awardGrid{grid-template-columns:repeat(2,minmax(220px,1fr));}}
+@media(max-width:680px){.awardGrid{grid-template-columns:1fr;}}
+.awardCard{background:rgba(255,255,255,.78);border:1px solid rgba(0,0,0,.07);border-radius:18px;padding:12px;box-shadow:0 6px 18px rgba(0,0,0,.06);position:relative;overflow:hidden}
+.awardCard::after{content:"";position:absolute;inset:-40px -60px auto auto;width:140px;height:140px;background:radial-gradient(circle, rgba(0,85,164,.15), transparent 62%);transform:rotate(18deg)}
+.aTop{display:flex;align-items:center;gap:10px}
+.aIcon{width:38px;height:38px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:rgba(0,85,164,.10);font-size:20px}
+.aTitle{font-weight:1000;color:#0b2a66}
+.aBadge{margin-inline-start:auto;font-size:12px;font-weight:900;padding:6px 10px;border-radius:999px;background:rgba(2,132,199,.12);color:#0b2a66;border:1px solid rgba(2,132,199,.18)}
+.aBadge.ok{background:rgba(34,197,94,.14);border-color:rgba(34,197,94,.22);color:#065f46}
+.aBadge.no{background:rgba(239,68,68,.10);border-color:rgba(239,68,68,.20);color:#7f1d1d}
+.aDesc{margin-top:8px;color:#334155;font-size:13px;line-height:1.5;min-height:38px}
+.aProg{margin-top:10px}
+.pRow{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:#64748b}
+.pBar{height:10px;background:rgba(148,163,184,.25);border-radius:999px;overflow:hidden;margin-top:6px}
+.pBar>div{height:100%;background:linear-gradient(90deg, rgba(0,85,164,.95), rgba(46,125,50,.85));border-radius:999px;width:0%}
+
+.leaderWrap{background:rgba(255,255,255,.70);border:1px solid rgba(0,0,0,.06);border-radius:18px;padding:12px}
+.leaderList{display:flex;flex-direction:column;gap:8px}
+.lbRow{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.75);border:1px solid rgba(0,0,0,.06);border-radius:14px;padding:10px}
+.lbRank{width:30px;height:30px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:1000;color:#0b2a66;background:rgba(0,85,164,.10)}
+.lbName{font-weight:900;color:#0b2a66}
+.lbMeta{margin-inline-start:auto;display:flex;gap:8px;align-items:center}
+.lbPill{font-size:12px;font-weight:900;padding:6px 10px;border-radius:999px;background:rgba(2,132,199,.10);border:1px solid rgba(2,132,199,.18);color:#0b2a66}
+</style>
 </head>
 
 <body>
@@ -410,6 +459,8 @@
           <div class="forgotRow">
             <a href="javascript:void(0)" onclick="forgotTeacher()">تذكرني / نسيت كلمة المرور؟</a>
             <span class="small">الدخول التجريبي: teacher / 12345</span>
+          
+            <a href="javascript:void(0)" id="changePinLink">تغيير الرقم السري</a>
           </div>
 
           <div class="row" style="margin-top:12px">
@@ -473,6 +524,8 @@
           </div>
           <div class="col" style="text-align:left">
             <button class="btn3" onclick="logout()">تسجيل خروج</button>
+            <button class="btn2" style="margin-top:8px" onclick="openDailyOps()">📅 العمليات اليومية</button>
+            <button class="btn2" style="margin-right:8px" onclick="pdfBankReport()">تقرير PDF شامل</button>
           </div>
         </div>
       </div>
@@ -491,33 +544,6 @@
         </div>
         <div class="small" style="margin-top:6px">
           * يتطلب واتساب «نقرة إرسال» أخيرة ✅
-        </div>
-      </div>
-
-      <div class="card soft">
-        <h3 style="margin:0 0 8px 0;color:#0b2a66">📲 العمليات اليومية – واتساب للأمهات (واتساب الأعمال)</h3>
-        <div class="row">
-          <div class="col">
-            <div class="small">نوع العملية</div>
-            <select id="dailyOp">
-              <option value="إيداع">إيداع</option>
-              <option value="سحب">سحب</option>
-            </select>
-          </div>
-          <div class="col">
-            <div class="small">المبلغ</div>
-            <input id="dailyAmt" type="number" step="0.01" placeholder="مثال: 5">
-          </div>
-          <div class="col">
-            <div class="small">السبب</div>
-            <input id="dailyReason" placeholder="مثال: التفاعل والمشاركة">
-          </div>
-        </div>
-        <div class="row" style="margin-top:10px">
-          <button class="whatsapp-btn col" onclick="sendDailyToBusinessWA()">إرسال لواتساب الأعمال</button>
-        </div>
-        <div class="small" style="margin-top:8px">
-          * يفتح واتساب برسالة جاهزة — وتبقى نقرة الإرسال الأخيرة ✅
         </div>
       </div>
 
@@ -617,6 +643,27 @@
 
         <div class="row">
           <div class="col">
+            <div class="small">تحويل من</div>
+            <select id="transferFromTeacher"></select>
+          </div>
+          <div class="col">
+            <div class="small">تحويل إلى</div>
+            <select id="transferToTeacher"></select>
+            <div class="small" id="transferTeacherPreview" style="margin-top:6px;color:#0b2a66;font-weight:1000"></div>
+          </div>
+          <div class="col">
+            <div class="small">المبلغ</div>
+            <input id="transferAmtTeacher" type="number" step="0.01" placeholder="مثال: 5">
+          </div>
+          <div class="col" style="align-self:flex-end">
+            <button class="btn" onclick="teacherTransfer()">تحويل</button>
+          </div>
+        </div>
+
+        <hr>
+
+        <div class="row">
+          <div class="col">
             <div class="small">سبب العملية (ثابت)</div>
             <select id="reasonTeacher"></select>
             <input id="reasonOtherTeacher" class="hidden" placeholder="أخرى: اكتب السبب هنا..." style="margin-top:8px">
@@ -635,9 +682,96 @@
         </div>
       </div>
 
+      
+      <div class="card soft" style="margin-top:12px">
+        <div class="row" style="align-items:center;gap:10px;flex-wrap:wrap">
+          <div style="font-weight:1000;color:#0b2a66">🏅 لوحة شرف الأسبوع (الأحد → الخميس)</div>
+          <div class="small" id="honorWeekLabel" style="margin-right:auto;color:#47607e"></div>
+          <label class="small" style="display:flex;gap:8px;align-items:center">
+            <input type="checkbox" id="autoCongrats" style="width:auto"> إرسال تهنئة تلقائية للفائزات
+          </label>
+          <button class="btn2" onclick="renderHonorRoll()">تحديث اللوحة</button>
+        </div>
+        <div id="honorRollList" style="margin-top:10px"></div>
+      </div>
+
+      <div class="card soft" style="margin-top:12px">
+        <div style="font-weight:1000;color:#0b2a66">📄 تقرير PDF (من تاريخ إلى تاريخ)</div>
+        <div class="row" style="margin-top:10px;gap:10px;flex-wrap:wrap;align-items:flex-end">
+          <div class="col" style="min-width:200px">
+            <div class="small">اختر الطالب/الطالبة</div>
+            <select id="repPickStudentTeacher"></select>
+          </div>
+          <div class="col" style="min-width:160px">
+            <div class="small">من تاريخ</div>
+            <input id="repFromTeacher" type="date">
+          </div>
+          <div class="col" style="min-width:160px">
+            <div class="small">إلى تاريخ</div>
+            <input id="repToTeacher" type="date">
+          </div>
+          <div class="col" style="align-self:flex-end">
+            <button class="btn" onclick="exportPdfTeacher()">إصدار PDF</button>
+          </div>
+        </div>
+        <div class="small" style="margin-top:8px;color:#47607e">* يتم استخراج التقرير حسب العمليات المسجلة ضمن الفترة المحددة.</div>
+      </div>
+
       <div id="studentsGrid" class="grid2"></div>
     </div>
   </div>
+
+
+  <!-- ===== Daily Ops (Teacher) ===== -->
+  <div id="dailyOpsPage" class="hidden">
+    <div class="container">
+      <div class="card soft">
+        <div class="row" style="align-items:center">
+          <div class="col">
+            <div style="font-weight:1000;color:#0b2a66">📅 العمليات اليومية</div>
+            <div class="small">عرض كل عمليات اليوم/تاريخ سابق + إرسال المحدد لواتساب أولياء الأمور</div>
+          </div>
+          <div class="col" style="text-align:left">
+            <button class="btn3" onclick="backToClasses()">رجوع</button>
+          </div>
+        </div>
+
+        <hr>
+
+        <div class="row">
+          <div class="col">
+            <div class="small">اختيار التاريخ</div>
+            <input id="dailyDate" type="date">
+          </div>
+          <div class="col" style="align-self:flex-end">
+            <button class="btn2" onclick="loadDailyOps()">عرض العمليات</button>
+          </div>
+          <div class="col" style="align-self:flex-end">
+            <button class="btn" onclick="sendSelectedDailyOps()">📲 إرسال المحدد</button>
+          </div>
+          <div class="col" style="align-self:flex-end">
+            <button class="whatsapp-btn" onclick="sendAllDailyOps()">📲 إرسال الكل</button>
+          </div>
+        </div>
+
+        <div class="small" style="margin-top:8px">
+          * يتم تسجيل كل عملية تلقائيًا مع (الطالب/العملية/المبلغ/السبب/الوقت). اختر/ي المطلوب ثم إرسال.
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="row" style="align-items:center;justify-content:space-between">
+          <div class="small" id="dailyCount">—</div>
+          <label class="small" style="display:flex;gap:8px;align-items:center">
+            <input type="checkbox" id="dailySelAll" onchange="toggleDailySelectAll()" style="width:auto"> تحديد الكل
+          </label>
+        </div>
+        <hr>
+        <div id="dailyOpsList"></div>
+      </div>
+    </div>
+  </div>
+
 
   <div id="studentAccountPage" class="hidden">
     <div class="container">
@@ -698,7 +832,34 @@
             <div class="kpi"><div class="k">الصافي</div><div class="v" id="kpiWeekNet">0</div></div>
           </div>
 
-          <div class="card" style="margin:12px 0 0 0">
+          
+          <div class="card soft" style="margin:12px 0 0 0">
+            <div class="row" style="align-items:center;gap:10px;flex-wrap:wrap">
+              <div style="font-weight:1000;color:#0b2a66">📄 تقرير PDF (من تاريخ إلى تاريخ)</div>
+              <div class="small" style="margin-right:auto;color:#47607e">اختر الفترة ثم اضغط إصدار PDF</div>
+            </div>
+            <div class="row" style="margin-top:10px;gap:10px;flex-wrap:wrap;align-items:flex-end">
+              <div class="col" style="min-width:160px">
+                <div class="small">من تاريخ</div>
+                <input id="repFromStudent" type="date">
+              </div>
+              <div class="col" style="min-width:160px">
+                <div class="small">إلى تاريخ</div>
+                <input id="repToStudent" type="date">
+              </div>
+              <div class="col" style="align-self:flex-end">
+                <button class="btn" onclick="exportPdfStudent()">إصدار PDF</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card soft" style="margin:12px 0 0 0">
+            <div style="font-weight:1000;color:#0b2a66">📈 رسم بياني لتطور الرصيد</div>
+            <div class="small" style="margin-top:6px;color:#47607e">آخر 30 يوم (يتحدث تلقائيًا)</div>
+            <canvas id="balanceChart" height="120" style="margin-top:10px;width:100%"></canvas>
+          </div>
+
+<div class="card" style="margin:12px 0 0 0">
             <h3 style="margin:0 0 10px 0;color:#0b2a66;font-size:15px">تنفيذ عملية</h3>
 
             <div class="row">
@@ -707,6 +868,7 @@
                 <select id="op">
                   <option value="deposit">إيداع</option>
                   <option value="withdraw">سحب</option>
+                  <option value="transfer">تحويل</option>
                 </select>
               </div>
 
@@ -717,11 +879,16 @@
               </div>
 
               <div class="col"><div class="small">المبلغ</div><input id="amt" type="number" step="0.01"></div>
+              <div class="col hidden" id="transferWrap">
+                <div class="small">تحويل إلى</div>
+                <select id="transferTo"></select>
+                <div class="small" id="transferToPreview" style="margin-top:6px;color:#0b2a66;font-weight:1000"></div>
+              </div>
             </div>
 
             <div class="row">
               <button class="btn col" onclick="executeOp()">تنفيذ</button>
-              <button class="btn2 col" onclick="downloadStudentStatementPDF()">PDF رسمي</button>
+              <button class="btn2 col" onclick="pdfStudentReport(currentStudentId)">PDF رسمي</button>
             </div>
           </div>
 
@@ -754,20 +921,131 @@
           </div>
         </div>
 
-        <div id="paneRewards" class="miniPane">
-          <div class="card" style="margin-top:12px">
-            <h3 style="margin:0;color:#0b2a66">🎁 الجوائز والحوافز</h3>
-            <div class="small" style="margin-top:6px">اقتراح نظام جوائز جاهز (قابل للتخصيص):</div>
-            <div class="row" style="margin-top:10px">
-              <div class="col"><div class="card soft"><div style="font-weight:1000;color:#0b2a66">🏆 بطل الأسبوع</div><div class="small">أعلى صافي نقاط خلال الأسبوع</div></div></div>
-              <div class="col"><div class="card soft"><div style="font-weight:1000;color:#0b2a66">🎖️ نجم الالتزام</div><div class="small">0 مخالفات خلال 5 أيام</div></div></div>
-              <div class="col"><div class="card soft"><div style="font-weight:1000;color:#0b2a66">🎯 نجم المشاركة</div><div class="small">تفاعل مستمر في الحصص</div></div></div>
-            </div>
-            <div class="small">سيتم لاحقًا ربطها آليًا من سجل العمليات.</div>
-          </div>
-        </div>
+        
+<div id="paneRewards" class="miniPane">
+  <div class="card" style="margin-top:12px">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap">
+      <div>
+        <h3 style="margin:0;color:#0b2a66">🎁 الجوائز والحوافز</h3>
+        <div class="small" style="margin-top:6px">احتساب الجوائز حسب <b>أسبوع المدرسة (الأحد → الخميس)</b>، وتتحدث تلقائيًا من سجل العمليات.</div>
+      </div>
+      <div class="chip" id="rwWeekRange" style="margin-top:2px">—</div>
+    </div>
 
-        <div id="paneCard" class="miniPane">
+    <div class="awardKpis" style="margin-top:12px">
+      <div class="awardKpi">
+        <div class="kLabel">صافي الأسبوع</div>
+        <div class="kValue"><span id="rwWeekNet">0</span> <span class="kUnit">ر.س</span></div>
+      </div>
+      <div class="awardKpi">
+        <div class="kLabel">نقاط الأسبوع</div>
+        <div class="kValue"><span id="rwPoints">0</span> <span class="kUnit">نقطة</span></div>
+      </div>
+      <div class="awardKpi">
+        <div class="kLabel">ترتيبك داخل الفصل</div>
+        <div class="kValue"><span id="rwRank">—</span></div>
+      </div>
+      <div class="awardKpi">
+        <div class="kLabel">مشاركات الأسبوع</div>
+        <div class="kValue"><span id="rwPartCount">0</span></div>
+      </div>
+    </div>
+
+    <div class="awardGrid" style="margin-top:12px">
+      <div class="awardCard" id="acChampion">
+        <div class="aTop">
+          <div class="aIcon">🏆</div>
+          <div class="aTitle">بطل الأسبوع</div>
+          <div class="aBadge" id="rwChampionBadge">—</div>
+        </div>
+        <div class="aDesc" id="rwChampion">—</div>
+        <div class="aProg">
+          <div class="pRow"><span>تقدّمك</span><span id="rwChampionProgTxt">—</span></div>
+          <div class="pBar"><div id="rwChampionProg" style="width:0%"></div></div>
+        </div>
+      </div>
+
+      <div class="awardCard" id="acCommit">
+        <div class="aTop">
+          <div class="aIcon">🎖️</div>
+          <div class="aTitle">نجم الالتزام</div>
+          <div class="aBadge" id="rwCommitBadge">—</div>
+        </div>
+        <div class="aDesc" id="rwCommit">—</div>
+        <div class="aProg">
+          <div class="pRow"><span>آخر 5 أيام</span><span id="rwCommitProgTxt">—</span></div>
+          <div class="pBar"><div id="rwCommitProg" style="width:0%"></div></div>
+        </div>
+      </div>
+
+      <div class="awardCard" id="acPart">
+        <div class="aTop">
+          <div class="aIcon">🎯</div>
+          <div class="aTitle">نجم المشاركة</div>
+          <div class="aBadge" id="rwPartBadge">—</div>
+        </div>
+        <div class="aDesc" id="rwPart">—</div>
+        <div class="aProg">
+          <div class="pRow"><span>الهدف</span><span id="rwPartProgTxt">—</span></div>
+          <div class="pBar"><div id="rwPartProg" style="width:0%"></div></div>
+        </div>
+      </div>
+
+      <div class="awardCard" id="acImpro">
+        <div class="aTop">
+          <div class="aIcon">📈</div>
+          <div class="aTitle">نجم التحسّن</div>
+          <div class="aBadge" id="rwImproBadge">—</div>
+        </div>
+        <div class="aDesc" id="rwImpro">—</div>
+        <div class="aProg">
+          <div class="pRow"><span>مقارنة بالأسبوع السابق</span><span id="rwImproProgTxt">—</span></div>
+          <div class="pBar"><div id="rwImproProg" style="width:0%"></div></div>
+        </div>
+      </div>
+
+      <div class="awardCard" id="acSave">
+        <div class="aTop">
+          <div class="aIcon">💰</div>
+          <div class="aTitle">بطل الادخار</div>
+          <div class="aBadge" id="rwSaveBadge">—</div>
+        </div>
+        <div class="aDesc" id="rwSave">—</div>
+        <div class="aProg">
+          <div class="pRow"><span>إجمالي الإيداعات</span><span id="rwSaveProgTxt">—</span></div>
+          <div class="pBar"><div id="rwSaveProg" style="width:0%"></div></div>
+        </div>
+      </div>
+
+      <div class="awardCard" id="acHelper">
+        <div class="aTop">
+          <div class="aIcon">🤝</div>
+          <div class="aTitle">نجم التعاون</div>
+          <div class="aBadge" id="rwHelpBadge">—</div>
+        </div>
+        <div class="aDesc" id="rwHelp">—</div>
+        <div class="aProg">
+          <div class="pRow"><span>تحويلات مساعدة</span><span id="rwHelpProgTxt">—</span></div>
+          <div class="pBar"><div id="rwHelpProg" style="width:0%"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="leaderWrap" style="margin-top:12px">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+        <div style="font-weight:900;color:#0b2a66">🏅 لوحة الشرف الأسبوعية</div>
+        <button class="btn ghost" onclick="refreshRewards()">تحديث اللوحة</button>
+      </div>
+      <div class="small" style="margin-top:6px">أعلى النقاط في الفصل لهذا الأسبوع (الأحد → الخميس).</div>
+      <div id="rwLeader" class="leaderList" style="margin-top:10px"></div>
+    </div>
+
+    <div class="cardHint" style="margin-top:12px">
+      ✅ يتم احتساب الجوائز تلقائيًا من العمليات اليومية • التهنئة التلقائية لولي الأمر تعمل عند تفعيلها من صفحة المعلمة.
+    </div>
+  </div>
+</div>
+<div id="paneCard" class="miniPane">
           <div class="card" style="margin-top:12px">
             <h3 style="margin:0;color:#0b2a66">تفاصيل البطاقة</h3>
             <div class="row" style="margin-top:10px">
@@ -850,7 +1128,11 @@
       btn.textContent = (el.type === "password") ? "👁️" : "🙈";
     }
 
-    function normalizePhoneToWA(phone){
+    
+    function escapeHtml(str){
+      return String(str||"").replace(/[&<>"']/g, s=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[s]));
+    }
+function normalizePhoneToWA(phone){
       let p = String(phone||"").replace(/[^0-9]/g,"");
       if(!p) return "";
       if(p.startsWith("00")) p = p.slice(2);
@@ -858,6 +1140,37 @@
       return p;
     }
     function contactLink(){ return "https://wa.me/" + normalizePhoneToWA(CONTACT_PRIMARY); }
+
+    // === Week range (School week: Sunday -> Thursday) ===
+    function getSchoolWeekRangeMs(baseDate){
+      const d = baseDate ? new Date(baseDate) : new Date();
+      const day = d.getDay(); // 0=Sun ... 6=Sat
+      const start = new Date(d);
+      start.setHours(0,0,0,0);
+      start.setDate(start.getDate() - day); // back to Sunday
+      const end = new Date(start);
+      end.setDate(start.getDate() + 4); // Thursday
+      end.setHours(23,59,59,999);
+      return {startMs:start.getTime(), endMs:end.getTime(), start, end};
+    }
+
+    function parseDateInputToMs(id, endOfDay){
+      const v = $(id)?.value;
+      if(!v) return null;
+      const d = new Date(v + "T00:00:00");
+      if(endOfDay) d.setHours(23,59,59,999);
+      else d.setHours(0,0,0,0);
+      return d.getTime();
+    }
+
+    function formatYMD(ms){
+      const d = new Date(ms);
+      const y=d.getFullYear();
+      const m=String(d.getMonth()+1).padStart(2,'0');
+      const da=String(d.getDate()).padStart(2,'0');
+      return `${y}-${m}-${da}`;
+    }
+
 
     function openWA(toPhone, messageText){
       const phone = normalizePhoneToWA(toPhone);
@@ -869,7 +1182,21 @@
       setTimeout(()=>{ window.location.href = web1; }, 900);
     }
 
-    function buildOfficialMessage(type, student, amount, reason){
+    
+    function openWABusiness(toPhone, messageText){
+      const phone = normalizePhoneToWA(toPhone);
+      if(!phone) return;
+      const enc = encodeURIComponent(messageText || "");
+      const schemeBiz = "whatsapp-business://send?phone=" + phone + "&text=" + enc;
+      const scheme = "whatsapp://send?phone=" + phone + "&text=" + enc;
+      const web = "https://wa.me/" + phone + "?text=" + enc;
+
+      // try WhatsApp Business first
+      window.location.href = schemeBiz;
+      setTimeout(()=>{ window.location.href = scheme; }, 500);
+      setTimeout(()=>{ window.location.href = web; }, 1200);
+    }
+function buildOfficialMessage(type, student, amount, reason){
       const warnLine = "⚠️ رسالة تلقائية";
       return (
 `${warnLine}
@@ -985,7 +1312,7 @@ ${SIGNATURE}`
     }
 
     function hideAllPages(){
-      ["startOverlay","onboardOverlay","teacherLoginPage","studentLoginPage","classesPage","classPage","studentAccountPage"].forEach(id=>{
+      ["startOverlay","onboardOverlay","teacherLoginPage","studentLoginPage","classesPage","classPage","studentAccountPage","dailyOpsPage"].forEach(id=>{
         const el=$(id); if(!el) return;
         if(id==="startOverlay"){ el.classList.add("hidden"); return; }
         el.classList.add("hidden");
@@ -1147,6 +1474,7 @@ ${SIGNATURE}`
     }
 
     let classes=[], currentClassId=null, currentStudentId=null;
+    let currentStudentObj=null;
     let selectedIds = new Set();
 
     async function loadClasses(){
@@ -1313,6 +1641,7 @@ ${SIGNATURE}`;
     }
 
     async function openStudentAccount(s){
+      currentStudentObj = s || null;
       hideAllPages(); show("studentAccountPage");
       $("studentHeader").textContent = s.name || "—";
       $("statusBadge").className = "badge " + (s.active ? "on":"off");
@@ -1333,7 +1662,16 @@ ${SIGNATURE}`;
 
       setupReasonUI($("op").value,'reasonStudent','reasonOtherStudent');
       await showStatement();
+      // default report dates (this week) if empty
+      try{
+        const wk = getSchoolWeekRangeMs(new Date());
+        if($('repFromStudent') && !$('repFromStudent').value) $('repFromStudent').value = formatYMD(wk.startMs);
+        if($('repToStudent') && !$('repToStudent').value) $('repToStudent').value = formatYMD(Math.min(Date.now(), wk.endMs));
+      }catch(e){}
+
       await refreshWeekKPIs();
+      await refreshRewards();
+      try{ await renderBalanceChartLast30(); }catch(e){}
     }
 
     function backAfterStudent(){
@@ -1343,6 +1681,7 @@ ${SIGNATURE}`;
     }
 
     function setMiniTab(paneId, el){
+      try{ if(paneId==='paneRewards' && typeof refreshRewards==='function'){ refreshRewards(); } }catch(e){}
       document.querySelectorAll(".miniTab").forEach(t=>t.classList.remove("active"));
       el.classList.add("active");
       document.querySelectorAll(".miniPane").forEach(p=>p.classList.remove("active"));
@@ -1380,6 +1719,25 @@ ${SIGNATURE}`;
       pick.innerHTML="";
       arr.forEach(s=>{ const o=document.createElement("option"); o.value=s.id; o.textContent=s.name; pick.appendChild(o); });
 
+      // report picker (teacher)
+      const repPick = $("repPickStudentTeacher");
+      if(repPick){
+        repPick.innerHTML="";
+        arr.forEach(s=>{ const o=document.createElement("option"); o.value=s.id; o.textContent=s.name; repPick.appendChild(o); });
+      }
+
+      // default report dates (this week) if empty
+      try{
+        const wk = getSchoolWeekRangeMs(new Date());
+        if($("repFromTeacher") && !$("repFromTeacher").value) $("repFromTeacher").value = formatYMD(wk.startMs);
+        if($("repToTeacher") && !$("repToTeacher").value) $("repToTeacher").value = formatYMD(Math.min(Date.now(), wk.endMs));
+        if($("honorWeekLabel")) $("honorWeekLabel").textContent = `${formatYMD(wk.startMs)} → ${formatYMD(wk.endMs)}`;
+        const auto = $("autoCongrats");
+        if(auto){ auto.checked = getAutoCongratsEnabled(); }
+      }catch(e){}
+
+      _populateTeacherTransferSelects(arr);
+
       const grid = $("studentsGrid");
       grid.innerHTML="";
       arr.forEach(s=>{
@@ -1398,18 +1756,23 @@ ${SIGNATURE}`;
             <div class="small" style="font-weight:1000;color:#0b2a66">${tierText}</div>
           </div>
 
+          
           <div style="margin-top:8px">
             <strong>${s.name || ""}</strong>
             <div class="small">الرصيد: ${fmt(s.balance)} ر.س</div>
             <div class="small">PIN: <b>${s.pin||""}</b></div>
+            <div class="small">ولي الأمر: <b style="direction:ltr;display:inline-block">${(s.guardianWhats||"—")}</b></div>
           </div>
 
           <div class="row" style="margin-top:10px">
             <button class="btn2 col js-open">دخول الطالب</button>
             <button class="btn3 col js-toggle">${s.active?'إقفال':'تفعيل'}</button>
             <button class="btn3 col js-edit">تعديل الاسم</button>
-            <button class="whatsapp-btn col js-sendpin">إرسال PIN</button>
+            <button class="btn3 col js-phone">📞 رقم ولي الأمر</button>
+            <button class="btn3 col js-pin">🔐 تغيير PIN</button>
+            <button class="whatsapp-btn col js-sendpin">📲 إرسال PIN</button>
             <button class="btn2 col js-pdf">تقرير PDF</button>
+
           </div>
         `;
         const cb = card.querySelector('input[data-sel="stu"]');
@@ -1418,8 +1781,11 @@ ${SIGNATURE}`;
         card.querySelector(".js-open").onclick = async()=>{ currentAccess="teacher"; currentStudentId=s.id; await openStudentAccount(s); };
         card.querySelector(".js-toggle").onclick = async()=>{ await db.collection("students").doc(s.id).update({active:!s.active}); await renderStudents(); };
         card.querySelector(".js-edit").onclick = async()=>{ const nn = prompt("الاسم الجديد:", s.name); if(nn) await db.collection("students").doc(s.id).update({name:nn.trim()}); await renderStudents(); };
-        card.querySelector(".js-sendpin").onclick = ()=>{};
-        card.querySelector(".js-pdf").onclick = ()=>{};
+        card.querySelector(".js-phone").onclick = ()=> editGuardianPhone(s.id);
+        card.querySelector(".js-pin").onclick = ()=> changePinTeacher(s.id);
+
+        card.querySelector(".js-sendpin").onclick = ()=> sendPinToGuardian(s.id);
+        card.querySelector(".js-pdf").onclick = ()=> pdfStudentReport(s.id);
         grid.appendChild(card);
       });
       updateSelCount();
@@ -1440,68 +1806,7 @@ ${SIGNATURE}`;
 
     async function refreshWeekKPIs(){ /* (موجودة بالنسخة الكاملة) */ }
 
-    
-async function executeOp(){
-
-  const op = document.getElementById("op").value;
-  const amt = parseFloat(document.getElementById("amt").value);
-  const reason = getReason("reasonStudent","reasonOtherStudent");
-
-  if(isNaN(amt) || amt <= 0){
-    warn("أدخلي مبلغ صحيح");
-    return;
-  }
-
-  const ref = db.collection("students").doc(currentStudentId);
-  const doc = await ref.get();
-  const s = doc.data();
-
-  if(!s.active){
-    warn("الحساب موقوف");
-    return;
-  }
-
-  if(op === "deposit"){
-    const newBal = Number(s.balance || 0) + amt;
-    await ref.update({ balance:newBal });
-    await logTxn(ref,"إيداع",reason,amt,newBal,s.name,s.guardianWhats||"");
-  }
-
-  if(op === "withdraw"){
-    if(Number(s.balance||0) < amt){
-      warn("الرصيد غير كافي");
-      return;
-    }
-    const newBal = Number(s.balance || 0) - amt;
-    await ref.update({ balance:newBal });
-    await logTxn(ref,"سحب",reason,amt,newBal,s.name,s.guardianWhats||"");
-  }
-
-  if(op === "transfer"){
-    if(Number(s.balance||0) < amt){
-      warn("الرصيد غير كافي للتحويل");
-      return;
-    }
-
-    const toId = document.getElementById("transferTo").value;
-    const toRef = db.collection("students").doc(toId);
-    const toDoc = await toRef.get();
-    const to = toDoc.data();
-
-    const batch = db.batch();
-    batch.update(ref,{ balance:Number(s.balance)-amt });
-    batch.update(toRef,{ balance:Number(to.balance||0)+amt });
-    await batch.commit();
-
-    await logTxn(ref,"تحويل إلى "+to.name,reason,amt,Number(s.balance)-amt,s.name,s.guardianWhats||"");
-    await logTxn(toRef,"تحويل من "+s.name,reason,amt,Number(to.balance||0)+amt,to.name,to.guardianWhats||"");
-  }
-
-  document.getElementById("amt").value = "";
-  await showStatement();
-  await refreshWeekKPIs();
-}
-
+    async function executeOp(){ warn("هذه النسخة مدمجة للواجهة + الكود الأساسي. لو تبغين كل الوظائف (PDF/واتساب/تقارير أسبوعية)، قولي لي وأصدر لك نسخة Full كاملة 100%."); }
 
     async function startApp(){
       const so = $("startOverlay");
@@ -1513,16 +1818,1511 @@ async function executeOp(){
       });
     }
 
-    document.addEventListener("DOMContentLoaded", async()=>{
+    
+    // ================== Daily Ops (Teacher) ==================
+    let dailyOpsCache = [];         // [{id, studentName, type, amount, reason, createdAtClient, guardianWhats}]
+    let dailySelected = new Set();  // ids
+
+    function openDailyOps(){
+      hideAllPages();
+      show("dailyOpsPage");
+      dailySelected.clear();
+      const inp = $("dailyDate");
+      if(inp){
+        const d = new Date();
+        const yyyy = d.getFullYear();
+        const mm = String(d.getMonth()+1).padStart(2,"0");
+        const dd = String(d.getDate()).padStart(2,"0");
+        inp.value = `${yyyy}-${mm}-${dd}`;
+      }
+      loadDailyOps();
+    }
+
+    function dailyKeyFromInput(){
+      const v = $("dailyDate")?.value;
+      if(v) return v;
+      return localTodayKey();
+    }
+
+    async function loadDailyOps(){
+      try{
+        dailySelected.clear();
+        if($("dailySelAll")) $("dailySelAll").checked = false;
+
+        const dateKey = dailyKeyFromInput();
+        const list = $("dailyOpsList");
+        if(list) list.innerHTML = '<div class="small">جاري التحميل…</div>';
+
+        // collectionGroup requires Firestore rules allow it; uses saved dateKey created during logTxn
+        const snap = await db.collectionGroup("txns")
+          .where("dateKey","==",dateKey)
+          .orderBy("createdAtClient","desc")
+          .limit(500)
+          .get();
+
+        // build quick lookup for guardian numbers (fixes old txns that didn't store the number)
+        const studsSnap = await db.collection("students").get();
+        const guardianById = {};
+        const nameById = {};
+        studsSnap.forEach(sd=>{
+          const v = sd.data() || {};
+          guardianById[sd.id] = (v.guardianWhats||"").trim();
+          nameById[sd.id] = (v.name||"").trim();
+        });
+
+        dailyOpsCache = [];
+        snap.forEach(d=>{
+          const x = d.data() || {};
+          const sid = (d.ref && d.ref.parent && d.ref.parent.parent) ? d.ref.parent.parent.id : "";
+          dailyOpsCache.push({
+            id: d.id,
+            studentId: sid,
+            studentName: x.studentName || nameById[sid] || "",
+            type: x.type || "",
+            amount: Number(x.amount||0),
+            reason: x.reason || "",
+            createdAtClient: x.createdAtClient || 0,
+            guardianWhats: (x.guardianWhats || guardianById[sid] || "").trim()
+          });
+        });
+
+        renderDailyOps();
+      }catch(e){
+        console.log(e);
+        const list = $("dailyOpsList");
+        if(list) list.innerHTML = '<div class="small" style="color:var(--red);font-weight:1000">تعذر تحميل العمليات اليومية. تأكد/ي من اتصال Firebase.</div>';
+      }
+    }
+
+    function renderDailyOps(){
+      const list = $("dailyOpsList");
+      if(!list) return;
+
+      if(!dailyOpsCache.length){
+        list.innerHTML = '<div class="small">لا توجد عمليات في هذا التاريخ.</div>';
+        if($("dailyCount")) $("dailyCount").textContent = "عدد العمليات: 0";
+        return;
+      }
+
+      if($("dailyCount")) $("dailyCount").textContent = "عدد العمليات: " + dailyOpsCache.length;
+
+      list.innerHTML = "";
+      dailyOpsCache.forEach((x, idx)=>{
+        const t = x.createdAtClient ? new Date(x.createdAtClient).toLocaleString("ar-SA") : "—";
+        const phone = String(x.guardianWhats||"").trim();
+        const card = document.createElement("div");
+        card.className = "opCard";
+        card.innerHTML = `
+          <div class="opTop">
+            <label class="small" style="display:flex;gap:8px;align-items:center">
+              <input type="checkbox" data-daily="1" data-id="${x.id}" style="width:auto">
+              تحديد
+            </label>
+            <div class="opName">${x.studentName || "—"}</div>
+            <div class="opMeta">${t}</div>
+          </div>
+          <div class="opLine">
+            <span class="pill2">${x.type || "—"}</span>
+            <span class="pill2">المبلغ: ${fmt(x.amount)} ر.س</span>
+            <span class="pill2">السبب: ${x.reason || "—"}</span>
+            <span class="pill2" style="direction:ltr;text-align:left">📞 ${phone || "—"}</span>
+            <button class="whatsapp-btn" style="padding:10px 12px" onclick="sendOneDailyOp('${x.id}')">إرسال</button>
+          </div>
+        `;
+        const cb = card.querySelector('input[data-daily="1"]');
+        cb.onchange = ()=>{
+          if(cb.checked) dailySelected.add(x.id);
+          else dailySelected.delete(x.id);
+        };
+        list.appendChild(card);
+      });
+    }
+
+    function toggleDailySelectAll(){
+      const all = $("dailySelAll")?.checked;
+      dailySelected.clear();
+      document.querySelectorAll('input[data-daily="1"]').forEach(cb=>{
+        cb.checked = !!all;
+        const id = cb.getAttribute("data-id");
+        if(all) dailySelected.add(id);
+      });
+    }
+
+    function buildDailyMsg(x){
+      return buildOfficialMessage(
+        x.type || "عملية",
+        x.studentName || "—",
+        fmt(x.amount),
+        x.reason || "—"
+      );
+    }
+
+    function sendOneDailyOp(id){
+      const x = dailyOpsCache.find(o=>o.id===id);
+      if(!x) return;
+      if(!x.guardianWhats) return openModal("تنبيه","لا يوجد رقم ولي أمر لهذه العملية.", '<button class="btn" onclick="closeModal()">تمام</button>');
+      const msg = buildDailyMsg(x);
+      // send via WhatsApp Business preferred
+      openWABusiness(x.guardianWhats, msg);
+    }
+
+    function sendSelectedDailyOps(){
+      if(!dailySelected.size) return warn("اختاري عملية واحدة على الأقل");
+      const arr = dailyOpsCache.filter(x=>dailySelected.has(x.id));
+      // send sequentially with small delays to avoid iOS blocking
+      let i=0;
+      const sendNext=()=>{
+        if(i>=arr.length) return;
+        const x=arr[i++];
+        if(x.guardianWhats){
+          openWABusiness(x.guardianWhats, buildDailyMsg(x));
+        }
+        setTimeout(sendNext, 1400);
+      };
+      sendNext();
+    }
+
+    function sendAllDailyOps(){
+      if(!dailyOpsCache.length) return warn("لا توجد عمليات لإرسالها");
+      dailySelected = new Set(dailyOpsCache.map(x=>x.id));
+      if($("dailySelAll")) $("dailySelAll").checked = true;
+      sendSelectedDailyOps();
+    }
+
+document.addEventListener("DOMContentLoaded", async()=>{
       $("modePill").textContent = IS_STUDENT_ENTRY ? "وضع: الطالب" : "وضع: المعلمة";
       if(IS_STUDENT_ENTRY){ $("startMsg").innerHTML = "بوابة دخول الطلاب 👇<br>اضغط زر البداية ثم تابعي التعريف السريع."; }
       $("forgotPinLink")?.addEventListener("click",(e)=>{ e.preventDefault(); forgotStudentPin(); });
-      $("op")?.addEventListener("change", ()=> setupReasonUI($("op").value, "reasonStudent", "reasonOtherStudent"));
+      $("changePinLink")?.addEventListener("click",(e)=>{ e.preventDefault(); changePinStudentFlow(); });
+      $("op")?.addEventListener("change", ()=>{
+        setupReasonUI($("op").value, "reasonStudent", "reasonOtherStudent");
+        toggleStudentOpUI();
+      });
       await loadForgotSetting();
       try{ await ensureSeed(); await renderTabs(); $("connPill").textContent="جاهز ✅"; }catch(e){ $("connPill").textContent="جاهز ✅"; }
       initTeacherReasonAlways();
       bindClickSounds();
     });
-  </script>
+  
+    // ================== Added: Guardian phone / PIN / PDF ==================
+    function isValidPin(p){ return /^[0-9]{4}$/.test(String(p||"").trim()); }
+
+    async function getStudentById(studentId){
+      const doc = await db.collection("students").doc(studentId).get();
+      if(!doc.exists) throw new Error("Student not found");
+      return { id: doc.id, ...doc.data() };
+    }
+
+    async function sendPinToGuardian(studentId){
+      try{
+        const s = await getStudentById(studentId);
+        let phone = String(s.guardianWhats||"").trim();
+        if(!phone){
+          const nn = prompt("اكتب رقم ولي الأمر (مثال: 05xxxxxxxx):", "");
+          if(!nn) return;
+          phone = nn.trim();
+          await db.collection("students").doc(studentId).update({guardianWhats: phone});
+        }
+        const wa = normalizePhoneToWA(phone);
+        if(!wa) return warn("رقم ولي الأمر غير صحيح");
+
+        const msg =
+          "⚠️ رسالة تلقائية\n" + TEACHER_BANK_TITLE + "\n\n" +
+          "رقم الدخول (PIN) للطالب/ـة:\n" + (s.name||"") + "\n" +
+          "PIN: " + (s.pin||"") + "\n\n" +
+          "للتواصل مع المعلمة:\n" + contactLink() + "\n\n" +
+          SIGNATURE;
+
+        openWA(wa, msg);
+        await renderStudents();
+      try{ await renderHonorRoll(); }catch(e){}
+      }catch(e){
+        console.log(e);
+        warn("تعذر إرسال PIN الآن.");
+      }
+    }
+
+    async function editGuardianPhone(studentId){
+      try{
+        const s = await getStudentById(studentId);
+        const body = `
+          <div class="small" style="margin-bottom:8px">تعديل رقم ولي الأمر للطالب/ـة: <b>${s.name||""}</b></div>
+          <div class="field" style="margin:0">
+            <input id="gpInput" placeholder="05xxxxxxxx" value="${String(s.guardianWhats||"").replace(/"/g,'&quot;')}">
+          </div>
+          <div class="small" style="margin-top:8px">نصيحة: اكتبي الرقم بصيغة <b>05xxxxxxxx</b></div>
+        `;
+        openModal("رقم ولي الأمر", body, `
+          <button class="btn2" onclick="closeModal()">إلغاء</button>
+          <button class="btn" onclick="(async()=>{
+            const v = (document.getElementById('gpInput').value||'').trim();
+            await db.collection('students').doc('${studentId}').update({guardianWhats: v});
+            closeModal();
+            await renderStudents();
+          })()">حفظ</button>
+        `);
+      }catch(e){
+        console.log(e);
+        warn("تعذر فتح تعديل الرقم.");
+      }
+    }
+
+    async function changePinTeacher(studentId){
+      try{
+        const s = await getStudentById(studentId);
+        const body = `
+          <div class="small" style="margin-bottom:8px">تغيير PIN للطالب/ـة: <b>${s.name||""}</b></div>
+          <div class="field" style="margin:0">
+            <input id="pinNew" inputmode="numeric" maxlength="4" placeholder="PIN جديد (4 أرقام)">
+          </div>
+          <div class="small" style="margin-top:8px">مثال: 1234</div>
+        `;
+        openModal("تغيير PIN", body, `
+          <button class="btn2" onclick="closeModal()">إلغاء</button>
+          <button class="btn" onclick="(async()=>{
+            const v = (document.getElementById('pinNew').value||'').trim();
+            if(!/^[0-9]{4}$/.test(v)){ return warn('PIN لازم يكون 4 أرقام'); }
+            await db.collection('students').doc('${studentId}').update({pin: v});
+            closeModal();
+            await renderStudents();
+          })()">حفظ</button>
+        `);
+      }catch(e){
+        console.log(e);
+        warn("تعذر تغيير PIN.");
+      }
+    }
+
+    async function changePinStudentFlow(){
+      try{
+        const name = (document.getElementById("stuName")?.value || "").trim();
+        if(!name) return warn("اكتب/ي الاسم أولًا في خانة الدخول");
+        const snap = await db.collection("students").where("name","==",name).limit(1).get();
+        if(snap.empty) return warn("الاسم غير موجود");
+
+        const doc = snap.docs[0];
+        const s = doc.data() || {};
+        const body = `
+          <div class="small">تغيير الرقم السري للطالب/ـة: <b>${s.name||""}</b></div>
+          <hr>
+          <div class="row">
+            <div class="col">
+              <div class="small">PIN الحالي</div>
+              <input id="oldPin" inputmode="numeric" maxlength="4" placeholder="****">
+            </div>
+            <div class="col">
+              <div class="small">PIN الجديد</div>
+              <input id="newPin" inputmode="numeric" maxlength="4" placeholder="****">
+            </div>
+          </div>
+          <div class="small" style="margin-top:8px">شرط: 4 أرقام</div>
+        `;
+        openModal("تغيير الرقم السري", body, `
+          <button class="btn2" onclick="closeModal()">إلغاء</button>
+          <button class="btn" onclick="(async()=>{
+            const oldP = (document.getElementById('oldPin').value||'').trim();
+            const newP = (document.getElementById('newPin').value||'').trim();
+            if(String(oldP)!==String(s.pin||'')) return warn('PIN الحالي غير صحيح');
+            if(!/^[0-9]{4}$/.test(newP)) return warn('PIN الجديد لازم يكون 4 أرقام');
+            await db.collection('students').doc('${doc.id}').update({pin:newP});
+            closeModal();
+            warn('تم تغيير PIN بنجاح ✅');
+          })()">تأكيد</button>
+        `);
+      }catch(e){
+        console.log(e);
+        warn("تعذر تغيير PIN الآن.");
+      }
+    }
+
+    function hijriAndGregToday(){
+      const now = new Date();
+      const greg = new Intl.DateTimeFormat("ar-SA", {year:"numeric", month:"long", day:"numeric"}).format(now);
+      let hijri = "";
+      try{
+        hijri = new Intl.DateTimeFormat("ar-SA-u-ca-islamic", {year:"numeric", month:"long", day:"numeric"}).format(now);
+      }catch(_){
+        hijri = "";
+      }
+      return {greg, hijri};
+    }
+
+    function openPrintWindow(title, innerHtml){
+      const w = window.open("", "_blank");
+      if(!w) return warn("المتصفح منع فتح نافذة التقرير. فعّلي Pop-ups ثم جربي.");
+      const {greg, hijri} = hijriAndGregToday();
+      w.document.open();
+      w.document.write(`
+<!doctype html><html lang="ar" dir="rtl"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${title}</title>
+<style>
+  *{box-sizing:border-box;font-family:Tahoma,Arial,sans-serif}
+  body{margin:0;background:#f5f7fb;color:#111827}
+  .paper{max-width:900px;margin:18px auto;background:#fff;border:1px solid #e5e7eb;border-radius:16px;padding:18px}
+  .head{display:flex;justify-content:space-between;gap:14px;align-items:center;flex-wrap:wrap}
+  .brand{display:flex;gap:12px;align-items:center}
+  .logo{width:66px;height:66px;border-radius:14px;overflow:hidden;border:1px solid rgba(0,0,0,.12);background:#fff}
+  .logo img{width:100%;height:100%;object-fit:contain}
+  .t1{font-weight:1000;color:#0b2a66;font-size:18px}
+  .t2{font-weight:900;color:#6b7280;font-size:12px;margin-top:4px}
+  .dates{font-size:12px;color:#6b7280;font-weight:900;line-height:1.7;text-align:left;direction:ltr}
+  .stamp{width:92px;height:92px;opacity:.98}
+  .stamp img{width:92px;height:92px;object-fit:contain}
+  hr{border:0;border-top:1px solid #e5e7eb;margin:14px 0}
+  table{width:100%;border-collapse:collapse}
+  th,td{border-bottom:1px solid #eef2f7;padding:10px;text-align:center;font-size:13px;white-space:nowrap}
+  th{background:#eef6ff;color:#0b2a66;font-weight:1000}
+  .sigRow{display:flex;justify-content:space-between;gap:12px;align-items:flex-end;margin-top:18px;flex-wrap:wrap}
+  .sigBox{min-width:260px;border-top:1px dashed #9ca3af;padding-top:8px;font-weight:900;font-size:12px}
+  .sigBox img{height:46px;object-fit:contain;display:block;margin-top:6px}
+  .muted{color:#6b7280}
+  @media print{ body{background:#fff} .paper{border:0;margin:0;border-radius:0} }
+
+    /* Daily ops list */
+    .opCard{
+      border:1px solid rgba(0,0,0,.08);
+      border-radius:16px;
+      padding:12px;
+      background:linear-gradient(180deg,#ffffff,#f8fbff);
+      box-shadow:0 10px 18px rgba(0,0,0,.05);
+      margin:10px 0;
+    }
+    .opTop{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+    .opName{font-weight:1000;color:#0b2a66}
+    .opMeta{font-size:12px;color:#6b7280;font-weight:900}
+    .opLine{margin-top:8px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .pill2{display:inline-block;background:#eef6ff;border:1px solid rgba(0,0,0,.06);padding:6px 10px;border-radius:999px;font-weight:1000;font-size:12px;color:#0b2a66}
+
+  </style>
+</head><body>
+<div class="paper">
+  <div class="head">
+    <div class="brand">
+      <div class="logo"><img src="logo.png" alt="logo"></div>
+      <div>
+        <div class="t1">بنك الرياضيات – المعلمة سارة حقوي</div>
+        <div class="t2">مدرسة رواد الشرق الأهلية</div>
+        <div class="t2 muted">${hijri ? ("التاريخ الهجري: " + hijri + " • ") : ""}التاريخ الميلادي: ${greg}</div>
+      </div>
+    </div>
+    <div class="stamp"><img src="stamp.png" alt="stamp"></div>
+  </div>
+  <hr>
+  ${innerHtml}
+  <div class="sigRow">
+    <div class="sigBox">توقيع المعلمة<br>${SIGNATURE}<img src="signature.png" alt="signature"></div>
+    <div class="sigBox" style="text-align:left;direction:ltr">التاريخ<br>${greg}</div>
+  </div>
+</div>
+<script>
+  window.onload = ()=>{ setTimeout(()=>window.print(), 300); };
+<\/script>
+</body></html>`);
+      w.document.close();
+    }
+
+    async function pdfStudentReport(studentId){
+      try{
+        const s = await getStudentById(studentId);
+        const txSnap = await db.collection("students").doc(studentId).collection("txns")
+          .orderBy("createdAtClient","desc").limit(200).get();
+
+        let rows="";
+        txSnap.forEach(d=>{
+          const x=d.data()||{};
+          const t = x.createdAtClient ? new Date(x.createdAtClient).toLocaleString("ar-SA") : "";
+          rows += `<tr>
+            <td>${t}</td>
+            <td>${x.type||""}</td>
+            <td>${x.reason||""}</td>
+            <td>${fmt(x.amount)}</td>
+            <td>${fmt(x.balanceAfter)}</td>
+          </tr>`;
+        });
+        if(!rows) rows = `<tr><td colspan="5" class="muted" style="padding:18px">لا توجد عمليات.</td></tr>`;
+
+        const inner = `
+          <div style="font-weight:1000;color:#0b2a66;margin-bottom:8px">تقرير الطالب</div>
+          <div class="muted" style="font-weight:900;margin-bottom:10px">
+            الاسم: <b>${s.name||"—"}</b> • الرصيد: <b>${fmt(s.balance)}</b> ر.س • PIN: <b>${s.pin||"—"}</b>
+          </div>
+          <table>
+            <thead><tr><th>الوقت</th><th>العملية</th><th>السبب</th><th>المبلغ</th><th>الرصيد بعد العملية</th></tr></thead>
+            <tbody>${rows}</tbody>
+          </table>
+        `;
+        openPrintWindow(`تقرير الطالب - ${s.name||""}`, inner);
+      }catch(e){
+        console.log(e);
+        warn("تعذر إنشاء تقرير الطالب الآن.");
+      }
+    }
+
+    async function pdfBankReport(){
+      try{
+        // report per current classes list
+        const clsSnap = await db.collection("classes").orderBy("order").get();
+        const classesArr = [];
+        clsSnap.forEach(d=>classesArr.push({id:d.id, ...d.data()}));
+
+        const stuSnap = await db.collection("students").get();
+        const students = [];
+        stuSnap.forEach(d=>students.push({id:d.id, ...d.data()}));
+        students.sort((a,b)=>(a.name||"").localeCompare(b.name||"","ar"));
+
+        const byClass = {};
+        classesArr.forEach(c=> byClass[c.id] = []);
+        students.forEach(s=>{ (byClass[s.classId] ||= []).push(s); });
+
+        let sections = "";
+        let totalBal = 0;
+        let totalStudents = students.length;
+
+        classesArr.forEach(c=>{
+          const arr = byClass[c.id] || [];
+          if(!arr.length) return;
+          sections += `<div style="margin:12px 0 6px;font-weight:1000;color:#0b2a66">${c.name||"فصل"}</div>`;
+          sections += `<table><thead><tr><th>الطالب</th><th>الرصيد</th><th>PIN</th><th>ولي الأمر</th><th>الحالة</th></tr></thead><tbody>`;
+          arr.forEach(s=>{
+            totalBal += Number(s.balance||0);
+            sections += `<tr>
+              <td>${s.name||""}</td>
+              <td>${fmt(s.balance)}</td>
+              <td>${String(s.pin||"—")}</td>
+              <td style="direction:ltr">${String(s.guardianWhats||"—")}</td>
+              <td>${s.active ? "🟢 مفعل" : "🔴 مقفل"}</td>
+            </tr>`;
+          });
+          sections += `</tbody></table>`;
+        });
+
+        if(!sections){
+          sections = `<div class="muted">لا توجد بيانات طلاب.</div>`;
+        }
+
+        const inner = `
+          <div style="font-weight:1000;color:#0b2a66;margin-bottom:8px">تقرير شامل للبنك</div>
+          <div class="muted" style="font-weight:900;margin-bottom:12px">
+            إجمالي الطلاب: <b>${totalStudents}</b> • إجمالي الأرصدة: <b>${fmt(totalBal)}</b> ر.س
+          </div>
+          ${sections}
+        `;
+        openPrintWindow("تقرير شامل - بنك الرياضيات", inner);
+      }catch(e){
+        console.log(e);
+        warn("تعذر إنشاء تقرير البنك الآن.");
+      }
+    }
+
+
+    /* ================== PATCH: تفعيل الإيداع/السحب/التحويل (معلمة + طالب) ==================
+       - لا يحذف أي شيء من الواجهة
+       - يضيف الدوال الناقصة التي كانت مستبدلة برسالة تحذير
+    */
+
+    function localDateKeyFromDate(d){
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth()+1).padStart(2,'0');
+      const dd = String(d.getDate()).padStart(2,'0');
+      return `${yyyy}-${mm}-${dd}`;
+    }
+    function localTodayKey(){ return localDateKeyFromDate(new Date()); }
+
+    async function logTxn(studentRef, type, reason, amount, balanceAfter, meta){
+      try{
+        const m = meta || {};
+        await studentRef.collection("txns").add({
+          studentId: studentRef.id || "",
+          studentName: m.name || m.studentName || "",
+          guardianWhats: m.guardianWhats || m.guardian || "",
+          type: type || "",
+          reason: reason || "",
+          amount: Number(amount||0),
+          balanceAfter: Number(balanceAfter||0),
+          dateKey: localTodayKey(),
+          createdAtClient: Date.now(),
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      }catch(e){
+
+        // ignore logging errors to avoid blocking UI
+        console.log("logTxn error", e);
+      }
+    }
+
+    async function buildTransferList(){
+      try{
+        const sel = $("transferTo");
+        if(!sel) return;
+        const snap = await db.collection("students").get();
+        const arr = [];
+        snap.forEach(d=>arr.push({id:d.id, ...(d.data()||{})}));
+        arr.sort((a,b)=>(a.name||"").localeCompare(b.name||"","ar"));
+        sel.innerHTML = "";
+        arr.forEach(s=>{
+          if(s.id===currentStudentId) return;
+          const o=document.createElement("option");
+          o.value=s.id; o.textContent=s.name || "—";
+          sel.appendChild(o);
+        });
+      }catch(e){
+        console.log("buildTransferList error", e);
+      }
+    }
+
+    // Override: openStudentAccount to keep existing behavior + populate transfer list
+    const __openStudentAccount_original = openStudentAccount;
+    openStudentAccount = async function(s){
+      await __openStudentAccount_original(s);
+      await buildTransferList();
+      toggleStudentOpUI();
+      updateTransferPreview();
+    };
+
+    function updateTransferPreview(){
+      const prev = $("transferToPreview");
+      const sel = $("transferTo");
+      if(!prev) return;
+      const opt = sel?.selectedOptions?.[0];
+      const name = opt ? opt.textContent : "";
+      if(name){
+        prev.textContent = "المستلم: " + name;
+      }else{
+        prev.textContent = "";
+      }
+    }
+
+    function toggleStudentOpUI(){
+      const op = $("op")?.value || "deposit";
+      const wrap = $("transferWrap");
+      if(!wrap) return;
+      if(op === "transfer"){
+        wrap.classList.remove("hidden");
+        buildTransferList().then(()=>{ if($("transferTo")) $("transferTo").onchange = updateTransferPreview; updateTransferPreview(); });
+      }else{
+        wrap.classList.add("hidden");
+      }
+    }
+
+
+    // KPI weekly (School week: Sunday -> Thursday)
+    refreshWeekKPIs = async function(){
+      try{
+        const range = getSchoolWeekRangeMs(new Date());
+        const startMs = range.startMs, endMs = range.endMs;
+
+        const q = db.collection("students").doc(currentStudentId).collection("txns")
+          .where("createdAtClient", ">=", startMs)
+          .where("createdAtClient", "<=", endMs)
+          .orderBy("createdAtClient","desc")
+          .limit(600);
+
+        const snap = await q.get();
+        let dep=0,wit=0,count=0;
+        snap.forEach(d=>{
+          const x=d.data()||{};
+          count++;
+          const a=Number(x.amount||0);
+          const t=String(x.type||"");
+          if(t.includes("إيداع")) dep += a;
+          else if(t.includes("سحب")) wit += a;
+        });
+        const net = dep - wit;
+        $("kpiWeekCount") && ($("kpiWeekCount").textContent = String(count));
+        $("kpiWeekDep") && ($("kpiWeekDep").textContent = fmt(dep));
+        $("kpiWeekWith") && ($("kpiWeekWith").textContent = fmt(wit));
+        $("kpiWeekNet") && ($("kpiWeekNet").textContent = fmt(net));
+      }catch(e){
+        console.log("refreshWeekKPIs error", e);
+      }
+    };
+
+    
+    // ===== Rewards (linked to daily operations / txns) =====
+    async function refreshRewards(){
+      try{
+        if(!currentStudentId) return;
+
+        const now = Date.now();
+        const wk = getSchoolWeekRangeMs(new Date());
+        const weekStart = wk.startMs;
+        const weekEnd = wk.endMs;
+        const fiveStart = now - 5*24*60*60*1000;
+
+        const sRef = db.collection("students").doc(currentStudentId);
+
+        // Student weekly net (deposit + transfer in) - (withdraw + transfer out)
+        const weekSnap = await sRef.collection("txns")
+          .where("createdAtClient", ">=", weekStart)
+          .where("createdAtClient", "<=", weekEnd)
+          .orderBy("createdAtClient","desc")
+          .limit(600)
+          .get();
+
+        let net=0, partCount=0, violations=0;
+        weekSnap.forEach(d=>{
+          const x=d.data()||{};
+          const t=String(x.type||"");
+          const reason=String(x.reason||"");
+          const a=Number(x.amount||0);
+
+          if(t.startsWith("إيداع") || t.startsWith("تحويل من")) net += a;
+          else if(t.startsWith("سحب") || t.startsWith("تحويل إلى")) net -= a;
+
+          // participation heuristic
+          if(t.startsWith("إيداع")){
+            const r = reason.replace(/\s+/g,'');
+            if(r.includes("مشاركة") || r.includes("تفاعل") || r.includes("إجابة") || r.includes("حل") || r.includes("واجب") || r.includes("نشاط")){
+              partCount++;
+            }
+          }
+        });
+
+        // Commitment: "0 مخالفات خلال 5 أيام"
+        const fiveSnap = await sRef.collection("txns")
+          .where("createdAtClient", ">=", fiveStart)
+          .orderBy("createdAtClient","desc")
+          .limit(600)
+          .get();
+
+        const violWords = ["مخالفة","سلوك","غياب","تأخر","عدم","انضباط","تنبيه"];
+        fiveSnap.forEach(d=>{
+          const x=d.data()||{};
+          const t=String(x.type||"");
+          const reason=String(x.reason||"");
+          if(!t.startsWith("سحب")) return;
+          const rr = reason || "";
+          if(violWords.some(w=>rr.includes(w))) violations++;
+        });
+
+        // Champion: rank by weekly net inside class
+        let rankText = "—";
+        let champText = "—";
+        let topNetValue = null;
+
+        if(currentClassId){
+          const studs = await db.collection("students").where("classId","==",currentClassId).get();
+          const nets = [];
+          for(const sd of studs.docs){
+            const sid = sd.id;
+            const ref = db.collection("students").doc(sid);
+            const snap = await ref.collection("txns")
+              .where("createdAtClient", ">=", weekStart)
+              .where("createdAtClient", "<=", weekEnd)
+              .orderBy("createdAtClient","desc")
+              .limit(600)
+              .get();
+            let n=0;
+            snap.forEach(d=>{
+              const x=d.data()||{};
+              const t=String(x.type||"");
+              const a=Number(x.amount||0);
+              if(t.startsWith("إيداع") || t.startsWith("تحويل من")) n += a;
+              else if(t.startsWith("سحب") || t.startsWith("تحويل إلى")) n -= a;
+            });
+            nets.push({id:sid, name:(sd.data()||{}).name||"—", net:n});
+          }
+          nets.sort((a,b)=>b.net-a.net);
+          const idx = nets.findIndex(x=>x.id===currentStudentId);
+          if(idx>=0){
+            rankText = `${idx+1} / ${nets.length}`;
+          }
+          if(nets.length){
+            const top = nets[0];
+            topNetValue = Number(top.net||0);
+            champText = (top.id===currentStudentId)
+              ? "مستحق ✅ (أنت/ي الأعلى هذا الأسبوع)"
+              : `غير مستحق — المتصدر: ${top.name}`;
+          }
+        }else{
+          champText = "—";
+        }
+        // Update UI (Rewards Pro)
+        const rangeTxt = `${formatYMD(weekStart)} → ${formatYMD(weekEnd)}`;
+        $("rwWeekRange") && ($("rwWeekRange").textContent = rangeTxt);
+
+        // Points + extra metrics
+        let depTotal=0, witTotal=0, helpCount=0, transferOut=0;
+        weekSnap.forEach(d=>{
+          const x=d.data()||{};
+          const t=String(x.type||"");
+          const a=Number(x.amount||0);
+          const reason=String(x.reason||"");
+          if(t.startsWith("إيداع")) depTotal += a;
+          if(t.startsWith("سحب")) witTotal += a;
+          if(t.startsWith("تحويل إلى")) {
+            transferOut++;
+            const rr = reason || "";
+            if(rr.includes("مساعدة") || rr.includes("تعاون") || rr.includes("إعانة") || rr.includes("مساندة")) helpCount++;
+          }
+        });
+
+        const partTarget = 3;
+        const saveTarget = 1000; // ر.س
+        const helpTarget = 2;    // تحويلات مساعدة
+
+        // Base points
+        const points = Math.max(0,
+          Math.round(
+            (depTotal>0 ? (depTotal*0.05) : 0) +          // كل 20 ريال ≈ 1 نقطة
+            (partCount*12) +                               // المشاركة وزنها عالي
+            (transferOut*2) -                              // تعاون بسيط
+            (violations*15)                                // مخالفات تقلل
+          )
+        );
+
+        $("rwWeekNet") && ($("rwWeekNet").textContent = fmt(net));
+        $("rwPoints") && ($("rwPoints").textContent = String(points));
+        $("rwRank") && ($("rwRank").textContent = rankText);
+        $("rwPartCount") && ($("rwPartCount").textContent = String(partCount));
+
+        // Badges helper
+        function setBadge(id, ok){
+          const el=$(id); if(!el) return;
+          el.classList.remove("ok","no");
+          if(ok===true){ el.textContent="مستحق ✅"; el.classList.add("ok"); }
+          else if(ok===false){ el.textContent="غير مستحق"; el.classList.add("no"); }
+          else { el.textContent="—"; }
+        }
+        function setProg(barId, txtId, val, target){
+          const bar=$(barId), txt=$(txtId);
+          const pct = (target<=0) ? 0 : Math.max(0, Math.min(100, Math.round((val/target)*100)));
+          if(bar) bar.style.width = pct + "%";
+          if(txt) txt.textContent = `${Math.round(val)} / ${Math.round(target)}`;
+        }
+
+        // Champion
+        const champOk = String(champText||"").startsWith("مستحق");
+        $("rwChampion") && ($("rwChampion").textContent = champText);
+        setBadge("rwChampionBadge", champOk);
+        // progress: compare to top net (if available)
+        const topNetVal = (typeof topNetValue!=="undefined" && topNetValue!==null) ? Number(topNetValue) : null;
+        if(topNetVal!==null && topNetVal>0){
+          $("rwChampionProgTxt") && ($("rwChampionProgTxt").textContent = `${fmt(net)} / ${fmt(topNetVal)} ر.س`);
+          const bar=$("rwChampionProg");
+          if(bar) bar.style.width = Math.max(0, Math.min(100, Math.round((net/topNetVal)*100))) + "%";
+        }else{
+          $("rwChampionProgTxt") && ($("rwChampionProgTxt").textContent = "—");
+          $("rwChampionProg") && ($("rwChampionProg").style.width = "0%");
+        }
+
+        // Commitment (5 days)
+        const commitOk = (violations===0);
+        $("rwCommit") && ($("rwCommit").textContent = commitOk ? "مستحق ✅ (0 مخالفات خلال آخر 5 أيام)" : `غير مستحق — مخالفات: ${violations}`);
+        setBadge("rwCommitBadge", commitOk);
+        setProg("rwCommitProg","rwCommitProgTxt", Math.max(0,5-violations), 5);
+
+        // Participation
+        const partOk = (partCount >= partTarget);
+        $("rwPart") && ($("rwPart").textContent = partOk ? `مستحق ✅ (مشاركات: ${partCount})` : `غير مستحق — مشاركات: ${partCount} (الحد ${partTarget})`);
+        setBadge("rwPartBadge", partOk);
+        setProg("rwPartProg","rwPartProgTxt", partCount, partTarget);
+
+        // Improvement (vs previous school week)
+        const prev = getPrevSchoolWeekRangeMs(new Date());
+        const prevSnap = await sRef.collection("txns")
+          .where("createdAtClient", ">=", prev.startMs)
+          .where("createdAtClient", "<=", prev.endMs)
+          .orderBy("createdAtClient","desc")
+          .limit(600)
+          .get();
+        let prevNet=0;
+        prevSnap.forEach(d=>{
+          const x=d.data()||{};
+          const t=String(x.type||"");
+          const a=Number(x.amount||0);
+          if(t.startsWith("إيداع") || t.startsWith("تحويل من")) prevNet += a;
+          else if(t.startsWith("سحب") || t.startsWith("تحويل إلى")) prevNet -= a;
+        });
+        const delta = net - prevNet;
+        const improTarget = 200; // ر.س تحسن
+        const improOk = (delta >= improTarget);
+        $("rwImpro") && ($("rwImpro").textContent = improOk ? `مستحق ✅ (تحسّن: +${fmt(delta)} ر.س)` : `غير مستحق — تحسّن: ${fmt(delta)} ر.س (الهدف +${improTarget})`);
+        setBadge("rwImproBadge", improOk);
+        setProg("rwImproProg","rwImproProgTxt", Math.max(0,delta), improTarget);
+
+        // Savings
+        const saveOk = (depTotal >= saveTarget);
+        $("rwSave") && ($("rwSave").textContent = saveOk ? `مستحق ✅ (إيداعات: ${fmt(depTotal)} ر.س)` : `غير مستحق — إيداعات: ${fmt(depTotal)} ر.س (الهدف ${saveTarget})`);
+        setBadge("rwSaveBadge", saveOk);
+        setProg("rwSaveProg","rwSaveProgTxt", depTotal, saveTarget);
+
+        // Helper
+        const helpOk = (helpCount >= helpTarget);
+        $("rwHelp") && ($("rwHelp").textContent = helpOk ? `مستحق ✅ (مساعدات: ${helpCount})` : `غير مستحق — مساعدات: ${helpCount} (الهدف ${helpTarget})`);
+        setBadge("rwHelpBadge", helpOk);
+        setProg("rwHelpProg","rwHelpProgTxt", helpCount, helpTarget);
+
+        // Leaderboard (Top points in class)
+        try{
+          const box = $("rwLeader");
+          if(box){
+            box.innerHTML = "";
+            if(currentClassId){
+              const studs = await db.collection("students").where("classId","==",currentClassId).get();
+              const rows = [];
+              for(const sd of studs.docs){
+                const sid = sd.id;
+                const ref = db.collection("students").doc(sid);
+                const snap2 = await ref.collection("txns")
+                  .where("createdAtClient", ">=", weekStart)
+                  .where("createdAtClient", "<=", weekEnd)
+                  .orderBy("createdAtClient","desc")
+                  .limit(600)
+                  .get();
+                let dep2=0, part2=0, vio2=0, trOut2=0, net2=0;
+                snap2.forEach(d=>{
+                  const x=d.data()||{};
+                  const t=String(x.type||"");
+                  const a=Number(x.amount||0);
+                  const reason=String(x.reason||"");
+                  if(t.startsWith("إيداع") || t.startsWith("تحويل من")) net2 += a;
+                  else if(t.startsWith("سحب") || t.startsWith("تحويل إلى")) net2 -= a;
+                  if(t.startsWith("إيداع")) dep2 += a;
+                  if(t.startsWith("تحويل إلى")) trOut2++;
+                  if(t.startsWith("إيداع")){
+                    const r = String(reason||"").replace(/\s+/g,'');
+                    if(r.includes("مشاركة") || r.includes("تفاعل") || r.includes("إجابة") || r.includes("حل") || r.includes("واجب") || r.includes("نشاط")) part2++;
+                  }
+                  if(t.startsWith("سحب")){
+                    const rr = String(reason||"");
+                    if(violWords.some(w=>rr.includes(w))) vio2++;
+                  }
+                });
+                const pts = Math.max(0, Math.round((dep2*0.05) + (part2*12) + (trOut2*2) - (vio2*15)));
+                rows.push({id:sid,name:(sd.data()||{}).name||"—",pts,net:net2});
+              }
+              rows.sort((a,b)=>b.pts-a.pts);
+              const top = rows.slice(0,5);
+              top.forEach((r,i)=>{
+                const el=document.createElement("div");
+                el.className="lbRow";
+                el.innerHTML = `<div class="lbRank">${i+1}</div>
+                  <div>
+                    <div class="lbName">${escapeHtml(r.name)}</div>
+                    <div class="small">صافي: ${fmt(r.net)} ر.س</div>
+                  </div>
+                  <div class="lbMeta">
+                    <div class="lbPill">${r.pts} نقطة</div>
+                  </div>`;
+                box.appendChild(el);
+              });
+              if(!top.length){
+                box.innerHTML = '<div class="small">لا توجد بيانات لهذا الأسبوع.</div>';
+              }
+            }else{
+              box.innerHTML = '<div class="small">لم يتم تعيين فصل لهذا الحساب.</div>';
+            }
+          }
+        }catch(e){}
+
+        // Auto WhatsApp congratulations (once per week per award)
+        try{
+          const champOk = String(champText||"").startsWith("مستحق");
+          const commitOk = (violations===0);
+          const key = `awardState_${currentStudentId}_${formatYMD(weekStart)}`;
+          const prev = JSON.parse(localStorage.getItem(key) || "{}");
+          const nowState = {champ:champOk, commit:commitOk, part:partOk};
+          localStorage.setItem(key, JSON.stringify(nowState));
+
+          const newly = [];
+          if(champOk && !prev.champ) newly.push("بطل الأسبوع 🏆");
+          if(commitOk && !prev.commit) newly.push("نجم الالتزام 🥇");
+          if(partOk && !prev.part) newly.push("نجم المشاركة 🎯");
+
+          const autoOn = (currentAccess!=="student") && getAutoCongratsEnabled();
+          const phone = (currentStudentObj && currentStudentObj.guardianWhats) ? currentStudentObj.guardianWhats : "";
+          if(autoOn && phone && newly.length){
+            const rangeTxt = `${formatYMD(weekStart)} إلى ${formatYMD(weekEnd)}`;
+            const msg = `تهانينا 🌟\nنفيدكم بفوز الطالبة/الطالب: ${(currentStudentObj&&currentStudentObj.name)||"—"}\nبالجوائز التالية: ${newly.join("، ")}\nأسبوع: ${rangeTxt}\nضمن بنك الرياضيات.\nمع تحيات: أ. سارة حقوي`;
+            openWA(phone, msg);
+          }
+        }catch(e){}
+
+      }catch(e){
+        console.log("refreshRewards error", e);
+        $("rwChampion") && ($("rwChampion").textContent = "تعذر الحساب");
+        $("rwCommit") && ($("rwCommit").textContent = "تعذر الحساب");
+        $("rwPart") && ($("rwPart").textContent = "تعذر الحساب");
+      }
+    }
+
+
+// ===== Student operations (deposit/withdraw/transfer) =====
+    executeOp = async function(){
+      try{
+        const ref = db.collection("students").doc(currentStudentId);
+        const doc = await ref.get();
+        if(!doc.exists) return warn("الحساب غير موجود");
+        const s = doc.data() || {};
+
+        const op = ($("op")?.value || "").trim();
+        const amt = parseFloat($("amt")?.value || "");
+        if(isNaN(amt) || amt<=0) return warn("اكتب مبلغ صحيح");
+
+        const reason = getReason("reasonStudent","reasonOtherStudent");
+
+        if(op === "deposit"){
+          const nb = Number(s.balance||0) + amt;
+          await ref.update({balance: nb});
+          await logTxn(ref, "إيداع", reason, amt, nb, s);
+
+        }else if(op === "withdraw"){
+          if(Number(s.balance||0) < amt) return warn("الرصيد ما يكفي");
+          const nb = Number(s.balance||0) - amt;
+          await ref.update({balance: nb});
+          await logTxn(ref, "سحب", reason, amt, nb, s);
+
+        }else if(op === "transfer"){
+          if(Number(s.balance||0) < amt) return warn("الرصيد ما يكفي للتحويل");
+          const toId = ($("transferTo")?.value || "").trim();
+          if(!toId) return warn("اختاري مستلم التحويل");
+          if(toId === currentStudentId) return warn("لا يمكن التحويل لنفس الحساب");
+
+          const toRef = db.collection("students").doc(toId);
+          const toDoc = await toRef.get();
+          if(!toDoc.exists) return warn("المستلم غير موجود");
+          const to = toDoc.data() || {};
+
+          const batch = db.batch();
+          batch.update(ref, {balance: Number(s.balance||0) - amt});
+          batch.update(toRef, {balance: Number(to.balance||0) + amt});
+          await batch.commit();
+
+          await logTxn(ref, "تحويل إلى " + (to.name||"—"), reason, amt, Number(s.balance||0) - amt, s);
+          await logTxn(toRef, "تحويل من " + (s.name||"طالب/ـة"), reason, amt, Number(to.balance||0) + amt, to);
+        }
+
+        // refresh UI
+        const updated = await ref.get();
+        const u = updated.data() || {};
+        $("studentBalance") && ($("studentBalance").textContent = fmt(u.balance));
+        $("tierLabel") && ($("tierLabel").textContent = calcTier(u.balance));
+        $("amt") && ($("amt").value = "");
+        setupReasonUI($("op")?.value || "deposit",'reasonStudent','reasonOtherStudent');
+        await showStatement();
+        await refreshWeekKPIs();
+      await refreshRewards();
+      }catch(e){
+        console.log("executeOp error", e);
+        warn("صار خطأ… جرّبي مرة ثانية");
+      }
+    };
+
+    // ===== Teacher operations (bulk + selected + single) =====
+    async function _ensureTeacherContext(){
+      if(!currentClassId) await renderTabs();
+      if(!currentClassId) throw new Error("No class selected");
+    }
+
+    depositAll = async function(){
+      try{
+        await _ensureTeacherContext();
+        const a = parseFloat($("bulkAmount")?.value || "");
+        if(isNaN(a) || a<=0) return warn("اكتب مبلغ الإيداع للكل");
+        const reason = getReason("reasonTeacher","reasonOtherTeacher");
+
+        const studs = await db.collection("students").where("classId","==",currentClassId).get();
+        const batch = db.batch();
+        const updates = [];
+        studs.forEach(d=>{
+          const s=d.data()||{};
+          if(s.active===false) return;
+          const nb = Number(s.balance||0) + a;
+          batch.update(db.collection("students").doc(d.id), {balance: nb});
+          updates.push({id:d.id, nb, name:(s.name||""), guardianWhats:(s.guardianWhats||"")});
+        });
+        await batch.commit();
+
+        // log after commit
+        for(const u of updates){
+          const ref = db.collection("students").doc(u.id);
+          await logTxn(ref, "إيداع (معلمة)", reason, a, u.nb, u);
+        }
+
+        $("bulkAmount") && ($("bulkAmount").value="");
+        await renderStudents();
+      }catch(e){
+        console.log("depositAll error", e);
+        warn("تعذر تنفيذ الإيداع الآن");
+      }
+    };
+
+    withdrawAll = async function(){
+      try{
+        await _ensureTeacherContext();
+        const a = parseFloat($("bulkWithdrawAmount")?.value || "");
+        if(isNaN(a) || a<=0) return warn("اكتب مبلغ السحب من الكل");
+        const reason = getReason("reasonTeacher","reasonOtherTeacher");
+
+        const studs = await db.collection("students").where("classId","==",currentClassId).get();
+
+        // check balances
+        let bad=false;
+        studs.forEach(d=>{
+          const s=d.data()||{};
+          if(s.active===false) return;
+          if(Number(s.balance||0) < a) bad=true;
+        });
+        if(bad) return warn("في طالب رصيده ما يكفي… قللي المبلغ");
+
+        const batch = db.batch();
+        const updates = [];
+        studs.forEach(d=>{
+          const s=d.data()||{};
+          if(s.active===false) return;
+          const nb = Number(s.balance||0) - a;
+          batch.update(db.collection("students").doc(d.id), {balance: nb});
+          updates.push({id:d.id, nb, name:(s.name||""), guardianWhats:(s.guardianWhats||"")});
+        });
+        await batch.commit();
+
+        for(const u of updates){
+          const ref = db.collection("students").doc(u.id);
+          await logTxn(ref, "سحب (معلمة)", reason, a, u.nb, u);
+        }
+
+        $("bulkWithdrawAmount") && ($("bulkWithdrawAmount").value="");
+        await renderStudents();
+      }catch(e){
+        console.log("withdrawAll error", e);
+        warn("تعذر تنفيذ السحب الآن");
+      }
+    };
+
+    depositToStudent = async function(){
+      try{
+        const sid = $("pickStudent")?.value;
+        const a = parseFloat($("pickAmount")?.value || "");
+        if(!sid) return warn("اختاري طالب");
+        if(isNaN(a) || a<=0) return warn("اكتبي مبلغ");
+        const reason = getReason("reasonTeacher","reasonOtherTeacher");
+
+        const ref = db.collection("students").doc(sid);
+        const doc = await ref.get();
+        if(!doc.exists) return warn("الطالب غير موجود");
+        const s = doc.data() || {};
+        if(s.active===false) return warn("حساب الطالب مقفل");
+
+        const nb = Number(s.balance||0) + a;
+        await ref.update({balance: nb});
+        await logTxn(ref, "إيداع (معلمة)", reason, a, nb, s);
+
+        $("pickAmount") && ($("pickAmount").value="");
+        await renderStudents();
+      }catch(e){
+        console.log("depositToStudent error", e);
+        warn("تعذر تنفيذ الإيداع الآن");
+      }
+    };
+
+    withdrawFromStudent = async function(){
+      try{
+        const sid = $("pickStudent")?.value;
+        const a = parseFloat($("pickAmount")?.value || "");
+        if(!sid) return warn("اختاري طالب");
+        if(isNaN(a) || a<=0) return warn("اكتبي مبلغ");
+        const reason = getReason("reasonTeacher","reasonOtherTeacher");
+
+        const ref = db.collection("students").doc(sid);
+        const doc = await ref.get();
+        if(!doc.exists) return warn("الطالب غير موجود");
+        const s = doc.data() || {};
+        if(s.active===false) return warn("حساب الطالب مقفل");
+        if(Number(s.balance||0) < a) return warn("رصيده ما يكفي");
+
+        const nb = Number(s.balance||0) - a;
+        await ref.update({balance: nb});
+        await logTxn(ref, "سحب (معلمة)", reason, a, nb, s);
+
+        $("pickAmount") && ($("pickAmount").value="");
+        await renderStudents();
+      }catch(e){
+        console.log("withdrawFromStudent error", e);
+        warn("تعذر تنفيذ السحب الآن");
+      }
+    };
+
+    function _populateTeacherTransferSelects(arr){
+      const tf = $("transferFromTeacher");
+      const tt = $("transferToTeacher");
+      if(!tf || !tt) return;
+
+      const curFrom = tf.value || "";
+      const curTo = tt.value || "";
+
+      tf.innerHTML = "";
+      tt.innerHTML = "";
+
+      arr.forEach(s=>{
+        const o=document.createElement("option");
+        o.value=s.id; o.textContent=s.name || "—";
+        tf.appendChild(o);
+      });
+      arr.forEach(s=>{
+        const o=document.createElement("option");
+        o.value=s.id; o.textContent=s.name || "—";
+        tt.appendChild(o);
+      });
+
+      // restore previous if possible
+      if(curFrom) tf.value = curFrom;
+      if(curTo) tt.value = curTo;
+
+      // if same, shift "to"
+      if(tf.value && tt.value && tf.value===tt.value){
+        if(tt.options.length>1){
+          tt.selectedIndex = (tt.selectedIndex===0?1:0);
+        }
+      }
+
+      tf.onchange = ()=>{ 
+        // avoid same
+        if(tf.value===tt.value && tt.options.length>1){
+          tt.selectedIndex = (tt.selectedIndex===0?1:0);
+        }
+        updateTeacherTransferPreview();
+      };
+      tt.onchange = updateTeacherTransferPreview;
+      $("transferAmtTeacher")?.addEventListener("input", updateTeacherTransferPreview);
+      $("reasonTeacher")?.addEventListener("change", updateTeacherTransferPreview);
+
+      updateTeacherTransferPreview();
+    }
+
+    function updateTeacherTransferPreview(){
+      const prev = $("transferTeacherPreview");
+      const tf = $("transferFromTeacher");
+      const tt = $("transferToTeacher");
+      if(!prev || !tf || !tt) return;
+      const fromName = tf.selectedOptions?.[0]?.textContent || "";
+      const toName = tt.selectedOptions?.[0]?.textContent || "";
+      const reason = getReason("reasonTeacher","reasonOtherTeacher");
+      prev.textContent = (fromName && toName) ? (`من: ${fromName}  →  إلى: ${toName}  |  السبب: ${reason}`) : "";
+    }
+
+    async function teacherTransfer(){
+      try{
+        await _ensureTeacherContext();
+        const fromId = $("transferFromTeacher")?.value;
+        const toId = $("transferToTeacher")?.value;
+        const amt = parseFloat($("transferAmtTeacher")?.value || "");
+        if(!fromId || !toId) return warn("اختاري الطالب المُرسِل والمستلم");
+        if(fromId===toId) return warn("لا يمكن التحويل لنفس الطالب");
+        if(isNaN(amt) || amt<=0) return warn("اكتبي مبلغ صحيح للتحويل");
+        const reason = getReason("reasonTeacher","reasonOtherTeacher");
+
+        const fromRef = db.collection("students").doc(fromId);
+        const toRef = db.collection("students").doc(toId);
+
+        const [fromDoc,toDoc] = await Promise.all([fromRef.get(), toRef.get()]);
+        if(!fromDoc.exists || !toDoc.exists) return warn("تعذر العثور على أحد الحسابات");
+        const from = fromDoc.data() || {};
+        const to = toDoc.data() || {};
+
+        if(from.active===false) return warn("حساب المُرسِل غير مُفعل");
+        if(to.active===false) return warn("حساب المستلم غير مُفعل");
+        if(Number(from.balance||0) < amt) return warn("رصيد المُرسِل لا يكفي للتحويل");
+
+        const batch = db.batch();
+        batch.update(fromRef, {balance: Number(from.balance||0) - amt});
+        batch.update(toRef, {balance: Number(to.balance||0) + amt});
+        await batch.commit();
+
+        await logTxn(fromRef, "تحويل إلى " + (to.name||"—"), reason, amt, Number(from.balance||0) - amt, from);
+        await logTxn(toRef, "تحويل من " + (from.name||"طالب/ـة"), reason, amt, Number(to.balance||0) + amt, to);
+
+        if($("transferAmtTeacher")) $("transferAmtTeacher").value = "";
+        updateTeacherTransferPreview();
+        await renderStudents();
+      }catch(e){
+        console.log("teacherTransfer error", e);
+        warn("صار خطأ… جرّبي مرة ثانية");
+      }
+    }
+
+
+    depositSelected = async function(){
+      try{
+        const a = parseFloat($("pickAmount")?.value || "");
+        if(isNaN(a) || a<=0) return warn("اكتبي مبلغ (في خانة المبلغ)");
+        if(!selectedIds || selectedIds.size===0) return warn("ما تم اختيار طلاب");
+        const reason = getReason("reasonTeacher","reasonOtherTeacher");
+
+        for(const sid of selectedIds){
+          const ref = db.collection("students").doc(sid);
+          const doc = await ref.get();
+          if(!doc.exists) continue;
+          const s = doc.data() || {};
+          if(s.active===false) continue;
+          const nb = Number(s.balance||0) + a;
+          await ref.update({balance: nb});
+          await logTxn(ref, "إيداع (معلمة)", reason, a, nb, s);
+        }
+        await renderStudents();
+      }catch(e){
+        console.log("depositSelected error", e);
+        warn("تعذر تنفيذ الإيداع الآن");
+      }
+    };
+
+    withdrawSelected = async function(){
+      try{
+        const a = parseFloat($("pickAmount")?.value || "");
+        if(isNaN(a) || a<=0) return warn("اكتبي مبلغ (في خانة المبلغ)");
+        if(!selectedIds || selectedIds.size===0) return warn("ما تم اختيار طلاب");
+        const reason = getReason("reasonTeacher","reasonOtherTeacher");
+
+        for(const sid of selectedIds){
+          const ref = db.collection("students").doc(sid);
+          const doc = await ref.get();
+          if(!doc.exists) continue;
+          const s = doc.data() || {};
+          if(s.active===false) continue;
+          if(Number(s.balance||0) < a) continue;
+          const nb = Number(s.balance||0) - a;
+          await ref.update({balance: nb});
+          await logTxn(ref, "سحب (معلمة)", reason, a, nb, s);
+        }
+        await renderStudents();
+      }catch(e){
+        console.log("withdrawSelected error", e);
+        warn("تعذر تنفيذ السحب الآن");
+      }
+    };
+
+
+    // ====== إضافات: PDF من تاريخ إلى تاريخ + رسم بياني بدون مكتبات خارجية ======
+
+    function safeDateMs(val, endOfDay=false){
+      if(!val) return null;
+      const d = new Date(val + "T00:00:00");
+      if(endOfDay) d.setHours(23,59,59,999);
+      return d.getTime();
+    }
+
+    async function exportPdfTeacher(){
+      try{
+        const sid = $('repPickStudentTeacher')?.value;
+        if(!sid) return warn("اختاري الطالب/الطالبة أولًا.");
+        const fromMs = safeDateMs($('repFromTeacher')?.value, false);
+        const toMs   = safeDateMs($('repToTeacher')?.value, true);
+        if(!fromMs || !toMs) return warn("اختاري من تاريخ وإلى تاريخ.");
+        if(fromMs>toMs) return warn("تاريخ البداية أكبر من تاريخ النهاية.");
+        await pdfRangeReport(sid, fromMs, toMs, "تقرير (من تاريخ إلى تاريخ)");
+      }catch(e){
+        console.log(e);
+        warn("تعذر إصدار التقرير الآن.");
+      }
+    }
+
+    async function exportPdfStudent(){
+      try{
+        if(!currentStudentId) return warn("لم يتم تحديد الطالب.");
+        const fromMs = safeDateMs($('repFromStudent')?.value, false);
+        const toMs   = safeDateMs($('repToStudent')?.value, true);
+        if(!fromMs || !toMs) return warn("اختاري من تاريخ وإلى تاريخ.");
+        if(fromMs>toMs) return warn("تاريخ البداية أكبر من تاريخ النهاية.");
+        await pdfRangeReport(currentStudentId, fromMs, toMs, "تقرير (من تاريخ إلى تاريخ)");
+      }catch(e){
+        console.log(e);
+        warn("تعذر إصدار التقرير الآن.");
+      }
+    }
+
+    async function pdfRangeReport(studentId, fromMs, toMs, titleLabel){
+      const s = await getStudentById(studentId);
+      // نجلب آخر 600 عملية ثم نفلتر (بدون تعقيد فهارس Firestore)
+      const snap = await db.collection("students").doc(studentId).collection("txns")
+        .orderBy("createdAtClient","desc").limit(600).get();
+
+      let rows = "";
+      let count = 0;
+      let sumIn = 0, sumOut = 0;
+
+      const items = [];
+      snap.forEach(d=>{
+        const x = d.data() || {};
+        const tms = Number(x.createdAtClient || x.createdAt || 0);
+        if(!tms) return;
+        if(tms < fromMs || tms > toMs) return;
+        items.push(x);
+      });
+      items.sort((a,b)=>Number(a.createdAtClient||0)-Number(b.createdAtClient||0));
+
+      items.forEach(x=>{
+        const t = x.createdAtClient ? new Date(x.createdAtClient).toLocaleString("ar-SA") : "";
+        const amt = Number(x.amount||0);
+        const typ = x.type || "";
+        // تصنيف دخول/خروج
+        const isIn = (typ.includes("إيداع") || typ.includes("تحويل وارد") || typ==="deposit" || typ==="transfer_in");
+        const isOut = (typ.includes("سحب") || typ.includes("تحويل صادر") || typ==="withdraw" || typ==="transfer_out");
+        if(isIn) sumIn += amt;
+        if(isOut) sumOut += amt;
+
+        rows += `<tr>
+          <td>${t}</td>
+          <td>${typ}</td>
+          <td>${x.reason||""}</td>
+          <td>${fmt(amt)}</td>
+          <td>${fmt(x.balanceAfter)}</td>
+        </tr>`;
+        count++;
+      });
+
+      if(!rows) rows = `<tr><td colspan="5" class="muted" style="padding:18px">لا توجد عمليات ضمن الفترة المحددة.</td></tr>`;
+
+      const fromTxt = new Date(fromMs).toLocaleDateString("ar-SA");
+      const toTxt   = new Date(toMs).toLocaleDateString("ar-SA");
+
+      const inner = `
+        <div style="font-weight:1000;color:#0b2a66;margin-bottom:8px">${titleLabel}</div>
+        <div class="muted" style="font-weight:900;margin-bottom:10px">
+          الاسم: <b>${s.name||"—"}</b> • الرصيد الحالي: <b>${fmt(s.balance)}</b> ر.س • الفترة: <b>${fromTxt}</b> إلى <b>${toTxt}</b>
+        </div>
+
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px">
+          <div style="flex:1;min-width:160px;border:1px solid #e5e7eb;border-radius:14px;padding:10px">
+            <div class="muted" style="font-weight:900">عدد العمليات</div>
+            <div style="font-weight:1000;color:#0b2a66">${count}</div>
+          </div>
+          <div style="flex:1;min-width:160px;border:1px solid #e5e7eb;border-radius:14px;padding:10px">
+            <div class="muted" style="font-weight:900">إجمالي الدخول</div>
+            <div style="font-weight:1000;color:#0b2a66">${fmt(sumIn)} ر.س</div>
+          </div>
+          <div style="flex:1;min-width:160px;border:1px solid #e5e7eb;border-radius:14px;padding:10px">
+            <div class="muted" style="font-weight:900">إجمالي الخروج</div>
+            <div style="font-weight:1000;color:#0b2a66">${fmt(sumOut)} ر.س</div>
+          </div>
+          <div style="flex:1;min-width:160px;border:1px solid #e5e7eb;border-radius:14px;padding:10px">
+            <div class="muted" style="font-weight:900">الصافي</div>
+            <div style="font-weight:1000;color:#0b2a66">${fmt(sumIn - sumOut)} ر.س</div>
+          </div>
+        </div>
+
+        <table>
+          <thead><tr><th>الوقت</th><th>العملية</th><th>السبب</th><th>المبلغ</th><th>الرصيد بعد العملية</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      `;
+      openPrintWindow(`${titleLabel} - ${s.name||""}`, inner);
+    }
+
+    // رسم بياني لتطور الرصيد: آخر 30 يوم (خط بسيط عبر Canvas API)
+    async function renderBalanceChartLast30(){
+      try{
+        if(!currentStudentId) return;
+        const canvas = document.getElementById("balanceChart");
+        if(!canvas) return;
+        // ضمان عرض صحيح
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = Math.max(600, Math.floor(rect.width || 600));
+        canvas.height = 220;
+
+        const now = Date.now();
+        const fromMs = now - 30*24*60*60*1000;
+
+        const snap = await db.collection("students").doc(currentStudentId).collection("txns")
+          .orderBy("createdAtClient","desc").limit(700).get();
+
+        const pts = [];
+        snap.forEach(d=>{
+          const x=d.data()||{};
+          const tms = Number(x.createdAtClient || 0);
+          if(!tms || tms < fromMs || tms > now) return;
+          pts.push({t:tms, y:Number(x.balanceAfter||0)});
+        });
+        pts.sort((a,b)=>a.t-b.t);
+
+        // إذا ما فيه عمليات، نرسم خط ثابت على الرصيد الحالي
+        if(!pts.length){
+          const s = await getStudentById(currentStudentId);
+          const y = Number(s.balance||0);
+          drawLineChart(canvas, [{t:fromMs,y},{t:now,y}], "آخر 30 يوم");
+          return;
+        }
+        // إضافة نقطة بداية لو ما فيه نقطة عند البداية
+        if(pts[0].t > fromMs){
+          pts.unshift({t:fromMs, y:pts[0].y});
+        }
+        drawLineChart(canvas, pts, "آخر 30 يوم");
+      }catch(e){
+        console.log("renderBalanceChartLast30 error", e);
+      }
+    }
+
+    function drawLineChart(canvas, pts, subtitle){
+      const ctx = canvas.getContext("2d");
+      const w = canvas.width, h = canvas.height;
+
+      // خلفية
+      ctx.clearRect(0,0,w,h);
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0,0,w,h);
+
+      const padL=52, padR=16, padT=18, padB=40;
+      const iw=w-padL-padR, ih=h-padT-padB;
+
+      let ymin = Math.min(...pts.map(p=>p.y));
+      let ymax = Math.max(...pts.map(p=>p.y));
+      if(ymin===ymax){ ymin -= 1; ymax += 1; }
+      const tmin = pts[0].t, tmax = pts[pts.length-1].t || (tmin+1);
+
+      const xOf = (t)=> padL + ( (t - tmin) / (tmax - tmin) ) * iw;
+      const yOf = (y)=> padT + (1 - (y - ymin)/(ymax - ymin)) * ih;
+
+      // Grid
+      ctx.strokeStyle = "rgba(0,0,0,.08)";
+      ctx.lineWidth = 1;
+      for(let i=0;i<=4;i++){
+        const y = padT + (ih/4)*i;
+        ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(w-padR, y); ctx.stroke();
+      }
+
+      // Axes labels (min/max)
+      ctx.fillStyle = "rgba(11,42,102,.9)";
+      ctx.font = "bold 12px Tahoma, Arial";
+      ctx.fillText(String(Math.round(ymax)), 6, padT+12);
+      ctx.fillText(String(Math.round(ymin)), 6, padT+ih);
+
+      // Title
+      ctx.fillStyle = "rgba(11,42,102,1)";
+      ctx.font = "bold 13px Tahoma, Arial";
+      ctx.fillText("تطور الرصيد", padL, 14);
+      ctx.fillStyle = "rgba(71,96,126,1)";
+      ctx.font = "bold 11px Tahoma, Arial";
+      ctx.fillText(subtitle||"", padL, h-10);
+
+      // Line
+      ctx.strokeStyle = "rgba(0,85,164,.95)";
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      pts.forEach((p,i)=>{
+        const x=xOf(p.t), y=yOf(p.y);
+        if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+      });
+      ctx.stroke();
+
+      // Dots (last point)
+      const last = pts[pts.length-1];
+      const lx=xOf(last.t), ly=yOf(last.y);
+      ctx.fillStyle = "rgba(0,85,164,1)";
+      ctx.beginPath(); ctx.arc(lx, ly, 4, 0, Math.PI*2); ctx.fill();
+
+      // Last value
+      ctx.fillStyle = "rgba(11,42,102,1)";
+      ctx.font = "bold 12px Tahoma, Arial";
+      ctx.fillText(`${Math.round(last.y)} ر.س`, Math.min(w-90, lx+8), Math.max(22, ly-8));
+    }
+
+    // نضمن التحديث عند فتح صفحة الطالب
+    const _origEnterStudent = window.enterStudent || null;
+    window.enterStudent = async function(studentId){
+      if(_origEnterStudent) await _origEnterStudent(studentId);
+      try{ await renderBalanceChartLast30(); }catch(e){}
+    };
+
+</script>
 </body>
 </html>
