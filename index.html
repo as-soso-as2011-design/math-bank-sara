@@ -214,9 +214,9 @@
     .cardHint{margin-top:10px;font-size:11px;font-weight:900;color:rgba(11,42,102,.78)}
 
     .miniTabs{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-    .miniTab{flex:1;min-width:150px;background:#f0f7ff;border:1px solid rgba(0,0,0,.06);
+    .miniTab{flex:1;min-width:150px;background:#0b2a66;color:#fff;border:1px solid rgba(255,255,255,.12);
       border-radius:14px;padding:10px;cursor:pointer;font-weight:1000;display:flex;align-items:center;gap:10px;justify-content:center}
-    .miniTab.active{background:linear-gradient(90deg,#0b2a66,#0b5bb5);color:#fff}
+    .miniTab.active{background:linear-gradient(90deg,#061c45,#0b2a66);color:#fff}
     .miniPane{display:none}
     .miniPane.active{display:block}
 
@@ -930,6 +930,40 @@
         <div class="small" style="margin-top:6px">احتساب الجوائز حسب <b>أسبوع المدرسة (الأحد → الخميس)</b>، وتتحدث تلقائيًا من سجل العمليات.</div>
       </div>
       <div class="chip" id="rwWeekRange" style="margin-top:2px">—</div>
+      <div class="card soft" style="margin:12px 0 0 0">
+        <div style="font-weight:1000;color:#0b2a66">🗂️ سجل الجوائز السابقة (بالتاريخ + النوع)</div>
+        <div class="small" style="margin-top:6px;color:#47607e">اختاري الفترة + نوع الجائزة (أو الكل) ثم عرض • ويمكنك استرجاع لوحة أسبوع سابق.</div>
+        <div class="row" style="margin-top:10px;gap:10px;align-items:flex-end">
+          <div class="col" style="min-width:160px"><div class="small">من تاريخ</div><input id="rwHistFrom" type="date"></div>
+          <div class="col" style="min-width:160px"><div class="small">إلى تاريخ</div><input id="rwHistTo" type="date"></div>
+          <div class="col" style="min-width:190px">
+            <div class="small">نوع الجائزة</div>
+            <select id="rwHistType">
+              <option value="all">الكل</option>
+              <option value="champ">بطل الأسبوع 🏆</option>
+              <option value="commit">نجم الالتزام 🥇</option>
+              <option value="part">نجم المشاركة 🎯</option>
+              <option value="save">بطل الادخار 💰</option>
+              <option value="help">نجم التعاون 🤝</option>
+            </select>
+          </div>
+          <div class="col" style="align-self:flex-end;min-width:160px">
+            <button class="btn3" onclick="showRewardsHistory()">عرض السجل</button>
+          </div>
+        </div>
+
+        <div class="tableWrap" style="margin-top:10px">
+          <table>
+            <thead>
+              <tr><th>الأسبوع</th><th>الجوائز</th><th>النوع</th><th>استرجاع</th></tr>
+            </thead>
+            <tbody id="rwHistRows">
+              <tr><td colspan="4" class="muted" style="padding:16px">اختر/ي الفترة ثم (عرض السجل).</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
     </div>
 
     <div class="awardKpis" style="margin-top:12px">
@@ -1647,7 +1681,20 @@ ${SIGNATURE}`;
       $("statusBadge").className = "badge " + (s.active ? "on":"off");
       $("statusBadge").textContent = s.active ? "🟢 نشط" : "🔴 مقفل";
       $("studentBalance").textContent = fmt(s.balance);
-      $("tierLabel").textContent = s.tier || calcTier(s.balance);
+      const computedTier = calcTier(s.balance);
+      $("tierLabel").textContent = computedTier;
+      // توحيد تاريخ فتح الحساب
+      $("openedAt").textContent = (s.openedAtHijri || "١٤٤٧/٨/١٣هـ");
+      // تحديث الحقول إن كانت ناقصة/قديمة (ترقية الحساب تعمل دائمًا)
+      try{
+        const patch={};
+        if(!s.openedAtHijri) patch.openedAtHijri = "١٤٤٧/٨/١٣هـ";
+        if(!s.openedAtClient) patch.openedAtClient = Date.now();
+        if(String(s.tier||"") !== String(computedTier)) patch.tier = computedTier;
+        if(Object.keys(patch).length){
+          await db.collection("students").doc(currentStudentId).update(patch);
+        }
+      }catch(e){}
 
       $("cardNumber").textContent = makeBankCardNumber(currentStudentId);
       const exp = makeExp();
@@ -1695,7 +1742,7 @@ ${SIGNATURE}`;
       const n=$("newStudentName").value.trim();
       if(!n) return warn("اكتب اسم الطالب");
       const pin=String(Math.floor(1000+Math.random()*9000));
-      await db.collection("students").add({ name:n,classId:currentClassId,active:true,balance:0,pin,openedAt:null, guardianWhats:"" });
+      await db.collection("students").add({ name:n,classId:currentClassId,active:true,balance:0,pin,openedAtHijri:"١٤٤٧/٨/١٣هـ", openedAtClient: Date.now(), guardianWhats:"" });
       $("newStudentName").value=""; await renderStudents();
     }
 
@@ -2756,6 +2803,112 @@ document.addEventListener("DOMContentLoaded", async()=>{
         const doc = await ref.get();
         if(!doc.exists) return warn("الحساب غير موجود");
         const s = doc.data() || {};
+
+        const op = ($("op")?.value || "").trim();
+        const amt = parseFloat($("amt")?.value || "");
+        if(isNaN(amt) || amt<=0) return warn("اكتب مبلغ صحيح");
+
+        const reason = getReason("reasonStudent","reasonOtherStudent");
+        const nowMs = Date.now();
+
+        // Batch لسرعة وأمان (تحديث الرصيد + تسجيل العملية بنفس اللحظة)
+        const batch = db.batch();
+
+        if(op === "deposit"){
+          const nb = Number(s.balance||0) + amt;
+          batch.update(ref, {balance: nb, tier: calcTier(nb)});
+          const txRef = ref.collection("txns").doc();
+          batch.set(txRef, {
+            type: "إيداع",
+            reason,
+            amount: amt,
+            balanceAfter: nb,
+            createdAtClient: nowMs,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+          // تحديث واجهة فوري
+          $("studentBalance") && ($("studentBalance").textContent = fmt(nb));
+          $("tierLabel") && ($("tierLabel").textContent = calcTier(nb));
+
+        }else if(op === "withdraw"){
+          if(Number(s.balance||0) < amt) return warn("الرصيد ما يكفي");
+          const nb = Number(s.balance||0) - amt;
+          batch.update(ref, {balance: nb, tier: calcTier(nb)});
+          const txRef = ref.collection("txns").doc();
+          batch.set(txRef, {
+            type: "سحب",
+            reason,
+            amount: amt,
+            balanceAfter: nb,
+            createdAtClient: nowMs,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+          $("studentBalance") && ($("studentBalance").textContent = fmt(nb));
+          $("tierLabel") && ($("tierLabel").textContent = calcTier(nb));
+
+        }else if(op === "transfer"){
+          if(Number(s.balance||0) < amt) return warn("الرصيد ما يكفي للتحويل");
+          const toId = ($("transferTo")?.value || "").trim();
+          if(!toId) return warn("اختاري مستلم التحويل");
+          if(toId === currentStudentId) return warn("لا يمكن التحويل لنفس الحساب");
+
+          const toRef = db.collection("students").doc(toId);
+          const toDoc = await toRef.get();
+          if(!toDoc.exists) return warn("المستلم غير موجود");
+          const t = toDoc.data() || {};
+          if(t.active===false) return warn("حساب المستلم مقفل");
+
+          const nbFrom = Number(s.balance||0) - amt;
+          const nbTo   = Number(t.balance||0) + amt;
+
+          batch.update(ref, {balance: nbFrom, tier: calcTier(nbFrom)});
+          batch.update(toRef, {balance: nbTo, tier: calcTier(nbTo)});
+
+          const outRef = ref.collection("txns").doc();
+          batch.set(outRef, {
+            type: "تحويل صادر",
+            reason,
+            amount: amt,
+            toId,
+            toName: t.name||"",
+            balanceAfter: nbFrom,
+            createdAtClient: nowMs,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+
+          const inRef = toRef.collection("txns").doc();
+          batch.set(inRef, {
+            type: "تحويل وارد",
+            reason,
+            amount: amt,
+            fromId: currentStudentId,
+            fromName: s.name||"",
+            balanceAfter: nbTo,
+            createdAtClient: nowMs,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+
+          $("studentBalance") && ($("studentBalance").textContent = fmt(nbFrom));
+          $("tierLabel") && ($("tierLabel").textContent = calcTier(nbFrom));
+        }else{
+          return warn("اختاري العملية");
+        }
+
+        await batch.commit();
+
+        // تنظيف الإدخال + تحديث كشف الحساب سريع
+        $("amt") && ($("amt").value = "");
+        $("reasonOtherStudent") && ($("reasonOtherStudent").value = "");
+        await showStatement();
+        try{ await refreshWeekKPIs(); }catch(e){}
+        try{ await refreshRewards(); }catch(e){}
+
+        warn("تم تنفيذ العملية ✅");
+      }catch(e){
+        console.log("executeOp error", e);
+        warn("تعذر تنفيذ العملية الآن");
+      }
+    };
 
         const op = ($("op")?.value || "").trim();
         const amt = parseFloat($("amt")?.value || "");
