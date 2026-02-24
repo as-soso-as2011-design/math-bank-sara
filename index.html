@@ -328,6 +328,96 @@
 .bankCard.tier-diamond .chip{background:linear-gradient(180deg,#d9f2ff,#4aa3d8);}
 .bankCard.tier-elite .chip{background:linear-gradient(180deg,#f4d48a,#8f6bff);}
 
+
+    /* ===== Celebration (login congrats) ===== */
+    #celebrateOverlay{
+      position:fixed; inset:0; z-index:10050;
+      display:none;
+      pointer-events:none;
+    }
+    #celebrateOverlay.active{display:block}
+    .celebrate-bg{
+      position:absolute; inset:0;
+      background:radial-gradient(circle at top, rgba(11,42,102,.22) 0%, rgba(0,0,0,.55) 60%, rgba(0,0,0,.65) 100%);
+      backdrop-filter: blur(1px);
+    }
+    .spark{
+      position:absolute;
+      font-size:22px;
+      opacity:.0;
+      transform:translate(-50%,-50%);
+      animation: sparkFloat 1200ms ease-out forwards;
+      filter: drop-shadow(0 10px 18px rgba(255,255,255,.20));
+      will-change: transform, opacity;
+    }
+    .spark.big{font-size:28px}
+    @keyframes sparkFloat{
+      0%{opacity:0; transform:translate(-50%,-50%) scale(.6) translateY(12px) rotate(0deg)}
+      15%{opacity:1}
+      100%{opacity:0; transform:translate(-50%,-50%) scale(1.25) translateY(-80px) rotate(20deg)}
+    }
+    .fire{
+      position:absolute;
+      width:8px;height:8px;border-radius:999px;
+      background:rgba(255,255,255,.95);
+      box-shadow:
+        0 0 10px rgba(255,255,255,.75),
+        0 0 24px rgba(255,215,0,.55),
+        0 0 44px rgba(0,180,255,.45);
+      opacity:0;
+      transform:translate(-50%,-50%) scale(.5);
+      animation: fireBurst 1100ms ease-out forwards;
+      will-change: transform, opacity;
+    }
+    @keyframes fireBurst{
+      0%{opacity:0; transform:translate(-50%,-50%) scale(.4)}
+      12%{opacity:1}
+      100%{opacity:0; transform:translate(-50%,-50%) scale(3.6)}
+    }
+
+    #congratsToast{
+      position:fixed; inset:0; z-index:10060;
+      display:none; align-items:center; justify-content:center;
+      padding:18px;
+    }
+    #congratsToast.active{display:flex}
+    .toastBox{
+      width:min(680px, 100%);
+      border-radius:24px;
+      border:1px solid rgba(255,255,255,.22);
+      background:linear-gradient(180deg, rgba(255,255,255,.16), rgba(255,255,255,.08));
+      backdrop-filter: blur(14px);
+      box-shadow:0 20px 70px rgba(0,0,0,.45);
+      color:#fff;
+      overflow:hidden;
+    }
+    .toastTop{
+      padding:14px 16px;
+      background:linear-gradient(90deg, rgba(255,255,255,.12), rgba(0,0,0,.08));
+      border-bottom:1px solid rgba(255,255,255,.14);
+      display:flex; justify-content:space-between; align-items:center; gap:10px;
+    }
+    .toastTitle{font-weight:1000;font-size:18px;letter-spacing:.2px}
+    .toastClose{
+      pointer-events:auto;
+      background:rgba(255,255,255,.14);
+      border:1px solid rgba(255,255,255,.18);
+      color:#fff;
+      padding:10px 12px; border-radius:14px; font-weight:1000;
+    }
+    .toastBody{padding:16px}
+    .toastMsg{font-size:18px; font-weight:1000; line-height:1.9}
+    .toastSub{margin-top:8px; font-size:13px; opacity:.92; font-weight:900; line-height:1.9}
+    .toastActions{margin-top:14px; display:flex; gap:10px; flex-wrap:wrap}
+    .toastActions button{flex:1; pointer-events:auto}
+    .toastBtn{
+      background:linear-gradient(90deg,#ffd54f,#ffb300);
+      color:#0b2a66;
+      border-radius:16px;
+      padding:12px 14px;
+      font-weight:1000;
+    }
+
 </style>
 </head>
 
@@ -1632,6 +1722,141 @@ ${SIGNATURE}`;
       openWA(wa, msg);
     }
 
+    
+    // ===== Celebration on each student login =====
+    const CONGRATS_MESSAGES = [
+      "يا بطل/ـة {name}! دخولك اليوم يساوي خطوة جديدة نحو التميز ✨",
+      "أهلًا {name}! جاهز/ة تكسر الأرقام وتلمع بالإنجاز؟ 🌟",
+      "مرحبًا {name}! طاقتك اليوم رهيبة… خلّنا نبدأ 💪✨",
+      "يا سلام يا {name}! أنت أقوى من أي مسألة… انطلق 🚀",
+      "{name}… حماسك يفرّح! اليوم يوم نجاحك 🎯✨",
+      "هلا {name}! كل رصيد تجمعه شهادة على اجتهادك 👏💎",
+      "يا مبدع/ـة {name}! بنك الرياضيات يقول: WOW! 🎆",
+      "صباح/مساء الخير {name}! جاهزين نرفع المستوى؟ 🔥✨",
+      "يا {name}! دخولك = بداية إنجاز جديد… استمر 🌈✨",
+      "يا {name}! أنت قدها وقدود… ورصيدك يثبت! 🏆✨"
+    ];
+
+    function pickRandom(arr){
+      return arr[Math.floor(Math.random()*arr.length)];
+    }
+
+    function formatCongratsMessage(tpl, s){
+      const nm = (s?.name || "صديقي/صديقتي");
+      return tpl.replaceAll("{name}", nm);
+    }
+
+    function openCongrats(s){
+      const tier = (window.currentTierLabel || $("tierLabel")?.textContent || "—").trim();
+      const bal  = ($("studentBalance")?.textContent || "0").trim();
+
+      // random message
+      const msg = formatCongratsMessage(pickRandom(CONGRATS_MESSAGES), s);
+      $("congratsMsg").textContent = msg;
+
+      // sub line
+      $("congratsSub").innerHTML =
+        `🏅 مستواك الحالي: <b>${tier}</b> &nbsp;•&nbsp; 💰 رصيدك: <b>${bal}</b> ر.س`;
+
+      // show layers
+      $("celebrateOverlay")?.classList.add("active");
+      $("congratsToast")?.classList.add("active");
+
+      // spawn effects
+      spawnSparks(46);
+      spawnFireworks(12);
+
+      // play short success jingle
+      playSuccessJingle();
+      // auto close effects layer after a bit (toast stays until close)
+      setTimeout(()=>{ $("celebrateOverlay")?.classList.remove("active"); }, 1400);
+    }
+
+    function closeCongrats(){
+      $("congratsToast")?.classList.remove("active");
+      $("celebrateOverlay")?.classList.remove("active");
+      // cleanup any remaining particles
+      cleanupCelebrate();
+    }
+
+    function cleanupCelebrate(){
+      const layer = $("celebrateOverlay");
+      if(!layer) return;
+      layer.querySelectorAll(".spark,.fire").forEach(n=>n.remove());
+    }
+
+    function spawnSparks(n){
+      const layer = $("celebrateOverlay");
+      if(!layer) return;
+      cleanupCelebrate();
+      for(let i=0;i<n;i++){
+        const sp = document.createElement("div");
+        sp.className = "spark" + (Math.random()>.75 ? " big" : "");
+        sp.textContent = (Math.random()>.35 ? "✨" : "⭐");
+        const x = Math.random()*100;
+        const y = (Math.random()*70)+10;
+        sp.style.left = x + "%";
+        sp.style.top = y + "%";
+        sp.style.animationDelay = (Math.random()*240) + "ms";
+        layer.appendChild(sp);
+        sp.addEventListener("animationend", ()=>sp.remove(), {once:true});
+      }
+    }
+
+    function spawnFireworks(n){
+      const layer = $("celebrateOverlay");
+      if(!layer) return;
+      for(let i=0;i<n;i++){
+        const f = document.createElement("div");
+        f.className = "fire";
+        const x = (Math.random()*86)+7;
+        const y = (Math.random()*48)+10;
+        f.style.left = x + "%";
+        f.style.top = y + "%";
+        f.style.animationDelay = (Math.random()*260) + "ms";
+        layer.appendChild(f);
+        f.addEventListener("animationend", ()=>f.remove(), {once:true});
+      }
+    }
+
+    // WebAudio short "success" jingle (no external files)
+    let __audioCtx = null;
+    function playSuccessJingle(){
+      try{
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if(!AC) return;
+        if(!__audioCtx) __audioCtx = new AC();
+        const ctx = __audioCtx;
+        if(ctx.state === "suspended") ctx.resume();
+
+        const now = ctx.currentTime;
+        const notes = [659.25, 783.99, 987.77, 1174.66, 987.77]; // E5 G5 B5 D6 B5
+        const durs  = [0.10, 0.10, 0.12, 0.16, 0.14];
+
+        const master = ctx.createGain();
+        master.gain.setValueAtTime(0.0001, now);
+        master.gain.exponentialRampToValueAtTime(0.20, now+0.02);
+        master.gain.exponentialRampToValueAtTime(0.0001, now+0.90);
+        master.connect(ctx.destination);
+
+        let t = now;
+        for(let i=0;i<notes.length;i++){
+          const osc = ctx.createOscillator();
+          const g = ctx.createGain();
+          osc.type = "triangle";
+          osc.frequency.setValueAtTime(notes[i], t);
+          g.gain.setValueAtTime(0.0001, t);
+          g.gain.exponentialRampToValueAtTime(0.55, t+0.01);
+          g.gain.exponentialRampToValueAtTime(0.0001, t + durs[i]);
+          osc.connect(g);
+          g.connect(master);
+          osc.start(t);
+          osc.stop(t + durs[i] + 0.02);
+          t += durs[i] + 0.02;
+        }
+      }catch(e){ console.log("playSuccessJingle", e); }
+    }
+
     async function studentLogin(){
       try{
         currentAccess="student";
@@ -1647,7 +1872,9 @@ ${SIGNATURE}`;
         if(String(pin) !== String(s.pin||"")) return warn("الرقم السري غلط");
         await playWelcome();
         await openStudentAccount(s);
-      }catch(e){ console.log(e); warn("صار خطأ… جرّبي مرة ثانية"); }
+        // show a random congratulations message + effects on every login
+        openCongrats(s);
+        }catch(e){ console.log(e); warn("صار خطأ… جرّبي مرة ثانية"); }
     }
 
     function getTierConfig(){
@@ -2306,6 +2533,28 @@ document.addEventListener("DOMContentLoaded", async()=>{
 <script>
   window.onload = ()=>{ setTimeout(()=>window.print(), 300); };
 <\/script>
+
+  <!-- ===== Celebration Layer (shown on each student login) ===== -->
+  <div id="celebrateOverlay" aria-hidden="true">
+    <div class="celebrate-bg"></div>
+  </div>
+
+  <div id="congratsToast" aria-hidden="true">
+    <div class="toastBox" role="dialog" aria-modal="true">
+      <div class="toastTop">
+        <div class="toastTitle">🎉 تهانينا!</div>
+        <button class="toastClose" onclick="closeCongrats()">✕</button>
+      </div>
+      <div class="toastBody">
+        <div class="toastMsg" id="congratsMsg">—</div>
+        <div class="toastSub" id="congratsSub">—</div>
+        <div class="toastActions">
+          <button class="toastBtn" onclick="closeCongrats()">ابدأ الآن ✨</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </body></html>`);
       w.document.close();
     }
