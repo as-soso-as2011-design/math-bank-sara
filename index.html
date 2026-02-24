@@ -1728,7 +1728,13 @@ function applyTierTheme(balanceOrKey){
       $("statusBadge").className = "badge " + (s.active ? "on":"off");
       $("statusBadge").textContent = s.active ? "🟢 نشط" : "🔴 مقفل";
       $("studentBalance").textContent = fmt(s.balance);
-      $("tierLabel").textContent = s.tier || calcTier(s.balance);
+      $("tierLabel").textContent = calcTier(s.balance);
+      
+      // ✅ مزامنة الترقية داخل البيانات إذا كانت قديمة
+      const computedTier = calcTier(s.balance);
+      if(s.tier !== computedTier){
+        try{ await ref.update({tier: computedTier}); s.tier = computedTier; }catch(e){}
+      }
       applyTierTheme(s.balance);
 
       $("cardNumber").textContent = makeBankCardNumber(currentStudentId);
@@ -1826,7 +1832,7 @@ function applyTierTheme(balanceOrKey){
         const card = document.createElement("div");
         card.className="card";
         const isChecked = selectedIds.has(s.id);
-        const tierText = (s.tier || calcTier(s.balance)) || "";
+        const tierText = (calcTier(s.balance)) || "";
         card.innerHTML = `
           <div class="row" style="align-items:center;justify-content:space-between">
             <div style="display:flex;gap:10px;align-items:center">
@@ -2846,7 +2852,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
     const reason = getReason("reasonStudent","reasonOtherStudent");
 
     const oldKey = tierKeyFromBalance(s.balance);
-    const oldLabel = s.tier || calcTier(s.balance);
+    const oldLabel = calcTier(s.balance);
 
     if(op === "deposit"){
       const nb = Number(s.balance||0) + amt;
