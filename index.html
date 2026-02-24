@@ -316,6 +316,18 @@
 .lbName{font-weight:900;color:#0b2a66}
 .lbMeta{margin-inline-start:auto;display:flex;gap:8px;align-items:center}
 .lbPill{font-size:12px;font-weight:900;padding:6px 10px;border-radius:999px;background:rgba(2,132,199,.10);border:1px solid rgba(2,132,199,.18);color:#0b2a66}
+
+/* ===== Tier themes (Bronze / Silver / Gold / Diamond / Elite) ===== */
+.bankCard.tier-bronze{background:linear-gradient(180deg,#fff,#f8f4f1);}
+.bankCard.tier-silver{background:linear-gradient(180deg,#ffffff,#f1f5f9);}
+.bankCard.tier-gold{background:linear-gradient(180deg,#ffffff,#fff7e6);}
+.bankCard.tier-diamond{background:linear-gradient(180deg,#ffffff,#eef6ff);}
+.bankCard.tier-elite{background:linear-gradient(180deg,#ffffff,#f3f0ff);}
+.bankCard.tier-bronze .chip{background:linear-gradient(180deg,#f7d7b3,#c9894f);}
+.bankCard.tier-silver .chip{background:linear-gradient(180deg,#f3f4f6,#bfc7d1);}
+.bankCard.tier-diamond .chip{background:linear-gradient(180deg,#d9f2ff,#4aa3d8);}
+.bankCard.tier-elite .chip{background:linear-gradient(180deg,#f4d48a,#8f6bff);}
+
 </style>
 </head>
 
@@ -1070,8 +1082,8 @@
     </div>
     <div class="footerNote">الرياضيات لغة الأذكياء ✨</div>
   </div>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore-compat.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
   <div id="pdfTemp"></div>
@@ -1102,51 +1114,10 @@
       appId: "1:333467940977:web:97d056d5dbff2debbf43d0",
       measurementId: "G-7RPQX9ER93"
     };
-    // Firebase init (safe): لا نسمح لأي خطأ بإيقاف النظام أو كسر زر (ابدأ الآن)
-let db = null;
-try{
-  if(window.firebase && typeof firebase.initializeApp === "function"){
     firebase.initializeApp(firebaseConfig);
-    if(typeof firebase.firestore === "function"){ db = firebase.firestore(); }
-  }else{
-    console.warn("Firebase SDK لم يتم تحميله (سيعمل النظام بوضع محلي).");
-  }
-}catch(e){
-  console.warn("Firebase init error (سيعمل النظام بوضع محلي):", e);
-  db = null;
-}
+    const db = firebase.firestore();
 
-
-    
-// Firestore fallback: حتى لو تعطل Firebase، ما نكسر النظام (ويدخل طبيعي)
-const __nullDoc = {
-  get: ()=>Promise.resolve({ exists:false, data:()=>null }),
-  set: ()=>Promise.resolve(),
-  update: ()=>Promise.resolve(),
-  delete: ()=>Promise.resolve(),
-  onSnapshot: ()=>()=>{}
-};
-const __nullQuery = {
-  doc: ()=>__nullDoc,
-  add: ()=>Promise.resolve({ id:"local" }),
-  get: ()=>Promise.resolve({ empty:true, docs:[], forEach:()=>{} }),
-  where: ()=>__nullQuery,
-  orderBy: ()=>__nullQuery,
-  limit: ()=>__nullQuery,
-  onSnapshot: ()=>()=>{}
-};
-const __nullDB = { collection: ()=>__nullQuery };
-
-function getDB(){
-  if(db) return db;
-  if(!window.__dbWarned){
-    window.__dbWarned = true;
-    try{ console.warn("Firebase غير متاح: سيتم تشغيل وضع محلي (بدون مزامنة سحابية)."); }catch(_){}
-  }
-  return __nullDB;
-}
-
-function $(id){return document.getElementById(id);}
+    function $(id){return document.getElementById(id);}
     function fmt(x){ return (Math.round((Number(x||0)+Number.EPSILON)*100)/100).toFixed(2); }
 
     function openModal(title, bodyHtml, actionsHtml){
@@ -1272,6 +1243,34 @@ ${SIGNATURE}`
     }
     async function playWelcome(){ await beep(); }
     async function playClick(){ await beep(); }
+    async function playCongrats(){
+  try{
+    const ctx=new (window.AudioContext||window.webkitAudioContext)();
+    const g=ctx.createGain(); g.gain.value=0.10; g.connect(ctx.destination);
+    const freqs=[740, 988, 1175, 1480]; // نغمة صاعدة
+    let t=ctx.currentTime;
+    freqs.forEach((f,i)=>{
+      const o=ctx.createOscillator();
+      o.type="triangle"; o.frequency.value=f;
+      o.connect(g);
+      o.start(t + i*0.08);
+      o.stop(t + i*0.08 + 0.12);
+    });
+    setTimeout(()=>{ ctx.close(); }, 800);
+  }catch(e){}
+}
+
+function showTierCongrats(oldLabel, newLabel, balance){
+  const body = `
+    <div style="font-weight:1000;color:#0b2a66;font-size:16px">🎉 تهانينا! تمت ترقية الحساب</div>
+    <div class="small" style="margin-top:6px;line-height:1.95">
+      المستوى السابق: <b>${oldLabel}</b><br>
+      المستوى الجديد: <b>${newLabel}</b><br>
+      الرصيد الحالي: <b>${fmt(balance)}</b> ر.س
+    </div>
+  `;
+  openModal("ترقية المستوى", body, '<button class="btn" onclick="closeModal()">تمام</button>');
+}
     function bindClickSounds(){
       document.querySelectorAll("button, .tab, .miniTab, a").forEach(el=>{
         el.addEventListener("click", ()=>{ playClick(); }, {passive:true});
@@ -1481,12 +1480,12 @@ ${SIGNATURE}`
     let forgotPinEnabled = true;
     async function loadForgotSetting(){
       try{
-        const doc = await getDB().collection("settings").doc("security").get();
+        const doc = await db.collection("settings").doc("security").get();
         if(doc.exists){
           const d = doc.data() || {};
           if(typeof d.forgotPinEnabled === "boolean") forgotPinEnabled = d.forgotPinEnabled;
         }else{
-          await getDB().collection("settings").doc("security").set({forgotPinEnabled:true});
+          await db.collection("settings").doc("security").set({forgotPinEnabled:true});
           forgotPinEnabled = true;
         }
       }catch(e){ forgotPinEnabled = true; }
@@ -1496,7 +1495,7 @@ ${SIGNATURE}`
     async function toggleForgotPinForAll(){
       try{
         forgotPinEnabled = !forgotPinEnabled;
-        await getDB().collection("settings").doc("security").set({forgotPinEnabled}, {merge:true});
+        await db.collection("settings").doc("security").set({forgotPinEnabled}, {merge:true});
         openModal("تم ✅", forgotPinEnabled ? "تم تفعيل (نسيت الرقم السري) للجميع." : "تم تعطيل (نسيت الرقم السري) للجميع.",
           '<button class="btn" onclick="closeModal()">تمام</button>');
       }catch(e){
@@ -1506,11 +1505,11 @@ ${SIGNATURE}`
     }
 
     async function ensureSeed(){
-      const c = await getDB().collection("classes").orderBy("order").get();
+      const c = await db.collection("classes").orderBy("order").get();
       if(c.empty){
-        await getDB().collection("classes").add({name:"الصف سادس بنين",order:1});
-        await getDB().collection("classes").add({name:"الصف سادس بنات",order:2});
-        await getDB().collection("classes").add({name:"الصف الأول المتوسط",order:3});
+        await db.collection("classes").add({name:"الصف سادس بنين",order:1});
+        await db.collection("classes").add({name:"الصف سادس بنات",order:2});
+        await db.collection("classes").add({name:"الصف الأول المتوسط",order:3});
       }
     }
 
@@ -1519,7 +1518,7 @@ ${SIGNATURE}`
     let selectedIds = new Set();
 
     async function loadClasses(){
-      const snap = await getDB().collection("classes").orderBy("order").get();
+      const snap = await db.collection("classes").orderBy("order").get();
       classes=[]; snap.forEach(d=>classes.push({id:d.id,...d.data()}));
       if(!currentClassId) currentClassId = classes[0]?.id;
     }
@@ -1541,16 +1540,16 @@ ${SIGNATURE}`
     async function addClass(){
       const n=$("newClassName").value.trim();
       if(!n) return warn("اكتب اسم الفصل");
-      const last=await getDB().collection("classes").orderBy("order","desc").limit(1).get();
+      const last=await db.collection("classes").orderBy("order","desc").limit(1).get();
       const max= last.empty?0:(last.docs[0].data().order||0);
-      await getDB().collection("classes").add({name:n,order:max+1});
+      await db.collection("classes").add({name:n,order:max+1});
       $("newClassName").value="";
       await renderTabs();
     }
     async function renameClass(){
       const c=classes.find(x=>x.id===currentClassId); if(!c) return;
       const nn=prompt("الاسم الجديد للفصل:", c.name); if(!nn) return;
-      await getDB().collection("classes").doc(currentClassId).update({name: nn.trim()});
+      await db.collection("classes").doc(currentClassId).update({name: nn.trim()});
       await renderTabs();
     }
     async function deleteClassMove(){
@@ -1559,10 +1558,10 @@ ${SIGNATURE}`
       const destName=prompt("ننقل طلاب الفصل لأي فصل?\n"+others.map(c=>c.name).join(" / "), others[0].name);
       if(!destName) return;
       const dest=classes.find(c=>c.name===destName); if(!dest) return warn("اسم الفصل غير موجود");
-      const studs=await getDB().collection("students").where("classId","==",currentClassId).get();
-      const batch=getDB().batch();
-      studs.forEach(d=>batch.update(getDB().collection("students").doc(d.id), {classId: dest.id}));
-      batch.delete(getDB().collection("classes").doc(currentClassId));
+      const studs=await db.collection("students").where("classId","==",currentClassId).get();
+      const batch=db.batch();
+      studs.forEach(d=>batch.update(db.collection("students").doc(d.id), {classId: dest.id}));
+      batch.delete(db.collection("classes").doc(currentClassId));
       await batch.commit();
       currentClassId=null;
       await renderTabs();
@@ -1618,7 +1617,7 @@ ${SIGNATURE}`;
       }
       const name = ($("stuName")?.value || "").trim();
       if(!name) return warn("اكتب/ي الاسم أولاً");
-      const snap = await getDB().collection("students").where("name","==",name).limit(1).get();
+      const snap = await db.collection("students").where("name","==",name).limit(1).get();
       if(snap.empty) return warn("الاسم غير موجود");
       const doc = snap.docs[0];
       const s = doc.data() || {};
@@ -1639,7 +1638,7 @@ ${SIGNATURE}`;
         const name = ($("stuName")?.value || "").trim();
         const pin  = ($("stuPin")?.value || "").trim();
         if(!name || !pin) return warn("اكتب/ي الاسم والرقم السري");
-        const snap = await getDB().collection("students").where("name","==",name).limit(1).get();
+        const snap = await db.collection("students").where("name","==",name).limit(1).get();
         if(snap.empty) return warn("الاسم غير مسجل بالنظام");
         const doc = snap.docs[0];
         currentStudentId = doc.id;
@@ -1651,14 +1650,55 @@ ${SIGNATURE}`;
       }catch(e){ console.log(e); warn("صار خطأ… جرّبي مرة ثانية"); }
     }
 
-    function calcTier(balance){
-      const b = Number(balance||0);
-      if(b > 30000) return "💎 ألماسي";
-      if(b >= 21000) return "🔷 ماسي";
-      if(b >= 16000) return "🥇 ذهبي";
-      if(b >= 11000) return "🥈 فضي";
-      return "🥉 برونزي";
-    }
+    function getTierConfig(){
+  // ✅ حدود الترقية حسب الرصيد (مطابقة للكروت الظاهرة في الصفحة):
+  // برونزي: 10,000 وأقل
+  // فضي: من 11,000 إلى 15,000  (فعليًا يبدأ من 11,000)
+  // ذهبي: من 16,000 إلى 20,000 (فعليًا يبدأ من 16,000)
+  // ماسي: من 21,000 إلى 30,000 (فعليًا يبدأ من 21,000)
+  // ألماسي: أكثر من 30,000      (يعني 30,001 فأعلى)
+  return {
+    silverMin: 11000,
+    goldMin: 16000,
+    diamondMin: 21000,
+    eliteMinExclusive: 30000
+  };
+}
+
+function tierKeyFromBalance(balance){
+  const b = Number(balance||0);
+  const cfg = getTierConfig();
+
+  // ألماسي: أكثر من 30,000
+  if(b > cfg.eliteMinExclusive) return "elite";
+  // ماسي: 21,000 إلى 30,000
+  if(b >= cfg.diamondMin) return "diamond";
+  // ذهبي: 16,000 إلى 20,000
+  if(b >= cfg.goldMin) return "gold";
+  // فضي: 11,000 إلى 15,000
+  if(b >= cfg.silverMin) return "silver";
+  // برونزي: 10,000 وأقل (وأي رقم أقل من 11,000)
+  return "bronze";
+}
+
+function calcTier(balance){
+  const key = tierKeyFromBalance(balance);
+  if(key==="elite") return "💎 ألماسي";
+  if(key==="diamond") return "🔷 ماسي";
+  if(key==="gold") return "🥇 ذهبي";
+  if(key==="silver") return "🥈 فضي";
+  return "🥉 برونزي";
+}
+
+function applyTierTheme(balanceOrKey){
+  const card = document.querySelector("#studentAccountPage .bankCard");
+  if(!card) return;
+  const key = (balanceOrKey==="bronze"||balanceOrKey==="silver"||balanceOrKey==="gold"||balanceOrKey==="diamond"||balanceOrKey==="elite")
+    ? balanceOrKey
+    : tierKeyFromBalance(balanceOrKey);
+  card.classList.remove("tier-bronze","tier-silver","tier-gold","tier-diamond","tier-elite");
+  card.classList.add("tier-" + key);
+}
 
     function makeBankCardNumber(studentId){
       const raw = String(studentId||"").replace(/[^a-zA-Z0-9]/g,"");
@@ -1689,6 +1729,7 @@ ${SIGNATURE}`;
       $("statusBadge").textContent = s.active ? "🟢 نشط" : "🔴 مقفل";
       $("studentBalance").textContent = fmt(s.balance);
       $("tierLabel").textContent = s.tier || calcTier(s.balance);
+      applyTierTheme(s.balance);
 
       $("cardNumber").textContent = makeBankCardNumber(currentStudentId);
       const exp = makeExp();
@@ -1736,7 +1777,7 @@ ${SIGNATURE}`;
       const n=$("newStudentName").value.trim();
       if(!n) return warn("اكتب اسم الطالب");
       const pin=String(Math.floor(1000+Math.random()*9000));
-      await getDB().collection("students").add({ name:n,classId:currentClassId,active:true,balance:0,pin,openedAt:null, guardianWhats:"" });
+      await db.collection("students").add({ name:n,classId:currentClassId,active:true,balance:0,pin,openedAt:null, guardianWhats:"" });
       $("newStudentName").value=""; await renderStudents();
     }
 
@@ -1752,7 +1793,7 @@ ${SIGNATURE}`;
     }
 
     async function renderStudents(){
-      const snap = await getDB().collection("students").where("classId","==",currentClassId).get();
+      const snap = await db.collection("students").where("classId","==",currentClassId).get();
       const arr=[]; snap.forEach(d=>arr.push({id:d.id,...d.data()}));
       arr.sort((a,b)=>(a.name||"").localeCompare(b.name||"","ar"));
 
@@ -1820,8 +1861,8 @@ ${SIGNATURE}`;
         cb.onchange = ()=>{ cb.checked ? selectedIds.add(s.id) : selectedIds.delete(s.id); updateSelCount(); };
 
         card.querySelector(".js-open").onclick = async()=>{ currentAccess="teacher"; currentStudentId=s.id; await openStudentAccount(s); };
-        card.querySelector(".js-toggle").onclick = async()=>{ await getDB().collection("students").doc(s.id).update({active:!s.active}); await renderStudents(); };
-        card.querySelector(".js-edit").onclick = async()=>{ const nn = prompt("الاسم الجديد:", s.name); if(nn) await getDB().collection("students").doc(s.id).update({name:nn.trim()}); await renderStudents(); };
+        card.querySelector(".js-toggle").onclick = async()=>{ await db.collection("students").doc(s.id).update({active:!s.active}); await renderStudents(); };
+        card.querySelector(".js-edit").onclick = async()=>{ const nn = prompt("الاسم الجديد:", s.name); if(nn) await db.collection("students").doc(s.id).update({name:nn.trim()}); await renderStudents(); };
         card.querySelector(".js-phone").onclick = ()=> editGuardianPhone(s.id);
         card.querySelector(".js-pin").onclick = ()=> changePinTeacher(s.id);
 
@@ -1833,7 +1874,7 @@ ${SIGNATURE}`;
     }
 
     async function showStatement(){
-      const snap=await getDB().collection("students").doc(currentStudentId).collection("txns").orderBy("createdAtClient","desc").limit(80).get();
+      const snap=await db.collection("students").doc(currentStudentId).collection("txns").orderBy("createdAtClient","desc").limit(80).get();
       const rows=$("stmtRows"); rows.innerHTML="";
       if(snap.empty){ rows.innerHTML='<tr><td colspan="5" class="small">لا توجد عمليات في هذه الفترة.</td></tr>'; return; }
       snap.forEach(d=>{
@@ -1895,14 +1936,14 @@ ${SIGNATURE}`;
         if(list) list.innerHTML = '<div class="small">جاري التحميل…</div>';
 
         // collectionGroup requires Firestore rules allow it; uses saved dateKey created during logTxn
-        const snap = await getDB().collectionGroup("txns")
+        const snap = await db.collectionGroup("txns")
           .where("dateKey","==",dateKey)
           .orderBy("createdAtClient","desc")
           .limit(500)
           .get();
 
         // build quick lookup for guardian numbers (fixes old txns that didn't store the number)
-        const studsSnap = await getDB().collection("students").get();
+        const studsSnap = await db.collection("students").get();
         const guardianById = {};
         const nameById = {};
         studsSnap.forEach(sd=>{
@@ -2049,7 +2090,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
     function isValidPin(p){ return /^[0-9]{4}$/.test(String(p||"").trim()); }
 
     async function getStudentById(studentId){
-      const doc = await getDB().collection("students").doc(studentId).get();
+      const doc = await db.collection("students").doc(studentId).get();
       if(!doc.exists) throw new Error("Student not found");
       return { id: doc.id, ...doc.data() };
     }
@@ -2062,7 +2103,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
           const nn = prompt("اكتب رقم ولي الأمر (مثال: 05xxxxxxxx):", "");
           if(!nn) return;
           phone = nn.trim();
-          await getDB().collection("students").doc(studentId).update({guardianWhats: phone});
+          await db.collection("students").doc(studentId).update({guardianWhats: phone});
         }
         const wa = normalizePhoneToWA(phone);
         if(!wa) return warn("رقم ولي الأمر غير صحيح");
@@ -2097,7 +2138,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
           <button class="btn2" onclick="closeModal()">إلغاء</button>
           <button class="btn" onclick="(async()=>{
             const v = (document.getElementById('gpInput').value||'').trim();
-            await getDB().collection('students').doc('${studentId}').update({guardianWhats: v});
+            await db.collection('students').doc('${studentId}').update({guardianWhats: v});
             closeModal();
             await renderStudents();
           })()">حفظ</button>
@@ -2123,7 +2164,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
           <button class="btn" onclick="(async()=>{
             const v = (document.getElementById('pinNew').value||'').trim();
             if(!/^[0-9]{4}$/.test(v)){ return warn('PIN لازم يكون 4 أرقام'); }
-            await getDB().collection('students').doc('${studentId}').update({pin: v});
+            await db.collection('students').doc('${studentId}').update({pin: v});
             closeModal();
             await renderStudents();
           })()">حفظ</button>
@@ -2138,7 +2179,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
       try{
         const name = (document.getElementById("stuName")?.value || "").trim();
         if(!name) return warn("اكتب/ي الاسم أولًا في خانة الدخول");
-        const snap = await getDB().collection("students").where("name","==",name).limit(1).get();
+        const snap = await db.collection("students").where("name","==",name).limit(1).get();
         if(snap.empty) return warn("الاسم غير موجود");
 
         const doc = snap.docs[0];
@@ -2165,7 +2206,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
             const newP = (document.getElementById('newPin').value||'').trim();
             if(String(oldP)!==String(s.pin||'')) return warn('PIN الحالي غير صحيح');
             if(!/^[0-9]{4}$/.test(newP)) return warn('PIN الجديد لازم يكون 4 أرقام');
-            await getDB().collection('students').doc('${doc.id}').update({pin:newP});
+            await db.collection('students').doc('${doc.id}').update({pin:newP});
             closeModal();
             warn('تم تغيير PIN بنجاح ✅');
           })()">تأكيد</button>
@@ -2266,7 +2307,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
     async function pdfStudentReport(studentId){
       try{
         const s = await getStudentById(studentId);
-        const txSnap = await getDB().collection("students").doc(studentId).collection("txns")
+        const txSnap = await db.collection("students").doc(studentId).collection("txns")
           .orderBy("createdAtClient","desc").limit(200).get();
 
         let rows="";
@@ -2303,11 +2344,11 @@ document.addEventListener("DOMContentLoaded", async()=>{
     async function pdfBankReport(){
       try{
         // report per current classes list
-        const clsSnap = await getDB().collection("classes").orderBy("order").get();
+        const clsSnap = await db.collection("classes").orderBy("order").get();
         const classesArr = [];
         clsSnap.forEach(d=>classesArr.push({id:d.id, ...d.data()}));
 
-        const stuSnap = await getDB().collection("students").get();
+        const stuSnap = await db.collection("students").get();
         const students = [];
         stuSnap.forEach(d=>students.push({id:d.id, ...d.data()}));
         students.sort((a,b)=>(a.name||"").localeCompare(b.name||"","ar"));
@@ -2396,7 +2437,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
       try{
         const sel = $("transferTo");
         if(!sel) return;
-        const snap = await getDB().collection("students").get();
+        const snap = await db.collection("students").get();
         const arr = [];
         snap.forEach(d=>arr.push({id:d.id, ...(d.data()||{})}));
         arr.sort((a,b)=>(a.name||"").localeCompare(b.name||"","ar"));
@@ -2453,7 +2494,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
         const range = getSchoolWeekRangeMs(new Date());
         const startMs = range.startMs, endMs = range.endMs;
 
-        const q = getDB().collection("students").doc(currentStudentId).collection("txns")
+        const q = db.collection("students").doc(currentStudentId).collection("txns")
           .where("createdAtClient", ">=", startMs)
           .where("createdAtClient", "<=", endMs)
           .orderBy("createdAtClient","desc")
@@ -2491,7 +2532,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
         const weekEnd = wk.endMs;
         const fiveStart = now - 5*24*60*60*1000;
 
-        const sRef = getDB().collection("students").doc(currentStudentId);
+        const sRef = db.collection("students").doc(currentStudentId);
 
         // Student weekly net (deposit + transfer in) - (withdraw + transfer out)
         const weekSnap = await sRef.collection("txns")
@@ -2543,11 +2584,11 @@ document.addEventListener("DOMContentLoaded", async()=>{
         let topNetValue = null;
 
         if(currentClassId){
-          const studs = await getDB().collection("students").where("classId","==",currentClassId).get();
+          const studs = await db.collection("students").where("classId","==",currentClassId).get();
           const nets = [];
           for(const sd of studs.docs){
             const sid = sd.id;
-            const ref = getDB().collection("students").doc(sid);
+            const ref = db.collection("students").doc(sid);
             const snap = await ref.collection("txns")
               .where("createdAtClient", ">=", weekStart)
               .where("createdAtClient", "<=", weekEnd)
@@ -2701,11 +2742,11 @@ document.addEventListener("DOMContentLoaded", async()=>{
           if(box){
             box.innerHTML = "";
             if(currentClassId){
-              const studs = await getDB().collection("students").where("classId","==",currentClassId).get();
+              const studs = await db.collection("students").where("classId","==",currentClassId).get();
               const rows = [];
               for(const sd of studs.docs){
                 const sid = sd.id;
-                const ref = getDB().collection("students").doc(sid);
+                const ref = db.collection("students").doc(sid);
                 const snap2 = await ref.collection("txns")
                   .where("createdAtClient", ">=", weekStart)
                   .where("createdAtClient", "<=", weekEnd)
@@ -2792,64 +2833,86 @@ document.addEventListener("DOMContentLoaded", async()=>{
 
 // ===== Student operations (deposit/withdraw/transfer) =====
     executeOp = async function(){
-      try{
-        const ref = getDB().collection("students").doc(currentStudentId);
-        const doc = await ref.get();
-        if(!doc.exists) return warn("الحساب غير موجود");
-        const s = doc.data() || {};
+  try{
+    const ref = db.collection("students").doc(currentStudentId);
+    const doc = await ref.get();
+    if(!doc.exists) return warn("الحساب غير موجود");
+    const s = doc.data() || {};
 
-        const op = ($("op")?.value || "").trim();
-        const amt = parseFloat($("amt")?.value || "");
-        if(isNaN(amt) || amt<=0) return warn("اكتب مبلغ صحيح");
+    const op = ($("op")?.value || "").trim();
+    const amt = parseFloat($("amt")?.value || "");
+    if(isNaN(amt) || amt<=0) return warn("اكتب مبلغ صحيح");
 
-        const reason = getReason("reasonStudent","reasonOtherStudent");
+    const reason = getReason("reasonStudent","reasonOtherStudent");
 
-        if(op === "deposit"){
-          const nb = Number(s.balance||0) + amt;
-          await ref.update({balance: nb});
-          await logTxn(ref, "إيداع", reason, amt, nb, s);
+    const oldKey = tierKeyFromBalance(s.balance);
+    const oldLabel = s.tier || calcTier(s.balance);
 
-        }else if(op === "withdraw"){
-          if(Number(s.balance||0) < amt) return warn("الرصيد ما يكفي");
-          const nb = Number(s.balance||0) - amt;
-          await ref.update({balance: nb});
-          await logTxn(ref, "سحب", reason, amt, nb, s);
+    if(op === "deposit"){
+      const nb = Number(s.balance||0) + amt;
+      const newLabel = calcTier(nb);
+      await ref.update({balance: nb, tier: newLabel});
+      await logTxn(ref, "إيداع", reason, amt, nb, {...s, tier:newLabel});
 
-        }else if(op === "transfer"){
-          if(Number(s.balance||0) < amt) return warn("الرصيد ما يكفي للتحويل");
-          const toId = ($("transferTo")?.value || "").trim();
-          if(!toId) return warn("اختاري مستلم التحويل");
-          if(toId === currentStudentId) return warn("لا يمكن التحويل لنفس الحساب");
+    }else if(op === "withdraw"){
+      if(Number(s.balance||0) < amt) return warn("الرصيد ما يكفي");
+      const nb = Number(s.balance||0) - amt;
+      const newLabel = calcTier(nb);
+      await ref.update({balance: nb, tier: newLabel});
+      await logTxn(ref, "سحب", reason, amt, nb, {...s, tier:newLabel});
 
-          const toRef = getDB().collection("students").doc(toId);
-          const toDoc = await toRef.get();
-          if(!toDoc.exists) return warn("المستلم غير موجود");
-          const to = toDoc.data() || {};
+    }else if(op === "transfer"){
+      if(Number(s.balance||0) < amt) return warn("الرصيد ما يكفي للتحويل");
+      const toId = ($("transferTo")?.value || "").trim();
+      if(!toId) return warn("اختاري مستلم التحويل");
+      if(toId === currentStudentId) return warn("لا يمكن التحويل لنفس الحساب");
 
-          const batch = getDB().batch();
-          batch.update(ref, {balance: Number(s.balance||0) - amt});
-          batch.update(toRef, {balance: Number(to.balance||0) + amt});
-          await batch.commit();
+      const toRef = db.collection("students").doc(toId);
+      const toDoc = await toRef.get();
+      if(!toDoc.exists) return warn("المستلم غير موجود");
+      const to = toDoc.data() || {};
 
-          await logTxn(ref, "تحويل إلى " + (to.name||"—"), reason, amt, Number(s.balance||0) - amt, s);
-          await logTxn(toRef, "تحويل من " + (s.name||"طالب/ـة"), reason, amt, Number(to.balance||0) + amt, to);
-        }
+      const fromNb = Number(s.balance||0) - amt;
+      const toNb   = Number(to.balance||0) + amt;
 
-        // refresh UI
-        const updated = await ref.get();
-        const u = updated.data() || {};
-        $("studentBalance") && ($("studentBalance").textContent = fmt(u.balance));
-        $("tierLabel") && ($("tierLabel").textContent = calcTier(u.balance));
-        $("amt") && ($("amt").value = "");
-        setupReasonUI($("op")?.value || "deposit",'reasonStudent','reasonOtherStudent');
-        await showStatement();
-        await refreshWeekKPIs();
-      await refreshRewards();
-      }catch(e){
-        console.log("executeOp error", e);
-        warn("صار خطأ… جرّبي مرة ثانية");
-      }
-    };
+      const fromTier = calcTier(fromNb);
+      const toTier   = calcTier(toNb);
+
+      const batch = db.batch();
+      batch.update(ref,  {balance: fromNb, tier: fromTier});
+      batch.update(toRef,{balance: toNb,   tier: toTier});
+      await batch.commit();
+
+      await logTxn(ref,  "تحويل إلى " + (to.name||"—"), reason, amt, fromNb, {...s, tier:fromTier});
+      await logTxn(toRef,"تحويل من " + (s.name||"طالب/ـة"), reason, amt, toNb, {...to, tier:toTier});
+    }
+
+    // refresh UI
+    const updated = await ref.get();
+    const u = updated.data() || {};
+    $("studentBalance") && ($("studentBalance").textContent = fmt(u.balance));
+    $("tierLabel") && ($("tierLabel").textContent = u.tier || calcTier(u.balance));
+    applyTierTheme(u.balance);
+
+    // تهنئة + صوت عند تغير المستوى
+    const newKey = tierKeyFromBalance(u.balance);
+    const newLabel = u.tier || calcTier(u.balance);
+    if(newKey !== oldKey){
+      await playCongrats();
+      showTierCongrats(oldLabel, newLabel, u.balance);
+    }
+
+    $("amt") && ($("amt").value = "");
+    setupReasonUI($("op")?.value || "deposit",'reasonStudent','reasonOtherStudent');
+    updateTransferPreview && updateTransferPreview();
+    await showStatement();
+    await refreshWeekKPIs();
+    await refreshRewards();
+  }catch(e){
+    console.log("executeOp error", e);
+    warn("صار خطأ… جرّبي مرة ثانية");
+  }
+};
 
     // ===== Teacher operations (bulk + selected + single) =====
     async function _ensureTeacherContext(){
@@ -2864,21 +2927,21 @@ document.addEventListener("DOMContentLoaded", async()=>{
         if(isNaN(a) || a<=0) return warn("اكتب مبلغ الإيداع للكل");
         const reason = getReason("reasonTeacher","reasonOtherTeacher");
 
-        const studs = await getDB().collection("students").where("classId","==",currentClassId).get();
-        const batch = getDB().batch();
+        const studs = await db.collection("students").where("classId","==",currentClassId).get();
+        const batch = db.batch();
         const updates = [];
         studs.forEach(d=>{
           const s=d.data()||{};
           if(s.active===false) return;
           const nb = Number(s.balance||0) + a;
-          batch.update(getDB().collection("students").doc(d.id), {balance: nb});
+          batch.update(db.collection("students").doc(d.id), {balance: nb});
           updates.push({id:d.id, nb, name:(s.name||""), guardianWhats:(s.guardianWhats||"")});
         });
         await batch.commit();
 
         // log after commit
         for(const u of updates){
-          const ref = getDB().collection("students").doc(u.id);
+          const ref = db.collection("students").doc(u.id);
           await logTxn(ref, "إيداع (معلمة)", reason, a, u.nb, u);
         }
 
@@ -2897,7 +2960,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
         if(isNaN(a) || a<=0) return warn("اكتب مبلغ السحب من الكل");
         const reason = getReason("reasonTeacher","reasonOtherTeacher");
 
-        const studs = await getDB().collection("students").where("classId","==",currentClassId).get();
+        const studs = await db.collection("students").where("classId","==",currentClassId).get();
 
         // check balances
         let bad=false;
@@ -2908,19 +2971,19 @@ document.addEventListener("DOMContentLoaded", async()=>{
         });
         if(bad) return warn("في طالب رصيده ما يكفي… قللي المبلغ");
 
-        const batch = getDB().batch();
+        const batch = db.batch();
         const updates = [];
         studs.forEach(d=>{
           const s=d.data()||{};
           if(s.active===false) return;
           const nb = Number(s.balance||0) - a;
-          batch.update(getDB().collection("students").doc(d.id), {balance: nb});
+          batch.update(db.collection("students").doc(d.id), {balance: nb});
           updates.push({id:d.id, nb, name:(s.name||""), guardianWhats:(s.guardianWhats||"")});
         });
         await batch.commit();
 
         for(const u of updates){
-          const ref = getDB().collection("students").doc(u.id);
+          const ref = db.collection("students").doc(u.id);
           await logTxn(ref, "سحب (معلمة)", reason, a, u.nb, u);
         }
 
@@ -2940,7 +3003,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
         if(isNaN(a) || a<=0) return warn("اكتبي مبلغ");
         const reason = getReason("reasonTeacher","reasonOtherTeacher");
 
-        const ref = getDB().collection("students").doc(sid);
+        const ref = db.collection("students").doc(sid);
         const doc = await ref.get();
         if(!doc.exists) return warn("الطالب غير موجود");
         const s = doc.data() || {};
@@ -2966,7 +3029,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
         if(isNaN(a) || a<=0) return warn("اكتبي مبلغ");
         const reason = getReason("reasonTeacher","reasonOtherTeacher");
 
-        const ref = getDB().collection("students").doc(sid);
+        const ref = db.collection("students").doc(sid);
         const doc = await ref.get();
         if(!doc.exists) return warn("الطالب غير موجود");
         const s = doc.data() || {};
@@ -3054,8 +3117,8 @@ document.addEventListener("DOMContentLoaded", async()=>{
         if(isNaN(amt) || amt<=0) return warn("اكتبي مبلغ صحيح للتحويل");
         const reason = getReason("reasonTeacher","reasonOtherTeacher");
 
-        const fromRef = getDB().collection("students").doc(fromId);
-        const toRef = getDB().collection("students").doc(toId);
+        const fromRef = db.collection("students").doc(fromId);
+        const toRef = db.collection("students").doc(toId);
 
         const [fromDoc,toDoc] = await Promise.all([fromRef.get(), toRef.get()]);
         if(!fromDoc.exists || !toDoc.exists) return warn("تعذر العثور على أحد الحسابات");
@@ -3066,7 +3129,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
         if(to.active===false) return warn("حساب المستلم غير مُفعل");
         if(Number(from.balance||0) < amt) return warn("رصيد المُرسِل لا يكفي للتحويل");
 
-        const batch = getDB().batch();
+        const batch = db.batch();
         batch.update(fromRef, {balance: Number(from.balance||0) - amt});
         batch.update(toRef, {balance: Number(to.balance||0) + amt});
         await batch.commit();
@@ -3092,7 +3155,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
         const reason = getReason("reasonTeacher","reasonOtherTeacher");
 
         for(const sid of selectedIds){
-          const ref = getDB().collection("students").doc(sid);
+          const ref = db.collection("students").doc(sid);
           const doc = await ref.get();
           if(!doc.exists) continue;
           const s = doc.data() || {};
@@ -3116,7 +3179,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
         const reason = getReason("reasonTeacher","reasonOtherTeacher");
 
         for(const sid of selectedIds){
-          const ref = getDB().collection("students").doc(sid);
+          const ref = db.collection("students").doc(sid);
           const doc = await ref.get();
           if(!doc.exists) continue;
           const s = doc.data() || {};
@@ -3175,7 +3238,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
     async function pdfRangeReport(studentId, fromMs, toMs, titleLabel){
       const s = await getStudentById(studentId);
       // نجلب آخر 600 عملية ثم نفلتر (بدون تعقيد فهارس Firestore)
-      const snap = await getDB().collection("students").doc(studentId).collection("txns")
+      const snap = await db.collection("students").doc(studentId).collection("txns")
         .orderBy("createdAtClient","desc").limit(600).get();
 
       let rows = "";
@@ -3264,7 +3327,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
         const now = Date.now();
         const fromMs = now - 30*24*60*60*1000;
 
-        const snap = await getDB().collection("students").doc(currentStudentId).collection("txns")
+        const snap = await db.collection("students").doc(currentStudentId).collection("txns")
           .orderBy("createdAtClient","desc").limit(700).get();
 
         const pts = [];
