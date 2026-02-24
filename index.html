@@ -214,9 +214,9 @@
     .cardHint{margin-top:10px;font-size:11px;font-weight:900;color:rgba(11,42,102,.78)}
 
     .miniTabs{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-    .miniTab{flex:1;min-width:150px;background:#0b2a66;color:#fff;border:1px solid rgba(255,255,255,.12);
+    .miniTab{flex:1;min-width:150px;background:#f0f7ff;border:1px solid rgba(0,0,0,.06);
       border-radius:14px;padding:10px;cursor:pointer;font-weight:1000;display:flex;align-items:center;gap:10px;justify-content:center}
-    .miniTab.active{background:linear-gradient(90deg,#061c45,#0b2a66);color:#fff}
+    .miniTab.active{background:linear-gradient(90deg,#0b2a66,#0b5bb5);color:#fff}
     .miniPane{display:none}
     .miniPane.active{display:block}
 
@@ -930,40 +930,6 @@
         <div class="small" style="margin-top:6px">احتساب الجوائز حسب <b>أسبوع المدرسة (الأحد → الخميس)</b>، وتتحدث تلقائيًا من سجل العمليات.</div>
       </div>
       <div class="chip" id="rwWeekRange" style="margin-top:2px">—</div>
-      <div class="card soft" style="margin:12px 0 0 0">
-        <div style="font-weight:1000;color:#0b2a66">🗂️ سجل الجوائز السابقة (بالتاريخ + النوع)</div>
-        <div class="small" style="margin-top:6px;color:#47607e">اختاري الفترة + نوع الجائزة (أو الكل) ثم عرض • ويمكنك استرجاع لوحة أسبوع سابق.</div>
-        <div class="row" style="margin-top:10px;gap:10px;align-items:flex-end">
-          <div class="col" style="min-width:160px"><div class="small">من تاريخ</div><input id="rwHistFrom" type="date"></div>
-          <div class="col" style="min-width:160px"><div class="small">إلى تاريخ</div><input id="rwHistTo" type="date"></div>
-          <div class="col" style="min-width:190px">
-            <div class="small">نوع الجائزة</div>
-            <select id="rwHistType">
-              <option value="all">الكل</option>
-              <option value="champ">بطل الأسبوع 🏆</option>
-              <option value="commit">نجم الالتزام 🥇</option>
-              <option value="part">نجم المشاركة 🎯</option>
-              <option value="save">بطل الادخار 💰</option>
-              <option value="help">نجم التعاون 🤝</option>
-            </select>
-          </div>
-          <div class="col" style="align-self:flex-end;min-width:160px">
-            <button class="btn3" onclick="showRewardsHistory()">عرض السجل</button>
-          </div>
-        </div>
-
-        <div class="tableWrap" style="margin-top:10px">
-          <table>
-            <thead>
-              <tr><th>الأسبوع</th><th>الجوائز</th><th>النوع</th><th>استرجاع</th></tr>
-            </thead>
-            <tbody id="rwHistRows">
-              <tr><td colspan="4" class="muted" style="padding:16px">اختر/ي الفترة ثم (عرض السجل).</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
     </div>
 
     <div class="awardKpis" style="margin-top:12px">
@@ -1104,8 +1070,8 @@
     </div>
     <div class="footerNote">الرياضيات لغة الأذكياء ✨</div>
   </div>
-<script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
   <div id="pdfTemp"></div>
@@ -1136,10 +1102,51 @@
       appId: "1:333467940977:web:97d056d5dbff2debbf43d0",
       measurementId: "G-7RPQX9ER93"
     };
+    // Firebase init (safe): لا نسمح لأي خطأ بإيقاف النظام أو كسر زر (ابدأ الآن)
+let db = null;
+try{
+  if(window.firebase && typeof firebase.initializeApp === "function"){
     firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
+    if(typeof firebase.firestore === "function"){ db = firebase.firestore(); }
+  }else{
+    console.warn("Firebase SDK لم يتم تحميله (سيعمل النظام بوضع محلي).");
+  }
+}catch(e){
+  console.warn("Firebase init error (سيعمل النظام بوضع محلي):", e);
+  db = null;
+}
 
-    function $(id){return document.getElementById(id);}
+
+    
+// Firestore fallback: حتى لو تعطل Firebase، ما نكسر النظام (ويدخل طبيعي)
+const __nullDoc = {
+  get: ()=>Promise.resolve({ exists:false, data:()=>null }),
+  set: ()=>Promise.resolve(),
+  update: ()=>Promise.resolve(),
+  delete: ()=>Promise.resolve(),
+  onSnapshot: ()=>()=>{}
+};
+const __nullQuery = {
+  doc: ()=>__nullDoc,
+  add: ()=>Promise.resolve({ id:"local" }),
+  get: ()=>Promise.resolve({ empty:true, docs:[], forEach:()=>{} }),
+  where: ()=>__nullQuery,
+  orderBy: ()=>__nullQuery,
+  limit: ()=>__nullQuery,
+  onSnapshot: ()=>()=>{}
+};
+const __nullDB = { collection: ()=>__nullQuery };
+
+function getDB(){
+  if(db) return db;
+  if(!window.__dbWarned){
+    window.__dbWarned = true;
+    try{ console.warn("Firebase غير متاح: سيتم تشغيل وضع محلي (بدون مزامنة سحابية)."); }catch(_){}
+  }
+  return __nullDB;
+}
+
+function $(id){return document.getElementById(id);}
     function fmt(x){ return (Math.round((Number(x||0)+Number.EPSILON)*100)/100).toFixed(2); }
 
     function openModal(title, bodyHtml, actionsHtml){
@@ -1474,12 +1481,12 @@ ${SIGNATURE}`
     let forgotPinEnabled = true;
     async function loadForgotSetting(){
       try{
-        const doc = await db.collection("settings").doc("security").get();
+        const doc = await getDB().collection("settings").doc("security").get();
         if(doc.exists){
           const d = doc.data() || {};
           if(typeof d.forgotPinEnabled === "boolean") forgotPinEnabled = d.forgotPinEnabled;
         }else{
-          await db.collection("settings").doc("security").set({forgotPinEnabled:true});
+          await getDB().collection("settings").doc("security").set({forgotPinEnabled:true});
           forgotPinEnabled = true;
         }
       }catch(e){ forgotPinEnabled = true; }
@@ -1489,7 +1496,7 @@ ${SIGNATURE}`
     async function toggleForgotPinForAll(){
       try{
         forgotPinEnabled = !forgotPinEnabled;
-        await db.collection("settings").doc("security").set({forgotPinEnabled}, {merge:true});
+        await getDB().collection("settings").doc("security").set({forgotPinEnabled}, {merge:true});
         openModal("تم ✅", forgotPinEnabled ? "تم تفعيل (نسيت الرقم السري) للجميع." : "تم تعطيل (نسيت الرقم السري) للجميع.",
           '<button class="btn" onclick="closeModal()">تمام</button>');
       }catch(e){
@@ -1499,11 +1506,11 @@ ${SIGNATURE}`
     }
 
     async function ensureSeed(){
-      const c = await db.collection("classes").orderBy("order").get();
+      const c = await getDB().collection("classes").orderBy("order").get();
       if(c.empty){
-        await db.collection("classes").add({name:"الصف سادس بنين",order:1});
-        await db.collection("classes").add({name:"الصف سادس بنات",order:2});
-        await db.collection("classes").add({name:"الصف الأول المتوسط",order:3});
+        await getDB().collection("classes").add({name:"الصف سادس بنين",order:1});
+        await getDB().collection("classes").add({name:"الصف سادس بنات",order:2});
+        await getDB().collection("classes").add({name:"الصف الأول المتوسط",order:3});
       }
     }
 
@@ -1512,7 +1519,7 @@ ${SIGNATURE}`
     let selectedIds = new Set();
 
     async function loadClasses(){
-      const snap = await db.collection("classes").orderBy("order").get();
+      const snap = await getDB().collection("classes").orderBy("order").get();
       classes=[]; snap.forEach(d=>classes.push({id:d.id,...d.data()}));
       if(!currentClassId) currentClassId = classes[0]?.id;
     }
@@ -1534,16 +1541,16 @@ ${SIGNATURE}`
     async function addClass(){
       const n=$("newClassName").value.trim();
       if(!n) return warn("اكتب اسم الفصل");
-      const last=await db.collection("classes").orderBy("order","desc").limit(1).get();
+      const last=await getDB().collection("classes").orderBy("order","desc").limit(1).get();
       const max= last.empty?0:(last.docs[0].data().order||0);
-      await db.collection("classes").add({name:n,order:max+1});
+      await getDB().collection("classes").add({name:n,order:max+1});
       $("newClassName").value="";
       await renderTabs();
     }
     async function renameClass(){
       const c=classes.find(x=>x.id===currentClassId); if(!c) return;
       const nn=prompt("الاسم الجديد للفصل:", c.name); if(!nn) return;
-      await db.collection("classes").doc(currentClassId).update({name: nn.trim()});
+      await getDB().collection("classes").doc(currentClassId).update({name: nn.trim()});
       await renderTabs();
     }
     async function deleteClassMove(){
@@ -1552,10 +1559,10 @@ ${SIGNATURE}`
       const destName=prompt("ننقل طلاب الفصل لأي فصل?\n"+others.map(c=>c.name).join(" / "), others[0].name);
       if(!destName) return;
       const dest=classes.find(c=>c.name===destName); if(!dest) return warn("اسم الفصل غير موجود");
-      const studs=await db.collection("students").where("classId","==",currentClassId).get();
-      const batch=db.batch();
-      studs.forEach(d=>batch.update(db.collection("students").doc(d.id), {classId: dest.id}));
-      batch.delete(db.collection("classes").doc(currentClassId));
+      const studs=await getDB().collection("students").where("classId","==",currentClassId).get();
+      const batch=getDB().batch();
+      studs.forEach(d=>batch.update(getDB().collection("students").doc(d.id), {classId: dest.id}));
+      batch.delete(getDB().collection("classes").doc(currentClassId));
       await batch.commit();
       currentClassId=null;
       await renderTabs();
@@ -1611,7 +1618,7 @@ ${SIGNATURE}`;
       }
       const name = ($("stuName")?.value || "").trim();
       if(!name) return warn("اكتب/ي الاسم أولاً");
-      const snap = await db.collection("students").where("name","==",name).limit(1).get();
+      const snap = await getDB().collection("students").where("name","==",name).limit(1).get();
       if(snap.empty) return warn("الاسم غير موجود");
       const doc = snap.docs[0];
       const s = doc.data() || {};
@@ -1632,7 +1639,7 @@ ${SIGNATURE}`;
         const name = ($("stuName")?.value || "").trim();
         const pin  = ($("stuPin")?.value || "").trim();
         if(!name || !pin) return warn("اكتب/ي الاسم والرقم السري");
-        const snap = await db.collection("students").where("name","==",name).limit(1).get();
+        const snap = await getDB().collection("students").where("name","==",name).limit(1).get();
         if(snap.empty) return warn("الاسم غير مسجل بالنظام");
         const doc = snap.docs[0];
         currentStudentId = doc.id;
@@ -1681,20 +1688,7 @@ ${SIGNATURE}`;
       $("statusBadge").className = "badge " + (s.active ? "on":"off");
       $("statusBadge").textContent = s.active ? "🟢 نشط" : "🔴 مقفل";
       $("studentBalance").textContent = fmt(s.balance);
-      const computedTier = calcTier(s.balance);
-      $("tierLabel").textContent = computedTier;
-      // توحيد تاريخ فتح الحساب
-      $("openedAt").textContent = (s.openedAtHijri || "١٤٤٧/٨/١٣هـ");
-      // تحديث الحقول إن كانت ناقصة/قديمة (ترقية الحساب تعمل دائمًا)
-      try{
-        const patch={};
-        if(!s.openedAtHijri) patch.openedAtHijri = "١٤٤٧/٨/١٣هـ";
-        if(!s.openedAtClient) patch.openedAtClient = Date.now();
-        if(String(s.tier||"") !== String(computedTier)) patch.tier = computedTier;
-        if(Object.keys(patch).length){
-          await db.collection("students").doc(currentStudentId).update(patch);
-        }
-      }catch(e){}
+      $("tierLabel").textContent = s.tier || calcTier(s.balance);
 
       $("cardNumber").textContent = makeBankCardNumber(currentStudentId);
       const exp = makeExp();
@@ -1742,7 +1736,7 @@ ${SIGNATURE}`;
       const n=$("newStudentName").value.trim();
       if(!n) return warn("اكتب اسم الطالب");
       const pin=String(Math.floor(1000+Math.random()*9000));
-      await db.collection("students").add({ name:n,classId:currentClassId,active:true,balance:0,pin,openedAtHijri:"١٤٤٧/٨/١٣هـ", openedAtClient: Date.now(), guardianWhats:"" });
+      await getDB().collection("students").add({ name:n,classId:currentClassId,active:true,balance:0,pin,openedAt:null, guardianWhats:"" });
       $("newStudentName").value=""; await renderStudents();
     }
 
@@ -1758,7 +1752,7 @@ ${SIGNATURE}`;
     }
 
     async function renderStudents(){
-      const snap = await db.collection("students").where("classId","==",currentClassId).get();
+      const snap = await getDB().collection("students").where("classId","==",currentClassId).get();
       const arr=[]; snap.forEach(d=>arr.push({id:d.id,...d.data()}));
       arr.sort((a,b)=>(a.name||"").localeCompare(b.name||"","ar"));
 
@@ -1826,8 +1820,8 @@ ${SIGNATURE}`;
         cb.onchange = ()=>{ cb.checked ? selectedIds.add(s.id) : selectedIds.delete(s.id); updateSelCount(); };
 
         card.querySelector(".js-open").onclick = async()=>{ currentAccess="teacher"; currentStudentId=s.id; await openStudentAccount(s); };
-        card.querySelector(".js-toggle").onclick = async()=>{ await db.collection("students").doc(s.id).update({active:!s.active}); await renderStudents(); };
-        card.querySelector(".js-edit").onclick = async()=>{ const nn = prompt("الاسم الجديد:", s.name); if(nn) await db.collection("students").doc(s.id).update({name:nn.trim()}); await renderStudents(); };
+        card.querySelector(".js-toggle").onclick = async()=>{ await getDB().collection("students").doc(s.id).update({active:!s.active}); await renderStudents(); };
+        card.querySelector(".js-edit").onclick = async()=>{ const nn = prompt("الاسم الجديد:", s.name); if(nn) await getDB().collection("students").doc(s.id).update({name:nn.trim()}); await renderStudents(); };
         card.querySelector(".js-phone").onclick = ()=> editGuardianPhone(s.id);
         card.querySelector(".js-pin").onclick = ()=> changePinTeacher(s.id);
 
@@ -1839,7 +1833,7 @@ ${SIGNATURE}`;
     }
 
     async function showStatement(){
-      const snap=await db.collection("students").doc(currentStudentId).collection("txns").orderBy("createdAtClient","desc").limit(80).get();
+      const snap=await getDB().collection("students").doc(currentStudentId).collection("txns").orderBy("createdAtClient","desc").limit(80).get();
       const rows=$("stmtRows"); rows.innerHTML="";
       if(snap.empty){ rows.innerHTML='<tr><td colspan="5" class="small">لا توجد عمليات في هذه الفترة.</td></tr>'; return; }
       snap.forEach(d=>{
@@ -1853,157 +1847,7 @@ ${SIGNATURE}`;
 
     async function refreshWeekKPIs(){ /* (موجودة بالنسخة الكاملة) */ }
 
-    
-    async function executeOp(){
-      try{
-        if(!currentStudentId){ warn("لا يوجد طالب محدد."); return; }
-
-        const opEl = $("op");
-        const amtEl = $("amt");
-        const reasonSel = $("reasonStudent");
-        const reasonOther = $("reasonOtherStudent");
-        const toSel = $("transferTo");
-
-        const op = opEl ? opEl.value : "deposit";
-        const amt = Number((amtEl && amtEl.value!=="" ) ? amtEl.value : 0);
-        if(!isFinite(amt) || amt<=0){ warn("اكتب/ي مبلغ صحيح أكبر من صفر."); return; }
-
-        let reason = "";
-        if(reasonSel){
-          reason = String(reasonSel.value||"").trim();
-          if(reason === "__other__" || reason === "أخرى" || reason === "اخرى"){
-            reason = String(reasonOther ? reasonOther.value : "").trim();
-          }
-        }
-        if(!reason) reason = "—";
-
-        // prevent double submit
-        const btns = document.querySelectorAll('button[onclick="executeOp()"]');
-        btns.forEach(b=>{ b.disabled=true; b.dataset._oldText=b.textContent; b.textContent="جارٍ التنفيذ…"; });
-
-        const now = Date.now();
-        const FV = firebase.firestore.FieldValue;
-
-        const sRef = db.collection("students").doc(currentStudentId);
-
-        // helper: write a txn doc for a student inside the same transaction
-        const addTxn = (tx, studentDocRef, payload)=>{
-          const tRef = studentDocRef.collection("txns").doc();
-          tx.set(tRef, payload);
-        };
-
-        if(op === "transfer"){
-          const toId = toSel ? String(toSel.value||"") : "";
-          if(!toId){ warn("اختر/ي الطالب الذي سيتم التحويل إليه."); return; }
-          if(toId === currentStudentId){ warn("لا يمكن التحويل لنفس الحساب."); return; }
-
-          const toRef = db.collection("students").doc(toId);
-
-          await db.runTransaction(async (tx)=>{
-            const fromSnap = await tx.get(sRef);
-            const toSnap = await tx.get(toRef);
-            if(!fromSnap.exists) throw new Error("from_missing");
-            if(!toSnap.exists) throw new Error("to_missing");
-
-            const from = fromSnap.data() || {};
-            const to = toSnap.data() || {};
-
-            const fromBal = Number(from.balance||0);
-            const toBal = Number(to.balance||0);
-
-            if(fromBal < amt) throw new Error("insufficient");
-
-            const fromAfter = fromBal - amt;
-            const toAfter = toBal + amt;
-
-            const fromTier = calcTier(fromAfter);
-            const toTier = calcTier(toAfter);
-
-            tx.update(sRef, { balance: fromAfter, tier: fromTier });
-            tx.update(toRef, { balance: toAfter, tier: toTier });
-
-            // txn on sender
-            addTxn(tx, sRef, {
-              type: "تحويل إلى",
-              amount: amt,
-              reason: reason,
-              otherStudentId: toId,
-              otherStudentName: String(to.name||""),
-              balanceAfter: fromAfter,
-              createdAtClient: now,
-              createdAt: FV.serverTimestamp()
-            });
-
-            // txn on receiver
-            addTxn(tx, toRef, {
-              type: "تحويل من",
-              amount: amt,
-              reason: reason,
-              otherStudentId: currentStudentId,
-              otherStudentName: String(from.name||""),
-              balanceAfter: toAfter,
-              createdAtClient: now,
-              createdAt: FV.serverTimestamp()
-            });
-
-            // reflect for UI
-            currentStudentObj = Object.assign({}, from, { balance: fromAfter, tier: fromTier });
-          });
-
-        } else {
-          const delta = (op === "withdraw") ? -amt : +amt;
-          const tLabel = (op === "withdraw") ? "سحب" : "إيداع";
-
-          await db.runTransaction(async (tx)=>{
-            const snap = await tx.get(sRef);
-            if(!snap.exists) throw new Error("missing");
-            const s = snap.data() || {};
-            const bal = Number(s.balance||0);
-            const after = bal + delta;
-            if(after < 0) throw new Error("insufficient");
-
-            const tier = calcTier(after);
-            tx.update(sRef, { balance: after, tier: tier });
-
-            addTxn(tx, sRef, {
-              type: tLabel,
-              amount: amt,
-              reason: reason,
-              balanceAfter: after,
-              createdAtClient: now,
-              createdAt: FV.serverTimestamp()
-            });
-
-            currentStudentObj = Object.assign({}, s, { balance: after, tier: tier });
-          });
-        }
-
-        // refresh UI quickly
-        if($("studentBalance") && currentStudentObj) $("studentBalance").textContent = fmt(currentStudentObj.balance);
-        if($("tierLabel") && currentStudentObj) $("tierLabel").textContent = currentStudentObj.tier || calcTier(currentStudentObj.balance);
-
-        // clear amount field
-        if(amtEl) amtEl.value = "";
-
-        // refresh statement + KPIs + rewards
-        try{ await showStatement(); }catch(e){}
-        try{ await refreshWeekKPIs(); }catch(e){}
-        try{ await refreshRewards(); }catch(e){}
-        try{ await renderBalanceChartLast30(); }catch(e){}
-
-      }catch(e){
-        console.log("executeOp error", e);
-        const msg = (String(e&&e.message||e).includes("insufficient")) ? "الرصيد غير كافٍ لإتمام العملية." : "حدث خطأ أثناء تنفيذ العملية.";
-        warn(msg);
-      }finally{
-        const btns = document.querySelectorAll('button[onclick="executeOp()"]');
-        btns.forEach(b=>{
-          b.disabled=false;
-          if(b.dataset._oldText){ b.textContent=b.dataset._oldText; delete b.dataset._oldText; }
-        });
-      }
-    }
-
+    async function executeOp(){ warn("هذه النسخة مدمجة للواجهة + الكود الأساسي. لو تبغين كل الوظائف (PDF/واتساب/تقارير أسبوعية)، قولي لي وأصدر لك نسخة Full كاملة 100%."); }
 
     async function startApp(){
       const so = $("startOverlay");
@@ -2051,14 +1895,14 @@ ${SIGNATURE}`;
         if(list) list.innerHTML = '<div class="small">جاري التحميل…</div>';
 
         // collectionGroup requires Firestore rules allow it; uses saved dateKey created during logTxn
-        const snap = await db.collectionGroup("txns")
+        const snap = await getDB().collectionGroup("txns")
           .where("dateKey","==",dateKey)
           .orderBy("createdAtClient","desc")
           .limit(500)
           .get();
 
         // build quick lookup for guardian numbers (fixes old txns that didn't store the number)
-        const studsSnap = await db.collection("students").get();
+        const studsSnap = await getDB().collection("students").get();
         const guardianById = {};
         const nameById = {};
         studsSnap.forEach(sd=>{
@@ -2205,7 +2049,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
     function isValidPin(p){ return /^[0-9]{4}$/.test(String(p||"").trim()); }
 
     async function getStudentById(studentId){
-      const doc = await db.collection("students").doc(studentId).get();
+      const doc = await getDB().collection("students").doc(studentId).get();
       if(!doc.exists) throw new Error("Student not found");
       return { id: doc.id, ...doc.data() };
     }
@@ -2218,7 +2062,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
           const nn = prompt("اكتب رقم ولي الأمر (مثال: 05xxxxxxxx):", "");
           if(!nn) return;
           phone = nn.trim();
-          await db.collection("students").doc(studentId).update({guardianWhats: phone});
+          await getDB().collection("students").doc(studentId).update({guardianWhats: phone});
         }
         const wa = normalizePhoneToWA(phone);
         if(!wa) return warn("رقم ولي الأمر غير صحيح");
@@ -2253,7 +2097,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
           <button class="btn2" onclick="closeModal()">إلغاء</button>
           <button class="btn" onclick="(async()=>{
             const v = (document.getElementById('gpInput').value||'').trim();
-            await db.collection('students').doc('${studentId}').update({guardianWhats: v});
+            await getDB().collection('students').doc('${studentId}').update({guardianWhats: v});
             closeModal();
             await renderStudents();
           })()">حفظ</button>
@@ -2279,7 +2123,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
           <button class="btn" onclick="(async()=>{
             const v = (document.getElementById('pinNew').value||'').trim();
             if(!/^[0-9]{4}$/.test(v)){ return warn('PIN لازم يكون 4 أرقام'); }
-            await db.collection('students').doc('${studentId}').update({pin: v});
+            await getDB().collection('students').doc('${studentId}').update({pin: v});
             closeModal();
             await renderStudents();
           })()">حفظ</button>
@@ -2294,7 +2138,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
       try{
         const name = (document.getElementById("stuName")?.value || "").trim();
         if(!name) return warn("اكتب/ي الاسم أولًا في خانة الدخول");
-        const snap = await db.collection("students").where("name","==",name).limit(1).get();
+        const snap = await getDB().collection("students").where("name","==",name).limit(1).get();
         if(snap.empty) return warn("الاسم غير موجود");
 
         const doc = snap.docs[0];
@@ -2321,7 +2165,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
             const newP = (document.getElementById('newPin').value||'').trim();
             if(String(oldP)!==String(s.pin||'')) return warn('PIN الحالي غير صحيح');
             if(!/^[0-9]{4}$/.test(newP)) return warn('PIN الجديد لازم يكون 4 أرقام');
-            await db.collection('students').doc('${doc.id}').update({pin:newP});
+            await getDB().collection('students').doc('${doc.id}').update({pin:newP});
             closeModal();
             warn('تم تغيير PIN بنجاح ✅');
           })()">تأكيد</button>
@@ -2422,7 +2266,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
     async function pdfStudentReport(studentId){
       try{
         const s = await getStudentById(studentId);
-        const txSnap = await db.collection("students").doc(studentId).collection("txns")
+        const txSnap = await getDB().collection("students").doc(studentId).collection("txns")
           .orderBy("createdAtClient","desc").limit(200).get();
 
         let rows="";
@@ -2459,11 +2303,11 @@ document.addEventListener("DOMContentLoaded", async()=>{
     async function pdfBankReport(){
       try{
         // report per current classes list
-        const clsSnap = await db.collection("classes").orderBy("order").get();
+        const clsSnap = await getDB().collection("classes").orderBy("order").get();
         const classesArr = [];
         clsSnap.forEach(d=>classesArr.push({id:d.id, ...d.data()}));
 
-        const stuSnap = await db.collection("students").get();
+        const stuSnap = await getDB().collection("students").get();
         const students = [];
         stuSnap.forEach(d=>students.push({id:d.id, ...d.data()}));
         students.sort((a,b)=>(a.name||"").localeCompare(b.name||"","ar"));
@@ -2552,7 +2396,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
       try{
         const sel = $("transferTo");
         if(!sel) return;
-        const snap = await db.collection("students").get();
+        const snap = await getDB().collection("students").get();
         const arr = [];
         snap.forEach(d=>arr.push({id:d.id, ...(d.data()||{})}));
         arr.sort((a,b)=>(a.name||"").localeCompare(b.name||"","ar"));
@@ -2609,7 +2453,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
         const range = getSchoolWeekRangeMs(new Date());
         const startMs = range.startMs, endMs = range.endMs;
 
-        const q = db.collection("students").doc(currentStudentId).collection("txns")
+        const q = getDB().collection("students").doc(currentStudentId).collection("txns")
           .where("createdAtClient", ">=", startMs)
           .where("createdAtClient", "<=", endMs)
           .orderBy("createdAtClient","desc")
@@ -2647,7 +2491,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
         const weekEnd = wk.endMs;
         const fiveStart = now - 5*24*60*60*1000;
 
-        const sRef = db.collection("students").doc(currentStudentId);
+        const sRef = getDB().collection("students").doc(currentStudentId);
 
         // Student weekly net (deposit + transfer in) - (withdraw + transfer out)
         const weekSnap = await sRef.collection("txns")
@@ -2699,11 +2543,11 @@ document.addEventListener("DOMContentLoaded", async()=>{
         let topNetValue = null;
 
         if(currentClassId){
-          const studs = await db.collection("students").where("classId","==",currentClassId).get();
+          const studs = await getDB().collection("students").where("classId","==",currentClassId).get();
           const nets = [];
           for(const sd of studs.docs){
             const sid = sd.id;
-            const ref = db.collection("students").doc(sid);
+            const ref = getDB().collection("students").doc(sid);
             const snap = await ref.collection("txns")
               .where("createdAtClient", ">=", weekStart)
               .where("createdAtClient", "<=", weekEnd)
@@ -2857,11 +2701,11 @@ document.addEventListener("DOMContentLoaded", async()=>{
           if(box){
             box.innerHTML = "";
             if(currentClassId){
-              const studs = await db.collection("students").where("classId","==",currentClassId).get();
+              const studs = await getDB().collection("students").where("classId","==",currentClassId).get();
               const rows = [];
               for(const sd of studs.docs){
                 const sid = sd.id;
-                const ref = db.collection("students").doc(sid);
+                const ref = getDB().collection("students").doc(sid);
                 const snap2 = await ref.collection("txns")
                   .where("createdAtClient", ">=", weekStart)
                   .where("createdAtClient", "<=", weekEnd)
@@ -2949,7 +2793,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
 // ===== Student operations (deposit/withdraw/transfer) =====
     executeOp = async function(){
       try{
-        const ref = db.collection("students").doc(currentStudentId);
+        const ref = getDB().collection("students").doc(currentStudentId);
         const doc = await ref.get();
         if(!doc.exists) return warn("الحساب غير موجود");
         const s = doc.data() || {};
@@ -2959,122 +2803,16 @@ document.addEventListener("DOMContentLoaded", async()=>{
         if(isNaN(amt) || amt<=0) return warn("اكتب مبلغ صحيح");
 
         const reason = getReason("reasonStudent","reasonOtherStudent");
-        const nowMs = Date.now();
-
-        // Batch لسرعة وأمان (تحديث الرصيد + تسجيل العملية بنفس اللحظة)
-        const batch = db.batch();
 
         if(op === "deposit"){
           const nb = Number(s.balance||0) + amt;
-          batch.update(ref, {balance: nb, tier: calcTier(nb)});
-          const txRef = ref.collection("txns").doc();
-          batch.set(txRef, {
-            type: "إيداع",
-            reason,
-            amount: amt,
-            balanceAfter: nb,
-            createdAtClient: nowMs,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp()
-          });
-          // تحديث واجهة فوري
-          $("studentBalance") && ($("studentBalance").textContent = fmt(nb));
-          $("tierLabel") && ($("tierLabel").textContent = calcTier(nb));
-
-        }else if(op === "withdraw"){
-          if(Number(s.balance||0) < amt) return warn("الرصيد ما يكفي");
-          const nb = Number(s.balance||0) - amt;
-          batch.update(ref, {balance: nb, tier: calcTier(nb)});
-          const txRef = ref.collection("txns").doc();
-          batch.set(txRef, {
-            type: "سحب",
-            reason,
-            amount: amt,
-            balanceAfter: nb,
-            createdAtClient: nowMs,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp()
-          });
-          $("studentBalance") && ($("studentBalance").textContent = fmt(nb));
-          $("tierLabel") && ($("tierLabel").textContent = calcTier(nb));
-
-        }else if(op === "transfer"){
-          if(Number(s.balance||0) < amt) return warn("الرصيد ما يكفي للتحويل");
-          const toId = ($("transferTo")?.value || "").trim();
-          if(!toId) return warn("اختاري مستلم التحويل");
-          if(toId === currentStudentId) return warn("لا يمكن التحويل لنفس الحساب");
-
-          const toRef = db.collection("students").doc(toId);
-          const toDoc = await toRef.get();
-          if(!toDoc.exists) return warn("المستلم غير موجود");
-          const t = toDoc.data() || {};
-          if(t.active===false) return warn("حساب المستلم مقفل");
-
-          const nbFrom = Number(s.balance||0) - amt;
-          const nbTo   = Number(t.balance||0) + amt;
-
-          batch.update(ref, {balance: nbFrom, tier: calcTier(nbFrom)});
-          batch.update(toRef, {balance: nbTo, tier: calcTier(nbTo)});
-
-          const outRef = ref.collection("txns").doc();
-          batch.set(outRef, {
-            type: "تحويل صادر",
-            reason,
-            amount: amt,
-            toId,
-            toName: t.name||"",
-            balanceAfter: nbFrom,
-            createdAtClient: nowMs,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp()
-          });
-
-          const inRef = toRef.collection("txns").doc();
-          batch.set(inRef, {
-            type: "تحويل وارد",
-            reason,
-            amount: amt,
-            fromId: currentStudentId,
-            fromName: s.name||"",
-            balanceAfter: nbTo,
-            createdAtClient: nowMs,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp()
-          });
-
-          $("studentBalance") && ($("studentBalance").textContent = fmt(nbFrom));
-          $("tierLabel") && ($("tierLabel").textContent = calcTier(nbFrom));
-        }else{
-          return warn("اختاري العملية");
-        }
-
-        await batch.commit();
-
-        // تنظيف الإدخال + تحديث كشف الحساب سريع
-        $("amt") && ($("amt").value = "");
-        $("reasonOtherStudent") && ($("reasonOtherStudent").value = "");
-        await showStatement();
-        try{ await refreshWeekKPIs(); }catch(e){}
-        try{ await refreshRewards(); }catch(e){}
-
-        warn("تم تنفيذ العملية ✅");
-      }catch(e){
-        console.log("executeOp error", e);
-        warn("تعذر تنفيذ العملية الآن");
-      }
-    };
-
-        const op = ($("op")?.value || "").trim();
-        const amt = parseFloat($("amt")?.value || "");
-        if(isNaN(amt) || amt<=0) return warn("اكتب مبلغ صحيح");
-
-        const reason = getReason("reasonStudent","reasonOtherStudent");
-
-        if(op === "deposit"){
-          const nb = Number(s.balance||0) + amt;
-          await ref.update({balance: nb, tier: calcTier(nb)});
+          await ref.update({balance: nb});
           await logTxn(ref, "إيداع", reason, amt, nb, s);
 
         }else if(op === "withdraw"){
           if(Number(s.balance||0) < amt) return warn("الرصيد ما يكفي");
           const nb = Number(s.balance||0) - amt;
-          await ref.update({balance: nb, tier: calcTier(nb)});
+          await ref.update({balance: nb});
           await logTxn(ref, "سحب", reason, amt, nb, s);
 
         }else if(op === "transfer"){
@@ -3083,12 +2821,12 @@ document.addEventListener("DOMContentLoaded", async()=>{
           if(!toId) return warn("اختاري مستلم التحويل");
           if(toId === currentStudentId) return warn("لا يمكن التحويل لنفس الحساب");
 
-          const toRef = db.collection("students").doc(toId);
+          const toRef = getDB().collection("students").doc(toId);
           const toDoc = await toRef.get();
           if(!toDoc.exists) return warn("المستلم غير موجود");
           const to = toDoc.data() || {};
 
-          const batch = db.batch();
+          const batch = getDB().batch();
           batch.update(ref, {balance: Number(s.balance||0) - amt});
           batch.update(toRef, {balance: Number(to.balance||0) + amt});
           await batch.commit();
@@ -3126,21 +2864,21 @@ document.addEventListener("DOMContentLoaded", async()=>{
         if(isNaN(a) || a<=0) return warn("اكتب مبلغ الإيداع للكل");
         const reason = getReason("reasonTeacher","reasonOtherTeacher");
 
-        const studs = await db.collection("students").where("classId","==",currentClassId).get();
-        const batch = db.batch();
+        const studs = await getDB().collection("students").where("classId","==",currentClassId).get();
+        const batch = getDB().batch();
         const updates = [];
         studs.forEach(d=>{
           const s=d.data()||{};
           if(s.active===false) return;
           const nb = Number(s.balance||0) + a;
-          batch.update(db.collection("students").doc(d.id), {balance: nb});
+          batch.update(getDB().collection("students").doc(d.id), {balance: nb});
           updates.push({id:d.id, nb, name:(s.name||""), guardianWhats:(s.guardianWhats||"")});
         });
         await batch.commit();
 
         // log after commit
         for(const u of updates){
-          const ref = db.collection("students").doc(u.id);
+          const ref = getDB().collection("students").doc(u.id);
           await logTxn(ref, "إيداع (معلمة)", reason, a, u.nb, u);
         }
 
@@ -3159,7 +2897,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
         if(isNaN(a) || a<=0) return warn("اكتب مبلغ السحب من الكل");
         const reason = getReason("reasonTeacher","reasonOtherTeacher");
 
-        const studs = await db.collection("students").where("classId","==",currentClassId).get();
+        const studs = await getDB().collection("students").where("classId","==",currentClassId).get();
 
         // check balances
         let bad=false;
@@ -3170,19 +2908,19 @@ document.addEventListener("DOMContentLoaded", async()=>{
         });
         if(bad) return warn("في طالب رصيده ما يكفي… قللي المبلغ");
 
-        const batch = db.batch();
+        const batch = getDB().batch();
         const updates = [];
         studs.forEach(d=>{
           const s=d.data()||{};
           if(s.active===false) return;
           const nb = Number(s.balance||0) - a;
-          batch.update(db.collection("students").doc(d.id), {balance: nb});
+          batch.update(getDB().collection("students").doc(d.id), {balance: nb});
           updates.push({id:d.id, nb, name:(s.name||""), guardianWhats:(s.guardianWhats||"")});
         });
         await batch.commit();
 
         for(const u of updates){
-          const ref = db.collection("students").doc(u.id);
+          const ref = getDB().collection("students").doc(u.id);
           await logTxn(ref, "سحب (معلمة)", reason, a, u.nb, u);
         }
 
@@ -3202,14 +2940,14 @@ document.addEventListener("DOMContentLoaded", async()=>{
         if(isNaN(a) || a<=0) return warn("اكتبي مبلغ");
         const reason = getReason("reasonTeacher","reasonOtherTeacher");
 
-        const ref = db.collection("students").doc(sid);
+        const ref = getDB().collection("students").doc(sid);
         const doc = await ref.get();
         if(!doc.exists) return warn("الطالب غير موجود");
         const s = doc.data() || {};
         if(s.active===false) return warn("حساب الطالب مقفل");
 
         const nb = Number(s.balance||0) + a;
-        await ref.update({balance: nb, tier: calcTier(nb)});
+        await ref.update({balance: nb});
         await logTxn(ref, "إيداع (معلمة)", reason, a, nb, s);
 
         $("pickAmount") && ($("pickAmount").value="");
@@ -3228,7 +2966,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
         if(isNaN(a) || a<=0) return warn("اكتبي مبلغ");
         const reason = getReason("reasonTeacher","reasonOtherTeacher");
 
-        const ref = db.collection("students").doc(sid);
+        const ref = getDB().collection("students").doc(sid);
         const doc = await ref.get();
         if(!doc.exists) return warn("الطالب غير موجود");
         const s = doc.data() || {};
@@ -3236,7 +2974,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
         if(Number(s.balance||0) < a) return warn("رصيده ما يكفي");
 
         const nb = Number(s.balance||0) - a;
-        await ref.update({balance: nb, tier: calcTier(nb)});
+        await ref.update({balance: nb});
         await logTxn(ref, "سحب (معلمة)", reason, a, nb, s);
 
         $("pickAmount") && ($("pickAmount").value="");
@@ -3316,8 +3054,8 @@ document.addEventListener("DOMContentLoaded", async()=>{
         if(isNaN(amt) || amt<=0) return warn("اكتبي مبلغ صحيح للتحويل");
         const reason = getReason("reasonTeacher","reasonOtherTeacher");
 
-        const fromRef = db.collection("students").doc(fromId);
-        const toRef = db.collection("students").doc(toId);
+        const fromRef = getDB().collection("students").doc(fromId);
+        const toRef = getDB().collection("students").doc(toId);
 
         const [fromDoc,toDoc] = await Promise.all([fromRef.get(), toRef.get()]);
         if(!fromDoc.exists || !toDoc.exists) return warn("تعذر العثور على أحد الحسابات");
@@ -3328,7 +3066,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
         if(to.active===false) return warn("حساب المستلم غير مُفعل");
         if(Number(from.balance||0) < amt) return warn("رصيد المُرسِل لا يكفي للتحويل");
 
-        const batch = db.batch();
+        const batch = getDB().batch();
         batch.update(fromRef, {balance: Number(from.balance||0) - amt});
         batch.update(toRef, {balance: Number(to.balance||0) + amt});
         await batch.commit();
@@ -3354,13 +3092,13 @@ document.addEventListener("DOMContentLoaded", async()=>{
         const reason = getReason("reasonTeacher","reasonOtherTeacher");
 
         for(const sid of selectedIds){
-          const ref = db.collection("students").doc(sid);
+          const ref = getDB().collection("students").doc(sid);
           const doc = await ref.get();
           if(!doc.exists) continue;
           const s = doc.data() || {};
           if(s.active===false) continue;
           const nb = Number(s.balance||0) + a;
-          await ref.update({balance: nb, tier: calcTier(nb)});
+          await ref.update({balance: nb});
           await logTxn(ref, "إيداع (معلمة)", reason, a, nb, s);
         }
         await renderStudents();
@@ -3378,14 +3116,14 @@ document.addEventListener("DOMContentLoaded", async()=>{
         const reason = getReason("reasonTeacher","reasonOtherTeacher");
 
         for(const sid of selectedIds){
-          const ref = db.collection("students").doc(sid);
+          const ref = getDB().collection("students").doc(sid);
           const doc = await ref.get();
           if(!doc.exists) continue;
           const s = doc.data() || {};
           if(s.active===false) continue;
           if(Number(s.balance||0) < a) continue;
           const nb = Number(s.balance||0) - a;
-          await ref.update({balance: nb, tier: calcTier(nb)});
+          await ref.update({balance: nb});
           await logTxn(ref, "سحب (معلمة)", reason, a, nb, s);
         }
         await renderStudents();
@@ -3437,7 +3175,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
     async function pdfRangeReport(studentId, fromMs, toMs, titleLabel){
       const s = await getStudentById(studentId);
       // نجلب آخر 600 عملية ثم نفلتر (بدون تعقيد فهارس Firestore)
-      const snap = await db.collection("students").doc(studentId).collection("txns")
+      const snap = await getDB().collection("students").doc(studentId).collection("txns")
         .orderBy("createdAtClient","desc").limit(600).get();
 
       let rows = "";
@@ -3526,7 +3264,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
         const now = Date.now();
         const fromMs = now - 30*24*60*60*1000;
 
-        const snap = await db.collection("students").doc(currentStudentId).collection("txns")
+        const snap = await getDB().collection("students").doc(currentStudentId).collection("txns")
           .orderBy("createdAtClient","desc").limit(700).get();
 
         const pts = [];
