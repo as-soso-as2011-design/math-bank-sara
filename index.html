@@ -2193,13 +2193,33 @@ function applyTierTheme(balanceOrKey){
     async function executeOp(){ warn("هذه النسخة مدمجة للواجهة + الكود الأساسي. لو تبغين كل الوظائف (PDF/واتساب/تقارير أسبوعية)، قولي لي وأصدر لك نسخة Full كاملة 100%."); }
 
     async function startApp(){
-      const so = $("startOverlay");
-      if(so){ so.classList.add("hidden"); so.style.display="none"; }
-      showOnboarding(()=>{
-        hideAllPages();
-        if(IS_STUDENT_ENTRY){ show("studentLoginPage"); currentAccess="student"; }
-        else{ show("teacherLoginPage"); currentAccess="teacher"; }
-      });
+      try{
+        const so = $("startOverlay");
+        if(so){ so.classList.add("hidden"); so.style.display="none"; }
+
+        // بعض الأجهزة/المتصفحات قد تمنع ظهور شاشة الإرشاد أو يحصل خطأ JS؛ لذلك نجعل الدخول مباشرًا دائمًا
+        const goNext = ()=>{
+          hideAllPages();
+          if(IS_STUDENT_ENTRY){ show("studentLoginPage"); currentAccess="student"; }
+          else{ show("teacherLoginPage"); currentAccess="teacher"; }
+        };
+
+        // إذا كانت شاشة الإرشاد موجودة نعرضها، وإلا ندخل مباشرة
+        const ov = $("onboardOverlay");
+        if(ov){
+          try{ showOnboarding(goNext); }
+          catch(e){ goNext(); }
+        }else{
+          goNext();
+        }
+      }catch(err){
+        // آخر حل: دخول مباشر بدون أي شاشات وسيطة
+        try{
+          hideAllPages();
+          if(IS_STUDENT_ENTRY){ show("studentLoginPage"); currentAccess="student"; }
+          else{ show("teacherLoginPage"); currentAccess="teacher"; }
+        }catch(e){}
+      }
     }
 
     
