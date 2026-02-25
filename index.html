@@ -1724,119 +1724,50 @@ ${SIGNATURE}`;
 
     
     // ===== Celebration on each student login =====
-    // ===== Congrats (random + gendered) =====
-    function isLikelyFemale(name){
-      const n = String(name||"").trim();
-      if(!n) return false;
-      // heuristic: many female names end with ة / ه (فاطمه) / ى / اء
-      return /[هةى]$/.test(n) || /اء$/.test(n);
-    }
-
-    const CONGRATS_BY_TIER = {
-      bronze: {
-        male: [
-          "أهلًا {name}! بداية قوية… خلك قريب من الفضي 💪✨",
-          "يا {name}! اليوم نرفع الرصيد خطوة خطوة 🚀",
-          "يا {name}! اجتهادك واضح… كمل وبتوصل 🎯✨"
-        ],
-        female: [
-          "أهلًا {name}! بداية قوية… خليكي قريبة من الفضي 💪✨",
-          "يا {name}! اليوم نرفع الرصيد خطوة خطوة 🚀",
-          "يا {name}! اجتهادك واضح… كمّلي وبتوصلي 🎯✨"
-        ]
-      },
-      silver: {
-        male: [
-          "🎉 مبروك يا {name}! وصلت للمستوى الفضي… استمر في التألق! 🥈✨",
-          "👏 رائع يا {name}! إنجاز فضي يليق بالمجتهدين!",
-          "✨ تقدم جميل يا {name}! القادم أحلى بإذن الله."
-        ],
-        female: [
-          "🎉 مبروك يا {name}! وصلتي للمستوى الفضي… استمري في التألق! 🥈✨",
-          "👏 رائعة يا {name}! إنجاز فضي يليق بالمجتهدات!",
-          "✨ تقدم جميل يا {name}! القادم أحلى بإذن الله."
-        ]
-      },
-      gold: {
-        male: [
-          "🏆 مبهر يا {name}! وصلت للمستوى الذهبي… أداء ذهبي! 🥇",
-          "🌟 يا {name}! إنجاز ذهبي نفتخر فيه… استمر!",
-          "🔥 يا {name}! مستوى الأبطال… ممتاز!"
-        ],
-        female: [
-          "🏆 مبهر يا {name}! وصلتي للمستوى الذهبي… أداء ذهبي! 🥇",
-          "🌟 يا {name}! إنجاز ذهبي نفتخر فيه… استمري!",
-          "🔥 يا {name}! مستوى البطلات… ممتاز!"
-        ]
-      },
-      diamond: {
-        male: [
-          "💎 مذهل يا {name}! وصلت للمستوى الماسي… أنت من النخبة! 🔷",
-          "🚀 يا {name}! تفوق من مستوى آخر… كمل!",
-          "👑 يا {name}! حضورك قوي ورصيدك أقوى!"
-        ],
-        female: [
-          "💎 مذهلة يا {name}! وصلتي للمستوى الماسي… أنتِ من النخبة! 🔷",
-          "🚀 يا {name}! تفوق من مستوى آخر… كمّلي!",
-          "👑 يا {name}! حضورك قوي ورصيدك أقوى!"
-        ]
-      },
-      elite: {
-        male: [
-          "👑 تهانينا يا {name}! وصلت للألماسي… أعلى مستوى! 💎🎆",
-          "🎆 يا {name}! قمة التميز حققتها بجدارة!",
-          "🏅 يا {name}! أنت بطل الإنجاز… فخر!"
-        ],
-        female: [
-          "👑 تهانينا يا {name}! وصلتي للألماسي… أعلى مستوى! 💎🎆",
-          "🎆 يا {name}! قمة التميز حققتها بجدارة!",
-          "🏅 يا {name}! أنتِ بطلة الإنجاز… فخر!"
-        ]
-      }
-    };
+    const CONGRATS_MESSAGES = [
+      "يا بطل/ـة {name}! دخولك اليوم يساوي خطوة جديدة نحو التميز ✨",
+      "أهلًا {name}! جاهز/ة تكسر الأرقام وتلمع بالإنجاز؟ 🌟",
+      "مرحبًا {name}! طاقتك اليوم رهيبة… خلّنا نبدأ 💪✨",
+      "يا سلام يا {name}! أنت أقوى من أي مسألة… انطلق 🚀",
+      "{name}… حماسك يفرّح! اليوم يوم نجاحك 🎯✨",
+      "هلا {name}! كل رصيد تجمعه شهادة على اجتهادك 👏💎",
+      "يا مبدع/ـة {name}! بنك الرياضيات يقول: WOW! 🎆",
+      "صباح/مساء الخير {name}! جاهزين نرفع المستوى؟ 🔥✨",
+      "يا {name}! دخولك = بداية إنجاز جديد… استمر 🌈✨",
+      "يا {name}! أنت قدها وقدود… ورصيدك يثبت! 🏆✨"
+    ];
 
     function pickRandom(arr){
       return arr[Math.floor(Math.random()*arr.length)];
     }
 
-    function formatTpl(tpl, s){
-      const nm = (s?.name || "طالب/طالبة");
-      return String(tpl||"").replaceAll("{name}", nm);
-    }
-
-    function pickCongratsMessage(s){
-      const bal = Number(s?.balance ?? s?.bal ?? 0);
-      const tierKey = (typeof tierKeyFromBalance === "function") ? tierKeyFromBalance(bal) : "bronze";
-      const gender = isLikelyFemale(s?.name) ? "female" : "male";
-      const tierBucket = CONGRATS_BY_TIER[tierKey] || CONGRATS_BY_TIER.bronze;
-      const arr = tierBucket[gender] || tierBucket.male || [];
-      if(!arr.length) return "";
-      return formatTpl(pickRandom(arr), s);
+    function formatCongratsMessage(tpl, s){
+      const nm = (s?.name || "صديقي/صديقتي");
+      return tpl.replaceAll("{name}", nm);
     }
 
     function openCongrats(s){
-(s){
       const tier = (window.currentTierLabel || $("tierLabel")?.textContent || "—").trim();
       const bal  = ($("studentBalance")?.textContent || "0").trim();
 
       // random message
-      const msg = pickCongratsMessage(s);
-      $("congratsMsg") && ($("congratsMsg").textContent = msg);
+      const msg = formatCongratsMessage(pickRandom(CONGRATS_MESSAGES), s);
+      $("congratsMsg").textContent = msg;
 
       // sub line
-      $("congratsSub") && ($("congratsSub").innerHTML =
-        `🏅 مستواك الحالي: <b>${tier}</b> &nbsp;•&nbsp; 💰 رصيدك: <b>${bal}</b> ر.س`);
+      $("congratsSub").innerHTML =
+        `🏅 مستواك الحالي: <b>${tier}</b> &nbsp;•&nbsp; 💰 رصيدك: <b>${bal}</b> ر.س`;
 
       // show layers
       $("celebrateOverlay")?.classList.add("active");
       $("congratsToast")?.classList.add("active");
 
       // spawn effects
-      try{ typeof spawnSparks==="function" && spawnSparks(46); }catch(e){}
-      try{ typeof spawnFireworks==="function" && spawnFireworks(12); }catch(e){}
+      spawnSparks(46);
+      spawnFireworks(12);
 
       // play short success jingle
-      try{ typeof playSuccessJingle==="function" && playSuccessJingle(); }catch(e){}
+      playSuccessJingle();
       // auto close effects layer after a bit (toast stays until close)
       setTimeout(()=>{ $("celebrateOverlay")?.classList.remove("active"); }, 1400);
     }
@@ -2193,33 +2124,13 @@ function applyTierTheme(balanceOrKey){
     async function executeOp(){ warn("هذه النسخة مدمجة للواجهة + الكود الأساسي. لو تبغين كل الوظائف (PDF/واتساب/تقارير أسبوعية)، قولي لي وأصدر لك نسخة Full كاملة 100%."); }
 
     async function startApp(){
-      try{
-        const so = $("startOverlay");
-        if(so){ so.classList.add("hidden"); so.style.display="none"; }
-
-        // بعض الأجهزة/المتصفحات قد تمنع ظهور شاشة الإرشاد أو يحصل خطأ JS؛ لذلك نجعل الدخول مباشرًا دائمًا
-        const goNext = ()=>{
-          hideAllPages();
-          if(IS_STUDENT_ENTRY){ show("studentLoginPage"); currentAccess="student"; }
-          else{ show("teacherLoginPage"); currentAccess="teacher"; }
-        };
-
-        // إذا كانت شاشة الإرشاد موجودة نعرضها، وإلا ندخل مباشرة
-        const ov = $("onboardOverlay");
-        if(ov){
-          try{ showOnboarding(goNext); }
-          catch(e){ goNext(); }
-        }else{
-          goNext();
-        }
-      }catch(err){
-        // آخر حل: دخول مباشر بدون أي شاشات وسيطة
-        try{
-          hideAllPages();
-          if(IS_STUDENT_ENTRY){ show("studentLoginPage"); currentAccess="student"; }
-          else{ show("teacherLoginPage"); currentAccess="teacher"; }
-        }catch(e){}
-      }
+      const so = $("startOverlay");
+      if(so){ so.classList.add("hidden"); so.style.display="none"; }
+      showOnboarding(()=>{
+        hideAllPages();
+        if(IS_STUDENT_ENTRY){ show("studentLoginPage"); currentAccess="student"; }
+        else{ show("teacherLoginPage"); currentAccess="teacher"; }
+      });
     }
 
     
