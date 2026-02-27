@@ -1715,7 +1715,17 @@ ${SIGNATURE}`;
       $("statusBadge").className = "badge " + (s.active ? "on":"off");
       $("statusBadge").textContent = s.active ? "🟢 نشط" : "🔴 مقفل";
       $("studentBalance").textContent = fmt(s.balance);
-      $("tierLabel").textContent = s.tier || calcTier(s.balance);
+      const __computedTier = calcTier(s.balance);
+      // Sync stored tier with balance so it never stays outdated (fixes Gold not showing, roulette eligibility, etc.)
+      try{
+        if(s.tier !== __computedTier){
+          s.tier = __computedTier;
+          if(typeof db !== "undefined" && db && currentStudentId){
+            db.collection("students").doc(currentStudentId).update({tier: __computedTier}).catch(()=>{});
+          }
+        }
+      }catch(e){}
+      $("tierLabel").textContent = __computedTier;
 
        try{ setupRouletteUI(); }catch(e){}
 
@@ -3018,7 +3028,9 @@ document.addEventListener("DOMContentLoaded", async()=>{
         const updated = await ref.get();
         const u = updated.data() || {};
         $("studentBalance") && ($("studentBalance").textContent = fmt(u.balance));
-        $("tierLabel") && ($("tierLabel").textContent = calcTier(u.balance));
+        const __t = calcTier(u.balance);
+        $("tierLabel") && ($("tierLabel").textContent = __t);
+        try{ await ref.update({tier: __t}); }catch(e){}
         $("amt") && ($("amt").value = "");
         setupReasonUI($("op")?.value || "deposit",'reasonStudent','reasonOtherStudent');
         await showStatement();
