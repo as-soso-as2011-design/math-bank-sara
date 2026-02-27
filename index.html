@@ -1918,13 +1918,22 @@ ${SIGNATURE}`;
     async function executeOp(){ warn("هذه النسخة مدمجة للواجهة + الكود الأساسي. لو تبغين كل الوظائف (PDF/واتساب/تقارير أسبوعية)، قولي لي وأصدر لك نسخة Full كاملة 100%."); }
 
     async function startApp(){
-      const so = $("startOverlay");
-      if(so){ so.classList.add("hidden"); so.style.display="none"; }
-      showOnboarding(()=>{
+      try{
+        const so = $("startOverlay");
+        if(so){ so.classList.add("hidden"); so.style.display="none"; }
+        const ob = $("onboardOverlay");
+        if(ob){ ob.classList.add("hidden"); ob.setAttribute("aria-hidden","true"); }
         hideAllPages();
-        if(IS_STUDENT_ENTRY){ show("studentLoginPage"); currentAccess="student"; }
-        else{ show("teacherLoginPage"); currentAccess="teacher"; }
-      });
+        if(IS_STUDENT_ENTRY){
+          show("studentLoginPage"); currentAccess="student";
+        }else{
+          show("teacherLoginPage"); currentAccess="teacher";
+        }
+      }catch(err){
+        console.error("startApp error:", err);
+        // fallback: حاول فتح صفحة دخول الطالب مباشرة
+        try{ hideAllPages(); show("studentLoginPage"); currentAccess="student"; }catch(_){}
+      }
     }
 
     
