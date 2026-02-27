@@ -987,6 +987,15 @@
       <div class="chip" id="rwWeekRange" style="margin-top:2px">—</div>
     </div>
 
+    <div class="leaderWrap" style="margin-top:12px">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+        <div style="font-weight:900;color:#0b2a66">🏅 لوحة الشرف الأسبوعية</div>
+        <div class="small" style="color:#47607e">تتحدث تلقائيًا</div>
+      </div>
+      <div class="small" style="margin-top:6px">أعلى النقاط في الفصل لهذا الأسبوع (الأحد → الخميس).</div>
+      <div id="rwLeader" class="leaderList" style="margin-top:10px"></div>
+    </div>
+
     <div class="awardKpis" style="margin-top:12px">
       <div class="awardKpi">
         <div class="kLabel">صافي الأسبوع</div>
@@ -1086,14 +1095,6 @@
       </div>
     </div>
 
-    <div class="leaderWrap" style="margin-top:12px">
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
-        <div style="font-weight:900;color:#0b2a66">🏅 لوحة الشرف الأسبوعية</div>
-        <button class="btn ghost" onclick="refreshRewards()">تحديث اللوحة</button>
-      </div>
-      <div class="small" style="margin-top:6px">أعلى النقاط في الفصل لهذا الأسبوع (الأحد → الخميس).</div>
-      <div id="rwLeader" class="leaderList" style="margin-top:10px"></div>
-    </div>
 
     <div class="cardHint" style="margin-top:12px">
       ✅ يتم احتساب الجوائز تلقائيًا من العمليات اليومية • التهنئة التلقائية لولي الأمر تعمل عند تفعيلها من صفحة المعلمة.
@@ -2920,7 +2921,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
         $("rwChampion") && ($("rwChampion").textContent = "تعذر الحساب");
         $("rwCommit") && ($("rwCommit").textContent = "تعذر الحساب");
         $("rwPart") && ($("rwPart").textContent = "تعذر الحساب");
-        try{ const box=$("rwLeader"); if(box) box.innerHTML = '<div class="small">تعذر تحميل لوحة الشرف — اضغط "تحديث اللوحة".</div>'; }catch(_e){}
+        try{ const box=$("rwLeader"); if(box) box.innerHTML = '<div class="small">تعذر تحميل لوحة الشرف مؤقتًا… جارٍ إعادة المحاولة تلقائيًا.</div>'; }catch(_e){}
       }
     }
 
