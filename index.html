@@ -317,106 +317,59 @@
 .lbMeta{margin-inline-start:auto;display:flex;gap:8px;align-items:center}
 .lbPill{font-size:12px;font-weight:900;padding:6px 10px;border-radius:999px;background:rgba(2,132,199,.10);border:1px solid rgba(2,132,199,.18);color:#0b2a66}
 
-/* ===== Tier themes (Bronze / Silver / Gold / Diamond / Elite) ===== */
-.bankCard.tier-bronze{background:linear-gradient(180deg,#fff,#f8f4f1);}
-.bankCard.tier-silver{background:linear-gradient(180deg,#ffffff,#f1f5f9);}
-.bankCard.tier-gold{background:linear-gradient(180deg,#ffffff,#fff7e6);}
-.bankCard.tier-diamond{background:linear-gradient(180deg,#ffffff,#eef6ff);}
-.bankCard.tier-elite{background:linear-gradient(180deg,#ffffff,#f3f0ff);}
-.bankCard.tier-bronze .chip{background:linear-gradient(180deg,#f7d7b3,#c9894f);}
-.bankCard.tier-silver .chip{background:linear-gradient(180deg,#f3f4f6,#bfc7d1);}
-.bankCard.tier-diamond .chip{background:linear-gradient(180deg,#d9f2ff,#4aa3d8);}
-.bankCard.tier-elite .chip{background:linear-gradient(180deg,#f4d48a,#8f6bff);}
 
-
-    /* ===== Celebration (login congrats) ===== */
-    #celebrateOverlay{
-      position:fixed; inset:0; z-index:10050;
-      display:none;
-      pointer-events:none;
-    }
-    #celebrateOverlay.active{display:block}
-    .celebrate-bg{
-      position:absolute; inset:0;
-      background:radial-gradient(circle at top, rgba(11,42,102,.22) 0%, rgba(0,0,0,.55) 60%, rgba(0,0,0,.65) 100%);
-      backdrop-filter: blur(1px);
-    }
-    .spark{
-      position:absolute;
-      font-size:22px;
-      opacity:.0;
-      transform:translate(-50%,-50%);
-      animation: sparkFloat 1200ms ease-out forwards;
-      filter: drop-shadow(0 10px 18px rgba(255,255,255,.20));
-      will-change: transform, opacity;
-    }
-    .spark.big{font-size:28px}
-    @keyframes sparkFloat{
-      0%{opacity:0; transform:translate(-50%,-50%) scale(.6) translateY(12px) rotate(0deg)}
-      15%{opacity:1}
-      100%{opacity:0; transform:translate(-50%,-50%) scale(1.25) translateY(-80px) rotate(20deg)}
-    }
-    .fire{
-      position:absolute;
-      width:8px;height:8px;border-radius:999px;
-      background:rgba(255,255,255,.95);
-      box-shadow:
-        0 0 10px rgba(255,255,255,.75),
-        0 0 24px rgba(255,215,0,.55),
-        0 0 44px rgba(0,180,255,.45);
-      opacity:0;
-      transform:translate(-50%,-50%) scale(.5);
-      animation: fireBurst 1100ms ease-out forwards;
-      will-change: transform, opacity;
-    }
-    @keyframes fireBurst{
-      0%{opacity:0; transform:translate(-50%,-50%) scale(.4)}
-      12%{opacity:1}
-      100%{opacity:0; transform:translate(-50%,-50%) scale(3.6)}
-    }
-
-    #congratsToast{
-      position:fixed; inset:0; z-index:10060;
-      display:none; align-items:center; justify-content:center;
-      padding:18px;
-    }
-    #congratsToast.active{display:flex}
-    .toastBox{
-      width:min(680px, 100%);
-      border-radius:24px;
-      border:1px solid rgba(255,255,255,.22);
-      background:linear-gradient(180deg, rgba(255,255,255,.16), rgba(255,255,255,.08));
-      backdrop-filter: blur(14px);
-      box-shadow:0 20px 70px rgba(0,0,0,.45);
-      color:#fff;
-      overflow:hidden;
-    }
-    .toastTop{
-      padding:14px 16px;
-      background:linear-gradient(90deg, rgba(255,255,255,.12), rgba(0,0,0,.08));
-      border-bottom:1px solid rgba(255,255,255,.14);
-      display:flex; justify-content:space-between; align-items:center; gap:10px;
-    }
-    .toastTitle{font-weight:1000;font-size:18px;letter-spacing:.2px}
-    .toastClose{
-      pointer-events:auto;
-      background:rgba(255,255,255,.14);
-      border:1px solid rgba(255,255,255,.18);
-      color:#fff;
-      padding:10px 12px; border-radius:14px; font-weight:1000;
-    }
-    .toastBody{padding:16px}
-    .toastMsg{font-size:18px; font-weight:1000; line-height:1.9}
-    .toastSub{margin-top:8px; font-size:13px; opacity:.92; font-weight:900; line-height:1.9}
-    .toastActions{margin-top:14px; display:flex; gap:10px; flex-wrap:wrap}
-    .toastActions button{flex:1; pointer-events:auto}
-    .toastBtn{
-      background:linear-gradient(90deg,#ffd54f,#ffb300);
-      color:#0b2a66;
-      border-radius:16px;
-      padding:12px 14px;
-      font-weight:1000;
-    }
+/* ===== Roulette ===== */
+.rouletteWrap{position:relative; width:min(320px, 90vw); height:min(320px, 90vw); margin: 6px auto 14px; }
+.rouletteWheel{
+  position:absolute; inset:0;
+  border-radius:50%;
+  border: 10px solid rgba(255,255,255,.55);
+  box-shadow: 0 18px 55px rgba(0,0,0,.22);
+  transform: rotate(0deg);
+  transition: transform 4.2s cubic-bezier(.14,.85,.19,1);
+  background: conic-gradient(#f7d36b 0 25%, #b7e3ff 25% 50%, #b9f5c8 50% 75%, #f9b7c7 75% 100%);
+}
+.roulettePointer{
+  position:absolute; top:-18px; left:50%; transform:translateX(-50%);
+  width:0; height:0;
+  border-left:14px solid transparent;
+  border-right:14px solid transparent;
+  border-bottom:24px solid #0b2a66;
+  filter: drop-shadow(0 6px 8px rgba(0,0,0,.25));
+  z-index:5;
+}
+.rouletteCenter{
+  position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+  width:70px; height:70px; border-radius:50%;
+  background: rgba(255,255,255,.9);
+  border: 2px solid rgba(11,42,102,.25);
+  display:flex; align-items:center; justify-content:center;
+  font-weight:1000; color:#0b2a66;
+  box-shadow: 0 10px 25px rgba(0,0,0,.18);
+  z-index:4;
+}
+.rouletteLabel{
+  position:absolute; left:50%; top:50%;
+  transform-origin: 0% 0%;
+  width: 46%;
+  text-align: right;
+  font-weight: 900;
+  color:#0b2a66;
+  text-shadow: 0 1px 0 rgba(255,255,255,.85);
+  font-size: 13px;
+  pointer-events:none;
+}
+.roulettePick{
+  text-align:center;
+  font-weight:1000;
+  margin-top:8px;
+}
+.rouletteNote{
+  text-align:center;
+  color:#475569;
+  font-size:13px;
+  margin-top:6px;
+}
 
 </style>
 </head>
@@ -1145,7 +1098,20 @@
     <div class="cardHint" style="margin-top:12px">
       ✅ يتم احتساب الجوائز تلقائيًا من العمليات اليومية • التهنئة التلقائية لولي الأمر تعمل عند تفعيلها من صفحة المعلمة.
     </div>
-  </div>
+  
+    <div class="card" id="rouletteCard" style="margin-top:12px; display:none">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap">
+        <div>
+          <h3 style="margin:0;color:#0b2a66">🎡 روليت الهدايا</h3>
+          <div class="small" style="margin-top:6px">متاح <b>مرة واحدة فقط</b> للحسابات: <b>ذهبي / ماسي / ألماسي</b>.</div>
+          <div class="small" id="rouletteStatus" style="margin-top:6px">—</div>
+        </div>
+        <button class="btn" id="rouletteBtn" onclick="openRoulette()">دوّر الروليت</button>
+      </div>
+      <div id="rouletteResult" class="small" style="margin-top:10px"></div>
+    </div>
+
+</div>
 </div>
 <div id="paneCard" class="miniPane">
           <div class="card" style="margin-top:12px">
@@ -1333,34 +1299,6 @@ ${SIGNATURE}`
     }
     async function playWelcome(){ await beep(); }
     async function playClick(){ await beep(); }
-    async function playCongrats(){
-  try{
-    const ctx=new (window.AudioContext||window.webkitAudioContext)();
-    const g=ctx.createGain(); g.gain.value=0.10; g.connect(ctx.destination);
-    const freqs=[740, 988, 1175, 1480]; // نغمة صاعدة
-    let t=ctx.currentTime;
-    freqs.forEach((f,i)=>{
-      const o=ctx.createOscillator();
-      o.type="triangle"; o.frequency.value=f;
-      o.connect(g);
-      o.start(t + i*0.08);
-      o.stop(t + i*0.08 + 0.12);
-    });
-    setTimeout(()=>{ ctx.close(); }, 800);
-  }catch(e){}
-}
-
-function showTierCongrats(oldLabel, newLabel, balance){
-  const body = `
-    <div style="font-weight:1000;color:#0b2a66;font-size:16px">🎉 تهانينا! تمت ترقية الحساب</div>
-    <div class="small" style="margin-top:6px;line-height:1.95">
-      المستوى السابق: <b>${oldLabel}</b><br>
-      المستوى الجديد: <b>${newLabel}</b><br>
-      الرصيد الحالي: <b>${fmt(balance)}</b> ر.س
-    </div>
-  `;
-  openModal("ترقية المستوى", body, '<button class="btn" onclick="closeModal()">تمام</button>');
-}
     function bindClickSounds(){
       document.querySelectorAll("button, .tab, .miniTab, a").forEach(el=>{
         el.addEventListener("click", ()=>{ playClick(); }, {passive:true});
@@ -1722,141 +1660,6 @@ ${SIGNATURE}`;
       openWA(wa, msg);
     }
 
-    
-    // ===== Celebration on each student login =====
-    const CONGRATS_MESSAGES = [
-      "يا بطل/ـة {name}! دخولك اليوم يساوي خطوة جديدة نحو التميز ✨",
-      "أهلًا {name}! جاهز/ة تكسر الأرقام وتلمع بالإنجاز؟ 🌟",
-      "مرحبًا {name}! طاقتك اليوم رهيبة… خلّنا نبدأ 💪✨",
-      "يا سلام يا {name}! أنت أقوى من أي مسألة… انطلق 🚀",
-      "{name}… حماسك يفرّح! اليوم يوم نجاحك 🎯✨",
-      "هلا {name}! كل رصيد تجمعه شهادة على اجتهادك 👏💎",
-      "يا مبدع/ـة {name}! بنك الرياضيات يقول: WOW! 🎆",
-      "صباح/مساء الخير {name}! جاهزين نرفع المستوى؟ 🔥✨",
-      "يا {name}! دخولك = بداية إنجاز جديد… استمر 🌈✨",
-      "يا {name}! أنت قدها وقدود… ورصيدك يثبت! 🏆✨"
-    ];
-
-    function pickRandom(arr){
-      return arr[Math.floor(Math.random()*arr.length)];
-    }
-
-    function formatCongratsMessage(tpl, s){
-      const nm = (s?.name || "صديقي/صديقتي");
-      return tpl.replaceAll("{name}", nm);
-    }
-
-    function openCongrats(s){
-      const tier = (window.currentTierLabel || $("tierLabel")?.textContent || "—").trim();
-      const bal  = ($("studentBalance")?.textContent || "0").trim();
-
-      // random message
-      const msg = formatCongratsMessage(pickRandom(CONGRATS_MESSAGES), s);
-      $("congratsMsg").textContent = msg;
-
-      // sub line
-      $("congratsSub").innerHTML =
-        `🏅 مستواك الحالي: <b>${tier}</b> &nbsp;•&nbsp; 💰 رصيدك: <b>${bal}</b> ر.س`;
-
-      // show layers
-      $("celebrateOverlay")?.classList.add("active");
-      $("congratsToast")?.classList.add("active");
-
-      // spawn effects
-      spawnSparks(46);
-      spawnFireworks(12);
-
-      // play short success jingle
-      playSuccessJingle();
-      // auto close effects layer after a bit (toast stays until close)
-      setTimeout(()=>{ $("celebrateOverlay")?.classList.remove("active"); }, 1400);
-    }
-
-    function closeCongrats(){
-      $("congratsToast")?.classList.remove("active");
-      $("celebrateOverlay")?.classList.remove("active");
-      // cleanup any remaining particles
-      cleanupCelebrate();
-    }
-
-    function cleanupCelebrate(){
-      const layer = $("celebrateOverlay");
-      if(!layer) return;
-      layer.querySelectorAll(".spark,.fire").forEach(n=>n.remove());
-    }
-
-    function spawnSparks(n){
-      const layer = $("celebrateOverlay");
-      if(!layer) return;
-      cleanupCelebrate();
-      for(let i=0;i<n;i++){
-        const sp = document.createElement("div");
-        sp.className = "spark" + (Math.random()>.75 ? " big" : "");
-        sp.textContent = (Math.random()>.35 ? "✨" : "⭐");
-        const x = Math.random()*100;
-        const y = (Math.random()*70)+10;
-        sp.style.left = x + "%";
-        sp.style.top = y + "%";
-        sp.style.animationDelay = (Math.random()*240) + "ms";
-        layer.appendChild(sp);
-        sp.addEventListener("animationend", ()=>sp.remove(), {once:true});
-      }
-    }
-
-    function spawnFireworks(n){
-      const layer = $("celebrateOverlay");
-      if(!layer) return;
-      for(let i=0;i<n;i++){
-        const f = document.createElement("div");
-        f.className = "fire";
-        const x = (Math.random()*86)+7;
-        const y = (Math.random()*48)+10;
-        f.style.left = x + "%";
-        f.style.top = y + "%";
-        f.style.animationDelay = (Math.random()*260) + "ms";
-        layer.appendChild(f);
-        f.addEventListener("animationend", ()=>f.remove(), {once:true});
-      }
-    }
-
-    // WebAudio short "success" jingle (no external files)
-    let __audioCtx = null;
-    function playSuccessJingle(){
-      try{
-        const AC = window.AudioContext || window.webkitAudioContext;
-        if(!AC) return;
-        if(!__audioCtx) __audioCtx = new AC();
-        const ctx = __audioCtx;
-        if(ctx.state === "suspended") ctx.resume();
-
-        const now = ctx.currentTime;
-        const notes = [659.25, 783.99, 987.77, 1174.66, 987.77]; // E5 G5 B5 D6 B5
-        const durs  = [0.10, 0.10, 0.12, 0.16, 0.14];
-
-        const master = ctx.createGain();
-        master.gain.setValueAtTime(0.0001, now);
-        master.gain.exponentialRampToValueAtTime(0.20, now+0.02);
-        master.gain.exponentialRampToValueAtTime(0.0001, now+0.90);
-        master.connect(ctx.destination);
-
-        let t = now;
-        for(let i=0;i<notes.length;i++){
-          const osc = ctx.createOscillator();
-          const g = ctx.createGain();
-          osc.type = "triangle";
-          osc.frequency.setValueAtTime(notes[i], t);
-          g.gain.setValueAtTime(0.0001, t);
-          g.gain.exponentialRampToValueAtTime(0.55, t+0.01);
-          g.gain.exponentialRampToValueAtTime(0.0001, t + durs[i]);
-          osc.connect(g);
-          g.connect(master);
-          osc.start(t);
-          osc.stop(t + durs[i] + 0.02);
-          t += durs[i] + 0.02;
-        }
-      }catch(e){ console.log("playSuccessJingle", e); }
-    }
-
     async function studentLogin(){
       try{
         currentAccess="student";
@@ -1872,60 +1675,17 @@ ${SIGNATURE}`;
         if(String(pin) !== String(s.pin||"")) return warn("الرقم السري غلط");
         await playWelcome();
         await openStudentAccount(s);
-        // show a random congratulations message + effects on every login
-        openCongrats(s);
-        }catch(e){ console.log(e); warn("صار خطأ… جرّبي مرة ثانية"); }
+      }catch(e){ console.log(e); warn("صار خطأ… جرّبي مرة ثانية"); }
     }
 
-    function getTierConfig(){
-  // ✅ حدود الترقية حسب الرصيد (مطابقة للكروت الظاهرة في الصفحة):
-  // برونزي: 10,000 وأقل
-  // فضي: من 11,000 إلى 15,000  (فعليًا يبدأ من 11,000)
-  // ذهبي: من 16,000 إلى 20,000 (فعليًا يبدأ من 16,000)
-  // ماسي: من 21,000 إلى 30,000 (فعليًا يبدأ من 21,000)
-  // ألماسي: أكثر من 30,000      (يعني 30,001 فأعلى)
-  return {
-    silverMin: 11000,
-    goldMin: 16000,
-    diamondMin: 21000,
-    eliteMinExclusive: 30000
-  };
-}
-
-function tierKeyFromBalance(balance){
-  const b = Number(balance||0);
-  const cfg = getTierConfig();
-
-  // ألماسي: أكثر من 30,000
-  if(b > cfg.eliteMinExclusive) return "elite";
-  // ماسي: 21,000 إلى 30,000
-  if(b >= cfg.diamondMin) return "diamond";
-  // ذهبي: 16,000 إلى 20,000
-  if(b >= cfg.goldMin) return "gold";
-  // فضي: 11,000 إلى 15,000
-  if(b >= cfg.silverMin) return "silver";
-  // برونزي: 10,000 وأقل (وأي رقم أقل من 11,000)
-  return "bronze";
-}
-
-function calcTier(balance){
-  const key = tierKeyFromBalance(balance);
-  if(key==="elite") return "💎 ألماسي";
-  if(key==="diamond") return "🔷 ماسي";
-  if(key==="gold") return "🥇 ذهبي";
-  if(key==="silver") return "🥈 فضي";
-  return "🥉 برونزي";
-}
-
-function applyTierTheme(balanceOrKey){
-  const card = document.querySelector("#studentAccountPage .bankCard");
-  if(!card) return;
-  const key = (balanceOrKey==="bronze"||balanceOrKey==="silver"||balanceOrKey==="gold"||balanceOrKey==="diamond"||balanceOrKey==="elite")
-    ? balanceOrKey
-    : tierKeyFromBalance(balanceOrKey);
-  card.classList.remove("tier-bronze","tier-silver","tier-gold","tier-diamond","tier-elite");
-  card.classList.add("tier-" + key);
-}
+    function calcTier(balance){
+      const b = Number(balance||0);
+      if(b > 30000) return "💎 ألماسي";
+      if(b >= 21000) return "🔷 ماسي";
+      if(b >= 16000) return "🥇 ذهبي";
+      if(b >= 11000) return "🥈 فضي";
+      return "🥉 برونزي";
+    }
 
     function makeBankCardNumber(studentId){
       const raw = String(studentId||"").replace(/[^a-zA-Z0-9]/g,"");
@@ -1955,14 +1715,9 @@ function applyTierTheme(balanceOrKey){
       $("statusBadge").className = "badge " + (s.active ? "on":"off");
       $("statusBadge").textContent = s.active ? "🟢 نشط" : "🔴 مقفل";
       $("studentBalance").textContent = fmt(s.balance);
-      $("tierLabel").textContent = calcTier(s.balance);
-      
-      // ✅ مزامنة الترقية داخل البيانات إذا كانت قديمة
-      const computedTier = calcTier(s.balance);
-      if(s.tier !== computedTier){
-        try{ await ref.update({tier: computedTier}); s.tier = computedTier; }catch(e){}
-      }
-      applyTierTheme(s.balance);
+      $("tierLabel").textContent = s.tier || calcTier(s.balance);
+
+       try{ setupRouletteUI(); }catch(e){}
 
       $("cardNumber").textContent = makeBankCardNumber(currentStudentId);
       const exp = makeExp();
@@ -2059,7 +1814,7 @@ function applyTierTheme(balanceOrKey){
         const card = document.createElement("div");
         card.className="card";
         const isChecked = selectedIds.has(s.id);
-        const tierText = (calcTier(s.balance)) || "";
+        const tierText = (s.tier || calcTier(s.balance)) || "";
         card.innerHTML = `
           <div class="row" style="align-items:center;justify-content:space-between">
             <div style="display:flex;gap:10px;align-items:center">
@@ -2533,28 +2288,6 @@ document.addEventListener("DOMContentLoaded", async()=>{
 <script>
   window.onload = ()=>{ setTimeout(()=>window.print(), 300); };
 <\/script>
-
-  <!-- ===== Celebration Layer (shown on each student login) ===== -->
-  <div id="celebrateOverlay" aria-hidden="true">
-    <div class="celebrate-bg"></div>
-  </div>
-
-  <div id="congratsToast" aria-hidden="true">
-    <div class="toastBox" role="dialog" aria-modal="true">
-      <div class="toastTop">
-        <div class="toastTitle">🎉 تهانينا!</div>
-        <button class="toastClose" onclick="closeCongrats()">✕</button>
-      </div>
-      <div class="toastBody">
-        <div class="toastMsg" id="congratsMsg">—</div>
-        <div class="toastSub" id="congratsSub">—</div>
-        <div class="toastActions">
-          <button class="toastBtn" onclick="closeCongrats()">ابدأ الآن ✨</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
 </body></html>`);
       w.document.close();
     }
@@ -3086,88 +2819,216 @@ document.addEventListener("DOMContentLoaded", async()=>{
     }
 
 
+
+    // ===== Roulette (Gold/Diamond/Elite only - One spin) =====
+    const ROULETTE_PRIZES = [
+      "إعفاء واجب ✅",
+      "إعفاء واجبان ✅✅",
+      "زيادة درجات في الاختبار ⭐",
+      "وجبة ماكدونالدز 🍔"
+    ];
+
+    function rouletteKey(){ return `roulette_${currentStudentId||"unknown"}`; }
+    function getRouletteState(){
+      try{ return JSON.parse(localStorage.getItem(rouletteKey())||"null"); }catch(e){ return null; }
+    }
+    function setRouletteState(obj){
+      try{ localStorage.setItem(rouletteKey(), JSON.stringify(obj||{})); }catch(e){}
+    }
+    function isRouletteEligible(){
+      try{
+        const key = (typeof tierKeyFromBalance==="function")
+          ? tierKeyFromBalance((currentStudentObj&&currentStudentObj.balance)||0)
+          : (String(($("tierLabel")&&$("tierLabel").textContent)||"").includes("ذهبي") ? "gold"
+            : String(($("tierLabel")&&$("tierLabel").textContent)||"").includes("ماسي") ? "diamond"
+            : String(($("tierLabel")&&$("tierLabel").textContent)||"").includes("ألماسي") ? "elite"
+            : "other");
+        return (key==="gold" || key==="diamond" || key==="elite");
+      }catch(e){ return false; }
+    }
+
+    function setupRouletteUI(){
+      const card = $("rouletteCard");
+      if(!card) return;
+      const eligible = isRouletteEligible();
+      if(!eligible){ card.style.display="none"; return; }
+      card.style.display="block";
+
+      const st = getRouletteState();
+      const btn = $("rouletteBtn");
+      const status = $("rouletteStatus");
+      const res = $("rouletteResult");
+
+      if(st && st.prize){
+        status.textContent = "تم استخدام فرصة الروليت ✅";
+        res.textContent = "نتيجتك: " + st.prize;
+        if(btn){ btn.disabled = true; btn.textContent = "تم التدوير"; btn.classList.add("ghost"); }
+      }else{
+        status.textContent = "🎟️ لديك فرصة واحدة لتدوير الروليت الآن!";
+        res.textContent = "";
+        if(btn){ btn.disabled = false; btn.textContent = "دوّر الروليت"; btn.classList.remove("ghost"); }
+      }
+    }
+
+    function buildRouletteWheelHTML(){
+      const n = ROULETTE_PRIZES.length;
+      const colors = ["#f7d36b","#b7e3ff","#b9f5c8","#f9b7c7","#d7c2ff","#ffd6a5"];
+      let stops = [];
+      for(let i=0;i<n;i++){
+        const a0 = (i*100/n);
+        const a1 = ((i+1)*100/n);
+        stops.push(`${colors[i%colors.length]} ${a0}% ${a1}%`);
+      }
+      return `
+        <div class="rouletteWrap">
+          <div class="roulettePointer"></div>
+          <div class="rouletteWheel" id="rouletteWheel" style="background: conic-gradient(${stops.join(",")});"></div>
+          <div class="rouletteCenter">🎁</div>
+        </div>
+        <div class="rouletteNote">* فرصة واحدة فقط — سيتم حفظ النتيجة تلقائيًا لهذا الحساب.</div>
+        <div id="roulettePick" class="roulettePick"></div>
+      `;
+    }
+
+    let rouletteBusy = false;
+
+    function openRoulette(){
+      try{
+        if(!isRouletteEligible()) return warn("الروليت متاح فقط للمستوى الذهبي/الماسي/الألماسي");
+        const st = getRouletteState();
+        if(st && st.prize){
+          openModal("🎡 روليت الهدايا",
+            `<div class="small">تم استخدام الفرصة مسبقًا ✅</div><div class="roulettePick" style="margin-top:10px">نتيجتك: <b>${escapeHtml(st.prize)}</b></div>`,
+            '<button class="btn" onclick="closeModal()">تمام</button>'
+          );
+          return;
+        }
+
+        openModal("🎡 روليت الهدايا", buildRouletteWheelHTML(),
+          '<button class="btn" id="rouletteSpinBtn" onclick="spinRoulette()">دوّر الآن</button><button class="btn3" onclick="closeModal()">إلغاء</button>'
+        );
+
+        setTimeout(()=>{
+          const wheel = $("rouletteWheel");
+          if(!wheel) return;
+          const n = ROULETTE_PRIZES.length;
+          wheel.innerHTML = "";
+          for(let i=0;i<n;i++){
+            const seg = 360/n;
+            const mid = (i*seg) + (seg/2);
+            const lab = document.createElement("div");
+            lab.className = "rouletteLabel";
+            lab.style.transform = `rotate(${mid}deg) translate(0,-46%) rotate(90deg)`;
+            lab.textContent = ROULETTE_PRIZES[i];
+            wheel.appendChild(lab);
+          }
+        }, 60);
+      }catch(e){ console.log(e); warn("تعذر فتح الروليت"); }
+    }
+
+    function spinRoulette(){
+      try{
+        if(rouletteBusy) return;
+        rouletteBusy = true;
+
+        const wheel = $("rouletteWheel");
+        const pick = $("roulettePick");
+        const btn = $("rouletteSpinBtn");
+        if(btn) btn.disabled = true;
+
+        const n = ROULETTE_PRIZES.length;
+        const seg = 360/n;
+        const idx = Math.floor(Math.random()*n);
+        const jitter = (Math.random()*0.5 - 0.25) * seg;
+        const target = (360*6) + (360 - (idx*seg + seg/2)) + jitter;
+
+        wheel.style.transition = "none";
+        wheel.style.transform = "rotate(0deg)";
+        wheel.offsetHeight;
+        wheel.style.transition = "transform 4.2s cubic-bezier(.14,.85,.19,1)";
+        wheel.style.transform = `rotate(${target}deg)`;
+
+        wheel.addEventListener("transitionend", ()=>{
+          const prize = ROULETTE_PRIZES[idx];
+          setRouletteState({prize, at: Date.now()});
+
+          if(pick) pick.innerHTML = `🎉 مبروك! فزت بـ <b>${escapeHtml(prize)}</b>`;
+
+          // effects + sound if available
+          try{
+            if(typeof spawnSparks==="function") spawnSparks(38);
+            if(typeof spawnFireworks==="function") spawnFireworks(10);
+            if(typeof playSuccessJingle==="function") playSuccessJingle();
+          }catch(e){}
+
+          rouletteBusy = false;
+          setupRouletteUI();
+          $("mActions") && ($("mActions").innerHTML = '<button class="btn" onclick="closeModal()">تمام</button>');
+        }, {once:true});
+      }catch(e){ console.log(e); rouletteBusy=false; warn("تعذر تدوير الروليت"); }
+    }
+
+
 // ===== Student operations (deposit/withdraw/transfer) =====
     executeOp = async function(){
-  try{
-    const ref = db.collection("students").doc(currentStudentId);
-    const doc = await ref.get();
-    if(!doc.exists) return warn("الحساب غير موجود");
-    const s = doc.data() || {};
+      try{
+        const ref = db.collection("students").doc(currentStudentId);
+        const doc = await ref.get();
+        if(!doc.exists) return warn("الحساب غير موجود");
+        const s = doc.data() || {};
 
-    const op = ($("op")?.value || "").trim();
-    const amt = parseFloat($("amt")?.value || "");
-    if(isNaN(amt) || amt<=0) return warn("اكتب مبلغ صحيح");
+        const op = ($("op")?.value || "").trim();
+        const amt = parseFloat($("amt")?.value || "");
+        if(isNaN(amt) || amt<=0) return warn("اكتب مبلغ صحيح");
 
-    const reason = getReason("reasonStudent","reasonOtherStudent");
+        const reason = getReason("reasonStudent","reasonOtherStudent");
 
-    const oldKey = tierKeyFromBalance(s.balance);
-    const oldLabel = calcTier(s.balance);
+        if(op === "deposit"){
+          const nb = Number(s.balance||0) + amt;
+          await ref.update({balance: nb});
+          await logTxn(ref, "إيداع", reason, amt, nb, s);
 
-    if(op === "deposit"){
-      const nb = Number(s.balance||0) + amt;
-      const newLabel = calcTier(nb);
-      await ref.update({balance: nb, tier: newLabel});
-      await logTxn(ref, "إيداع", reason, amt, nb, {...s, tier:newLabel});
+        }else if(op === "withdraw"){
+          if(Number(s.balance||0) < amt) return warn("الرصيد ما يكفي");
+          const nb = Number(s.balance||0) - amt;
+          await ref.update({balance: nb});
+          await logTxn(ref, "سحب", reason, amt, nb, s);
 
-    }else if(op === "withdraw"){
-      if(Number(s.balance||0) < amt) return warn("الرصيد ما يكفي");
-      const nb = Number(s.balance||0) - amt;
-      const newLabel = calcTier(nb);
-      await ref.update({balance: nb, tier: newLabel});
-      await logTxn(ref, "سحب", reason, amt, nb, {...s, tier:newLabel});
+        }else if(op === "transfer"){
+          if(Number(s.balance||0) < amt) return warn("الرصيد ما يكفي للتحويل");
+          const toId = ($("transferTo")?.value || "").trim();
+          if(!toId) return warn("اختاري مستلم التحويل");
+          if(toId === currentStudentId) return warn("لا يمكن التحويل لنفس الحساب");
 
-    }else if(op === "transfer"){
-      if(Number(s.balance||0) < amt) return warn("الرصيد ما يكفي للتحويل");
-      const toId = ($("transferTo")?.value || "").trim();
-      if(!toId) return warn("اختاري مستلم التحويل");
-      if(toId === currentStudentId) return warn("لا يمكن التحويل لنفس الحساب");
+          const toRef = db.collection("students").doc(toId);
+          const toDoc = await toRef.get();
+          if(!toDoc.exists) return warn("المستلم غير موجود");
+          const to = toDoc.data() || {};
 
-      const toRef = db.collection("students").doc(toId);
-      const toDoc = await toRef.get();
-      if(!toDoc.exists) return warn("المستلم غير موجود");
-      const to = toDoc.data() || {};
+          const batch = db.batch();
+          batch.update(ref, {balance: Number(s.balance||0) - amt});
+          batch.update(toRef, {balance: Number(to.balance||0) + amt});
+          await batch.commit();
 
-      const fromNb = Number(s.balance||0) - amt;
-      const toNb   = Number(to.balance||0) + amt;
+          await logTxn(ref, "تحويل إلى " + (to.name||"—"), reason, amt, Number(s.balance||0) - amt, s);
+          await logTxn(toRef, "تحويل من " + (s.name||"طالب/ـة"), reason, amt, Number(to.balance||0) + amt, to);
+        }
 
-      const fromTier = calcTier(fromNb);
-      const toTier   = calcTier(toNb);
-
-      const batch = db.batch();
-      batch.update(ref,  {balance: fromNb, tier: fromTier});
-      batch.update(toRef,{balance: toNb,   tier: toTier});
-      await batch.commit();
-
-      await logTxn(ref,  "تحويل إلى " + (to.name||"—"), reason, amt, fromNb, {...s, tier:fromTier});
-      await logTxn(toRef,"تحويل من " + (s.name||"طالب/ـة"), reason, amt, toNb, {...to, tier:toTier});
-    }
-
-    // refresh UI
-    const updated = await ref.get();
-    const u = updated.data() || {};
-    $("studentBalance") && ($("studentBalance").textContent = fmt(u.balance));
-    $("tierLabel") && ($("tierLabel").textContent = u.tier || calcTier(u.balance));
-    applyTierTheme(u.balance);
-
-    // تهنئة + صوت عند تغير المستوى
-    const newKey = tierKeyFromBalance(u.balance);
-    const newLabel = u.tier || calcTier(u.balance);
-    if(newKey !== oldKey){
-      await playCongrats();
-      showTierCongrats(oldLabel, newLabel, u.balance);
-    }
-
-    $("amt") && ($("amt").value = "");
-    setupReasonUI($("op")?.value || "deposit",'reasonStudent','reasonOtherStudent');
-    updateTransferPreview && updateTransferPreview();
-    await showStatement();
-    await refreshWeekKPIs();
-    await refreshRewards();
-  }catch(e){
-    console.log("executeOp error", e);
-    warn("صار خطأ… جرّبي مرة ثانية");
-  }
-};
+        // refresh UI
+        const updated = await ref.get();
+        const u = updated.data() || {};
+        $("studentBalance") && ($("studentBalance").textContent = fmt(u.balance));
+        $("tierLabel") && ($("tierLabel").textContent = calcTier(u.balance));
+        $("amt") && ($("amt").value = "");
+        setupReasonUI($("op")?.value || "deposit",'reasonStudent','reasonOtherStudent');
+        await showStatement();
+        await refreshWeekKPIs();
+      await refreshRewards();
+      }catch(e){
+        console.log("executeOp error", e);
+        warn("صار خطأ… جرّبي مرة ثانية");
+      }
+    };
 
     // ===== Teacher operations (bulk + selected + single) =====
     async function _ensureTeacherContext(){
