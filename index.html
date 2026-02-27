@@ -2524,6 +2524,10 @@ document.addEventListener("DOMContentLoaded", async()=>{
       try{
         if(!currentStudentId) return;
 
+        // Leaderboard placeholder
+        try{ const box=$("rwLeader"); if(box) box.innerHTML = '<div class="small">جارٍ تحميل لوحة الشرف...</div>'; }catch(e){}
+
+
         const now = Date.now();
         const wk = getSchoolWeekRangeMs(new Date());
         const weekStart = wk.startMs;
@@ -2533,12 +2537,31 @@ document.addEventListener("DOMContentLoaded", async()=>{
         const sRef = db.collection("students").doc(currentStudentId);
 
         // Student weekly net (deposit + transfer in) - (withdraw + transfer out)
-        const weekSnap = await sRef.collection("txns")
-          .where("createdAtClient", ">=", weekStart)
-          .where("createdAtClient", "<=", weekEnd)
-          .orderBy("createdAtClient","desc")
-          .limit(600)
-          .get();
+        let weekSnap=null;
+        try{
+          weekSnap = await sRef.collection("txns")
+            .where("createdAtClient", ">=", weekStart)
+            .where("createdAtClient", "<=", weekEnd)
+            .orderBy("createdAtClient","desc")
+            .limit(600)
+            .get();
+        }catch(e){
+          // Fallback (avoid composite-index issues): fetch recent and filter client-side
+          try{
+            const all = await sRef.collection("txns").orderBy("createdAtClient","desc").limit(800).get();
+            const fake = {docs:[]};
+            const docs = [];
+            all.forEach(d=>{
+              const x=d.data()||{};
+              const ts = Number(x.createdAtClient||0);
+              if(ts>=weekStart && ts<=weekEnd) docs.push(d);
+            });
+            fake.forEach = (fn)=>docs.forEach(fn);
+            weekSnap = fake;
+          }catch(e2){
+            weekSnap = {forEach:()=>{}};
+          }
+        }
 
         let net=0, partCount=0, violations=0;
         weekSnap.forEach(d=>{
@@ -2560,11 +2583,29 @@ document.addEventListener("DOMContentLoaded", async()=>{
         });
 
         // Commitment: "0 مخالفات خلال 5 أيام"
-        const fiveSnap = await sRef.collection("txns")
-          .where("createdAtClient", ">=", fiveStart)
-          .orderBy("createdAtClient","desc")
-          .limit(600)
-          .get();
+        let fiveSnap=null;
+        try{
+          fiveSnap = await sRef.collection("txns")
+            .where("createdAtClient", ">=", fiveStart)
+            .orderBy("createdAtClient","desc")
+            .limit(600)
+            .get();
+        }catch(e){
+          try{
+            const all = await sRef.collection("txns").orderBy("createdAtClient","desc").limit(800).get();
+            const docs=[];
+            all.forEach(d=>{
+              const x=d.data()||{};
+              const ts = Number(x.createdAtClient||0);
+              if(ts>=fiveStart) docs.push(d);
+            });
+            const fake={};
+            fake.forEach=(fn)=>docs.forEach(fn);
+            fiveSnap=fake;
+          }catch(e2){
+            fiveSnap={forEach:()=>{}};
+          }
+        }
 
         const violWords = ["مخالفة","سلوك","غياب","تأخر","عدم","انضباط","تنبيه"];
         fiveSnap.forEach(d=>{
@@ -2587,12 +2628,30 @@ document.addEventListener("DOMContentLoaded", async()=>{
           for(const sd of studs.docs){
             const sid = sd.id;
             const ref = db.collection("students").doc(sid);
-            const snap = await ref.collection("txns")
-              .where("createdAtClient", ">=", weekStart)
-              .where("createdAtClient", "<=", weekEnd)
-              .orderBy("createdAtClient","desc")
-              .limit(600)
-              .get();
+            let snap=null;
+            try{
+              snap = await ref.collection("txns")
+                .where("createdAtClient", ">=", weekStart)
+                .where("createdAtClient", "<=", weekEnd)
+                .orderBy("createdAtClient","desc")
+                .limit(600)
+                .get();
+            }catch(e){
+              try{
+                const all = await ref.collection("txns").orderBy("createdAtClient","desc").limit(800).get();
+                const docs=[];
+                all.forEach(d=>{
+                  const x=d.data()||{};
+                  const ts=Number(x.createdAtClient||0);
+                  if(ts>=weekStart && ts<=weekEnd) docs.push(d);
+                });
+                const fake={};
+                fake.forEach=(fn)=>docs.forEach(fn);
+                snap=fake;
+              }catch(e2){
+                snap={forEach:()=>{}};
+              }
+            }
             let n=0;
             snap.forEach(d=>{
               const x=d.data()||{};
@@ -2701,12 +2760,30 @@ document.addEventListener("DOMContentLoaded", async()=>{
 
         // Improvement (vs previous school week)
         const prev = getPrevSchoolWeekRangeMs(new Date());
-        const prevSnap = await sRef.collection("txns")
-          .where("createdAtClient", ">=", prev.startMs)
-          .where("createdAtClient", "<=", prev.endMs)
-          .orderBy("createdAtClient","desc")
-          .limit(600)
-          .get();
+        let prevSnap=null;
+        try{
+          prevSnap = await sRef.collection("txns")
+            .where("createdAtClient", ">=", prev.startMs)
+            .where("createdAtClient", "<=", prev.endMs)
+            .orderBy("createdAtClient","desc")
+            .limit(600)
+            .get();
+        }catch(e){
+          try{
+            const all = await sRef.collection("txns").orderBy("createdAtClient","desc").limit(900).get();
+            const docs=[];
+            all.forEach(d=>{
+              const x=d.data()||{};
+              const ts=Number(x.createdAtClient||0);
+              if(ts>=prev.startMs && ts<=prev.endMs) docs.push(d);
+            });
+            const fake={};
+            fake.forEach=(fn)=>docs.forEach(fn);
+            prevSnap=fake;
+          }catch(e2){
+            prevSnap={forEach:()=>{}};
+          }
+        }
         let prevNet=0;
         prevSnap.forEach(d=>{
           const x=d.data()||{};
@@ -2745,12 +2822,30 @@ document.addEventListener("DOMContentLoaded", async()=>{
               for(const sd of studs.docs){
                 const sid = sd.id;
                 const ref = db.collection("students").doc(sid);
-                const snap2 = await ref.collection("txns")
-                  .where("createdAtClient", ">=", weekStart)
-                  .where("createdAtClient", "<=", weekEnd)
-                  .orderBy("createdAtClient","desc")
-                  .limit(600)
-                  .get();
+                let snap2=null;
+                try{
+                  snap2 = await ref.collection("txns")
+                    .where("createdAtClient", ">=", weekStart)
+                    .where("createdAtClient", "<=", weekEnd)
+                    .orderBy("createdAtClient","desc")
+                    .limit(600)
+                    .get();
+                }catch(e){
+                  try{
+                    const all2 = await ref.collection("txns").orderBy("createdAtClient","desc").limit(800).get();
+                    const docs2=[];
+                    all2.forEach(d=>{
+                      const x=d.data()||{};
+                      const ts=Number(x.createdAtClient||0);
+                      if(ts>=weekStart && ts<=weekEnd) docs2.push(d);
+                    });
+                    const fake2={};
+                    fake2.forEach=(fn)=>docs2.forEach(fn);
+                    snap2=fake2;
+                  }catch(e2){
+                    snap2={forEach:()=>{}};
+                  }
+                }
                 let dep2=0, part2=0, vio2=0, trOut2=0, net2=0;
                 snap2.forEach(d=>{
                   const x=d.data()||{};
@@ -2825,6 +2920,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
         $("rwChampion") && ($("rwChampion").textContent = "تعذر الحساب");
         $("rwCommit") && ($("rwCommit").textContent = "تعذر الحساب");
         $("rwPart") && ($("rwPart").textContent = "تعذر الحساب");
+        try{ const box=$("rwLeader"); if(box) box.innerHTML = '<div class="small">تعذر تحميل لوحة الشرف — اضغط "تحديث اللوحة".</div>'; }catch(_e){}
       }
     }
 
