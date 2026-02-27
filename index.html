@@ -316,6 +316,34 @@
 .lbName{font-weight:900;color:#0b2a66}
 .lbMeta{margin-inline-start:auto;display:flex;gap:8px;align-items:center}
 .lbPill{font-size:12px;font-weight:900;padding:6px 10px;border-radius:999px;background:rgba(2,132,199,.10);border:1px solid rgba(2,132,199,.18);color:#0b2a66}
+.lbPill.soft{background:rgba(148,163,184,.10);border-color:rgba(148,163,184,.18);color:#334155}
+.lbHeader{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px}
+.lbRight{min-width:220px}
+.lbProgWrap{background:rgba(255,255,255,.55);border:1px solid rgba(0,0,0,.06);border-radius:14px;padding:8px 10px}
+.lbFilters{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:8px 0 12px;flex-wrap:wrap}
+.lbSelect{padding:10px 12px;border-radius:12px;border:1px solid rgba(0,0,0,.12);background:rgba(255,255,255,.85);font-weight:900;color:#0b2a66;min-width:220px}
+
+.lbTop3{display:grid;grid-template-columns:repeat(3,minmax(180px,1fr));gap:12px;margin-top:8px}
+@media(max-width:950px){.lbTop3{grid-template-columns:repeat(2,minmax(180px,1fr));}}
+@media(max-width:620px){.lbTop3{grid-template-columns:1fr;}}
+.lbTopCard{background:rgba(255,255,255,.80);border:1px solid rgba(0,0,0,.07);border-radius:18px;padding:12px;box-shadow:0 10px 24px rgba(0,0,0,.06);position:relative;overflow:hidden}
+.lbTopCard::after{content:"";position:absolute;inset:-50px -70px auto auto;width:160px;height:160px;background:radial-gradient(circle, rgba(0,85,164,.16), transparent 62%);transform:rotate(18deg)}
+.lbTopMedal{font-size:22px;font-weight:1000}
+.lbAvatar{width:54px;height:54px;border-radius:18px;display:flex;align-items:center;justify-content:center;font-weight:1000;background:rgba(0,85,164,.10);color:#0b2a66;margin-top:8px}
+.lbTopName{margin-top:8px;font-weight:1000;color:#0b2a66;font-size:15px}
+.lbTopMeta{margin-top:8px;display:flex;gap:8px;flex-wrap:wrap}
+
+.lbBar{height:10px;background:rgba(148,163,184,.22);border-radius:999px;overflow:hidden;margin-top:10px}
+.lbBar.sm{height:8px;margin-top:6px}
+.lbBarIn{height:100%;background:linear-gradient(90deg, rgba(0,85,164,.95), rgba(46,125,50,.85));border-radius:999px;width:0%}
+
+.lbList{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.lbRow2{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:16px;padding:10px 12px}
+.lbRank2{width:34px;height:34px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:1000;color:#0b2a66;background:rgba(0,85,164,.08)}
+.lbName2{flex:1}
+.lbNameTxt{font-weight:1000;color:#0b2a66}
+.lbPts2{display:flex;align-items:center;gap:8px}
+.muted{color:#64748b}
 
 
 /* ===== Roulette ===== */
@@ -2619,65 +2647,75 @@ document.addEventListener("DOMContentLoaded", async()=>{
         });
 
         // Champion: rank by weekly net inside class
-        let rankText = "—";
-        let champText = "—";
-        let topNetValue = null;
+let rankText = "—";
+let champText = "—";
+let topNetValue = null;
 
-        if(currentClassId){
-          const studs = await db.collection("students").where("classId","==",currentClassId).get();
-          const nets = [];
-          for(const sd of studs.docs){
-            const sid = sd.id;
-            const ref = db.collection("students").doc(sid);
-            let snap=null;
-            try{
-              snap = await ref.collection("txns")
-                .where("createdAtClient", ">=", weekStart)
-                .where("createdAtClient", "<=", weekEnd)
-                .orderBy("createdAtClient","desc")
-                .limit(600)
-                .get();
-            }catch(e){
-              try{
-                const all = await ref.collection("txns").orderBy("createdAtClient","desc").limit(800).get();
-                const docs=[];
-                all.forEach(d=>{
-                  const x=d.data()||{};
-                  const ts=Number(x.createdAtClient||0);
-                  if(ts>=weekStart && ts<=weekEnd) docs.push(d);
-                });
-                const fake={};
-                fake.forEach=(fn)=>docs.forEach(fn);
-                snap=fake;
-              }catch(e2){
-                snap={forEach:()=>{}};
-              }
-            }
-            let n=0;
-            snap.forEach(d=>{
+if(currentClassId){
+  // ملاحظة: بعض قواعد Firebase قد تمنع الطالب من قراءة بيانات زملائه
+  // لذلك نحسب "بطل الأسبوع" من صفحة المعلمة فقط.
+  if(currentAccess === "teacher"){
+    try{
+      const studs = await db.collection("students").where("classId","==",currentClassId).get();
+      const nets = [];
+      for(const sd of studs.docs){
+        const sid = sd.id;
+        const ref = db.collection("students").doc(sid);
+        let snap=null;
+        try{
+          snap = await ref.collection("txns")
+            .where("createdAtClient", ">=", weekStart)
+            .where("createdAtClient", "<=", weekEnd)
+            .orderBy("createdAtClient","desc")
+            .limit(600)
+            .get();
+        }catch(e){
+          // Fallback (avoid composite-index issues): fetch recent and filter client-side
+          try{
+            const all = await ref.collection("txns").orderBy("createdAtClient","desc").limit(800).get();
+            const docs = [];
+            all.forEach(d=>{
               const x=d.data()||{};
-              const t=String(x.type||"");
-              const a=Number(x.amount||0);
-              if(t.startsWith("إيداع") || t.startsWith("تحويل من")) n += a;
-              else if(t.startsWith("سحب") || t.startsWith("تحويل إلى")) n -= a;
+              const ts=Number(x.createdAtClient||0);
+              if(ts>=weekStart && ts<=weekEnd) docs.push(d);
             });
-            nets.push({id:sid, name:(sd.data()||{}).name||"—", net:n});
+            const fake = {};
+            fake.forEach = (fn)=>docs.forEach(fn);
+            snap = fake;
+          }catch(e2){
+            snap = {forEach:()=>{}};
           }
-          nets.sort((a,b)=>b.net-a.net);
-          const idx = nets.findIndex(x=>x.id===currentStudentId);
-          if(idx>=0){
-            rankText = `${idx+1} / ${nets.length}`;
-          }
-          if(nets.length){
-            const top = nets[0];
-            topNetValue = Number(top.net||0);
-            champText = (top.id===currentStudentId)
-              ? "مستحق ✅ (أنت/ي الأعلى هذا الأسبوع)"
-              : `غير مستحق — المتصدر: ${top.name}`;
-          }
-        }else{
-          champText = "—";
         }
+        let n=0;
+        snap.forEach(d=>{
+          const x=d.data()||{};
+          const t=String(x.type||"");
+          const a=Number(x.amount||0);
+          if(t.startsWith("إيداع") || t.startsWith("تحويل من")) n += a;
+          else if(t.startsWith("سحب") || t.startsWith("تحويل إلى")) n -= a;
+        });
+        nets.push({id:sid, name:(sd.data()||{}).name||"—", net:n});
+      }
+      nets.sort((a,b)=>b.net-a.net);
+      const idx = nets.findIndex(x=>x.id===currentStudentId);
+      if(idx>=0) rankText = `${idx+1} / ${nets.length}`;
+      if(nets.length){
+        const top = nets[0];
+        topNetValue = Number(top.net||0);
+        champText = (top.id===currentStudentId)
+          ? "مستحق ✅ (أنت/ي الأعلى هذا الأسبوع)"
+          : `غير مستحق — المتصدر: ${top.name}`;
+      }
+    }catch(e){
+      console.log("champion calc error", e);
+      champText = "—";
+    }
+  }else{
+    champText = "—";
+  }
+}else{
+  champText = "—";
+}
         // Update UI (Rewards Pro)
         const rangeTxt = `${formatYMD(weekStart)} → ${formatYMD(weekEnd)}`;
         $("rwWeekRange") && ($("rwWeekRange").textContent = rangeTxt);
@@ -2813,85 +2851,16 @@ document.addEventListener("DOMContentLoaded", async()=>{
         setProg("rwHelpProg","rwHelpProgTxt", helpCount, helpTarget);
 
         // Leaderboard (Top points in class)
-        try{
-          const box = $("rwLeader");
-          if(box){
-            box.innerHTML = "";
-            if(currentClassId){
-              const studs = await db.collection("students").where("classId","==",currentClassId).get();
-              const rows = [];
-              for(const sd of studs.docs){
-                const sid = sd.id;
-                const ref = db.collection("students").doc(sid);
-                let snap2=null;
-                try{
-                  snap2 = await ref.collection("txns")
-                    .where("createdAtClient", ">=", weekStart)
-                    .where("createdAtClient", "<=", weekEnd)
-                    .orderBy("createdAtClient","desc")
-                    .limit(600)
-                    .get();
-                }catch(e){
-                  try{
-                    const all2 = await ref.collection("txns").orderBy("createdAtClient","desc").limit(800).get();
-                    const docs2=[];
-                    all2.forEach(d=>{
-                      const x=d.data()||{};
-                      const ts=Number(x.createdAtClient||0);
-                      if(ts>=weekStart && ts<=weekEnd) docs2.push(d);
-                    });
-                    const fake2={};
-                    fake2.forEach=(fn)=>docs2.forEach(fn);
-                    snap2=fake2;
-                  }catch(e2){
-                    snap2={forEach:()=>{}};
-                  }
-                }
-                let dep2=0, part2=0, vio2=0, trOut2=0, net2=0;
-                snap2.forEach(d=>{
-                  const x=d.data()||{};
-                  const t=String(x.type||"");
-                  const a=Number(x.amount||0);
-                  const reason=String(x.reason||"");
-                  if(t.startsWith("إيداع") || t.startsWith("تحويل من")) net2 += a;
-                  else if(t.startsWith("سحب") || t.startsWith("تحويل إلى")) net2 -= a;
-                  if(t.startsWith("إيداع")) dep2 += a;
-                  if(t.startsWith("تحويل إلى")) trOut2++;
-                  if(t.startsWith("إيداع")){
-                    const r = String(reason||"").replace(/\s+/g,'');
-                    if(r.includes("مشاركة") || r.includes("تفاعل") || r.includes("إجابة") || r.includes("حل") || r.includes("واجب") || r.includes("نشاط")) part2++;
-                  }
-                  if(t.startsWith("سحب")){
-                    const rr = String(reason||"");
-                    if(violWords.some(w=>rr.includes(w))) vio2++;
-                  }
-                });
-                const pts = Math.max(0, Math.round((dep2*0.05) + (part2*12) + (trOut2*2) - (vio2*15)));
-                rows.push({id:sid,name:(sd.data()||{}).name||"—",pts,net:net2});
-              }
-              rows.sort((a,b)=>b.pts-a.pts);
-              const top = rows.slice(0,5);
-              top.forEach((r,i)=>{
-                const el=document.createElement("div");
-                el.className="lbRow";
-                el.innerHTML = `<div class="lbRank">${i+1}</div>
-                  <div>
-                    <div class="lbName">${escapeHtml(r.name)}</div>
-                    <div class="small">صافي: ${fmt(r.net)} ر.س</div>
-                  </div>
-                  <div class="lbMeta">
-                    <div class="lbPill">${r.pts} نقطة</div>
-                  </div>`;
-                box.appendChild(el);
-              });
-              if(!top.length){
-                box.innerHTML = '<div class="small">لا توجد بيانات لهذا الأسبوع.</div>';
-              }
-            }else{
-              box.innerHTML = '<div class="small">لم يتم تعيين فصل لهذا الحساب.</div>';
-            }
-          }
-        }catch(e){}
+try{
+  await loadWeeklyLeaderboard({
+    classId: currentClassId,
+    weekStartMs: weekStart,
+    weekEndMs: weekEnd
+  });
+}catch(e){
+  console.log("leaderboard render error", e);
+}
+
 
         // Auto WhatsApp congratulations (once per week per award)
         try{
@@ -3007,7 +2976,304 @@ document.addEventListener("DOMContentLoaded", async()=>{
           openModal("🎡 روليت الهدايا",
             `<div class="small">تم استخدام الفرصة مسبقًا ✅</div><div class="roulettePick" style="margin-top:10px">نتيجتك: <b>${escapeHtml(st.prize)}</b></div>`,
             '<button class="btn" onclick="closeModal()">تمام</button>'
-          );
+       
+// ===== Weekly Honor Board (Auto + Advanced) =====
+const WEEKLY_LB_COLL = "weeklyLeaderboards";
+
+function weekKeyFromStartMs(startMs){
+  try{ return formatYMD(startMs); }catch(e){ return String(startMs||""); }
+}
+function weeklyLbDocId(classId, weekStartMs){
+  return `wk_${String(classId||"noclass")}_${weekKeyFromStartMs(weekStartMs)}`;
+}
+
+async function getClassesCached(){
+  if(window.__classesCache && Array.isArray(window.__classesCache)) return window.__classesCache;
+  try{
+    const snap = await db.collection("classes").orderBy("order").get();
+    const arr=[];
+    snap.forEach(d=>arr.push({id:d.id, ...(d.data()||{})}));
+    window.__classesCache = arr;
+    return arr;
+  }catch(e){
+    return [];
+  }
+}
+
+function initials(name){
+  const t = String(name||"").trim();
+  if(!t) return "؟";
+  const parts = t.split(/\s+/).filter(Boolean);
+  const a = parts[0]?.[0] || "";
+  const b = parts[1]?.[0] || "";
+  return (a+b) || a || "؟";
+}
+
+function renderWeeklyLeaderboardUI(payload){
+  const box = $("rwLeader");
+  if(!box) return;
+
+  const meta = payload?.meta || {};
+  const rows = Array.isArray(payload?.rows) ? payload.rows : [];
+  const topPts = rows.length ? Number(rows[0].pts||0) : 0;
+
+  const top3 = rows.slice(0,3);
+  const rest = rows.slice(3,20);
+
+  const medal = (i)=> i===0 ? "🥇" : i===1 ? "🥈" : "🥉";
+
+  let topHtml = "";
+  if(top3.length){
+    topHtml += `<div class="lbTop3">`;
+    top3.forEach((r,i)=>{
+      const pct = topPts>0 ? Math.max(0, Math.min(100, Math.round((Number(r.pts||0)/topPts)*100))) : 0;
+      topHtml += `
+        <div class="lbTopCard">
+          <div class="lbTopMedal">${medal(i)}</div>
+          <div class="lbAvatar">${escapeHtml(initials(r.name))}</div>
+          <div class="lbTopName">${escapeHtml(r.name||"—")}</div>
+          <div class="lbTopMeta">
+            <span class="lbPill">${Number(r.pts||0)} نقطة</span>
+            <span class="lbPill soft">صافي: ${fmt(r.net||0)} ر.س</span>
+          </div>
+          <div class="lbBar"><div class="lbBarIn" style="width:${pct}%"></div></div>
+        </div>
+      `;
+    });
+    topHtml += `</div>`;
+  }else{
+    topHtml = `<div class="small">لا توجد بيانات لهذا الأسبوع.</div>`;
+  }
+
+  let listHtml = "";
+  if(rest.length){
+    listHtml += `<div class="lbList">`;
+    rest.forEach((r,idx)=>{
+      const rank = idx + 4;
+      const pct = topPts>0 ? Math.max(0, Math.min(100, Math.round((Number(r.pts||0)/topPts)*100))) : 0;
+      listHtml += `
+        <div class="lbRow2">
+          <div class="lbRank2">${rank}</div>
+          <div class="lbName2">
+            <div class="lbNameTxt">${escapeHtml(r.name||"—")}</div>
+            <div class="small muted">صافي: ${fmt(r.net||0)} ر.س</div>
+            <div class="lbBar sm"><div class="lbBarIn" style="width:${pct}%"></div></div>
+          </div>
+          <div class="lbPts2"><div class="lbPill">${Number(r.pts||0)} نقطة</div></div>
+        </div>
+      `;
+    });
+    listHtml += `</div>`;
+  }
+
+  const rangeTxt = meta.rangeTxt || "";
+  const clsTxt = meta.className ? ` • ${escapeHtml(meta.className)}` : "";
+  const note = meta.note ? `<div class="small muted" style="margin-top:6px">${escapeHtml(meta.note)}</div>` : "";
+
+  // Filters UI (Teacher can change class)
+  let filters = "";
+  if(currentAccess === "teacher"){
+    filters = `
+      <div class="lbFilters">
+        <div class="small muted">فلتر حسب الفصل/الشعبة:</div>
+        <select id="lbClassSel" class="lbSelect"></select>
+      </div>
+    `;
+  }
+
+  box.innerHTML = `
+    <div class="lbHeader">
+      <div>
+        <div style="font-weight:1000;color:#0b2a66">🏅 لوحة الشرف الأسبوعية</div>
+        <div class="small muted">${escapeHtml(rangeTxt)}${clsTxt}</div>
+      </div>
+      <div class="lbRight">
+        <div class="lbProgWrap">
+          <div class="small muted">شريط التقدم (حسب المتصدر)</div>
+          <div class="lbBar"><div class="lbBarIn" style="width:100%"></div></div>
+        </div>
+      </div>
+    </div>
+    ${filters}
+    ${topHtml}
+    ${listHtml || ""}
+    ${note}
+  `;
+
+  if(currentAccess === "teacher"){
+    // Fill class selector
+    getClassesCached().then(arr=>{
+      const sel = $("lbClassSel");
+      if(!sel) return;
+      sel.innerHTML = `<option value="">— اختر الفصل —</option>` + arr.map(c=>`<option value="${c.id}">${escapeHtml(c.name||c.id)}</option>`).join("");
+      sel.value = String(meta.classId||currentClassId||"");
+      sel.onchange = async ()=>{
+        const cid = sel.value;
+        if(!cid) return;
+        await loadWeeklyLeaderboard({classId: cid, weekStartMs: meta.weekStartMs, weekEndMs: meta.weekEndMs});
+      };
+    });
+  }
+}
+
+async function computeWeeklyLeaderboardForClass(classId, weekStartMs, weekEndMs){
+  const studs = await db.collection("students").where("classId","==",classId).get();
+  const violWords = ["مخالفة","سلوك","غياب","تأخر","عدم","انضباط","تنبيه"];
+  const rows = [];
+  for(const sd of studs.docs){
+    const sid = sd.id;
+    const st = sd.data() || {};
+    const ref = db.collection("students").doc(sid);
+    let snap=null;
+    try{
+      snap = await ref.collection("txns")
+        .where("createdAtClient", ">=", weekStartMs)
+        .where("createdAtClient", "<=", weekEndMs)
+        .orderBy("createdAtClient","desc")
+        .limit(600)
+        .get();
+    }catch(e){
+      // Fallback without composite index
+      const all2 = await ref.collection("txns").orderBy("createdAtClient","desc").limit(800).get();
+      const docs2=[];
+      all2.forEach(d=>{
+        const x=d.data()||{};
+        const ts=Number(x.createdAtClient||0);
+        if(ts>=weekStartMs && ts<=weekEndMs) docs2.push(d);
+      });
+      const fake2={};
+      fake2.forEach=(fn)=>docs2.forEach(fn);
+      snap=fake2;
+    }
+
+    let dep=0, part=0, vio=0, trOut=0, net=0;
+    snap.forEach(d=>{
+      const x=d.data()||{};
+      const t=String(x.type||"");
+      const a=Number(x.amount||0);
+      const reason=String(x.reason||"");
+      if(t.startsWith("إيداع") || t.startsWith("تحويل من")) net += a;
+      else if(t.startsWith("سحب") || t.startsWith("تحويل إلى")) net -= a;
+
+      if(t.startsWith("إيداع")) dep += a;
+      if(t.startsWith("تحويل إلى")) trOut++;
+
+      if(t.startsWith("إيداع")){
+        const r = String(reason||"").replace(/\s+/g,'');
+        if(r.includes("مشاركة") || r.includes("تفاعل") || r.includes("إجابة") || r.includes("حل") || r.includes("واجب") || r.includes("نشاط")) part++;
+      }
+      if(t.startsWith("سحب")){
+        const rr = String(reason||"");
+        if(violWords.some(w=>rr.includes(w))) vio++;
+      }
+    });
+
+    // نقاط مرنة (يمكن تعديلها لاحقًا)
+    const pts = Math.max(0, Math.round((dep*0.05) + (part*12) + (trOut*2) - (vio*15)));
+
+    rows.push({
+      id: sid,
+      name: st.name || "—",
+      pts,
+      net,
+      balance: Number(st.balance||0),
+      classId: st.classId || classId
+    });
+  }
+  rows.sort((a,b)=>b.pts-a.pts);
+  return rows;
+}
+
+async function ensureWeeklyLeaderboardSnapshot(classId, weekStartMs, weekEndMs){
+  try{
+    if(currentAccess !== "teacher") return null;
+    if(!classId) return null;
+
+    const docId = weeklyLbDocId(classId, weekStartMs);
+    const ref = db.collection(WEEKLY_LB_COLL).doc(docId);
+
+    // If already exists, keep it (avoid rewriting كثير)
+    const existing = await ref.get();
+    if(existing.exists){
+      return existing.data() || null;
+    }
+
+    const rows = await computeWeeklyLeaderboardForClass(classId, weekStartMs, weekEndMs);
+    const classes = await getClassesCached();
+    const cls = classes.find(x=>String(x.id)===String(classId));
+    const payload = {
+      classId,
+      className: (cls && cls.name) ? cls.name : "",
+      weekStartMs,
+      weekEndMs,
+      rangeTxt: `${formatYMD(weekStartMs)} → ${formatYMD(weekEndMs)}`,
+      createdAt: Date.now(),
+      rows: rows.slice(0,30)
+    };
+    await ref.set(payload, {merge:true});
+    return payload;
+  }catch(e){
+    console.log("ensureWeeklyLeaderboardSnapshot error", e);
+    return null;
+  }
+}
+
+async function loadWeeklyLeaderboard({classId, weekStartMs, weekEndMs}){
+  const box = $("rwLeader");
+  if(!box) return;
+
+  if(!classId){
+    box.innerHTML = '<div class="small">لم يتم تعيين فصل لهذا الحساب.</div>';
+    return;
+  }
+
+  // Try to read snapshot first (works for students even if peer reads ممنوعة)
+  const docId = weeklyLbDocId(classId, weekStartMs);
+  const ref = db.collection(WEEKLY_LB_COLL).doc(docId);
+
+  // Teacher: ensure snapshot exists (create once)
+  if(currentAccess === "teacher"){
+    await ensureWeeklyLeaderboardSnapshot(classId, weekStartMs, weekEndMs);
+  }
+
+  try{
+    const snap = await ref.get();
+    if(snap.exists){
+      const data = snap.data() || {};
+      renderWeeklyLeaderboardUI({meta:{...data, note:""}, rows:data.rows||[]});
+      return;
+    }
+  }catch(e){
+    console.log("read leaderboard snapshot error", e);
+  }
+
+  // Fallback:
+  if(currentAccess === "teacher"){
+    // compute directly even if snapshot failed
+    try{
+      const rows = await computeWeeklyLeaderboardForClass(classId, weekStartMs, weekEndMs);
+      const classes = await getClassesCached();
+      const cls = classes.find(x=>String(x.id)===String(classId));
+      renderWeeklyLeaderboardUI({
+        meta:{
+          classId,
+          className:(cls&&cls.name)||"",
+          weekStartMs, weekEndMs,
+          rangeTxt:`${formatYMD(weekStartMs)} → ${formatYMD(weekEndMs)}`,
+          note:"(عرض مباشر — لم يتم حفظ نسخة اللوحة)"
+        },
+        rows
+      });
+      return;
+    }catch(e){
+      console.log("compute leaderboard fallback error", e);
+    }
+  }
+
+  box.innerHTML = '<div class="small">تعذر تحميل لوحة الشرف الآن. افتحيها من وضع المعلمة واضغطي تحديث اللوحة مرة واحدة.</div>';
+}
+
+   );
           return;
         }
 
