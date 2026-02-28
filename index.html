@@ -4,6 +4,63 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
   <title>بنك الرياضيات – المصرفي للمعلمة سارة حقوي</title>
+<script>
+/* Boot-safe router (runs before anything else).
+   Ensures زر "ابدأ الآن" يعمل حتى لو تعطّل جزء من السكربت في Safari/iOS. */
+(function(){
+  function getMode(){
+    try{
+      const u=new URL(location.href);
+      const m=(u.searchParams.get("mode")||"").toLowerCase();
+      return (m==="student"||m==="teacher") ? m : "";
+    }catch(e){ return ""; }
+  }
+  function showOnly(id){
+    const ids=["startOverlay","onboardOverlay","teacherLoginPage","studentLoginPage","classesPage","classPage","studentAccountPage","dailyOpsPage"];
+    ids.forEach(function(x){
+      const el=document.getElementById(x);
+      if(!el) return;
+      if(x===id){ el.classList.remove("hidden"); el.style.display=""; }
+      else{ el.classList.add("hidden"); if(x==="startOverlay") el.style.display=""; }
+    });
+  }
+  function goLogin(){
+    var mode=getMode();
+    window.IS_STUDENT_ENTRY = (mode==="student");
+    window.currentAccess = window.IS_STUDENT_ENTRY ? "student" : "teacher";
+    showOnly(window.IS_STUDENT_ENTRY ? "studentLoginPage" : "teacherLoginPage");
+  }
+  // تعريف startApp عالميًا مبكرًا
+  window.startApp = function(){
+    try{
+      // أخفِ شاشة البداية إن وجدت
+      var so=document.getElementById("startOverlay");
+      if(so){ so.classList.add("hidden"); so.style.display="none"; }
+    }catch(e){}
+    // تجاهل الـ onboarding لو صار فيه تعليق
+    try{
+      if(typeof window.showOnboarding === "function"){
+        window.showOnboarding(function(){ goLogin(); });
+        return;
+      }
+    }catch(e){}
+    goLogin();
+  };
+  // اربطي الحدث أيضًا بعد تحميل الـ DOM كخطة بديلة
+  document.addEventListener("DOMContentLoaded", function(){
+    try{
+      var btn=document.querySelector('button[onclick="startApp()"]');
+      if(btn){
+        btn.addEventListener("click", function(ev){
+          ev.preventDefault();
+          window.startApp();
+        }, {passive:false});
+      }
+    }catch(e){}
+  });
+})();
+</script>
+
 
   <style>
     :root{
