@@ -329,22 +329,7 @@
 .roulLabel span{position:absolute;left:50%;top:8%;transform-origin:0 150px;font-size:12px;font-weight:900;color:#0b2a66;white-space:nowrap;text-shadow:0 1px 0 rgba(255,255,255,.7)}
 @media (max-width:420px){ .roulLabel span{font-size:11px} .roulHub{width:84px;height:84px} }
 
-
-    /* === v8 fallback: allow الدخول حتى لو تعطل JavaScript === */
-    #teacherLoginPage:target, #studentLoginPage:target{
-      display:block !important;
-    }
-    /* نسخة الإصدار */
-    .verBadge{
-      position:absolute; top:10px; left:10px;
-      background:rgba(0,0,0,.35); color:#fff;
-      padding:6px 10px; border-radius:999px;
-      font-size:12px; font-weight:800; letter-spacing:.3px;
-      border:1px solid rgba(255,255,255,.22);
-      backdrop-filter: blur(6px);
-    }
-
-  </style>
+</style>
 </head>
 
 <body>
@@ -359,7 +344,6 @@
 
   <div id="startOverlay">
     <div class="startBox">
-        <div class="verBadge">v8</div>
       <div class="startTop">
         <div class="pill" id="connPill">...جاري تجهيز النظام...</div>
         <div class="pill" id="modePill">وضع: المعلمة</div>
@@ -380,7 +364,7 @@
         </div>
 
         <div class="startActions">
-          <a class="btn" href="#teacherLoginPage" onclick="startApp();return false;" data-start-btn="1">ابدأ الآن</a>
+          <button class="btn" onclick="startApp()">ابدأ الآن</button>
           <button class="ghostBtn" onclick="openHelp()">هل تحتاج إلى مساعدة؟</button>
         </div>
       </div>
@@ -531,6 +515,7 @@
 
           <div class="forgotRow">
             <a href="javascript:void(0)" id="forgotPinLink">نسيت الرقم السري؟</a>
+            <a href="javascript:void(0)" id="stuChangePinLink">تغيير الرقم السري</a>
             <span class="small">اطلبه من ولي أمرك أو المعلمة</span>
           </div>
 
@@ -1188,11 +1173,11 @@
               <div class="row" style="margin-top:10px">
                 <div class="col">
                   <div class="small">PIN الجديد</div>
-                  <input id="stuNewPin" inputmode="numeric" maxlength="4" placeholder="****">
+                  <input id="stuNewPin" maxlength="16" placeholder="••••">
                 </div>
                 <div class="col">
                   <div class="small">تأكيد PIN</div>
-                  <input id="stuNewPin2" inputmode="numeric" maxlength="4" placeholder="****">
+                  <input id="stuNewPin2" maxlength="16" placeholder="••••">
                 </div>
               </div>
               <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:10px;flex-wrap:wrap">
@@ -1226,6 +1211,9 @@
     const forcedStudent = (urlParams.get("student")==="1" || urlParams.get("s")==="1" || (window.location.hash||"").toLowerCase().includes("student"));
 const APP_MODE = ((urlParams.get("mode") || (forcedStudent?"student":"") ) || localStorage.getItem("MB_LAST_MODE") || "teacher").toLowerCase();
     const IS_STUDENT_ENTRY = (APP_MODE === "student");
+    // Expose to window for later safety patches
+    window.IS_STUDENT_ENTRY = IS_STUDENT_ENTRY;
+    window.APP_MODE = APP_MODE;
 
     const SIGNATURE = "المعلمة: سارة حقوي";
     const TEACHER_BANK_TITLE = "بنك الرياضيات – المصرفي";
@@ -1678,12 +1666,31 @@ ${SIGNATURE}`
       await renderTabs();
     }
 
-    function teacherLogin(){
-      if(($("tu").value||"").trim()==="teacher" && ($("tp").value||"").trim()==="12345"){
-        currentAccess="teacher";
-        hideAllPages(); show("classesPage"); renderTabs();
-      } else warn("بيانات الدخول غير صحيحة");
+
+function getTeacherCred(){
+  try{
+    const raw = localStorage.getItem("MB_TEACHER_CRED");
+    if(raw){
+      const obj = JSON.parse(raw);
+      if(obj && obj.user && obj.pass) return {user:String(obj.user), pass:String(obj.pass)};
     }
+  }catch(e){}
+  return {user:"teacher", pass:"12345"};
+}
+function setTeacherCred(user, pass){
+  localStorage.setItem("MB_TEACHER_CRED", JSON.stringify({user, pass}));
+}
+
+function teacherLogin(){
+  const u = ($("tu").value||"").trim();
+  const p = ($("tp").value||"").trim();
+  const cred = getTeacherCred();
+  if(u===cred.user && p===cred.pass){
+    currentAccess="teacher";
+    try{ localStorage.setItem("MB_LAST_MODE","teacher"); }catch(e){}
+    hideAllPages(); show("classesPage"); renderTabs();
+  } else warn("بيانات الدخول غير صحيحة");
+}
 
     function forgotTeacher(){
       const subject = encodeURIComponent("طلب استرجاع بيانات الدخول – بنك الرياضيات");
@@ -1957,6 +1964,7 @@ function renderStudents(){
         card.querySelector(".js-edit").onclick = async()=>{ const nn = prompt("الاسم الجديد:", s.name); if(nn) await db.collection("students").doc(s.id).update({name:nn.trim()}); await renderStudents(); };
         card.querySelector(".js-phone").onclick = ()=> editGuardianPhone(s.id);
         card.querySelector(".js-pin").onclick = ()=> changePinTeacher(s.id);
+        card.querySelector(".js-del").onclick = ()=> deleteStudentFlow(s.id, s.name);
 
         card.querySelector(".js-sendpin").onclick = ()=> sendPinToGuardian(s.id);
         card.querySelector(".js-pdf").onclick = ()=> pdfStudentReport(s.id);
@@ -1983,61 +1991,14 @@ function renderStudents(){
     async function executeOp(){ warn("هذه النسخة مدمجة للواجهة + الكود الأساسي. لو تبغين كل الوظائف (PDF/واتساب/تقارير أسبوعية)، قولي لي وأصدر لك نسخة Full كاملة 100%."); }
 
     async function startApp(){
-      // زر "ابدأ الآن" لازم يشتغل حتى لو حصل خطأ في شاشة التعريف (Safari أحياناً يسكت)
-      const go = ()=>{
-        try{
-          hideAllPages();
-          if(IS_STUDENT_ENTRY){ show("studentLoginPage"); currentAccess="student"; }
-          else{ show("teacherLoginPage"); currentAccess="teacher"; }
-        }catch(err){
-          console.error("startApp/go failed", err);
-        }
-      };
-
-      try{
-        const so = $("startOverlay");
-        if(so){ so.classList.add("hidden"); so.style.display="none"; }
-      }catch(_){}
-
-      try{
-        if(typeof showOnboarding === "function"){
-          showOnboarding(go);
-        }else{
-          go();
-        }
-      }catch(err){
-        console.error("showOnboarding failed", err);
-        go();
-      }
+      const so = $("startOverlay");
+      if(so){ so.classList.add("hidden"); so.style.display="none"; }
+      showOnboarding(()=>{
+        hideAllPages();
+        if(IS_STUDENT_ENTRY){ show("studentLoginPage"); currentAccess="student"; }
+        else{ show("teacherLoginPage"); currentAccess="teacher"; }
+      });
     }
-
-    // ضمان ربط زر ابدأ حتى لو تعطلت onclick في بعض المتصفحات
-    
-    function syncStartHref(){
-      try{
-        const btn = document.querySelector('[data-start-btn="1"]');
-        if(!btn) return;
-        // افتراضي: المعلمة
-        let target = "#teacherLoginPage";
-        // وضع الطالب عبر الرابط ?mode=student أو زر الوضع
-        if(IS_STUDENT_ENTRY || currentAccess==="student") target = "#studentLoginPage";
-        btn.setAttribute("href", target);
-      }catch(_){}
-    }
-
-    function bindStartBtn(){
-      try{
-        const btn = document.querySelector('[data-start-btn="1"]');
-        if(btn){
-          btn.addEventListener("click", (e)=>{ e.preventDefault(); startApp(); });
-          btn.addEventListener("touchend", (e)=>{ e.preventDefault(); startApp(); }, {passive:false});
-          syncStartHref();
-        }
-      }catch(err){ console.error("bindStartBtn failed", err); }
-    }
-    document.addEventListener("DOMContentLoaded", bindStartBtn);
-    window.addEventListener("pageshow", bindStartBtn);
-
 
     
     // ================== Daily Ops (Teacher) ==================
@@ -2229,7 +2190,11 @@ document.addEventListener("DOMContentLoaded", async()=>{
 
       if(IS_STUDENT_ENTRY){ $("startMsg").innerHTML = "بوابة دخول الطلاب 👇<br>اضغط زر البداية ثم تابعي التعريف السريع."; }
       $("forgotPinLink")?.addEventListener("click",(e)=>{ e.preventDefault(); forgotStudentPin(); });
-      $("changePinLink")?.addEventListener("click",(e)=>{ e.preventDefault(); changePinStudentFlow(); });
+      $("changePinLink")?.addEventListener("click",(e)=>{ e.preventDefault();
+        // في صفحة المعلمة: تغيير كلمة مرور المعلمة — في وضع الطالب: تغيير الرقم السري للطالب
+        if(window.IS_STUDENT_ENTRY){ changePinStudentFlow(); } else { changeTeacherPassFlow(); }
+      });
+      $("stuChangePinLink")?.addEventListener("click",(e)=>{ e.preventDefault(); changePinStudentFlow(); });
       $("op")?.addEventListener("change", ()=>{
         setupReasonUI($("op").value, "reasonStudent", "reasonOtherStudent");
         toggleStudentOpUI();
@@ -2240,8 +2205,52 @@ document.addEventListener("DOMContentLoaded", async()=>{
       bindClickSounds();
     });
   
-    // ================== Added: Guardian phone / PIN / PDF ==================
-    function isValidPin(p){ return /^[0-9]{4}$/.test(String(p||"").trim()); }
+    
+// ================== Teacher password (change) ==================
+function isValidPass(p){
+  const v = String(p||"").trim();
+  // يسمح بأرقام أو حروف (عربي/إنجليزي) بدون مسافات: 4 إلى 16
+  return /^[A-Za-z0-9\u0600-\u06FF]{4,16}$/.test(v);
+}
+
+function changeTeacherPassFlow(){
+  try{
+    const cred = getTeacherCred ? getTeacherCred() : {user:"teacher", pass:"12345"};
+    const body = `
+      <div class="small">تغيير كلمة مرور المعلمة</div>
+      <hr>
+      <div class="row">
+        <div class="col">
+          <div class="small">كلمة المرور الحالية</div>
+          <input id="tOldPass" type="password" placeholder="••••">
+        </div>
+        <div class="col">
+          <div class="small">كلمة المرور الجديدة</div>
+          <input id="tNewPass" type="password" placeholder="4-16 حرف/رقم">
+        </div>
+      </div>
+      <div class="small" style="margin-top:8px">بدون مسافات • 4–16 • أحرف/أرقام</div>
+    `;
+    openModal("تغيير كلمة المرور", body, `
+      <button class="btn2" onclick="closeModal()">إلغاء</button>
+      <button class="btn" onclick="(async()=>{
+        const oldP = (document.getElementById('tOldPass').value||'').trim();
+        const newP = (document.getElementById('tNewPass').value||'').trim();
+        if(oldP !== String(cred.pass||'')) return warn('كلمة المرور الحالية غير صحيحة');
+        if(!isValidPass(newP)) return warn('كلمة المرور الجديدة غير صالحة (4-16 حرف/رقم بدون مسافات)');
+        try{ setTeacherCred(cred.user, newP); }catch(e){ localStorage.setItem('MB_TEACHER_CRED', JSON.stringify({user:cred.user, pass:newP})); }
+        closeModal();
+        warn('تم تغيير كلمة المرور ✅');
+      })()">حفظ</button>
+    `);
+  }catch(e){
+    console.log(e);
+    warn("تعذر تغيير كلمة المرور الآن.");
+  }
+}
+
+// ================== Added: Guardian phone / PIN / PDF ==================
+    function isValidPin(p){ return isValidPass(p); }$/.test(String(p||"").trim()); }
 
     async function getStudentById(studentId){
       const doc = await db.collection("students").doc(studentId).get();
@@ -2309,15 +2318,15 @@ document.addEventListener("DOMContentLoaded", async()=>{
         const body = `
           <div class="small" style="margin-bottom:8px">تغيير PIN للطالب/ـة: <b>${s.name||""}</b></div>
           <div class="field" style="margin:0">
-            <input id="pinNew" inputmode="numeric" maxlength="4" placeholder="PIN جديد (4 أرقام)">
+            <input id="pinNew" maxlength="16" placeholder="رقم سري جديد (4-16 حرف/رقم)">
           </div>
-          <div class="small" style="margin-top:8px">مثال: 1234</div>
+          <div class="small" style="margin-top:8px">مثال: 1234 أو Sara11</div>
         `;
         openModal("تغيير PIN", body, `
           <button class="btn2" onclick="closeModal()">إلغاء</button>
           <button class="btn" onclick="(async()=>{
             const v = (document.getElementById('pinNew').value||'').trim();
-            if(!/^[0-9]{4}$/.test(v)){ return warn('PIN لازم يكون 4 أرقام'); }
+            if(!isValidPin(v)){ return warn('الرقم السري غير صالح (4-16 حرف/رقم بدون مسافات)'); }
             await db.collection('students').doc('${studentId}').update({pin: v});
             closeModal();
             await renderStudents();
@@ -2344,14 +2353,14 @@ document.addEventListener("DOMContentLoaded", async()=>{
           <div class="row">
             <div class="col">
               <div class="small">PIN الحالي</div>
-              <input id="oldPin" inputmode="numeric" maxlength="4" placeholder="****">
+              <input id="oldPin" maxlength="16" placeholder="••••">
             </div>
             <div class="col">
               <div class="small">PIN الجديد</div>
-              <input id="newPin" inputmode="numeric" maxlength="4" placeholder="****">
+              <input id="newPin" maxlength="16" placeholder="••••">
             </div>
           </div>
-          <div class="small" style="margin-top:8px">شرط: 4 أرقام</div>
+          <div class="small" style="margin-top:8px">شرط: 4–16 حرف/رقم بدون مسافات</div>
         `;
         openModal("تغيير الرقم السري", body, `
           <button class="btn2" onclick="closeModal()">إلغاء</button>
@@ -2359,7 +2368,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
             const oldP = (document.getElementById('oldPin').value||'').trim();
             const newP = (document.getElementById('newPin').value||'').trim();
             if(String(oldP)!==String(s.pin||'')) return warn('PIN الحالي غير صحيح');
-            if(!/^[0-9]{4}$/.test(newP)) return warn('PIN الجديد لازم يكون 4 أرقام');
+            if(!isValidPin(newP)) return warn('الرقم السري الجديد غير صالح (4-16 حرف/رقم بدون مسافات)');
             await db.collection('students').doc('${doc.id}').update({pin:newP});
             closeModal();
             warn('تم تغيير PIN بنجاح ✅');
@@ -2389,7 +2398,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
         const p1 = (document.getElementById("stuNewPin")?.value || "").trim();
         const p2 = (document.getElementById("stuNewPin2")?.value || "").trim();
         const msg = document.getElementById("stuPinMsg");
-        if(!/^[0-9]{4}$/.test(p1)) return warn("PIN الجديد لازم يكون 4 أرقام");
+        if(!isValidPin(p1)) return warn("الرقم السري الجديد غير صالح (4-16 حرف/رقم بدون مسافات)");
         if(p1 !== p2) return warn("التأكيد غير مطابق");
         await db.collection("students").doc(currentStudentObj.id).update({pin:p1});
         // تحديث محلي
@@ -2403,7 +2412,43 @@ document.addEventListener("DOMContentLoaded", async()=>{
       }
     }
 
-    function hijriAndGregToday(){
+    
+
+// ================== Delete student (inside class) ==================
+async function deleteStudentFlow(studentId, studentName){
+  try{
+    const ok = confirm(`تأكيد حذف الطالب/ـة: ${studentName||""}\nسيتم حذف الحساب وعملياته (قد يستغرق ثواني).`);
+    if(!ok) return;
+    await deleteStudentHard(studentId);
+    warn("تم حذف الطالب ✅");
+    await renderStudents();
+  }catch(e){
+    console.log(e);
+    warn("تعذر حذف الطالب الآن.");
+  }
+}
+
+async function deleteStudentHard(studentId){
+  // حذف عمليات الطالب ثم حذف ملف الطالب
+  const stuRef = db.collection("students").doc(studentId);
+  try{
+    const txRef = stuRef.collection("txns");
+    // حذف على دفعات
+    while(true){
+      const snap = await txRef.limit(250).get();
+      if(snap.empty) break;
+      const batch = db.batch();
+      snap.forEach(d=>batch.delete(d.ref));
+      await batch.commit();
+    }
+  }catch(e){
+    // لو فشل حذف العمليات، نكمل حذف الطالب على الأقل
+    console.log("txns delete err", e);
+  }
+  await stuRef.delete();
+}
+
+function hijriAndGregToday(){
       const now = new Date();
       const greg = new Intl.DateTimeFormat("ar-SA", {year:"numeric", month:"long", day:"numeric"}).format(now);
       let hijri = "";
