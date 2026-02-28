@@ -160,6 +160,8 @@
     .tab.active{background:var(--rajhi);color:#fff}
 
     .grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+    .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    @media(max-width:820px){.grid3{grid-template-columns:1fr}}
     @media(max-width:820px){.grid2{grid-template-columns:1fr}}
 
     .badge{display:inline-block;padding:5px 10px;border-radius:999px;font-size:12px;font-weight:900}
@@ -717,6 +719,54 @@
         <div class="small" style="margin-top:8px;color:#47607e">* يتم استخراج التقرير حسب العمليات المسجلة ضمن الفترة المحددة.</div>
       </div>
 
+      <div class="card soft" style="margin-top:12px">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+          <div>
+            <div style="font-weight:1000;color:#0b2a66">🏅 لوحة الشرف (تبويب خاص)</div>
+            <div class="small" style="margin-top:4px;color:#47607e">تُحسب محليًا من بيانات طلاب الفصل داخل النظام — بدون تعذّر.</div>
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:10px">
+          <div class="col">
+            <div class="small">فلترة الشعبة/المجموعة</div>
+            <select id="hbSection"></select>
+          </div>
+          <div class="col">
+            <div class="small">نوع الترتيب</div>
+            <select id="hbSort">
+              <option value="weekPoints">نقاط الأسبوع</option>
+              <option value="balance">الرصيد</option>
+              <option value="ops">مشاركات الأسبوع</option>
+            </select>
+          </div>
+          <div class="col" style="align-self:flex-end">
+            <button class="btn3" onclick="renderHonorBoard()">تحديث تلقائي</button>
+          </div>
+        </div>
+
+        <div id="honorBoardTop3" class="grid3" style="margin-top:12px"></div>
+        <div id="honorBoardList" class="card" style="margin-top:10px"></div>
+      </div>
+
+      <div class="card soft" style="margin-top:12px">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+          <div>
+            <div style="font-weight:1000;color:#0b2a66">🎡 إدارة الروليت (تبويب خاص)</div>
+            <div class="small" style="margin-top:4px;color:#47607e">تغيير الجوائز يظهر فورًا للطلاب المؤهلين (ذهبي/ماسي/ألماسي).</div>
+          </div>
+          <button class="btn" onclick="saveRoulettePrizes()">حفظ الجوائز</button>
+        </div>
+
+        <div class="row" style="margin-top:10px">
+          <div class="col">
+            <div class="small">قائمة الجوائز (كل سطر = جائزة)</div>
+            <textarea id="roulettePrizes" rows="5" style="width:100%;resize:vertical" placeholder="إعفاء واجب&#10;إعفاء واجبان&#10;زيادة درجات في الاختبار&#10;وجبة ماكدونالدز"></textarea>
+            <div class="small" style="margin-top:6px;color:#47607e">* فرصة تدوير واحدة لكل طالب في الأسبوع.</div>
+          </div>
+        </div>
+      </div>
+
       <div id="studentsGrid" class="grid2"></div>
     </div>
   </div>
@@ -821,6 +871,7 @@
           <div class="miniTab active" onclick="setMiniTab('paneStmt',this)">📄 كشف الحساب</div>
           <div class="miniTab" onclick="setMiniTab('paneUpgrade',this)">⬆️ ترقية الحساب</div>
           <div class="miniTab" onclick="setMiniTab('paneRewards',this)">🎁 الجوائز والحوافز</div>
+          <div class="miniTab" id="tabRoulette" onclick="setMiniTab('paneRoulette',this)" style="display:none">🎡 روليت الهدايا</div>
           <div class="miniTab" onclick="setMiniTab('paneCard',this)">💳 تفاصيل البطاقة</div>
         </div>
 
@@ -1045,6 +1096,31 @@
     </div>
   </div>
 </div>
+
+        <div id="paneRoulette" class="miniPane">
+          <div class="card soft" style="margin-top:10px">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+              <div>
+                <div style="font-weight:1000;color:#0b2a66">🎡 روليت الهدايا</div>
+                <div class="small" id="rouletteHint" style="margin-top:4px;color:#47607e">متاح مرة واحدة فقط للحسابات: ذهبي / ماسي / ألماسي.</div>
+              </div>
+              <div class="badge" id="rouletteStatus">—</div>
+            </div>
+            <hr>
+            <div id="rouletteBody">
+              <div class="small" style="line-height:1.9">اضغط/ي “تدوير الآن” للحصول على هدية تحفيزية 🎁</div>
+              <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px">
+                <button class="btn" id="spinBtn" onclick="spinRoulette()">تدوير الآن</button>
+                <button class="btn3" onclick="showRoulettePrizes()">عرض الجوائز</button>
+              </div>
+              <div id="rouletteResultBox" class="card" style="margin-top:12px;display:none">
+                <div class="small" style="color:#47607e">نتيجتك:</div>
+                <div id="rouletteResult" style="font-weight:1000;color:#0b2a66;font-size:18px;margin-top:6px">—</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
 <div id="paneCard" class="miniPane">
           <div class="card" style="margin-top:12px">
             <h3 style="margin:0;color:#0b2a66">تفاصيل البطاقة</h3>
@@ -1129,27 +1205,7 @@
     }
 
     
-    
-    // ===== Honor Roll helpers (robust) =====
-    function getStudentClassLabel(s){
-      if(!s) return "";
-      return String(s.className || s.class || s.gradeClass || s.grade || s.group || s.section || s.shuaba || "").trim();
-    }
-    function getStudentSectionLabel(s){
-      if(!s) return "";
-      return String(s.section || s.shuaba || s.classSection || s.groupSection || "").trim();
-    }
-    function honorCacheKey(weekStart, cls, sec){
-      return `honor_cache_${formatYMD(new Date(weekStart))}_${(cls||"all").replace(/\s+/g,'_')}_${(sec||"all").replace(/\s+/g,'_')}`;
-    }
-    function saveHonorCache(key, data){
-      try{ localStorage.setItem(key, JSON.stringify({ts:Date.now(), data})); }catch(e){}
-    }
-    function loadHonorCache(key){
-      try{ const v=localStorage.getItem(key); if(!v) return null; const o=JSON.parse(v); return o&&o.data?o.data:null; }catch(e){ return null; }
-    }
-
-function escapeHtml(str){
+    function escapeHtml(str){
       return String(str||"").replace(/[&<>"']/g, s=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[s]));
     }
 function normalizePhoneToWA(phone){
@@ -1734,6 +1790,8 @@ ${SIGNATURE}`;
       const snap = await db.collection("students").where("classId","==",currentClassId).get();
       const arr=[]; snap.forEach(d=>arr.push({id:d.id,...d.data()}));
       arr.sort((a,b)=>(a.name||"").localeCompare(b.name||"","ar"));
+      window.__lastClassStudents = arr;
+      try{ initHonorRouletteUI(arr); }catch(e){}
 
       const pick = $("pickStudent");
       pick.innerHTML="";
@@ -2678,117 +2736,61 @@ document.addEventListener("DOMContentLoaded", async()=>{
         try{
           const box = $("rwLeader");
           if(box){
-            const clsLabel = (typeof currentClassId!=="undefined" && currentClassId) ? String(currentClassId) : getStudentClassLabel(currentStudentObj);
-            const cacheKey = honorCacheKey(weekStart, clsLabel||"all", "");
-            const cached = loadHonorCache(cacheKey);
-
-            const renderList = (rows)=>{
-              box.innerHTML = "";
-              const top = (rows||[]).slice(0,10);
-              top.forEach((r,i)=>{
-                const medal = (i===0?"🥇":i===1?"🥈":i===2?"🥉":`#${i+1}`);
-                const el=document.createElement("div");
-                el.className="lbRow";
-                el.innerHTML = `<div class="lbRank">${medal}</div>
-                  <div>
-                    <div class="lbName">${escapeHtml(r.name||"—")}</div>
-                    <div class="small">صافي: ${fmt(r.net||0)} ر.س</div>
-                  </div>
-                  <div class="lbMeta"><div class="lbPill">${Number(r.pts||0)} نقطة</div></div>`;
-                box.appendChild(el);
-              });
-              if(!top.length) box.innerHTML = '<div class="small">لا توجد بيانات كافية لهذا الأسبوع.</div>';
-            };
-
-            // show cached immediately (if available) to avoid "تعذر"
-            if(cached && Array.isArray(cached) && cached.length){
-              renderList(cached);
-            }else{
-              box.innerHTML = '<div class="small">جارٍ تحميل لوحة الشرف…</div>';
-            }
-
-            // Students: show cached only (privacy / rules safe)
-            if(currentAccess==="student"){
-              if(!(cached && cached.length)){
-                // Try to read shared published snapshot
-                try{
-                  const pub = await db.collection("publicBoards").doc(cacheKey).get();
-                  const pdata = pub.exists ? (pub.data()||{}) : {};
-                  const prows = Array.isArray(pdata.rows) ? pdata.rows : [];
-                  if(prows.length){
-                    saveHonorCache(cacheKey, prows);
-                    renderList(prows);
-                  }else{
-                    box.innerHTML = '<div class="small">لوحة الشرف غير متاحة الآن.</div>';
-                  }
-                }catch(e){
-                  box.innerHTML = '<div class="small">لوحة الشرف تظهر بعد تحديثها من حساب المعلمة.</div>';
-                }
-              }
-            }else{
-              // Teacher: compute fresh and cache
-              let studsSnap = null;
-              try{
-                if(typeof currentClassId!=="undefined" && currentClassId){
-                  studsSnap = await db.collection("students").where("classId","==",currentClassId).get();
-                }else{
-                  const c = getStudentClassLabel(currentStudentObj);
-                  if(c){
-                    // try common field names; fall back to all
-                    studsSnap = await db.collection("students").where("className","==",c).get().catch(()=>null);
-                    if(!studsSnap) studsSnap = await db.collection("students").where("class","==",c).get().catch(()=>null);
-                  }
-                  if(!studsSnap) studsSnap = await db.collection("students").limit(200).get();
-                }
-              }catch(e){
-                studsSnap = await db.collection("students").limit(200).get();
-              }
-
+            box.innerHTML = "";
+            if(currentClassId){
+              const studs = await db.collection("students").where("classId","==",currentClassId).get();
               const rows = [];
-              const violWords = ["مخالفة","سلوك","غياب","تأخر","عدم","انضباط","تنبيه"];
-              for(const sd of (studsSnap?.docs||[])){
-                try{
-                  const sid = sd.id;
-                  const ref = db.collection("students").doc(sid);
-                  const snap2 = await ref.collection("txns")
-                    .where("createdAtClient", ">=", weekStart)
-                    .where("createdAtClient", "<=", weekEnd)
-                    .orderBy("createdAtClient","desc")
-                    .limit(400)
-                    .get();
-                  let dep2=0, part2=0, vio2=0, trOut2=0, net2=0;
-                  snap2.forEach(d=>{
-                    const x=d.data()||{};
-                    const t=String(x.type||"");
-                    const a=Number(x.amount||0);
-                    const reason=String(x.reason||"");
-                    if(t.startsWith("إيداع") || t.startsWith("تحويل من")) net2 += a;
-                    else if(t.startsWith("سحب") || t.startsWith("تحويل إلى")) net2 -= a;
-                    if(t.startsWith("إيداع")) dep2 += a;
-                    if(t.startsWith("تحويل إلى")) trOut2++;
-                    if(t.startsWith("إيداع")){
-                      const r = String(reason||"").replace(/\s+/g,'');
-                      if(r.includes("مشاركة") || r.includes("تفاعل") || r.includes("إجابة") || r.includes("حل") || r.includes("واجب") || r.includes("نشاط")) part2++;
-                    }
-                    if(t.startsWith("سحب")){
-                      const rr = String(reason||"");
-                      if(violWords.some(w=>rr.includes(w))) vio2++;
-                    }
-                  });
-                  const pts = Math.max(0, Math.round((dep2*0.05) + (part2*12) + (trOut2*2) - (vio2*15)));
-                  rows.push({id:sid,name:(sd.data()||{}).name||"—",pts,net:net2});
-                }catch(e){}
+              for(const sd of studs.docs){
+                const sid = sd.id;
+                const ref = db.collection("students").doc(sid);
+                const snap2 = await ref.collection("txns")
+                  .where("createdAtClient", ">=", weekStart)
+                  .where("createdAtClient", "<=", weekEnd)
+                  .orderBy("createdAtClient","desc")
+                  .limit(600)
+                  .get();
+                let dep2=0, part2=0, vio2=0, trOut2=0, net2=0;
+                snap2.forEach(d=>{
+                  const x=d.data()||{};
+                  const t=String(x.type||"");
+                  const a=Number(x.amount||0);
+                  const reason=String(x.reason||"");
+                  if(t.startsWith("إيداع") || t.startsWith("تحويل من")) net2 += a;
+                  else if(t.startsWith("سحب") || t.startsWith("تحويل إلى")) net2 -= a;
+                  if(t.startsWith("إيداع")) dep2 += a;
+                  if(t.startsWith("تحويل إلى")) trOut2++;
+                  if(t.startsWith("إيداع")){
+                    const r = String(reason||"").replace(/\s+/g,'');
+                    if(r.includes("مشاركة") || r.includes("تفاعل") || r.includes("إجابة") || r.includes("حل") || r.includes("واجب") || r.includes("نشاط")) part2++;
+                  }
+                  if(t.startsWith("سحب")){
+                    const rr = String(reason||"");
+                    if(violWords.some(w=>rr.includes(w))) vio2++;
+                  }
+                });
+                const pts = Math.max(0, Math.round((dep2*0.05) + (part2*12) + (trOut2*2) - (vio2*15)));
+                rows.push({id:sid,name:(sd.data()||{}).name||"—",pts,net:net2});
               }
               rows.sort((a,b)=>b.pts-a.pts);
-              // Try to publish a shared snapshot so students can read without scanning students
-              try{
-                const pub = db.collection("publicBoards").doc(cacheKey);
-                const top10 = rows.slice(0,10);
-                const payload = {rows: top10, weekStart, updatedAt: (firebase?.firestore?.FieldValue?.serverTimestamp ? firebase.firestore.FieldValue.serverTimestamp() : Date.now())};
-                await pub.set(payload, {merge:true});
-              }catch(e){}
-              saveHonorCache(cacheKey, rows);
-              renderList(rows);
+              const top = rows.slice(0,5);
+              top.forEach((r,i)=>{
+                const el=document.createElement("div");
+                el.className="lbRow";
+                el.innerHTML = `<div class="lbRank">${i+1}</div>
+                  <div>
+                    <div class="lbName">${escapeHtml(r.name)}</div>
+                    <div class="small">صافي: ${fmt(r.net)} ر.س</div>
+                  </div>
+                  <div class="lbMeta">
+                    <div class="lbPill">${r.pts} نقطة</div>
+                  </div>`;
+                box.appendChild(el);
+              });
+              if(!top.length){
+                box.innerHTML = '<div class="small">لا توجد بيانات لهذا الأسبوع.</div>';
+              }
+            }else{
+              box.innerHTML = '<div class="small">لم يتم تعيين فصل لهذا الحساب.</div>';
             }
           }
         }catch(e){}
@@ -3397,6 +3399,246 @@ document.addEventListener("DOMContentLoaded", async()=>{
     window.enterStudent = async function(studentId){
       if(_origEnterStudent) await _origEnterStudent(studentId);
       try{ await renderBalanceChartLast30(); }catch(e){}
+    };
+
+
+    // ===== Honor Board + Roulette (Stable / Local B) =====
+    function weekKey(d=new Date()){
+      // school week: Sunday -> Thursday (use Sunday start)
+      const x=new Date(d.getTime());
+      const day=x.getDay(); // 0 Sun
+      const diff = day; // since Sun=0
+      x.setHours(0,0,0,0);
+      x.setDate(x.getDate()-diff);
+      return formatYMD(x.getTime()); // e.g., 2026-02-23
+    }
+
+    function loadRoulettePrizes(){
+      try{
+        const raw = localStorage.getItem("mb_roulette_prizes");
+        if(raw){
+          const arr = JSON.parse(raw);
+          if(Array.isArray(arr) && arr.length) return arr;
+        }
+      }catch(e){}
+      return ["إعفاء واجب","إعفاء واجبان","زيادة درجات في الاختبار","وجبة ماكدونالدز"];
+    }
+    function saveRoulettePrizes(){
+      const ta=$("roulettePrizes");
+      const arr = (ta? ta.value.split("\n").map(x=>x.trim()).filter(Boolean): loadRoulettePrizes());
+      localStorage.setItem("mb_roulette_prizes", JSON.stringify(arr));
+      toast("✅ تم حفظ جوائز الروليت");
+      // refresh student roulette if open
+      try{ renderRoulettePane(); }catch(e){}
+    }
+    function showRoulettePrizes(){
+      const arr=loadRoulettePrizes();
+      const body = `<div class="small" style="line-height:2">${arr.map(x=>"• "+escapeHtml(x)).join("<br>")}</div>`;
+      openModal("🎁 جوائز الروليت", body, '<button class="btn" onclick="closeModal()">تمام</button>');
+    }
+
+    function tierEligible(tierText){
+      const t = String(tierText||"");
+      return (t.includes("ذهبي") || t.includes("ماسي") || t.includes("ألماسي"));
+    }
+
+    function rouletteStorageKey(studentId){
+      return `mb_roulette_${studentId}_${weekKey()}`;
+    }
+
+    function renderRoulettePane(){
+      const tab=$("tabRoulette");
+      const pane=$("paneRoulette");
+      if(!tab || !pane || !currentStudentObj) return;
+
+      const tier = calcTier(currentStudentObj.balance);
+      const eligible = tierEligible(tier);
+      tab.style.display = eligible ? "" : "none";
+
+      const status=$("rouletteStatus");
+      const hint=$("rouletteHint");
+      const btn=$("spinBtn");
+      const resBox=$("rouletteResultBox");
+      const res=$("rouletteResult");
+
+      const k = rouletteStorageKey(currentStudentObj.id||currentStudentId);
+      const saved = localStorage.getItem(k);
+
+      if(!eligible){
+        if(status) status.textContent="غير متاح";
+        if(hint) hint.textContent="الروليت متاح للحسابات: ذهبي / ماسي / ألماسي فقط.";
+        if(btn) btn.disabled=true;
+        if(resBox) resBox.style.display="none";
+        return;
+      }
+
+      if(saved){
+        const prize = saved;
+        if(status) status.textContent="✅ تم التدوير";
+        if(btn) btn.disabled=true;
+        if(resBox){ resBox.style.display="block"; }
+        if(res) res.textContent = prize;
+      }else{
+        if(status) status.textContent="🎯 فرصة واحدة";
+        if(btn) btn.disabled=false;
+        if(resBox) resBox.style.display="none";
+      }
+    }
+
+    async function spinRoulette(){
+      try{
+        if(!currentStudentObj) return;
+        const tier = calcTier(currentStudentObj.balance);
+        if(!tierEligible(tier)){
+          openModal("تنبيه", `<div class="small">الروليت متاح للحسابات: ذهبي / ماسي / ألماسي فقط.</div>`, '<button class="btn" onclick="closeModal()">موافق</button>');
+          return;
+        }
+        const sid = currentStudentObj.id || currentStudentId;
+        const k = rouletteStorageKey(sid);
+        const already = localStorage.getItem(k);
+        if(already){
+          renderRoulettePane();
+          return;
+        }
+        const prizes = loadRoulettePrizes();
+        if(!prizes.length){
+          openModal("تنبيه", `<div class="small">لا توجد جوائز في إعدادات الروليت.</div>`, '<button class="btn" onclick="closeModal()">موافق</button>');
+          return;
+        }
+        // pick random
+        const prize = prizes[Math.floor(Math.random()*prizes.length)];
+        localStorage.setItem(k, prize);
+
+        // optional: persist to Firebase (simple, no heavy reads)
+        try{
+          if(window.db && sid){
+            await db.collection("students").doc(sid).set({
+              roulette:{ week: weekKey(), prize, at: Date.now() }
+            }, {merge:true});
+          }
+        }catch(e){}
+
+        // celebration
+        try{ playSuccess(); launchCelebration(); }catch(e){}
+
+        openModal("🎉 مبروك!", `<div style="font-size:18px;font-weight:1000;line-height:1.9">فزت بـ: <span style="color:#0b2a66">${escapeHtml(prize)}</span></div>`, '<button class="btn" onclick="closeModal()">رائع!</button>');
+        renderRoulettePane();
+      }catch(e){
+        openModal("تنبيه", `<div class="small">صار خطأ… جرّبي مرة ثانية.</div>`, '<button class="btn" onclick="closeModal()">موافق</button>');
+      }
+    }
+
+    function initHonorRouletteUI(arr){
+      // init roulette prizes textarea
+      const ta=$("roulettePrizes");
+      if(ta && !ta.value.trim()){
+        ta.value = loadRoulettePrizes().join("\n");
+      }
+      // init honorboard section filter
+      const sec=$("hbSection");
+      if(sec){
+        const vals = Array.from(new Set(arr.map(s=> (s.section||s.group||s.division||"").trim()).filter(Boolean)));
+        sec.innerHTML="";
+        const o0=document.createElement("option"); o0.value=""; o0.textContent="كل الشعب"; sec.appendChild(o0);
+        vals.forEach(v=>{ const o=document.createElement("option"); o.value=v; o.textContent=v; sec.appendChild(o); });
+      }
+      // auto render
+      try{ renderHonorBoard(); }catch(e){}
+    }
+
+    function computeWeekStats(student){
+      // Try read cached week stats if present; fallback: 0
+      const weekPoints = Number(student.weekPoints||student.pointsWeek||0);
+      const ops = Number(student.weekOps||student.weekCount||student.opsWeek||0);
+      return {weekPoints, ops};
+    }
+
+    function renderHonorBoard(){
+      const arr = window.__lastClassStudents || [];
+      const list=$("honorBoardList");
+      const top3=$("honorBoardTop3");
+      if(!list || !top3) return;
+
+      const secVal = $("hbSection") ? $("hbSection").value : "";
+      const sortBy = $("hbSort") ? $("hbSort").value : "weekPoints";
+
+      let filtered = arr.slice();
+      if(secVal){
+        filtered = filtered.filter(s=> (String(s.section||s.group||s.division||"").trim()===secVal));
+      }
+
+      const rows = filtered.map(s=>{
+        const st=computeWeekStats(s);
+        return {
+          id:s.id, name:s.name||"—",
+          section:(s.section||s.group||s.division||""),
+          balance:Number(s.balance||0),
+          weekPoints: st.weekPoints,
+          ops: st.ops
+        };
+      });
+
+      rows.sort((a,b)=>{
+        if(sortBy==="balance") return b.balance-a.balance;
+        if(sortBy==="ops") return b.ops-a.ops;
+        return b.weekPoints-a.weekPoints;
+      });
+
+      const max = rows[0] ? (sortBy==="balance"?rows[0].balance : sortBy==="ops"?rows[0].ops : rows[0].weekPoints) : 0;
+      const top = rows.slice(0,10);
+
+      // Top 3 cards
+      const medals=["🥇","🥈","🥉"];
+      top3.innerHTML = top.slice(0,3).map((r,i)=>{
+        const val = sortBy==="balance"? r.balance : sortBy==="ops"? r.ops : r.weekPoints;
+        const pct = max? Math.round((val/max)*100):0;
+        return `
+          <div class="card soft">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+              <div style="font-weight:1000;color:#0b2a66">${medals[i]} ${escapeHtml(r.name)}</div>
+              <div class="badge">${val}</div>
+            </div>
+            <div class="small" style="margin-top:6px;color:#47607e">${escapeHtml(r.section||"")}</div>
+            <div class="pBar" style="margin-top:10px"><div style="width:${pct}%;height:10px;border-radius:999px;background:linear-gradient(90deg,#0b5bb5,#0b2a66)"></div></div>
+          </div>
+        `;
+      }).join("");
+
+      // List
+      list.innerHTML = `
+        <div style="font-weight:1000;color:#0b2a66;margin-bottom:8px">📋 الترتيب (Top 10)</div>
+        <div class="tableWrap">
+          <table>
+            <thead><tr><th>#</th><th>الاسم</th><th>الشعبة</th><th>${sortBy==="balance"?"الرصيد":sortBy==="ops"?"مشاركات":"نقاط الأسبوع"}</th><th>التقدم</th></tr></thead>
+            <tbody>
+              ${top.map((r,idx)=>{
+                const val = sortBy==="balance"? r.balance : sortBy==="ops"? r.ops : r.weekPoints;
+                const pct = max? Math.round((val/max)*100):0;
+                return `<tr>
+                  <td style="font-weight:900;color:#0b2a66">${idx+1}</td>
+                  <td>${escapeHtml(r.name)}</td>
+                  <td class="small">${escapeHtml(r.section||"—")}</td>
+                  <td style="font-weight:900">${val}</td>
+                  <td><div class="pBar"><div style="width:${pct}%;height:8px;border-radius:999px;background:#0b5bb5"></div></div></td>
+                </tr>`;
+              }).join("")}
+            </tbody>
+          </table>
+        </div>
+        <div class="small" style="margin-top:8px;color:#47607e">* يتم التحديث من داخل النظام بدون قواعد Firebase إضافية.</div>
+      `;
+    }
+
+    // Hook roulette into student account open
+    const _openStudentAccountOrig = openStudentAccount;
+    openStudentAccount = function(s){
+      _openStudentAccountOrig(s);
+      try{
+        // always sync tier label from balance
+        const tier = calcTier(s.balance);
+        if($("tierLabel")) $("tierLabel").textContent = tier;
+        renderRoulettePane();
+      }catch(e){}
     };
 
 </script>
