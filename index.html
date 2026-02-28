@@ -515,7 +515,7 @@
 
           <div class="forgotRow">
             <a href="javascript:void(0)" id="forgotPinLink">نسيت الرقم السري؟</a>
-            <span class="small"></span>
+            <span class="small">اطلبه من ولي أمرك أو المعلمة</span>
           </div>
 
           <div class="row" style="margin-top:12px">
@@ -2399,20 +2399,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
     .opLine{margin-top:8px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
     .pill2{display:inline-block;background:#eef6ff;border:1px solid rgba(0,0,0,.06);padding:6px 10px;border-radius:999px;font-weight:1000;font-size:12px;color:#0b2a66}
 
-  
-/* ===== Footer buttons readability fix (Sara) ===== */
-.footerLinks a{
-  background:#e0e0e0 !important;   /* رصاصي */
-  color:#00205B !important;        /* كحلي */
-  font-weight:900 !important;
-  opacity:1 !important;
-}
-.footerLinks a:hover{
-  background:#d5d5d5 !important;
-  color:#00205B !important;
-}
-
-</style>
+  </style>
 </head><body>
 <div class="paper">
   <div class="head">
@@ -4017,45 +4004,5 @@ function renderRoulettePane(){
 })();
 
 </script>
-<script>
-/* Safety layer: keeps login buttons responsive even if a later script crashes. */
-(function(){
-  function showMsg(msg){
-    try{ alert(msg); }catch(e){}
-  }
-  function callIfExists(fnName, args){
-    try{
-      var fn = window[fnName];
-      if(typeof fn === "function"){ return fn.apply(null, args||[]); }
-    }catch(e){}
-    return null;
-  }
-  window.__safeLoginTeacher = function(){ 
-    var r = callIfExists("loginTeacher", []); 
-    if(r===null) showMsg("تعذر تشغيل تسجيل الدخول الآن. تحققي من الاتصال بالإنترنت ثم أعيدي تحديث الصفحة.");
-  };
-  window.__safeLoginStudent = function(){ 
-    var r = callIfExists("loginStudent", []); 
-    if(r===null) showMsg("تعذر تشغيل تسجيل الدخول الآن. تحققي من الاتصال بالإنترنت ثم أعيدي تحديث الصفحة.");
-  };
-  window.__safeRegisterTeacher = function(){
-    var r = callIfExists("registerTeacher", []);
-    if(r===null) showMsg("تعذر تشغيل تسجيل الدخول الآن. تحققي من الاتصال بالإنترنت ثم أعيدي تحديث الصفحة.");
-  };
-  window.__safeBackToStart = function(){
-    var r = callIfExists("backToStart", []);
-    if(r===null){
-      try{
-        var so=document.getElementById("startOverlay");
-        if(so){ so.classList.remove("hidden"); so.style.display="flex"; }
-      }catch(e){}
-    }
-  };
-  window.addEventListener("error", function(ev){
-    try{ console.error("JS error:", ev.error||ev.message); }catch(e){}
-  });
-})();
-</script>
-
 </body>
 </html>
