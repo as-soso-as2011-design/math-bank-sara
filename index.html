@@ -318,6 +318,17 @@
 .lbName{font-weight:900;color:#0b2a66}
 .lbMeta{margin-inline-start:auto;display:flex;gap:8px;align-items:center}
 .lbPill{font-size:12px;font-weight:900;padding:6px 10px;border-radius:999px;background:rgba(2,132,199,.10);border:1px solid rgba(2,132,199,.18);color:#0b2a66}
+
+/* ===== Roulette Wheel ===== */
+.roulWrap{display:flex;justify-content:center;align-items:center;margin-top:12px}
+.roulStage{position:relative;width:min(320px,90vw);height:min(320px,90vw)}
+.roulWheel{position:absolute;inset:0;border-radius:50%;box-shadow:0 12px 30px rgba(0,0,0,.12);transform:rotate(0deg);transition:transform 3.2s cubic-bezier(.2,.9,.1,1);overflow:hidden}
+.roulHub{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:92px;height:92px;border-radius:50%;background:rgba(255,255,255,.92);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;font-weight:1000;color:#0b2a66;box-shadow:0 10px 22px rgba(0,0,0,.10);text-align:center;line-height:1.1;padding:10px}
+.roulPointer{position:absolute;left:50%;top:-8px;transform:translateX(-50%);width:0;height:0;border-left:14px solid transparent;border-right:14px solid transparent;border-bottom:22px solid #0b2a66;filter:drop-shadow(0 6px 8px rgba(0,0,0,.25))}
+.roulLabel{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:100%;height:100%;pointer-events:none}
+.roulLabel span{position:absolute;left:50%;top:8%;transform-origin:0 150px;font-size:12px;font-weight:900;color:#0b2a66;white-space:nowrap;text-shadow:0 1px 0 rgba(255,255,255,.7)}
+@media (max-width:420px){ .roulLabel span{font-size:11px} .roulHub{width:84px;height:84px} }
+
 </style>
 </head>
 
@@ -1108,6 +1119,16 @@
             </div>
             <hr>
             <div id="rouletteBody">
+
+<div class="roulWrap">
+  <div class="roulStage">
+    <div class="roulPointer" aria-hidden="true"></div>
+    <div id="rouletteWheel" class="roulWheel" aria-label="روليت الهدايا"></div>
+    <div id="rouletteLabels" class="roulLabel" aria-hidden="true"></div>
+    <div class="roulHub">🎁<br>روليت</div>
+  </div>
+</div>
+
               <div class="small" style="line-height:1.9">اضغط/ي “تدوير الآن” للحصول على هدية تحفيزية 🎁</div>
               <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px">
                 <button class="btn" id="spinBtn" onclick="spinRoulette()">تدوير الآن</button>
@@ -3446,7 +3467,69 @@ document.addEventListener("DOMContentLoaded", async()=>{
       return `mb_roulette_${studentId}_${weekKey()}`;
     }
 
-    function renderRoulettePane(){
+    
+    // ===== Roulette wheel rendering (visual spin) =====
+    function buildRouletteWheel(prizes){
+      const wheel = $("rouletteWheel");
+      const labels = $("rouletteLabels");
+      if(!wheel || !labels) return;
+      const n = Math.max(1, prizes.length);
+      const step = 360 / n;
+
+      // conic-gradient segments
+      const stops = [];
+      for(let i=0;i<n;i++){
+        const a0 = i*step;
+        const a1 = (i+1)*step;
+        const col = `hsl(${(i*360/n)|0} 70% 78%)`;
+        stops.push(`${col} ${a0}deg ${a1}deg`);
+      }
+      wheel.style.background = `conic-gradient(${stops.join(",")})`;
+
+      // labels around wheel (shortened)
+      labels.innerHTML = "";
+      prizes.forEach((p,i)=>{
+        const sp=document.createElement("span");
+        const txt = String(p||"").trim();
+        sp.textContent = txt.length>16 ? (txt.slice(0,16)+"…") : txt;
+        const ang = (i*step) + step/2;
+        sp.style.transform = `rotate(${ang}deg) translateX(-50%)`;
+        labels.appendChild(sp);
+      });
+
+      // reset wheel rotation if not set
+      if(!wheel.dataset.rot) wheel.dataset.rot="0";
+      wheel.style.transform = `rotate(${Number(wheel.dataset.rot)||0}deg)`;
+    }
+
+    function pickRouletteIndex(n){ return Math.floor(Math.random()*n); }
+
+    function animateRouletteTo(index, n){
+      const wheel = $("rouletteWheel");
+      if(!wheel) return {done: Promise.resolve(), rot:0};
+      const step = 360 / n;
+      // Pointer at top, so we need segment center to align at 0deg (top).
+      // Wheel rotates clockwise; conic-gradient starts at 0deg on the right by default,
+      // but visually it's fine as long as mapping is consistent.
+      const target = 360 - ((index + 0.5) * step);
+      const base = Number(wheel.dataset.rot||0);
+      const spins = 3 + Math.floor(Math.random()*3); // 3-5 full spins
+      const finalRot = base + spins*360 + target;
+
+      wheel.dataset.rot = String(finalRot);
+      wheel.style.transition = "transform 3.2s cubic-bezier(.2,.9,.1,1)";
+      wheel.style.transform = `rotate(${finalRot}deg)`;
+
+      const done = new Promise(res=>{
+        const h=()=>{ wheel.removeEventListener("transitionend", h); res(); };
+        wheel.addEventListener("transitionend", h, {once:true});
+        // fallback in case transitionend doesn't fire
+        setTimeout(res, 3600);
+      });
+      return {done, rot:finalRot};
+    }
+
+function renderRoulettePane(){
       const tab=$("tabRoulette");
       const pane=$("paneRoulette");
       if(!tab || !pane || !currentStudentObj) return;
@@ -3463,6 +3546,9 @@ document.addEventListener("DOMContentLoaded", async()=>{
 
       const k = rouletteStorageKey(currentStudentObj.id||currentStudentId);
       const saved = localStorage.getItem(k);
+
+      // ensure wheel reflects current prizes
+      try{ buildRouletteWheel(loadRoulettePrizes()); }catch(e){}
 
       if(!eligible){
         if(status) status.textContent="غير متاح";
@@ -3488,11 +3574,13 @@ document.addEventListener("DOMContentLoaded", async()=>{
     async function spinRoulette(){
       try{
         if(!currentStudentObj) return;
+
         const tier = calcTier(currentStudentObj.balance);
         if(!tierEligible(tier)){
           openModal("تنبيه", `<div class="small">الروليت متاح للحسابات: ذهبي / ماسي / ألماسي فقط.</div>`, '<button class="btn" onclick="closeModal()">موافق</button>');
           return;
         }
+
         const sid = currentStudentObj.id || currentStudentId;
         const k = rouletteStorageKey(sid);
         const already = localStorage.getItem(k);
@@ -3500,16 +3588,27 @@ document.addEventListener("DOMContentLoaded", async()=>{
           renderRoulettePane();
           return;
         }
+
         const prizes = loadRoulettePrizes();
         if(!prizes.length){
           openModal("تنبيه", `<div class="small">لا توجد جوائز في إعدادات الروليت.</div>`, '<button class="btn" onclick="closeModal()">موافق</button>');
           return;
         }
-        // pick random
-        const prize = prizes[Math.floor(Math.random()*prizes.length)];
+
+        // Visual spin
+        const btn = $("spinBtn");
+        if(btn){ btn.disabled=true; btn.textContent="جارِ التدوير…"; }
+        buildRouletteWheel(prizes);
+
+        const n = prizes.length;
+        const idx = pickRouletteIndex(n);
+        const {done} = animateRouletteTo(idx, n);
+        await done;
+
+        const prize = prizes[idx];
         localStorage.setItem(k, prize);
 
-        // optional: persist to Firebase (simple, no heavy reads)
+        // optional: persist to Firebase (light write only)
         try{
           if(window.db && sid){
             await db.collection("students").doc(sid).set({
@@ -3522,8 +3621,12 @@ document.addEventListener("DOMContentLoaded", async()=>{
         try{ playSuccess(); launchCelebration(); }catch(e){}
 
         openModal("🎉 مبروك!", `<div style="font-size:18px;font-weight:1000;line-height:1.9">فزت بـ: <span style="color:#0b2a66">${escapeHtml(prize)}</span></div>`, '<button class="btn" onclick="closeModal()">رائع!</button>');
+
+        if(btn){ btn.textContent="تدوير الآن"; }
         renderRoulettePane();
       }catch(e){
+        const btn = $("spinBtn");
+        if(btn){ btn.disabled=false; btn.textContent="تدوير الآن"; }
         openModal("تنبيه", `<div class="small">صار خطأ… جرّبي مرة ثانية.</div>`, '<button class="btn" onclick="closeModal()">موافق</button>');
       }
     }
