@@ -573,7 +573,7 @@
           <div class="forgotRow">
             <a href="javascript:void(0)" id="forgotPinLink">نسيت الرقم السري؟</a>
             <a href="javascript:void(0)" id="stuChangePinLink">تغيير الرقم السري</a>
-            <span class="small">اطلبه من ولي أمرك أو المعلمة</span>
+            
           </div>
 
           <div class="row" style="margin-top:12px">
@@ -1293,8 +1293,24 @@ const APP_MODE = ((urlParams.get("mode") || (forcedStudent?"student":"") ) || lo
       appId: "1:333467940977:web:97d056d5dbff2debbf43d0",
       measurementId: "G-7RPQX9ER93"
     };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
+    (function(){
+      try{
+        if(window.firebase && typeof firebase.initializeApp==='function'){
+          firebase.initializeApp(firebaseConfig);
+          window.__MB_DB__ = firebase.firestore();
+          window.__MB_FIREBASE_OK__ = true;
+        }else{
+          window.__MB_DB__ = null;
+          window.__MB_FIREBASE_OK__ = false;
+          console.warn('Firebase scripts not loaded.');
+        }
+      }catch(e){
+        window.__MB_DB__ = null;
+        window.__MB_FIREBASE_OK__ = false;
+        console.warn('Firebase init failed:', e);
+      }
+    })();
+    const db = window.__MB_DB__;
 
     function $(id){return document.getElementById(id);}
     function fmt(x){ return (Math.round((Number(x||0)+Number.EPSILON)*100)/100).toFixed(2); }
@@ -1739,6 +1755,11 @@ function setTeacherCred(user, pass){
 }
 
 function teacherLogin(){
+      if(!window.__MB_FIREBASE_OK__ || !db){
+        try{ openModal("تنبيه","تعذر تشغيل النظام لأن الاتصال بخدمة البيانات غير متاح حاليًا.<br><br>✅ الحل السريع: افتحي الصفحة بدون مانع إعلانات/حجب، أو جرّبي شبكة أخرى، ثم أعيدي المحاولة.","<button class=\"btn\" onclick=\"closeModal()\">موافق</button>"); }catch(e){ alert("تعذر تشغيل النظام لأن خدمة البيانات غير متاحة حاليًا."); }
+        return;
+      }
+
   const u = ($("tu").value||"").trim();
   const p = ($("tp").value||"").trim();
   const cred = getTeacherCred();
@@ -1803,6 +1824,11 @@ ${SIGNATURE}`;
     }
 
     async function studentLogin(){
+      if(!window.__MB_FIREBASE_OK__ || !db){
+        try{ openModal("تنبيه","تعذر تشغيل النظام لأن الاتصال بخدمة البيانات غير متاح حاليًا.<br><br>✅ الحل السريع: افتحي الصفحة بدون مانع إعلانات/حجب، أو جرّبي شبكة أخرى، ثم أعيدي المحاولة.","<button class=\"btn\" onclick=\"closeModal()\">موافق</button>"); }catch(e){ alert("تعذر تشغيل النظام لأن خدمة البيانات غير متاحة حاليًا."); }
+        return;
+      }
+
       try{
         currentAccess="student";
         const name = ($("stuName")?.value || "").trim();
