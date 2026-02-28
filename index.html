@@ -883,6 +883,7 @@
           <div class="miniTab" onclick="setMiniTab('paneUpgrade',this)">⬆️ ترقية الحساب</div>
           <div class="miniTab" onclick="setMiniTab('paneRewards',this)">🎁 الجوائز والحوافز</div>
           <div class="miniTab" id="tabRoulette" onclick="setMiniTab('paneRoulette',this)" style="display:none">🎡 روليت الهدايا</div>
+          <div class="miniTab" id="tabHonor" onclick="setMiniTab('paneHonor',this)">🏅 لوحة الشرف</div>
           <div class="miniTab" onclick="setMiniTab('paneCard',this)">💳 تفاصيل البطاقة</div>
         </div>
 
@@ -1142,6 +1143,21 @@
           </div>
         </div>
 
+
+        <div id="paneHonor" class="miniPane">
+          <div class="card soft" style="margin-top:10px">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+              <div>
+                <div style="font-weight:1000;color:#0b2a66">🏅 لوحة الشرف (Top 5)</div>
+                <div class="small" style="margin-top:4px;color:#47607e">تظهر هنا بدون تعذّر — يتم تحديثها من المعلمة.</div>
+              </div>
+              <button class="btn3" onclick="renderStudentHonorBoard()">تحديث</button>
+            </div>
+            <div id="studentHonorTop3" class="grid3" style="margin-top:12px"></div>
+            <div id="studentHonorList" class="card" style="margin-top:10px"></div>
+          </div>
+        </div>
+
 <div id="paneCard" class="miniPane">
           <div class="card" style="margin-top:12px">
             <h3 style="margin:0;color:#0b2a66">تفاصيل البطاقة</h3>
@@ -1199,10 +1215,131 @@
       appId: "1:333467940977:web:97d056d5dbff2debbf43d0",
       measurementId: "G-7RPQX9ER93"
     };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
+    
+    // ---- Firestore (safe init + local fallback) ----
+    function createLocalFirestore(){
+      const LS_PREFIX = "fs:";
+      function loadCol(name){
+        try{ return JSON.parse(localStorage.getItem(LS_PREFIX+name) || "{}") || {}; }catch(e){ return {}; }
+      }
+      function saveCol(name, obj){
+        localStorage.setItem(LS_PREFIX+name, JSON.stringify(obj||{}));
+      }
+      function deepMerge(a,b){
+        const out = Array.isArray(a)? a.slice(): Object.assign({}, a||{});
+        for(const k in (b||{})){
+          if(b[k] && typeof b[k]==="object" && !Array.isArray(b[k])){
+            out[k]=deepMerge(out[k]||{}, b[k]);
+          }else out[k]=b[k];
+        }
+        return out;
+      }
+      function makeDocSnap(id, data){
+        return { id, exists: !!data, data: ()=> (data||{}) };
+      }
+      function makeDocRef(col, id){
+        return {
+          id,
+          async get(){
+            const c=loadCol(col); const d=c[id];
+            return makeDocSnap(id, d);
+          },
+          async set(data, opts){
+            const c=loadCol(col);
+            const prev=c[id]||{};
+            c[id] = (opts && opts.merge)? deepMerge(prev, data||{}) : (data||{});
+            saveCol(col, c);
+          },
+          async update(patch){
+            const c=loadCol(col);
+            const prev=c[id]||{};
+            c[id]=deepMerge(prev, patch||{});
+            saveCol(col, c);
+          },
+          async delete(){
+            const c=loadCol(col);
+            delete c[id];
+            saveCol(col, c);
+          }
+        };
+      }
+      function applyQuery(col, filters, orders, lim){
+        const c=loadCol(col);
+        let arr = Object.entries(c).map(([id,data])=>({id,data}));
+        // filters: [{field,op,value}]
+        for(const f of (filters||[])){
+          arr = arr.filter(({data})=>{
+            const v = (data||{})[f.field];
+            if(f.op==="==") return v===f.value;
+            if(f.op==="!=") return v!==f.value;
+            if(f.op===">") return v>f.value;
+            if(f.op===">=") return v>=f.value;
+            if(f.op==="<") return v<f.value;
+            if(f.op==="<=") return v<=f.value;
+            if(f.op==="array-contains") return Array.isArray(v) && v.includes(f.value);
+            return true;
+          });
+        }
+        for(const o of (orders||[])){
+          const dir = (o.dir||"asc").toLowerCase();
+          arr.sort((a,b)=>{
+            const va=(a.data||{})[o.field], vb=(b.data||{})[o.field];
+            if(va===vb) return 0;
+            const res = (va>vb)? 1 : -1;
+            return dir==="desc"? -res : res;
+          });
+        }
+        if(typeof lim==="number") arr = arr.slice(0, lim);
+        return arr;
+      }
+      function makeQuery(col, filters=[], orders=[], lim=null){
+        return {
+          where(field,op,value){ return makeQuery(col, filters.concat([{field,op,value}]), orders, lim); },
+          orderBy(field,dir){ return makeQuery(col, filters, orders.concat([{field,dir}]), lim); },
+          limit(n){ return makeQuery(col, filters, orders, n); },
+          async get(){
+            const arr = applyQuery(col, filters, orders, lim);
+            return { docs: arr.map(({id,data})=>({ id, data: ()=> (data||{}) })) };
+          }
+        };
+      }
+      function makeCollection(col){
+        return {
+          doc(id){ return makeDocRef(col, id); },
+          async add(data){
+            const id = "id_"+Math.random().toString(36).slice(2,10)+Date.now().toString(36);
+            const c=loadCol(col);
+            c[id]=data||{};
+            saveCol(col,c);
+            return makeDocRef(col, id);
+          },
+          where(field,op,value){ return makeQuery(col).where(field,op,value); },
+          orderBy(field,dir){ return makeQuery(col).orderBy(field,dir); },
+          limit(n){ return makeQuery(col).limit(n); },
+          async get(){ return makeQuery(col).get(); }
+        };
+      }
+      return { collection: makeCollection };
+    }
 
-    function $(id){return document.getElementById(id);}
+    let db = null;
+    try{
+      if(window.firebase && firebase.initializeApp){
+        // avoid duplicate init
+        if(firebase.apps && firebase.apps.length){
+          // already initialized
+        }else{
+          firebase.initializeApp(firebaseConfig);
+        }
+        if(firebase.firestore) db = firebase.firestore();
+      }
+    }catch(e){
+      console.warn("Firebase unavailable; using local storage firestore fallback.", e);
+      db = null;
+    }
+    if(!db) db = createLocalFirestore();
+
+function $(id){return document.getElementById(id);}
     function fmt(x){ return (Math.round((Number(x||0)+Number.EPSILON)*100)/100).toFixed(2); }
 
     function openModal(title, bodyHtml, actionsHtml){
@@ -3450,7 +3587,8 @@ document.addEventListener("DOMContentLoaded", async()=>{
       localStorage.setItem("mb_roulette_prizes", JSON.stringify(arr));
       toast("✅ تم حفظ جوائز الروليت");
       // refresh student roulette if open
-      try{ renderRoulettePane(); }catch(e){}
+      try{ renderRoulettePane();
+        try{ const th=$("tabHonor"); if(th) th.style.display=""; renderStudentHonorBoard(); }catch(e){} }catch(e){}
     }
     function showRoulettePrizes(){
       const arr=loadRoulettePrizes();
@@ -3656,7 +3794,101 @@ function renderRoulettePane(){
       return {weekPoints, ops};
     }
 
-    function renderHonorBoard(){
+    
+    // ===== Honor Board cache (No Firebase) =====
+    function weekStartKey(){
+      const d=new Date();
+      const day=d.getDay(); // 0=Sun
+      const ws=new Date(d);
+      ws.setDate(d.getDate()-day);
+      ws.setHours(0,0,0,0);
+      return ws.toISOString().slice(0,10);
+    }
+    function honorCacheKey(classId, section){
+      return `MB_HB_${classId||"ALL"}_${(section||"ALL").replace(/\s+/g,"_")}_${weekStartKey()}`;
+    }
+    function saveHonorCache(classId, section, sortBy, rows){
+      try{
+        const payload={ts:Date.now(), classId:classId||"", section:section||"", sortBy:sortBy||"weekPoints",
+          weekStart:weekStartKey(), top5:rows.slice(0,5)};
+        const key=honorCacheKey(classId, section);
+        localStorage.setItem(key, JSON.stringify(payload));
+        localStorage.setItem(`MB_HB_LAST_${classId||"ALL"}`, key);
+      }catch(e){}
+    }
+    function loadHonorCache(classId){
+      try{
+        const last=localStorage.getItem(`MB_HB_LAST_${classId||"ALL"}`) || honorCacheKey(classId,"");
+        const raw=localStorage.getItem(last);
+        return raw? JSON.parse(raw): null;
+      }catch(e){ return null; }
+    }
+
+    function renderStudentHonorBoard(){
+      const top3=$("studentHonorTop3");
+      const list=$("studentHonorList");
+      if(!top3 || !list) return;
+
+      const s = window.__currentStudentObj || null;
+      const classId = s ? (s.classId || s.class || s.className || "") : "";
+      const data = loadHonorCache(classId);
+
+      if(!data || !data.top5 || !data.top5.length){
+        top3.innerHTML = "";
+        list.innerHTML = `
+          <div style="font-weight:1000;color:#0b2a66">📌 لوحة الشرف قيد التحديث</div>
+          <div class="small" style="margin-top:6px;color:#47607e;line-height:1.9">
+            سيتم نشر لوحة الشرف من حساب المعلمة تلقائيًا.<br>
+            إذا لم تظهر بعد: افتحي صفحة <b>الفصول</b> من وضع المعلمة ثم ادخلي تبويب <b>لوحة الشرف</b> مرة واحدة.
+          </div>
+        `;
+        return;
+      }
+
+      const rows=data.top5;
+      const sortBy=data.sortBy||"weekPoints";
+      const max = rows[0] ? (sortBy==="balance"?rows[0].balance: sortBy==="ops"?rows[0].ops: rows[0].weekPoints) : 0;
+
+      const medals=["🥇","🥈","🥉"];
+      top3.innerHTML = rows.slice(0,3).map((r,i)=>{
+        const val = sortBy==="balance"? r.balance : sortBy==="ops"? r.ops : r.weekPoints;
+        const pct = max? Math.round((val/max)*100):0;
+        return `
+          <div class="card soft" style="border:1px solid #e6eef7;background:linear-gradient(180deg,#ffffff,#f6fbff)">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+              <div style="font-weight:1000;color:#0b2a66;font-size:14px">${medals[i]} ${escapeHtml(r.name||"—")}</div>
+              <div class="badge">${val}</div>
+            </div>
+            <div class="small" style="margin-top:6px;color:#47607e">${escapeHtml(r.section||"")}</div>
+            <div class="pBar" style="margin-top:10px"><div style="width:${pct}%;height:10px;border-radius:999px;background:linear-gradient(90deg,#0b5bb5,#0b2a66)"></div></div>
+          </div>
+        `;
+      }).join("");
+
+      list.innerHTML = `
+        <div style="font-weight:1000;color:#0b2a66;margin-bottom:8px">🏅 المتصدرون الخمسة الأوائل</div>
+        <div class="tableWrap">
+          <table>
+            <thead><tr><th>#</th><th>الاسم</th><th>الشعبة</th><th>${sortBy==="balance"?"الرصيد":sortBy==="ops"?"مشاركات":"نقاط الأسبوع"}</th></tr></thead>
+            <tbody>
+              ${rows.map((r,idx)=>{
+                const val = sortBy==="balance"? r.balance : sortBy==="ops"? r.ops : r.weekPoints;
+                const highlight = (s && (String(s.id||"")===String(r.id||""))) ? 'style="background:#eef6ff"' : "";
+                return `<tr ${highlight}>
+                  <td style="font-weight:900;color:#0b2a66">${idx+1}</td>
+                  <td style="font-weight:900">${escapeHtml(r.name||"—")}</td>
+                  <td class="small">${escapeHtml(r.section||"—")}</td>
+                  <td style="font-weight:900">${val}</td>
+                </tr>`;
+              }).join("")}
+            </tbody>
+          </table>
+        </div>
+        <div class="small" style="margin-top:8px;color:#47607e">آخر تحديث: ${new Date(data.ts).toLocaleString('ar-SA')}</div>
+      `;
+    }
+
+function renderHonorBoard(){
       const arr = window.__lastClassStudents || [];
       const list=$("honorBoardList");
       const top3=$("honorBoardTop3");
@@ -3730,13 +3962,17 @@ function renderRoulettePane(){
         </div>
         <div class="small" style="margin-top:8px;color:#47607e">* يتم التحديث من داخل النظام بدون قواعد Firebase إضافية.</div>
       `;
+      // cache top5 for students (same device / published by teacher)
+      saveHonorCache(currentClassId||"", secVal||"", sortBy||"weekPoints", rows);
+</div>
+      `;
     }
 
     // Hook roulette into student account open
     const _openStudentAccountOrig = openStudentAccount;
     openStudentAccount = function(s){
       _openStudentAccountOrig(s);
-      try{
+      try{ window.__currentStudentObj = s; 
         // always sync tier label from balance
         const tier = calcTier(s.balance);
         if($("tierLabel")) $("tierLabel").textContent = tier;
