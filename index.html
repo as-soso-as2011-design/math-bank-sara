@@ -4,63 +4,6 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
   <title>بنك الرياضيات – المصرفي للمعلمة سارة حقوي</title>
-<script>
-/* Boot-safe router (runs before anything else).
-   Ensures زر "ابدأ الآن" يعمل حتى لو تعطّل جزء من السكربت في Safari/iOS. */
-(function(){
-  function getMode(){
-    try{
-      const u=new URL(location.href);
-      const m=(u.searchParams.get("mode")||"").toLowerCase();
-      return (m==="student"||m==="teacher") ? m : "";
-    }catch(e){ return ""; }
-  }
-  function showOnly(id){
-    const ids=["startOverlay","onboardOverlay","teacherLoginPage","studentLoginPage","classesPage","classPage","studentAccountPage","dailyOpsPage"];
-    ids.forEach(function(x){
-      const el=document.getElementById(x);
-      if(!el) return;
-      if(x===id){ el.classList.remove("hidden"); el.style.display=""; }
-      else{ el.classList.add("hidden"); if(x==="startOverlay") el.style.display=""; }
-    });
-  }
-  function goLogin(){
-    var mode=getMode();
-    window.IS_STUDENT_ENTRY = (mode==="student");
-    window.currentAccess = window.IS_STUDENT_ENTRY ? "student" : "teacher";
-    showOnly(window.IS_STUDENT_ENTRY ? "studentLoginPage" : "teacherLoginPage");
-  }
-  // تعريف startApp عالميًا مبكرًا
-  window.startApp = function(){
-    try{
-      // أخفِ شاشة البداية إن وجدت
-      var so=document.getElementById("startOverlay");
-      if(so){ so.classList.add("hidden"); so.style.display="none"; }
-    }catch(e){}
-    // تجاهل الـ onboarding لو صار فيه تعليق
-    try{
-      if(typeof window.showOnboarding === "function"){
-        window.showOnboarding(function(){ goLogin(); });
-        return;
-      }
-    }catch(e){}
-    goLogin();
-  };
-  // اربطي الحدث أيضًا بعد تحميل الـ DOM كخطة بديلة
-  document.addEventListener("DOMContentLoaded", function(){
-    try{
-      var btn=document.querySelector('button[onclick="startApp()"]');
-      if(btn){
-        btn.addEventListener("click", function(ev){
-          ev.preventDefault();
-          window.startApp();
-        }, {passive:false});
-      }
-    }catch(e){}
-  });
-})();
-</script>
-
 
   <style>
     :root{
@@ -572,8 +515,7 @@
 
           <div class="forgotRow">
             <a href="javascript:void(0)" id="forgotPinLink">نسيت الرقم السري؟</a>
-            <a href="javascript:void(0)" id="stuChangePinLink">تغيير الرقم السري</a>
-            
+            <span class="small"></span>
           </div>
 
           <div class="row" style="margin-top:12px">
@@ -1230,11 +1172,11 @@
               <div class="row" style="margin-top:10px">
                 <div class="col">
                   <div class="small">PIN الجديد</div>
-                  <input id="stuNewPin" maxlength="16" placeholder="••••">
+                  <input id="stuNewPin" inputmode="numeric" maxlength="4" placeholder="****">
                 </div>
                 <div class="col">
                   <div class="small">تأكيد PIN</div>
-                  <input id="stuNewPin2" maxlength="16" placeholder="••••">
+                  <input id="stuNewPin2" inputmode="numeric" maxlength="4" placeholder="****">
                 </div>
               </div>
               <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:10px;flex-wrap:wrap">
@@ -1268,9 +1210,6 @@
     const forcedStudent = (urlParams.get("student")==="1" || urlParams.get("s")==="1" || (window.location.hash||"").toLowerCase().includes("student"));
 const APP_MODE = ((urlParams.get("mode") || (forcedStudent?"student":"") ) || localStorage.getItem("MB_LAST_MODE") || "teacher").toLowerCase();
     const IS_STUDENT_ENTRY = (APP_MODE === "student");
-    // Expose to window for later safety patches
-    window.IS_STUDENT_ENTRY = IS_STUDENT_ENTRY;
-    window.APP_MODE = APP_MODE;
 
     const SIGNATURE = "المعلمة: سارة حقوي";
     const TEACHER_BANK_TITLE = "بنك الرياضيات – المصرفي";
@@ -1293,24 +1232,8 @@ const APP_MODE = ((urlParams.get("mode") || (forcedStudent?"student":"") ) || lo
       appId: "1:333467940977:web:97d056d5dbff2debbf43d0",
       measurementId: "G-7RPQX9ER93"
     };
-    (function(){
-      try{
-        if(window.firebase && typeof firebase.initializeApp==='function'){
-          firebase.initializeApp(firebaseConfig);
-          window.__MB_DB__ = firebase.firestore();
-          window.__MB_FIREBASE_OK__ = true;
-        }else{
-          window.__MB_DB__ = null;
-          window.__MB_FIREBASE_OK__ = false;
-          console.warn('Firebase scripts not loaded.');
-        }
-      }catch(e){
-        window.__MB_DB__ = null;
-        window.__MB_FIREBASE_OK__ = false;
-        console.warn('Firebase init failed:', e);
-      }
-    })();
-    const db = window.__MB_DB__;
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
 
     function $(id){return document.getElementById(id);}
     function fmt(x){ return (Math.round((Number(x||0)+Number.EPSILON)*100)/100).toFixed(2); }
@@ -1739,36 +1662,12 @@ ${SIGNATURE}`
       await renderTabs();
     }
 
-
-function getTeacherCred(){
-  try{
-    const raw = localStorage.getItem("MB_TEACHER_CRED");
-    if(raw){
-      const obj = JSON.parse(raw);
-      if(obj && obj.user && obj.pass) return {user:String(obj.user), pass:String(obj.pass)};
+    function teacherLogin(){
+      if(($("tu").value||"").trim()==="teacher" && ($("tp").value||"").trim()==="12345"){
+        currentAccess="teacher";
+        hideAllPages(); show("classesPage"); renderTabs();
+      } else warn("بيانات الدخول غير صحيحة");
     }
-  }catch(e){}
-  return {user:"teacher", pass:"12345"};
-}
-function setTeacherCred(user, pass){
-  localStorage.setItem("MB_TEACHER_CRED", JSON.stringify({user, pass}));
-}
-
-function teacherLogin(){
-      if(!window.__MB_FIREBASE_OK__ || !db){
-        try{ openModal("تنبيه","تعذر تشغيل النظام لأن الاتصال بخدمة البيانات غير متاح حاليًا.<br><br>✅ الحل السريع: افتحي الصفحة بدون مانع إعلانات/حجب، أو جرّبي شبكة أخرى، ثم أعيدي المحاولة.","<button class=\"btn\" onclick=\"closeModal()\">موافق</button>"); }catch(e){ alert("تعذر تشغيل النظام لأن خدمة البيانات غير متاحة حاليًا."); }
-        return;
-      }
-
-  const u = ($("tu").value||"").trim();
-  const p = ($("tp").value||"").trim();
-  const cred = getTeacherCred();
-  if(u===cred.user && p===cred.pass){
-    currentAccess="teacher";
-    try{ localStorage.setItem("MB_LAST_MODE","teacher"); }catch(e){}
-    hideAllPages(); show("classesPage"); renderTabs();
-  } else warn("بيانات الدخول غير صحيحة");
-}
 
     function forgotTeacher(){
       const subject = encodeURIComponent("طلب استرجاع بيانات الدخول – بنك الرياضيات");
@@ -1824,11 +1723,6 @@ ${SIGNATURE}`;
     }
 
     async function studentLogin(){
-      if(!window.__MB_FIREBASE_OK__ || !db){
-        try{ openModal("تنبيه","تعذر تشغيل النظام لأن الاتصال بخدمة البيانات غير متاح حاليًا.<br><br>✅ الحل السريع: افتحي الصفحة بدون مانع إعلانات/حجب، أو جرّبي شبكة أخرى، ثم أعيدي المحاولة.","<button class=\"btn\" onclick=\"closeModal()\">موافق</button>"); }catch(e){ alert("تعذر تشغيل النظام لأن خدمة البيانات غير متاحة حاليًا."); }
-        return;
-      }
-
       try{
         currentAccess="student";
         const name = ($("stuName")?.value || "").trim();
@@ -2047,7 +1941,6 @@ function renderStudents(){
         card.querySelector(".js-edit").onclick = async()=>{ const nn = prompt("الاسم الجديد:", s.name); if(nn) await db.collection("students").doc(s.id).update({name:nn.trim()}); await renderStudents(); };
         card.querySelector(".js-phone").onclick = ()=> editGuardianPhone(s.id);
         card.querySelector(".js-pin").onclick = ()=> changePinTeacher(s.id);
-        card.querySelector(".js-del").onclick = ()=> deleteStudentFlow(s.id, s.name);
 
         card.querySelector(".js-sendpin").onclick = ()=> sendPinToGuardian(s.id);
         card.querySelector(".js-pdf").onclick = ()=> pdfStudentReport(s.id);
@@ -2273,11 +2166,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
 
       if(IS_STUDENT_ENTRY){ $("startMsg").innerHTML = "بوابة دخول الطلاب 👇<br>اضغط زر البداية ثم تابعي التعريف السريع."; }
       $("forgotPinLink")?.addEventListener("click",(e)=>{ e.preventDefault(); forgotStudentPin(); });
-      $("changePinLink")?.addEventListener("click",(e)=>{ e.preventDefault();
-        // في صفحة المعلمة: تغيير كلمة مرور المعلمة — في وضع الطالب: تغيير الرقم السري للطالب
-        if(window.IS_STUDENT_ENTRY){ changePinStudentFlow(); } else { changeTeacherPassFlow(); }
-      });
-      $("stuChangePinLink")?.addEventListener("click",(e)=>{ e.preventDefault(); changePinStudentFlow(); });
+      $("changePinLink")?.addEventListener("click",(e)=>{ e.preventDefault(); changePinStudentFlow(); });
       $("op")?.addEventListener("change", ()=>{
         setupReasonUI($("op").value, "reasonStudent", "reasonOtherStudent");
         toggleStudentOpUI();
@@ -2288,52 +2177,8 @@ document.addEventListener("DOMContentLoaded", async()=>{
       bindClickSounds();
     });
   
-    
-// ================== Teacher password (change) ==================
-function isValidPass(p){
-  const v = String(p||"").trim();
-  // يسمح بأرقام أو حروف (عربي/إنجليزي) بدون مسافات: 4 إلى 16
-  return /^[A-Za-z0-9\u0600-\u06FF]{4,16}$/.test(v);
-}
-
-function changeTeacherPassFlow(){
-  try{
-    const cred = getTeacherCred ? getTeacherCred() : {user:"teacher", pass:"12345"};
-    const body = `
-      <div class="small">تغيير كلمة مرور المعلمة</div>
-      <hr>
-      <div class="row">
-        <div class="col">
-          <div class="small">كلمة المرور الحالية</div>
-          <input id="tOldPass" type="password" placeholder="••••">
-        </div>
-        <div class="col">
-          <div class="small">كلمة المرور الجديدة</div>
-          <input id="tNewPass" type="password" placeholder="4-16 حرف/رقم">
-        </div>
-      </div>
-      <div class="small" style="margin-top:8px">بدون مسافات • 4–16 • أحرف/أرقام</div>
-    `;
-    openModal("تغيير كلمة المرور", body, `
-      <button class="btn2" onclick="closeModal()">إلغاء</button>
-      <button class="btn" onclick="(async()=>{
-        const oldP = (document.getElementById('tOldPass').value||'').trim();
-        const newP = (document.getElementById('tNewPass').value||'').trim();
-        if(oldP !== String(cred.pass||'')) return warn('كلمة المرور الحالية غير صحيحة');
-        if(!isValidPass(newP)) return warn('كلمة المرور الجديدة غير صالحة (4-16 حرف/رقم بدون مسافات)');
-        try{ setTeacherCred(cred.user, newP); }catch(e){ localStorage.setItem('MB_TEACHER_CRED', JSON.stringify({user:cred.user, pass:newP})); }
-        closeModal();
-        warn('تم تغيير كلمة المرور ✅');
-      })()">حفظ</button>
-    `);
-  }catch(e){
-    console.log(e);
-    warn("تعذر تغيير كلمة المرور الآن.");
-  }
-}
-
-// ================== Added: Guardian phone / PIN / PDF ==================
-    function isValidPin(p){ return isValidPass(p); }$/.test(String(p||"").trim()); }
+    // ================== Added: Guardian phone / PIN / PDF ==================
+    function isValidPin(p){ return /^[0-9]{4}$/.test(String(p||"").trim()); }
 
     async function getStudentById(studentId){
       const doc = await db.collection("students").doc(studentId).get();
@@ -2401,15 +2246,15 @@ function changeTeacherPassFlow(){
         const body = `
           <div class="small" style="margin-bottom:8px">تغيير PIN للطالب/ـة: <b>${s.name||""}</b></div>
           <div class="field" style="margin:0">
-            <input id="pinNew" maxlength="16" placeholder="رقم سري جديد (4-16 حرف/رقم)">
+            <input id="pinNew" inputmode="numeric" maxlength="4" placeholder="PIN جديد (4 أرقام)">
           </div>
-          <div class="small" style="margin-top:8px">مثال: 1234 أو Sara11</div>
+          <div class="small" style="margin-top:8px">مثال: 1234</div>
         `;
         openModal("تغيير PIN", body, `
           <button class="btn2" onclick="closeModal()">إلغاء</button>
           <button class="btn" onclick="(async()=>{
             const v = (document.getElementById('pinNew').value||'').trim();
-            if(!isValidPin(v)){ return warn('الرقم السري غير صالح (4-16 حرف/رقم بدون مسافات)'); }
+            if(!/^[0-9]{4}$/.test(v)){ return warn('PIN لازم يكون 4 أرقام'); }
             await db.collection('students').doc('${studentId}').update({pin: v});
             closeModal();
             await renderStudents();
@@ -2436,14 +2281,14 @@ function changeTeacherPassFlow(){
           <div class="row">
             <div class="col">
               <div class="small">PIN الحالي</div>
-              <input id="oldPin" maxlength="16" placeholder="••••">
+              <input id="oldPin" inputmode="numeric" maxlength="4" placeholder="****">
             </div>
             <div class="col">
               <div class="small">PIN الجديد</div>
-              <input id="newPin" maxlength="16" placeholder="••••">
+              <input id="newPin" inputmode="numeric" maxlength="4" placeholder="****">
             </div>
           </div>
-          <div class="small" style="margin-top:8px">شرط: 4–16 حرف/رقم بدون مسافات</div>
+          <div class="small" style="margin-top:8px">شرط: 4 أرقام</div>
         `;
         openModal("تغيير الرقم السري", body, `
           <button class="btn2" onclick="closeModal()">إلغاء</button>
@@ -2451,7 +2296,7 @@ function changeTeacherPassFlow(){
             const oldP = (document.getElementById('oldPin').value||'').trim();
             const newP = (document.getElementById('newPin').value||'').trim();
             if(String(oldP)!==String(s.pin||'')) return warn('PIN الحالي غير صحيح');
-            if(!isValidPin(newP)) return warn('الرقم السري الجديد غير صالح (4-16 حرف/رقم بدون مسافات)');
+            if(!/^[0-9]{4}$/.test(newP)) return warn('PIN الجديد لازم يكون 4 أرقام');
             await db.collection('students').doc('${doc.id}').update({pin:newP});
             closeModal();
             warn('تم تغيير PIN بنجاح ✅');
@@ -2481,7 +2326,7 @@ function changeTeacherPassFlow(){
         const p1 = (document.getElementById("stuNewPin")?.value || "").trim();
         const p2 = (document.getElementById("stuNewPin2")?.value || "").trim();
         const msg = document.getElementById("stuPinMsg");
-        if(!isValidPin(p1)) return warn("الرقم السري الجديد غير صالح (4-16 حرف/رقم بدون مسافات)");
+        if(!/^[0-9]{4}$/.test(p1)) return warn("PIN الجديد لازم يكون 4 أرقام");
         if(p1 !== p2) return warn("التأكيد غير مطابق");
         await db.collection("students").doc(currentStudentObj.id).update({pin:p1});
         // تحديث محلي
@@ -2495,43 +2340,7 @@ function changeTeacherPassFlow(){
       }
     }
 
-    
-
-// ================== Delete student (inside class) ==================
-async function deleteStudentFlow(studentId, studentName){
-  try{
-    const ok = confirm(`تأكيد حذف الطالب/ـة: ${studentName||""}\nسيتم حذف الحساب وعملياته (قد يستغرق ثواني).`);
-    if(!ok) return;
-    await deleteStudentHard(studentId);
-    warn("تم حذف الطالب ✅");
-    await renderStudents();
-  }catch(e){
-    console.log(e);
-    warn("تعذر حذف الطالب الآن.");
-  }
-}
-
-async function deleteStudentHard(studentId){
-  // حذف عمليات الطالب ثم حذف ملف الطالب
-  const stuRef = db.collection("students").doc(studentId);
-  try{
-    const txRef = stuRef.collection("txns");
-    // حذف على دفعات
-    while(true){
-      const snap = await txRef.limit(250).get();
-      if(snap.empty) break;
-      const batch = db.batch();
-      snap.forEach(d=>batch.delete(d.ref));
-      await batch.commit();
-    }
-  }catch(e){
-    // لو فشل حذف العمليات، نكمل حذف الطالب على الأقل
-    console.log("txns delete err", e);
-  }
-  await stuRef.delete();
-}
-
-function hijriAndGregToday(){
+    function hijriAndGregToday(){
       const now = new Date();
       const greg = new Intl.DateTimeFormat("ar-SA", {year:"numeric", month:"long", day:"numeric"}).format(now);
       let hijri = "";
@@ -2590,7 +2399,20 @@ function hijriAndGregToday(){
     .opLine{margin-top:8px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
     .pill2{display:inline-block;background:#eef6ff;border:1px solid rgba(0,0,0,.06);padding:6px 10px;border-radius:999px;font-weight:1000;font-size:12px;color:#0b2a66}
 
-  </style>
+  
+/* ===== Footer buttons readability fix (Sara) ===== */
+.footerLinks a{
+  background:#e0e0e0 !important;   /* رصاصي */
+  color:#00205B !important;        /* كحلي */
+  font-weight:900 !important;
+  opacity:1 !important;
+}
+.footerLinks a:hover{
+  background:#d5d5d5 !important;
+  color:#00205B !important;
+}
+
+</style>
 </head><body>
 <div class="paper">
   <div class="head">
@@ -4195,5 +4017,45 @@ function renderRoulettePane(){
 })();
 
 </script>
+<script>
+/* Safety layer: keeps login buttons responsive even if a later script crashes. */
+(function(){
+  function showMsg(msg){
+    try{ alert(msg); }catch(e){}
+  }
+  function callIfExists(fnName, args){
+    try{
+      var fn = window[fnName];
+      if(typeof fn === "function"){ return fn.apply(null, args||[]); }
+    }catch(e){}
+    return null;
+  }
+  window.__safeLoginTeacher = function(){ 
+    var r = callIfExists("loginTeacher", []); 
+    if(r===null) showMsg("تعذر تشغيل تسجيل الدخول الآن. تحققي من الاتصال بالإنترنت ثم أعيدي تحديث الصفحة.");
+  };
+  window.__safeLoginStudent = function(){ 
+    var r = callIfExists("loginStudent", []); 
+    if(r===null) showMsg("تعذر تشغيل تسجيل الدخول الآن. تحققي من الاتصال بالإنترنت ثم أعيدي تحديث الصفحة.");
+  };
+  window.__safeRegisterTeacher = function(){
+    var r = callIfExists("registerTeacher", []);
+    if(r===null) showMsg("تعذر تشغيل تسجيل الدخول الآن. تحققي من الاتصال بالإنترنت ثم أعيدي تحديث الصفحة.");
+  };
+  window.__safeBackToStart = function(){
+    var r = callIfExists("backToStart", []);
+    if(r===null){
+      try{
+        var so=document.getElementById("startOverlay");
+        if(so){ so.classList.remove("hidden"); so.style.display="flex"; }
+      }catch(e){}
+    }
+  };
+  window.addEventListener("error", function(ev){
+    try{ console.error("JS error:", ev.error||ev.message); }catch(e){}
+  });
+})();
+</script>
+
 </body>
 </html>
