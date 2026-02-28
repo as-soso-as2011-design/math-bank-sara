@@ -329,7 +329,22 @@
 .roulLabel span{position:absolute;left:50%;top:8%;transform-origin:0 150px;font-size:12px;font-weight:900;color:#0b2a66;white-space:nowrap;text-shadow:0 1px 0 rgba(255,255,255,.7)}
 @media (max-width:420px){ .roulLabel span{font-size:11px} .roulHub{width:84px;height:84px} }
 
-</style>
+
+    /* === v8 fallback: allow الدخول حتى لو تعطل JavaScript === */
+    #teacherLoginPage:target, #studentLoginPage:target{
+      display:block !important;
+    }
+    /* نسخة الإصدار */
+    .verBadge{
+      position:absolute; top:10px; left:10px;
+      background:rgba(0,0,0,.35); color:#fff;
+      padding:6px 10px; border-radius:999px;
+      font-size:12px; font-weight:800; letter-spacing:.3px;
+      border:1px solid rgba(255,255,255,.22);
+      backdrop-filter: blur(6px);
+    }
+
+  </style>
 </head>
 
 <body>
@@ -344,6 +359,7 @@
 
   <div id="startOverlay">
     <div class="startBox">
+        <div class="verBadge">v8</div>
       <div class="startTop">
         <div class="pill" id="connPill">...جاري تجهيز النظام...</div>
         <div class="pill" id="modePill">وضع: المعلمة</div>
@@ -364,7 +380,7 @@
         </div>
 
         <div class="startActions">
-          <button class="btn" onclick="startApp()" data-start-btn="1">ابدأ الآن</button>
+          <a class="btn" href="#teacherLoginPage" onclick="startApp();return false;" data-start-btn="1">ابدأ الآن</a>
           <button class="ghostBtn" onclick="openHelp()">هل تحتاج إلى مساعدة؟</button>
         </div>
       </div>
@@ -1996,12 +2012,26 @@ function renderStudents(){
     }
 
     // ضمان ربط زر ابدأ حتى لو تعطلت onclick في بعض المتصفحات
+    
+    function syncStartHref(){
+      try{
+        const btn = document.querySelector('[data-start-btn="1"]');
+        if(!btn) return;
+        // افتراضي: المعلمة
+        let target = "#teacherLoginPage";
+        // وضع الطالب عبر الرابط ?mode=student أو زر الوضع
+        if(IS_STUDENT_ENTRY || currentAccess==="student") target = "#studentLoginPage";
+        btn.setAttribute("href", target);
+      }catch(_){}
+    }
+
     function bindStartBtn(){
       try{
         const btn = document.querySelector('[data-start-btn="1"]');
         if(btn){
           btn.addEventListener("click", (e)=>{ e.preventDefault(); startApp(); });
           btn.addEventListener("touchend", (e)=>{ e.preventDefault(); startApp(); }, {passive:false});
+          syncStartHref();
         }
       }catch(err){ console.error("bindStartBtn failed", err); }
     }
