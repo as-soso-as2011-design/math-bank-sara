@@ -364,7 +364,7 @@
         </div>
 
         <div class="startActions">
-          <button class="btn" onclick="startApp()">ابدأ الآن</button>
+          <button class="btn" onclick="startApp()" data-start-btn="1">ابدأ الآن</button>
           <button class="ghostBtn" onclick="openHelp()">هل تحتاج إلى مساعدة؟</button>
         </div>
       </div>
@@ -1967,14 +1967,47 @@ function renderStudents(){
     async function executeOp(){ warn("هذه النسخة مدمجة للواجهة + الكود الأساسي. لو تبغين كل الوظائف (PDF/واتساب/تقارير أسبوعية)، قولي لي وأصدر لك نسخة Full كاملة 100%."); }
 
     async function startApp(){
-      const so = $("startOverlay");
-      if(so){ so.classList.add("hidden"); so.style.display="none"; }
-      showOnboarding(()=>{
-        hideAllPages();
-        if(IS_STUDENT_ENTRY){ show("studentLoginPage"); currentAccess="student"; }
-        else{ show("teacherLoginPage"); currentAccess="teacher"; }
-      });
+      // زر "ابدأ الآن" لازم يشتغل حتى لو حصل خطأ في شاشة التعريف (Safari أحياناً يسكت)
+      const go = ()=>{
+        try{
+          hideAllPages();
+          if(IS_STUDENT_ENTRY){ show("studentLoginPage"); currentAccess="student"; }
+          else{ show("teacherLoginPage"); currentAccess="teacher"; }
+        }catch(err){
+          console.error("startApp/go failed", err);
+        }
+      };
+
+      try{
+        const so = $("startOverlay");
+        if(so){ so.classList.add("hidden"); so.style.display="none"; }
+      }catch(_){}
+
+      try{
+        if(typeof showOnboarding === "function"){
+          showOnboarding(go);
+        }else{
+          go();
+        }
+      }catch(err){
+        console.error("showOnboarding failed", err);
+        go();
+      }
     }
+
+    // ضمان ربط زر ابدأ حتى لو تعطلت onclick في بعض المتصفحات
+    function bindStartBtn(){
+      try{
+        const btn = document.querySelector('[data-start-btn="1"]');
+        if(btn){
+          btn.addEventListener("click", (e)=>{ e.preventDefault(); startApp(); });
+          btn.addEventListener("touchend", (e)=>{ e.preventDefault(); startApp(); }, {passive:false});
+        }
+      }catch(err){ console.error("bindStartBtn failed", err); }
+    }
+    document.addEventListener("DOMContentLoaded", bindStartBtn);
+    window.addEventListener("pageshow", bindStartBtn);
+
 
     
     // ================== Daily Ops (Teacher) ==================
