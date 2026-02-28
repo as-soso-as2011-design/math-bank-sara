@@ -316,95 +316,7 @@
 .lbName{font-weight:900;color:#0b2a66}
 .lbMeta{margin-inline-start:auto;display:flex;gap:8px;align-items:center}
 .lbPill{font-size:12px;font-weight:900;padding:6px 10px;border-radius:999px;background:rgba(2,132,199,.10);border:1px solid rgba(2,132,199,.18);color:#0b2a66}
-
-
-/* ===== Roulette ===== */
-.rouletteWrap{position:relative; width:min(320px, 90vw); height:min(320px, 90vw); margin: 6px auto 14px; }
-.rouletteWheel{
-  position:absolute; inset:0;
-  border-radius:50%;
-  border: 10px solid rgba(255,255,255,.55);
-  box-shadow: 0 18px 55px rgba(0,0,0,.22);
-  transform: rotate(0deg);
-  transition: transform 4.2s cubic-bezier(.14,.85,.19,1);
-  background: conic-gradient(#f7d36b 0 25%, #b7e3ff 25% 50%, #b9f5c8 50% 75%, #f9b7c7 75% 100%);
-}
-.roulettePointer{
-  position:absolute; top:-18px; left:50%; transform:translateX(-50%);
-  width:0; height:0;
-  border-left:14px solid transparent;
-  border-right:14px solid transparent;
-  border-bottom:24px solid #0b2a66;
-  filter: drop-shadow(0 6px 8px rgba(0,0,0,.25));
-  z-index:5;
-}
-.rouletteCenter{
-  position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
-  width:70px; height:70px; border-radius:50%;
-  background: rgba(255,255,255,.9);
-  border: 2px solid rgba(11,42,102,.25);
-  display:flex; align-items:center; justify-content:center;
-  font-weight:1000; color:#0b2a66;
-  box-shadow: 0 10px 25px rgba(0,0,0,.18);
-  z-index:4;
-}
-.rouletteLabel{
-  position:absolute; left:50%; top:50%;
-  transform-origin: 0% 0%;
-  width: 46%;
-  text-align: right;
-  font-weight: 900;
-  color:#0b2a66;
-  text-shadow: 0 1px 0 rgba(255,255,255,.85);
-  font-size: 13px;
-  pointer-events:none;
-}
-.roulettePick{
-  text-align:center;
-  font-weight:1000;
-  margin-top:8px;
-}
-.rouletteNote{
-  text-align:center;
-  color:#475569;
-  font-size:13px;
-  margin-top:6px;
-}
-
-
-/* Leaderboard (advanced) */
-.leaderBig{display:grid;grid-template-columns:1fr;gap:10px}
-.lbTop3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.lbCard{border:1px solid rgba(11,42,102,.12);border-radius:14px;padding:12px;background:#fff;box-shadow:0 8px 18px rgba(0,0,0,.04)}
-.lbCard .t{font-weight:1000;color:#0b2a66}
-.lbCard .v{font-weight:1000;font-size:20px;color:#0b2a66;margin-top:6px}
-.lbRow{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.lbBadge{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:34px;border-radius:12px;background:#f1f6ff;color:#0b2a66;font-weight:1000}
-.lbProg{height:10px;border-radius:999px;background:#e9effa;overflow:hidden;margin-top:10px}
-.lbProg > div{height:100%;width:0%;background:linear-gradient(90deg,#0b5bb5,#0b2a66)}
-.lbMe{outline:3px solid rgba(46,125,50,.25);border-color:rgba(46,125,50,.35)}
-@media (max-width:760px){.lbTop3{grid-template-columns:1fr}}
-
 </style>
-
-<script>
-/* ضمان عمل زر "ابدأ الآن" حتى لو حدث خطأ لاحق في أي سكربت */
-(function(){
-  function hide(id){ var e=document.getElementById(id); if(e){ e.classList.add('hidden'); e.style.display='none'; } }
-  function show(id){ var e=document.getElementById(id); if(e){ e.classList.remove('hidden'); e.style.display=''; } }
-  window.goLogin = function(){
-    try{
-      ['startOverlay','onboardOverlay','teacherLoginPage','studentLoginPage','classesPage','classPage','studentAccountPage','dailyOpsPage'].forEach(hide);
-      var qs=new URLSearchParams(location.search);
-      var mode=qs.get('mode');
-      if(mode==='teacher'){ show('teacherLoginPage'); } else { show('studentLoginPage'); }
-      // إيقاف أي رسائل تحميل عالقة
-      var s=document.getElementById('startOverlay'); if(s){ s.setAttribute('aria-hidden','true'); }
-    }catch(e){ console.log('goLogin fallback error', e); }
-  };
-})();
-</script>
-
 </head>
 
 <body>
@@ -439,7 +351,7 @@
         </div>
 
         <div class="startActions">
-          <button class="btn" onclick="goLogin()">ابدأ الآن</button>
+          <button class="btn" onclick="startApp()">ابدأ الآن</button>
           <button class="ghostBtn" onclick="openHelp()">هل تحتاج إلى مساعدة؟</button>
         </div>
       </div>
@@ -1119,43 +1031,19 @@
       </div>
     </div>
 
-    
-<div class="leaderWrap" style="margin-top:12px">
-  <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap">
-    <div>
-      <div style="font-weight:1000;color:#0b2a66;font-size:18px">🏅 لوحة الشرف الأسبوعية</div>
-      <div class="small" style="margin-top:6px">أعلى النقاط لهذا الأسبوع (الأحد → الخميس) — تتحدث تلقائيًا.</div>
-      <div class="small" id="lbStatus" style="margin-top:6px;color:#47607e">جارٍ التحميل…</div>
+    <div class="leaderWrap" style="margin-top:12px">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+        <div style="font-weight:900;color:#0b2a66">🏅 لوحة الشرف الأسبوعية</div>
+        <button class="btn ghost" onclick="refreshRewards()">تحديث اللوحة</button>
+      </div>
+      <div class="small" style="margin-top:6px">أعلى النقاط في الفصل لهذا الأسبوع (الأحد → الخميس).</div>
+      <div id="rwLeader" class="leaderList" style="margin-top:10px"></div>
     </div>
-
-    <div id="lbFilters" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-      <div class="small" style="font-weight:900;color:#0b2a66">فلترة:</div>
-      <select id="lbClassFilter" style="min-width:170px"></select>
-      <select id="lbSectionFilter" style="min-width:140px"></select>
-    </div>
-  </div>
-
-  <div id="rwLeader" class="leaderBig" style="margin-top:12px"></div>
-</div>
-
 
     <div class="cardHint" style="margin-top:12px">
       ✅ يتم احتساب الجوائز تلقائيًا من العمليات اليومية • التهنئة التلقائية لولي الأمر تعمل عند تفعيلها من صفحة المعلمة.
     </div>
-  
-    <div class="card" id="rouletteCard" style="margin-top:12px; display:none">
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap">
-        <div>
-          <h3 style="margin:0;color:#0b2a66">🎡 روليت الهدايا</h3>
-          <div class="small" style="margin-top:6px">متاح <b>مرة واحدة فقط</b> للحسابات: <b>ذهبي / ماسي / ألماسي</b>.</div>
-          <div class="small" id="rouletteStatus" style="margin-top:6px">—</div>
-        </div>
-        <button class="btn" id="rouletteBtn" onclick="openRoulette()">دوّر الروليت</button>
-      </div>
-      <div id="rouletteResult" class="small" style="margin-top:10px"></div>
-    </div>
-
-</div>
+  </div>
 </div>
 <div id="paneCard" class="miniPane">
           <div class="card" style="margin-top:12px">
@@ -1241,7 +1129,27 @@
     }
 
     
-    function escapeHtml(str){
+    
+    // ===== Honor Roll helpers (robust) =====
+    function getStudentClassLabel(s){
+      if(!s) return "";
+      return String(s.className || s.class || s.gradeClass || s.grade || s.group || s.section || s.shuaba || "").trim();
+    }
+    function getStudentSectionLabel(s){
+      if(!s) return "";
+      return String(s.section || s.shuaba || s.classSection || s.groupSection || "").trim();
+    }
+    function honorCacheKey(weekStart, cls, sec){
+      return `honor_cache_${formatYMD(new Date(weekStart))}_${(cls||"all").replace(/\s+/g,'_')}_${(sec||"all").replace(/\s+/g,'_')}`;
+    }
+    function saveHonorCache(key, data){
+      try{ localStorage.setItem(key, JSON.stringify({ts:Date.now(), data})); }catch(e){}
+    }
+    function loadHonorCache(key){
+      try{ const v=localStorage.getItem(key); if(!v) return null; const o=JSON.parse(v); return o&&o.data?o.data:null; }catch(e){ return null; }
+    }
+
+function escapeHtml(str){
       return String(str||"").replace(/[&<>"']/g, s=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[s]));
     }
 function normalizePhoneToWA(phone){
@@ -1759,19 +1667,7 @@ ${SIGNATURE}`;
       $("statusBadge").className = "badge " + (s.active ? "on":"off");
       $("statusBadge").textContent = s.active ? "🟢 نشط" : "🔴 مقفل";
       $("studentBalance").textContent = fmt(s.balance);
-      const __computedTier = calcTier(s.balance);
-      // Sync stored tier with balance so it never stays outdated (fixes Gold not showing, roulette eligibility, etc.)
-      try{
-        if(s.tier !== __computedTier){
-          s.tier = __computedTier;
-          if(typeof db !== "undefined" && db && currentStudentId){
-            db.collection("students").doc(currentStudentId).update({tier: __computedTier}).catch(()=>{});
-          }
-        }
-      }catch(e){}
-      $("tierLabel").textContent = __computedTier;
-
-       try{ setupRouletteUI(); }catch(e){}
+      $("tierLabel").textContent = s.tier || calcTier(s.balance);
 
       $("cardNumber").textContent = makeBankCardNumber(currentStudentId);
       const exp = makeExp();
@@ -1932,29 +1828,7 @@ ${SIGNATURE}`;
 
     async function executeOp(){ warn("هذه النسخة مدمجة للواجهة + الكود الأساسي. لو تبغين كل الوظائف (PDF/واتساب/تقارير أسبوعية)، قولي لي وأصدر لك نسخة Full كاملة 100%."); }
 
-    
-    // دخول مباشر (مستقر) - لا يعتمد على الإرشاد
-    function goLogin(){
-      try{
-        const so = $("startOverlay");
-        if(so){ so.classList.add("hidden"); so.style.display="none"; }
-        const ob = $("onboardOverlay");
-        if(ob){ ob.classList.add("hidden"); ob.setAttribute("aria-hidden","true"); }
-      }catch(e){}
-      try{ hideAllPages(); }catch(e){}
-      try{
-        if(IS_STUDENT_ENTRY){
-          show("studentLoginPage"); currentAccess="student";
-        }else{
-          show("teacherLoginPage"); currentAccess="teacher";
-        }
-      }catch(e){
-        // fallback نهائي: إظهار صفحة دخول الطالب إن وجدت
-        try{ document.getElementById("studentLoginPage")?.classList.remove("hidden"); }catch(_){}
-      }
-    }
-
-async function startApp(){
+    async function startApp(){
       const so = $("startOverlay");
       if(so){ so.classList.add("hidden"); so.style.display="none"; }
       showOnboarding(()=>{
@@ -2585,116 +2459,10 @@ document.addEventListener("DOMContentLoaded", async()=>{
     };
 
     
-    
-    // ===== لوحة الشرف (متطورة + آمنة) =====
-    function lbWeekKey(d){
-      const dt = new Date(d);
-      const y = dt.getFullYear();
-      const m = String(dt.getMonth()+1).padStart(2,'0');
-      const day = String(dt.getDate()).padStart(2,'0');
-      return `${y}-${m}-${day}`;
-    }
-    function setLBStatus(t){ try{ const s=$("lbStatus"); if(s) s.textContent=t; }catch(e){} }
-    function safeText(x){ return (x==null?"":String(x)).replace(/[<>]/g,''); }
-
-    function renderLeaderboardAdvanced(rows, opts){
-      try{
-        const box=$("rwLeader");
-        if(!box) return;
-        const meId = opts?.meId || "";
-        const top = rows.slice(0,3);
-        const rest = rows.slice(3);
-        const max = rows.length ? Math.max(...rows.map(r=>Number(r.points||0))) : 0;
-
-        let topHtml = '<div class="lbTop3">';
-        const medals = ["🥇","🥈","🥉"];
-        top.forEach((r,i)=>{
-          const pts = Number(r.points||0);
-          topHtml += `
-            <div class="lbCard ${r.id===meId?'lbMe':''}">
-              <div class="lbRow">
-                <div class="t">${medals[i]} ${safeText(r.name||'—')}</div>
-                <div class="lbBadge">${i+1}</div>
-              </div>
-              <div class="v">${fmt(pts)} نقطة</div>
-              <div class="small" style="margin-top:6px;color:#47607e">${safeText(r.className||'')} ${r.section?('— شعبة '+safeText(r.section)):""}</div>
-              <div class="lbProg"><div style="width:${max?Math.round((pts/max)*100):0}%"></div></div>
-            </div>`;
-        });
-        topHtml += '</div>';
-
-        let restHtml = '';
-        if(rest.length){
-          restHtml += '<div class="lbCard"><div class="t">الترتيب الكامل</div><div style="margin-top:10px;display:grid;gap:8px">';
-          rest.forEach((r,idx)=>{
-            const rank = idx+4;
-            const pts = Number(r.points||0);
-            restHtml += `
-              <div class="lbRow ${r.id===meId?'lbMe':''}" style="padding:10px;border:1px solid rgba(11,42,102,.10);border-radius:12px">
-                <div style="display:flex;align-items:center;gap:10px;min-width:0">
-                  <div class="lbBadge">${rank}</div>
-                  <div style="min-width:0">
-                    <div style="font-weight:1000;color:#0b2a66;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${safeText(r.name||'—')}</div>
-                    <div class="small" style="color:#47607e">${safeText(r.className||'')} ${r.section?('— شعبة '+safeText(r.section)):""}</div>
-                  </div>
-                </div>
-                <div style="text-align:left;min-width:120px">
-                  <div style="font-weight:1000;color:#0b2a66">${fmt(pts)} نقطة</div>
-                  <div class="lbProg"><div style="width:${max?Math.round((pts/max)*100):0}%"></div></div>
-                </div>
-              </div>`;
-          });
-          restHtml += '</div></div>';
-        }
-
-        box.innerHTML = topHtml + restHtml;
-      }catch(e){
-        console.log("renderLeaderboardAdvanced error", e);
-      }
-    }
-
-    function fillLBFilters(rows){
-      try{
-        const clsSel = $("lbClassFilter");
-        const secSel = $("lbSectionFilter");
-        if(!clsSel || !secSel) return;
-
-        const classes = Array.from(new Set(rows.map(r=>r.classId||r.className).filter(Boolean)));
-        const sections = Array.from(new Set(rows.map(r=>r.section).filter(Boolean)));
-
-        const curC = clsSel.value || "";
-        const curS = secSel.value || "";
-
-        clsSel.innerHTML = '<option value="">كل الفصول</option>' + classes.map(c=>`<option value="${safeText(c)}">${safeText(c)}</option>`).join('');
-        secSel.innerHTML = '<option value="">كل الشعب</option>' + sections.map(s=>`<option value="${safeText(s)}">شعبة ${safeText(s)}</option>`).join('');
-
-        if(curC) clsSel.value = curC;
-        if(curS) secSel.value = curS;
-
-        clsSel.onchange = () => applyLBFilter(rows);
-        secSel.onchange = () => applyLBFilter(rows);
-      }catch(e){}
-    }
-
-    function applyLBFilter(allRows){
-      try{
-        const cls = $("lbClassFilter")?.value || "";
-        const sec = $("lbSectionFilter")?.value || "";
-        let rows = allRows.slice();
-        if(cls) rows = rows.filter(r => (r.classId||r.className) === cls);
-        if(sec) rows = rows.filter(r => String(r.section||"") === String(sec));
-        rows.sort((a,b)=>Number(b.points||0)-Number(a.points||0));
-        renderLeaderboardAdvanced(rows, {meId: currentStudentId});
-      }catch(e){}
-    }
-// ===== Rewards (linked to daily operations / txns) =====
+    // ===== Rewards (linked to daily operations / txns) =====
     async function refreshRewards(){
       try{
         if(!currentStudentId) return;
-
-        // Leaderboard placeholder
-        try{ const box=$("rwLeader"); if(box) box.innerHTML = '<div class="small">جارٍ تحميل لوحة الشرف...</div>'; }catch(e){}
-
 
         const now = Date.now();
         const wk = getSchoolWeekRangeMs(new Date());
@@ -2705,31 +2473,12 @@ document.addEventListener("DOMContentLoaded", async()=>{
         const sRef = db.collection("students").doc(currentStudentId);
 
         // Student weekly net (deposit + transfer in) - (withdraw + transfer out)
-        let weekSnap=null;
-        try{
-          weekSnap = await sRef.collection("txns")
-            .where("createdAtClient", ">=", weekStart)
-            .where("createdAtClient", "<=", weekEnd)
-            .orderBy("createdAtClient","desc")
-            .limit(600)
-            .get();
-        }catch(e){
-          // Fallback (avoid composite-index issues): fetch recent and filter client-side
-          try{
-            const all = await sRef.collection("txns").orderBy("createdAtClient","desc").limit(800).get();
-            const fake = {docs:[]};
-            const docs = [];
-            all.forEach(d=>{
-              const x=d.data()||{};
-              const ts = Number(x.createdAtClient||0);
-              if(ts>=weekStart && ts<=weekEnd) docs.push(d);
-            });
-            fake.forEach = (fn)=>docs.forEach(fn);
-            weekSnap = fake;
-          }catch(e2){
-            weekSnap = {forEach:()=>{}};
-          }
-        }
+        const weekSnap = await sRef.collection("txns")
+          .where("createdAtClient", ">=", weekStart)
+          .where("createdAtClient", "<=", weekEnd)
+          .orderBy("createdAtClient","desc")
+          .limit(600)
+          .get();
 
         let net=0, partCount=0, violations=0;
         weekSnap.forEach(d=>{
@@ -2751,29 +2500,11 @@ document.addEventListener("DOMContentLoaded", async()=>{
         });
 
         // Commitment: "0 مخالفات خلال 5 أيام"
-        let fiveSnap=null;
-        try{
-          fiveSnap = await sRef.collection("txns")
-            .where("createdAtClient", ">=", fiveStart)
-            .orderBy("createdAtClient","desc")
-            .limit(600)
-            .get();
-        }catch(e){
-          try{
-            const all = await sRef.collection("txns").orderBy("createdAtClient","desc").limit(800).get();
-            const docs=[];
-            all.forEach(d=>{
-              const x=d.data()||{};
-              const ts = Number(x.createdAtClient||0);
-              if(ts>=fiveStart) docs.push(d);
-            });
-            const fake={};
-            fake.forEach=(fn)=>docs.forEach(fn);
-            fiveSnap=fake;
-          }catch(e2){
-            fiveSnap={forEach:()=>{}};
-          }
-        }
+        const fiveSnap = await sRef.collection("txns")
+          .where("createdAtClient", ">=", fiveStart)
+          .orderBy("createdAtClient","desc")
+          .limit(600)
+          .get();
 
         const violWords = ["مخالفة","سلوك","غياب","تأخر","عدم","انضباط","تنبيه"];
         fiveSnap.forEach(d=>{
@@ -2796,30 +2527,12 @@ document.addEventListener("DOMContentLoaded", async()=>{
           for(const sd of studs.docs){
             const sid = sd.id;
             const ref = db.collection("students").doc(sid);
-            let snap=null;
-            try{
-              snap = await ref.collection("txns")
-                .where("createdAtClient", ">=", weekStart)
-                .where("createdAtClient", "<=", weekEnd)
-                .orderBy("createdAtClient","desc")
-                .limit(600)
-                .get();
-            }catch(e){
-              try{
-                const all = await ref.collection("txns").orderBy("createdAtClient","desc").limit(800).get();
-                const docs=[];
-                all.forEach(d=>{
-                  const x=d.data()||{};
-                  const ts=Number(x.createdAtClient||0);
-                  if(ts>=weekStart && ts<=weekEnd) docs.push(d);
-                });
-                const fake={};
-                fake.forEach=(fn)=>docs.forEach(fn);
-                snap=fake;
-              }catch(e2){
-                snap={forEach:()=>{}};
-              }
-            }
+            const snap = await ref.collection("txns")
+              .where("createdAtClient", ">=", weekStart)
+              .where("createdAtClient", "<=", weekEnd)
+              .orderBy("createdAtClient","desc")
+              .limit(600)
+              .get();
             let n=0;
             snap.forEach(d=>{
               const x=d.data()||{};
@@ -2928,30 +2641,12 @@ document.addEventListener("DOMContentLoaded", async()=>{
 
         // Improvement (vs previous school week)
         const prev = getPrevSchoolWeekRangeMs(new Date());
-        let prevSnap=null;
-        try{
-          prevSnap = await sRef.collection("txns")
-            .where("createdAtClient", ">=", prev.startMs)
-            .where("createdAtClient", "<=", prev.endMs)
-            .orderBy("createdAtClient","desc")
-            .limit(600)
-            .get();
-        }catch(e){
-          try{
-            const all = await sRef.collection("txns").orderBy("createdAtClient","desc").limit(900).get();
-            const docs=[];
-            all.forEach(d=>{
-              const x=d.data()||{};
-              const ts=Number(x.createdAtClient||0);
-              if(ts>=prev.startMs && ts<=prev.endMs) docs.push(d);
-            });
-            const fake={};
-            fake.forEach=(fn)=>docs.forEach(fn);
-            prevSnap=fake;
-          }catch(e2){
-            prevSnap={forEach:()=>{}};
-          }
-        }
+        const prevSnap = await sRef.collection("txns")
+          .where("createdAtClient", ">=", prev.startMs)
+          .where("createdAtClient", "<=", prev.endMs)
+          .orderBy("createdAtClient","desc")
+          .limit(600)
+          .get();
         let prevNet=0;
         prevSnap.forEach(d=>{
           const x=d.data()||{};
@@ -2979,105 +2674,124 @@ document.addEventListener("DOMContentLoaded", async()=>{
         setBadge("rwHelpBadge", helpOk);
         setProg("rwHelpProg","rwHelpProgTxt", helpCount, helpTarget);
 
-        // Leaderboard (Advanced + auto)
+        // Leaderboard (Top points in class)
         try{
-          setLBStatus("جارٍ تحميل لوحة الشرف…");
           const box = $("rwLeader");
-          if(box){ box.innerHTML = '<div class="small">جارٍ تحميل لوحة الشرف…</div>'; }
+          if(box){
+            const clsLabel = (typeof currentClassId!=="undefined" && currentClassId) ? String(currentClassId) : getStudentClassLabel(currentStudentObj);
+            const cacheKey = honorCacheKey(weekStart, clsLabel||"all", "");
+            const cached = loadHonorCache(cacheKey);
 
-          const wkKey = `lb_${formatYMD(weekStart)}_${formatYMD(weekEnd)}`;
-          const cacheKey = `lb_cache_${wkKey}_${currentClassId||'all'}`;
-          let rows = [];
+            const renderList = (rows)=>{
+              box.innerHTML = "";
+              const top = (rows||[]).slice(0,10);
+              top.forEach((r,i)=>{
+                const medal = (i===0?"🥇":i===1?"🥈":i===2?"🥉":`#${i+1}`);
+                const el=document.createElement("div");
+                el.className="lbRow";
+                el.innerHTML = `<div class="lbRank">${medal}</div>
+                  <div>
+                    <div class="lbName">${escapeHtml(r.name||"—")}</div>
+                    <div class="small">صافي: ${fmt(r.net||0)} ر.س</div>
+                  </div>
+                  <div class="lbMeta"><div class="lbPill">${Number(r.pts||0)} نقطة</div></div>`;
+                box.appendChild(el);
+              });
+              if(!top.length) box.innerHTML = '<div class="small">لا توجد بيانات كافية لهذا الأسبوع.</div>';
+            };
 
-          // 1) Try compute from Firestore (if rules allow)
-          try{
-            if(currentClassId){
-              const studs = await db.collection("students").where("classId","==",currentClassId).get();
-              for(const sd of studs.docs){
-                const sid = sd.id;
-                const sdata = sd.data()||{};
-                // fetch last txns then filter client-side (avoids index issues)
-                let all2=null;
-                try{
-                  all2 = await db.collection("students").doc(sid).collection("txns")
-                    .orderBy("createdAtClient","desc").limit(800).get();
-                }catch(_e){
-                  all2 = { forEach: ()=>{} };
-                }
-
-                let dep2=0, part2=0, vio2=0, trOut2=0, net2=0;
-                all2.forEach(d=>{
-                  const x=d.data()||{};
-                  const ts=Number(x.createdAtClient||0);
-                  if(!(ts>=weekStart && ts<=weekEnd)) return;
-                  const t=String(x.type||"");
-                  const a=Number(x.amount||0);
-                  const reason=String(x.reason||"");
-                  if(t.startsWith("إيداع") || t.startsWith("تحويل من")) net2 += a;
-                  else if(t.startsWith("سحب") || t.startsWith("تحويل إلى")) net2 -= a;
-                  if(t.startsWith("إيداع")) dep2 += a;
-                  if(t.startsWith("تحويل إلى")) trOut2++;
-                  if(t.startsWith("إيداع")){
-                    const r = String(reason||"").replace(/\s+/g,'');
-                    if(r.includes("مشاركة") || r.includes("تفاعل") || r.includes("إجابة") || r.includes("حل") || r.includes("واجب") || r.includes("نشاط")) part2++;
-                  }
-                  if(t.startsWith("سحب")){
-                    const rr = String(reason||"");
-                    if(violWords.some(w=>rr.includes(w))) vio2++;
-                  }
-                });
-
-                const points = Math.max(0, Math.round((dep2*0.05) + (part2*12) + (trOut2*2) - (vio2*15)));
-                rows.push({
-                  id:sid,
-                  name: sdata.name || "—",
-                  points,
-                  net: net2,
-                  classId: sdata.classId || "",
-                  className: sdata.className || sdata.classId || "",
-                  section: sdata.section || ""
-                });
-              }
+            // show cached immediately (if available) to avoid "تعذر"
+            if(cached && Array.isArray(cached) && cached.length){
+              renderList(cached);
+            }else{
+              box.innerHTML = '<div class="small">جارٍ تحميل لوحة الشرف…</div>';
             }
-          }catch(eCompute){
-            rows = [];
-          }
 
-          // 2) Fallback to cached leaderboard if compute not available (common for student rules)
-          if(!rows.length){
-            try{
-              const cached = JSON.parse(localStorage.getItem(cacheKey) || "null");
-              if(cached && Array.isArray(cached.rows) && cached.rows.length){
-                rows = cached.rows;
+            // Students: show cached only (privacy / rules safe)
+            if(currentAccess==="student"){
+              if(!(cached && cached.length)){
+                // Try to read shared published snapshot
+                try{
+                  const pub = await db.collection("publicBoards").doc(cacheKey).get();
+                  const pdata = pub.exists ? (pub.data()||{}) : {};
+                  const prows = Array.isArray(pdata.rows) ? pdata.rows : [];
+                  if(prows.length){
+                    saveHonorCache(cacheKey, prows);
+                    renderList(prows);
+                  }else{
+                    box.innerHTML = '<div class="small">لوحة الشرف غير متاحة الآن.</div>';
+                  }
+                }catch(e){
+                  box.innerHTML = '<div class="small">لوحة الشرف تظهر بعد تحديثها من حساب المعلمة.</div>';
+                }
               }
-            }catch(_e){}
-          }
+            }else{
+              // Teacher: compute fresh and cache
+              let studsSnap = null;
+              try{
+                if(typeof currentClassId!=="undefined" && currentClassId){
+                  studsSnap = await db.collection("students").where("classId","==",currentClassId).get();
+                }else{
+                  const c = getStudentClassLabel(currentStudentObj);
+                  if(c){
+                    // try common field names; fall back to all
+                    studsSnap = await db.collection("students").where("className","==",c).get().catch(()=>null);
+                    if(!studsSnap) studsSnap = await db.collection("students").where("class","==",c).get().catch(()=>null);
+                  }
+                  if(!studsSnap) studsSnap = await db.collection("students").limit(200).get();
+                }
+              }catch(e){
+                studsSnap = await db.collection("students").limit(200).get();
+              }
 
-          // 3) Cache results for next time + for students on same device
-          if(rows.length){
-            try{
-              localStorage.setItem(cacheKey, JSON.stringify({rows, ts: Date.now()}));
-            }catch(_e){}
+              const rows = [];
+              const violWords = ["مخالفة","سلوك","غياب","تأخر","عدم","انضباط","تنبيه"];
+              for(const sd of (studsSnap?.docs||[])){
+                try{
+                  const sid = sd.id;
+                  const ref = db.collection("students").doc(sid);
+                  const snap2 = await ref.collection("txns")
+                    .where("createdAtClient", ">=", weekStart)
+                    .where("createdAtClient", "<=", weekEnd)
+                    .orderBy("createdAtClient","desc")
+                    .limit(400)
+                    .get();
+                  let dep2=0, part2=0, vio2=0, trOut2=0, net2=0;
+                  snap2.forEach(d=>{
+                    const x=d.data()||{};
+                    const t=String(x.type||"");
+                    const a=Number(x.amount||0);
+                    const reason=String(x.reason||"");
+                    if(t.startsWith("إيداع") || t.startsWith("تحويل من")) net2 += a;
+                    else if(t.startsWith("سحب") || t.startsWith("تحويل إلى")) net2 -= a;
+                    if(t.startsWith("إيداع")) dep2 += a;
+                    if(t.startsWith("تحويل إلى")) trOut2++;
+                    if(t.startsWith("إيداع")){
+                      const r = String(reason||"").replace(/\s+/g,'');
+                      if(r.includes("مشاركة") || r.includes("تفاعل") || r.includes("إجابة") || r.includes("حل") || r.includes("واجب") || r.includes("نشاط")) part2++;
+                    }
+                    if(t.startsWith("سحب")){
+                      const rr = String(reason||"");
+                      if(violWords.some(w=>rr.includes(w))) vio2++;
+                    }
+                  });
+                  const pts = Math.max(0, Math.round((dep2*0.05) + (part2*12) + (trOut2*2) - (vio2*15)));
+                  rows.push({id:sid,name:(sd.data()||{}).name||"—",pts,net:net2});
+                }catch(e){}
+              }
+              rows.sort((a,b)=>b.pts-a.pts);
+              // Try to publish a shared snapshot so students can read without scanning students
+              try{
+                const pub = db.collection("publicBoards").doc(cacheKey);
+                const top10 = rows.slice(0,10);
+                const payload = {rows: top10, weekStart, updatedAt: (firebase?.firestore?.FieldValue?.serverTimestamp ? firebase.firestore.FieldValue.serverTimestamp() : Date.now())};
+                await pub.set(payload, {merge:true});
+              }catch(e){}
+              saveHonorCache(cacheKey, rows);
+              renderList(rows);
+            }
           }
-
-          // Render
-          if(!currentClassId){
-            setLBStatus("لم يتم تعيين فصل لهذا الحساب.");
-            if(box) box.innerHTML = '<div class="small">لم يتم تعيين فصل لهذا الحساب.</div>';
-          }else if(!rows.length){
-            setLBStatus("تعذر تحميل لوحة الشرف — افتحيها من وضع المعلمة مرة واحدة لتُحفظ تلقائيًا.");
-            if(box) box.innerHTML = '<div class="small">تعذر تحميل لوحة الشرف. افتحي صفحة الجوائز من وضع المعلمة مرة واحدة لتفعيل التحديث.</div>';
-          }else{
-            // Sort + fill filters + apply
-            rows.sort((a,b)=>Number(b.points||0)-Number(a.points||0));
-            fillLBFilters(rows);
-            applyLBFilter(rows);
-            setLBStatus("تم تحديث لوحة الشرف تلقائيًا ✅");
-          }
-        }catch(e){
-          console.log("leaderboard error", e);
-          setLBStatus("تعذر تحميل لوحة الشرف مؤقتًا…");
-        }
+        }catch(e){}
 
         // Auto WhatsApp congratulations (once per week per award)
         try{
@@ -3107,158 +2821,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
         $("rwChampion") && ($("rwChampion").textContent = "تعذر الحساب");
         $("rwCommit") && ($("rwCommit").textContent = "تعذر الحساب");
         $("rwPart") && ($("rwPart").textContent = "تعذر الحساب");
-        try{ const box=$("rwLeader"); if(box) box.innerHTML = '<div class="small">تعذر تحميل لوحة الشرف — اضغط "تحديث اللوحة".</div>'; }catch(_e){}
       }
-    }
-
-
-
-    // ===== Roulette (Gold/Diamond/Elite only - One spin) =====
-    const ROULETTE_PRIZES = [
-      "إعفاء واجب ✅",
-      "إعفاء واجبان ✅✅",
-      "زيادة درجات في الاختبار ⭐",
-      "وجبة ماكدونالدز 🍔"
-    ];
-
-    function rouletteKey(){ return `roulette_${currentStudentId||"unknown"}`; }
-    function getRouletteState(){
-      try{ return JSON.parse(localStorage.getItem(rouletteKey())||"null"); }catch(e){ return null; }
-    }
-    function setRouletteState(obj){
-      try{ localStorage.setItem(rouletteKey(), JSON.stringify(obj||{})); }catch(e){}
-    }
-    function isRouletteEligible(){
-      try{
-        const key = (typeof tierKeyFromBalance==="function")
-          ? tierKeyFromBalance((currentStudentObj&&currentStudentObj.balance)||0)
-          : (String(($("tierLabel")&&$("tierLabel").textContent)||"").includes("ذهبي") ? "gold"
-            : String(($("tierLabel")&&$("tierLabel").textContent)||"").includes("ماسي") ? "diamond"
-            : String(($("tierLabel")&&$("tierLabel").textContent)||"").includes("ألماسي") ? "elite"
-            : "other");
-        return (key==="gold" || key==="diamond" || key==="elite");
-      }catch(e){ return false; }
-    }
-
-    function setupRouletteUI(){
-      const card = $("rouletteCard");
-      if(!card) return;
-      const eligible = isRouletteEligible();
-      if(!eligible){ card.style.display="none"; return; }
-      card.style.display="block";
-
-      const st = getRouletteState();
-      const btn = $("rouletteBtn");
-      const status = $("rouletteStatus");
-      const res = $("rouletteResult");
-
-      if(st && st.prize){
-        status.textContent = "تم استخدام فرصة الروليت ✅";
-        res.textContent = "نتيجتك: " + st.prize;
-        if(btn){ btn.disabled = true; btn.textContent = "تم التدوير"; btn.classList.add("ghost"); }
-      }else{
-        status.textContent = "🎟️ لديك فرصة واحدة لتدوير الروليت الآن!";
-        res.textContent = "";
-        if(btn){ btn.disabled = false; btn.textContent = "دوّر الروليت"; btn.classList.remove("ghost"); }
-      }
-    }
-
-    function buildRouletteWheelHTML(){
-      const n = ROULETTE_PRIZES.length;
-      const colors = ["#f7d36b","#b7e3ff","#b9f5c8","#f9b7c7","#d7c2ff","#ffd6a5"];
-      let stops = [];
-      for(let i=0;i<n;i++){
-        const a0 = (i*100/n);
-        const a1 = ((i+1)*100/n);
-        stops.push(`${colors[i%colors.length]} ${a0}% ${a1}%`);
-      }
-      return `
-        <div class="rouletteWrap">
-          <div class="roulettePointer"></div>
-          <div class="rouletteWheel" id="rouletteWheel" style="background: conic-gradient(${stops.join(",")});"></div>
-          <div class="rouletteCenter">🎁</div>
-        </div>
-        <div class="rouletteNote">* فرصة واحدة فقط — سيتم حفظ النتيجة تلقائيًا لهذا الحساب.</div>
-        <div id="roulettePick" class="roulettePick"></div>
-      `;
-    }
-
-    let rouletteBusy = false;
-
-    function openRoulette(){
-      try{
-        if(!isRouletteEligible()) return warn("الروليت متاح فقط للمستوى الذهبي/الماسي/الألماسي");
-        const st = getRouletteState();
-        if(st && st.prize){
-          openModal("🎡 روليت الهدايا",
-            `<div class="small">تم استخدام الفرصة مسبقًا ✅</div><div class="roulettePick" style="margin-top:10px">نتيجتك: <b>${escapeHtml(st.prize)}</b></div>`,
-            '<button class="btn" onclick="closeModal()">تمام</button>'
-          );
-          return;
-        }
-
-        openModal("🎡 روليت الهدايا", buildRouletteWheelHTML(),
-          '<button class="btn" id="rouletteSpinBtn" onclick="spinRoulette()">دوّر الآن</button><button class="btn3" onclick="closeModal()">إلغاء</button>'
-        );
-
-        setTimeout(()=>{
-          const wheel = $("rouletteWheel");
-          if(!wheel) return;
-          const n = ROULETTE_PRIZES.length;
-          wheel.innerHTML = "";
-          for(let i=0;i<n;i++){
-            const seg = 360/n;
-            const mid = (i*seg) + (seg/2);
-            const lab = document.createElement("div");
-            lab.className = "rouletteLabel";
-            lab.style.transform = `rotate(${mid}deg) translate(0,-46%) rotate(90deg)`;
-            lab.textContent = ROULETTE_PRIZES[i];
-            wheel.appendChild(lab);
-          }
-        }, 60);
-      }catch(e){ console.log(e); warn("تعذر فتح الروليت"); }
-    }
-
-    function spinRoulette(){
-      try{
-        if(rouletteBusy) return;
-        rouletteBusy = true;
-
-        const wheel = $("rouletteWheel");
-        const pick = $("roulettePick");
-        const btn = $("rouletteSpinBtn");
-        if(btn) btn.disabled = true;
-
-        const n = ROULETTE_PRIZES.length;
-        const seg = 360/n;
-        const idx = Math.floor(Math.random()*n);
-        const jitter = (Math.random()*0.5 - 0.25) * seg;
-        const target = (360*6) + (360 - (idx*seg + seg/2)) + jitter;
-
-        wheel.style.transition = "none";
-        wheel.style.transform = "rotate(0deg)";
-        wheel.offsetHeight;
-        wheel.style.transition = "transform 4.2s cubic-bezier(.14,.85,.19,1)";
-        wheel.style.transform = `rotate(${target}deg)`;
-
-        wheel.addEventListener("transitionend", ()=>{
-          const prize = ROULETTE_PRIZES[idx];
-          setRouletteState({prize, at: Date.now()});
-
-          if(pick) pick.innerHTML = `🎉 مبروك! فزت بـ <b>${escapeHtml(prize)}</b>`;
-
-          // effects + sound if available
-          try{
-            if(typeof spawnSparks==="function") spawnSparks(38);
-            if(typeof spawnFireworks==="function") spawnFireworks(10);
-            if(typeof playSuccessJingle==="function") playSuccessJingle();
-          }catch(e){}
-
-          rouletteBusy = false;
-          setupRouletteUI();
-          $("mActions") && ($("mActions").innerHTML = '<button class="btn" onclick="closeModal()">تمام</button>');
-        }, {once:true});
-      }catch(e){ console.log(e); rouletteBusy=false; warn("تعذر تدوير الروليت"); }
     }
 
 
@@ -3311,9 +2874,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
         const updated = await ref.get();
         const u = updated.data() || {};
         $("studentBalance") && ($("studentBalance").textContent = fmt(u.balance));
-        const __t = calcTier(u.balance);
-        $("tierLabel") && ($("tierLabel").textContent = __t);
-        try{ await ref.update({tier: __t}); }catch(e){}
+        $("tierLabel") && ($("tierLabel").textContent = calcTier(u.balance));
         $("amt") && ($("amt").value = "");
         setupReasonUI($("op")?.value || "deposit",'reasonStudent','reasonOtherStudent');
         await showStatement();
