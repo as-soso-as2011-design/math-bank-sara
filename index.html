@@ -371,7 +371,40 @@
   margin-top:6px;
 }
 
+
+/* Leaderboard (advanced) */
+.leaderBig{display:grid;grid-template-columns:1fr;gap:10px}
+.lbTop3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.lbCard{border:1px solid rgba(11,42,102,.12);border-radius:14px;padding:12px;background:#fff;box-shadow:0 8px 18px rgba(0,0,0,.04)}
+.lbCard .t{font-weight:1000;color:#0b2a66}
+.lbCard .v{font-weight:1000;font-size:20px;color:#0b2a66;margin-top:6px}
+.lbRow{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.lbBadge{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:34px;border-radius:12px;background:#f1f6ff;color:#0b2a66;font-weight:1000}
+.lbProg{height:10px;border-radius:999px;background:#e9effa;overflow:hidden;margin-top:10px}
+.lbProg > div{height:100%;width:0%;background:linear-gradient(90deg,#0b5bb5,#0b2a66)}
+.lbMe{outline:3px solid rgba(46,125,50,.25);border-color:rgba(46,125,50,.35)}
+@media (max-width:760px){.lbTop3{grid-template-columns:1fr}}
+
 </style>
+
+<script>
+/* ضمان عمل زر "ابدأ الآن" حتى لو حدث خطأ لاحق في أي سكربت */
+(function(){
+  function hide(id){ var e=document.getElementById(id); if(e){ e.classList.add('hidden'); e.style.display='none'; } }
+  function show(id){ var e=document.getElementById(id); if(e){ e.classList.remove('hidden'); e.style.display=''; } }
+  window.goLogin = function(){
+    try{
+      ['startOverlay','onboardOverlay','teacherLoginPage','studentLoginPage','classesPage','classPage','studentAccountPage','dailyOpsPage'].forEach(hide);
+      var qs=new URLSearchParams(location.search);
+      var mode=qs.get('mode');
+      if(mode==='teacher'){ show('teacherLoginPage'); } else { show('studentLoginPage'); }
+      // إيقاف أي رسائل تحميل عالقة
+      var s=document.getElementById('startOverlay'); if(s){ s.setAttribute('aria-hidden','true'); }
+    }catch(e){ console.log('goLogin fallback error', e); }
+  };
+})();
+</script>
+
 </head>
 
 <body>
@@ -406,7 +439,7 @@
         </div>
 
         <div class="startActions">
-          <button class="btn" onclick="startApp()">ابدأ الآن</button>
+          <button class="btn" onclick="goLogin()">ابدأ الآن</button>
           <button class="ghostBtn" onclick="openHelp()">هل تحتاج إلى مساعدة؟</button>
         </div>
       </div>
@@ -1086,14 +1119,25 @@
       </div>
     </div>
 
-    <div class="leaderWrap" style="margin-top:12px">
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
-        <div style="font-weight:900;color:#0b2a66">🏅 لوحة الشرف الأسبوعية</div>
-        <button class="btn ghost" onclick="refreshRewards()">تحديث اللوحة</button>
-      </div>
-      <div class="small" style="margin-top:6px">أعلى النقاط في الفصل لهذا الأسبوع (الأحد → الخميس).</div>
-      <div id="rwLeader" class="leaderList" style="margin-top:10px"></div>
+    
+<div class="leaderWrap" style="margin-top:12px">
+  <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap">
+    <div>
+      <div style="font-weight:1000;color:#0b2a66;font-size:18px">🏅 لوحة الشرف الأسبوعية</div>
+      <div class="small" style="margin-top:6px">أعلى النقاط لهذا الأسبوع (الأحد → الخميس) — تتحدث تلقائيًا.</div>
+      <div class="small" id="lbStatus" style="margin-top:6px;color:#47607e">جارٍ التحميل…</div>
     </div>
+
+    <div id="lbFilters" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <div class="small" style="font-weight:900;color:#0b2a66">فلترة:</div>
+      <select id="lbClassFilter" style="min-width:170px"></select>
+      <select id="lbSectionFilter" style="min-width:140px"></select>
+    </div>
+  </div>
+
+  <div id="rwLeader" class="leaderBig" style="margin-top:12px"></div>
+</div>
+
 
     <div class="cardHint" style="margin-top:12px">
       ✅ يتم احتساب الجوائز تلقائيًا من العمليات اليومية • التهنئة التلقائية لولي الأمر تعمل عند تفعيلها من صفحة المعلمة.
@@ -1888,7 +1932,29 @@ ${SIGNATURE}`;
 
     async function executeOp(){ warn("هذه النسخة مدمجة للواجهة + الكود الأساسي. لو تبغين كل الوظائف (PDF/واتساب/تقارير أسبوعية)، قولي لي وأصدر لك نسخة Full كاملة 100%."); }
 
-    async function startApp(){
+    
+    // دخول مباشر (مستقر) - لا يعتمد على الإرشاد
+    function goLogin(){
+      try{
+        const so = $("startOverlay");
+        if(so){ so.classList.add("hidden"); so.style.display="none"; }
+        const ob = $("onboardOverlay");
+        if(ob){ ob.classList.add("hidden"); ob.setAttribute("aria-hidden","true"); }
+      }catch(e){}
+      try{ hideAllPages(); }catch(e){}
+      try{
+        if(IS_STUDENT_ENTRY){
+          show("studentLoginPage"); currentAccess="student";
+        }else{
+          show("teacherLoginPage"); currentAccess="teacher";
+        }
+      }catch(e){
+        // fallback نهائي: إظهار صفحة دخول الطالب إن وجدت
+        try{ document.getElementById("studentLoginPage")?.classList.remove("hidden"); }catch(_){}
+      }
+    }
+
+async function startApp(){
       const so = $("startOverlay");
       if(so){ so.classList.add("hidden"); so.style.display="none"; }
       showOnboarding(()=>{
@@ -2519,7 +2585,109 @@ document.addEventListener("DOMContentLoaded", async()=>{
     };
 
     
-    // ===== Rewards (linked to daily operations / txns) =====
+    
+    // ===== لوحة الشرف (متطورة + آمنة) =====
+    function lbWeekKey(d){
+      const dt = new Date(d);
+      const y = dt.getFullYear();
+      const m = String(dt.getMonth()+1).padStart(2,'0');
+      const day = String(dt.getDate()).padStart(2,'0');
+      return `${y}-${m}-${day}`;
+    }
+    function setLBStatus(t){ try{ const s=$("lbStatus"); if(s) s.textContent=t; }catch(e){} }
+    function safeText(x){ return (x==null?"":String(x)).replace(/[<>]/g,''); }
+
+    function renderLeaderboardAdvanced(rows, opts){
+      try{
+        const box=$("rwLeader");
+        if(!box) return;
+        const meId = opts?.meId || "";
+        const top = rows.slice(0,3);
+        const rest = rows.slice(3);
+        const max = rows.length ? Math.max(...rows.map(r=>Number(r.points||0))) : 0;
+
+        let topHtml = '<div class="lbTop3">';
+        const medals = ["🥇","🥈","🥉"];
+        top.forEach((r,i)=>{
+          const pts = Number(r.points||0);
+          topHtml += `
+            <div class="lbCard ${r.id===meId?'lbMe':''}">
+              <div class="lbRow">
+                <div class="t">${medals[i]} ${safeText(r.name||'—')}</div>
+                <div class="lbBadge">${i+1}</div>
+              </div>
+              <div class="v">${fmt(pts)} نقطة</div>
+              <div class="small" style="margin-top:6px;color:#47607e">${safeText(r.className||'')} ${r.section?('— شعبة '+safeText(r.section)):""}</div>
+              <div class="lbProg"><div style="width:${max?Math.round((pts/max)*100):0}%"></div></div>
+            </div>`;
+        });
+        topHtml += '</div>';
+
+        let restHtml = '';
+        if(rest.length){
+          restHtml += '<div class="lbCard"><div class="t">الترتيب الكامل</div><div style="margin-top:10px;display:grid;gap:8px">';
+          rest.forEach((r,idx)=>{
+            const rank = idx+4;
+            const pts = Number(r.points||0);
+            restHtml += `
+              <div class="lbRow ${r.id===meId?'lbMe':''}" style="padding:10px;border:1px solid rgba(11,42,102,.10);border-radius:12px">
+                <div style="display:flex;align-items:center;gap:10px;min-width:0">
+                  <div class="lbBadge">${rank}</div>
+                  <div style="min-width:0">
+                    <div style="font-weight:1000;color:#0b2a66;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${safeText(r.name||'—')}</div>
+                    <div class="small" style="color:#47607e">${safeText(r.className||'')} ${r.section?('— شعبة '+safeText(r.section)):""}</div>
+                  </div>
+                </div>
+                <div style="text-align:left;min-width:120px">
+                  <div style="font-weight:1000;color:#0b2a66">${fmt(pts)} نقطة</div>
+                  <div class="lbProg"><div style="width:${max?Math.round((pts/max)*100):0}%"></div></div>
+                </div>
+              </div>`;
+          });
+          restHtml += '</div></div>';
+        }
+
+        box.innerHTML = topHtml + restHtml;
+      }catch(e){
+        console.log("renderLeaderboardAdvanced error", e);
+      }
+    }
+
+    function fillLBFilters(rows){
+      try{
+        const clsSel = $("lbClassFilter");
+        const secSel = $("lbSectionFilter");
+        if(!clsSel || !secSel) return;
+
+        const classes = Array.from(new Set(rows.map(r=>r.classId||r.className).filter(Boolean)));
+        const sections = Array.from(new Set(rows.map(r=>r.section).filter(Boolean)));
+
+        const curC = clsSel.value || "";
+        const curS = secSel.value || "";
+
+        clsSel.innerHTML = '<option value="">كل الفصول</option>' + classes.map(c=>`<option value="${safeText(c)}">${safeText(c)}</option>`).join('');
+        secSel.innerHTML = '<option value="">كل الشعب</option>' + sections.map(s=>`<option value="${safeText(s)}">شعبة ${safeText(s)}</option>`).join('');
+
+        if(curC) clsSel.value = curC;
+        if(curS) secSel.value = curS;
+
+        clsSel.onchange = () => applyLBFilter(rows);
+        secSel.onchange = () => applyLBFilter(rows);
+      }catch(e){}
+    }
+
+    function applyLBFilter(allRows){
+      try{
+        const cls = $("lbClassFilter")?.value || "";
+        const sec = $("lbSectionFilter")?.value || "";
+        let rows = allRows.slice();
+        if(cls) rows = rows.filter(r => (r.classId||r.className) === cls);
+        if(sec) rows = rows.filter(r => String(r.section||"") === String(sec));
+        rows.sort((a,b)=>Number(b.points||0)-Number(a.points||0));
+        renderLeaderboardAdvanced(rows, {meId: currentStudentId});
+      }catch(e){}
+    }
+// ===== Rewards (linked to daily operations / txns) =====
     async function refreshRewards(){
       try{
         if(!currentStudentId) return;
@@ -2811,44 +2979,37 @@ document.addEventListener("DOMContentLoaded", async()=>{
         setBadge("rwHelpBadge", helpOk);
         setProg("rwHelpProg","rwHelpProgTxt", helpCount, helpTarget);
 
-        // Leaderboard (Top points in class)
+        // Leaderboard (Advanced + auto)
         try{
+          setLBStatus("جارٍ تحميل لوحة الشرف…");
           const box = $("rwLeader");
-          if(box){
-            box.innerHTML = "";
+          if(box){ box.innerHTML = '<div class="small">جارٍ تحميل لوحة الشرف…</div>'; }
+
+          const wkKey = `lb_${formatYMD(weekStart)}_${formatYMD(weekEnd)}`;
+          const cacheKey = `lb_cache_${wkKey}_${currentClassId||'all'}`;
+          let rows = [];
+
+          // 1) Try compute from Firestore (if rules allow)
+          try{
             if(currentClassId){
               const studs = await db.collection("students").where("classId","==",currentClassId).get();
-              const rows = [];
               for(const sd of studs.docs){
                 const sid = sd.id;
-                const ref = db.collection("students").doc(sid);
-                let snap2=null;
+                const sdata = sd.data()||{};
+                // fetch last txns then filter client-side (avoids index issues)
+                let all2=null;
                 try{
-                  snap2 = await ref.collection("txns")
-                    .where("createdAtClient", ">=", weekStart)
-                    .where("createdAtClient", "<=", weekEnd)
-                    .orderBy("createdAtClient","desc")
-                    .limit(600)
-                    .get();
-                }catch(e){
-                  try{
-                    const all2 = await ref.collection("txns").orderBy("createdAtClient","desc").limit(800).get();
-                    const docs2=[];
-                    all2.forEach(d=>{
-                      const x=d.data()||{};
-                      const ts=Number(x.createdAtClient||0);
-                      if(ts>=weekStart && ts<=weekEnd) docs2.push(d);
-                    });
-                    const fake2={};
-                    fake2.forEach=(fn)=>docs2.forEach(fn);
-                    snap2=fake2;
-                  }catch(e2){
-                    snap2={forEach:()=>{}};
-                  }
+                  all2 = await db.collection("students").doc(sid).collection("txns")
+                    .orderBy("createdAtClient","desc").limit(800).get();
+                }catch(_e){
+                  all2 = { forEach: ()=>{} };
                 }
+
                 let dep2=0, part2=0, vio2=0, trOut2=0, net2=0;
-                snap2.forEach(d=>{
+                all2.forEach(d=>{
                   const x=d.data()||{};
+                  const ts=Number(x.createdAtClient||0);
+                  if(!(ts>=weekStart && ts<=weekEnd)) return;
                   const t=String(x.type||"");
                   const a=Number(x.amount||0);
                   const reason=String(x.reason||"");
@@ -2865,32 +3026,58 @@ document.addEventListener("DOMContentLoaded", async()=>{
                     if(violWords.some(w=>rr.includes(w))) vio2++;
                   }
                 });
-                const pts = Math.max(0, Math.round((dep2*0.05) + (part2*12) + (trOut2*2) - (vio2*15)));
-                rows.push({id:sid,name:(sd.data()||{}).name||"—",pts,net:net2});
+
+                const points = Math.max(0, Math.round((dep2*0.05) + (part2*12) + (trOut2*2) - (vio2*15)));
+                rows.push({
+                  id:sid,
+                  name: sdata.name || "—",
+                  points,
+                  net: net2,
+                  classId: sdata.classId || "",
+                  className: sdata.className || sdata.classId || "",
+                  section: sdata.section || ""
+                });
               }
-              rows.sort((a,b)=>b.pts-a.pts);
-              const top = rows.slice(0,5);
-              top.forEach((r,i)=>{
-                const el=document.createElement("div");
-                el.className="lbRow";
-                el.innerHTML = `<div class="lbRank">${i+1}</div>
-                  <div>
-                    <div class="lbName">${escapeHtml(r.name)}</div>
-                    <div class="small">صافي: ${fmt(r.net)} ر.س</div>
-                  </div>
-                  <div class="lbMeta">
-                    <div class="lbPill">${r.pts} نقطة</div>
-                  </div>`;
-                box.appendChild(el);
-              });
-              if(!top.length){
-                box.innerHTML = '<div class="small">لا توجد بيانات لهذا الأسبوع.</div>';
-              }
-            }else{
-              box.innerHTML = '<div class="small">لم يتم تعيين فصل لهذا الحساب.</div>';
             }
+          }catch(eCompute){
+            rows = [];
           }
-        }catch(e){}
+
+          // 2) Fallback to cached leaderboard if compute not available (common for student rules)
+          if(!rows.length){
+            try{
+              const cached = JSON.parse(localStorage.getItem(cacheKey) || "null");
+              if(cached && Array.isArray(cached.rows) && cached.rows.length){
+                rows = cached.rows;
+              }
+            }catch(_e){}
+          }
+
+          // 3) Cache results for next time + for students on same device
+          if(rows.length){
+            try{
+              localStorage.setItem(cacheKey, JSON.stringify({rows, ts: Date.now()}));
+            }catch(_e){}
+          }
+
+          // Render
+          if(!currentClassId){
+            setLBStatus("لم يتم تعيين فصل لهذا الحساب.");
+            if(box) box.innerHTML = '<div class="small">لم يتم تعيين فصل لهذا الحساب.</div>';
+          }else if(!rows.length){
+            setLBStatus("تعذر تحميل لوحة الشرف — افتحيها من وضع المعلمة مرة واحدة لتُحفظ تلقائيًا.");
+            if(box) box.innerHTML = '<div class="small">تعذر تحميل لوحة الشرف. افتحي صفحة الجوائز من وضع المعلمة مرة واحدة لتفعيل التحديث.</div>';
+          }else{
+            // Sort + fill filters + apply
+            rows.sort((a,b)=>Number(b.points||0)-Number(a.points||0));
+            fillLBFilters(rows);
+            applyLBFilter(rows);
+            setLBStatus("تم تحديث لوحة الشرف تلقائيًا ✅");
+          }
+        }catch(e){
+          console.log("leaderboard error", e);
+          setLBStatus("تعذر تحميل لوحة الشرف مؤقتًا…");
+        }
 
         // Auto WhatsApp congratulations (once per week per award)
         try{
