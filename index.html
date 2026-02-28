@@ -882,7 +882,6 @@
           <div class="miniTab active" onclick="setMiniTab('paneStmt',this)">📄 كشف الحساب</div>
           <div class="miniTab" onclick="setMiniTab('paneUpgrade',this)">⬆️ ترقية الحساب</div>
           <div class="miniTab" onclick="setMiniTab('paneRewards',this)">🎁 الجوائز والحوافز</div>
-          <div class="miniTab" onclick="setMiniTab('paneHonor',this)">🏆 لوحة الشرف</div>
           <div class="miniTab" id="tabRoulette" onclick="setMiniTab('paneRoulette',this)" style="display:none">🎡 روليت الهدايا</div>
           <div class="miniTab" onclick="setMiniTab('paneCard',this)">💳 تفاصيل البطاقة</div>
         </div>
@@ -1108,31 +1107,6 @@
     </div>
   </div>
 </div>
-
-
-        <div id="paneHonor" class="miniPane">
-          <div class="card" style="margin-top:12px">
-            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap">
-              <div>
-                <h3 style="margin:0;color:#0b2a66">🏆 لوحة الشرف (أفضل 5)</h3>
-                <div class="small" style="margin-top:6px;color:#47607e">
-                  تتحدّث تلقائيًا كل <b>يوم خميس</b> حسب <b>نقاط الأسبوع</b> (الأحد → الخميس).
-                </div>
-              </div>
-              <div class="small" id="honorUpdated" style="font-weight:1000;color:#0b2a66">—</div>
-            </div>
-
-            <div class="leaderWrap" style="margin-top:12px">
-              <div class="leaderList" id="honorList">
-                <div class="small">جارٍ التحميل…</div>
-              </div>
-            </div>
-
-            <div class="small" style="margin-top:10px;color:#47607e">
-              * إذا لم تظهر بيانات: تأكدي من تعيين فصل للحساب ووجود عمليات خلال الأسبوع الحالي.
-            </div>
-          </div>
-        </div>
 
         <div id="paneRoulette" class="miniPane">
           <div class="card soft" style="margin-top:10px">
@@ -2503,7 +2477,6 @@ document.addEventListener("DOMContentLoaded", async()=>{
       await buildTransferList();
       toggleStudentOpUI();
       updateTransferPreview();
-      try{ await refreshHonorBoard(); }catch(e){}
     };
 
     function updateTransferPreview(){
@@ -2870,143 +2843,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
         console.log("refreshRewards error", e);
         $("rwChampion") && ($("rwChampion").textContent = "تعذر الحساب");
         $("rwCommit") && ($("rwCommit").textContent = "تعذر الحساب");
-        $("rwPart") && ($("rw
-    // ===== Honor Board (Student Tab) | Auto refresh every Thursday =====
-    function getHonorWeekKey(dateObj){
-      const wk = getSchoolWeekRangeMs(dateObj || new Date());
-      // key by week start
-      return formatYMD(wk.startMs);
-    }
-
-    function formatDateTimeAr(ms){
-      try{
-        const d = new Date(ms);
-        const y=d.getFullYear();
-        const m=String(d.getMonth()+1).padStart(2,'0');
-        const da=String(d.getDate()).padStart(2,'0');
-        const hh=String(d.getHours()).padStart(2,'0');
-        const mm=String(d.getMinutes()).padStart(2,'0');
-        return `${y}-${m}-${da} • ${hh}:${mm}`;
-      }catch(e){ return "—"; }
-    }
-
-    async function computeClassTop5Points(classId, weekStart, weekEnd){
-      const studs = await db.collection("students").where("classId","==",classId).get();
-      const rows = [];
-      for(const sd of studs.docs){
-        const sid = sd.id;
-        const ref = db.collection("students").doc(sid);
-        const snap2 = await ref.collection("txns")
-          .where("createdAtClient", ">=", weekStart)
-          .where("createdAtClient", "<=", weekEnd)
-          .orderBy("createdAtClient","desc")
-          .limit(600)
-          .get();
-
-        let dep2=0, part2=0, vio2=0, trOut2=0, net2=0;
-        snap2.forEach(d=>{
-          const x=d.data()||{};
-          const t=String(x.type||"");
-          const a=Number(x.amount||0);
-          const reason=String(x.reason||"");
-          if(t.startsWith("إيداع") || t.startsWith("تحويل من")) net2 += a;
-          else if(t.startsWith("سحب") || t.startsWith("تحويل إلى")) net2 -= a;
-
-          if(t.startsWith("إيداع")) dep2 += a;
-          if(t.startsWith("تحويل إلى")) trOut2++;
-
-          if(t.startsWith("إيداع")){
-            const r = String(reason||"").replace(/\s+/g,'');
-            if(r.includes("مشاركة") || r.includes("تفاعل") || r.includes("إجابة") || r.includes("حل") || r.includes("واجب") || r.includes("نشاط")) part2++;
-          }
-
-          // violations words (fallback if not defined)
-          const vw = (typeof violWords !== "undefined" && Array.isArray(violWords)) ? violWords : ["تأخر","غياب","سلوك","مخالفة","إزعاج","عدم","نوم","هروب","تجاهل"];
-          if(t.startsWith("سحب")){
-            const rr = String(reason||"");
-            if(vw.some(w=>rr.includes(w))) vio2++;
-          }
-        });
-
-        const pts = Math.max(0, Math.round((dep2*0.05) + (part2*12) + (trOut2*2) - (vio2*15)));
-        rows.push({id:sid,name:(sd.data()||{}).name||"—",pts,net:net2});
-      }
-      rows.sort((a,b)=>b.pts-a.pts);
-      return rows.slice(0,5);
-    }
-
-    async function refreshHonorBoard(force){
-      try{
-        const list = $("honorList");
-        const upd = $("honorUpdated");
-        if(!list || !upd) return;
-
-        list.innerHTML = '<div class="small">جارٍ التحميل…</div>';
-
-        if(!currentClassId){
-          list.innerHTML = '<div class="small">لم يتم تعيين فصل لهذا الحساب.</div>';
-          upd.textContent = "—";
-          return;
-        }
-
-        const now = new Date();
-        const wk = getSchoolWeekRangeMs(now);
-        const weekKey = getHonorWeekKey(now);
-        const storageKey = `honor_${currentClassId}_${weekKey}`;
-        const isThu = (now.getDay() === 4); // Thursday
-        const cached = localStorage.getItem(storageKey);
-        const cachedTs = Number(localStorage.getItem(storageKey+"_ts")||0);
-
-        let top = null;
-        let usedCache = false;
-
-        // تحديث رسمي كل خميس (أو عند force)
-        if((isThu && !cached) || force === true || (isThu && cached && !cachedTs)){
-          top = await computeClassTop5Points(currentClassId, wk.startMs, wk.endMs);
-          localStorage.setItem(storageKey, JSON.stringify(top));
-          localStorage.setItem(storageKey+"_ts", String(Date.now()));
-        }else if(cached){
-          try{ top = JSON.parse(cached); usedCache = true; }catch(e){ top = null; }
-        }
-
-        // إذا ما فيه كاش (أول مرة) احسبي مباشرة (بدون فرض أنه تحديث خميس)
-        if(!top){
-          top = await computeClassTop5Points(currentClassId, wk.startMs, wk.endMs);
-          // خزّنيها كـ "مسودة" لو ما كان خميس (عشان ما تثقل كل مرة)
-          if(!cached){
-            localStorage.setItem(storageKey, JSON.stringify(top));
-            localStorage.setItem(storageKey+"_ts", String(Date.now()));
-          }
-        }
-
-        // Render
-        list.innerHTML = "";
-        (top||[]).forEach((r,i)=>{
-          const el=document.createElement("div");
-          el.className="lbRow";
-          el.innerHTML = `<div class="lbRank">${i+1}</div>
-            <div>
-              <div class="lbName">${escapeHtml(r.name)}</div>
-              <div class="small">صافي: ${fmt(r.net)} ر.س</div>
-            </div>
-            <div class="lbMeta">
-              <div class="lbPill">${r.pts} نقطة</div>
-            </div>`;
-          list.appendChild(el);
-        });
-
-        if(!top || !top.length){
-          list.innerHTML = '<div class="small">لا توجد بيانات لهذا الأسبوع.</div>';
-        }
-
-        const ts = Number(localStorage.getItem(storageKey+"_ts")||0);
-        upd.textContent = ts ? ("آخر تحديث: " + formatDateTimeAr(ts) + (usedCache ? " (محفوظ)" : "")) : "—";
-      }catch(e){
-        console.log("refreshHonorBoard error", e);
-        $("honorList") && ($("honorList").innerHTML = '<div class="small">تعذر تحميل لوحة الشرف.</div>');
-      }
-    }
-Part").textContent = "تعذر الحساب");
+        $("rwPart") && ($("rwPart").textContent = "تعذر الحساب");
       }
     }
 
@@ -3906,6 +3743,73 @@ function renderRoulettePane(){
         renderRoulettePane();
       }catch(e){}
     };
+
+
+/* ================== START BUTTON FIX (iOS/Safari safe) ==================
+   الهدف: ضمان أن زر "ابدأ الآن" ينقل للواجهة التالية حتى لو حصل خطأ في الـ Onboarding
+   أو كانت بعض العناصر غير موجودة (حماية من الأعطال الصامتة في Safari).
+*/
+(function(){
+  // حفظ مراجع للدوال الأصلية إن وُجدت
+  const _origStartApp = (typeof window.startApp === "function") ? window.startApp : null;
+  const _origFinishOnboarding = (typeof window.finishOnboarding === "function") ? window.finishOnboarding : null;
+
+  function goNextFromStart(){
+    try{ if(typeof hideAllPages === "function") hideAllPages(); }catch(e){}
+    try{
+      if(typeof show === "function"){
+        if(window.IS_STUDENT_ENTRY){ show("studentLoginPage"); window.currentAccess="student"; }
+        else{ show("teacherLoginPage"); window.currentAccess="teacher"; }
+        return;
+      }
+    }catch(e){}
+    // Fallback خفيف لو show/hideAllPages غير متاحة لأي سبب
+    try{
+      const ids=["teacherLoginPage","studentLoginPage","classesPage","classPage","studentAccountPage","dailyOpsPage"];
+      ids.forEach(id=>{ const el=document.getElementById(id); if(el) el.classList.add("hidden"); });
+      const target = window.IS_STUDENT_ENTRY ? "studentLoginPage":"teacherLoginPage";
+      const t=document.getElementById(target);
+      if(t) t.classList.remove("hidden");
+    }catch(e){}
+  }
+
+  // اجعل finishOnboarding يضع علامة "تم" لتجاوزها لاحقاً
+  if(_origFinishOnboarding){
+    window.finishOnboarding = function(){
+      try{ localStorage.setItem("mb_onboarded_v1","1"); }catch(e){}
+      return _origFinishOnboarding.apply(this, arguments);
+    };
+  }
+
+  // إعادة تعريف startApp بشكل آمن
+  window.startApp = function(){
+    // اخفِ شاشة البداية دائماً
+    try{
+      const so = document.getElementById("startOverlay");
+      if(so){ so.classList.add("hidden"); so.style.display="none"; }
+    }catch(e){}
+
+    // لو سبق وتمت المقدمة، ادخل مباشرة
+    let onboarded=false;
+    try{ onboarded = (localStorage.getItem("mb_onboarded_v1")==="1"); }catch(e){}
+    if(onboarded){ goNextFromStart(); return; }
+
+    // حاول تشغيل المقدمة، وإذا فشلت ادخل مباشرة
+    try{
+      if(typeof showOnboarding === "function"){
+        showOnboarding(function(){
+          try{ localStorage.setItem("mb_onboarded_v1","1"); }catch(e){}
+          goNextFromStart();
+        });
+        return;
+      }
+    }catch(e){}
+    goNextFromStart();
+  };
+
+  // في حال زر البداية كان مرتبط بدالة مختلفة بالخطأ، اربطها هنا أيضاً
+  window.startAppSafe = window.startApp;
+})();
 
 </script>
 </body>
