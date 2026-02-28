@@ -884,6 +884,7 @@
           <div class="miniTab" onclick="setMiniTab('paneRewards',this)">🎁 الجوائز والحوافز</div>
           <div class="miniTab" id="tabRoulette" onclick="setMiniTab('paneRoulette',this)" style="display:none">🎡 روليت الهدايا</div>
           <div class="miniTab" onclick="setMiniTab('paneCard',this)">💳 تفاصيل البطاقة</div>
+          <div class="miniTab" onclick="setMiniTab('paneHonorStudent',this)">🏆 لوحة الشرف</div>
         </div>
 
         <div id="paneStmt" class="miniPane active">
@@ -1139,6 +1140,22 @@
                 <div id="rouletteResult" style="font-weight:1000;color:#0b2a66;font-size:18px;margin-top:6px">—</div>
               </div>
             </div>
+          </div>
+        </div>
+
+
+        <div id="paneHonorStudent" class="miniPane">
+          <div class="card soft" style="margin-top:12px">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+              <div>
+                <div style="font-weight:1000;color:#0b2a66">🏆 لوحة الشرف الأسبوعية (Top 5)</div>
+                <div class="small" style="margin-top:4px;color:#47607e">تُحدّث تلقائيًا كل يوم خميس حسب نقاط الأسبوع (الأحد – الخميس).</div>
+              </div>
+              <div class="small" id="hbStuLastUpdate" style="color:#47607e">آخر تحديث: —</div>
+            </div>
+
+            <div id="hbStuTop5" style="margin-top:12px;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px"></div>
+            <div id="hbStuNote" class="small" style="margin-top:10px;color:#47607e"></div>
           </div>
         </div>
 
@@ -1768,6 +1785,7 @@ ${SIGNATURE}`;
 
       await refreshWeekKPIs();
       await refreshRewards();
+      try{ await renderStudentHonorBoard(); }catch(e){}
       try{ await renderBalanceChartLast30(); }catch(e){}
     }
 
@@ -1779,6 +1797,7 @@ ${SIGNATURE}`;
 
     function setMiniTab(paneId, el){
       try{ if(paneId==='paneRewards' && typeof refreshRewards==='function'){ refreshRewards(); } }catch(e){}
+      try{ if(paneId==='paneHonorStudent' && typeof renderStudentHonorBoard==='function'){ renderStudentHonorBoard(); } }catch(e){}
       document.querySelectorAll(".miniTab").forEach(t=>t.classList.remove("active"));
       el.classList.add("active");
       document.querySelectorAll(".miniPane").forEach(p=>p.classList.remove("active"));
@@ -3731,6 +3750,90 @@ function renderRoulettePane(){
         <div class="small" style="margin-top:8px;color:#47607e">* يتم التحديث من داخل النظام بدون قواعد Firebase إضافية.</div>
       `;
     }
+
+    // ===== لوحة الشرف داخل صفحة الطالب (Top 5) =====
+    async function renderStudentHonorBoard(){
+      const box = $("hbStuTop5");
+      const last = $("hbStuLastUpdate");
+      const note = $("hbStuNote");
+      if(!box || !last) return;
+
+      try{
+        if(!currentStudentObj || !currentStudentObj.classId){
+          box.innerHTML = '<div class="small" style="color:#47607e">لا تتوفر بيانات الشعبة/الفصل لعرض لوحة الشرف.</div>';
+          last.textContent = "آخر تحديث: —";
+          if(note) note.textContent = "";
+          return;
+        }
+
+        const wk = getSchoolWeekRangeMs(new Date());
+        const weekKey = formatYMD(wk.startMs); // بداية الأسبوع (الأحد)
+        const classId = String(currentStudentObj.classId);
+        const cacheKey = "HB_STU_TOP5_" + classId + "_" + weekKey;
+
+        const today = new Date();
+        const isThu = (today.getDay() === 4); // 0=Sun .. 4=Thu
+
+        let cached = null;
+        try{ cached = JSON.parse(localStorage.getItem(cacheKey) || "null"); }catch(e){ cached=null; }
+
+        // إذا اليوم خميس أو ما فيه كاش => احسب وخزّن
+        let rows = (cached && Array.isArray(cached.rows)) ? cached.rows : null;
+        let lastAt = cached && cached.updatedAt ? cached.updatedAt : null;
+
+        if(isThu || !rows){
+          const snap = await db.collection("students").where("classId","==",currentStudentObj.classId).get();
+          const arr=[]; snap.forEach(d=>arr.push({id:d.id,...d.data()}));
+
+          const mapped = arr.map(s=>{
+            const st = computeWeekStats(s);
+            return {
+              id:s.id,
+              name:s.name||"—",
+              weekPoints: st.weekPoints,
+              ops: st.ops,
+              balance:Number(s.balance||0)
+            };
+          });
+
+          mapped.sort((a,b)=> (b.weekPoints - a.weekPoints) || (b.balance - a.balance) || (b.ops - a.ops));
+          rows = mapped.slice(0,5);
+
+          lastAt = Date.now();
+          try{
+            localStorage.setItem(cacheKey, JSON.stringify({updatedAt:lastAt, rows}));
+          }catch(e){}
+        }
+
+        // عرض
+        const medals = ["🥇","🥈","🥉","4️⃣","5️⃣"];
+        box.innerHTML = rows.map((r,i)=>`
+          <div class="card soft">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+              <div style="font-weight:1000;color:#0b2a66">${medals[i]} ${escapeHtml(r.name)}</div>
+              <div class="badge">${Number(r.weekPoints||0)}</div>
+            </div>
+            <div class="small" style="margin-top:6px;color:#47607e">نقاط الأسبوع</div>
+          </div>
+        `).join("");
+
+        const d = lastAt ? new Date(lastAt) : null;
+        last.textContent = "آخر تحديث: " + (d ? d.toLocaleString("ar-SA") : "—");
+
+        if(note){
+          note.textContent = isThu
+            ? "تم تحديث اللوحة اليوم (الخميس) تلقائيًا."
+            : "تُعرض نتائج آخر تحديث (الخميس). يتم التجديد تلقائيًا عند دخول النظام يوم الخميس.";
+        }
+      }catch(err){
+        console.error(err);
+        box.innerHTML = '<div class="small" style="color:#b00020">تعذّر تحميل لوحة الشرف. جرّبي تحديث الصفحة.</div>';
+        last.textContent = "آخر تحديث: —";
+        if(note) note.textContent = "";
+      }
+    }
+
+
 
     // Hook roulette into student account open
     const _openStudentAccountOrig = openStudentAccount;
