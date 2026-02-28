@@ -471,7 +471,7 @@
 
           <div class="forgotRow">
             <a href="javascript:void(0)" onclick="forgotTeacher()">تذكرني / نسيت كلمة المرور؟</a>
-            <span class="small">الدخول التجريبي: teacher / 12345</span>
+            <span class="small"></span>
           
             <a href="javascript:void(0)" id="changePinLink">تغيير الرقم السري</a>
           </div>
@@ -1094,15 +1094,6 @@
       </div>
     </div>
 
-    <div class="leaderWrap" style="margin-top:12px">
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
-        <div style="font-weight:900;color:#0b2a66">🏅 لوحة الشرف الأسبوعية</div>
-        <button class="btn ghost" onclick="refreshRewards()">تحديث اللوحة</button>
-      </div>
-      <div class="small" style="margin-top:6px">أعلى النقاط في الفصل لهذا الأسبوع (الأحد → الخميس).</div>
-      <div id="rwLeader" class="leaderList" style="margin-top:10px"></div>
-    </div>
-
     <div class="cardHint" style="margin-top:12px">
       ✅ يتم احتساب الجوائز تلقائيًا من العمليات اليومية • التهنئة التلقائية لولي الأمر تعمل عند تفعيلها من صفحة المعلمة.
     </div>
@@ -1170,6 +1161,30 @@
             </div>
             <div class="cardHint" style="margin-top:12px">⚠️ حافظ على بطاقتك وبياناتك ولا تُظهر الرقم السري للآخرين.</div>
           </div>
+
+            <div class="card soft" style="margin-top:12px">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+                <div>
+                  <div style="font-weight:1000;color:#0b2a66">🔒 تغيير الرقم السري (PIN)</div>
+                  <div class="small" style="margin-top:4px;color:#47607e">أدخلي رقمًا جديدًا من 4 أرقام ثم حفظ. سيتم تحديثه تلقائيًا في صفحة المعلمة.</div>
+                </div>
+              </div>
+              <div class="row" style="margin-top:10px">
+                <div class="col">
+                  <div class="small">PIN الجديد</div>
+                  <input id="stuNewPin" inputmode="numeric" maxlength="4" placeholder="****">
+                </div>
+                <div class="col">
+                  <div class="small">تأكيد PIN</div>
+                  <input id="stuNewPin2" inputmode="numeric" maxlength="4" placeholder="****">
+                </div>
+              </div>
+              <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:10px;flex-wrap:wrap">
+                <button class="btn2" onclick="clearStudentPinFields()">مسح</button>
+                <button class="btn" onclick="saveStudentNewPin()">حفظ</button>
+              </div>
+              <div class="small" id="stuPinMsg" style="margin-top:8px;color:#47607e"></div>
+            </div>
         </div>
 
       </div>
@@ -1192,7 +1207,7 @@
 
   <script>
     const urlParams = new URLSearchParams(window.location.search);
-    const APP_MODE = (urlParams.get("mode") || "teacher").toLowerCase();
+    const APP_MODE = (urlParams.get("mode") || localStorage.getItem("MB_LAST_MODE") || "teacher").toLowerCase();
     const IS_STUDENT_ENTRY = (APP_MODE === "student");
 
     const SIGNATURE = "المعلمة: سارة حقوي";
@@ -2109,6 +2124,21 @@ ${SIGNATURE}`;
 
 document.addEventListener("DOMContentLoaded", async()=>{
       $("modePill").textContent = IS_STUDENT_ENTRY ? "وضع: الطالب" : "وضع: المعلمة";
+      // حفظ/تبديل وضع الدخول (معلمة/طالب)
+      try{
+        localStorage.setItem("MB_LAST_MODE", IS_STUDENT_ENTRY ? "student" : "teacher");
+      }catch(e){}
+      const mp = document.getElementById("modePill");
+      if(mp){
+        mp.style.cursor = "pointer";
+        mp.title = "اضغطي للتبديل بين وضع المعلمة/الطالب";
+        mp.addEventListener("click", ()=>{
+          const u = new URL(window.location.href);
+          u.searchParams.set("mode", IS_STUDENT_ENTRY ? "teacher" : "student");
+          window.location.href = u.toString();
+        });
+      }
+
       if(IS_STUDENT_ENTRY){ $("startMsg").innerHTML = "بوابة دخول الطلاب 👇<br>اضغط زر البداية ثم تابعي التعريف السريع."; }
       $("forgotPinLink")?.addEventListener("click",(e)=>{ e.preventDefault(); forgotStudentPin(); });
       $("changePinLink")?.addEventListener("click",(e)=>{ e.preventDefault(); changePinStudentFlow(); });
@@ -2250,6 +2280,38 @@ document.addEventListener("DOMContentLoaded", async()=>{
       }catch(e){
         console.log(e);
         warn("تعذر تغيير PIN الآن.");
+      }
+    }
+
+    // تغيير PIN من داخل صفحة الطالب (بعد تسجيل الدخول) — بدون الرجوع للمعلمة
+    function clearStudentPinFields(){
+      const a = document.getElementById("stuNewPin");
+      const b = document.getElementById("stuNewPin2");
+      const msg = document.getElementById("stuPinMsg");
+      if(a) a.value="";
+      if(b) b.value="";
+      if(msg) msg.textContent="";
+    }
+
+    async function saveStudentNewPin(){
+      try{
+        if(!currentStudentObj || !currentStudentObj.id){
+          return warn("يلزم تسجيل الدخول كطالب أولًا.");
+        }
+        const p1 = (document.getElementById("stuNewPin")?.value || "").trim();
+        const p2 = (document.getElementById("stuNewPin2")?.value || "").trim();
+        const msg = document.getElementById("stuPinMsg");
+        if(!/^[0-9]{4}$/.test(p1)) return warn("PIN الجديد لازم يكون 4 أرقام");
+        if(p1 !== p2) return warn("التأكيد غير مطابق");
+        await db.collection("students").doc(currentStudentObj.id).update({pin:p1});
+        // تحديث محلي
+        currentStudentObj.pin = p1;
+        if(document.getElementById("detailPin")) document.getElementById("detailPin").textContent = p1;
+        if(msg) msg.textContent = "تم حفظ PIN بنجاح ✅";
+        warn("تم تغيير PIN بنجاح ✅");
+      }catch(e){
+        console.log(e);
+        warn("تعذر حفظ PIN الآن. جرّبي مرة أخرى.");
       }
     }
 
@@ -3811,7 +3873,7 @@ function renderRoulettePane(){
           <div class="card soft">
             <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
               <div style="font-weight:1000;color:#0b2a66">${medals[i]} ${escapeHtml(r.name)}</div>
-              <div class="badge">${Number(r.weekPoints||0)}</div>
+              <div class="badge on">${Number(r.weekPoints||0)} نقطة</div>
             </div>
             <div class="small" style="margin-top:6px;color:#47607e">نقاط الأسبوع</div>
           </div>
