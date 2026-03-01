@@ -64,11 +64,9 @@
       padding:8px 10px;border-radius:12px;
       border:1px solid rgba(255,255,255,.10);
       background:rgba(0,0,0,.08);
-          color: var(--navy);
     }
     .footerNote{
       margin-top:10px;text-align:center;font-weight:900;letter-spacing:.2px;
-          color: var(--navy);
     }
 
     .modal{position:fixed;inset:0;background:rgba(0,0,0,.50);display:none;align-items:center;justify-content:center;padding:18px;z-index:9999}
@@ -511,33 +509,13 @@
               <path d="M7 10V8a5 5 0 0 1 10 0v2" stroke="#0b2a66" stroke-width="2" stroke-linecap="round"/>
               <rect x="6" y="10" width="12" height="10" rx="2" stroke="#0b5bb5" stroke-width="2"/>
             </svg>
-            <input id="stuPin" type="password" placeholder="كلمة المرور" autocomplete="current-password"/>
+            <input id="stuPin" type="password" placeholder="الرقم السري (PIN)" autocomplete="current-password"/>
             <button class="eyeBtn" type="button" onclick="togglePass('stuPin',this)">👁️</button>
           </div>
 
           <div class="forgotRow">
             <a href="javascript:void(0)" id="forgotPinLink">نسيت الرقم السري؟</a>
-            <span class="small"></span>
-            <a href="javascript:void(0)" id="changeStudentPassLink">تغيير كلمة المرور</a>
-          </div>
-
-          <div id="studentPassPanel" class="hidden" style="margin-top:10px;padding:12px;border-radius:14px;background:#f4f6f9;border:1px solid #e1e6ef">
-            <div class="small" style="color:#47607e;margin-bottom:8px">غيّري كلمة المرور من هنا (حروف + أرقام). يلزم إدخال الاسم وكلمة المرور الحالية بالأعلى.</div>
-            <div class="row">
-              <div class="col">
-                <div class="small">كلمة المرور الجديدة</div>
-                <input id="stuNewPinLogin" type="password" inputmode="text" maxlength="16" placeholder="مثال: Sara2026" autocomplete="new-password"/>
-              </div>
-              <div class="col">
-                <div class="small">تأكيد كلمة المرور</div>
-                <input id="stuNewPinLogin2" type="password" inputmode="text" maxlength="16" placeholder="أعيدي كتابة كلمة المرور" autocomplete="new-password"/>
-              </div>
-            </div>
-            <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:10px;flex-wrap:wrap">
-              <button class="btn2" type="button" onclick="clearStudentPassLogin()">مسح</button>
-              <button class="btn" type="button" onclick="saveStudentNewPinFromLogin()">حفظ</button>
-            </div>
-            <div class="small" id="stuPassLoginMsg" style="margin-top:8px;color:#47607e"></div>
+            <span class="small">اطلبه من ولي أمرك أو المعلمة</span>
           </div>
 
           <div class="row" style="margin-top:12px">
@@ -582,22 +560,6 @@
         </div>
       </div>
 
-
-      <div class="card soft">
-        <h3 style="margin:0 0 8px 0;color:#0b2a66">🔒 إعدادات قفل البصمة</h3>
-        <div class="small" style="margin-bottom:10px;line-height:1.8">
-          • قفل <b>المعلمة</b> بالبصمة: <b>مفعل دائمًا</b> لحماية البيانات.<br>
-          • قفل <b>الطالب</b> بالبصمة: اختياري (لتجنب إلزام كل طالبة بتفعيل بصمة على جهازها).
-        </div>
-        <label class="small" style="display:flex;gap:10px;align-items:center">
-          <input type="checkbox" id="bioStudentToggle" style="width:auto">
-          تفعيل قفل الطالب بالبصمة (اختياري)
-        </label>
-        <div class="small" style="margin-top:8px;color:#57606a">
-          ملاحظة: عند تفعيل قفل الطالب على هذا الجهاز لأول مرة قد يطلب المتصفح "تفعيل البصمة" (Passkey) مرة واحدة.
-        </div>
-      </div>
-
       <div class="card soft">
         <div class="row">
           <div class="col">
@@ -619,17 +581,6 @@
       </div>
 
       <div class="tabs" id="classTabs"></div>
-
-      <div class="card soft" style="margin-top:10px">
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
-          <div>
-            <div style="font-weight:1000;color:#0b2a66">⚙️ إعدادات الفصول</div>
-            <div class="small" style="margin-top:4px;color:#47607e">تحكم سريع: قفل بصمة الطالب + فرص الروليت للحسابات (ذهبي/ماسي/ألماسي).</div>
-          </div>
-          <button class="btn3" onclick="openClassQuickSettings()">فتح الإعدادات</button>
-        </div>
-      </div>
-
 
       <div class="card">
         <button class="btn" onclick="openClassPage()">دخول الفصل</button>
@@ -1211,6 +1162,29 @@
             <div class="cardHint" style="margin-top:12px">⚠️ حافظ على بطاقتك وبياناتك ولا تُظهر الرقم السري للآخرين.</div>
           </div>
 
+            <div class="card soft" style="margin-top:12px">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+                <div>
+                  <div style="font-weight:1000;color:#0b2a66">🔒 تغيير الرقم السري (PIN)</div>
+                  <div class="small" style="margin-top:4px;color:#47607e">أدخلي رقمًا جديدًا من 4 أرقام ثم حفظ. سيتم تحديثه تلقائيًا في صفحة المعلمة.</div>
+                </div>
+              </div>
+              <div class="row" style="margin-top:10px">
+                <div class="col">
+                  <div class="small">PIN الجديد</div>
+                  <input id="stuNewPin" inputmode="numeric" maxlength="4" placeholder="****">
+                </div>
+                <div class="col">
+                  <div class="small">تأكيد PIN</div>
+                  <input id="stuNewPin2" inputmode="numeric" maxlength="4" placeholder="****">
+                </div>
+              </div>
+              <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:10px;flex-wrap:wrap">
+                <button class="btn2" onclick="clearStudentPinFields()">مسح</button>
+                <button class="btn" onclick="saveStudentNewPin()">حفظ</button>
+              </div>
+              <div class="small" id="stuPinMsg" style="margin-top:8px;color:#47607e"></div>
+            </div>
         </div>
 
       </div>
@@ -1235,323 +1209,6 @@
     const urlParams = new URLSearchParams(window.location.search);
     const APP_MODE = (urlParams.get("mode") || localStorage.getItem("MB_LAST_MODE") || "teacher").toLowerCase();
     const IS_STUDENT_ENTRY = (APP_MODE === "student");
-    // expose mode flags globally for patched handlers
-    window.APP_MODE = APP_MODE;
-    window.IS_STUDENT_ENTRY = IS_STUDENT_ENTRY;
-
-    // =========================
-    // Biometric (Passkey) Lock
-    // =========================
-    // ملاحظة: هذا قفل "بصمة" عبر WebAuthn (Passkeys) يعمل على الأجهزة الداعمة (FaceID/TouchID/بصمة أندرويد).
-    // لأنه مشروع static بدون خادم، نستخدمه كبوابة وصول محلية على نفس الجهاز/المتصفح.
-    const BIO = {
-      supported: (window.PublicKeyCredential && typeof PublicKeyCredential === "function"),
-      keys: {
-        teacherId: "MB_WEBAUTHN_TEACHER_ID",
-        studentId: "MB_WEBAUTHN_STUDENT_ID",
-        teacherEnabled: "MB_BIOLOCK_TEACHER_ENABLED",
-        studentEnabled: "MB_BIOLOCK_STUDENT_ENABLED",
-        unlockedTeacher: "MB_BIOLOCK_UNLOCKED_TEACHER",
-        unlockedStudent: "MB_BIOLOCK_UNLOCKED_STUDENT"
-      }
-    };
-
-    function b64urlToBytes(b64url){
-      try{
-        const pad = "=".repeat((4 - (b64url.length % 4)) % 4);
-        const b64 = (b64url + pad).replace(/-/g, "+").replace(/_/g, "/");
-        const raw = atob(b64);
-        const bytes = new Uint8Array(raw.length);
-        for(let i=0;i<raw.length;i++) bytes[i]=raw.charCodeAt(i);
-        return bytes;
-      }catch(e){ return null; }
-    }
-    function bytesToB64url(bytes){
-      let s = "";
-      bytes.forEach(b => s += String.fromCharCode(b));
-      const b64 = btoa(s).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
-      return b64;
-    }
-    function randBytes(n=32){
-      const a = new Uint8Array(n);
-      crypto.getRandomValues(a);
-      return a;
-    }
-
-    function ensureBioLockUI(){
-      if(document.getElementById("bioLockOverlay")) return;
-      const overlay = document.createElement("div");
-      overlay.id = "bioLockOverlay";
-      overlay.style.cssText = "position:fixed;inset:0;z-index:99999;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.45);padding:18px;";
-      overlay.innerHTML = `
-        <div style="max-width:520px;width:100%;background:#fff;border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.25);overflow:hidden">
-          <div style="background:linear-gradient(135deg,#00205B,#0055A4);color:#fff;padding:14px 16px;font-weight:800;font-size:18px">🔒 قفل البصمة</div>
-          <div style="padding:16px 16px 6px;color:#1b1f23;line-height:1.8">
-            <div id="bioLockDesc" style="font-weight:700;margin-bottom:6px"></div>
-            <div id="bioLockHint" style="font-size:13px;color:#57606a"></div>
-            <div id="bioLockErr" style="display:none;margin-top:10px;color:#b00020;font-weight:700;font-size:13px"></div>
-          </div>
-          <div style="display:flex;gap:10px;flex-wrap:wrap;padding:12px 16px 16px">
-            <button id="bioLockUnlockBtn" style="flex:1;min-width:160px;border:none;border-radius:12px;padding:12px 14px;background:#00205B;color:#fff;font-weight:800;cursor:pointer">فتح بالبصمة</button>
-            <button id="bioLockEnrollBtn" style="flex:1;min-width:160px;border:none;border-radius:12px;padding:12px 14px;background:#EAF3FB;color:#00205B;font-weight:800;cursor:pointer">تفعيل البصمة لأول مرة</button>
-            <button id="bioLockCancelBtn" style="flex:0 0 auto;border:none;border-radius:12px;padding:12px 14px;background:#f6f8fa;color:#1b1f23;font-weight:800;cursor:pointer">إلغاء</button>
-          </div>
-        </div>`;
-      document.body.appendChild(overlay);
-    }
-
-    function showBioLock(role){
-      ensureBioLockUI();
-      const overlay = document.getElementById("bioLockOverlay");
-      const desc = document.getElementById("bioLockDesc");
-      const hint = document.getElementById("bioLockHint");
-      const err = document.getElementById("bioLockErr");
-      const unlockBtn = document.getElementById("bioLockUnlockBtn");
-      const enrollBtn = document.getElementById("bioLockEnrollBtn");
-      const cancelBtn = document.getElementById("bioLockCancelBtn");
-
-      err.style.display = "none";
-      err.textContent = "";
-
-      const isTeacher = (role === "teacher");
-      desc.textContent = isTeacher ? "هذه الصفحة مقفلة ببصمة المعلمة." : "هذه الصفحة مقفلة ببصمة الطالب.";
-      if(!BIO.supported){
-        hint.textContent = "جهازك/متصفحك لا يدعم قفل البصمة (Passkeys).";
-        unlockBtn.disabled = true;
-        enrollBtn.disabled = true;
-        unlockBtn.style.opacity = ".5";
-        enrollBtn.style.opacity = ".5";
-      }else{
-        hint.textContent = "سيطلب منك الجهاز FaceID/TouchID أو بصمة لفتح الصفحة.";
-        unlockBtn.disabled = false;
-        enrollBtn.disabled = false;
-        unlockBtn.style.opacity = "1";
-        enrollBtn.style.opacity = "1";
-      }
-
-      overlay.style.display = "flex";
-
-      const credKey = isTeacher ? BIO.keys.teacherId : BIO.keys.studentId;
-      const enabledKey = isTeacher ? BIO.keys.teacherEnabled : BIO.keys.studentEnabled;
-      const unlockedKey = isTeacher ? BIO.keys.unlockedTeacher : BIO.keys.unlockedStudent;
-
-      const hasCred = !!localStorage.getItem(credKey);
-      enrollBtn.style.display = hasCred ? "none" : "inline-block";
-
-      cancelBtn.onclick = () => {
-        overlay.style.display = "none";
-        // إذا الصفحة Teacher مقفلة، نرجع للبداية بدل ما تبقى مفتوحة
-        if(isTeacher){
-          // نعيد توجيه للطالب كبوابة آمنة إذا كانت متاحة، وإلا نرجع للبداية
-          try{
-            const u = new URL(window.location.href);
-            u.searchParams.set("mode","student");
-            window.location.href = u.toString();
-          }catch(e){
-            window.location.href = window.location.pathname + "?mode=student";
-          }
-        }
-      };
-
-      async function enroll(){
-        try{
-          if(!BIO.supported) return;
-          err.style.display = "none";
-          const userId = randBytes(16);
-          const challenge = randBytes(32);
-          const publicKey = {
-            challenge,
-            rp: { name: "Math Bank" },
-            user: {
-              id: userId,
-              name: isTeacher ? "teacher" : "student",
-              displayName: isTeacher ? "المعلمة" : "الطالب"
-            },
-            pubKeyCredParams: [
-              { type: "public-key", alg: -7 },
-              { type: "public-key", alg: -257 }
-            ],
-            authenticatorSelection: {
-              authenticatorAttachment: "platform",
-              userVerification: "required"
-            },
-            timeout: 60000,
-            attestation: "none"
-          };
-          const cred = await navigator.credentials.create({ publicKey });
-          const idB64 = bytesToB64url(new Uint8Array(cred.rawId));
-          localStorage.setItem(credKey, idB64);
-          localStorage.setItem(enabledKey, "1");
-          // افتح مباشرة بعد التفعيل
-          await unlock();
-        }catch(e){
-          err.style.display = "block";
-          err.textContent = "تعذر تفعيل البصمة. جرّبي مرة أخرى.";
-        }
-      }
-
-      async function unlock(){
-        try{
-          if(!BIO.supported) return;
-          err.style.display = "none";
-          const idB64 = localStorage.getItem(credKey);
-          if(!idB64){
-            err.style.display = "block";
-            err.textContent = "لا توجد بصمة مفعلة لهذا الوضع. اضغطي (تفعيل البصمة لأول مرة).";
-            return;
-          }
-          const idBytes = b64urlToBytes(idB64);
-          if(!idBytes){
-            localStorage.removeItem(credKey);
-            err.style.display = "block";
-            err.textContent = "بيانات البصمة غير صالحة. أعيدي التفعيل.";
-            return;
-          }
-          const challenge = randBytes(32);
-          const publicKey = {
-            challenge,
-            allowCredentials: [{ type: "public-key", id: idBytes }],
-            userVerification: "required",
-            timeout: 60000
-          };
-          await navigator.credentials.get({ publicKey });
-          sessionStorage.setItem(unlockedKey, "1");
-          overlay.style.display = "none";
-        }catch(e){
-          err.style.display = "block";
-          err.textContent = "لم يتم التحقق بالبصمة. حاول/ي مرة أخرى.";
-        }
-      }
-
-      enrollBtn.onclick = enroll;
-      unlockBtn.onclick = unlock;
-    }
-
-    function isBioLockEnabled(role){
-      // ✅ قفل المعلمة دائمًا (لا يمكن تعطيله)
-      if(role==="teacher") return true;
-      // ✅ قفل الطالب اختياري من إعدادات المعلمة
-      const key = BIO.keys.studentEnabled;
-      return localStorage.getItem(key) === "1";
-    }
-    function isBioUnlocked(role){
-      const key = (role==="teacher") ? BIO.keys.unlockedTeacher : BIO.keys.unlockedStudent;
-      return sessionStorage.getItem(key) === "1";
-    }
-
-    // عند فتح الصفحة: لو القفل مفعل لهذا الوضع، نطلب البصمة قبل التفاعل
-    window.addEventListener("DOMContentLoaded", () => {
-      // ✅ قفل المعلمة دائمًا
-      localStorage.setItem(BIO.keys.teacherEnabled, "1");
-
-      // ✅ قفل الطالب اختياري — افتراضيًا غير مفعل حتى لا نلزم كل طالبة بتفعيل بصمة
-      if(localStorage.getItem(BIO.keys.studentEnabled) === null){
-        localStorage.setItem(BIO.keys.studentEnabled, "0");
-      }
-
-      // إذا دخلنا بوضع المعلمة/الطالب و القفل مطلوب -> نطلب البصمة
-      const role = IS_STUDENT_ENTRY ? "student" : "teacher";
-      if(isBioLockEnabled(role) && !isBioUnlocked(role)){
-        showBioLock(role);
-      }
-    });
-
-
-
-
-    
-    // ربط خيار قفل الطالب (اختياري) داخل إعدادات المعلمة
-    function wireBioStudentToggle(){
-      const el = document.getElementById("bioStudentToggle");
-      if(!el) return;
-      el.checked = (localStorage.getItem(BIO.keys.studentEnabled) === "1");
-      el.addEventListener("change", () => {
-        localStorage.setItem(BIO.keys.studentEnabled, el.checked ? "1" : "0");
-        // عند تفعيل قفل الطالب: نخليه يطلب البصمة عند أول دخول لاحقًا
-        if(el.checked){
-          try{ sessionStorage.removeItem(BIO.keys.unlockedStudent); }catch(e){}
-        }
-        toast(el.checked ? "تم تفعيل قفل الطالب بالبصمة ✅" : "تم إيقاف قفل الطالب بالبصمة ✅");
-      });
-    }
-
-    // ================== Quick settings (Classes page) ==================
-    function openClassQuickSettings(){
-      const bioOn = (localStorage.getItem(BIO.keys.studentEnabled) === "1");
-      const multiOn = (localStorage.getItem(ROULETTE_MULTI_KEY) === "1");
-      const body = `
-        <div class="small" style="line-height:1.9;color:#47607e">هذه الإعدادات تؤثر فورًا على الطلاب المؤهلين (ذهبي/ماسي/ألماسي).</div>
-
-        <div id="qsBioCard" class="card soft" style="margin-top:10px;cursor:pointer" role="button" tabindex="0">
-          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
-            <div>
-              <div style="font-weight:1000;color:#0b2a66">🔒 قفل الطالب بالبصمة (اختياري)</div>
-              <div class="small" style="margin-top:4px;color:#47607e">إذا فُعّل، سيطلب FaceID/TouchID عند دخول الطالب على نفس الجهاز.</div>
-            </div>
-            <div id="qsBioState" class="pill" style="white-space:nowrap"></div>
-          </div>
-        </div>
-
-        <div id="qsRouletteCard" class="card soft" style="margin-top:10px;cursor:pointer" role="button" tabindex="0">
-          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
-            <div>
-              <div style="font-weight:1000;color:#0b2a66">🎡 إتاحة أكثر من فرصة للروليت أسبوعيًا</div>
-              <div class="small" style="margin-top:4px;color:#47607e">افتراضيًا: فرصة واحدة. عند التفعيل: 3 فرص أسبوعيًا.</div>
-            </div>
-            <div id="qsRouletteState" class="pill" style="white-space:nowrap"></div>
-          </div>
-        </div>
-
-        <div class="small" style="margin-top:10px;color:#6b7f99">اضغطي على البطاقة للتفعيل/الإيقاف.</div>
-      `;
-      openModal("⚙️ إعدادات الفصول", body, '<button class="btn" onclick="closeModal()">تم</button>');
-
-      setTimeout(()=>{
-        const statePill = (on)=> on
-          ? '<span class="badge" style="background:#e8fff0;color:#177a36;border:1px solid #b7f0c7;font-weight:900">مفعّل</span>'
-          : '<span class="badge" style="background:#fff3f3;color:#8a1f1f;border:1px solid #f1c0c0;font-weight:900">غير مفعّل</span>';
-
-        const qsBioState = document.getElementById("qsBioState");
-        const qsRouletteState = document.getElementById("qsRouletteState");
-        if(qsBioState) qsBioState.innerHTML = statePill(bioOn);
-        if(qsRouletteState) qsRouletteState.innerHTML = statePill(multiOn);
-
-        const toggleBio = ()=>{
-          const now = !(localStorage.getItem(BIO.keys.studentEnabled) === "1");
-          localStorage.setItem(BIO.keys.studentEnabled, now ? "1":"0");
-          if(now){ try{ sessionStorage.removeItem(BIO.keys.unlockedStudent); }catch(e){} }
-          if(qsBioState) qsBioState.innerHTML = statePill(now);
-          toast(now ? "تم تفعيل قفل الطالب بالبصمة ✅" : "تم إيقاف قفل الطالب بالبصمة ✅");
-        };
-
-        const toggleMulti = ()=>{
-          const now = !(localStorage.getItem(ROULETTE_MULTI_KEY) === "1");
-          localStorage.setItem(ROULETTE_MULTI_KEY, now ? "1":"0");
-          if(qsRouletteState) qsRouletteState.innerHTML = statePill(now);
-          toast(now ? "تم تفعيل 3 فرص أسبوعيًا للروليت ✅" : "تم ضبط الروليت على فرصة واحدة أسبوعيًا ✅");
-          try{ renderRoulettePane(); }catch(e){}
-        };
-
-        const bioCard = document.getElementById("qsBioCard");
-        if(bioCard){
-          bioCard.onclick = toggleBio;
-          bioCard.onkeydown = (e)=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); toggleBio(); } };
-        }
-        const rouletteCard = document.getElementById("qsRouletteCard");
-        if(rouletteCard){
-          rouletteCard.onclick = toggleMulti;
-          rouletteCard.onkeydown = (e)=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); toggleMulti(); } };
-        }
-      }, 0);
-    }
-
-
-
-    // بعد تحميل الصفحة اربط واجهة الإعدادات (إن وجدت)
-    window.addEventListener("DOMContentLoaded", () => {
-      wireBioStudentToggle();
-    });
-
 
     const SIGNATURE = "المعلمة: سارة حقوي";
     const TEACHER_BANK_TITLE = "بنك الرياضيات – المصرفي";
@@ -1592,37 +1249,6 @@
       $("modal").setAttribute("aria-hidden","true");
     }
     function warn(msg){ openModal("تنبيه", msg); }
-
-    function toast(msg){
-      try{
-        let t = document.getElementById("__toast");
-        if(!t){
-          t = document.createElement("div");
-          t.id = "__toast";
-          t.style.position = "fixed";
-          t.style.left = "50%";
-          t.style.bottom = "22px";
-          t.style.transform = "translateX(-50%)";
-          t.style.background = "rgba(11,42,102,.92)";
-          t.style.color = "#fff";
-          t.style.padding = "10px 14px";
-          t.style.borderRadius = "14px";
-          t.style.fontWeight = "900";
-          t.style.zIndex = 99999;
-          t.style.boxShadow = "0 10px 30px rgba(0,0,0,.18)";
-          t.style.maxWidth = "90vw";
-          t.style.textAlign = "center";
-          document.body.appendChild(t);
-        }
-        t.textContent = msg;
-        t.style.opacity = 1;
-        clearTimeout(window.__toastTimer);
-        window.__toastTimer = setTimeout(()=>{ t.style.opacity = 0; }, 2200);
-      }catch(e){
-        alert(msg);
-      }
-    }
-
 
     function togglePass(id, btn){
       const el = $(id);
@@ -2100,14 +1726,14 @@ ${SIGNATURE}`;
         currentAccess="student";
         const name = ($("stuName")?.value || "").trim();
         const pin  = ($("stuPin")?.value || "").trim();
-        if(!name || !pin) return warn("اكتب/ي الاسم وكلمة المرور");
+        if(!name || !pin) return warn("اكتب/ي الاسم والرقم السري");
         const snap = await db.collection("students").where("name","==",name).limit(1).get();
         if(snap.empty) return warn("الاسم غير مسجل بالنظام");
         const doc = snap.docs[0];
         currentStudentId = doc.id;
         const s = doc.data() || {};
         if(!s.active) return warn("الحساب مقفل");
-        if(String(pin) !== String(s.pin||"")) return warn("كلمة المرور غير صحيحة");
+        if(String(pin) !== String(s.pin||"")) return warn("الرقم السري غلط");
         await playWelcome();
         await openStudentAccount(s);
       }catch(e){ console.log(e); warn("صار خطأ… جرّبي مرة ثانية"); }
@@ -2204,60 +1830,6 @@ ${SIGNATURE}`;
       $("newStudentName").value=""; await renderStudents();
     }
 
-    async function deleteStudentConfirm(studentId, studentName){
-      if(!studentId) return;
-      const name = (studentName||"هذا الطالب/الطالبة");
-      openModal(
-        "تأكيد الحذف",
-        "هل تريدين حذف <b>"+escapeHtml(name)+"</b> نهائيًا؟"
-        + "<div class='small' style='margin-top:6px;color:#6b7b8f'>* سيتم حذف حساب الطالب من هذا الفصل. لا يمكن التراجع.</div>",
-        "<div class='row' style='gap:10px;justify-content:flex-end'>"
-          + "<button class='btn3' onclick='closeModal()'>إلغاء</button>"
-          + "<button class='btnRed' id='confirmDeleteBtn'>حذف</button>"
-        + "</div>"
-      );
-      // اربطي الزر بعد فتح النافذة لتفادي مشاكل الاقتباسات
-      setTimeout(()=>{
-        const b = document.getElementById("confirmDeleteBtn");
-        if(b) b.onclick = ()=> __doDeleteStudent(String(studentId));
-      },0);
-    }
-
-    async function __doDeleteStudent(studentId){
-      try{
-        closeModal();
-        // حذف من قاعدة البيانات
-        await db.collection("students").doc(studentId).delete();
-
-        // تحديث كاش لوحة الشرف للطلاب (حتى لا تظهر أسماء محذوفة)
-        try{
-          const prefix = "HB_STU_TOP5_" + String(currentClassId) + "_";
-          const keys = [];
-          for(let i=0;i<localStorage.length;i++){
-            const k = localStorage.key(i);
-            if(k && k.startsWith(prefix)) keys.push(k);
-          }
-          keys.forEach(k=>{
-            try{
-              const cached = JSON.parse(localStorage.getItem(k) || "null");
-              if(cached && Array.isArray(cached.rows)){
-                cached.rows = cached.rows.filter(r=> String(r.id) !== String(studentId));
-                localStorage.setItem(k, JSON.stringify(cached));
-              }
-            }catch(e){}
-          });
-        }catch(e){}
-// إذا كان الطالب مفتوح حاليًا
-        if(currentStudentId===studentId){ currentStudentId=null; }
-        await renderStudents();
-        openModal("تم ✅","تم حذف الطالب بنجاح.","<button class='btn' onclick='closeModal()'>تمام</button>");
-      }catch(e){
-        console.log(e);
-        warn("تعذر حذف الطالب. تأكدي من الاتصال وحاولي مرة أخرى.");
-      }
-    }
-
-
     function updateSelCount(){ $("selCount").textContent = "المحدد: " + selectedIds.size; }
     function toggleSelectAll(){
       const all = $("selAll").checked;
@@ -2320,18 +1892,6 @@ ${SIGNATURE}`;
           
           <div style="margin-top:8px">
             <strong>${s.name || ""}</strong>
-            <div class="row" style="margin-top:8px;gap:8px;align-items:center">
-              <select class="js-note" style="flex:1;padding:10px;border-radius:12px;border:1px solid #e6e9f2;font-weight:900">
-                <option value="">📝 ملاحظة/حضور...</option>
-                <option value="غياب">غياب</option>
-                <option value="غياب بعذر">غياب بعذر</option>
-                <option value="استئذان">استئذان</option>
-                <option value="استئذان قبل بدء الحصة">استئذان قبل بدء الحصة</option>
-                <option value="استئذان أثناء الحصة">استئذان أثناء الحصة</option>
-                <option value="إجازة">إجازة</option>
-              </select>
-              <span class="small" style="white-space:nowrap;color:#0b2a66;font-weight:900">خصم نقاط</span>
-            </div>
             <div class="small">الرصيد: ${fmt(s.balance)} ر.س</div>
             <div class="small">PIN: <b>${s.pin||""}</b></div>
             <div class="small">ولي الأمر: <b style="direction:ltr;display:inline-block">${(s.guardianWhats||"—")}</b></div>
@@ -2342,10 +1902,9 @@ ${SIGNATURE}`;
             <button class="btn3 col js-toggle">${s.active?'إقفال':'تفعيل'}</button>
             <button class="btn3 col js-edit">تعديل الاسم</button>
             <button class="btn3 col js-phone">📞 رقم ولي الأمر</button>
-            <button class="btn3 col js-pin">🔐 تغيير كلمة المرور</button>
+            <button class="btn3 col js-pin">🔐 تغيير PIN</button>
             <button class="whatsapp-btn col js-sendpin">📲 إرسال PIN</button>
             <button class="btn2 col js-pdf">تقرير PDF</button>
-            <button class="btnRed col js-del">حذف الطالب</button>
 
           </div>
         `;
@@ -2360,19 +1919,6 @@ ${SIGNATURE}`;
 
         card.querySelector(".js-sendpin").onclick = ()=> sendPinToGuardian(s.id);
         card.querySelector(".js-pdf").onclick = ()=> pdfStudentReport(s.id);
-        const noteSel = card.querySelector(".js-note");
-        if(noteSel){
-          noteSel.onchange = async()=>{
-            const v = noteSel.value;
-            if(!v) return;
-            noteSel.disabled = true;
-            await applyAttendanceNote(s.id, v);
-            noteSel.value = "";
-            noteSel.disabled = false;
-            await renderStudents();
-          };
-        }
-        card.querySelector(".js-del").onclick = ()=> deleteStudentConfirm(s.id, s.name||"");
         grid.appendChild(card);
       });
       updateSelCount();
@@ -2386,11 +1932,7 @@ ${SIGNATURE}`;
         const x=d.data();
         const t=x.createdAtClient ? new Date(x.createdAtClient).toLocaleString("ar-SA") : "";
         const tr=document.createElement("tr");
-        const amtCell = (x.type==="ملاحظة" && (x.weekPointsDelta!==undefined || x.weekPointsAfter!==undefined))
-          ? `${Number(x.weekPointsDelta||0)} نقطة`
-          : fmt(x.amount);
-        const balCell = fmt(x.balanceAfter);
-        tr.innerHTML=`<td>${t}</td><td>${x.type||""}</td><td>${x.reason||""}</td><td>${amtCell}</td><td>${balCell}</td>`;
+        tr.innerHTML=`<td>${t}</td><td>${x.type||""}</td><td>${x.reason||""}</td><td>${fmt(x.amount)}</td><td>${fmt(x.balanceAfter)}</td>`;
         rows.appendChild(tr);
       });
     }
@@ -2677,17 +2219,17 @@ document.addEventListener("DOMContentLoaded", async()=>{
       try{
         const s = await getStudentById(studentId);
         const body = `
-          <div class="small" style="margin-bottom:8px">تغيير كلمة المرور للطالب/ـة: <b>${s.name||""}</b></div>
+          <div class="small" style="margin-bottom:8px">تغيير PIN للطالب/ـة: <b>${s.name||""}</b></div>
           <div class="field" style="margin:0">
             <input id="pinNew" inputmode="numeric" maxlength="4" placeholder="PIN جديد (4 أرقام)">
           </div>
           <div class="small" style="margin-top:8px">مثال: 1234</div>
         `;
-        openModal("تغيير كلمة المرور", body, `
+        openModal("تغيير PIN", body, `
           <button class="btn2" onclick="closeModal()">إلغاء</button>
           <button class="btn" onclick="(async()=>{
             const v = (document.getElementById('pinNew').value||'').trim();
-            if(!isValidStudentPassword(v)){ return warn('كلمة المرور لازم تكون من 6 إلى 16 (حروف وأرقام معًا)'); }
+            if(!/^[0-9]{4}$/.test(v)){ return warn('PIN لازم يكون 4 أرقام'); }
             await db.collection('students').doc('${studentId}').update({pin: v});
             closeModal();
             await renderStudents();
@@ -2695,7 +2237,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
         `);
       }catch(e){
         console.log(e);
-        warn("تعذر تغيير كلمة المرور.");
+        warn("تعذر تغيير PIN.");
       }
     }
 
@@ -2717,7 +2259,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
               <input id="oldPin" inputmode="numeric" maxlength="4" placeholder="****">
             </div>
             <div class="col">
-              <div class="small">كلمة المرور الجديدة</div>
+              <div class="small">PIN الجديد</div>
               <input id="newPin" inputmode="numeric" maxlength="4" placeholder="****">
             </div>
           </div>
@@ -2728,83 +2270,20 @@ document.addEventListener("DOMContentLoaded", async()=>{
           <button class="btn" onclick="(async()=>{
             const oldP = (document.getElementById('oldPin').value||'').trim();
             const newP = (document.getElementById('newPin').value||'').trim();
-            if(String(oldP)!==String(s.pin||'')) return warn('كلمة المرور الحالية غير صحيحة');
-            if(!isValidStudentPassword(newP)) return warn('كلمة المرور لازم تكون من 6 إلى 16 (حروف وأرقام معًا)');
+            if(String(oldP)!==String(s.pin||'')) return warn('PIN الحالي غير صحيح');
+            if(!/^[0-9]{4}$/.test(newP)) return warn('PIN الجديد لازم يكون 4 أرقام');
             await db.collection('students').doc('${doc.id}').update({pin:newP});
             closeModal();
-            warn('تم تغيير كلمة المرور بنجاح ✅');
+            warn('تم تغيير PIN بنجاح ✅');
           })()">تأكيد</button>
         `);
       }catch(e){
         console.log(e);
-        warn("تعذر تغيير كلمة المرور الآن.");
+        warn("تعذر تغيير PIN الآن.");
       }
     }
 
-    
-    // تحقق من كلمة مرور الطالب: 6-16 حرف/رقم، ويجب أن تحتوي حرفًا ورقمًا
-    function isValidStudentPassword(v){
-      const s = String(v||"").trim();
-      if(!/^[A-Za-z0-9]{6,16}$/.test(s)) return false;
-      if(!/[A-Za-z]/.test(s)) return false;
-      if(!/[0-9]/.test(s)) return false;
-      return true;
-    }
-
-    // تغيير كلمة المرور من صفحة دخول الطالب (قبل الدخول)
-    function clearStudentPassLogin(){
-      const a = document.getElementById("stuNewPinLogin");
-      const b = document.getElementById("stuNewPinLogin2");
-      const msg = document.getElementById("stuPassLoginMsg");
-      if(a) a.value="";
-      if(b) b.value="";
-      if(msg) msg.textContent="";
-    }
-
-    async function saveStudentNewPinFromLogin(){
-      try{
-        const name = (document.getElementById("stuName")?.value || "").trim();
-        const oldPin = (document.getElementById("stuPin")?.value || "").trim();
-        const p1 = (document.getElementById("stuNewPinLogin")?.value || "").trim();
-        const p2 = (document.getElementById("stuNewPinLogin2")?.value || "").trim();
-        const msg = document.getElementById("stuPassLoginMsg");
-
-        if(!name || !oldPin) return warn("اكتب/ي الاسم وكلمة المرور الحالية أولًا.");
-        if(!isValidStudentPassword(p1)) return warn("كلمة المرور لازم تكون من 6 إلى 16 (حروف وأرقام معًا)");
-        if(p1 !== p2) return warn("التأكيد غير مطابق");
-
-        const snap = await db.collection("students").where("name","==",name).limit(1).get();
-        if(snap.empty) return warn("الاسم غير مسجل بالنظام");
-        const doc = snap.docs[0];
-        const s = doc.data() || {};
-        if(!s.active) return warn("الحساب مقفل");
-        if(String(oldPin) !== String(s.pin||"")) return warn("كلمة المرور الحالية غير صحيحة");
-
-        await db.collection("students").doc(doc.id).update({pin:p1});
-
-        if(msg) msg.textContent = "تم حفظ كلمة المرور بنجاح ✅";
-        warn("تم تغيير كلمة المرور بنجاح ✅");
-        // إخفاء اللوحة بعد النجاح
-        const panel = document.getElementById("studentPassPanel");
-        if(panel) panel.classList.add("hidden");
-      }catch(e){
-        console.log(e);
-        warn("تعذر حفظ كلمة المرور الآن. جرّبي مرة أخرى.");
-      }
-    }
-
-    document.addEventListener("DOMContentLoaded", ()=>{
-      const link = document.getElementById("changeStudentPassLink");
-      if(link){
-        link.addEventListener("click", ()=>{
-          const panel = document.getElementById("studentPassPanel");
-          if(panel) panel.classList.toggle("hidden");
-        });
-      }
-    });
-
-
-// تغيير كلمة المرور من داخل صفحة الطالب (بعد تسجيل الدخول) — بدون الرجوع للمعلمة
+    // تغيير PIN من داخل صفحة الطالب (بعد تسجيل الدخول) — بدون الرجوع للمعلمة
     function clearStudentPinFields(){
       const a = document.getElementById("stuNewPin");
       const b = document.getElementById("stuNewPin2");
@@ -2822,17 +2301,17 @@ document.addEventListener("DOMContentLoaded", async()=>{
         const p1 = (document.getElementById("stuNewPin")?.value || "").trim();
         const p2 = (document.getElementById("stuNewPin2")?.value || "").trim();
         const msg = document.getElementById("stuPinMsg");
-        if(!isValidStudentPassword(p1)) return warn("كلمة المرور لازم تكون من 6 إلى 16 (حروف وأرقام معًا)");
+        if(!/^[0-9]{4}$/.test(p1)) return warn("PIN الجديد لازم يكون 4 أرقام");
         if(p1 !== p2) return warn("التأكيد غير مطابق");
         await db.collection("students").doc(currentStudentObj.id).update({pin:p1});
         // تحديث محلي
         currentStudentObj.pin = p1;
         if(document.getElementById("detailPin")) document.getElementById("detailPin").textContent = p1;
-        if(msg) msg.textContent = "تم حفظ كلمة المرور بنجاح ✅";
-        warn("تم تغيير كلمة المرور بنجاح ✅");
+        if(msg) msg.textContent = "تم حفظ PIN بنجاح ✅";
+        warn("تم تغيير PIN بنجاح ✅");
       }catch(e){
         console.log(e);
-        warn("تعذر حفظ كلمة المرور الآن. جرّبي مرة أخرى.");
+        warn("تعذر حفظ PIN الآن. جرّبي مرة أخرى.");
       }
     }
 
@@ -3049,57 +2528,6 @@ document.addEventListener("DOMContentLoaded", async()=>{
 
         // ignore logging errors to avoid blocking UI
         console.log("logTxn error", e);
-      }
-    }
-
-    // ================== ملاحظات الحضور (خصم نقاط بدون سحب/إيداع) ==================
-    const NOTE_DEDUCTIONS = {
-      "غياب": -100,
-      "غياب بعذر": -50,
-      "استئذان": -25,
-      "استئذان قبل بدء الحصة": -25,
-      "استئذان أثناء الحصة": -25,
-      "إجازة": -10
-    };
-
-    async function applyAttendanceNote(studentId, noteLabel){
-      try{
-        const delta = Number((NOTE_DEDUCTIONS[noteLabel] ?? -10)); // خصم نقاط (قيمة سالبة)
-        const sRef = db.collection("students").doc(studentId);
-        await db.runTransaction(async(tx)=>{
-          const sDoc = await tx.get(sRef);
-          if(!sDoc.exists) throw new Error("student_not_found");
-          const s = sDoc.data()||{};
-
-          // لا نمسّ الرصيد إطلاقًا — الخصم من نقاط الأسبوع فقط
-          const prevBalance = Number(s.balance||0);
-
-          const prevWP = Number(s.weekPoints||s.pointsWeek||0);
-          const nextWP = prevWP + delta;
-
-          tx.update(sRef, { weekPoints: nextWP, pointsWeek: nextWP });
-
-          const txRef = sRef.collection("txns").doc();
-          tx.set(txRef, {
-            studentId: studentId,
-            studentName: s.name||"",
-            guardianWhats: s.guardianWhats||"",
-            type: "ملاحظة",
-            reason: noteLabel,
-            amount: 0,                 // بدون سحب/إيداع
-            balanceAfter: prevBalance, // يبقى كما هو
-            weekPointsDelta: delta,
-            weekPointsAfter: nextWP,
-            dateKey: localTodayKey(),
-            createdAtClient: Date.now(),
-            createdAt: firebase.firestore.FieldValue.serverTimestamp()
-          });
-        });
-
-        toast("تم تسجيل ملاحظة: " + noteLabel + " (خصم " + Math.abs(delta) + " نقطة من نقاط الأسبوع)");
-      }catch(e){
-        console.log(e);
-        warn("تعذر تسجيل الملاحظة الآن.");
       }
     }
 
@@ -4116,34 +3544,9 @@ document.addEventListener("DOMContentLoaded", async()=>{
       return (t.includes("ذهبي") || t.includes("ماسي") || t.includes("ألماسي"));
     }
 
-    // ================== Roulette chances (Gold/Diamond/Almasi) ==================
-    const ROULETTE_MULTI_KEY = "MB_ROULETTE_MULTI_V1"; // "1" => 3 chances/week for eligible tiers
-    function rouletteMaxChances(){ return (localStorage.getItem(ROULETTE_MULTI_KEY)==="1") ? 3 : 1; }
-
     function rouletteStorageKey(studentId){
       return `mb_roulette_${studentId}_${weekKey()}`;
     }
-    function rouletteReadState(studentId){
-      const k = rouletteStorageKey(studentId);
-      const raw = localStorage.getItem(k);
-      if(!raw) return {used:0, prizes:[]};
-      try{
-        if(raw.trim().startsWith("{")){
-          const obj = JSON.parse(raw);
-          const used = Number(obj.used||0);
-          const prizes = Array.isArray(obj.prizes)? obj.prizes.map(String) : [];
-          return {used:isFinite(used)?used:0, prizes};
-        }
-      }catch(e){}
-      // backward-compat: raw string prize
-      return {used:1, prizes:[String(raw)]};
-    }
-    function rouletteWriteState(studentId, state){
-      const k = rouletteStorageKey(studentId);
-      const safe = {used: Number(state.used||0), prizes: Array.isArray(state.prizes)? state.prizes.map(String) : []};
-      localStorage.setItem(k, JSON.stringify(safe));
-    }
-
 
     
     // ===== Roulette wheel rendering (visual spin) =====
@@ -4222,6 +3625,9 @@ function renderRoulettePane(){
       const resBox=$("rouletteResultBox");
       const res=$("rouletteResult");
 
+      const k = rouletteStorageKey(currentStudentObj.id||currentStudentId);
+      const saved = localStorage.getItem(k);
+
       // ensure wheel reflects current prizes
       try{ buildRouletteWheel(loadRoulettePrizes()); }catch(e){}
 
@@ -4233,25 +3639,15 @@ function renderRoulettePane(){
         return;
       }
 
-      const sid = currentStudentObj.id||currentStudentId;
-      const st = rouletteReadState(sid);
-      const max = rouletteMaxChances();
-      const left = Math.max(0, max - (st.used||0));
-
-      if(left<=0){
-        if(status) status.textContent="✅ تم استهلاك الفرص";
-        if(hint) hint.textContent = `انتهت فرص هذا الأسبوع (${max}/${max}).`;
+      if(saved){
+        const prize = saved;
+        if(status) status.textContent="✅ تم التدوير";
         if(btn) btn.disabled=true;
-      }else{
-        if(status) status.textContent = (max===1) ? "🎯 فرصة واحدة" : `🎯 متبقي: ${left} من ${max}`;
-        if(hint) hint.textContent = (max===1) ? "تدوير واحد لكل أسبوع." : "عدد الفرص يحدده إعداد المعلمة.";
-        if(btn) btn.disabled=false;
-      }
-
-      if(st.prizes && st.prizes.length){
         if(resBox){ resBox.style.display="block"; }
-        if(res) res.textContent = st.prizes[st.prizes.length-1];
+        if(res) res.textContent = prize;
       }else{
+        if(status) status.textContent="🎯 فرصة واحدة";
+        if(btn) btn.disabled=false;
         if(resBox) resBox.style.display="none";
       }
     }
@@ -4267,11 +3663,10 @@ function renderRoulettePane(){
         }
 
         const sid = currentStudentObj.id || currentStudentId;
-        const st = rouletteReadState(sid);
-        const max = rouletteMaxChances();
-        if((st.used||0) >= max){
+        const k = rouletteStorageKey(sid);
+        const already = localStorage.getItem(k);
+        if(already){
           renderRoulettePane();
-          openModal("تنبيه", `<div class="small">تم استهلاك فرص الروليت لهذا الأسبوع (${max}/${max}).</div>`, '<button class="btn" onclick="closeModal()">موافق</button>');
           return;
         }
 
@@ -4292,16 +3687,13 @@ function renderRoulettePane(){
         await done;
 
         const prize = prizes[idx];
-        st.used = Number(st.used||0) + 1;
-        st.prizes = Array.isArray(st.prizes)? st.prizes : [];
-        st.prizes.push(prize);
-        rouletteWriteState(sid, st);
+        localStorage.setItem(k, prize);
 
         // optional: persist to Firebase (light write only)
         try{
           if(window.db && sid){
             await db.collection("students").doc(sid).set({
-              roulette:{ week: weekKey(), used: st.used, max, prizes: st.prizes, at: Date.now() }
+              roulette:{ week: weekKey(), prize, at: Date.now() }
             }, {merge:true});
           }
         }catch(e){}
@@ -4309,8 +3701,7 @@ function renderRoulettePane(){
         // celebration
         try{ playSuccess(); launchCelebration(); }catch(e){}
 
-        const left = Math.max(0, max - st.used);
-        openModal("🎉 مبروك!", `<div style="font-size:18px;font-weight:1000;line-height:1.9">فزت بـ: <span style="color:#0b2a66">${escapeHtml(prize)}</span></div><div class="small" style="margin-top:8px;color:#47607e">المتبقي هذا الأسبوع: ${left} من ${max}</div>`, '<button class="btn" onclick="closeModal()">رائع!</button>');
+        openModal("🎉 مبروك!", `<div style="font-size:18px;font-weight:1000;line-height:1.9">فزت بـ: <span style="color:#0b2a66">${escapeHtml(prize)}</span></div>`, '<button class="btn" onclick="closeModal()">رائع!</button>');
 
         if(btn){ btn.textContent="تدوير الآن"; }
         renderRoulettePane();
