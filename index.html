@@ -511,7 +511,7 @@
               <path d="M7 10V8a5 5 0 0 1 10 0v2" stroke="#0b2a66" stroke-width="2" stroke-linecap="round"/>
               <rect x="6" y="10" width="12" height="10" rx="2" stroke="#0b5bb5" stroke-width="2"/>
             </svg>
-            <input id="stuPin" type="password" placeholder="الرقم السري (PIN)" autocomplete="current-password"/>
+            <input id="stuPin" type="password" placeholder="كلمة المرور" autocomplete="current-password"/>
             <button class="eyeBtn" type="button" onclick="togglePass('stuPin',this)">👁️</button>
           </div>
 
@@ -1167,18 +1167,18 @@
             <div class="card soft" style="margin-top:12px">
               <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
                 <div>
-                  <div style="font-weight:1000;color:#0b2a66">🔒 تغيير الرقم السري (PIN)</div>
-                  <div class="small" style="margin-top:4px;color:#47607e">أدخلي رقمًا جديدًا من 4 أرقام ثم حفظ. سيتم تحديثه تلقائيًا في صفحة المعلمة.</div>
+                  <div style="font-weight:1000;color:#0b2a66">🔒 تغيير كلمة المرور</div>
+                  <div class="small" style="margin-top:4px;color:#47607e">اختاري كلمة مرور جديدة (حروف + أرقام) ثم احفظيها. سيتم تحديثها تلقائيًا في صفحة المعلمة.</div>
                 </div>
               </div>
               <div class="row" style="margin-top:10px">
                 <div class="col">
-                  <div class="small">PIN الجديد</div>
-                  <input id="stuNewPin" inputmode="numeric" maxlength="4" placeholder="****">
+                  <div class="small">كلمة المرور الجديدة</div>
+                  <input id="stuNewPin" type="password" inputmode="text" maxlength="16" placeholder="مثال: Sara2026" autocomplete="new-password">
                 </div>
                 <div class="col">
-                  <div class="small">تأكيد PIN</div>
-                  <input id="stuNewPin2" inputmode="numeric" maxlength="4" placeholder="****">
+                  <div class="small">تأكيد كلمة المرور</div>
+                  <input id="stuNewPin2" type="password" inputmode="text" maxlength="16" placeholder="أعيدي كتابة كلمة المرور" autocomplete="new-password">
                 </div>
               </div>
               <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:10px;flex-wrap:wrap">
@@ -1732,14 +1732,14 @@ ${SIGNATURE}`;
         currentAccess="student";
         const name = ($("stuName")?.value || "").trim();
         const pin  = ($("stuPin")?.value || "").trim();
-        if(!name || !pin) return warn("اكتب/ي الاسم والرقم السري");
+        if(!name || !pin) return warn("اكتب/ي الاسم وكلمة المرور");
         const snap = await db.collection("students").where("name","==",name).limit(1).get();
         if(snap.empty) return warn("الاسم غير مسجل بالنظام");
         const doc = snap.docs[0];
         currentStudentId = doc.id;
         const s = doc.data() || {};
         if(!s.active) return warn("الحساب مقفل");
-        if(String(pin) !== String(s.pin||"")) return warn("الرقم السري غلط");
+        if(String(pin) !== String(s.pin||"")) return warn("كلمة المرور غير صحيحة");
         await playWelcome();
         await openStudentAccount(s);
       }catch(e){ console.log(e); warn("صار خطأ… جرّبي مرة ثانية"); }
@@ -1962,7 +1962,7 @@ ${SIGNATURE}`;
             <button class="btn3 col js-toggle">${s.active?'إقفال':'تفعيل'}</button>
             <button class="btn3 col js-edit">تعديل الاسم</button>
             <button class="btn3 col js-phone">📞 رقم ولي الأمر</button>
-            <button class="btn3 col js-pin">🔐 تغيير PIN</button>
+            <button class="btn3 col js-pin">🔐 تغيير كلمة المرور</button>
             <button class="whatsapp-btn col js-sendpin">📲 إرسال PIN</button>
             <button class="btn2 col js-pdf">تقرير PDF</button>
             <button class="btnRed col js-del">حذف الطالب</button>
@@ -2281,17 +2281,17 @@ document.addEventListener("DOMContentLoaded", async()=>{
       try{
         const s = await getStudentById(studentId);
         const body = `
-          <div class="small" style="margin-bottom:8px">تغيير PIN للطالب/ـة: <b>${s.name||""}</b></div>
+          <div class="small" style="margin-bottom:8px">تغيير كلمة المرور للطالب/ـة: <b>${s.name||""}</b></div>
           <div class="field" style="margin:0">
             <input id="pinNew" inputmode="numeric" maxlength="4" placeholder="PIN جديد (4 أرقام)">
           </div>
           <div class="small" style="margin-top:8px">مثال: 1234</div>
         `;
-        openModal("تغيير PIN", body, `
+        openModal("تغيير كلمة المرور", body, `
           <button class="btn2" onclick="closeModal()">إلغاء</button>
           <button class="btn" onclick="(async()=>{
             const v = (document.getElementById('pinNew').value||'').trim();
-            if(!/^[0-9]{4}$/.test(v)){ return warn('PIN لازم يكون 4 أرقام'); }
+            if(!isValidStudentPassword(v)){ return warn('كلمة المرور لازم تكون من 6 إلى 16 (حروف وأرقام معًا)'); }
             await db.collection('students').doc('${studentId}').update({pin: v});
             closeModal();
             await renderStudents();
@@ -2299,7 +2299,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
         `);
       }catch(e){
         console.log(e);
-        warn("تعذر تغيير PIN.");
+        warn("تعذر تغيير كلمة المرور.");
       }
     }
 
@@ -2321,7 +2321,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
               <input id="oldPin" inputmode="numeric" maxlength="4" placeholder="****">
             </div>
             <div class="col">
-              <div class="small">PIN الجديد</div>
+              <div class="small">كلمة المرور الجديدة</div>
               <input id="newPin" inputmode="numeric" maxlength="4" placeholder="****">
             </div>
           </div>
@@ -2332,20 +2332,30 @@ document.addEventListener("DOMContentLoaded", async()=>{
           <button class="btn" onclick="(async()=>{
             const oldP = (document.getElementById('oldPin').value||'').trim();
             const newP = (document.getElementById('newPin').value||'').trim();
-            if(String(oldP)!==String(s.pin||'')) return warn('PIN الحالي غير صحيح');
-            if(!/^[0-9]{4}$/.test(newP)) return warn('PIN الجديد لازم يكون 4 أرقام');
+            if(String(oldP)!==String(s.pin||'')) return warn('كلمة المرور الحالية غير صحيحة');
+            if(!isValidStudentPassword(newP)) return warn('كلمة المرور لازم تكون من 6 إلى 16 (حروف وأرقام معًا)');
             await db.collection('students').doc('${doc.id}').update({pin:newP});
             closeModal();
-            warn('تم تغيير PIN بنجاح ✅');
+            warn('تم تغيير كلمة المرور بنجاح ✅');
           })()">تأكيد</button>
         `);
       }catch(e){
         console.log(e);
-        warn("تعذر تغيير PIN الآن.");
+        warn("تعذر تغيير كلمة المرور الآن.");
       }
     }
 
-    // تغيير PIN من داخل صفحة الطالب (بعد تسجيل الدخول) — بدون الرجوع للمعلمة
+    
+    // تحقق من كلمة مرور الطالب: 6-16 حرف/رقم، ويجب أن تحتوي حرفًا ورقمًا
+    function isValidStudentPassword(v){
+      const s = String(v||"").trim();
+      if(!/^[A-Za-z0-9]{6,16}$/.test(s)) return false;
+      if(!/[A-Za-z]/.test(s)) return false;
+      if(!/[0-9]/.test(s)) return false;
+      return true;
+    }
+
+// تغيير كلمة المرور من داخل صفحة الطالب (بعد تسجيل الدخول) — بدون الرجوع للمعلمة
     function clearStudentPinFields(){
       const a = document.getElementById("stuNewPin");
       const b = document.getElementById("stuNewPin2");
@@ -2363,17 +2373,17 @@ document.addEventListener("DOMContentLoaded", async()=>{
         const p1 = (document.getElementById("stuNewPin")?.value || "").trim();
         const p2 = (document.getElementById("stuNewPin2")?.value || "").trim();
         const msg = document.getElementById("stuPinMsg");
-        if(!/^[0-9]{4}$/.test(p1)) return warn("PIN الجديد لازم يكون 4 أرقام");
+        if(!isValidStudentPassword(p1)) return warn("كلمة المرور لازم تكون من 6 إلى 16 (حروف وأرقام معًا)");
         if(p1 !== p2) return warn("التأكيد غير مطابق");
         await db.collection("students").doc(currentStudentObj.id).update({pin:p1});
         // تحديث محلي
         currentStudentObj.pin = p1;
         if(document.getElementById("detailPin")) document.getElementById("detailPin").textContent = p1;
-        if(msg) msg.textContent = "تم حفظ PIN بنجاح ✅";
-        warn("تم تغيير PIN بنجاح ✅");
+        if(msg) msg.textContent = "تم حفظ كلمة المرور بنجاح ✅";
+        warn("تم تغيير كلمة المرور بنجاح ✅");
       }catch(e){
         console.log(e);
-        warn("تعذر حفظ PIN الآن. جرّبي مرة أخرى.");
+        warn("تعذر حفظ كلمة المرور الآن. جرّبي مرة أخرى.");
       }
     }
 
