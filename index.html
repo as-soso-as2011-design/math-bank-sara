@@ -5,53 +5,6 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
   <title>بنك الرياضيات – المصرفي للمعلمة سارة حقوي</title>
 
-<script>
-/* StartApp Main Router (very early, independent of Firebase/other scripts)
-   ensures زر "ابدأ الآن" ينقلك لصفحة الدخول حتى لو تعطل باقي الجافاسكربت. */
-(function(){
-  function getMode(){
-    try{
-      var u=new URL(location.href);
-      var m=(u.searchParams.get("mode")||"").toLowerCase();
-      return (m==="student"||m==="teacher") ? m : "";
-    }catch(e){ return ""; }
-  }
-  function showOnly(id){
-    var ids=["startOverlay","onboardOverlay","teacherLoginPage","studentLoginPage","classesPage","classPage","studentAccountPage","dailyOpsPage"];
-    ids.forEach(function(x){
-      var el=document.getElementById(x);
-      if(!el) return;
-      if(x===id){
-        el.classList.remove("hidden");
-        el.style.display="";
-      }else{
-        el.classList.add("hidden");
-        if(x==="startOverlay") el.style.display="";
-      }
-    });
-  }
-  window.startAppMain=function(){
-    try{
-      var mode=getMode();
-      window.currentAccess = (mode==="student") ? "student" : "teacher";
-      // اخفاء شاشة البداية
-      var so=document.getElementById("startOverlay");
-      if(so){ so.classList.add("hidden"); so.style.display="none"; }
-      // فتح صفحة الدخول المناسبة
-      showOnly((mode==="student") ? "studentLoginPage" : "teacherLoginPage");
-    }catch(err){
-      alert("حدث خطأ في بدء النظام. جرّبي تحديث الصفحة ثم المحاولة مرة أخرى.");
-    }
-  };
-  document.addEventListener("DOMContentLoaded", function(){
-    try{
-      var btn=document.querySelector('#startOverlay button');
-      if(btn){ btn.onclick=function(ev){ ev.preventDefault(); window.startAppMain(); }; }
-    }catch(e){}
-  });
-})();
-</script>
-
   <style>
     :root{
       --navy:#00205B; --rajhi:#0055A4; --sky:#EAF3FB; --sky2:#CFE6F7; --beige:#FAF9F7;
@@ -376,16 +329,6 @@
 .roulLabel span{position:absolute;left:50%;top:8%;transform-origin:0 150px;font-size:12px;font-weight:900;color:#0b2a66;white-space:nowrap;text-shadow:0 1px 0 rgba(255,255,255,.7)}
 @media (max-width:420px){ .roulLabel span{font-size:11px} .roulHub{width:84px;height:84px} }
 
-
-/* ===== تحسين وضوح أزرار أسفل صفحات الدخول ===== */
-.footerLinks a{
-  background:#e0e0e0 !important; /* رصاصي */
-  color:var(--navy) !important;  /* كحلي */
-  opacity:1 !important;
-}
-.footerLinks a:hover{ background:#d5d5d5 !important; color:var(--navy) !important; }
-.footerNote{ color:var(--navy) !important; }
-
 </style>
 </head>
 
@@ -421,7 +364,7 @@
         </div>
 
         <div class="startActions">
-          <button class="btn" onclick="startAppMain()">ابدأ الآن</button>
+          <button class="btn" onclick="startApp()">ابدأ الآن</button>
           <button class="ghostBtn" onclick="openHelp()">هل تحتاج إلى مساعدة؟</button>
         </div>
       </div>
@@ -572,8 +515,7 @@
 
           <div class="forgotRow">
             <a href="javascript:void(0)" id="forgotPinLink">نسيت الرقم السري؟</a>
-            <span class="small"></span>
-            <a href="javascript:void(0)" id="changeStudentPinLink">تغيير الرقم السري</a>
+            <span class="small">اطلبه من ولي أمرك أو المعلمة</span>
           </div>
 
           <div class="row" style="margin-top:12px">
@@ -1721,8 +1663,7 @@ ${SIGNATURE}`
     }
 
     function teacherLogin(){
-      const savedPass = (localStorage.getItem("mb_teacher_pass") || "12345");
-      if(($("tu").value||"").trim()==="teacher" && ($("tp").value||"").trim()===savedPass){
+      if(($("tu").value||"").trim()==="teacher" && ($("tp").value||"").trim()==="12345"){
         currentAccess="teacher";
         hideAllPages(); show("classesPage"); renderTabs();
       } else warn("بيانات الدخول غير صحيحة");
@@ -1741,81 +1682,6 @@ ${SIGNATURE}`
 `);
       window.location.href = `mailto:${TEACHER_EMAIL}?subject=${subject}&body=${body}`;
     }
-
-    function isValidPass(p){
-      const s = String(p||"").trim();
-      if(s.length < 4 || s.length > 16) return false;
-      if(/\s/.test(s)) return false;
-      return true;
-    }
-
-    function openTeacherPassChange(){
-      const savedPass = (localStorage.getItem("mb_teacher_pass") || "12345");
-      const html = `
-        <div class="small" style="color:#47607e">تغيير كلمة مرور المعلمة (محليًا على هذا الجهاز)</div>
-        <hr>
-        <div class="row">
-          <div class="col">
-            <div class="small">كلمة المرور الحالية</div>
-            <input id="tOldPass" type="password" placeholder="الحالية">
-          </div>
-          <div class="col">
-            <div class="small">كلمة المرور الجديدة</div>
-            <input id="tNewPass" type="password" placeholder="جديدة (4-16 بدون مسافات)">
-          </div>
-        </div>
-      `;
-      openModal("تغيير كلمة المرور", html, [
-        {text:"حفظ", cls:"btn", onClick:()=>{
-          const oldP = ($("tOldPass")?.value||"").trim();
-          const newP = ($("tNewPass")?.value||"").trim();
-          if(oldP !== savedPass) return warn("كلمة المرور الحالية غير صحيحة");
-          if(!isValidPass(newP)) return warn("كلمة المرور الجديدة غير صالحة (4-16 بدون مسافات)");
-          localStorage.setItem("mb_teacher_pass", newP);
-          closeModal();
-          alert("تم حفظ كلمة المرور الجديدة ✅");
-        }},
-        {text:"إلغاء", cls:"btn3", onClick:()=>closeModal()}
-      ]);
-      // تذكير اختياري
-      try{ $("tOldPass").value = ""; $("tNewPass").value=""; }catch(e){}
-    }
-
-    async function openStudentPassChange(){
-      const name = ($("stuName")?.value || "").trim();
-      const oldPin = ($("stuPin")?.value || "").trim();
-      if(!name || !oldPin) return warn("اكتب/ي اسم الطالب والرقم السري الحالي أولًا");
-      const newPin = prompt("اكتب/ي الرقم السري الجديد (4-16 بدون مسافات):","");
-      if(newPin===null) return;
-      const np = String(newPin||"").trim();
-      if(!isValidPass(np)) return warn("الرقم السري الجديد غير صالح (4-16 بدون مسافات)");
-      try{
-        const snap = await db.collection("students").where("name","==",name).limit(1).get();
-        if(snap.empty) return warn("الاسم غير مسجل بالنظام");
-        const doc = snap.docs[0];
-        const s = doc.data() || {};
-        if(String(s.pin||"") !== oldPin) return warn("الرقم السري الحالي غير صحيح");
-        await db.collection("students").doc(doc.id).update({pin: np});
-        alert("تم تغيير الرقم السري ✅");
-        $("stuPin").value = "";
-      }catch(err){
-        console.error(err);
-        warn("تعذر تغيير الرقم السري الآن. تأكدي من الاتصال ثم أعيدي المحاولة.");
-      }
-    }
-
-    // ربط روابط تغيير الرقم السري في صفحات الدخول
-    document.addEventListener("DOMContentLoaded", ()=>{
-      try{
-        const t = document.getElementById("changePinLink");
-        if(t) t.onclick = (e)=>{ e.preventDefault(); openTeacherPassChange(); };
-      }catch(e){}
-      try{
-        const s = document.getElementById("changeStudentPinLink");
-        if(s) s.onclick = (e)=>{ e.preventDefault(); openStudentPassChange(); };
-      }catch(e){}
-    });
-
 
     function sendDailyToBusinessWA(){
       const op = ($("dailyOp")?.value || "").trim();
@@ -1935,7 +1801,6 @@ ${SIGNATURE}`;
 
       await refreshWeekKPIs();
       await refreshRewards();
-      try{ renderRoulettePane(); }catch(e){}
       try{ await renderStudentHonorBoard(); }catch(e){}
       try{ await renderBalanceChartLast30(); }catch(e){}
     }
@@ -2076,7 +1941,6 @@ function renderStudents(){
         card.querySelector(".js-edit").onclick = async()=>{ const nn = prompt("الاسم الجديد:", s.name); if(nn) await db.collection("students").doc(s.id).update({name:nn.trim()}); await renderStudents(); };
         card.querySelector(".js-phone").onclick = ()=> editGuardianPhone(s.id);
         card.querySelector(".js-pin").onclick = ()=> changePinTeacher(s.id);
-        card.querySelector(".js-del").onclick = ()=> deleteStudentFromClass(s);
 
         card.querySelector(".js-sendpin").onclick = ()=> sendPinToGuardian(s.id);
         card.querySelector(".js-pdf").onclick = ()=> pdfStudentReport(s.id);
@@ -2102,7 +1966,7 @@ function renderStudents(){
 
     async function executeOp(){ warn("هذه النسخة مدمجة للواجهة + الكود الأساسي. لو تبغين كل الوظائف (PDF/واتساب/تقارير أسبوعية)، قولي لي وأصدر لك نسخة Full كاملة 100%."); }
 
-    async function startAppMain(){
+    async function startApp(){
       const so = $("startOverlay");
       if(so){ so.classList.add("hidden"); so.style.display="none"; }
       showOnboarding(()=>{
@@ -2111,9 +1975,6 @@ function renderStudents(){
         else{ show("teacherLoginPage"); currentAccess="teacher"; }
       });
     }
-
-    // expose main start function
-    window.startAppMain = startAppMain;
 
     
     // ================== Daily Ops (Teacher) ==================
@@ -4140,6 +4001,72 @@ function renderRoulettePane(){
 
   // في حال زر البداية كان مرتبط بدالة مختلفة بالخطأ، اربطها هنا أيضاً
   window.startAppSafe = window.startApp;
+})();
+
+
+// ======= FIX: ضمان عمل الأزرار على كل الأجهزة (خصوصًا iOS) =======
+(function(){
+  // اجعلي الدوال متاحة عالميًا حتى لو تغيّر ترتيب التحميل
+  try{
+    window.teacherLogin = window.teacherLogin || teacherLogin;
+    window.studentLogin = window.studentLogin || studentLogin;
+    window.goPublic = window.goPublic || goPublic;
+    window.forgotTeacher = window.forgotTeacher || forgotTeacher;
+    window.forgotStudentPin = window.forgotStudentPin || forgotStudentPin;
+  }catch(e){}
+
+  function bindOnce(sel, fn){
+    try{
+      const el = document.querySelector(sel);
+      if(!el) return;
+      // لا نكرر الربط
+      if(el.dataset && el.dataset.mbBound === "1") return;
+      if(el.dataset) el.dataset.mbBound = "1";
+      el.addEventListener("click", function(ev){
+        ev.preventDefault();
+        ev.stopPropagation();
+        try{ fn(); }catch(err){ console.warn(err); }
+      }, {passive:false});
+      // دعم اللمس لبعض أجهزة iOS
+      el.addEventListener("touchend", function(ev){
+        ev.preventDefault();
+        ev.stopPropagation();
+        try{ fn(); }catch(err){ console.warn(err); }
+      }, {passive:false});
+    }catch(e){}
+  }
+
+  function bindAll(){
+    // أزرار صفحة الطالب
+    bindOnce('button[onclick="studentLogin()"]', ()=>window.studentLogin());
+    bindOnce('button[onclick="goPublic()"]', ()=>window.goPublic());
+
+    // أزرار صفحة المعلمة
+    bindOnce('button[onclick="teacherLogin()"]', ()=>window.teacherLogin());
+    bindOnce('button[onclick="goPublic()"]', ()=>window.goPublic());
+
+    // روابط "نسيت" (لو موجودة)
+    bindOnce('#stuForgotLink', ()=>window.forgotStudentPin && window.forgotStudentPin());
+    bindOnce('#tchForgotLink', ()=>window.forgotTeacher && window.forgotTeacher());
+  }
+
+  // اربط بعد تحميل الـ DOM + إعادة محاولة خفيفة
+  document.addEventListener("DOMContentLoaded", function(){
+    bindAll();
+    setTimeout(bindAll, 300);
+    setTimeout(bindAll, 900);
+  });
+  // في حال تم تغيير الصفحة داخليًا بدون إعادة تحميل
+  try{
+    const _oldHideAll = window.hideAllPages;
+    if(typeof _oldHideAll === "function"){
+      window.hideAllPages = function(){
+        const r = _oldHideAll.apply(this, arguments);
+        setTimeout(bindAll, 0);
+        return r;
+      };
+    }
+  }catch(e){}
 })();
 
 </script>
