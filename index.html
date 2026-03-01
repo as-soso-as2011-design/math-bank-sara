@@ -1979,13 +1979,25 @@ ${SIGNATURE}`;
     async function executeOp(){ warn("هذه النسخة مدمجة للواجهة + الكود الأساسي. لو تبغين كل الوظائف (PDF/واتساب/تقارير أسبوعية)، قولي لي وأصدر لك نسخة Full كاملة 100%."); }
 
     async function startApp(){
-      const so = $("startOverlay");
-      if(so){ so.classList.add("hidden"); so.style.display="none"; }
-      showOnboarding(()=>{
-        hideAllPages();
-        if(IS_STUDENT_ENTRY){ show("studentLoginPage"); currentAccess="student"; }
-        else{ show("teacherLoginPage"); currentAccess="teacher"; }
-      });
+      // Safe start: do not rely on onboarding or any optional overlays
+      try{
+        const so = document.getElementById("startOverlay");
+        if(so){ so.classList.add("hidden"); so.style.display="none"; }
+      }catch(e){}
+      try{ if(typeof hideAllPages === "function") hideAllPages(); }catch(e){}
+      try{
+        const target = (typeof IS_STUDENT_ENTRY !== "undefined" && IS_STUDENT_ENTRY) ? "studentLoginPage" : "teacherLoginPage";
+        if(typeof show === "function"){ show(target); }
+        else{
+          // fallback: unhide target
+          const t=document.getElementById(target);
+          if(t) t.classList.remove("hidden");
+        }
+        window.currentAccess = (target === "studentLoginPage") ? "student" : "teacher";
+      }catch(e){
+        // absolute fallback: just reload without cache-busting
+        try{ location.href = location.pathname + location.search; }catch(_){}
+      }
     }
 
     
