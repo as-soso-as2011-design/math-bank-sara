@@ -4,6 +4,63 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
   <title>بنك الرياضيات – المصرفي للمعلمة سارة حقوي</title>
+<script>
+/* V16 Safe Start Router (runs early - prevents "ابدأ" من التعطل حتى لو تعطّل باقي السكربت) */
+(function(){
+  function getMode(){
+    try{
+      var u=new URL(location.href);
+      var m=(u.searchParams.get("mode")||"").toLowerCase();
+      return (m==="student"||m==="teacher")?m:"";
+    }catch(e){ return ""; }
+  }
+  function showOnly(id){
+    var ids=["startOverlay","onboardOverlay","teacherLoginPage","studentLoginPage","classesPage","classPage","studentAccountPage","dailyOpsPage"];
+    for(var i=0;i<ids.length;i++){
+      var el=document.getElementById(ids[i]);
+      if(!el) continue;
+      if(ids[i]===id){ el.classList.remove("hidden"); el.style.display=""; el.setAttribute("aria-hidden","false"); }
+      else{ el.classList.add("hidden"); if(ids[i]==="onboardOverlay") el.style.display="none"; el.setAttribute("aria-hidden","true"); }
+    }
+  }
+  function goLogin(){
+    var mode=getMode();
+    window.IS_STUDENT_ENTRY = (mode==="student");
+    window.currentAccess = window.IS_STUDENT_ENTRY ? "student" : "teacher";
+    try{
+      var pill=document.getElementById("modePill");
+      if(pill) pill.textContent = window.IS_STUDENT_ENTRY ? "وضع: الطالب" : "وضع: المعلمة";
+    }catch(e){}
+    showOnly(window.IS_STUDENT_ENTRY ? "studentLoginPage" : "teacherLoginPage");
+  }
+  window.startAppSafe = function(){
+    try{
+      var so=document.getElementById("startOverlay");
+      if(so){ so.classList.add("hidden"); so.style.display="none"; }
+    }catch(e){}
+    // لا تعتمد على onboarding هنا — ادخل مباشرة لصفحة الدخول
+    goLogin();
+  };
+  // اجعل startApp متاحًا مبكرًا
+  if(typeof window.startApp!=="function"){ window.startApp = window.startAppSafe; }
+
+  // اربط زر "ابدأ الآن" وربط touch كخطة بديلة
+  function bindStartBtn(){
+    try{
+      var btn=document.querySelector('#startOverlay button[onclick*="startApp"]') || document.querySelector('button[onclick="startApp()"]');
+      if(!btn) return;
+      // أزل onclick لمنع أي تعارض مستقبلي
+      btn.onclick = function(ev){ ev && ev.preventDefault && ev.preventDefault(); window.startAppSafe(); return false; };
+      btn.addEventListener("click", function(ev){ ev.preventDefault(); window.startAppSafe(); }, {passive:false});
+      btn.addEventListener("touchend", function(ev){ ev.preventDefault(); window.startAppSafe(); }, {passive:false});
+    }catch(e){}
+  }
+  document.addEventListener("DOMContentLoaded", bindStartBtn);
+  // لو DOM جاهز مسبقًا
+  if(document.readyState==="interactive"||document.readyState==="complete"){ setTimeout(bindStartBtn,0); }
+})();
+</script>
+
 
   <style>
     :root{
@@ -333,6 +390,16 @@
 .roulLabel{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:100%;height:100%;pointer-events:none}
 .roulLabel span{position:absolute;left:50%;top:8%;transform-origin:0 150px;font-size:12px;font-weight:900;color:#0b2a66;white-space:nowrap;text-shadow:0 1px 0 rgba(255,255,255,.7)}
 @media (max-width:420px){ .roulLabel span{font-size:11px} .roulHub{width:84px;height:84px} }
+
+
+/* V16 Footer buttons text navy while keeping gray background */
+.footerLinks a{
+  background:#e0e0e0 !important;
+  color:#00205B !important;
+  opacity:1 !important;
+}
+.footerLinks a:hover{background:#d5d5d5 !important;color:#00205B !important;}
+.footerNote{color:#00205B !important; opacity:1 !important;}
 
 </style>
 </head>
@@ -3763,7 +3830,8 @@ function renderRoulettePane(){
 
       const tier = calcTier(currentStudentObj.balance);
       const eligible = tierEligible(tier);
-      tab.style.display = eligible ? "" : "none";
+      tab.style.display = ""; // show tab always
+      tab.style.opacity = eligible ? "1" : ".7";
 
       const status=$("rouletteStatus");
       const hint=$("rouletteHint");
