@@ -67,6 +67,7 @@
     }
     .footerNote{
       margin-top:10px;text-align:center;font-weight:900;letter-spacing:.2px;
+      color: var(--navy);
     }
 
     .modal{position:fixed;inset:0;background:rgba(0,0,0,.50);display:none;align-items:center;justify-content:center;padding:18px;z-index:9999}
@@ -515,7 +516,7 @@
 
           <div class="forgotRow">
             <a href="javascript:void(0)" id="forgotPinLink">نسيت الرقم السري؟</a>
-            <span class="small">اطلبه من ولي أمرك أو المعلمة</span>
+            
           </div>
 
           <div class="row" style="margin-top:12px">
@@ -1865,7 +1866,7 @@ ${SIGNATURE}`;
       }
     }
 
-function renderStudents(){
+async function renderStudents(){
       const snap = await db.collection("students").where("classId","==",currentClassId).get();
       const arr=[]; snap.forEach(d=>arr.push({id:d.id,...d.data()}));
       arr.sort((a,b)=>(a.name||"").localeCompare(b.name||"","ar"));
@@ -4001,72 +4002,6 @@ function renderRoulettePane(){
 
   // في حال زر البداية كان مرتبط بدالة مختلفة بالخطأ، اربطها هنا أيضاً
   window.startAppSafe = window.startApp;
-})();
-
-
-// ======= FIX: ضمان عمل الأزرار على كل الأجهزة (خصوصًا iOS) =======
-(function(){
-  // اجعلي الدوال متاحة عالميًا حتى لو تغيّر ترتيب التحميل
-  try{
-    window.teacherLogin = window.teacherLogin || teacherLogin;
-    window.studentLogin = window.studentLogin || studentLogin;
-    window.goPublic = window.goPublic || goPublic;
-    window.forgotTeacher = window.forgotTeacher || forgotTeacher;
-    window.forgotStudentPin = window.forgotStudentPin || forgotStudentPin;
-  }catch(e){}
-
-  function bindOnce(sel, fn){
-    try{
-      const el = document.querySelector(sel);
-      if(!el) return;
-      // لا نكرر الربط
-      if(el.dataset && el.dataset.mbBound === "1") return;
-      if(el.dataset) el.dataset.mbBound = "1";
-      el.addEventListener("click", function(ev){
-        ev.preventDefault();
-        ev.stopPropagation();
-        try{ fn(); }catch(err){ console.warn(err); }
-      }, {passive:false});
-      // دعم اللمس لبعض أجهزة iOS
-      el.addEventListener("touchend", function(ev){
-        ev.preventDefault();
-        ev.stopPropagation();
-        try{ fn(); }catch(err){ console.warn(err); }
-      }, {passive:false});
-    }catch(e){}
-  }
-
-  function bindAll(){
-    // أزرار صفحة الطالب
-    bindOnce('button[onclick="studentLogin()"]', ()=>window.studentLogin());
-    bindOnce('button[onclick="goPublic()"]', ()=>window.goPublic());
-
-    // أزرار صفحة المعلمة
-    bindOnce('button[onclick="teacherLogin()"]', ()=>window.teacherLogin());
-    bindOnce('button[onclick="goPublic()"]', ()=>window.goPublic());
-
-    // روابط "نسيت" (لو موجودة)
-    bindOnce('#stuForgotLink', ()=>window.forgotStudentPin && window.forgotStudentPin());
-    bindOnce('#tchForgotLink', ()=>window.forgotTeacher && window.forgotTeacher());
-  }
-
-  // اربط بعد تحميل الـ DOM + إعادة محاولة خفيفة
-  document.addEventListener("DOMContentLoaded", function(){
-    bindAll();
-    setTimeout(bindAll, 300);
-    setTimeout(bindAll, 900);
-  });
-  // في حال تم تغيير الصفحة داخليًا بدون إعادة تحميل
-  try{
-    const _oldHideAll = window.hideAllPages;
-    if(typeof _oldHideAll === "function"){
-      window.hideAllPages = function(){
-        const r = _oldHideAll.apply(this, arguments);
-        setTimeout(bindAll, 0);
-        return r;
-      };
-    }
-  }catch(e){}
 })();
 
 </script>
