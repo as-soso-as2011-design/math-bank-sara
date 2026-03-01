@@ -60,14 +60,18 @@
     .footerLinks a{
       text-decoration:none;
       font-weight:900;font-size:13px;
-      opacity:.95;
+      opacity:1;
       padding:8px 10px;border-radius:12px;
-      border:1px solid rgba(255,255,255,.10);
-      background:rgba(0,0,0,.08);
+      border:1px solid rgba(0,0,0,.08);
+      background:#e0e0e0;
+      color:var(--navy);
+    }
+    .footerLinks a:hover{
+      background:#d5d5d5;
+      color:var(--navy);
     }
     .footerNote{
       margin-top:10px;text-align:center;font-weight:900;letter-spacing:.2px;
-      color: var(--navy);
     }
 
     .modal{position:fixed;inset:0;background:rgba(0,0,0,.50);display:none;align-items:center;justify-content:center;padding:18px;z-index:9999}
@@ -516,7 +520,8 @@
 
           <div class="forgotRow">
             <a href="javascript:void(0)" id="forgotPinLink">نسيت الرقم السري؟</a>
-            
+            <span class="small"></span>
+            <a href="javascript:void(0)" id="stuChangePinLink">تغيير الرقم السري</a>
           </div>
 
           <div class="row" style="margin-top:12px">
@@ -1663,8 +1668,17 @@ ${SIGNATURE}`
       await renderTabs();
     }
 
+    function getTeacherPass(){
+      try{ return localStorage.getItem("MB_TEACHER_PASS") || "12345"; }catch(e){ return "12345"; }
+    }
+    function setTeacherPass(p){
+      try{ localStorage.setItem("MB_TEACHER_PASS", String(p||"").trim()); }catch(e){}
+    }
+
     function teacherLogin(){
-      if(($("tu").value||"").trim()==="teacher" && ($("tp").value||"").trim()==="12345"){
+      const u = ($("tu").value||"").trim();
+      const p = ($("tp").value||"").trim();
+      if(u==="teacher" && p===getTeacherPass()){
         currentAccess="teacher";
         hideAllPages(); show("classesPage"); renderTabs();
       } else warn("بيانات الدخول غير صحيحة");
@@ -1692,6 +1706,111 @@ ${SIGNATURE}`
       const msg =
 `⚠️ رسالة يومية – بنك الرياضيات
 ${TEACHER_BANK_TITLE}
+    function openChangeTeacherPass(){
+      openModal("تغيير الرقم السري (المعلمة)",
+        `<div class="small">اكتبي الرقم الحالي ثم الرقم الجديد (4–16 حرف/رقم).</div>
+         <div style="margin-top:10px" class="row">
+           <div class="col">
+             <div class="small">الرقم الحالي</div>
+             <input id="cpOld" type="password" placeholder="••••">
+           </div>
+           <div class="col">
+             <div class="small">الرقم الجديد</div>
+             <input id="cpNew" type="password" placeholder="مثال: 2580">
+           </div>
+         </div>`,
+        `<button class="btn3" onclick="closeModal()">إلغاء</button>
+         <button class="btn" onclick="saveTeacherPassFromModal()">حفظ</button>`
+      );
+      setTimeout(()=>{ try{ $("cpOld")?.focus(); }catch(e){} }, 50);
+    }
+
+    function saveTeacherPassFromModal(){
+      const oldP = ($("cpOld")?.value||"").trim();
+      const newP = ($("cpNew")?.value||"").trim();
+      if(!oldP || !newP) return warn("اكتب/ي الرقم الحالي والجديد");
+      if(oldP !== getTeacherPass()) return warn("الرقم الحالي غير صحيح");
+      if(newP.length < 4 || newP.length > 16) return warn("الرقم الجديد يجب أن يكون 4–16");
+      if(/\s/.test(newP)) return warn("بدون مسافات");
+      setTeacherPass(newP);
+      closeModal();
+      openModal("تم","<div class='small'>تم تغيير الرقم السري بنجاح ✅</div>", "<button class='btn' onclick='closeModal()'>موافق</button>");
+    }
+
+    async function openChangeStudentPin(){
+      openModal("تغيير الرقم السري (الطالب/ـة)",
+        `<div class="small">اكتبي الاسم كما هو مسجل + الرقم الحالي + الرقم الجديد.</div>
+         <div style="margin-top:10px" class="row">
+           <div class="col">
+             <div class="small">اسم الطالب/ـة</div>
+             <input id="spName" placeholder="مثال: طلال الرحيمي">
+           </div>
+         </div>
+         <div class="row" style="margin-top:10px">
+           <div class="col">
+             <div class="small">الرقم الحالي</div>
+             <input id="spOld" type="password" placeholder="••••">
+           </div>
+           <div class="col">
+             <div class="small">الرقم الجديد</div>
+             <input id="spNew" type="password" placeholder="مثال: 1470">
+           </div>
+         </div>`,
+        `<button class="btn3" onclick="closeModal()">إلغاء</button>
+         <button class="btn" onclick="saveStudentPinFromModal()">حفظ</button>`
+      );
+      setTimeout(()=>{ try{ $("spName")?.focus(); }catch(e){} }, 50);
+    }
+
+    async function saveStudentPinFromModal(){
+      try{
+        const name = ($("spName")?.value||"").trim();
+        const oldP = ($("spOld")?.value||"").trim();
+        const newP = ($("spNew")?.value||"").trim();
+        if(!name || !oldP || !newP) return warn("كمّلي البيانات");
+        if(newP.length < 4 || newP.length > 16) return warn("الرقم الجديد يجب أن يكون 4–16");
+        if(/\s/.test(newP)) return warn("بدون مسافات");
+        const snap = await db.collection("students").where("name","==",name).limit(1).get();
+        if(snap.empty) return warn("الاسم غير مسجل بالنظام");
+        const doc = snap.docs[0];
+        const s = doc.data() || {};
+        if(String(oldP) !== String(s.pin||"")) return warn("الرقم الحالي غير صحيح");
+        await db.collection("students").doc(doc.id).update({pin:String(newP)});
+        closeModal();
+        openModal("تم","<div class='small'>تم تغيير الرقم السري للطالب/ـة ✅</div>", "<button class='btn' onclick='closeModal()'>موافق</button>");
+      }catch(e){
+        console.error(e);
+        warn("تعذر تغيير الرقم السري، تحققي من الاتصال.");
+      }
+    }
+
+    function forgotStudentPin(){
+      const name = ($("stuName")?.value||"").trim();
+      const msg = `السلام عليكم\n\nطلب استرجاع الرقم السري (PIN)\nاسم الطالب/ـة: ${name||"—"}\n\nبنك الرياضيات – المصرفي\n` + SIGNATURE;
+      window.__waRecoverMsg = msg;
+      openModal("استرجاع الرقم السري",
+        `<div class="small">اضغطي الزر لإرسال طلب استرجاع عبر واتساب للمعلمة.</div>`,
+        `<button class="btn3" onclick="closeModal()">إلغاء</button>
+         <button class="whatsapp-btn" onclick="openWA(WHATSAPP_PHONE, window.__waRecoverMsg); closeModal();">إرسال واتساب</button>`
+      );
+    }
+
+    // ربط الروابط (بدون الاعتماد على onclick فقط)
+    document.addEventListener("DOMContentLoaded", ()=>{
+      try{
+        const a = $("changePinLink");
+        if(a) a.addEventListener("click", (e)=>{ e.preventDefault(); openChangeTeacherPass(); });
+      }catch(e){}
+      try{
+        const b = $("stuChangePinLink");
+        if(b) b.addEventListener("click", (e)=>{ e.preventDefault(); openChangeStudentPin(); });
+      }catch(e){}
+      try{
+        const c = $("forgotPinLink");
+        if(c) c.addEventListener("click", (e)=>{ e.preventDefault(); forgotStudentPin(); });
+      }catch(e){}
+    });
+
 
 نوع العملية: ${op}
 المبلغ: ${amt} ريال
@@ -1843,7 +1962,6 @@ ${SIGNATURE}`;
       updateSelCount();
     }
 
-    async 
     async function deleteStudentFromClass(s){
       try{
         if(!s || !s.id) return;
@@ -1942,6 +2060,8 @@ async function renderStudents(){
         card.querySelector(".js-edit").onclick = async()=>{ const nn = prompt("الاسم الجديد:", s.name); if(nn) await db.collection("students").doc(s.id).update({name:nn.trim()}); await renderStudents(); };
         card.querySelector(".js-phone").onclick = ()=> editGuardianPhone(s.id);
         card.querySelector(".js-pin").onclick = ()=> changePinTeacher(s.id);
+
+        card.querySelector(".js-del").onclick = ()=> deleteStudentFromClass(s);
 
         card.querySelector(".js-sendpin").onclick = ()=> sendPinToGuardian(s.id);
         card.querySelector(".js-pdf").onclick = ()=> pdfStudentReport(s.id);
@@ -3643,7 +3763,8 @@ function renderRoulettePane(){
 
       const tier = calcTier(currentStudentObj.balance);
       const eligible = tierEligible(tier);
-      tab.style.display = eligible ? "" : "none";
+      tab.style.display = ""; // show tab always
+      tab.style.opacity = eligible ? "1" : ".7";
 
       const status=$("rouletteStatus");
       const hint=$("rouletteHint");
