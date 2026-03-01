@@ -517,7 +517,7 @@
 
           <div class="forgotRow">
             <a href="javascript:void(0)" id="forgotPinLink">نسيت الرقم السري؟</a>
-            <span class="small">اطلبه من ولي أمرك أو المعلمة</span>
+            <span class="small"></span>
           </div>
 
           <div class="row" style="margin-top:12px">
@@ -1858,8 +1858,28 @@ ${SIGNATURE}`;
     async function __doDeleteStudent(studentId){
       try{
         closeModal();
+        // حذف من قاعدة البيانات
         await db.collection("students").doc(studentId).delete();
-        // إذا كان الطالب مفتوح حاليًا
+
+        // تحديث كاش لوحة الشرف للطلاب (حتى لا تظهر أسماء محذوفة)
+        try{
+          const prefix = "HB_STU_TOP5_" + String(currentClassId) + "_";
+          const keys = [];
+          for(let i=0;i<localStorage.length;i++){
+            const k = localStorage.key(i);
+            if(k && k.startsWith(prefix)) keys.push(k);
+          }
+          keys.forEach(k=>{
+            try{
+              const cached = JSON.parse(localStorage.getItem(k) || "null");
+              if(cached && Array.isArray(cached.rows)){
+                cached.rows = cached.rows.filter(r=> String(r.id) !== String(studentId));
+                localStorage.setItem(k, JSON.stringify(cached));
+              }
+            }catch(e){}
+          });
+        }catch(e){}
+// إذا كان الطالب مفتوح حاليًا
         if(currentStudentId===studentId){ currentStudentId=null; }
         await renderStudents();
         openModal("تم ✅","تم حذف الطالب بنجاح.","<button class='btn' onclick='closeModal()'>تمام</button>");
