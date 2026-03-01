@@ -620,6 +620,17 @@
 
       <div class="tabs" id="classTabs"></div>
 
+      <div class="card soft" style="margin-top:10px">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+          <div>
+            <div style="font-weight:1000;color:#0b2a66">🔧 إعدادات سريعة للفصول</div>
+            <div class="small" style="margin-top:4px;color:#47607e">قفل الطالب بالبصمة اختياري + فرص الروليت للحساب الألماسي.</div>
+          </div>
+          <button class="btn3" onclick="openQuickClassSettings()">فتح الإعدادات</button>
+        </div>
+      </div>
+
+
       <div class="card">
         <button class="btn" onclick="openClassPage()">دخول الفصل</button>
       </div>
@@ -1423,6 +1434,57 @@
       const key = BIO.keys.studentEnabled;
       return localStorage.getItem(key) === "1";
     }
+
+    // =========================
+    // إعدادات سريعة (من صفحة الفصول)
+    // =========================
+    function openQuickClassSettings(){
+      const studentEnabled = (localStorage.getItem(BIO.keys.studentEnabled)==="1");
+      const goldMax = parseInt(localStorage.getItem("MB_ROULETTE_GOLD_MAX")||"1",10) || 1;
+      const diamondMax = parseInt(localStorage.getItem("MB_ROULETTE_DIAMOND_MAX")||"1",10) || 1;
+      const almasiMax = parseInt(localStorage.getItem("MB_ROULETTE_ALMASI_MAX")||"1",10) || 1;
+      const body = `
+        <div class="small" style="line-height:2">
+          <div style="font-weight:900;color:#0b2a66;margin-bottom:6px">🔒 قفل الطالب بالبصمة (اختياري)</div>
+          <label style="display:flex;gap:10px;align-items:center;margin:8px 0">
+            <input id="qsBioStudent" type="checkbox" ${studentEnabled?"checked":""} style="width:auto">
+            <span>تفعيل قفل الطالب بالبصمة</span>
+          </label>
+
+          <hr style="margin:12px 0">
+
+          <div style="font-weight:900;color:#0b2a66;margin-bottom:6px">🎡 فرص الروليت للحسابات (ذهبي / ماسي / ألماسي)</div>
+          <div class="small" style="color:#57606a;margin-bottom:6px">افتراضيًا: فرصة واحدة أسبوعيًا لكل حساب. يمكن زيادتها عند الحاجة.</div>
+          <label style="display:flex;gap:10px;align-items:center;margin:8px 0">
+            <input id="qsRouletteMore" type="checkbox" ${( (goldMax>1) || (diamondMax>1) || (almasiMax>1) )?"checked":""} style="width:auto">
+            <span>إتاحة أكثر من فرصة (3 فرص أسبوعيًا للذهبي/الماسي/الألماسي)</span>
+          </label>
+        </div>
+      `;
+      openModal("🔧 إعدادات الفصول", body,
+        '<button class="btn" id="qsSaveBtn">حفظ</button><button class="btn3" onclick="closeModal()">إلغاء</button>'
+      );
+      setTimeout(()=>{
+        const saveBtn = document.getElementById("qsSaveBtn");
+        if(saveBtn){
+          saveBtn.onclick = ()=>{
+            const en = document.getElementById("qsBioStudent")?.checked ? "1" : "0";
+            localStorage.setItem(BIO.keys.studentEnabled, en);
+
+            const more = document.getElementById("qsRouletteMore")?.checked;
+            const v = more ? "3" : "1";
+            localStorage.setItem("MB_ROULETTE_GOLD_MAX", v);
+            localStorage.setItem("MB_ROULETTE_DIAMOND_MAX", v);
+            localStorage.setItem("MB_ROULETTE_ALMASI_MAX", v);
+
+            toast("✅ تم حفظ الإعدادات");
+            closeModal();
+            try{ renderRoulettePane(); }catch(e){}
+          };
+        }
+      }, 30);
+    }
+
     function isBioUnlocked(role){
       const key = (role==="teacher") ? BIO.keys.unlockedTeacher : BIO.keys.unlockedStudent;
       return sessionStorage.getItem(key) === "1";
@@ -1437,6 +1499,9 @@
       if(localStorage.getItem(BIO.keys.studentEnabled) === null){
         localStorage.setItem(BIO.keys.studentEnabled, "0");
       }
+      if(localStorage.getItem("MB_ROULETTE_GOLD_MAX") === null) localStorage.setItem("MB_ROULETTE_GOLD_MAX","1");
+      if(localStorage.getItem("MB_ROULETTE_DIAMOND_MAX") === null) localStorage.setItem("MB_ROULETTE_DIAMOND_MAX","1");
+      if(localStorage.getItem("MB_ROULETTE_ALMASI_MAX") === null) localStorage.setItem("MB_ROULETTE_ALMASI_MAX","1");
 
       // إذا دخلنا بوضع المعلمة/الطالب و القفل مطلوب -> نطلب البصمة
       const role = IS_STUDENT_ENTRY ? "student" : "teacher";
@@ -3924,8 +3989,37 @@ document.addEventListener("DOMContentLoaded", async()=>{
     }
 
     function rouletteStorageKey(studentId){
+      // آخر جائزة محفوظة لهذا الطالب في هذا الأسبوع
       return `mb_roulette_${studentId}_${weekKey()}`;
     }
+    function rouletteCountKey(studentId){
+      // عدد مرات التدوير لهذا الطالب في هذا الأسبوع
+      return `mb_roulette_count_${studentId}_${weekKey()}`;
+    }
+    function rouletteMaxSpinsForTier(tierText){
+      const t = String(tierText||"");
+      // ✅ الذهبي / الماسي / الألماسي: فرصة واحدة أسبوعيًا افتراضيًا (قابلة للزيادة من إعدادات المعلمة)
+      // ملاحظة: "ألماسي" يحتوي "ماسي" لذا نتحقق منه أولًا.
+      if(t.includes("ألماسي")){
+        const v = parseInt(localStorage.getItem("MB_ROULETTE_ALMASI_MAX")||"1",10);
+        return (Number.isFinite(v) && v>0) ? v : 1;
+      }
+      if(t.includes("ماسي")){
+        const v = parseInt(localStorage.getItem("MB_ROULETTE_DIAMOND_MAX")||"1",10);
+        return (Number.isFinite(v) && v>0) ? v : 1;
+      }
+      if(t.includes("ذهبي")){
+        const v = parseInt(localStorage.getItem("MB_ROULETTE_GOLD_MAX")||"1",10);
+        return (Number.isFinite(v) && v>0) ? v : 1;
+      }
+      // غير ذلك (حتى لو ظهر التبويب) لا توجد فرص
+      return 0;
+    }
+
+      // ✅ الذهبي / الماسي: بدون حد (مفتوح)
+      return 9999;
+    }
+
 
     
     // ===== Roulette wheel rendering (visual spin) =====
@@ -3996,7 +4090,9 @@ function renderRoulettePane(){
 
       const tier = calcTier(currentStudentObj.balance);
       const eligible = tierEligible(tier);
-      tab.style.display = eligible ? "" : "none";
+
+      // ✅ يظهر التبويب لكل الطلاب، لكن التفعيل حسب المستوى
+      tab.style.display = "";
 
       const status=$("rouletteStatus");
       const hint=$("rouletteHint");
@@ -4004,8 +4100,13 @@ function renderRoulettePane(){
       const resBox=$("rouletteResultBox");
       const res=$("rouletteResult");
 
-      const k = rouletteStorageKey(currentStudentObj.id||currentStudentId);
-      const saved = localStorage.getItem(k);
+      const sid = currentStudentObj.id||currentStudentId;
+      const lastKey = rouletteStorageKey(sid);
+      const countKey = rouletteCountKey(sid);
+
+      const lastPrize = localStorage.getItem(lastKey) || "";
+      const count = parseInt(localStorage.getItem(countKey)||"0",10) || 0;
+      const maxSpins = rouletteMaxSpinsForTier(tier);
 
       // ensure wheel reflects current prizes
       try{ buildRouletteWheel(loadRoulettePrizes()); }catch(e){}
@@ -4013,25 +4114,35 @@ function renderRoulettePane(){
       if(!eligible){
         if(status) status.textContent="غير متاح";
         if(hint) hint.textContent="الروليت متاح للحسابات: ذهبي / ماسي / ألماسي فقط.";
-        if(btn) btn.disabled=true;
+        if(btn){ btn.disabled=true; btn.textContent="تدوير الآن"; }
         if(resBox) resBox.style.display="none";
         return;
       }
 
-      if(saved){
-        const prize = saved;
-        if(status) status.textContent="✅ تم التدوير";
-        if(btn) btn.disabled=true;
-        if(resBox){ resBox.style.display="block"; }
-        if(res) res.textContent = prize;
+      // ✅ الذهبي / الماسي / الألماسي محدود بعدد فرص (افتراضيًا 1 أسبوعيًا، قابل للزيادة من إعدادات المعلمة)
+      if(maxSpins !== 9999 && count >= maxSpins){
+        if(status) status.textContent="تم استهلاك الفرصة";
+        if(hint) hint.textContent=`الحساب ${tier}: تم استخدام (${count}/${maxSpins}) لهذا الأسبوع.`;
+        if(btn){ btn.disabled=true; btn.textContent="تدوير الآن"; }
       }else{
-        if(status) status.textContent="🎯 فرصة واحدة";
-        if(btn) btn.disabled=false;
+        if(status) status.textContent = (count>0) ? "✅ تم التدوير" : "جاهز";
+        if(hint){
+          if(maxSpins===9999) hint.textContent="يمكنك التدوير والحصول على هدية تحفيزية 🎁";
+          else hint.textContent=`الحساب ${tier}: المتبقي (${Math.max(0,maxSpins-count)}) لهذا الأسبوع.`;
+        }
+        if(btn){ btn.disabled=false; btn.textContent="تدوير الآن"; }
+      }
+
+      if(lastPrize){
+        if(resBox){ resBox.style.display="block"; }
+        if(res) res.textContent = lastPrize;
+      }else{
         if(resBox) resBox.style.display="none";
       }
     }
 
-    async function spinRoulette(){
+
+function spinRoulette(){
       try{
         if(!currentStudentObj) return;
 
@@ -4042,16 +4153,21 @@ function renderRoulettePane(){
         }
 
         const sid = currentStudentObj.id || currentStudentId;
-        const k = rouletteStorageKey(sid);
-        const already = localStorage.getItem(k);
-        if(already){
-          renderRoulettePane();
-          return;
-        }
+        const lastKey = rouletteStorageKey(sid);
+        const countKey = rouletteCountKey(sid);
 
         const prizes = loadRoulettePrizes();
         if(!prizes.length){
           openModal("تنبيه", `<div class="small">لا توجد جوائز في إعدادات الروليت.</div>`, '<button class="btn" onclick="closeModal()">موافق</button>');
+          return;
+        }
+
+        // ✅ حد الفرص (الذهبي / الماسي / الألماسي)
+        const maxSpins = rouletteMaxSpinsForTier(tier);
+        const count = parseInt(localStorage.getItem(countKey)||"0",10) || 0;
+        if(maxSpins !== 9999 && count >= maxSpins){
+          openModal("تنبيه", `<div class="small">تم استهلاك فرص الروليت لهذا الأسبوع للحساب الألماسي.</div>`, '<button class="btn" onclick="closeModal()">موافق</button>');
+          renderRoulettePane();
           return;
         }
 
@@ -4060,36 +4176,45 @@ function renderRoulettePane(){
         if(btn){ btn.disabled=true; btn.textContent="جارِ التدوير…"; }
         buildRouletteWheel(prizes);
 
-        const n = prizes.length;
-        const idx = pickRouletteIndex(n);
-        const {done} = animateRouletteTo(idx, n);
-        await done;
-
+        // deterministic-ish random
+        const idx = Math.floor(Math.random()*prizes.length);
         const prize = prizes[idx];
-        localStorage.setItem(k, prize);
 
-        // optional: persist to Firebase (light write only)
-        try{
-          if(window.db && sid){
-            await db.collection("students").doc(sid).set({
-              roulette:{ week: weekKey(), prize, at: Date.now() }
-            }, {merge:true});
-          }
-        }catch(e){}
+        // animate wheel rotation
+        const wheel = $("rouletteWheel");
+        const n = Math.max(1, prizes.length);
+        const step = 360/n;
+        const target = (idx*step) + (step/2);
+        const spins = 6 + Math.floor(Math.random()*4);
+        const deg = spins*360 + (360 - target);
+        if(wheel){
+          wheel.style.transition = "transform 3.2s cubic-bezier(.12,.85,.18,1)";
+          wheel.style.transform = `rotate(${deg}deg)`;
+        }
 
-        // celebration
-        try{ playSuccess(); launchCelebration(); }catch(e){}
+        // after animation
+        setTimeout(()=>{
+          try{
+            // حفظ آخر جائزة + زيادة العدّاد
+            localStorage.setItem(lastKey, String(prize));
+            localStorage.setItem(countKey, String(count+1));
 
-        openModal("🎉 مبروك!", `<div style="font-size:18px;font-weight:1000;line-height:1.9">فزت بـ: <span style="color:#0b2a66">${escapeHtml(prize)}</span></div>`, '<button class="btn" onclick="closeModal()">رائع!</button>');
+            const resBox=$("rouletteResultBox");
+            const res=$("rouletteResult");
+            if(resBox) resBox.style.display="block";
+            if(res) res.textContent = prize;
 
-        if(btn){ btn.textContent="تدوير الآن"; }
-        renderRoulettePane();
+            toast("🎁 مبروك! تم اختيار جائزتك");
+          }catch(e){}
+          if(btn){ btn.disabled=false; btn.textContent="تدوير الآن"; }
+          renderRoulettePane();
+        }, 3300);
+
       }catch(e){
-        const btn = $("spinBtn");
-        if(btn){ btn.disabled=false; btn.textContent="تدوير الآن"; }
-        openModal("تنبيه", `<div class="small">صار خطأ… جرّبي مرة ثانية.</div>`, '<button class="btn" onclick="closeModal()">موافق</button>');
+        try{ toast("حدث خطأ في الروليت"); }catch(_){}
       }
     }
+
 
     function initHonorRouletteUI(arr){
       // init roulette prizes textarea
