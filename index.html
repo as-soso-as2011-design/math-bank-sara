@@ -1481,48 +1481,70 @@
       const multiOn = (localStorage.getItem(ROULETTE_MULTI_KEY) === "1");
       const body = `
         <div class="small" style="line-height:1.9;color:#47607e">هذه الإعدادات تؤثر فورًا على الطلاب المؤهلين (ذهبي/ماسي/ألماسي).</div>
-        <div class="card soft" style="margin-top:10px">
-          <label style="display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer">
+
+        <div id="qsBioCard" class="card soft" style="margin-top:10px;cursor:pointer" role="button" tabindex="0">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
             <div>
               <div style="font-weight:1000;color:#0b2a66">🔒 قفل الطالب بالبصمة (اختياري)</div>
               <div class="small" style="margin-top:4px;color:#47607e">إذا فُعّل، سيطلب FaceID/TouchID عند دخول الطالب على نفس الجهاز.</div>
             </div>
-            <input id="bioStudentToggleQuick" type="checkbox" style="transform:scale(1.15)">
-          </label>
+            <div id="qsBioState" class="pill" style="white-space:nowrap"></div>
+          </div>
         </div>
-        <div class="card soft" style="margin-top:10px">
-          <label style="display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer">
+
+        <div id="qsRouletteCard" class="card soft" style="margin-top:10px;cursor:pointer" role="button" tabindex="0">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
             <div>
               <div style="font-weight:1000;color:#0b2a66">🎡 إتاحة أكثر من فرصة للروليت أسبوعيًا</div>
               <div class="small" style="margin-top:4px;color:#47607e">افتراضيًا: فرصة واحدة. عند التفعيل: 3 فرص أسبوعيًا.</div>
             </div>
-            <input id="rouletteMultiToggleQuick" type="checkbox" style="transform:scale(1.15)">
-          </label>
+            <div id="qsRouletteState" class="pill" style="white-space:nowrap"></div>
+          </div>
         </div>
+
+        <div class="small" style="margin-top:10px;color:#6b7f99">اضغطي على البطاقة للتفعيل/الإيقاف.</div>
       `;
       openModal("⚙️ إعدادات الفصول", body, '<button class="btn" onclick="closeModal()">تم</button>');
+
       setTimeout(()=>{
-        const bioEl = document.getElementById("bioStudentToggleQuick");
-        if(bioEl){
-          bioEl.checked = bioOn;
-          bioEl.addEventListener("change", ()=>{
-            localStorage.setItem(BIO.keys.studentEnabled, bioEl.checked ? "1":"0");
-            if(bioEl.checked){ try{ sessionStorage.removeItem(BIO.keys.unlockedStudent); }catch(e){} }
-            toast(bioEl.checked ? "تم تفعيل قفل الطالب بالبصمة ✅" : "تم إيقاف قفل الطالب بالبصمة ✅");
-          });
+        const statePill = (on)=> on
+          ? '<span class="badge" style="background:#e8fff0;color:#177a36;border:1px solid #b7f0c7;font-weight:900">مفعّل</span>'
+          : '<span class="badge" style="background:#fff3f3;color:#8a1f1f;border:1px solid #f1c0c0;font-weight:900">غير مفعّل</span>';
+
+        const qsBioState = document.getElementById("qsBioState");
+        const qsRouletteState = document.getElementById("qsRouletteState");
+        if(qsBioState) qsBioState.innerHTML = statePill(bioOn);
+        if(qsRouletteState) qsRouletteState.innerHTML = statePill(multiOn);
+
+        const toggleBio = ()=>{
+          const now = !(localStorage.getItem(BIO.keys.studentEnabled) === "1");
+          localStorage.setItem(BIO.keys.studentEnabled, now ? "1":"0");
+          if(now){ try{ sessionStorage.removeItem(BIO.keys.unlockedStudent); }catch(e){} }
+          if(qsBioState) qsBioState.innerHTML = statePill(now);
+          toast(now ? "تم تفعيل قفل الطالب بالبصمة ✅" : "تم إيقاف قفل الطالب بالبصمة ✅");
+        };
+
+        const toggleMulti = ()=>{
+          const now = !(localStorage.getItem(ROULETTE_MULTI_KEY) === "1");
+          localStorage.setItem(ROULETTE_MULTI_KEY, now ? "1":"0");
+          if(qsRouletteState) qsRouletteState.innerHTML = statePill(now);
+          toast(now ? "تم تفعيل 3 فرص أسبوعيًا للروليت ✅" : "تم ضبط الروليت على فرصة واحدة أسبوعيًا ✅");
+          try{ renderRoulettePane(); }catch(e){}
+        };
+
+        const bioCard = document.getElementById("qsBioCard");
+        if(bioCard){
+          bioCard.onclick = toggleBio;
+          bioCard.onkeydown = (e)=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); toggleBio(); } };
         }
-        const mulEl = document.getElementById("rouletteMultiToggleQuick");
-        if(mulEl){
-          mulEl.checked = multiOn;
-          mulEl.addEventListener("change", ()=>{
-            localStorage.setItem(ROULETTE_MULTI_KEY, mulEl.checked ? "1":"0");
-            toast(mulEl.checked ? "تم تفعيل 3 فرص أسبوعيًا للروليت ✅" : "تم ضبط الروليت على فرصة واحدة أسبوعيًا ✅");
-            // تحديث واجهة الطالب لو كانت مفتوحة
-            try{ renderRoulettePane(); }catch(e){}
-          });
+        const rouletteCard = document.getElementById("qsRouletteCard");
+        if(rouletteCard){
+          rouletteCard.onclick = toggleMulti;
+          rouletteCard.onkeydown = (e)=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); toggleMulti(); } };
         }
       }, 0);
     }
+
 
 
     // بعد تحميل الصفحة اربط واجهة الإعدادات (إن وجدت)
