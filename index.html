@@ -582,6 +582,22 @@
         </div>
       </div>
 
+
+      <div class="card soft">
+        <h3 style="margin:0 0 8px 0;color:#0b2a66">🔒 إعدادات قفل البصمة</h3>
+        <div class="small" style="margin-bottom:10px;line-height:1.8">
+          • قفل <b>المعلمة</b> بالبصمة: <b>مفعل دائمًا</b> لحماية البيانات.<br>
+          • قفل <b>الطالب</b> بالبصمة: اختياري (لتجنب إلزام كل طالبة بتفعيل بصمة على جهازها).
+        </div>
+        <label class="small" style="display:flex;gap:10px;align-items:center">
+          <input type="checkbox" id="bioStudentToggle" style="width:auto">
+          تفعيل قفل الطالب بالبصمة (اختياري)
+        </label>
+        <div class="small" style="margin-top:8px;color:#57606a">
+          ملاحظة: عند تفعيل قفل الطالب على هذا الجهاز لأول مرة قد يطلب المتصفح "تفعيل البصمة" (Passkey) مرة واحدة.
+        </div>
+      </div>
+
       <div class="card soft">
         <div class="row">
           <div class="col">
@@ -1401,7 +1417,10 @@
     }
 
     function isBioLockEnabled(role){
-      const key = (role==="teacher") ? BIO.keys.teacherEnabled : BIO.keys.studentEnabled;
+      // ✅ قفل المعلمة دائمًا (لا يمكن تعطيله)
+      if(role==="teacher") return true;
+      // ✅ قفل الطالب اختياري من إعدادات المعلمة
+      const key = BIO.keys.studentEnabled;
       return localStorage.getItem(key) === "1";
     }
     function isBioUnlocked(role){
@@ -1411,13 +1430,15 @@
 
     // عند فتح الصفحة: لو القفل مفعل لهذا الوضع، نطلب البصمة قبل التفاعل
     window.addEventListener("DOMContentLoaded", () => {
-      // افتراضيًا: قفل المعلمة مفعل لحمايتها (يمكن تعطيله من localStorage)
-      if(localStorage.getItem(BIO.keys.teacherEnabled) === null){
-        localStorage.setItem(BIO.keys.teacherEnabled, "1");
-      }
+      // ✅ قفل المعلمة دائمًا
+      localStorage.setItem(BIO.keys.teacherEnabled, "1");
+
+      // ✅ قفل الطالب اختياري — افتراضيًا غير مفعل حتى لا نلزم كل طالبة بتفعيل بصمة
       if(localStorage.getItem(BIO.keys.studentEnabled) === null){
-        localStorage.setItem(BIO.keys.studentEnabled, "1");
+        localStorage.setItem(BIO.keys.studentEnabled, "0");
       }
+
+      // إذا دخلنا بوضع المعلمة/الطالب و القفل مطلوب -> نطلب البصمة
       const role = IS_STUDENT_ENTRY ? "student" : "teacher";
       if(isBioLockEnabled(role) && !isBioUnlocked(role)){
         showBioLock(role);
@@ -1425,6 +1446,28 @@
     });
 
 
+
+
+    
+    // ربط خيار قفل الطالب (اختياري) داخل إعدادات المعلمة
+    function wireBioStudentToggle(){
+      const el = document.getElementById("bioStudentToggle");
+      if(!el) return;
+      el.checked = (localStorage.getItem(BIO.keys.studentEnabled) === "1");
+      el.addEventListener("change", () => {
+        localStorage.setItem(BIO.keys.studentEnabled, el.checked ? "1" : "0");
+        // عند تفعيل قفل الطالب: نخليه يطلب البصمة عند أول دخول لاحقًا
+        if(el.checked){
+          try{ sessionStorage.removeItem(BIO.keys.unlockedStudent); }catch(e){}
+        }
+        toast(el.checked ? "تم تفعيل قفل الطالب بالبصمة ✅" : "تم إيقاف قفل الطالب بالبصمة ✅");
+      });
+    }
+
+    // بعد تحميل الصفحة اربط واجهة الإعدادات (إن وجدت)
+    window.addEventListener("DOMContentLoaded", () => {
+      wireBioStudentToggle();
+    });
 
 
     const SIGNATURE = "المعلمة: سارة حقوي";
