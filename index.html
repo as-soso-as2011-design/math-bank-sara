@@ -5,6 +5,53 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
   <title>بنك الرياضيات – المصرفي للمعلمة سارة حقوي</title>
 
+<script>
+/* StartApp Main Router (very early, independent of Firebase/other scripts)
+   ensures زر "ابدأ الآن" ينقلك لصفحة الدخول حتى لو تعطل باقي الجافاسكربت. */
+(function(){
+  function getMode(){
+    try{
+      var u=new URL(location.href);
+      var m=(u.searchParams.get("mode")||"").toLowerCase();
+      return (m==="student"||m==="teacher") ? m : "";
+    }catch(e){ return ""; }
+  }
+  function showOnly(id){
+    var ids=["startOverlay","onboardOverlay","teacherLoginPage","studentLoginPage","classesPage","classPage","studentAccountPage","dailyOpsPage"];
+    ids.forEach(function(x){
+      var el=document.getElementById(x);
+      if(!el) return;
+      if(x===id){
+        el.classList.remove("hidden");
+        el.style.display="";
+      }else{
+        el.classList.add("hidden");
+        if(x==="startOverlay") el.style.display="";
+      }
+    });
+  }
+  window.startAppMain=function(){
+    try{
+      var mode=getMode();
+      window.currentAccess = (mode==="student") ? "student" : "teacher";
+      // اخفاء شاشة البداية
+      var so=document.getElementById("startOverlay");
+      if(so){ so.classList.add("hidden"); so.style.display="none"; }
+      // فتح صفحة الدخول المناسبة
+      showOnly((mode==="student") ? "studentLoginPage" : "teacherLoginPage");
+    }catch(err){
+      alert("حدث خطأ في بدء النظام. جرّبي تحديث الصفحة ثم المحاولة مرة أخرى.");
+    }
+  };
+  document.addEventListener("DOMContentLoaded", function(){
+    try{
+      var btn=document.querySelector('#startOverlay button');
+      if(btn){ btn.onclick=function(ev){ ev.preventDefault(); window.startAppMain(); }; }
+    }catch(e){}
+  });
+})();
+</script>
+
   <style>
     :root{
       --navy:#00205B; --rajhi:#0055A4; --sky:#EAF3FB; --sky2:#CFE6F7; --beige:#FAF9F7;
@@ -374,7 +421,7 @@
         </div>
 
         <div class="startActions">
-          <button class="btn" onclick="startApp()">ابدأ الآن</button>
+          <button class="btn" onclick="startAppMain()">ابدأ الآن</button>
           <button class="ghostBtn" onclick="openHelp()">هل تحتاج إلى مساعدة؟</button>
         </div>
       </div>
