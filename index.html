@@ -1207,8 +1207,7 @@
 
   <script>
     const urlParams = new URLSearchParams(window.location.search);
-    const forcedStudent = (urlParams.get("student")==="1" || urlParams.get("s")==="1" || (window.location.hash||"").toLowerCase().includes("student"));
-const APP_MODE = ((urlParams.get("mode") || (forcedStudent?"student":"") ) || localStorage.getItem("MB_LAST_MODE") || "teacher").toLowerCase();
+    const APP_MODE = (urlParams.get("mode") || localStorage.getItem("MB_LAST_MODE") || "teacher").toLowerCase();
     const IS_STUDENT_ENTRY = (APP_MODE === "student");
 
     const SIGNATURE = "المعلمة: سارة حقوي";
@@ -1842,30 +1841,7 @@ ${SIGNATURE}`;
       updateSelCount();
     }
 
-    async 
-    async function deleteStudentFromClass(s){
-      try{
-        if(!s || !s.id) return;
-        const ok = confirm(`تأكيد حذف الطالب/ـة: ${s.name||""}\n\nسيتم حذف بياناته من هذا الفصل (لا يمكن التراجع).`);
-        if(!ok) return;
-        // حذف الطالب
-        await db.collection("students").doc(s.id).delete();
-        // محاولة حذف سجلات العمليات إن كانت موجودة (اختياري)
-        try{
-          const opsSnap = await db.collection("ops").where("studentId","==",s.id).get();
-          const batch = db.batch();
-          opsSnap.forEach(d=>batch.delete(d.ref));
-          if(opsSnap.size) await batch.commit();
-        }catch(e){}
-        alert("تم حذف الطالب بنجاح.");
-        await renderStudents();
-      }catch(err){
-        console.error(err);
-        alert("تعذر حذف الطالب. تأكدي من الاتصال ثم أعيدي المحاولة.");
-      }
-    }
-
-function renderStudents(){
+    async function renderStudents(){
       const snap = await db.collection("students").where("classId","==",currentClassId).get();
       const arr=[]; snap.forEach(d=>arr.push({id:d.id,...d.data()}));
       arr.sort((a,b)=>(a.name||"").localeCompare(b.name||"","ar"));
@@ -1927,7 +1903,6 @@ function renderStudents(){
             <button class="btn3 col js-edit">تعديل الاسم</button>
             <button class="btn3 col js-phone">📞 رقم ولي الأمر</button>
             <button class="btn3 col js-pin">🔐 تغيير PIN</button>
-            <button class="btnRed col js-del">🗑️ حذف الطالب</button>
             <button class="whatsapp-btn col js-sendpin">📲 إرسال PIN</button>
             <button class="btn2 col js-pdf">تقرير PDF</button>
 
@@ -3756,11 +3731,9 @@ function renderRoulettePane(){
     }
 
     function computeWeekStats(student){
-      // قراءة نقاط الأسبوع إن وُجدت، وإلا نرجع لأقرب حقل شائع (points/balance)
-      const weekPoints = Number(
-        student.weekPoints ?? student.pointsWeek ?? student.weeklyPoints ?? student.points ?? student.balance ?? 0
-      );
-      const ops = Number(student.weekOps ?? student.weekCount ?? student.opsWeek ?? student.ops ?? 0);
+      // Try read cached week stats if present; fallback: 0
+      const weekPoints = Number(student.weekPoints||student.pointsWeek||0);
+      const ops = Number(student.weekOps||student.weekCount||student.opsWeek||0);
       return {weekPoints, ops};
     }
 
@@ -3902,7 +3875,7 @@ function renderRoulettePane(){
               <div style="font-weight:1000;color:#0b2a66">${medals[i]} ${escapeHtml(r.name)}</div>
               <div class="badge on">${Number(r.weekPoints||0)} نقطة</div>
             </div>
-            <div class="small" style="margin-top:6px;color:#47607e">نقاط الأسبوع: <b>${Number(r.weekPoints||0)}</b></div>
+            <div class="small" style="margin-top:6px;color:#47607e">نقاط الأسبوع</div>
           </div>
         `).join("");
 
