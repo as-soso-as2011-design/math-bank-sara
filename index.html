@@ -1839,13 +1839,22 @@ ${SIGNATURE}`;
     async function deleteStudentConfirm(studentId, studentName){
       if(!studentId) return;
       const name = (studentName||"هذا الطالب/الطالبة");
-      openModal("تأكيد الحذف","هل تريدين حذف <b>"+escapeHtml(name)+"</b> نهائيًا؟<div class='small' style='margin-top:6px;color:#6b7b8f'>* سيتم حذف حساب الطالب من هذا الفصل. لا يمكن التراجع.</div>",
-        "<div class='row' style='gap:10px;justify-content:flex-end'>"+
-          "<button class='btn3' onclick='closeModal()'>إلغاء</button>"+
-          "<button class='btnRed' onclick='__doDeleteStudent(""+studentId+"")'>حذف</button>"+
-        "</div>"
+      openModal(
+        "تأكيد الحذف",
+        "هل تريدين حذف <b>"+escapeHtml(name)+"</b> نهائيًا؟"
+        + "<div class='small' style='margin-top:6px;color:#6b7b8f'>* سيتم حذف حساب الطالب من هذا الفصل. لا يمكن التراجع.</div>",
+        "<div class='row' style='gap:10px;justify-content:flex-end'>"
+          + "<button class='btn3' onclick='closeModal()'>إلغاء</button>"
+          + "<button class='btnRed' id='confirmDeleteBtn'>حذف</button>"
+        + "</div>"
       );
+      // اربطي الزر بعد فتح النافذة لتفادي مشاكل الاقتباسات
+      setTimeout(()=>{
+        const b = document.getElementById("confirmDeleteBtn");
+        if(b) b.onclick = ()=> __doDeleteStudent(String(studentId));
+      },0);
     }
+
     async function __doDeleteStudent(studentId){
       try{
         closeModal();
