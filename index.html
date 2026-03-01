@@ -518,6 +518,26 @@
           <div class="forgotRow">
             <a href="javascript:void(0)" id="forgotPinLink">نسيت الرقم السري؟</a>
             <span class="small"></span>
+            <a href="javascript:void(0)" id="changeStudentPassLink">تغيير كلمة المرور</a>
+          </div>
+
+          <div id="studentPassPanel" class="hidden" style="margin-top:10px;padding:12px;border-radius:14px;background:#f4f6f9;border:1px solid #e1e6ef">
+            <div class="small" style="color:#47607e;margin-bottom:8px">غيّري كلمة المرور من هنا (حروف + أرقام). يلزم إدخال الاسم وكلمة المرور الحالية بالأعلى.</div>
+            <div class="row">
+              <div class="col">
+                <div class="small">كلمة المرور الجديدة</div>
+                <input id="stuNewPinLogin" type="password" inputmode="text" maxlength="16" placeholder="مثال: Sara2026" autocomplete="new-password"/>
+              </div>
+              <div class="col">
+                <div class="small">تأكيد كلمة المرور</div>
+                <input id="stuNewPinLogin2" type="password" inputmode="text" maxlength="16" placeholder="أعيدي كتابة كلمة المرور" autocomplete="new-password"/>
+              </div>
+            </div>
+            <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:10px;flex-wrap:wrap">
+              <button class="btn2" type="button" onclick="clearStudentPassLogin()">مسح</button>
+              <button class="btn" type="button" onclick="saveStudentNewPinFromLogin()">حفظ</button>
+            </div>
+            <div class="small" id="stuPassLoginMsg" style="margin-top:8px;color:#47607e"></div>
           </div>
 
           <div class="row" style="margin-top:12px">
@@ -1164,29 +1184,6 @@
             <div class="cardHint" style="margin-top:12px">⚠️ حافظ على بطاقتك وبياناتك ولا تُظهر الرقم السري للآخرين.</div>
           </div>
 
-            <div class="card soft" style="margin-top:12px">
-              <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
-                <div>
-                  <div style="font-weight:1000;color:#0b2a66">🔒 تغيير كلمة المرور</div>
-                  <div class="small" style="margin-top:4px;color:#47607e">اختاري كلمة مرور جديدة (حروف + أرقام) ثم احفظيها. سيتم تحديثها تلقائيًا في صفحة المعلمة.</div>
-                </div>
-              </div>
-              <div class="row" style="margin-top:10px">
-                <div class="col">
-                  <div class="small">كلمة المرور الجديدة</div>
-                  <input id="stuNewPin" type="password" inputmode="text" maxlength="16" placeholder="مثال: Sara2026" autocomplete="new-password">
-                </div>
-                <div class="col">
-                  <div class="small">تأكيد كلمة المرور</div>
-                  <input id="stuNewPin2" type="password" inputmode="text" maxlength="16" placeholder="أعيدي كتابة كلمة المرور" autocomplete="new-password">
-                </div>
-              </div>
-              <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:10px;flex-wrap:wrap">
-                <button class="btn2" onclick="clearStudentPinFields()">مسح</button>
-                <button class="btn" onclick="saveStudentNewPin()">حفظ</button>
-              </div>
-              <div class="small" id="stuPinMsg" style="margin-top:8px;color:#47607e"></div>
-            </div>
         </div>
 
       </div>
@@ -2354,6 +2351,59 @@ document.addEventListener("DOMContentLoaded", async()=>{
       if(!/[0-9]/.test(s)) return false;
       return true;
     }
+
+    // تغيير كلمة المرور من صفحة دخول الطالب (قبل الدخول)
+    function clearStudentPassLogin(){
+      const a = document.getElementById("stuNewPinLogin");
+      const b = document.getElementById("stuNewPinLogin2");
+      const msg = document.getElementById("stuPassLoginMsg");
+      if(a) a.value="";
+      if(b) b.value="";
+      if(msg) msg.textContent="";
+    }
+
+    async function saveStudentNewPinFromLogin(){
+      try{
+        const name = (document.getElementById("stuName")?.value || "").trim();
+        const oldPin = (document.getElementById("stuPin")?.value || "").trim();
+        const p1 = (document.getElementById("stuNewPinLogin")?.value || "").trim();
+        const p2 = (document.getElementById("stuNewPinLogin2")?.value || "").trim();
+        const msg = document.getElementById("stuPassLoginMsg");
+
+        if(!name || !oldPin) return warn("اكتب/ي الاسم وكلمة المرور الحالية أولًا.");
+        if(!isValidStudentPassword(p1)) return warn("كلمة المرور لازم تكون من 6 إلى 16 (حروف وأرقام معًا)");
+        if(p1 !== p2) return warn("التأكيد غير مطابق");
+
+        const snap = await db.collection("students").where("name","==",name).limit(1).get();
+        if(snap.empty) return warn("الاسم غير مسجل بالنظام");
+        const doc = snap.docs[0];
+        const s = doc.data() || {};
+        if(!s.active) return warn("الحساب مقفل");
+        if(String(oldPin) !== String(s.pin||"")) return warn("كلمة المرور الحالية غير صحيحة");
+
+        await db.collection("students").doc(doc.id).update({pin:p1});
+
+        if(msg) msg.textContent = "تم حفظ كلمة المرور بنجاح ✅";
+        warn("تم تغيير كلمة المرور بنجاح ✅");
+        // إخفاء اللوحة بعد النجاح
+        const panel = document.getElementById("studentPassPanel");
+        if(panel) panel.classList.add("hidden");
+      }catch(e){
+        console.log(e);
+        warn("تعذر حفظ كلمة المرور الآن. جرّبي مرة أخرى.");
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", ()=>{
+      const link = document.getElementById("changeStudentPassLink");
+      if(link){
+        link.addEventListener("click", ()=>{
+          const panel = document.getElementById("studentPassPanel");
+          if(panel) panel.classList.toggle("hidden");
+        });
+      }
+    });
+
 
 // تغيير كلمة المرور من داخل صفحة الطالب (بعد تسجيل الدخول) — بدون الرجوع للمعلمة
     function clearStudentPinFields(){
