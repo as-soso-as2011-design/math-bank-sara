@@ -58,14 +58,20 @@
       background:rgba(255,255,255,.06);backdrop-filter: blur(10px);
     }
     .footerLinks a{
+      color:var(--navy);
       text-decoration:none;
       font-weight:900;font-size:13px;
       opacity:.95;
       padding:8px 10px;border-radius:12px;
       border:1px solid rgba(255,255,255,.10);
-      background:rgba(0,0,0,.08);
+      background:#d9d9d9;
     }
-    .footerNote{
+    
+    .footerLinks a:hover{
+      background:#cfcfcf;
+      color:var(--navy);
+    }
+.footerNote{
       margin-top:10px;text-align:center;font-weight:900;letter-spacing:.2px;
     }
 
@@ -1865,7 +1871,7 @@ ${SIGNATURE}`;
       }
     }
 
-function renderStudents(){
+async function renderStudents(){
       const snap = await db.collection("students").where("classId","==",currentClassId).get();
       const arr=[]; snap.forEach(d=>arr.push({id:d.id,...d.data()}));
       arr.sort((a,b)=>(a.name||"").localeCompare(b.name||"","ar"));
