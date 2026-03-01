@@ -1212,6 +1212,220 @@
     window.APP_MODE = APP_MODE;
     window.IS_STUDENT_ENTRY = IS_STUDENT_ENTRY;
 
+    // =========================
+    // Biometric (Passkey) Lock
+    // =========================
+    // ملاحظة: هذا قفل "بصمة" عبر WebAuthn (Passkeys) يعمل على الأجهزة الداعمة (FaceID/TouchID/بصمة أندرويد).
+    // لأنه مشروع static بدون خادم، نستخدمه كبوابة وصول محلية على نفس الجهاز/المتصفح.
+    const BIO = {
+      supported: (window.PublicKeyCredential && typeof PublicKeyCredential === "function"),
+      keys: {
+        teacherId: "MB_WEBAUTHN_TEACHER_ID",
+        studentId: "MB_WEBAUTHN_STUDENT_ID",
+        teacherEnabled: "MB_BIOLOCK_TEACHER_ENABLED",
+        studentEnabled: "MB_BIOLOCK_STUDENT_ENABLED",
+        unlockedTeacher: "MB_BIOLOCK_UNLOCKED_TEACHER",
+        unlockedStudent: "MB_BIOLOCK_UNLOCKED_STUDENT"
+      }
+    };
+
+    function b64urlToBytes(b64url){
+      try{
+        const pad = "=".repeat((4 - (b64url.length % 4)) % 4);
+        const b64 = (b64url + pad).replace(/-/g, "+").replace(/_/g, "/");
+        const raw = atob(b64);
+        const bytes = new Uint8Array(raw.length);
+        for(let i=0;i<raw.length;i++) bytes[i]=raw.charCodeAt(i);
+        return bytes;
+      }catch(e){ return null; }
+    }
+    function bytesToB64url(bytes){
+      let s = "";
+      bytes.forEach(b => s += String.fromCharCode(b));
+      const b64 = btoa(s).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+      return b64;
+    }
+    function randBytes(n=32){
+      const a = new Uint8Array(n);
+      crypto.getRandomValues(a);
+      return a;
+    }
+
+    function ensureBioLockUI(){
+      if(document.getElementById("bioLockOverlay")) return;
+      const overlay = document.createElement("div");
+      overlay.id = "bioLockOverlay";
+      overlay.style.cssText = "position:fixed;inset:0;z-index:99999;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.45);padding:18px;";
+      overlay.innerHTML = `
+        <div style="max-width:520px;width:100%;background:#fff;border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.25);overflow:hidden">
+          <div style="background:linear-gradient(135deg,#00205B,#0055A4);color:#fff;padding:14px 16px;font-weight:800;font-size:18px">🔒 قفل البصمة</div>
+          <div style="padding:16px 16px 6px;color:#1b1f23;line-height:1.8">
+            <div id="bioLockDesc" style="font-weight:700;margin-bottom:6px"></div>
+            <div id="bioLockHint" style="font-size:13px;color:#57606a"></div>
+            <div id="bioLockErr" style="display:none;margin-top:10px;color:#b00020;font-weight:700;font-size:13px"></div>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;padding:12px 16px 16px">
+            <button id="bioLockUnlockBtn" style="flex:1;min-width:160px;border:none;border-radius:12px;padding:12px 14px;background:#00205B;color:#fff;font-weight:800;cursor:pointer">فتح بالبصمة</button>
+            <button id="bioLockEnrollBtn" style="flex:1;min-width:160px;border:none;border-radius:12px;padding:12px 14px;background:#EAF3FB;color:#00205B;font-weight:800;cursor:pointer">تفعيل البصمة لأول مرة</button>
+            <button id="bioLockCancelBtn" style="flex:0 0 auto;border:none;border-radius:12px;padding:12px 14px;background:#f6f8fa;color:#1b1f23;font-weight:800;cursor:pointer">إلغاء</button>
+          </div>
+        </div>`;
+      document.body.appendChild(overlay);
+    }
+
+    function showBioLock(role){
+      ensureBioLockUI();
+      const overlay = document.getElementById("bioLockOverlay");
+      const desc = document.getElementById("bioLockDesc");
+      const hint = document.getElementById("bioLockHint");
+      const err = document.getElementById("bioLockErr");
+      const unlockBtn = document.getElementById("bioLockUnlockBtn");
+      const enrollBtn = document.getElementById("bioLockEnrollBtn");
+      const cancelBtn = document.getElementById("bioLockCancelBtn");
+
+      err.style.display = "none";
+      err.textContent = "";
+
+      const isTeacher = (role === "teacher");
+      desc.textContent = isTeacher ? "هذه الصفحة مقفلة ببصمة المعلمة." : "هذه الصفحة مقفلة ببصمة الطالب.";
+      if(!BIO.supported){
+        hint.textContent = "جهازك/متصفحك لا يدعم قفل البصمة (Passkeys).";
+        unlockBtn.disabled = true;
+        enrollBtn.disabled = true;
+        unlockBtn.style.opacity = ".5";
+        enrollBtn.style.opacity = ".5";
+      }else{
+        hint.textContent = "سيطلب منك الجهاز FaceID/TouchID أو بصمة لفتح الصفحة.";
+        unlockBtn.disabled = false;
+        enrollBtn.disabled = false;
+        unlockBtn.style.opacity = "1";
+        enrollBtn.style.opacity = "1";
+      }
+
+      overlay.style.display = "flex";
+
+      const credKey = isTeacher ? BIO.keys.teacherId : BIO.keys.studentId;
+      const enabledKey = isTeacher ? BIO.keys.teacherEnabled : BIO.keys.studentEnabled;
+      const unlockedKey = isTeacher ? BIO.keys.unlockedTeacher : BIO.keys.unlockedStudent;
+
+      const hasCred = !!localStorage.getItem(credKey);
+      enrollBtn.style.display = hasCred ? "none" : "inline-block";
+
+      cancelBtn.onclick = () => {
+        overlay.style.display = "none";
+        // إذا الصفحة Teacher مقفلة، نرجع للبداية بدل ما تبقى مفتوحة
+        if(isTeacher){
+          // نعيد توجيه للطالب كبوابة آمنة إذا كانت متاحة، وإلا نرجع للبداية
+          try{
+            const u = new URL(window.location.href);
+            u.searchParams.set("mode","student");
+            window.location.href = u.toString();
+          }catch(e){
+            window.location.href = window.location.pathname + "?mode=student";
+          }
+        }
+      };
+
+      async function enroll(){
+        try{
+          if(!BIO.supported) return;
+          err.style.display = "none";
+          const userId = randBytes(16);
+          const challenge = randBytes(32);
+          const publicKey = {
+            challenge,
+            rp: { name: "Math Bank" },
+            user: {
+              id: userId,
+              name: isTeacher ? "teacher" : "student",
+              displayName: isTeacher ? "المعلمة" : "الطالب"
+            },
+            pubKeyCredParams: [
+              { type: "public-key", alg: -7 },
+              { type: "public-key", alg: -257 }
+            ],
+            authenticatorSelection: {
+              authenticatorAttachment: "platform",
+              userVerification: "required"
+            },
+            timeout: 60000,
+            attestation: "none"
+          };
+          const cred = await navigator.credentials.create({ publicKey });
+          const idB64 = bytesToB64url(new Uint8Array(cred.rawId));
+          localStorage.setItem(credKey, idB64);
+          localStorage.setItem(enabledKey, "1");
+          // افتح مباشرة بعد التفعيل
+          await unlock();
+        }catch(e){
+          err.style.display = "block";
+          err.textContent = "تعذر تفعيل البصمة. جرّبي مرة أخرى.";
+        }
+      }
+
+      async function unlock(){
+        try{
+          if(!BIO.supported) return;
+          err.style.display = "none";
+          const idB64 = localStorage.getItem(credKey);
+          if(!idB64){
+            err.style.display = "block";
+            err.textContent = "لا توجد بصمة مفعلة لهذا الوضع. اضغطي (تفعيل البصمة لأول مرة).";
+            return;
+          }
+          const idBytes = b64urlToBytes(idB64);
+          if(!idBytes){
+            localStorage.removeItem(credKey);
+            err.style.display = "block";
+            err.textContent = "بيانات البصمة غير صالحة. أعيدي التفعيل.";
+            return;
+          }
+          const challenge = randBytes(32);
+          const publicKey = {
+            challenge,
+            allowCredentials: [{ type: "public-key", id: idBytes }],
+            userVerification: "required",
+            timeout: 60000
+          };
+          await navigator.credentials.get({ publicKey });
+          sessionStorage.setItem(unlockedKey, "1");
+          overlay.style.display = "none";
+        }catch(e){
+          err.style.display = "block";
+          err.textContent = "لم يتم التحقق بالبصمة. حاول/ي مرة أخرى.";
+        }
+      }
+
+      enrollBtn.onclick = enroll;
+      unlockBtn.onclick = unlock;
+    }
+
+    function isBioLockEnabled(role){
+      const key = (role==="teacher") ? BIO.keys.teacherEnabled : BIO.keys.studentEnabled;
+      return localStorage.getItem(key) === "1";
+    }
+    function isBioUnlocked(role){
+      const key = (role==="teacher") ? BIO.keys.unlockedTeacher : BIO.keys.unlockedStudent;
+      return sessionStorage.getItem(key) === "1";
+    }
+
+    // عند فتح الصفحة: لو القفل مفعل لهذا الوضع، نطلب البصمة قبل التفاعل
+    window.addEventListener("DOMContentLoaded", () => {
+      // افتراضيًا: قفل المعلمة مفعل لحمايتها (يمكن تعطيله من localStorage)
+      if(localStorage.getItem(BIO.keys.teacherEnabled) === null){
+        localStorage.setItem(BIO.keys.teacherEnabled, "1");
+      }
+      if(localStorage.getItem(BIO.keys.studentEnabled) === null){
+        localStorage.setItem(BIO.keys.studentEnabled, "1");
+      }
+      const role = IS_STUDENT_ENTRY ? "student" : "teacher";
+      if(isBioLockEnabled(role) && !isBioUnlocked(role)){
+        showBioLock(role);
+      }
+    });
+
+
+
 
     const SIGNATURE = "المعلمة: سارة حقوي";
     const TEACHER_BANK_TITLE = "بنك الرياضيات – المصرفي";
