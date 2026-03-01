@@ -1593,6 +1593,37 @@
     }
     function warn(msg){ openModal("تنبيه", msg); }
 
+    function toast(msg){
+      try{
+        let t = document.getElementById("__toast");
+        if(!t){
+          t = document.createElement("div");
+          t.id = "__toast";
+          t.style.position = "fixed";
+          t.style.left = "50%";
+          t.style.bottom = "22px";
+          t.style.transform = "translateX(-50%)";
+          t.style.background = "rgba(11,42,102,.92)";
+          t.style.color = "#fff";
+          t.style.padding = "10px 14px";
+          t.style.borderRadius = "14px";
+          t.style.fontWeight = "900";
+          t.style.zIndex = 99999;
+          t.style.boxShadow = "0 10px 30px rgba(0,0,0,.18)";
+          t.style.maxWidth = "90vw";
+          t.style.textAlign = "center";
+          document.body.appendChild(t);
+        }
+        t.textContent = msg;
+        t.style.opacity = 1;
+        clearTimeout(window.__toastTimer);
+        window.__toastTimer = setTimeout(()=>{ t.style.opacity = 0; }, 2200);
+      }catch(e){
+        alert(msg);
+      }
+    }
+
+
     function togglePass(id, btn){
       const el = $(id);
       if(!el) return;
@@ -2289,6 +2320,16 @@ ${SIGNATURE}`;
           
           <div style="margin-top:8px">
             <strong>${s.name || ""}</strong>
+            <div class="row" style="margin-top:8px;gap:8px;align-items:center">
+              <select class="js-note" style="flex:1;padding:10px;border-radius:12px;border:1px solid #e6e9f2;font-weight:900">
+                <option value="">📝 ملاحظة/حضور...</option>
+                <option value="غياب">غياب</option>
+                <option value="غياب بعذر">غياب بعذر</option>
+                <option value="استئذان">استئذان</option>
+                <option value="إجازة">إجازة</option>
+              </select>
+              <span class="small" style="white-space:nowrap;color:#0b2a66;font-weight:900">خصم نقاط</span>
+            </div>
             <div class="small">الرصيد: ${fmt(s.balance)} ر.س</div>
             <div class="small">PIN: <b>${s.pin||""}</b></div>
             <div class="small">ولي الأمر: <b style="direction:ltr;display:inline-block">${(s.guardianWhats||"—")}</b></div>
@@ -2317,6 +2358,18 @@ ${SIGNATURE}`;
 
         card.querySelector(".js-sendpin").onclick = ()=> sendPinToGuardian(s.id);
         card.querySelector(".js-pdf").onclick = ()=> pdfStudentReport(s.id);
+        const noteSel = card.querySelector(".js-note");
+        if(noteSel){
+          noteSel.onchange = async()=>{
+            const v = noteSel.value;
+            if(!v) return;
+            noteSel.disabled = true;
+            await applyAttendanceNote(s.id, v);
+            noteSel.value = "";
+            noteSel.disabled = false;
+            await renderStudents();
+          };
+        }
         card.querySelector(".js-del").onclick = ()=> deleteStudentConfirm(s.id, s.name||"");
         grid.appendChild(card);
       });
@@ -2990,6 +3043,46 @@ document.addEventListener("DOMContentLoaded", async()=>{
 
         // ignore logging errors to avoid blocking UI
         console.log("logTxn error", e);
+      }
+    }
+
+    // ================== ملاحظات الحضور (خصم نقاط بدون سحب/إيداع) ==================
+    const NOTE_DEDUCTIONS = {
+      "غياب": -100,
+      "غياب بعذر": -50,
+      "استئذان": -25,
+      "إجازة": -10
+    };
+
+    async function applyAttendanceNote(studentId, noteLabel){
+      try{
+        const delta = Number((NOTE_DEDUCTIONS[noteLabel] ?? -10));
+        const sRef = db.collection("students").doc(studentId);
+        await db.runTransaction(async(tx)=>{
+          const sDoc = await tx.get(sRef);
+          if(!sDoc.exists) throw new Error("student_not_found");
+          const s = sDoc.data()||{};
+          const prev = Number(s.balance||0);
+          const next = prev + delta;
+          tx.update(sRef, {balance: next});
+          const txRef = sRef.collection("txns").doc();
+          tx.set(txRef, {
+            studentId: studentId,
+            studentName: s.name||"",
+            guardianWhats: s.guardianWhats||"",
+            type: "ملاحظة",
+            reason: noteLabel,
+            amount: delta,
+            balanceAfter: next,
+            dateKey: localTodayKey(),
+            createdAtClient: Date.now(),
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+        });
+        toast("تم تسجيل ملاحظة: " + noteLabel + " (" + delta + " نقطة)");
+      }catch(e){
+        console.log(e);
+        warn("تعذر تسجيل الملاحظة الآن.");
       }
     }
 
