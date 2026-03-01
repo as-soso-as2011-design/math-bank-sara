@@ -3763,8 +3763,7 @@ function renderRoulettePane(){
 
       const tier = calcTier(currentStudentObj.balance);
       const eligible = tierEligible(tier);
-      tab.style.display = ""; // show tab always
-      tab.style.opacity = eligible ? "1" : ".7";
+      tab.style.display = eligible ? "" : "none";
 
       const status=$("rouletteStatus");
       const hint=$("rouletteHint");
