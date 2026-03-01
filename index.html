@@ -331,6 +331,57 @@
 .roulLabel span{position:absolute;left:50%;top:8%;transform-origin:0 150px;font-size:12px;font-weight:900;color:#0b2a66;white-space:nowrap;text-shadow:0 1px 0 rgba(255,255,255,.7)}
 @media (max-width:420px){ .roulLabel span{font-size:11px} .roulHub{width:84px;height:84px} }
 
+
+/* ===== Royal Gold + Blue Roulette Upgrade ===== */
+.roulStage{
+  background: radial-gradient(circle at center, #0b2a66 0%, #071f4a 60%, #04112a 100%);
+  border-radius:50%;
+  padding:14px;
+  box-shadow:0 0 40px rgba(255,215,0,.35), 0 0 80px rgba(0,85,164,.35);
+}
+
+.roulWheel{
+  border:10px solid #0b2a66;
+  box-shadow:0 0 25px rgba(255,215,0,.6), inset 0 0 30px rgba(0,85,164,.5);
+}
+
+.roulWheel::before{
+  content:"";
+  position:absolute;
+  inset:-14px;
+  border-radius:50%;
+  background:
+    repeating-conic-gradient(
+      gold 0deg 5deg,
+      #0b2a66 5deg 10deg
+    );
+  animation: spinLights 6s linear infinite;
+  z-index:-1;
+}
+
+@keyframes spinLights{
+  from{transform:rotate(0deg);}
+  to{transform:rotate(360deg);}
+}
+
+.roulLabel span{
+  font-size:18px !important;
+  font-weight:1000;
+  color:#ffffff;
+  text-shadow:0 0 8px gold, 0 0 15px rgba(0,85,164,.9);
+}
+
+.roulHub{
+  background:linear-gradient(135deg, gold, #0b2a66);
+  color:#fff;
+  font-size:14px;
+  box-shadow:0 0 25px gold;
+}
+
+
+/* ===== Hard lock: hide Start overlay after start ===== */
+body.mb-started #startOverlay{display:none !important; visibility:hidden !important; pointer-events:none !important;}
+
 </style>
 </head>
 
@@ -373,7 +424,71 @@
     </div>
   </div>
 
-  <div id="onboardOverlay" aria-hidden="true">
+  
+<script>
+/* ===== Start button safe handler (prevents onboarding issues) ===== */
+(function(){
+  function byId(id){ return document.getElementById(id); }
+  function hide(ids){
+    ids.forEach(function(id){
+      var el = byId(id);
+      if(!el) return;
+      el.classList.add("hidden");
+      el.style.display = "none";
+      if(id==="startOverlay"){ el.style.display="none"; }
+    });
+  }
+  function show(id){
+    var el = byId(id);
+    if(!el) return;
+    el.classList.remove("hidden");
+    el.style.display = "block";
+  }
+  function getMode(){
+    try{
+      var p = new URLSearchParams(location.search);
+      var m = (p.get("mode")||"").toLowerCase();
+      return (m==="student") ? "student" : "teacher";
+    }catch(e){ return "teacher"; }
+  }
+
+  window.startApp = function(){
+    // If the full onboarding system exists, still allow it; otherwise fallback.
+    try{
+      if(typeof window.showOnboarding === "function" && typeof window.hideAllPages === "function"){
+        // Use existing flow if available
+        var so = byId("startOverlay");
+        if(so){ so.classList.add("hidden"); so.style.display="none"; }
+        window.showOnboarding(function(){
+          window.hideAllPages();
+          var mode = getMode();
+          if(mode==="student"){
+            window.currentAccess="student";
+            if(typeof window.show==="function") window.show("studentLoginPage"); else show("studentLoginPage");
+          }else{
+            window.currentAccess="teacher";
+            if(typeof window.show==="function") window.show("teacherLoginPage"); else show("teacherLoginPage");
+          }
+        });
+        return;
+      }
+    }catch(err){}
+    // Fallback: direct entry to login page.
+    hide(["startOverlay","onboardOverlay","classesPage","classPage","studentAccountPage","dailyOpsPage","teacherLoginPage","studentLoginPage"]);
+    var mode = getMode();
+    if(mode==="student"){ window.currentAccess="student"; show("studentLoginPage"); }
+    else{ window.currentAccess="teacher"; show("teacherLoginPage"); }
+  };
+
+  // Ensure the start button always points to startApp
+  document.addEventListener("DOMContentLoaded", function(){
+    var btn = document.querySelector('.startActions .btn');
+    if(btn){ btn.onclick = window.startApp; }
+  });
+})();
+</script>
+
+<div id="onboardOverlay" aria-hidden="true">
     <div class="onbBox">
       <div class="onbTop">
         <div>تعريف بنك الرياضيات</div>
@@ -2836,7 +2951,54 @@ document.addEventListener("DOMContentLoaded", async()=>{
     .opLine{margin-top:8px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
     .pill2{display:inline-block;background:#eef6ff;border:1px solid rgba(0,0,0,.06);padding:6px 10px;border-radius:999px;font-weight:1000;font-size:12px;color:#0b2a66}
 
-  </style>
+  
+/* ===== Royal Gold + Blue Roulette Upgrade ===== */
+.roulStage{
+  background: radial-gradient(circle at center, #0b2a66 0%, #071f4a 60%, #04112a 100%);
+  border-radius:50%;
+  padding:14px;
+  box-shadow:0 0 40px rgba(255,215,0,.35), 0 0 80px rgba(0,85,164,.35);
+}
+
+.roulWheel{
+  border:10px solid #0b2a66;
+  box-shadow:0 0 25px rgba(255,215,0,.6), inset 0 0 30px rgba(0,85,164,.5);
+}
+
+.roulWheel::before{
+  content:"";
+  position:absolute;
+  inset:-14px;
+  border-radius:50%;
+  background:
+    repeating-conic-gradient(
+      gold 0deg 5deg,
+      #0b2a66 5deg 10deg
+    );
+  animation: spinLights 6s linear infinite;
+  z-index:-1;
+}
+
+@keyframes spinLights{
+  from{transform:rotate(0deg);}
+  to{transform:rotate(360deg);}
+}
+
+.roulLabel span{
+  font-size:18px !important;
+  font-weight:1000;
+  color:#ffffff;
+  text-shadow:0 0 8px gold, 0 0 15px rgba(0,85,164,.9);
+}
+
+.roulHub{
+  background:linear-gradient(135deg, gold, #0b2a66);
+  color:#fff;
+  font-size:14px;
+  box-shadow:0 0 25px gold;
+}
+
+</style>
 </head><body>
 <div class="paper">
   <div class="head">
@@ -2860,6 +3022,127 @@ document.addEventListener("DOMContentLoaded", async()=>{
 <script>
   window.onload = ()=>{ setTimeout(()=>window.print(), 300); };
 <\/script>
+
+<script>
+function addWeeklyNote(select, studentId){
+  const type = select.value;
+  if(!type) return;
+
+  const penalties = {
+    "غياب": 5,
+    "غياب بعذر": 3,
+    "استئذان قبل الحصة": 1,
+    "استئذان أثناء الحصة": 2,
+    "غير موجودة في الفصل لتواجدها في العيادة بسبب وعكة صحية": 0,
+    "إجازة": 0
+  };
+
+  let students = JSON.parse(localStorage.getItem("students") || "[]");
+  let student = students.find(s => s.id == studentId);
+  if(!student) return;
+
+  if(!student.weekPoints) student.weekPoints = 0;
+  if(!student.absenceCount) student.absenceCount = 0;
+
+  const deduction = penalties[type] || 0;
+  student.weekPoints -= deduction;
+
+  if(type === "غياب"){
+      student.absenceCount += 1;
+  }
+
+  if(!student.transactions) student.transactions = [];
+  student.transactions.push({
+    date: new Date().toLocaleDateString(),
+    type: "ملاحظة",
+    reason: type,
+    weekPointsChange: -deduction
+  });
+
+  localStorage.setItem("students", JSON.stringify(students));
+
+  // Color name red if has absence
+  const nameEl = document.querySelector('[data-student-id="' + studentId + '"]');
+  if(nameEl && student.absenceCount > 0){
+      nameEl.style.color = "#b00020";
+  }
+
+  const counterEl = document.getElementById("absenceCounter_" + studentId);
+  if(counterEl){
+      counterEl.textContent = "عدد الغياب: " + student.absenceCount;
+  }
+
+  alert("تم تسجيل الملاحظة وتحديث نقاط الأسبوع ✅");
+  select.value = "";
+}
+<\/script>
+
+
+<script>
+/* ===== StartApp hard-fix (prevents returning to start overlay) ===== */
+(function(){
+  const KEY = "MB_STARTED_LOCK";
+  function hardHideStart(){
+    const so = document.getElementById("startOverlay");
+    if(so){
+      so.classList.add("hidden");
+      so.style.display = "none";
+      so.style.visibility = "hidden";
+      so.style.pointerEvents = "none";
+    }
+    document.body && document.body.classList.add("mb-started");
+  }
+  function gotoLogin(){
+    try{ hardHideStart(); }catch(e){}
+    try{ if(typeof hideAllPages === "function") hideAllPages(); }catch(e){}
+    try{
+      if(window.IS_STUDENT_ENTRY){
+        if(typeof show === "function") show("studentLoginPage");
+        window.currentAccess = "student";
+      }else{
+        if(typeof show === "function") show("teacherLoginPage");
+        window.currentAccess = "teacher";
+      }
+    }catch(e){}
+  }
+
+  // On load: if already started, keep it hidden
+  window.addEventListener("load", function(){
+    try{
+      if(localStorage.getItem(KEY)==="1"){
+        hardHideStart();
+      }
+    }catch(e){}
+  });
+
+  // Wrap startApp
+  const origStartApp = window.startApp;
+  window.startApp = function(){
+    try{ localStorage.setItem(KEY,"1"); }catch(e){}
+    hardHideStart();
+
+    // If onboarding helper exists, use it safely
+    try{
+      if(typeof window.showOnboarding === "function"){
+        return window.showOnboarding(function(){
+          gotoLogin();
+        });
+      }
+    }catch(e){ /* fallthrough */ }
+
+    // Try original startApp, but guarantee navigation
+    try{
+      if(typeof origStartApp === "function"){
+        origStartApp();
+      }
+    }catch(e){ /* ignore */ }
+
+    // Final fallback
+    gotoLogin();
+  };
+})();
+<\/script>
+
 </body></html>`);
       w.document.close();
     }
@@ -4476,5 +4759,126 @@ function renderRoulettePane(){
 })();
 
 </script>
+
+<script>
+function addWeeklyNote(select, studentId){
+  const type = select.value;
+  if(!type) return;
+
+  const penalties = {
+    "غياب": 5,
+    "غياب بعذر": 3,
+    "استئذان قبل الحصة": 1,
+    "استئذان أثناء الحصة": 2,
+    "غير موجودة في الفصل لتواجدها في العيادة بسبب وعكة صحية": 0,
+    "إجازة": 0
+  };
+
+  let students = JSON.parse(localStorage.getItem("students") || "[]");
+  let student = students.find(s => s.id == studentId);
+  if(!student) return;
+
+  if(!student.weekPoints) student.weekPoints = 0;
+  if(!student.absenceCount) student.absenceCount = 0;
+
+  const deduction = penalties[type] || 0;
+  student.weekPoints -= deduction;
+
+  if(type === "غياب"){
+      student.absenceCount += 1;
+  }
+
+  if(!student.transactions) student.transactions = [];
+  student.transactions.push({
+    date: new Date().toLocaleDateString(),
+    type: "ملاحظة",
+    reason: type,
+    weekPointsChange: -deduction
+  });
+
+  localStorage.setItem("students", JSON.stringify(students));
+
+  // Color name red if has absence
+  const nameEl = document.querySelector('[data-student-id="' + studentId + '"]');
+  if(nameEl && student.absenceCount > 0){
+      nameEl.style.color = "#b00020";
+  }
+
+  const counterEl = document.getElementById("absenceCounter_" + studentId);
+  if(counterEl){
+      counterEl.textContent = "عدد الغياب: " + student.absenceCount;
+  }
+
+  alert("تم تسجيل الملاحظة وتحديث نقاط الأسبوع ✅");
+  select.value = "";
+}
+</script>
+
+
+<script>
+/* ===== StartApp hard-fix (prevents returning to start overlay) ===== */
+(function(){
+  const KEY = "MB_STARTED_LOCK";
+  function hardHideStart(){
+    const so = document.getElementById("startOverlay");
+    if(so){
+      so.classList.add("hidden");
+      so.style.display = "none";
+      so.style.visibility = "hidden";
+      so.style.pointerEvents = "none";
+    }
+    document.body && document.body.classList.add("mb-started");
+  }
+  function gotoLogin(){
+    try{ hardHideStart(); }catch(e){}
+    try{ if(typeof hideAllPages === "function") hideAllPages(); }catch(e){}
+    try{
+      if(window.IS_STUDENT_ENTRY){
+        if(typeof show === "function") show("studentLoginPage");
+        window.currentAccess = "student";
+      }else{
+        if(typeof show === "function") show("teacherLoginPage");
+        window.currentAccess = "teacher";
+      }
+    }catch(e){}
+  }
+
+  // On load: if already started, keep it hidden
+  window.addEventListener("load", function(){
+    try{
+      if(localStorage.getItem(KEY)==="1"){
+        hardHideStart();
+      }
+    }catch(e){}
+  });
+
+  // Wrap startApp
+  const origStartApp = window.startApp;
+  window.startApp = function(){
+    try{ localStorage.setItem(KEY,"1"); }catch(e){}
+    hardHideStart();
+
+    // If onboarding helper exists, use it safely
+    try{
+      if(typeof window.showOnboarding === "function"){
+        return window.showOnboarding(function(){
+          gotoLogin();
+        });
+      }
+    }catch(e){ /* fallthrough */ }
+
+    // Try original startApp, but guarantee navigation
+    try{
+      if(typeof origStartApp === "function"){
+        origStartApp();
+      }
+    }catch(e){ /* ignore */ }
+
+    // Final fallback
+    gotoLogin();
+  };
+})();
+</script>
+
 </body>
 </html>
