@@ -619,8 +619,15 @@
       </div>
 
       <div class="tabs" id="classTabs"></div>
-      <div style="text-align:left;margin-top:6px">
-        <button class="ghostBtn" style="padding:8px 12px" onclick="openClassQuickSettings()">⚙️ إعدادات سريعة</button>
+
+      <div class="card soft" style="margin-top:10px">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+          <div>
+            <div style="font-weight:1000;color:#0b2a66">⚙️ إعدادات الفصول</div>
+            <div class="small" style="margin-top:4px;color:#47607e">تحكم سريع: قفل بصمة الطالب + فرص الروليت للحسابات (ذهبي/ماسي/ألماسي).</div>
+          </div>
+          <button class="btn3" onclick="openClassQuickSettings()">فتح الإعدادات</button>
+        </div>
       </div>
 
 
@@ -1151,19 +1158,7 @@
               </div>
               <div class="badge" id="rouletteStatus">—</div>
             </div>
-            
-        <div class="card soft" style="margin-top:12px">
-          <div class="row" style="align-items:center">
-            <div class="col">
-              <div style="font-weight:1000;color:#0b2a66">🎡 روليت بنك الرياضيات</div>
-              <div class="small" id="rouletteHint">متاح للحسابات: ذهبي / ماسي / ألماسي</div>
-            </div>
-            <div class="col" style="text-align:left">
-              <button class="btn" onclick="openRoulette()">فتح الروليت</button>
-            </div>
-          </div>
-        </div>
-<hr>
+            <hr>
             <div id="rouletteBody">
 
 <div class="roulWrap">
@@ -1479,6 +1474,56 @@
         toast(el.checked ? "تم تفعيل قفل الطالب بالبصمة ✅" : "تم إيقاف قفل الطالب بالبصمة ✅");
       });
     }
+
+    // ================== Quick settings (Classes page) ==================
+    function openClassQuickSettings(){
+      const bioOn = (localStorage.getItem(BIO.keys.studentEnabled) === "1");
+      const multiOn = (localStorage.getItem(ROULETTE_MULTI_KEY) === "1");
+      const body = `
+        <div class="small" style="line-height:1.9;color:#47607e">هذه الإعدادات تؤثر فورًا على الطلاب المؤهلين (ذهبي/ماسي/ألماسي).</div>
+        <div class="card soft" style="margin-top:10px">
+          <label style="display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer">
+            <div>
+              <div style="font-weight:1000;color:#0b2a66">🔒 قفل الطالب بالبصمة (اختياري)</div>
+              <div class="small" style="margin-top:4px;color:#47607e">إذا فُعّل، سيطلب FaceID/TouchID عند دخول الطالب على نفس الجهاز.</div>
+            </div>
+            <input id="bioStudentToggleQuick" type="checkbox" style="transform:scale(1.15)">
+          </label>
+        </div>
+        <div class="card soft" style="margin-top:10px">
+          <label style="display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer">
+            <div>
+              <div style="font-weight:1000;color:#0b2a66">🎡 إتاحة أكثر من فرصة للروليت أسبوعيًا</div>
+              <div class="small" style="margin-top:4px;color:#47607e">افتراضيًا: فرصة واحدة. عند التفعيل: 3 فرص أسبوعيًا.</div>
+            </div>
+            <input id="rouletteMultiToggleQuick" type="checkbox" style="transform:scale(1.15)">
+          </label>
+        </div>
+      `;
+      openModal("⚙️ إعدادات الفصول", body, '<button class="btn" onclick="closeModal()">تم</button>');
+      setTimeout(()=>{
+        const bioEl = document.getElementById("bioStudentToggleQuick");
+        if(bioEl){
+          bioEl.checked = bioOn;
+          bioEl.addEventListener("change", ()=>{
+            localStorage.setItem(BIO.keys.studentEnabled, bioEl.checked ? "1":"0");
+            if(bioEl.checked){ try{ sessionStorage.removeItem(BIO.keys.unlockedStudent); }catch(e){} }
+            toast(bioEl.checked ? "تم تفعيل قفل الطالب بالبصمة ✅" : "تم إيقاف قفل الطالب بالبصمة ✅");
+          });
+        }
+        const mulEl = document.getElementById("rouletteMultiToggleQuick");
+        if(mulEl){
+          mulEl.checked = multiOn;
+          mulEl.addEventListener("change", ()=>{
+            localStorage.setItem(ROULETTE_MULTI_KEY, mulEl.checked ? "1":"0");
+            toast(mulEl.checked ? "تم تفعيل 3 فرص أسبوعيًا للروليت ✅" : "تم ضبط الروليت على فرصة واحدة أسبوعيًا ✅");
+            // تحديث واجهة الطالب لو كانت مفتوحة
+            try{ renderRoulettePane(); }catch(e){}
+          });
+        }
+      }, 0);
+    }
+
 
     // بعد تحميل الصفحة اربط واجهة الإعدادات (إن وجدت)
     window.addEventListener("DOMContentLoaded", () => {
@@ -2790,210 +2835,9 @@ document.addEventListener("DOMContentLoaded", async()=>{
     <div class="sigBox" style="text-align:left;direction:ltr">التاريخ<br>${greg}</div>
   </div>
 </div>
-
-// ================== Roulette (Gold/Diamond/Almasi) ==================
-const ROULETTE_MULTI_KEY = "MB_ROULETTE_MULTI_V1"; // "1" => 3 chances/week for eligible tiers
-function rouletteMaxChances(){ return (localStorage.getItem(ROULETTE_MULTI_KEY)==="1") ? 3 : 1; }
-function eligibleTier(tierStr){
-  const t = String(tierStr||"");
-  return (t.includes("ذهبي") || t.includes("ماسي") || t.includes("ألماسي"));
-}
-function isoWeekKey(d=new Date()){
-  const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-  const dayNum = date.getUTCDay() || 7;
-  date.setUTCDate(date.getUTCDate() + 4 - dayNum);
-  const yearStart = new Date(Date.UTC(date.getUTCFullYear(),0,1));
-  const weekNo = Math.ceil((((date - yearStart) / 86400000) + 1)/7);
-  return `${date.getUTCFullYear()}-W${String(weekNo).padStart(2,"0")}`;
-}
-function rouletteCountKey(studentId){ return `MB_ROUL_COUNT_${studentId}`; }
-function rouletteWeekKey(studentId){ return `MB_ROUL_WEEK_${studentId}`; }
-function getRouletteUsedThisWeek(studentId){
-  const wk = isoWeekKey(new Date());
-  const wKey = rouletteWeekKey(studentId);
-  const cKey = rouletteCountKey(studentId);
-  const storedW = localStorage.getItem(wKey);
-  if(storedW !== wk){
-    localStorage.setItem(wKey, wk);
-    localStorage.setItem(cKey, "0");
-    return 0;
-  }
-  return Number(localStorage.getItem(cKey) || 0);
-}
-function incRouletteUsed(studentId){
-  const cKey = rouletteCountKey(studentId);
-  const used = getRouletteUsedThisWeek(studentId);
-  localStorage.setItem(cKey, String(used+1));
-}
-function openRoulette(){
-  if(!currentStudentObj) return;
-  const tier = calcTier(currentStudentObj.balance);
-  const sid = currentStudentObj.id || currentStudentId || "unknown";
-  const used = getRouletteUsedThisWeek(sid);
-  const max = rouletteMaxChances();
-  const left = Math.max(0, max - used);
-
-  const sub = $("rouletteSub");
-  if(sub){
-    sub.innerHTML = eligibleTier(tier)
-      ? `نوع الحساب الحالي: <b>${tier}</b><br>استمتعي بفرصتك هذا الأسبوع ✨`
-      : `نوع الحساب الحالي: <b>${tier}</b><br>الروليت متاح للحسابات: <b>ذهبي / ماسي / ألماسي</b>.`;
-  }
-  const leftBox = $("rouletteLeft");
-  if(leftBox) leftBox.textContent = left;
-
-  const res = $("rouletteResult");
-  if(res) res.classList.add("hidden");
-
-  const btn = $("spinBtn");
-  if(btn){
-    btn.disabled = (!eligibleTier(tier) || left<=0);
-    btn.style.opacity = btn.disabled ? .6 : 1;
-  }
-
-  const m = $("rouletteModal");
-  if(m){ m.classList.remove("hidden"); m.setAttribute("aria-hidden","false"); }
-}
-function closeRoulette(){
-  const m = $("rouletteModal");
-  if(m){ m.classList.add("hidden"); m.setAttribute("aria-hidden","true"); }
-}
-function spinRoulette(){
-  try{
-    if(!currentStudentObj) return;
-    const tier = calcTier(currentStudentObj.balance);
-    const sid = currentStudentObj.id || currentStudentId || "unknown";
-    if(!eligibleTier(tier)){
-      openModal("تنبيه", `<div class="small">الروليت متاح للحسابات: ذهبي / ماسي / ألماسي فقط.</div>`, '<button class="btn" onclick="closeModal()">موافق</button>');
-      return;
-    }
-    const used = getRouletteUsedThisWeek(sid);
-    const max = rouletteMaxChances();
-    if(used >= max){
-      openModal("تنبيه", `<div class="small">انتهت فرصك لهذا الأسبوع 🌿</div>`, '<button class="btn" onclick="closeModal()">موافق</button>');
-      openRoulette();
-      return;
-    }
-
-    const prizes = ["🎮 10 نقاط لعب", "⭐ بطاقة تميز", "💰 200 ريال بنكي", "💎 شارة ألماس", "🎁 جائزة مفاجأة"];
-    const wheel = $("roulWheel");
-    const prizeIndex = Math.floor(Math.random() * prizes.length);
-    const seg = 360 / prizes.length;
-    const extraTurns = 4 + Math.floor(Math.random()*3);
-    const landing = (prizeIndex * seg) + (seg/2);
-    const rotation = (extraTurns*360) + (360 - landing);
-
-    if(wheel){
-      wheel.style.transition = "none";
-      wheel.style.transform = "rotate(0deg)";
-      wheel.offsetHeight;
-      wheel.style.transition = "transform 3.2s cubic-bezier(.2,.9,.1,1)";
-      wheel.style.transform = `rotate(${rotation}deg)`;
-    }
-
-    const btn = $("spinBtn");
-    if(btn) btn.disabled = true;
-
-    setTimeout(()=>{
-      incRouletteUsed(sid);
-      const used2 = getRouletteUsedThisWeek(sid);
-      const left = Math.max(0, rouletteMaxChances() - used2);
-      const leftBox = $("rouletteLeft");
-      if(leftBox) leftBox.textContent = left;
-
-      const prizeBox = $("roulettePrize");
-      if(prizeBox) prizeBox.textContent = prizes[prizeIndex];
-
-      const res = $("rouletteResult");
-      if(res) res.classList.remove("hidden");
-
-      if(btn){
-        btn.disabled = (left<=0);
-        btn.style.opacity = btn.disabled ? .6 : 1;
-      }
-    }, 3400);
-
-  }catch(e){
-    console.error(e);
-    openModal("تنبيه", `<div class="small">حدث خطأ بسيط في الروليت. جرّبي مرة أخرى.</div>`, '<button class="btn" onclick="closeModal()">موافق</button>');
-  }
-}
-
-// ===== Class quick settings (Teacher) =====
-function openClassQuickSettings(){
-  const bioOn = (localStorage.getItem("MB_BIO_STUDENT_V1")==="1");
-  const multi = (localStorage.getItem(ROULETTE_MULTI_KEY)==="1");
-  const body = `
-    <div class="small" style="line-height:1.9">
-      <div style="margin-bottom:10px"><b>قفل الطالب بالبصمة</b> (اختياري على هذا الجهاز)</div>
-      <label style="display:flex;gap:10px;align-items:center">
-        <input type="checkbox" id="qsBio" ${bioOn?'checked':''} style="width:auto">
-        تفعيل قفل الطالب بالبصمة
-      </label>
-      <hr style="margin:14px 0">
-      <div style="margin-bottom:10px"><b>الروليت</b></div>
-      <label style="display:flex;gap:10px;align-items:center">
-        <input type="checkbox" id="qsMulti" ${multi?'checked':''} style="width:auto">
-        إتاحة أكثر من فرصة أسبوعيًا (للذهبي/الماسي/الألماسي)
-      </label>
-      <div class="small" style="margin-top:8px;color:#57606a">افتراضيًا: فرصة واحدة أسبوعيًا. عند التفعيل: 3 فرص أسبوعيًا.</div>
-    </div>
-  `;
-  const footer = `
-    <button class="ghostBtn" onclick="closeModal()">إلغاء</button>
-    <button class="btn" onclick="applyClassQuickSettings()">حفظ</button>
-  `;
-  openModal("⚙️ إعدادات سريعة", body, footer);
-}
-function applyClassQuickSettings(){
-  const b = document.getElementById("qsBio");
-  const m = document.getElementById("qsMulti");
-  if(b) localStorage.setItem("MB_BIO_STUDENT_V1", b.checked ? "1":"0");
-  if(m) localStorage.setItem(ROULETTE_MULTI_KEY, m.checked ? "1":"0");
-  const t = document.getElementById("bioStudentToggle");
-  if(t) t.checked = (localStorage.getItem("MB_BIO_STUDENT_V1")==="1");
-  closeModal();
-}
-
 <script>
   window.onload = ()=>{ setTimeout(()=>window.print(), 300); };
 <\/script>
-
-  <!-- Roulette Modal -->
-  <div id="rouletteModal" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;display:flex;align-items:center;justify-content:center;padding:18px">
-    <div class="card" style="max-width:520px;width:100%;position:relative">
-      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
-        <div style="font-weight:1000;color:#0b2a66">🎡 روليت بنك الرياضيات</div>
-        <button class="ghostBtn" onclick="closeRoulette()">إغلاق</button>
-      </div>
-      <div class="small" id="rouletteSub" style="margin-top:6px;line-height:1.7"></div>
-
-      <div style="display:flex;justify-content:center;align-items:center;margin-top:14px">
-        <div style="position:relative;width:min(320px,90vw);height:min(320px,90vw)">
-          <div id="roulWheel" style="position:absolute;inset:0;border-radius:50%;box-shadow:0 12px 30px rgba(0,0,0,.12);transform:rotate(0deg);transition:transform 3.2s cubic-bezier(.2,.9,.1,1);overflow:hidden;background:conic-gradient(#EAF3FB 0 45deg,#CFE6F7 45deg 90deg,#EAF3FB 90deg 135deg,#CFE6F7 135deg 180deg,#EAF3FB 180deg 225deg,#CFE6F7 225deg 270deg,#EAF3FB 270deg 315deg,#CFE6F7 315deg 360deg)"></div>
-          <div style="position:absolute;left:50%;top:-8px;transform:translateX(-50%);width:0;height:0;border-left:14px solid transparent;border-right:14px solid transparent;border-bottom:24px solid #0b2a66;filter:drop-shadow(0 6px 8px rgba(0,0,0,.15))"></div>
-          <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:92px;height:92px;border-radius:50%;background:rgba(255,255,255,.92);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;font-weight:1000;color:#0b2a66;box-shadow:0 10px 22px rgba(0,0,0,.10);text-align:center;line-height:1.1;padding:10px">اضغط<br>تدوير</div>
-        </div>
-      </div>
-
-      <div class="row" style="margin-top:14px;align-items:center">
-        <div class="col">
-          <div class="small">الفرص المتبقية هذا الأسبوع</div>
-          <div style="font-size:22px;font-weight:1000;color:#0b2a66" id="rouletteLeft">—</div>
-        </div>
-        <div class="col" style="text-align:left">
-          <button class="btn" id="spinBtn" onclick="spinRoulette()">تدوير الآن</button>
-        </div>
-      </div>
-
-      <div id="rouletteResult" class="card soft hidden" style="margin-top:12px">
-        <div class="small">مبروك 🎉 نتيجتك:</div>
-        <div id="roulettePrize" style="font-weight:1000;font-size:22px;color:#0b2a66;margin-top:6px">—</div>
-        <div class="small" style="margin-top:6px;color:#57606a">يمكنك استبدال الجائزة عبر المعلمة.</div>
-      </div>
-    </div>
-  </div>
-
 </body></html>`);
       w.document.close();
     }
@@ -4140,9 +3984,34 @@ function applyClassQuickSettings(){
       return (t.includes("ذهبي") || t.includes("ماسي") || t.includes("ألماسي"));
     }
 
+    // ================== Roulette chances (Gold/Diamond/Almasi) ==================
+    const ROULETTE_MULTI_KEY = "MB_ROULETTE_MULTI_V1"; // "1" => 3 chances/week for eligible tiers
+    function rouletteMaxChances(){ return (localStorage.getItem(ROULETTE_MULTI_KEY)==="1") ? 3 : 1; }
+
     function rouletteStorageKey(studentId){
       return `mb_roulette_${studentId}_${weekKey()}`;
     }
+    function rouletteReadState(studentId){
+      const k = rouletteStorageKey(studentId);
+      const raw = localStorage.getItem(k);
+      if(!raw) return {used:0, prizes:[]};
+      try{
+        if(raw.trim().startsWith("{")){
+          const obj = JSON.parse(raw);
+          const used = Number(obj.used||0);
+          const prizes = Array.isArray(obj.prizes)? obj.prizes.map(String) : [];
+          return {used:isFinite(used)?used:0, prizes};
+        }
+      }catch(e){}
+      // backward-compat: raw string prize
+      return {used:1, prizes:[String(raw)]};
+    }
+    function rouletteWriteState(studentId, state){
+      const k = rouletteStorageKey(studentId);
+      const safe = {used: Number(state.used||0), prizes: Array.isArray(state.prizes)? state.prizes.map(String) : []};
+      localStorage.setItem(k, JSON.stringify(safe));
+    }
+
 
     
     // ===== Roulette wheel rendering (visual spin) =====
@@ -4221,9 +4090,6 @@ function renderRoulettePane(){
       const resBox=$("rouletteResultBox");
       const res=$("rouletteResult");
 
-      const k = rouletteStorageKey(currentStudentObj.id||currentStudentId);
-      const saved = localStorage.getItem(k);
-
       // ensure wheel reflects current prizes
       try{ buildRouletteWheel(loadRoulettePrizes()); }catch(e){}
 
@@ -4235,15 +4101,25 @@ function renderRoulettePane(){
         return;
       }
 
-      if(saved){
-        const prize = saved;
-        if(status) status.textContent="✅ تم التدوير";
+      const sid = currentStudentObj.id||currentStudentId;
+      const st = rouletteReadState(sid);
+      const max = rouletteMaxChances();
+      const left = Math.max(0, max - (st.used||0));
+
+      if(left<=0){
+        if(status) status.textContent="✅ تم استهلاك الفرص";
+        if(hint) hint.textContent = `انتهت فرص هذا الأسبوع (${max}/${max}).`;
         if(btn) btn.disabled=true;
-        if(resBox){ resBox.style.display="block"; }
-        if(res) res.textContent = prize;
       }else{
-        if(status) status.textContent="🎯 فرصة واحدة";
+        if(status) status.textContent = (max===1) ? "🎯 فرصة واحدة" : `🎯 متبقي: ${left} من ${max}`;
+        if(hint) hint.textContent = (max===1) ? "تدوير واحد لكل أسبوع." : "عدد الفرص يحدده إعداد المعلمة.";
         if(btn) btn.disabled=false;
+      }
+
+      if(st.prizes && st.prizes.length){
+        if(resBox){ resBox.style.display="block"; }
+        if(res) res.textContent = st.prizes[st.prizes.length-1];
+      }else{
         if(resBox) resBox.style.display="none";
       }
     }
@@ -4259,10 +4135,11 @@ function renderRoulettePane(){
         }
 
         const sid = currentStudentObj.id || currentStudentId;
-        const k = rouletteStorageKey(sid);
-        const already = localStorage.getItem(k);
-        if(already){
+        const st = rouletteReadState(sid);
+        const max = rouletteMaxChances();
+        if((st.used||0) >= max){
           renderRoulettePane();
+          openModal("تنبيه", `<div class="small">تم استهلاك فرص الروليت لهذا الأسبوع (${max}/${max}).</div>`, '<button class="btn" onclick="closeModal()">موافق</button>');
           return;
         }
 
@@ -4283,13 +4160,16 @@ function renderRoulettePane(){
         await done;
 
         const prize = prizes[idx];
-        localStorage.setItem(k, prize);
+        st.used = Number(st.used||0) + 1;
+        st.prizes = Array.isArray(st.prizes)? st.prizes : [];
+        st.prizes.push(prize);
+        rouletteWriteState(sid, st);
 
         // optional: persist to Firebase (light write only)
         try{
           if(window.db && sid){
             await db.collection("students").doc(sid).set({
-              roulette:{ week: weekKey(), prize, at: Date.now() }
+              roulette:{ week: weekKey(), used: st.used, max, prizes: st.prizes, at: Date.now() }
             }, {merge:true});
           }
         }catch(e){}
@@ -4297,7 +4177,8 @@ function renderRoulettePane(){
         // celebration
         try{ playSuccess(); launchCelebration(); }catch(e){}
 
-        openModal("🎉 مبروك!", `<div style="font-size:18px;font-weight:1000;line-height:1.9">فزت بـ: <span style="color:#0b2a66">${escapeHtml(prize)}</span></div>`, '<button class="btn" onclick="closeModal()">رائع!</button>');
+        const left = Math.max(0, max - st.used);
+        openModal("🎉 مبروك!", `<div style="font-size:18px;font-weight:1000;line-height:1.9">فزت بـ: <span style="color:#0b2a66">${escapeHtml(prize)}</span></div><div class="small" style="margin-top:8px;color:#47607e">المتبقي هذا الأسبوع: ${left} من ${max}</div>`, '<button class="btn" onclick="closeModal()">رائع!</button>');
 
         if(btn){ btn.textContent="تدوير الآن"; }
         renderRoulettePane();
@@ -4573,41 +4454,5 @@ function renderRoulettePane(){
 })();
 
 </script>
-
-  <!-- Roulette Modal -->
-  <div id="rouletteModal" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;display:flex;align-items:center;justify-content:center;padding:18px">
-    <div class="card" style="max-width:520px;width:100%;position:relative">
-      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
-        <div style="font-weight:1000;color:#0b2a66">🎡 روليت بنك الرياضيات</div>
-        <button class="ghostBtn" onclick="closeRoulette()">إغلاق</button>
-      </div>
-      <div class="small" id="rouletteSub" style="margin-top:6px;line-height:1.7"></div>
-
-      <div style="display:flex;justify-content:center;align-items:center;margin-top:14px">
-        <div style="position:relative;width:min(320px,90vw);height:min(320px,90vw)">
-          <div id="roulWheel" style="position:absolute;inset:0;border-radius:50%;box-shadow:0 12px 30px rgba(0,0,0,.12);transform:rotate(0deg);transition:transform 3.2s cubic-bezier(.2,.9,.1,1);overflow:hidden;background:conic-gradient(#EAF3FB 0 45deg,#CFE6F7 45deg 90deg,#EAF3FB 90deg 135deg,#CFE6F7 135deg 180deg,#EAF3FB 180deg 225deg,#CFE6F7 225deg 270deg,#EAF3FB 270deg 315deg,#CFE6F7 315deg 360deg)"></div>
-          <div style="position:absolute;left:50%;top:-8px;transform:translateX(-50%);width:0;height:0;border-left:14px solid transparent;border-right:14px solid transparent;border-bottom:24px solid #0b2a66;filter:drop-shadow(0 6px 8px rgba(0,0,0,.15))"></div>
-          <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:92px;height:92px;border-radius:50%;background:rgba(255,255,255,.92);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;font-weight:1000;color:#0b2a66;box-shadow:0 10px 22px rgba(0,0,0,.10);text-align:center;line-height:1.1;padding:10px">اضغط<br>تدوير</div>
-        </div>
-      </div>
-
-      <div class="row" style="margin-top:14px;align-items:center">
-        <div class="col">
-          <div class="small">الفرص المتبقية هذا الأسبوع</div>
-          <div style="font-size:22px;font-weight:1000;color:#0b2a66" id="rouletteLeft">—</div>
-        </div>
-        <div class="col" style="text-align:left">
-          <button class="btn" id="spinBtn" onclick="spinRoulette()">تدوير الآن</button>
-        </div>
-      </div>
-
-      <div id="rouletteResult" class="card soft hidden" style="margin-top:12px">
-        <div class="small">مبروك 🎉 نتيجتك:</div>
-        <div id="roulettePrize" style="font-weight:1000;font-size:22px;color:#0b2a66;margin-top:6px">—</div>
-        <div class="small" style="margin-top:6px;color:#57606a">يمكنك استبدال الجائزة عبر المعلمة.</div>
-      </div>
-    </div>
-  </div>
-
 </body>
 </html>
