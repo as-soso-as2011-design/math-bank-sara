@@ -2238,7 +2238,7 @@ ${SIGNATURE}`;
       updateSelCount();
     }
 
-    async async function renderStudents(){
+    async function renderStudents(){
       const snap = await db.collection("students").where("classId","==",currentClassId).get();
       const arr=[]; snap.forEach(d=>arr.push({id:d.id,...d.data()}));
       arr.sort((a,b)=>(a.name||"").localeCompare(b.name||"","ar"));
@@ -2288,16 +2288,7 @@ ${SIGNATURE}`;
 
           
           <div style="margin-top:8px">
-            <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
-              <strong style="${(String((s.lastNoteKey||s.lastNote||'')).startsWith('absent') || (String(s.lastNote||'')).includes('غياب')) ? 'color:var(--red)' : ''}">${s.name || ""}</strong>
-              <span class="badge" style="background:rgba(0,32,91,.08);color:#0b2a66;border:1px solid rgba(0,32,91,.12)">${(Number(s.absences||s.absenceCount||0)>0)?('غيابات: '+Number(s.absences||s.absenceCount||0)):'✅'}</span>
-            </div>
-            <div class="small" style="margin-top:6px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-              <select class="js-note" style="min-width:240px">
-                ${ATTENDANCE_NOTES.map(n=>`<option value="${n.key}">${n.label}${n.key?` (${_noteDeltaText(n)} نقاط)`:""}</option>`).join("")}
-              </select>
-              <button class="btn3 js-note-apply" style="min-width:120px">تسجيل الملاحظة</button>
-            </div>
+            <strong>${s.name || ""}</strong>
             <div class="small">الرصيد: ${fmt(s.balance)} ر.س</div>
             <div class="small">PIN: <b>${s.pin||""}</b></div>
             <div class="small">ولي الأمر: <b style="direction:ltr;display:inline-block">${(s.guardianWhats||"—")}</b></div>
@@ -2327,80 +2318,12 @@ ${SIGNATURE}`;
         card.querySelector(".js-sendpin").onclick = ()=> sendPinToGuardian(s.id);
         card.querySelector(".js-pdf").onclick = ()=> pdfStudentReport(s.id);
         card.querySelector(".js-del").onclick = ()=> deleteStudentConfirm(s.id, s.name||"");
-        // attendance note
-        const noteSel = card.querySelector(".js-note");
-        const noteBtn = card.querySelector(".js-note-apply");
-        if(noteSel && noteBtn){
-          noteBtn.onclick = async ()=>{
-            const key = noteSel.value;
-            if(!key) return;
-            await applyAttendanceNote(s.id, key);
-            noteSel.value = "";
-          };
-        }
-
         grid.appendChild(card);
       });
       updateSelCount();
     }
 
-    
-    // ===== Attendance / Notes (week points only) =====
-    const ATTENDANCE_NOTES = [
-      {key:"", label:"— اختر ملاحظة —", delta:0, absence:false},
-      {key:"absent", label:"غياب", delta:-5, absence:true},
-      {key:"absent_excused", label:"غياب بعذر", delta:-3, absence:true},
-      {key:"early_leave_before", label:"استئذان قبل الحصة", delta:-1, absence:false},
-      {key:"early_leave_during", label:"استئذان أثناء الحصة", delta:-2, absence:false},
-      {key:"clinic", label:"غير موجودة في الفصل لتواجدها في العيادة بسبب وعكة صحية", delta:0, absence:false},
-      {key:"leave", label:"إجازة", delta:0, absence:false},
-    ];
-    const _noteByKey = Object.fromEntries(ATTENDANCE_NOTES.map(n=>[n.key,n]));
-    function _noteDeltaText(n){
-      if(!n) return "";
-      if(n.delta===0) return "0";
-      return (n.delta>0?`+${n.delta}`:`${n.delta}`);
-    }
-    async function applyAttendanceNote(studentId, noteKey){
-      try{
-        const n = _noteByKey[noteKey];
-        if(!n || !noteKey) return;
-        const stuRef = db.collection("students").doc(studentId);
-        const now = Date.now();
-        await db.runTransaction(async (tx)=>{
-          const doc = await tx.get(stuRef);
-          if(!doc.exists) return;
-          const s = doc.data()||{};
-          const wp = Number(s.weekPoints||s.pointsWeek||0);
-          const newWp = wp + Number(n.delta||0);
-          const abs = Number(s.absences||s.absenceCount||0) + (n.absence?1:0);
-          tx.update(stuRef, {
-            weekPoints: newWp,
-            absences: abs,
-            lastNote: n.label,
-            lastNoteKey: n.key,
-            lastNoteAt: now
-          });
-          const txnRef = stuRef.collection("txns").doc();
-          tx.set(txnRef, {
-            type: "ملاحظة",
-            reason: `${n.label} (نقاط الأسبوع: ${_noteDeltaText(n)})`,
-            amount: 0,
-            balanceAfter: Number(s.balance||0),
-            createdAtClient: now
-          });
-        });
-        try{ toast(`تم تسجيل: ${n.label}`); }catch(e){}
-        try{ renderHonorBoard(); }catch(e){}
-        try{ await renderStudents(); }catch(e){}
-      }catch(err){
-        console.error(err);
-        try{ warn("تعذر تسجيل الملاحظة. أعيدي المحاولة."); }catch(e){}
-      }
-    }
-    // ===== end Attendance / Notes =====
-
-async function showStatement(){
+    async function showStatement(){
       const snap=await db.collection("students").doc(currentStudentId).collection("txns").orderBy("createdAtClient","desc").limit(80).get();
       const rows=$("stmtRows"); rows.innerHTML="";
       if(snap.empty){ rows.innerHTML='<tr><td colspan="5" class="small">لا توجد عمليات في هذه الفترة.</td></tr>'; return; }
