@@ -2055,7 +2055,7 @@ function renderStudents(){
 
     async function executeOp(){ warn("هذه النسخة مدمجة للواجهة + الكود الأساسي. لو تبغين كل الوظائف (PDF/واتساب/تقارير أسبوعية)، قولي لي وأصدر لك نسخة Full كاملة 100%."); }
 
-    async function startApp(){
+    async function startAppMain(){
       const so = $("startOverlay");
       if(so){ so.classList.add("hidden"); so.style.display="none"; }
       showOnboarding(()=>{
@@ -2064,6 +2064,9 @@ function renderStudents(){
         else{ show("teacherLoginPage"); currentAccess="teacher"; }
       });
     }
+
+    // expose main start function
+    window.startAppMain = startAppMain;
 
     
     // ================== Daily Ops (Teacher) ==================
