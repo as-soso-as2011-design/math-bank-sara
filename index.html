@@ -331,6 +331,53 @@
 .roulLabel span{position:absolute;left:50%;top:8%;transform-origin:0 150px;font-size:12px;font-weight:900;color:#0b2a66;white-space:nowrap;text-shadow:0 1px 0 rgba(255,255,255,.7)}
 @media (max-width:420px){ .roulLabel span{font-size:11px} .roulHub{width:84px;height:84px} }
 
+
+/* ===== Royal Gold + Blue Roulette Upgrade ===== */
+.roulStage{
+  background: radial-gradient(circle at center, #0b2a66 0%, #071f4a 60%, #04112a 100%);
+  border-radius:50%;
+  padding:14px;
+  box-shadow:0 0 40px rgba(255,215,0,.35), 0 0 80px rgba(0,85,164,.35);
+}
+
+.roulWheel{
+  border:10px solid #0b2a66;
+  box-shadow:0 0 25px rgba(255,215,0,.6), inset 0 0 30px rgba(0,85,164,.5);
+}
+
+.roulWheel::before{
+  content:"";
+  position:absolute;
+  inset:-14px;
+  border-radius:50%;
+  background:
+    repeating-conic-gradient(
+      gold 0deg 5deg,
+      #0b2a66 5deg 10deg
+    );
+  animation: spinLights 6s linear infinite;
+  z-index:-1;
+}
+
+@keyframes spinLights{
+  from{transform:rotate(0deg);}
+  to{transform:rotate(360deg);}
+}
+
+.roulLabel span{
+  font-size:18px !important;
+  font-weight:1000;
+  color:#ffffff;
+  text-shadow:0 0 8px gold, 0 0 15px rgba(0,85,164,.9);
+}
+
+.roulHub{
+  background:linear-gradient(135deg, gold, #0b2a66);
+  color:#fff;
+  font-size:14px;
+  box-shadow:0 0 25px gold;
+}
+
 </style>
 </head>
 
@@ -2836,7 +2883,54 @@ document.addEventListener("DOMContentLoaded", async()=>{
     .opLine{margin-top:8px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
     .pill2{display:inline-block;background:#eef6ff;border:1px solid rgba(0,0,0,.06);padding:6px 10px;border-radius:999px;font-weight:1000;font-size:12px;color:#0b2a66}
 
-  </style>
+  
+/* ===== Royal Gold + Blue Roulette Upgrade ===== */
+.roulStage{
+  background: radial-gradient(circle at center, #0b2a66 0%, #071f4a 60%, #04112a 100%);
+  border-radius:50%;
+  padding:14px;
+  box-shadow:0 0 40px rgba(255,215,0,.35), 0 0 80px rgba(0,85,164,.35);
+}
+
+.roulWheel{
+  border:10px solid #0b2a66;
+  box-shadow:0 0 25px rgba(255,215,0,.6), inset 0 0 30px rgba(0,85,164,.5);
+}
+
+.roulWheel::before{
+  content:"";
+  position:absolute;
+  inset:-14px;
+  border-radius:50%;
+  background:
+    repeating-conic-gradient(
+      gold 0deg 5deg,
+      #0b2a66 5deg 10deg
+    );
+  animation: spinLights 6s linear infinite;
+  z-index:-1;
+}
+
+@keyframes spinLights{
+  from{transform:rotate(0deg);}
+  to{transform:rotate(360deg);}
+}
+
+.roulLabel span{
+  font-size:18px !important;
+  font-weight:1000;
+  color:#ffffff;
+  text-shadow:0 0 8px gold, 0 0 15px rgba(0,85,164,.9);
+}
+
+.roulHub{
+  background:linear-gradient(135deg, gold, #0b2a66);
+  color:#fff;
+  font-size:14px;
+  box-shadow:0 0 25px gold;
+}
+
+</style>
 </head><body>
 <div class="paper">
   <div class="head">
@@ -2860,6 +2954,61 @@ document.addEventListener("DOMContentLoaded", async()=>{
 <script>
   window.onload = ()=>{ setTimeout(()=>window.print(), 300); };
 <\/script>
+
+<script>
+function addWeeklyNote(select, studentId){
+  const type = select.value;
+  if(!type) return;
+
+  const penalties = {
+    "غياب": 5,
+    "غياب بعذر": 3,
+    "استئذان قبل الحصة": 1,
+    "استئذان أثناء الحصة": 2,
+    "غير موجودة في الفصل لتواجدها في العيادة بسبب وعكة صحية": 0,
+    "إجازة": 0
+  };
+
+  let students = JSON.parse(localStorage.getItem("students") || "[]");
+  let student = students.find(s => s.id == studentId);
+  if(!student) return;
+
+  if(!student.weekPoints) student.weekPoints = 0;
+  if(!student.absenceCount) student.absenceCount = 0;
+
+  const deduction = penalties[type] || 0;
+  student.weekPoints -= deduction;
+
+  if(type === "غياب"){
+      student.absenceCount += 1;
+  }
+
+  if(!student.transactions) student.transactions = [];
+  student.transactions.push({
+    date: new Date().toLocaleDateString(),
+    type: "ملاحظة",
+    reason: type,
+    weekPointsChange: -deduction
+  });
+
+  localStorage.setItem("students", JSON.stringify(students));
+
+  // Color name red if has absence
+  const nameEl = document.querySelector('[data-student-id="' + studentId + '"]');
+  if(nameEl && student.absenceCount > 0){
+      nameEl.style.color = "#b00020";
+  }
+
+  const counterEl = document.getElementById("absenceCounter_" + studentId);
+  if(counterEl){
+      counterEl.textContent = "عدد الغياب: " + student.absenceCount;
+  }
+
+  alert("تم تسجيل الملاحظة وتحديث نقاط الأسبوع ✅");
+  select.value = "";
+}
+</script>
+
 </body></html>`);
       w.document.close();
     }
@@ -4476,5 +4625,60 @@ function renderRoulettePane(){
 })();
 
 </script>
+
+<script>
+function addWeeklyNote(select, studentId){
+  const type = select.value;
+  if(!type) return;
+
+  const penalties = {
+    "غياب": 5,
+    "غياب بعذر": 3,
+    "استئذان قبل الحصة": 1,
+    "استئذان أثناء الحصة": 2,
+    "غير موجودة في الفصل لتواجدها في العيادة بسبب وعكة صحية": 0,
+    "إجازة": 0
+  };
+
+  let students = JSON.parse(localStorage.getItem("students") || "[]");
+  let student = students.find(s => s.id == studentId);
+  if(!student) return;
+
+  if(!student.weekPoints) student.weekPoints = 0;
+  if(!student.absenceCount) student.absenceCount = 0;
+
+  const deduction = penalties[type] || 0;
+  student.weekPoints -= deduction;
+
+  if(type === "غياب"){
+      student.absenceCount += 1;
+  }
+
+  if(!student.transactions) student.transactions = [];
+  student.transactions.push({
+    date: new Date().toLocaleDateString(),
+    type: "ملاحظة",
+    reason: type,
+    weekPointsChange: -deduction
+  });
+
+  localStorage.setItem("students", JSON.stringify(students));
+
+  // Color name red if has absence
+  const nameEl = document.querySelector('[data-student-id="' + studentId + '"]');
+  if(nameEl && student.absenceCount > 0){
+      nameEl.style.color = "#b00020";
+  }
+
+  const counterEl = document.getElementById("absenceCounter_" + studentId);
+  if(counterEl){
+      counterEl.textContent = "عدد الغياب: " + student.absenceCount;
+  }
+
+  alert("تم تسجيل الملاحظة وتحديث نقاط الأسبوع ✅");
+  select.value = "";
+}
+</script>
+
 </body>
 </html>
