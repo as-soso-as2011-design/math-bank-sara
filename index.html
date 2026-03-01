@@ -331,81 +331,6 @@
 .roulLabel span{position:absolute;left:50%;top:8%;transform-origin:0 150px;font-size:12px;font-weight:900;color:#0b2a66;white-space:nowrap;text-shadow:0 1px 0 rgba(255,255,255,.7)}
 @media (max-width:420px){ .roulLabel span{font-size:11px} .roulHub{width:84px;height:84px} }
 
-/* ===== Roulette Sky + Lights (Sara Pro) ===== */
-.rouletteSky{
-  position:relative;
-  border-radius:18px;
-  padding:18px 12px;
-  overflow:hidden;
-  border:1px solid rgba(0,0,0,.06);
-  background:
-    radial-gradient(circle at 20% 20%, rgba(255,255,255,.85) 0 18%, rgba(255,255,255,0) 32%),
-    radial-gradient(circle at 70% 30%, rgba(255,255,255,.80) 0 20%, rgba(255,255,255,0) 34%),
-    radial-gradient(circle at 35% 65%, rgba(255,255,255,.78) 0 22%, rgba(255,255,255,0) 38%),
-    radial-gradient(circle at 78% 72%, rgba(255,255,255,.74) 0 20%, rgba(255,255,255,0) 36%),
-    radial-gradient(circle at 50% 10%, rgba(255,255,255,.65) 0 26%, rgba(255,255,255,0) 44%),
-    linear-gradient(180deg, rgba(207,230,247,.95), rgba(234,243,251,.92));
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,.55);
-}
-.rouletteSky:before{
-  content:"";
-  position:absolute; inset:-80px;
-  background:
-    radial-gradient(circle at 15% 30%, rgba(255,255,255,.55) 0 18%, rgba(255,255,255,0) 48%),
-    radial-gradient(circle at 55% 20%, rgba(255,255,255,.45) 0 16%, rgba(255,255,255,0) 46%),
-    radial-gradient(circle at 85% 45%, rgba(255,255,255,.42) 0 18%, rgba(255,255,255,0) 50%),
-    radial-gradient(circle at 35% 85%, rgba(255,255,255,.40) 0 18%, rgba(255,255,255,0) 52%);
-  filter: blur(2px);
-  opacity:.9;
-  pointer-events:none;
-}
-.rouletteSky > *{ position:relative; z-index:1; }
-
-.roulHub{
-  font-size:34px;
-  font-weight:1000;
-  letter-spacing:.3px;
-  text-shadow: 0 2px 0 rgba(255,255,255,.55), 0 10px 24px rgba(0,0,0,.20);
-}
-@media(max-width:420px){ .roulHub{font-size:30px} }
-
-.roulLabel span{
-  font-size:14px;
-  font-weight:1000;
-  text-shadow: 0 1px 0 rgba(255,255,255,.85), 0 10px 24px rgba(0,0,0,.18);
-}
-@media(max-width:420px){ .roulLabel span{font-size:13px} }
-
-/* Bulb ring overlay */
-.roulStage::after{
-  content:"";
-  position:absolute; inset:-8px;
-  border-radius:50%;
-  pointer-events:none;
-  background:
-    repeating-conic-gradient(
-      from 0deg,
-      rgba(255,213,79,.10) 0 8deg,
-      rgba(255,213,79,.60) 8deg 10deg,
-      rgba(255,213,79,.12) 10deg 18deg
-    );
-  -webkit-mask: radial-gradient(circle, transparent 0 62%, #000 62% 66%, transparent 66% 100%);
-  mask: radial-gradient(circle, transparent 0 62%, #000 62% 66%, transparent 66% 100%);
-  filter: drop-shadow(0 10px 18px rgba(0,0,0,.10));
-  opacity:.55;
-  transition: opacity .25s ease, filter .25s ease;
-}
-.roulStage.spinning::after{
-  opacity:1;
-  filter: drop-shadow(0 14px 26px rgba(255,193,7,.40)) drop-shadow(0 10px 22px rgba(0,0,0,.12));
-  animation: bulbPulse .35s infinite alternate;
-}
-@keyframes bulbPulse{
-  from{ transform:scale(1); filter:drop-shadow(0 10px 18px rgba(255,193,7,.25)); }
-  to{ transform:scale(1.01); filter:drop-shadow(0 16px 28px rgba(255,193,7,.55)); }
-}
-
-
 
     /* ===== Notes System (Class Page) ===== */
     .studentName.absent-name{ color: var(--red) !important; font-weight:1000; }
@@ -413,43 +338,6 @@
     .noteBox .noteRow{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
     .noteBox select,.noteBox input{ padding:10px 10px; border-radius:12px; border:1px solid rgba(0,0,0,.16); font-size:13px; }
     .noteBox .counter{ margin-top:6px; font-size:12px; color:#0b2a66; font-weight:900; }
-
-
-/* ===== Enhanced Cloud Background Section ===== */
-.roulette-section{
-  position: relative;
-  background: url('https://images.unsplash.com/photo-1502082553048-f009c37129b9?q=80&w=1400') center center / cover no-repeat;
-  border-radius: 22px;
-  padding: 25px 15px 35px;
-  overflow: hidden;
-}
-
-.roulette-section::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  background: linear-gradient(to bottom, rgba(255,255,255,0.65), rgba(255,255,255,0.35));
-  z-index:0;
-}
-
-.roulette-section *{
-  position: relative;
-  z-index:1;
-}
-
-/* Glow only during spin */
-.wheel.spin{
-  animation: glow 1s infinite alternate;
-}
-
-@keyframes glow{
-  from{
-    box-shadow: 0 0 10px #ffd700;
-  }
-  to{
-    box-shadow: 0 0 35px #ffcc00, 0 0 60px #ff9900;
-  }
-}
 
 </style>
 </head>
@@ -1281,15 +1169,13 @@
             <hr>
             <div id="rouletteBody">
 
-<div class="rouletteSky">
 <div class="roulWrap">
-  <div class="roulStage" id="roulStage">
+  <div class="roulStage">
     <div class="roulPointer" aria-hidden="true"></div>
     <div id="rouletteWheel" class="roulWheel" aria-label="روليت الهدايا"></div>
     <div id="rouletteLabels" class="roulLabel" aria-hidden="true"></div>
-    <div class="roulHub" id="roulHubText">ابدأ</div>
+    <div class="roulHub">🎁<br>روليت</div>
   </div>
-</div>
 </div>
 
               <div class="small" style="line-height:1.9">اضغط/ي “تدوير الآن” للحصول على هدية تحفيزية 🎁</div>
@@ -3067,44 +2953,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
     .opLine{margin-top:8px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
     .pill2{display:inline-block;background:#eef6ff;border:1px solid rgba(0,0,0,.06);padding:6px 10px;border-radius:999px;font-weight:1000;font-size:12px;color:#0b2a66}
 
-  
-/* ===== Enhanced Cloud Background Section ===== */
-.roulette-section{
-  position: relative;
-  background: url('https://images.unsplash.com/photo-1502082553048-f009c37129b9?q=80&w=1400') center center / cover no-repeat;
-  border-radius: 22px;
-  padding: 25px 15px 35px;
-  overflow: hidden;
-}
-
-.roulette-section::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  background: linear-gradient(to bottom, rgba(255,255,255,0.65), rgba(255,255,255,0.35));
-  z-index:0;
-}
-
-.roulette-section *{
-  position: relative;
-  z-index:1;
-}
-
-/* Glow only during spin */
-.wheel.spin{
-  animation: glow 1s infinite alternate;
-}
-
-@keyframes glow{
-  from{
-    box-shadow: 0 0 10px #ffd700;
-  }
-  to{
-    box-shadow: 0 0 35px #ffcc00, 0 0 60px #ff9900;
-  }
-}
-
-</style>
+  </style>
 </head><body>
 <div class="paper">
   <div class="head">
@@ -3128,24 +2977,6 @@ document.addEventListener("DOMContentLoaded", async()=>{
 <script>
   window.onload = ()=>{ setTimeout(()=>window.print(), 300); };
 <\/script>
-
-<script>
-function spinWheel(){
-  const wheel = document.querySelector(".wheel");
-  if(!wheel) return;
-
-  wheel.classList.add("spin");
-
-  const rotation = 3600 + Math.floor(Math.random()*360);
-  wheel.style.transition = "transform 3.5s cubic-bezier(.17,.67,.38,1.05)";
-  wheel.style.transform = "rotate(" + rotation + "deg)";
-
-  setTimeout(()=>{
-    wheel.classList.remove("spin");
-  }, 3500);
-}
-</script>
-
 </body></html>`);
       w.document.close();
     }
@@ -4461,14 +4292,11 @@ function renderRoulettePane(){
         const btn = $("spinBtn");
         if(btn){ btn.disabled=true; btn.textContent="جارِ التدوير…"; }
         buildRouletteWheel(prizes);
-        const stageEl = document.getElementById("roulStage") || document.querySelector(".roulStage");
-        if(stageEl) stageEl.classList.add("spinning");
 
         const n = prizes.length;
         const idx = pickRouletteIndex(n);
         const {done} = animateRouletteTo(idx, n);
         await done;
-        try{ const stageEl = document.getElementById("roulStage") || document.querySelector(".roulStage"); if(stageEl) stageEl.classList.remove("spinning"); }catch(e){}
 
         const prize = prizes[idx];
         st.used = Number(st.used||0) + 1;
@@ -4765,23 +4593,5 @@ function renderRoulettePane(){
 })();
 
 </script>
-
-<script>
-function spinWheel(){
-  const wheel = document.querySelector(".wheel");
-  if(!wheel) return;
-
-  wheel.classList.add("spin");
-
-  const rotation = 3600 + Math.floor(Math.random()*360);
-  wheel.style.transition = "transform 3.5s cubic-bezier(.17,.67,.38,1.05)";
-  wheel.style.transform = "rotate(" + rotation + "deg)";
-
-  setTimeout(()=>{
-    wheel.classList.remove("spin");
-  }, 3500);
-}
-</script>
-
 </body>
 </html>
