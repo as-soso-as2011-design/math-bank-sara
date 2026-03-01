@@ -2326,6 +2326,8 @@ ${SIGNATURE}`;
                 <option value="غياب">غياب</option>
                 <option value="غياب بعذر">غياب بعذر</option>
                 <option value="استئذان">استئذان</option>
+                <option value="استئذان قبل بدء الحصة">استئذان قبل بدء الحصة</option>
+                <option value="استئذان أثناء الحصة">استئذان أثناء الحصة</option>
                 <option value="إجازة">إجازة</option>
               </select>
               <span class="small" style="white-space:nowrap;color:#0b2a66;font-weight:900">خصم نقاط</span>
@@ -2384,7 +2386,11 @@ ${SIGNATURE}`;
         const x=d.data();
         const t=x.createdAtClient ? new Date(x.createdAtClient).toLocaleString("ar-SA") : "";
         const tr=document.createElement("tr");
-        tr.innerHTML=`<td>${t}</td><td>${x.type||""}</td><td>${x.reason||""}</td><td>${fmt(x.amount)}</td><td>${fmt(x.balanceAfter)}</td>`;
+        const amtCell = (x.type==="ملاحظة" && (x.weekPointsDelta!==undefined || x.weekPointsAfter!==undefined))
+          ? `${Number(x.weekPointsDelta||0)} نقطة`
+          : fmt(x.amount);
+        const balCell = fmt(x.balanceAfter);
+        tr.innerHTML=`<td>${t}</td><td>${x.type||""}</td><td>${x.reason||""}</td><td>${amtCell}</td><td>${balCell}</td>`;
         rows.appendChild(tr);
       });
     }
@@ -3051,20 +3057,28 @@ document.addEventListener("DOMContentLoaded", async()=>{
       "غياب": -100,
       "غياب بعذر": -50,
       "استئذان": -25,
+      "استئذان قبل بدء الحصة": -25,
+      "استئذان أثناء الحصة": -25,
       "إجازة": -10
     };
 
     async function applyAttendanceNote(studentId, noteLabel){
       try{
-        const delta = Number((NOTE_DEDUCTIONS[noteLabel] ?? -10));
+        const delta = Number((NOTE_DEDUCTIONS[noteLabel] ?? -10)); // خصم نقاط (قيمة سالبة)
         const sRef = db.collection("students").doc(studentId);
         await db.runTransaction(async(tx)=>{
           const sDoc = await tx.get(sRef);
           if(!sDoc.exists) throw new Error("student_not_found");
           const s = sDoc.data()||{};
-          const prev = Number(s.balance||0);
-          const next = prev + delta;
-          tx.update(sRef, {balance: next});
+
+          // لا نمسّ الرصيد إطلاقًا — الخصم من نقاط الأسبوع فقط
+          const prevBalance = Number(s.balance||0);
+
+          const prevWP = Number(s.weekPoints||s.pointsWeek||0);
+          const nextWP = prevWP + delta;
+
+          tx.update(sRef, { weekPoints: nextWP, pointsWeek: nextWP });
+
           const txRef = sRef.collection("txns").doc();
           tx.set(txRef, {
             studentId: studentId,
@@ -3072,14 +3086,17 @@ document.addEventListener("DOMContentLoaded", async()=>{
             guardianWhats: s.guardianWhats||"",
             type: "ملاحظة",
             reason: noteLabel,
-            amount: delta,
-            balanceAfter: next,
+            amount: 0,                 // بدون سحب/إيداع
+            balanceAfter: prevBalance, // يبقى كما هو
+            weekPointsDelta: delta,
+            weekPointsAfter: nextWP,
             dateKey: localTodayKey(),
             createdAtClient: Date.now(),
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
           });
         });
-        toast("تم تسجيل ملاحظة: " + noteLabel + " (" + delta + " نقطة)");
+
+        toast("تم تسجيل ملاحظة: " + noteLabel + " (خصم " + Math.abs(delta) + " نقطة من نقاط الأسبوع)");
       }catch(e){
         console.log(e);
         warn("تعذر تسجيل الملاحظة الآن.");
