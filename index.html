@@ -64,9 +64,11 @@
       padding:8px 10px;border-radius:12px;
       border:1px solid rgba(255,255,255,.10);
       background:rgba(0,0,0,.08);
+          color: var(--navy);
     }
     .footerNote{
       margin-top:10px;text-align:center;font-weight:900;letter-spacing:.2px;
+          color: var(--navy);
     }
 
     .modal{position:fixed;inset:0;background:rgba(0,0,0,.50);display:none;align-items:center;justify-content:center;padding:18px;z-index:9999}
@@ -1834,6 +1836,31 @@ ${SIGNATURE}`;
       $("newStudentName").value=""; await renderStudents();
     }
 
+    async function deleteStudentConfirm(studentId, studentName){
+      if(!studentId) return;
+      const name = (studentName||"هذا الطالب/الطالبة");
+      openModal("تأكيد الحذف","هل تريدين حذف <b>"+escapeHtml(name)+"</b> نهائيًا؟<div class='small' style='margin-top:6px;color:#6b7b8f'>* سيتم حذف حساب الطالب من هذا الفصل. لا يمكن التراجع.</div>",
+        "<div class='row' style='gap:10px;justify-content:flex-end'>"+
+          "<button class='btn3' onclick='closeModal()'>إلغاء</button>"+
+          "<button class='btnRed' onclick='__doDeleteStudent(""+studentId+"")'>حذف</button>"+
+        "</div>"
+      );
+    }
+    async function __doDeleteStudent(studentId){
+      try{
+        closeModal();
+        await db.collection("students").doc(studentId).delete();
+        // إذا كان الطالب مفتوح حاليًا
+        if(currentStudentId===studentId){ currentStudentId=null; }
+        await renderStudents();
+        openModal("تم ✅","تم حذف الطالب بنجاح.","<button class='btn' onclick='closeModal()'>تمام</button>");
+      }catch(e){
+        console.log(e);
+        warn("تعذر حذف الطالب. تأكدي من الاتصال وحاولي مرة أخرى.");
+      }
+    }
+
+
     function updateSelCount(){ $("selCount").textContent = "المحدد: " + selectedIds.size; }
     function toggleSelectAll(){
       const all = $("selAll").checked;
@@ -1909,6 +1936,7 @@ ${SIGNATURE}`;
             <button class="btn3 col js-pin">🔐 تغيير PIN</button>
             <button class="whatsapp-btn col js-sendpin">📲 إرسال PIN</button>
             <button class="btn2 col js-pdf">تقرير PDF</button>
+            <button class="btnRed col js-del">حذف الطالب</button>
 
           </div>
         `;
@@ -1923,6 +1951,7 @@ ${SIGNATURE}`;
 
         card.querySelector(".js-sendpin").onclick = ()=> sendPinToGuardian(s.id);
         card.querySelector(".js-pdf").onclick = ()=> pdfStudentReport(s.id);
+        card.querySelector(".js-del").onclick = ()=> deleteStudentConfirm(s.id, s.name||"");
         grid.appendChild(card);
       });
       updateSelCount();
