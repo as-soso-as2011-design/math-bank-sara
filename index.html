@@ -367,10 +367,6 @@
           <button class="btn" onclick="startApp()">ابدأ الآن</button>
           <button class="ghostBtn" onclick="openHelp()">هل تحتاج إلى مساعدة؟</button>
         </div>
-        <div class="startActions" style="margin-top:10px">
-          <button class="ghostBtn" onclick="switchMode('student')">دخول الطالب</button>
-          <button class="ghostBtn" onclick="switchMode('teacher')">دخول المعلمة</button>
-        </div>
       </div>
     </div>
   </div>
@@ -1211,20 +1207,23 @@
 
   <script>
     const urlParams = new URLSearchParams(window.location.search);
-    const APP_MODE = (urlParams.get("mode") || localStorage.getItem("MB_LAST_MODE") || "teacher").toLowerCase();
-    const IS_STUDENT_ENTRY = (APP_MODE === "student");
 
-    function switchMode(m){
+    // وضع الدخول يُقرأ دائمًا من الرابط (teacher / student) إن وُجد — ثم يُستخدم المخزّن كخيار احتياطي
+    function getEntryModeFromUrl(){
       try{
-        const u = new URL(window.location.href);
-        u.searchParams.set('mode', String(m||'teacher'));
-        window.location.href = u.toString();
-      }catch(e){
-        // fallback
-        window.location.search = '?mode=' + encodeURIComponent(String(m||'teacher'));
-      }
+        const m1 = urlParams.get("mode");
+        if(m1) return String(m1).trim();
+        // احتياط إضافي: بعض المتصفحات/الروابط قد تُعيد توجيه مع تغيّر search — لذلك نلتقطها من href
+        const href = String(window.location.href || "");
+        const match = href.match(/[?&]mode=([^&#]+)/i);
+        if(match && match[1]) return decodeURIComponent(match[1]).trim();
+      }catch(e){}
+      return null;
     }
 
+    const URL_MODE = getEntryModeFromUrl();
+    const APP_MODE = (URL_MODE || localStorage.getItem("MB_LAST_MODE") || "teacher").toLowerCase();
+    const IS_STUDENT_ENTRY = (APP_MODE === "student");
 
     const SIGNATURE = "المعلمة: سارة حقوي";
     const TEACHER_BANK_TITLE = "بنك الرياضيات – المصرفي";
