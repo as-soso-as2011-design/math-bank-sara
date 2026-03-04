@@ -332,12 +332,12 @@
 @media (max-width:420px){ .roulLabel span{font-size:11px} .roulHub{width:84px;height:84px} }
 
 
-    /* ===== Notes System (Class Page) ===== */
-    .studentName.absent-name{ color: var(--red) !important; font-weight:1000; }
-    .noteBox{ margin-top:10px; padding:10px; border-radius:14px; border:1px dashed rgba(0,0,0,.12); background:rgba(234,243,251,.65); }
-    .noteBox .noteRow{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
-    .noteBox select,.noteBox input{ padding:10px 10px; border-radius:12px; border:1px solid rgba(0,0,0,.16); font-size:13px; }
-    .noteBox .counter{ margin-top:6px; font-size:12px; color:#0b2a66; font-weight:900; }
+    /* Attachments (image/video) under each student */
+    .attBox{margin-top:10px;padding:10px;border-radius:14px;border:1px dashed rgba(0,0,0,.14);background:#fbfdff}
+    .attRow{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .attRow .attBtn{flex:1}
+    .attStatus{font-weight:1000;color:#0b2a66}
+    .attFile{display:none}
 
 </style>
 </head>
@@ -1020,7 +1020,7 @@
 
           <div class="tableWrap" style="margin-top:10px">
             <table>
-              <thead><tr><th>الوقت</th><th>العملية</th><th>السبب</th><th>المبلغ</th><th>الرصيد بعد العملية</th></tr></thead>
+              <thead><tr><th>الوقت</th><th>العملية</th><th>السبب</th><th>مرفق</th><th>المبلغ</th><th>الرصيد بعد العملية</th></tr></thead>
               <tbody id="stmtRows"></tbody>
             </table>
           </div>
@@ -2246,78 +2246,7 @@ ${SIGNATURE}`;
       updateSelCount();
     }
 
-    
-    // ===== Notes System (Class Page) =====
-    const __noteSaveTimers = {};
-    const __noteLastSig = {}; // prevent duplicate txns (especially while typing)
-
-    function __noteTypeLabel(t){
-      switch(t){
-        case "absent": return "غياب";
-        case "excused": return "غياب بعذر";
-        case "before": return "استئذان قبل الحصة";
-        case "during": return "استئذان أثناء الحصة";
-        case "clinic": return "الطالب/ة في العيادة";
-        case "leave": return "إجازة";
-        case "other": return "أخرى";
-        default: return "";
-      }
-    }
-
-    async function __logNoteToStatement(studentId, payload){
-      try{
-        // Build reason
-        const t = (payload?.noteType||"");
-        if(!t) return;
-
-        const label = __noteTypeLabel(t) || "ملاحظة";
-        const text = (t==="other" ? (payload?.noteText||"").trim() : "");
-        const reason = text ? `${label}: ${text}` : label;
-
-        // Fetch student for balance/name/guardian
-        const studentRef = db.collection("students").doc(studentId);
-        const sDoc = await studentRef.get();
-        const s = sDoc.data() || {};
-        const bal = Number(s.balance||0);
-
-        // Write txn (amount 0 — notes shouldn't affect balance)
-        await logTxn(
-          studentRef,
-          "ملاحظة",
-          reason,
-          0,
-          bal,
-          { name: s.name || "", guardianWhats: s.guardianWhats || s.guardianPhone || s.guardian || "" }
-        );
-      }catch(e){
-        console.log("note->statement error", e);
-      }
-    }
-
-    function __queueSaveStudentNote(studentId, payload){
-      try{
-        const sig = `${payload?.noteType||""}|${(payload?.noteText||"").trim()}|${Number(payload?.absenceCount||0)}`;
-        if(__noteSaveTimers[studentId]) clearTimeout(__noteSaveTimers[studentId]);
-        __noteSaveTimers[studentId] = setTimeout(async()=>{
-          try{
-            await db.collection("students").doc(studentId).update(payload);
-
-            // Avoid duplicates: only log when the content changed
-            if(__noteLastSig[studentId] !== sig){
-              __noteLastSig[studentId] = sig;
-              await __logNoteToStatement(studentId, payload);
-            }
-          }catch(e){
-            console.log(e);
-            warn("تعذر حفظ الملاحظة الآن.");
-          }
-        }, 450);
-      }catch(e){
-        console.log(e);
-      }
-    }
-
-async function renderStudents(){
+    async function renderStudents(){
       const snap = await db.collection("students").where("classId","==",currentClassId).get();
       const arr=[]; snap.forEach(d=>arr.push({id:d.id,...d.data()}));
       arr.sort((a,b)=>(a.name||"").localeCompare(b.name||"","ar"));
@@ -2366,32 +2295,12 @@ async function renderStudents(){
           </div>
 
           
-          
           <div style="margin-top:8px">
-            <strong class="studentName" data-student-name="${s.id}">${s.name || ""}</strong>
+            <strong>${s.name || ""}</strong>
             <div class="small">الرصيد: ${fmt(s.balance)} ر.س</div>
             <div class="small">PIN: <b>${s.pin||""}</b></div>
             <div class="small">ولي الأمر: <b style="direction:ltr;display:inline-block">${(s.guardianWhats||"—")}</b></div>
-
-            <!-- Notes -->
-            <div class="noteBox" data-note-box="${s.id}">
-              <div class="noteRow">
-                <select class="noteSel" title="ملاحظة الطالب/ة">
-                  <option value="">ملاحظة…</option>
-                  <option value="absent">غياب</option>
-                  <option value="excused">غياب بعذر</option>
-                  <option value="before">استئذان قبل الحصة</option>
-                  <option value="during">استئذان أثناء الحصة</option>
-                  <option value="clinic">في العيادة</option>
-                  <option value="leave">إجازة</option>
-                  <option value="other">أخرى</option>
-                </select>
-                <input class="noteOther hidden" type="text" placeholder="اكتبي الملاحظة هنا…" />
-              </div>
-              <div class="counter">عداد الغياب: <span class="absCount">0</span></div>
-            </div>
           </div>
-
 
           <div class="row" style="margin-top:10px">
             <button class="btn2 col js-open">دخول الطالب</button>
@@ -2417,75 +2326,39 @@ async function renderStudents(){
         card.querySelector(".js-sendpin").onclick = ()=> sendPinToGuardian(s.id);
         card.querySelector(".js-pdf").onclick = ()=> pdfStudentReport(s.id);
         card.querySelector(".js-del").onclick = ()=> deleteStudentConfirm(s.id, s.name||"");
+        
+        // Attachments UI init
+        try{
+          const attBtn = card.querySelector(".attBtn");
+          const attInput = card.querySelector(".attFile");
+          const attStatus = card.querySelector(".attStatus");
+          if(attBtn && attInput){
+            attBtn.onclick = ()=> attInput.click();
+            attInput.onchange = async()=>{
+              const f = (attInput.files && attInput.files[0]) ? attInput.files[0] : null;
+              if(!f) return;
+              // limit to keep the ledger lightweight
+              const MAX = 500 * 1024; // 500KB (آمن لكشف الحساب)
+              if(f.size > MAX){
+                warn("الملف كبير. فضلاً اختاري ملف أصغر (حتى 500KB).");
+                attInput.value = "";
+                return;
+              }
+              let dataUrl = "";
+              try{ dataUrl = await readFileAsDataURL(f); }catch(e){ warn("تعذر قراءة الملف"); attInput.value=""; return; }
 
-        // Notes UI init
-        const nameEl = card.querySelector(".studentName");
-        const noteSel = card.querySelector(".noteSel");
-        const otherIn = card.querySelector(".noteOther");
-        const absSpan = card.querySelector(".absCount");
+              const kind = (String(f.type||"").startsWith("video/")) ? "video" : "image";
+              const ref = db.collection("students").doc(s.id);
+              const bal = Number(s.balance||0);
+              await logTxn(ref, "مرفق", (kind==="video" ? "إرفاق فيديو" : "إرفاق صورة"), 0, bal, s, {
+                attachment: { kind, name: f.name||"", mime: f.type||"", size: Number(f.size||0), dataUrl }
+              });
 
-        let curType = (s.noteType || "");
-        let curAbs = Number(s.absenceCount || 0);
-
-        if(absSpan) absSpan.textContent = String(curAbs);
-        if(noteSel) noteSel.value = curType;
-
-        const applyNoteUi = (t)=>{
-          if(!nameEl) return;
-          const isAbs = (t==="absent" || t==="excused");
-          nameEl.classList.toggle("absent-name", isAbs);
-        };
-        applyNoteUi(curType);
-
-        if(otherIn){
-          if(curType==="other"){
-            otherIn.classList.remove("hidden");
-            otherIn.value = (s.noteText || "");
-          }else{
-            otherIn.classList.add("hidden");
-            otherIn.value = "";
+              if(attStatus) attStatus.textContent = "تم الإرفاق ✅";
+              attInput.value = "";
+            };
           }
-        }
-
-        if(noteSel){
-          noteSel.onchange = ()=>{
-            const t = noteSel.value || "";
-            // absence counter: count when switching to absent/excused from non-absent
-            if((t==="absent" || t==="excused") && !(curType==="absent" || curType==="excused")){
-              curAbs = curAbs + 1; // الغياب = 0 نقاط (لا خصم) لكن العداد يزيد
-              if(absSpan) absSpan.textContent = String(curAbs);
-            }
-            curType = t;
-
-            if(otherIn){
-              if(t==="other") otherIn.classList.remove("hidden");
-              else { otherIn.classList.add("hidden"); otherIn.value=""; }
-            }
-
-            applyNoteUi(t);
-
-            const payload = {
-              noteType: t,
-              noteText: (t==="other" ? (otherIn?.value||"").trim() : ""),
-              absenceCount: curAbs,
-              noteUpdatedAt: Date.now()
-            };
-            __queueSaveStudentNote(s.id, payload);
-          };
-        }
-
-        if(otherIn){
-          otherIn.oninput = ()=>{
-            if(curType!=="other") return;
-            const payload = {
-              noteType: "other",
-              noteText: (otherIn.value||"").trim(),
-              absenceCount: curAbs,
-              noteUpdatedAt: Date.now()
-            };
-            __queueSaveStudentNote(s.id, payload);
-          };
-        }
+        }catch(e){}
 
         grid.appendChild(card);
       });
@@ -2495,12 +2368,18 @@ async function renderStudents(){
     async function showStatement(){
       const snap=await db.collection("students").doc(currentStudentId).collection("txns").orderBy("createdAtClient","desc").limit(80).get();
       const rows=$("stmtRows"); rows.innerHTML="";
-      if(snap.empty){ rows.innerHTML='<tr><td colspan="5" class="small">لا توجد عمليات في هذه الفترة.</td></tr>'; return; }
+      if(snap.empty){ rows.innerHTML='<tr><td colspan="6" class="small">لا توجد عمليات في هذه الفترة.</td></tr>'; return; }
       snap.forEach(d=>{
         const x=d.data();
         const t=x.createdAtClient ? new Date(x.createdAtClient).toLocaleString("ar-SA") : "";
         const tr=document.createElement("tr");
-        tr.innerHTML=`<td>${t}</td><td>${x.type||""}</td><td>${x.reason||""}</td><td>${fmt(x.amount)}</td><td>${fmt(x.balanceAfter)}</td>`;
+        const att = x.attachment || null;
+        let attHtml = "—";
+        if(att && att.dataUrl){
+          const label = (att.kind==="video") ? "عرض فيديو" : "عرض صورة";
+          attHtml = `<a href="${att.dataUrl}" target="_blank" style="font-weight:900;color:#0b5bb5;text-decoration:none">${label}</a>`;
+        }
+        tr.innerHTML=`<td>${t}</td><td>${x.type||""}</td><td>${x.reason||""}</td><td>${attHtml}</td><td>${fmt(x.amount)}</td><td>${fmt(x.balanceAfter)}</td>`;
         rows.appendChild(tr);
       });
     }
@@ -3051,7 +2930,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
             <td>${fmt(x.balanceAfter)}</td>
           </tr>`;
         });
-        if(!rows) rows = `<tr><td colspan="5" class="muted" style="padding:18px">لا توجد عمليات.</td></tr>`;
+        if(!rows) rows = `<tr><td colspan="6" class="muted" style="padding:18px">لا توجد عمليات.</td></tr>`;
 
         const inner = `
           <div style="font-weight:1000;color:#0b2a66;margin-bottom:8px">تقرير الطالب</div>
@@ -3059,7 +2938,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
             الاسم: <b>${s.name||"—"}</b> • الرصيد: <b>${fmt(s.balance)}</b> ر.س • PIN: <b>${s.pin||"—"}</b>
           </div>
           <table>
-            <thead><tr><th>الوقت</th><th>العملية</th><th>السبب</th><th>المبلغ</th><th>الرصيد بعد العملية</th></tr></thead>
+            <thead><tr><th>الوقت</th><th>العملية</th><th>السبب</th><th>مرفق</th><th>المبلغ</th><th>الرصيد بعد العملية</th></tr></thead>
             <tbody>${rows}</tbody>
           </table>
         `;
@@ -3139,12 +3018,23 @@ document.addEventListener("DOMContentLoaded", async()=>{
       return `${yyyy}-${mm}-${dd}`;
     }
     function localTodayKey(){ return localDateKeyFromDate(new Date()); }
+    function readFileAsDataURL(file){
+      return new Promise((resolve,reject)=>{
+        try{
+          const r = new FileReader();
+          r.onload = ()=> resolve(String(r.result||""));
+          r.onerror = ()=> reject(r.error||new Error("FileReader error"));
+          r.readAsDataURL(file);
+        }catch(e){ reject(e); }
+      });
+    }
 
-    async function logTxn(studentRef, type, reason, amount, balanceAfter, meta){
+
+    async function logTxn(studentRef, type, reason, amount, balanceAfter, meta, extra){
       try{
         const m = meta || {};
-        await studentRef.collection("txns").add({
-          studentId: studentRef.id || "",
+        const doc = {
+studentId: studentRef.id || "",
           studentName: m.name || m.studentName || "",
           guardianWhats: m.guardianWhats || m.guardian || "",
           type: type || "",
@@ -3154,9 +3044,12 @@ document.addEventListener("DOMContentLoaded", async()=>{
           dateKey: localTodayKey(),
           createdAtClient: Date.now(),
           createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
+        };
+        if(extra && typeof extra === "object"){
+          try{ Object.assign(doc, extra); }catch(e){}
+        }
+        await studentRef.collection("txns").add(doc);
       }catch(e){
-
         // ignore logging errors to avoid blocking UI
         console.log("logTxn error", e);
       }
@@ -3982,7 +3875,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
         count++;
       });
 
-      if(!rows) rows = `<tr><td colspan="5" class="muted" style="padding:18px">لا توجد عمليات ضمن الفترة المحددة.</td></tr>`;
+      if(!rows) rows = `<tr><td colspan="6" class="muted" style="padding:18px">لا توجد عمليات ضمن الفترة المحددة.</td></tr>`;
 
       const fromTxt = new Date(fromMs).toLocaleDateString("ar-SA");
       const toTxt   = new Date(toMs).toLocaleDateString("ar-SA");
@@ -4013,7 +3906,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
         </div>
 
         <table>
-          <thead><tr><th>الوقت</th><th>العملية</th><th>السبب</th><th>المبلغ</th><th>الرصيد بعد العملية</th></tr></thead>
+          <thead><tr><th>الوقت</th><th>العملية</th><th>السبب</th><th>مرفق</th><th>المبلغ</th><th>الرصيد بعد العملية</th></tr></thead>
           <tbody>${rows}</tbody>
         </table>
       `;
