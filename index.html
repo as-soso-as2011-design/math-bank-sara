@@ -331,14 +331,6 @@
 .roulLabel span{position:absolute;left:50%;top:8%;transform-origin:0 150px;font-size:12px;font-weight:900;color:#0b2a66;white-space:nowrap;text-shadow:0 1px 0 rgba(255,255,255,.7)}
 @media (max-width:420px){ .roulLabel span{font-size:11px} .roulHub{width:84px;height:84px} }
 
-
-    /* Attachments (image/video) under each student */
-    .attBox{margin-top:10px;padding:10px;border-radius:14px;border:1px dashed rgba(0,0,0,.14);background:#fbfdff}
-    .attRow{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-    .attRow .attBtn{flex:1}
-    .attStatus{font-weight:1000;color:#0b2a66}
-    .attFile{display:none}
-
 </style>
 </head>
 
@@ -2300,6 +2292,11 @@ ${SIGNATURE}`;
             <div class="small">الرصيد: ${fmt(s.balance)} ر.س</div>
             <div class="small">PIN: <b>${s.pin||""}</b></div>
             <div class="small">ولي الأمر: <b style="direction:ltr;display:inline-block">${(s.guardianWhats||"—")}</b></div>
+            <div class="row" style="margin-top:8px;gap:10px;align-items:center;flex-wrap:wrap">
+              <button class="btn3 js-attach" type="button" style="min-width:180px">📎 إرفاق صورة/فيديو</button>
+              <span class="small js-attachStatus" style="color:#47607e">—</span>
+            </div>
+
           </div>
 
           <div class="row" style="margin-top:10px">
@@ -2314,10 +2311,15 @@ ${SIGNATURE}`;
 
           </div>
         `;
+        card.dataset.stuId = s.id;
         const cb = card.querySelector('input[data-sel="stu"]');
         cb.onchange = ()=>{ cb.checked ? selectedIds.add(s.id) : selectedIds.delete(s.id); updateSelCount(); };
 
-        card.querySelector(".js-open").onclick = async()=>{ currentAccess="teacher"; currentStudentId=s.id; await openStudentAccount(s); };
+        
+        // Attachment (photo/video) -> saved to ledger
+        const attBtn = card.querySelector(".js-attach");
+        if(attBtn){ attBtn.onclick = ()=> addAttachmentForStudent(s.id); }
+card.querySelector(".js-open").onclick = async()=>{ currentAccess="teacher"; currentStudentId=s.id; await openStudentAccount(s); };
         card.querySelector(".js-toggle").onclick = async()=>{ await db.collection("students").doc(s.id).update({active:!s.active}); await renderStudents(); };
         card.querySelector(".js-edit").onclick = async()=>{ const nn = prompt("الاسم الجديد:", s.name); if(nn) await db.collection("students").doc(s.id).update({name:nn.trim()}); await renderStudents(); };
         card.querySelector(".js-phone").onclick = ()=> editGuardianPhone(s.id);
@@ -2326,40 +2328,6 @@ ${SIGNATURE}`;
         card.querySelector(".js-sendpin").onclick = ()=> sendPinToGuardian(s.id);
         card.querySelector(".js-pdf").onclick = ()=> pdfStudentReport(s.id);
         card.querySelector(".js-del").onclick = ()=> deleteStudentConfirm(s.id, s.name||"");
-        
-        // Attachments UI init
-        try{
-          const attBtn = card.querySelector(".attBtn");
-          const attInput = card.querySelector(".attFile");
-          const attStatus = card.querySelector(".attStatus");
-          if(attBtn && attInput){
-            attBtn.onclick = ()=> attInput.click();
-            attInput.onchange = async()=>{
-              const f = (attInput.files && attInput.files[0]) ? attInput.files[0] : null;
-              if(!f) return;
-              // limit to keep the ledger lightweight
-              const MAX = 500 * 1024; // 500KB (آمن لكشف الحساب)
-              if(f.size > MAX){
-                warn("الملف كبير. فضلاً اختاري ملف أصغر (حتى 500KB).");
-                attInput.value = "";
-                return;
-              }
-              let dataUrl = "";
-              try{ dataUrl = await readFileAsDataURL(f); }catch(e){ warn("تعذر قراءة الملف"); attInput.value=""; return; }
-
-              const kind = (String(f.type||"").startsWith("video/")) ? "video" : "image";
-              const ref = db.collection("students").doc(s.id);
-              const bal = Number(s.balance||0);
-              await logTxn(ref, "مرفق", (kind==="video" ? "إرفاق فيديو" : "إرفاق صورة"), 0, bal, s, {
-                attachment: { kind, name: f.name||"", mime: f.type||"", size: Number(f.size||0), dataUrl }
-              });
-
-              if(attStatus) attStatus.textContent = "تم الإرفاق ✅";
-              attInput.value = "";
-            };
-          }
-        }catch(e){}
-
         grid.appendChild(card);
       });
       updateSelCount();
@@ -2373,13 +2341,7 @@ ${SIGNATURE}`;
         const x=d.data();
         const t=x.createdAtClient ? new Date(x.createdAtClient).toLocaleString("ar-SA") : "";
         const tr=document.createElement("tr");
-        const att = x.attachment || null;
-        let attHtml = "—";
-        if(att && att.dataUrl){
-          const label = (att.kind==="video") ? "عرض فيديو" : "عرض صورة";
-          attHtml = `<a href="${att.dataUrl}" target="_blank" style="font-weight:900;color:#0b5bb5;text-decoration:none">${label}</a>`;
-        }
-        tr.innerHTML=`<td>${t}</td><td>${x.type||""}</td><td>${x.reason||""}</td><td>${attHtml}</td><td>${fmt(x.amount)}</td><td>${fmt(x.balanceAfter)}</td>`;
+        tr.innerHTML=`<td>${t}</td><td>${x.type||""}</td><td>${x.reason||""}</td><td>${fmt(x.amount)}</td><td>${fmt(x.balanceAfter)}</td>`;
         rows.appendChild(tr);
       });
     }
@@ -2908,6 +2870,106 @@ document.addEventListener("DOMContentLoaded", async()=>{
 <script>
   window.onload = ()=>{ setTimeout(()=>window.print(), 300); };
 <\/script>
+
+<div id="attachModal" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;display:flex;align-items:center;justify-content:center;padding:14px">
+  <div class="card" style="max-width:900px;width:min(900px,100%);max-height:85vh;overflow:auto">
+    <div class="row" style="justify-content:space-between;align-items:center">
+      <div style="font-weight:900;color:#0b2a66">المرفق</div>
+      <button class="btn3" onclick="closeAttachment()">إغلاق</button>
+    </div>
+    <div id="attachBody" style="margin-top:10px"></div>
+  </div>
+</div>
+
+
+<script>
+async function addAttachmentForStudent(studentId){
+  try{
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*,video/*';
+    input.onchange = async () => {
+      const file = input.files && input.files[0];
+      if(!file) return;
+
+      const MAX = 900 * 1024; // 900KB
+      if(file.size > MAX){
+        alert('حجم الملف كبير. رجاءً اختاري ملفًا أقل من 900KB.');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = async () => {
+        const dataUrl = String(reader.result||'');
+        const mime = file.type || (dataUrl.split(';')[0].replace('data:','') || 'application/octet-stream');
+        const name = file.name || 'attachment';
+
+        const sRef = db.collection('students').doc(studentId);
+        const sDoc = await sRef.get();
+        const sData = sDoc.data()||{};
+        const balanceAfter = Number(sData.balance||0);
+
+        await sRef.collection('txns').add({
+          type: 'مرفق',
+          reason: 'إرفاق ملف (صورة/فيديو)',
+          amount: 0,
+          balanceAfter,
+          attachment: { mime, name, data: dataUrl },
+          createdAtClient: Date.now(),
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        try{
+          const card = document.querySelector(`[data-stu-id="${studentId}"]`);
+          if(card){
+            const st = card.querySelector('.js-attachStatus');
+            if(st) st.textContent = '✅ تم الإرفاق';
+          }
+        }catch(e){}
+
+        try{ if(window.currentStudentId === studentId){ showStatement(); } }catch(e){}
+      };
+      reader.readAsDataURL(file);
+    };
+    input.click();
+  }catch(e){
+    console.log(e);
+    alert('تعذر إرفاق الملف.');
+  }
+}
+
+async function openAttachment(txnId){
+  try{
+    const modal = document.getElementById('attachModal');
+    const body = document.getElementById('attachBody');
+    body.innerHTML = '...جاري التحميل...';
+    modal.classList.remove('hidden');
+
+    const d = await db.collection('students').doc(currentStudentId).collection('txns').doc(txnId).get();
+    const x = d.data()||{};
+    const att = x.attachment || {};
+    if(!att.data || !att.mime){
+      body.innerHTML = '<div class="small">لا يوجد مرفق.</div>';
+      return;
+    }
+
+    if(att.mime.startsWith('image/')){
+      body.innerHTML = `<img src="${att.data}" alt="attachment" style="max-width:100%;border-radius:14px;border:1px solid rgba(0,0,0,.08)">`;
+    }else if(att.mime.startsWith('video/')){
+      body.innerHTML = `<video src="${att.data}" controls style="max-width:100%;border-radius:14px;border:1px solid rgba(0,0,0,.08)"></video>`;
+    }else{
+      body.innerHTML = `<a class="btn2" href="${att.data}" download="${att.name||'attachment'}">تحميل الملف</a>`;
+    }
+  }catch(e){
+    console.log(e);
+    alert('تعذر فتح المرفق.');
+  }
+}
+function closeAttachment(){
+  document.getElementById('attachModal').classList.add('hidden');
+}
+</script>
+
 </body></html>`);
       w.document.close();
     }
@@ -3018,23 +3080,12 @@ document.addEventListener("DOMContentLoaded", async()=>{
       return `${yyyy}-${mm}-${dd}`;
     }
     function localTodayKey(){ return localDateKeyFromDate(new Date()); }
-    function readFileAsDataURL(file){
-      return new Promise((resolve,reject)=>{
-        try{
-          const r = new FileReader();
-          r.onload = ()=> resolve(String(r.result||""));
-          r.onerror = ()=> reject(r.error||new Error("FileReader error"));
-          r.readAsDataURL(file);
-        }catch(e){ reject(e); }
-      });
-    }
 
-
-    async function logTxn(studentRef, type, reason, amount, balanceAfter, meta, extra){
+    async function logTxn(studentRef, type, reason, amount, balanceAfter, meta){
       try{
         const m = meta || {};
-        const doc = {
-studentId: studentRef.id || "",
+        await studentRef.collection("txns").add({
+          studentId: studentRef.id || "",
           studentName: m.name || m.studentName || "",
           guardianWhats: m.guardianWhats || m.guardian || "",
           type: type || "",
@@ -3044,12 +3095,9 @@ studentId: studentRef.id || "",
           dateKey: localTodayKey(),
           createdAtClient: Date.now(),
           createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        };
-        if(extra && typeof extra === "object"){
-          try{ Object.assign(doc, extra); }catch(e){}
-        }
-        await studentRef.collection("txns").add(doc);
+        });
       }catch(e){
+
         // ignore logging errors to avoid blocking UI
         console.log("logTxn error", e);
       }
@@ -4538,5 +4586,105 @@ function renderRoulettePane(){
 })();
 
 </script>
+
+<div id="attachModal" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;display:flex;align-items:center;justify-content:center;padding:14px">
+  <div class="card" style="max-width:900px;width:min(900px,100%);max-height:85vh;overflow:auto">
+    <div class="row" style="justify-content:space-between;align-items:center">
+      <div style="font-weight:900;color:#0b2a66">المرفق</div>
+      <button class="btn3" onclick="closeAttachment()">إغلاق</button>
+    </div>
+    <div id="attachBody" style="margin-top:10px"></div>
+  </div>
+</div>
+
+
+<script>
+async function addAttachmentForStudent(studentId){
+  try{
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*,video/*';
+    input.onchange = async () => {
+      const file = input.files && input.files[0];
+      if(!file) return;
+
+      const MAX = 900 * 1024; // 900KB
+      if(file.size > MAX){
+        alert('حجم الملف كبير. رجاءً اختاري ملفًا أقل من 900KB.');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = async () => {
+        const dataUrl = String(reader.result||'');
+        const mime = file.type || (dataUrl.split(';')[0].replace('data:','') || 'application/octet-stream');
+        const name = file.name || 'attachment';
+
+        const sRef = db.collection('students').doc(studentId);
+        const sDoc = await sRef.get();
+        const sData = sDoc.data()||{};
+        const balanceAfter = Number(sData.balance||0);
+
+        await sRef.collection('txns').add({
+          type: 'مرفق',
+          reason: 'إرفاق ملف (صورة/فيديو)',
+          amount: 0,
+          balanceAfter,
+          attachment: { mime, name, data: dataUrl },
+          createdAtClient: Date.now(),
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        try{
+          const card = document.querySelector(`[data-stu-id="${studentId}"]`);
+          if(card){
+            const st = card.querySelector('.js-attachStatus');
+            if(st) st.textContent = '✅ تم الإرفاق';
+          }
+        }catch(e){}
+
+        try{ if(window.currentStudentId === studentId){ showStatement(); } }catch(e){}
+      };
+      reader.readAsDataURL(file);
+    };
+    input.click();
+  }catch(e){
+    console.log(e);
+    alert('تعذر إرفاق الملف.');
+  }
+}
+
+async function openAttachment(txnId){
+  try{
+    const modal = document.getElementById('attachModal');
+    const body = document.getElementById('attachBody');
+    body.innerHTML = '...جاري التحميل...';
+    modal.classList.remove('hidden');
+
+    const d = await db.collection('students').doc(currentStudentId).collection('txns').doc(txnId).get();
+    const x = d.data()||{};
+    const att = x.attachment || {};
+    if(!att.data || !att.mime){
+      body.innerHTML = '<div class="small">لا يوجد مرفق.</div>';
+      return;
+    }
+
+    if(att.mime.startsWith('image/')){
+      body.innerHTML = `<img src="${att.data}" alt="attachment" style="max-width:100%;border-radius:14px;border:1px solid rgba(0,0,0,.08)">`;
+    }else if(att.mime.startsWith('video/')){
+      body.innerHTML = `<video src="${att.data}" controls style="max-width:100%;border-radius:14px;border:1px solid rgba(0,0,0,.08)"></video>`;
+    }else{
+      body.innerHTML = `<a class="btn2" href="${att.data}" download="${att.name||'attachment'}">تحميل الملف</a>`;
+    }
+  }catch(e){
+    console.log(e);
+    alert('تعذر فتح المرفق.');
+  }
+}
+function closeAttachment(){
+  document.getElementById('attachModal').classList.add('hidden');
+}
+</script>
+
 </body>
 </html>
