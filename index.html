@@ -1012,7 +1012,7 @@
 
           <div class="tableWrap" style="margin-top:10px">
             <table>
-              <thead><tr><th>الوقت</th><th>العملية</th><th>السبب</th><th>مرفق</th><th>المبلغ</th><th>الرصيد بعد العملية</th></tr></thead>
+              <thead><tr><th>الوقت</th><th>العملية</th><th>السبب</th><th>المبلغ</th><th>الرصيد بعد العملية</th></tr></thead>
               <tbody id="stmtRows"></tbody>
             </table>
           </div>
@@ -1225,6 +1225,51 @@
     </div>
     <div class="footerNote">الرياضيات لغة الأذكياء ✨</div>
   </div>
+
+<script>
+/* ✅ Fallback boot (prevents "ابدأ الآن" from breaking if Firebase/CDN fails) */
+(function(){
+  function $(id){ return document.getElementById(id); }
+  function hide(id){
+    var el=$(id); if(!el) return;
+    el.classList.add("hidden");
+    if(id==="startOverlay"||id==="onboardOverlay"){ el.style.display="none"; }
+  }
+  function show(id, display){
+    var el=$(id); if(!el) return;
+    el.classList.remove("hidden");
+    if(display) el.style.display=display;
+  }
+  function fallbackGo(){
+    try{
+      var mode=(new URLSearchParams(location.search).get("mode")||"teacher").toLowerCase();
+      hide("startOverlay"); hide("onboardOverlay");
+      // أخفِ باقي الصفحات إن وجدت
+      ["teacherLoginPage","studentLoginPage","classesPage","classPage","studentAccountPage","dailyOpsPage"].forEach(function(pid){
+        var p=$(pid); if(p) p.classList.add("hidden");
+      });
+      var target = (mode==="student") ? "studentLoginPage" : "teacherLoginPage";
+      // لو صفحة الدخول موجودة اعرضها، وإلا اعرض الفصول
+      if($(target)){ show(target); }
+      else if($("classesPage")){ show("classesPage"); }
+    }catch(e){}
+  }
+  // عرف startApp مبكرًا (ولا نغطي على النسخة الأصلية إذا كانت موجودة)
+  if(typeof window.startApp !== "function"){
+    window.startApp = function(){ fallbackGo(); };
+  }
+  // تأكد من أن زر "ابدأ الآن" يعمل حتى لو تعطّل onclick
+  document.addEventListener("click", function(ev){
+    var btn = ev.target && ev.target.closest ? ev.target.closest("button") : null;
+    if(!btn) return;
+    var txt=(btn.textContent||"").trim();
+    if(txt==="ابدأ الآن" || (btn.getAttribute("onclick")||"").includes("startApp")){
+      ev.preventDefault(); ev.stopPropagation();
+      try{ window.startApp(); }catch(e){ fallbackGo(); }
+    }
+  }, true);
+})();
+</script>
 <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore-compat.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -2292,11 +2337,6 @@ ${SIGNATURE}`;
             <div class="small">الرصيد: ${fmt(s.balance)} ر.س</div>
             <div class="small">PIN: <b>${s.pin||""}</b></div>
             <div class="small">ولي الأمر: <b style="direction:ltr;display:inline-block">${(s.guardianWhats||"—")}</b></div>
-            <div class="row" style="margin-top:8px;gap:10px;align-items:center;flex-wrap:wrap">
-              <button class="btn3 js-attach" type="button" style="min-width:180px">📎 إرفاق صورة/فيديو</button>
-              <span class="small js-attachStatus" style="color:#47607e">—</span>
-            </div>
-
           </div>
 
           <div class="row" style="margin-top:10px">
@@ -2311,13 +2351,8 @@ ${SIGNATURE}`;
 
           </div>
         `;
-        card.dataset.stuId = s.id;
         const cb = card.querySelector('input[data-sel="stu"]');
         cb.onchange = ()=>{ cb.checked ? selectedIds.add(s.id) : selectedIds.delete(s.id); updateSelCount(); };
-
-        // Attachment (photo/video) -> saved to ledger
-        const attBtn = card.querySelector(".js-attach");
-        if(attBtn){ attBtn.onclick = ()=> addAttachmentForStudent(s.id); }
 
         card.querySelector(".js-open").onclick = async()=>{ currentAccess="teacher"; currentStudentId=s.id; await openStudentAccount(s); };
         card.querySelector(".js-toggle").onclick = async()=>{ await db.collection("students").doc(s.id).update({active:!s.active}); await renderStudents(); };
@@ -2336,7 +2371,7 @@ ${SIGNATURE}`;
     async function showStatement(){
       const snap=await db.collection("students").doc(currentStudentId).collection("txns").orderBy("createdAtClient","desc").limit(80).get();
       const rows=$("stmtRows"); rows.innerHTML="";
-      if(snap.empty){ rows.innerHTML='<tr><td colspan="6" class="small">لا توجد عمليات في هذه الفترة.</td></tr>'; return; }
+      if(snap.empty){ rows.innerHTML='<tr><td colspan="5" class="small">لا توجد عمليات في هذه الفترة.</td></tr>'; return; }
       snap.forEach(d=>{
         const x=d.data();
         const t=x.createdAtClient ? new Date(x.createdAtClient).toLocaleString("ar-SA") : "";
@@ -2867,7 +2902,6 @@ document.addEventListener("DOMContentLoaded", async()=>{
     <div class="sigBox" style="text-align:left;direction:ltr">التاريخ<br>${greg}</div>
   </div>
 </div>
-</script>
 <script>
   window.onload = ()=>{ setTimeout(()=>window.print(), 300); };
 <\/script>
@@ -2893,7 +2927,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
             <td>${fmt(x.balanceAfter)}</td>
           </tr>`;
         });
-        if(!rows) rows = `<tr><td colspan="6" class="muted" style="padding:18px">لا توجد عمليات.</td></tr>`;
+        if(!rows) rows = `<tr><td colspan="5" class="muted" style="padding:18px">لا توجد عمليات.</td></tr>`;
 
         const inner = `
           <div style="font-weight:1000;color:#0b2a66;margin-bottom:8px">تقرير الطالب</div>
@@ -2901,7 +2935,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
             الاسم: <b>${s.name||"—"}</b> • الرصيد: <b>${fmt(s.balance)}</b> ر.س • PIN: <b>${s.pin||"—"}</b>
           </div>
           <table>
-            <thead><tr><th>الوقت</th><th>العملية</th><th>السبب</th><th>مرفق</th><th>المبلغ</th><th>الرصيد بعد العملية</th></tr></thead>
+            <thead><tr><th>الوقت</th><th>العملية</th><th>السبب</th><th>المبلغ</th><th>الرصيد بعد العملية</th></tr></thead>
             <tbody>${rows}</tbody>
           </table>
         `;
@@ -3824,7 +3858,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
         count++;
       });
 
-      if(!rows) rows = `<tr><td colspan="6" class="muted" style="padding:18px">لا توجد عمليات ضمن الفترة المحددة.</td></tr>`;
+      if(!rows) rows = `<tr><td colspan="5" class="muted" style="padding:18px">لا توجد عمليات ضمن الفترة المحددة.</td></tr>`;
 
       const fromTxt = new Date(fromMs).toLocaleDateString("ar-SA");
       const toTxt   = new Date(toMs).toLocaleDateString("ar-SA");
@@ -3855,7 +3889,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
         </div>
 
         <table>
-          <thead><tr><th>الوقت</th><th>العملية</th><th>السبب</th><th>مرفق</th><th>المبلغ</th><th>الرصيد بعد العملية</th></tr></thead>
+          <thead><tr><th>الوقت</th><th>العملية</th><th>السبب</th><th>المبلغ</th><th>الرصيد بعد العملية</th></tr></thead>
           <tbody>${rows}</tbody>
         </table>
       `;
@@ -4487,104 +4521,5 @@ function renderRoulettePane(){
 })();
 
 </script>
-
-<div id="attachModal" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;display:flex;align-items:center;justify-content:center;padding:14px">
-  <div class="card" style="max-width:900px;width:min(900px,100%);max-height:85vh;overflow:auto">
-    <div class="row" style="justify-content:space-between;align-items:center">
-      <div style="font-weight:900;color:#0b2a66">المرفق</div>
-      <button class="btn3" type="button" onclick="closeAttachment()">إغلاق</button>
-    </div>
-    <div id="attachBody" style="margin-top:10px"></div>
-  </div>
-</div>
-
-<script>
-async function addAttachmentForStudent(studentId){
-  try{
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*,video/*';
-    input.onchange = async () => {
-      const file = input.files && input.files[0];
-      if(!file) return;
-
-      const MAX = 900 * 1024; // 900KB
-      if(file.size > MAX){
-        alert('حجم الملف كبير. رجاءً اختاري ملفًا أقل من 900KB.');
-        return;
-      }
-
-      const reader = new FileReader();
-      reader.onload = async () => {
-        const dataUrl = String(reader.result||'');
-        const mime = file.type || (dataUrl.split(';')[0].replace('data:','') || 'application/octet-stream');
-        const name = file.name || 'attachment';
-
-        const sRef = db.collection('students').doc(studentId);
-        const sDoc = await sRef.get();
-        const sData = sDoc.data()||{};
-        const balanceAfter = Number(sData.balance||0);
-
-        await sRef.collection('txns').add({
-          type: 'مرفق',
-          reason: 'إرفاق ملف (صورة/فيديو)',
-          amount: 0,
-          balanceAfter,
-          attachment: { mime, name, data: dataUrl },
-          createdAtClient: Date.now(),
-          createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-
-        try{
-          const card = document.querySelector(`[data-stu-id="${studentId}"]`);
-          if(card){
-            const st = card.querySelector('.js-attachStatus');
-            if(st) st.textContent = '✅ تم الإرفاق';
-          }
-        }catch(e){}
-
-        try{ if(window.currentStudentId === studentId){ showStatement(); } }catch(e){}
-      };
-      reader.readAsDataURL(file);
-    };
-    input.click();
-  }catch(e){
-    console.log(e);
-    alert('تعذر إرفاق الملف.');
-  }
-}
-
-async function openAttachment(txnId){
-  try{
-    const modal = document.getElementById('attachModal');
-    const body = document.getElementById('attachBody');
-    body.innerHTML = '...جاري التحميل...';
-    modal.classList.remove('hidden');
-
-    const d = await db.collection('students').doc(currentStudentId).collection('txns').doc(txnId).get();
-    const x = d.data()||{};
-    const att = x.attachment || {};
-    if(!att.data || !att.mime){
-      body.innerHTML = '<div class="small">لا يوجد مرفق.</div>';
-      return;
-    }
-
-    if(att.mime.startsWith('image/')){
-      body.innerHTML = `<img src="${att.data}" alt="attachment" style="max-width:100%;border-radius:14px;border:1px solid rgba(0,0,0,.08)">`;
-    }else if(att.mime.startsWith('video/')){
-      body.innerHTML = `<video src="${att.data}" controls style="max-width:100%;border-radius:14px;border:1px solid rgba(0,0,0,.08)"></video>`;
-    }else{
-      body.innerHTML = `<a class="btn2" href="${att.data}" download="${att.name||'attachment'}">تحميل الملف</a>`;
-    }
-  }catch(e){
-    console.log(e);
-    alert('تعذر فتح المرفق.');
-  }
-}
-function closeAttachment(){
-  document.getElementById('attachModal').classList.add('hidden');
-}
-</script>
-
 </body>
 </html>
