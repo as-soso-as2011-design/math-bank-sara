@@ -1020,7 +1020,7 @@
 
           <div class="tableWrap" style="margin-top:10px">
             <table>
-              <thead><tr><th>الوقت</th><th>العملية</th><th>السبب</th><th>المبلغ</th><th>الرصيد بعد العملية</th></tr></thead>
+              <thead><tr><th>الوقت</th><th>العملية</th><th>السبب</th><th>المبلغ</th><th>الرصيد بعد العملية</th><th>مرفقات</th></tr></thead>
               <tbody id="stmtRows"></tbody>
             </table>
           </div>
@@ -2388,6 +2388,22 @@ async function renderStudents(){
                 </select>
                 <input class="noteOther hidden" type="text" placeholder="اكتبي الملاحظة هنا…" />
               </div>
+
+              <div class="noteRow" style="margin-top:8px">
+                <input class="noteImg" type="file" accept="image/*" title="إرفاق صورة" />
+                <input class="noteVideo" type="url" placeholder="رابط فيديو (اختياري)" />
+              </div>
+
+              <div class="noteRow" style="margin-top:8px">
+                <input class="noteDeduct" type="number" min="0" step="1" placeholder="مقدار الخصم من الرصيد" />
+                <button class="btn2 noteSave" type="button">حفظ الملاحظة</button>
+              </div>
+
+              <div class="noteRow" style="margin-top:8px;align-items:flex-start">
+                <img class="noteImgPrev hidden" alt="صورة مرفقة" style="max-width:120px;border-radius:12px;border:1px solid rgba(0,0,0,.10)" />
+                <a class="noteVideoPrev hidden" target="_blank" rel="noopener" style="font-weight:900;color:#0b5bb5;text-decoration:none">🎥 فتح الفيديو</a>
+              </div>
+
               <div class="counter">عداد الغياب: <span class="absCount">0</span></div>
             </div>
           </div>
@@ -2447,12 +2463,83 @@ async function renderStudents(){
           }
         }
 
+        // --- New Notes (with image + video link + deduction) ---
+        const imgIn = card.querySelector(".noteImg");
+        const imgPrev = card.querySelector(".noteImgPrev");
+        const videoIn = card.querySelector(".noteVideo");
+        const videoPrev = card.querySelector(".noteVideoPrev");
+        const deductIn = card.querySelector(".noteDeduct");
+        const saveBtn = card.querySelector(".noteSave");
+
+        let curImg = (s.noteImage || "");
+        let curVideo = (s.noteVideoUrl || "");
+        let curDeduct = Number(s.noteDeduct || 0);
+
+        // hydrate UI
+        if(videoIn) videoIn.value = curVideo || "";
+        if(deductIn) deductIn.value = curDeduct ? String(curDeduct) : "";
+
+        if(curImg && imgPrev){
+          imgPrev.src = curImg;
+          imgPrev.classList.remove("hidden");
+        }
+        if(curVideo && videoPrev){
+          videoPrev.href = curVideo;
+          videoPrev.classList.remove("hidden");
+        }
+
+        if(imgIn){
+          imgIn.onchange = async ()=>{
+            try{
+              const f = imgIn.files && imgIn.files[0];
+              if(!f){ curImg=""; if(imgPrev){ imgPrev.src=""; imgPrev.classList.add("hidden"); } return; }
+              // small safety: limit ~1.5MB
+              if(f.size > 1.5*1024*1024){
+                warn("الصورة كبيرة. رجاءً اختاري صورة أصغر (أقل من 1.5MB).");
+                imgIn.value="";
+                return;
+              }
+              const r = new FileReader();
+              r.onload = ()=>{
+                curImg = String(r.result||"");
+                if(imgPrev){
+                  imgPrev.src = curImg;
+                  imgPrev.classList.remove("hidden");
+                }
+              };
+              r.readAsDataURL(f);
+            }catch(e){ console.log(e); }
+          };
+        }
+
+        if(videoIn){
+          videoIn.oninput = ()=>{
+            curVideo = (videoIn.value||"").trim();
+            if(videoPrev){
+              if(curVideo){
+                videoPrev.href = curVideo;
+                videoPrev.classList.remove("hidden");
+              }else{
+                videoPrev.href = "#";
+                videoPrev.classList.add("hidden");
+              }
+            }
+          };
+        }
+
+        if(deductIn){
+          deductIn.oninput = ()=>{
+            const v = Number(deductIn.value||0);
+            curDeduct = isFinite(v) && v>0 ? Math.floor(v) : 0;
+          };
+        }
+
         if(noteSel){
           noteSel.onchange = ()=>{
             const t = noteSel.value || "";
             // absence counter: count when switching to absent/excused from non-absent
             if((t==="absent" || t==="excused") && !(curType==="absent" || curType==="excused")){
-              curAbs = curAbs + 1; // الغياب = 0 نقاط (لا خصم) لكن العداد يزيد
+              curAbs = curAbs + 1;
               if(absSpan) absSpan.textContent = String(curAbs);
             }
             curType = t;
@@ -2461,29 +2548,83 @@ async function renderStudents(){
               if(t==="other") otherIn.classList.remove("hidden");
               else { otherIn.classList.add("hidden"); otherIn.value=""; }
             }
-
             applyNoteUi(t);
-
-            const payload = {
-              noteType: t,
-              noteText: (t==="other" ? (otherIn?.value||"").trim() : ""),
-              absenceCount: curAbs,
-              noteUpdatedAt: Date.now()
-            };
-            __queueSaveStudentNote(s.id, payload);
           };
         }
 
-        if(otherIn){
-          otherIn.oninput = ()=>{
-            if(curType!=="other") return;
-            const payload = {
-              noteType: "other",
-              noteText: (otherIn.value||"").trim(),
-              absenceCount: curAbs,
-              noteUpdatedAt: Date.now()
-            };
-            __queueSaveStudentNote(s.id, payload);
+        // Save button: update student note + (optional) deduct from balance + log to statement
+        if(saveBtn){
+          saveBtn.onclick = async ()=>{
+            try{
+              const t = curType || (noteSel? (noteSel.value||"") : "");
+              const txt = (t==="other" ? (otherIn?.value||"").trim() : "");
+              const deduct = Number(curDeduct||0);
+
+              if(!t){
+                warn("اختاري نوع الملاحظة أولاً.");
+                return;
+              }
+              if(deduct < 0){ warn("قيمة الخصم غير صحيحة."); return; }
+
+              const payload = {
+                noteType: t,
+                noteText: txt,
+                absenceCount: curAbs,
+                noteImage: curImg || "",
+                noteVideoUrl: (curVideo||"").trim(),
+                noteDeduct: deduct,
+                noteUpdatedAt: Date.now()
+              };
+
+              // prevent duplicates
+              const sig = `${payload.noteType}|${(payload.noteText||"").trim()}|${Number(payload.absenceCount||0)}|${Number(payload.noteDeduct||0)}|${(payload.noteVideoUrl||"").trim()}|${payload.noteImage?1:0}`;
+              if(__noteLastSig[s.id] === sig){
+                ok("تم الحفظ.");
+                return;
+              }
+
+              // transaction: update note + balance (if deduct) then log
+              await db.runTransaction(async(tx)=>{
+                const studentRef = db.collection("students").doc(s.id);
+                const sDoc = await tx.get(studentRef);
+                const cur = sDoc.data() || {};
+                const bal = Number(cur.balance||0);
+
+                let newBal = bal;
+                if(deduct>0){
+                  newBal = bal - deduct;
+                  if(newBal < 0) newBal = 0;
+                  tx.update(studentRef, { ...payload, balance: newBal });
+                }else{
+                  tx.update(studentRef, payload);
+                }
+
+                // log to statement with attachments
+                const label = __noteTypeLabel(t) || "ملاحظة";
+                const reason = (t==="other" && txt) ? `${label}: ${txt}` : label;
+                // note: transaction can't call logTxn (it uses add) safely, so we add directly here
+                tx.set(studentRef.collection("txns").doc(), {
+                  studentId: studentRef.id || "",
+                  studentName: cur.name || "",
+                  guardianWhats: cur.guardianWhats || cur.guardianPhone || cur.guardian || "",
+                  type: (deduct>0 ? "خصم" : "ملاحظة"),
+                  reason: reason,
+                  amount: (deduct>0 ? -Number(deduct) : 0),
+                  balanceAfter: Number(newBal||0),
+                  noteImage: payload.noteImage || "",
+                  noteVideoUrl: payload.noteVideoUrl || "",
+                  dateKey: localTodayKey(),
+                  createdAtClient: Date.now(),
+                  createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+              });
+
+              __noteLastSig[s.id] = sig;
+              ok("تم حفظ الملاحظة وتسجيلها في كشف الحساب.");
+            }catch(e){
+              console.log(e);
+              warn("تعذر الحفظ الآن. تأكدي من الاتصال.");
+            }
           };
         }
 
@@ -2500,7 +2641,10 @@ async function renderStudents(){
         const x=d.data();
         const t=x.createdAtClient ? new Date(x.createdAtClient).toLocaleString("ar-SA") : "";
         const tr=document.createElement("tr");
-        tr.innerHTML=`<td>${t}</td><td>${x.type||""}</td><td>${x.reason||""}</td><td>${fmt(x.amount)}</td><td>${fmt(x.balanceAfter)}</td>`;
+        const att = [];
+        if(x.noteImage){ att.push(`<a href="${x.noteImage}" target="_blank" rel="noopener" title="صورة">📷</a>`); }
+        if(x.noteVideoUrl){ att.push(`<a href="${x.noteVideoUrl}" target="_blank" rel="noopener" title="فيديو">🎥</a>`); }
+        tr.innerHTML=`<td>${t}</td><td>${x.type||""}</td><td>${x.reason||""}</td><td>${fmt(x.amount)}</td><td>${fmt(x.balanceAfter)}</td><td>${att.join(" ")}</td>`;
         rows.appendChild(tr);
       });
     }
