@@ -1012,7 +1012,7 @@
 
           <div class="tableWrap" style="margin-top:10px">
             <table>
-              <thead><tr><th>الوقت</th><th>العملية</th><th>السبب</th><th>المبلغ</th><th>الرصيد بعد العملية</th></tr></thead>
+              <thead><tr><th>الوقت</th><th>العملية</th><th>السبب</th><th>مرفق</th><th>المبلغ</th><th>الرصيد بعد العملية</th></tr></thead>
               <tbody id="stmtRows"></tbody>
             </table>
           </div>
@@ -1225,51 +1225,6 @@
     </div>
     <div class="footerNote">الرياضيات لغة الأذكياء ✨</div>
   </div>
-
-<script>
-/* ✅ Fallback boot (prevents "ابدأ الآن" from breaking if Firebase/CDN fails) */
-(function(){
-  function $(id){ return document.getElementById(id); }
-  function hide(id){
-    var el=$(id); if(!el) return;
-    el.classList.add("hidden");
-    if(id==="startOverlay"||id==="onboardOverlay"){ el.style.display="none"; }
-  }
-  function show(id, display){
-    var el=$(id); if(!el) return;
-    el.classList.remove("hidden");
-    if(display) el.style.display=display;
-  }
-  function fallbackGo(){
-    try{
-      var mode=(new URLSearchParams(location.search).get("mode")||"teacher").toLowerCase();
-      hide("startOverlay"); hide("onboardOverlay");
-      // أخفِ باقي الصفحات إن وجدت
-      ["teacherLoginPage","studentLoginPage","classesPage","classPage","studentAccountPage","dailyOpsPage"].forEach(function(pid){
-        var p=$(pid); if(p) p.classList.add("hidden");
-      });
-      var target = (mode==="student") ? "studentLoginPage" : "teacherLoginPage";
-      // لو صفحة الدخول موجودة اعرضها، وإلا اعرض الفصول
-      if($(target)){ show(target); }
-      else if($("classesPage")){ show("classesPage"); }
-    }catch(e){}
-  }
-  // عرف startApp مبكرًا (ولا نغطي على النسخة الأصلية إذا كانت موجودة)
-  if(typeof window.startApp !== "function"){
-    window.startApp = function(){ fallbackGo(); };
-  }
-  // تأكد من أن زر "ابدأ الآن" يعمل حتى لو تعطّل onclick
-  document.addEventListener("click", function(ev){
-    var btn = ev.target && ev.target.closest ? ev.target.closest("button") : null;
-    if(!btn) return;
-    var txt=(btn.textContent||"").trim();
-    if(txt==="ابدأ الآن" || (btn.getAttribute("onclick")||"").includes("startApp")){
-      ev.preventDefault(); ev.stopPropagation();
-      try{ window.startApp(); }catch(e){ fallbackGo(); }
-    }
-  }, true);
-})();
-</script>
 <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore-compat.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -2371,7 +2326,7 @@ ${SIGNATURE}`;
     async function showStatement(){
       const snap=await db.collection("students").doc(currentStudentId).collection("txns").orderBy("createdAtClient","desc").limit(80).get();
       const rows=$("stmtRows"); rows.innerHTML="";
-      if(snap.empty){ rows.innerHTML='<tr><td colspan="5" class="small">لا توجد عمليات في هذه الفترة.</td></tr>'; return; }
+      if(snap.empty){ rows.innerHTML='<tr><td colspan="6" class="small">لا توجد عمليات في هذه الفترة.</td></tr>'; return; }
       snap.forEach(d=>{
         const x=d.data();
         const t=x.createdAtClient ? new Date(x.createdAtClient).toLocaleString("ar-SA") : "";
@@ -2905,6 +2860,106 @@ document.addEventListener("DOMContentLoaded", async()=>{
 <script>
   window.onload = ()=>{ setTimeout(()=>window.print(), 300); };
 <\/script>
+
+<div id="attachModal" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;display:flex;align-items:center;justify-content:center;padding:14px">
+  <div class="card" style="max-width:900px;width:min(900px,100%);max-height:85vh;overflow:auto">
+    <div class="row" style="justify-content:space-between;align-items:center">
+      <div style="font-weight:900;color:#0b2a66">المرفق</div>
+      <button class="btn3" onclick="closeAttachment()">إغلاق</button>
+    </div>
+    <div id="attachBody" style="margin-top:10px"></div>
+  </div>
+</div>
+
+
+<script>
+async function addAttachmentForStudent(studentId){
+  try{
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*,video/*';
+    input.onchange = async () => {
+      const file = input.files && input.files[0];
+      if(!file) return;
+
+      // IMPORTANT: we store inside Firestore as DataURL -> keep it light
+      const MAX = 900 * 1024; // 900KB
+      if(file.size > MAX){
+        alert('حجم الملف كبير. رجاءً اختاري ملفًا أقل من 900KB.');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = async () => {
+        const dataUrl = String(reader.result||'');
+        const mime = file.type || (dataUrl.split(';')[0].replace('data:','') || 'application/octet-stream');
+        const name = file.name || 'attachment';
+
+        const sRef = db.collection('students').doc(studentId);
+        const sDoc = await sRef.get();
+        const sData = sDoc.data()||{};
+        const balanceAfter = Number(sData.balance||0);
+
+        await sRef.collection('txns').add({
+          type: 'مرفق',
+          reason: 'إرفاق صورة/فيديو',
+          amount: 0,
+          balanceAfter,
+          attachment: { mime, name, data: dataUrl },
+          createdAtClient: Date.now(),
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        // status chip in class card
+        try{
+          const st = document.querySelector(`[data-attach-status="${studentId}"]`);
+          if(st) st.textContent = '✅ تم الإرفاق';
+        }catch(e){}
+
+        // refresh statement if currently viewing same student
+        try{ if(window.currentStudentId === studentId){ showStatement(); } }catch(e){}
+      };
+      reader.readAsDataURL(file);
+    };
+    input.click();
+  }catch(e){
+    console.log(e);
+    alert('تعذر إرفاق الملف.');
+  }
+}
+
+async function openAttachment(txnId){
+  try{
+    const modal = document.getElementById('attachModal');
+    const body = document.getElementById('attachBody');
+    body.innerHTML = '...جاري التحميل...';
+    modal.classList.remove('hidden');
+
+    const d = await db.collection('students').doc(currentStudentId).collection('txns').doc(txnId).get();
+    const x = d.data()||{};
+    const att = x.attachment || {};
+    if(!att.data || !att.mime){
+      body.innerHTML = '<div class="small">لا يوجد مرفق.</div>';
+      return;
+    }
+
+    if(att.mime.startsWith('image/')){
+      body.innerHTML = `<img src="${att.data}" alt="attachment" style="max-width:100%;border-radius:14px;border:1px solid rgba(0,0,0,.08)">`;
+    }else if(att.mime.startsWith('video/')){
+      body.innerHTML = `<video src="${att.data}" controls playsinline style="max-width:100%;border-radius:14px;border:1px solid rgba(0,0,0,.08)"></video>`;
+    }else{
+      body.innerHTML = `<a class="btn2" href="${att.data}" download="${att.name||'attachment'}">تحميل الملف</a>`;
+    }
+  }catch(e){
+    console.log(e);
+    alert('تعذر فتح المرفق.');
+  }
+}
+function closeAttachment(){
+  document.getElementById('attachModal').classList.add('hidden');
+}
+</script>
+
 </body></html>`);
       w.document.close();
     }
@@ -2935,7 +2990,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
             الاسم: <b>${s.name||"—"}</b> • الرصيد: <b>${fmt(s.balance)}</b> ر.س • PIN: <b>${s.pin||"—"}</b>
           </div>
           <table>
-            <thead><tr><th>الوقت</th><th>العملية</th><th>السبب</th><th>المبلغ</th><th>الرصيد بعد العملية</th></tr></thead>
+            <thead><tr><th>الوقت</th><th>العملية</th><th>السبب</th><th>مرفق</th><th>المبلغ</th><th>الرصيد بعد العملية</th></tr></thead>
             <tbody>${rows}</tbody>
           </table>
         `;
@@ -3889,7 +3944,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
         </div>
 
         <table>
-          <thead><tr><th>الوقت</th><th>العملية</th><th>السبب</th><th>المبلغ</th><th>الرصيد بعد العملية</th></tr></thead>
+          <thead><tr><th>الوقت</th><th>العملية</th><th>السبب</th><th>مرفق</th><th>المبلغ</th><th>الرصيد بعد العملية</th></tr></thead>
           <tbody>${rows}</tbody>
         </table>
       `;
@@ -4521,5 +4576,105 @@ function renderRoulettePane(){
 })();
 
 </script>
+
+<div id="attachModal" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;display:flex;align-items:center;justify-content:center;padding:14px">
+  <div class="card" style="max-width:900px;width:min(900px,100%);max-height:85vh;overflow:auto">
+    <div class="row" style="justify-content:space-between;align-items:center">
+      <div style="font-weight:900;color:#0b2a66">المرفق</div>
+      <button class="btn3" onclick="closeAttachment()">إغلاق</button>
+    </div>
+    <div id="attachBody" style="margin-top:10px"></div>
+  </div>
+</div>
+
+
+<script>
+async function addAttachmentForStudent(studentId){
+  try{
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*,video/*';
+    input.onchange = async () => {
+      const file = input.files && input.files[0];
+      if(!file) return;
+
+      // IMPORTANT: we store inside Firestore as DataURL -> keep it light
+      const MAX = 900 * 1024; // 900KB
+      if(file.size > MAX){
+        alert('حجم الملف كبير. رجاءً اختاري ملفًا أقل من 900KB.');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = async () => {
+        const dataUrl = String(reader.result||'');
+        const mime = file.type || (dataUrl.split(';')[0].replace('data:','') || 'application/octet-stream');
+        const name = file.name || 'attachment';
+
+        const sRef = db.collection('students').doc(studentId);
+        const sDoc = await sRef.get();
+        const sData = sDoc.data()||{};
+        const balanceAfter = Number(sData.balance||0);
+
+        await sRef.collection('txns').add({
+          type: 'مرفق',
+          reason: 'إرفاق صورة/فيديو',
+          amount: 0,
+          balanceAfter,
+          attachment: { mime, name, data: dataUrl },
+          createdAtClient: Date.now(),
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        // status chip in class card
+        try{
+          const st = document.querySelector(`[data-attach-status="${studentId}"]`);
+          if(st) st.textContent = '✅ تم الإرفاق';
+        }catch(e){}
+
+        // refresh statement if currently viewing same student
+        try{ if(window.currentStudentId === studentId){ showStatement(); } }catch(e){}
+      };
+      reader.readAsDataURL(file);
+    };
+    input.click();
+  }catch(e){
+    console.log(e);
+    alert('تعذر إرفاق الملف.');
+  }
+}
+
+async function openAttachment(txnId){
+  try{
+    const modal = document.getElementById('attachModal');
+    const body = document.getElementById('attachBody');
+    body.innerHTML = '...جاري التحميل...';
+    modal.classList.remove('hidden');
+
+    const d = await db.collection('students').doc(currentStudentId).collection('txns').doc(txnId).get();
+    const x = d.data()||{};
+    const att = x.attachment || {};
+    if(!att.data || !att.mime){
+      body.innerHTML = '<div class="small">لا يوجد مرفق.</div>';
+      return;
+    }
+
+    if(att.mime.startsWith('image/')){
+      body.innerHTML = `<img src="${att.data}" alt="attachment" style="max-width:100%;border-radius:14px;border:1px solid rgba(0,0,0,.08)">`;
+    }else if(att.mime.startsWith('video/')){
+      body.innerHTML = `<video src="${att.data}" controls playsinline style="max-width:100%;border-radius:14px;border:1px solid rgba(0,0,0,.08)"></video>`;
+    }else{
+      body.innerHTML = `<a class="btn2" href="${att.data}" download="${att.name||'attachment'}">تحميل الملف</a>`;
+    }
+  }catch(e){
+    console.log(e);
+    alert('تعذر فتح المرفق.');
+  }
+}
+function closeAttachment(){
+  document.getElementById('attachModal').classList.add('hidden');
+}
+</script>
+
 </body>
 </html>
