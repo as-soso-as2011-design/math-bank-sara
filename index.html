@@ -368,11 +368,30 @@
     }
 
     @media(max-width:980px){
-      .sidebarShell{display:block;direction:rtl}
-      .sidebarNav{position:static !important;width:100%;margin-bottom:12px;padding:10px;overflow:auto;white-space:nowrap}
-      #classesPage .sidebarShell{padding-left:0}
-      .sidebarNav .sideTitle,.sidebarHint{display:none}
-      .sideBtn{display:inline-flex;width:auto;min-width:160px;margin:4px}
+      .sidebarNav{
+        width:88px;
+        flex:0 0 88px;
+        padding:8px 6px;
+        border-radius:16px;
+      }
+      .sidebarNav .sideTitle,.sidebarHint,.sideBtn .num{display:none}
+      .sideBtn{
+        display:flex;
+        width:100%;
+        min-width:0;
+        margin:5px 0;
+        padding:10px 8px;
+        border-radius:12px;
+        font-size:11px;
+        line-height:1.35;
+        justify-content:center;
+        text-align:center;
+      }
+      #classesPage .sidebarShell{padding-left:100px}
+      #classesPage .sidebarShell > .sidebarNav{
+        left:6px;
+        top:110px;
+      }
     }
 
     /* ===== Dual sidebars for class page ===== */
@@ -382,9 +401,23 @@
     .dualContent{min-width:0}
     .classSidebarRight{right:max(12px, calc((100vw - 1040px) / 2 + 12px))}
     @media(max-width:980px){
-      .dualSidebarShell{display:block;padding-left:0;padding-right:0}
-      .dualSidebarShell .sidebarNav{position:static !important;width:100%;margin-bottom:12px;padding:10px;overflow:auto;white-space:nowrap}
-      .teacherSidebarClone,.classSidebarRight,.dualContent{grid-column:auto}
+      .dualSidebarShell{padding-left:100px;padding-right:100px}
+      .dualSidebarShell .sidebarNav{
+        width:88px;
+        flex:0 0 88px;
+        padding:8px 6px;
+        top:110px;
+      }
+      .teacherSidebarClone{left:6px}
+      .classSidebarRight{right:6px}
+      .dualContent{min-width:0}
+    }
+    @media(max-width:520px){
+      .sidebarNav{width:80px;flex-basis:80px}
+      #classesPage .sidebarShell{padding-left:92px}
+      .dualSidebarShell{padding-left:92px;padding-right:92px}
+      .dualSidebarShell .sidebarNav{width:80px;flex-basis:80px}
+      .sideBtn{font-size:10px;padding:9px 6px}
     }
 
 
