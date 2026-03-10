@@ -364,6 +364,18 @@
       .sideBtn{display:inline-flex;width:auto;min-width:160px;margin:4px}
     }
 
+    /* ===== Dual sidebars for class page ===== */
+    .dualSidebarShell{display:grid;grid-template-columns:220px minmax(0,1fr) 220px;gap:14px;align-items:start;margin-top:12px}
+    .dualSidebarShell .sidebarNav{position:sticky;top:86px}
+    .teacherSidebarClone{grid-column:1}
+    .dualContent{grid-column:2;min-width:0}
+    .classSidebarRight{grid-column:3}
+    @media(max-width:980px){
+      .dualSidebarShell{display:block}
+      .dualSidebarShell .sidebarNav{position:static;width:100%;margin-bottom:12px;padding:10px;overflow:auto;white-space:nowrap}
+      .teacherSidebarClone,.classSidebarRight,.dualContent{grid-column:auto}
+    }
+
 
     .studentHomeBack{
       display:flex;justify-content:flex-start;margin:0 0 12px 0;
@@ -661,8 +673,8 @@
       <div class="card soft" style="margin-top:10px">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
           <div>
-            <div style="font-weight:1000;color:#0b2a66">⚙️ إعدادات الفصول</div>
-            <div class="small" style="margin-top:4px;color:#47607e">تحكم سريع: قفل بصمة الطالب + فرص الروليت للحسابات (ذهبي/ماسي/ألماسي).</div>
+            <div style="font-weight:1000;color:#0b2a66">⚙️ الإعدادات السريعة</div>
+            <div class="small" style="margin-top:4px;color:#47607e">تحكم سريع: قفل بصمة الطالب + فرص الروليت للحسابات (ذهبي/ماسي/ألماسي) + إعدادات الفصل.</div>
           </div>
           <button class="btn3" onclick="openClassQuickSettings()">فتح الإعدادات</button>
         </div>
@@ -1538,7 +1550,7 @@
 
         <div class="small" style="margin-top:10px;color:#6b7f99">اضغطي على البطاقة للتفعيل/الإيقاف.</div>
       `;
-      openModal("⚙️ إعدادات الفصول", body, '<button class="btn" onclick="closeModal()">تم</button>');
+      openModal("⚙️ الإعدادات السريعة", body, '<button class="btn" onclick="closeModal()">تم</button>');
 
       setTimeout(()=>{
         const statePill = (on)=> on
@@ -4842,14 +4854,84 @@ function renderRoulettePane(){
   }
 
   function initClassSidebar(){
-    buildSidebar('classPage', 'صفحة الفصل', [
+    const page = document.getElementById('classPage');
+    if(!page) return;
+    const container = page.querySelector('.container');
+    if(!container || container.dataset.dualSidebarReady === '1') return;
+
+    const specs = [
       {id:'class-ops', label:'العمليات', childIndex:0},
       {id:'class-week', label:'شرف الأسبوع', childIndex:1},
       {id:'class-pdf', label:'التقارير PDF', childIndex:2},
       {id:'class-board', label:'لوحة الشرف', childIndex:3},
       {id:'class-roulette', label:'الروليت', childIndex:4},
       {id:'class-students', label:'الطلاب', selector:'#studentsGrid', wrap:true, wrapTitle:'الطلاب'}
-    ]);
+    ];
+
+    const directChildren = Array.from(container.children);
+    const resolved = [];
+    specs.forEach((spec)=>{
+      let el = null;
+      if(spec.selector) el = container.querySelector(spec.selector);
+      else if(typeof spec.childIndex === 'number') el = directChildren[spec.childIndex] || null;
+      if(!el) return;
+      if(spec.wrap) el = makeWrappedSection(el, spec.wrapTitle || '');
+      el.classList.add('sidebarSection');
+      el.dataset.sidebarItem = spec.id;
+      resolved.push({el, spec});
+    });
+    if(!resolved.length) return;
+
+    const shell = document.createElement('div');
+    shell.className = 'dualSidebarShell';
+
+    const teacherNav = document.createElement('aside');
+    teacherNav.className = 'sidebarNav teacherSidebarClone';
+    teacherNav.innerHTML = '<div class="sideTitle">صفحة المعلمة</div><div class="sidebarHint">تنقّل سريع إلى أقسام صفحة المعلمة</div>';
+    const teacherLinks = [
+      {id:'teacher-home', label:'الرئيسية'},
+      {id:'teacher-wa', label:'واتساب'},
+      {id:'teacher-bio', label:'قفل البصمة'},
+      {id:'teacher-manage', label:'إدارة الفصول'},
+      {id:'teacher-tabs', label:'الفصول'},
+      {id:'teacher-quick', label:'إعدادات سريعة'}
+    ];
+    teacherLinks.forEach((item, idx)=>{
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'sideBtn';
+      btn.innerHTML = '<span>'+item.label+'</span><span class="num">'+String(idx+1).padStart(2,'0')+'</span>';
+      btn.addEventListener('click', ()=>{
+        backToClasses();
+        setTimeout(()=>sidebarShowSection('classesPage', item.id), 80);
+      });
+      teacherNav.appendChild(btn);
+    });
+
+    const content = document.createElement('div');
+    content.className = 'dualContent';
+    resolved.forEach(({el})=> content.appendChild(el));
+
+    const classNav = document.createElement('aside');
+    classNav.className = 'sidebarNav classSidebarRight';
+    classNav.innerHTML = '<div class="sideTitle">تبويبات الفصل</div><div class="sidebarHint">اضغطي على التبويب لفتح الجزء المطلوب</div>';
+    resolved.forEach(({spec}, idx)=>{
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'sideBtn';
+      btn.dataset.target = spec.id;
+      btn.dataset.page = 'classPage';
+      btn.innerHTML = '<span>'+spec.label+'</span><span class="num">'+String(idx+1).padStart(2,'0')+'</span>';
+      btn.addEventListener('click', ()=> sidebarShowSection('classPage', spec.id));
+      classNav.appendChild(btn);
+    });
+
+    container.appendChild(shell);
+    shell.appendChild(teacherNav);
+    shell.appendChild(content);
+    shell.appendChild(classNav);
+    container.dataset.dualSidebarReady = '1';
+    sidebarShowSection('classPage','class-ops');
   }
 
   function initSidebars(){
