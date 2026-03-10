@@ -421,6 +421,57 @@
     }
 
 
+    /* ===== Layout chooser: desktop sidebars vs mobile top tabs ===== */
+    .layoutChooser{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:8px}
+    .layoutChoiceBtn{border:1px solid rgba(11,42,102,.12);background:#eef6ff;color:#0b2a66;border-radius:14px;padding:12px 14px;font-weight:1000;cursor:pointer;min-width:180px;text-align:center}
+    .layoutChoiceBtn.active{background:linear-gradient(90deg,#0b2a66,#0b5bb5);color:#fff;box-shadow:0 10px 20px rgba(11,42,102,.18)}
+    .layoutModeBadge{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:#eef6ff;color:#0b2a66;font-weight:1000;font-size:12px}
+    body.layout-mobiletop #classesPage .sidebarShell{display:block;padding-left:0 !important}
+    body.layout-mobiletop #classesPage .sidebarShell > .sidebarNav,
+    body.layout-mobiletop .dualSidebarShell .sidebarNav{
+      position:sticky !important;
+      top:78px !important;
+      left:auto !important;
+      right:auto !important;
+      width:100% !important;
+      max-width:100%;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      overflow-x:auto;
+      white-space:nowrap;
+      padding:10px;
+      border-radius:16px;
+      margin:0 0 12px 0;
+      scrollbar-width:none;
+      -ms-overflow-style:none;
+    }
+    body.layout-mobiletop #classesPage .sidebarShell > .sidebarNav::-webkit-scrollbar,
+    body.layout-mobiletop .dualSidebarShell .sidebarNav::-webkit-scrollbar{display:none}
+    body.layout-mobiletop #classesPage .sidebarShell > .sidebarNav .sideTitle,
+    body.layout-mobiletop #classesPage .sidebarShell > .sidebarNav .sidebarHint,
+    body.layout-mobiletop .dualSidebarShell .sidebarNav .sideTitle,
+    body.layout-mobiletop .dualSidebarShell .sidebarNav .sidebarHint{display:none}
+    body.layout-mobiletop #classesPage .sidebarShell > .sidebarNav .sideBtn,
+    body.layout-mobiletop .dualSidebarShell .sidebarNav .sideBtn{
+      flex:0 0 auto;
+      width:auto;
+      min-width:max-content;
+      margin:0;
+      padding:10px 14px;
+      font-size:13px;
+      border-radius:999px;
+      justify-content:center;
+    }
+    body.layout-mobiletop #classesPage .sidebarShell > .sidebarNav .sideBtn .num,
+    body.layout-mobiletop .dualSidebarShell .sidebarNav .sideBtn .num{display:none}
+    body.layout-mobiletop #classesPage .sidebarShell > .sidebarContent{display:block}
+    body.layout-mobiletop .dualSidebarShell{display:flex;flex-direction:column;padding-left:0 !important;padding-right:0 !important}
+    body.layout-mobiletop .dualSidebarShell .teacherSidebarClone{order:1}
+    body.layout-mobiletop .dualSidebarShell .classSidebarRight{order:2;top:136px !important}
+    body.layout-mobiletop .dualSidebarShell .dualContent{order:3;min-width:0}
+
+
     .studentHomeBack{
       display:flex;justify-content:flex-start;margin:0 0 12px 0;
     }
@@ -5005,6 +5056,87 @@ function renderRoulettePane(){
       return out;
     };
   }
+})();
+
+
+
+(function(){
+  const LAYOUT_KEY = 'MB_LAYOUT_PREF';
+  function getLayoutMode(){
+    try{ return localStorage.getItem(LAYOUT_KEY) || 'desktop'; }catch(e){ return 'desktop'; }
+  }
+  function applyLayoutMode(mode){
+    const m = (mode === 'mobiletop') ? 'mobiletop' : 'desktop';
+    document.body.classList.toggle('layout-mobiletop', m === 'mobiletop');
+    document.body.classList.toggle('layout-desktopside', m !== 'mobiletop');
+    document.querySelectorAll('.layoutChoiceBtn').forEach(btn=>{
+      btn.classList.toggle('active', btn.dataset.layoutMode === m);
+    });
+    document.querySelectorAll('[data-layout-mode-label]').forEach(el=>{
+      el.textContent = (m === 'mobiletop') ? 'نسخة الجوال' : 'نسخة الكمبيوتر والآيباد';
+    });
+  }
+  function setLayoutMode(mode){
+    try{ localStorage.setItem(LAYOUT_KEY, mode); }catch(e){}
+    applyLayoutMode(mode);
+  }
+  window.setLayoutMode = setLayoutMode;
+  window.applyLayoutMode = applyLayoutMode;
+
+  function buildLayoutChooserHTML(){
+    return `
+      <div class="card soft layoutChooserCard">
+        <div class="row" style="align-items:center;gap:12px">
+          <div class="col">
+            <div style="font-weight:1000;color:#0b2a66">اختيار تنسيق العرض</div>
+            <div class="small">اختاري النسخة المناسبة لجهازك، ويتطبق الشكل فورًا على صفحة المعلمة وصفحة الفصل.</div>
+          </div>
+          <div class="col" style="text-align:left">
+            <span class="layoutModeBadge">الوضع الحالي: <b data-layout-mode-label></b></span>
+          </div>
+        </div>
+        <div class="layoutChooser">
+          <button type="button" class="layoutChoiceBtn" data-layout-mode="desktop">نسخة الكمبيوتر والآيباد<br><span class="small" style="color:inherit;opacity:.9">تبويبات جانبية يمين ويسار</span></button>
+          <button type="button" class="layoutChoiceBtn" data-layout-mode="mobiletop">نسخة الجوال<br><span class="small" style="color:inherit;opacity:.9">التبويبات أعلى الصفحة مع تمرير</span></button>
+        </div>
+      </div>`;
+  }
+
+  function wireLayoutChoosers(root=document){
+    root.querySelectorAll('.layoutChoiceBtn').forEach(btn=>{
+      if(btn.dataset.layoutWired === '1') return;
+      btn.dataset.layoutWired = '1';
+      btn.addEventListener('click', ()=> setLayoutMode(btn.dataset.layoutMode || 'desktop'));
+    });
+    applyLayoutMode(getLayoutMode());
+  }
+
+  function injectLayoutChoosers(){
+    const classesPage = document.getElementById('classesPage');
+    if(classesPage){
+      const container = classesPage.querySelector('.container');
+      if(container && !container.querySelector('.layoutChooserCard')){
+        const wrap = document.createElement('div');
+        wrap.innerHTML = buildLayoutChooserHTML();
+        const card = wrap.firstElementChild;
+        container.insertBefore(card, container.firstElementChild || null);
+      }
+    }
+    const classPage = document.getElementById('classPage');
+    if(classPage){
+      const container = classPage.querySelector('.container');
+      if(container && !container.querySelector('.layoutChooserCard')){
+        const wrap = document.createElement('div');
+        wrap.innerHTML = buildLayoutChooserHTML();
+        const card = wrap.firstElementChild;
+        container.insertBefore(card, container.firstElementChild || null);
+      }
+    }
+    wireLayoutChoosers(document);
+  }
+
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', injectLayoutChoosers);
+  else injectLayoutChoosers();
 })();
 
 
