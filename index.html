@@ -350,7 +350,8 @@
     .sideBtn.active{background:#fff;color:#0b2a66;box-shadow:0 8px 18px rgba(0,0,0,.14)}
     .sideBtn .num{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:24px;border-radius:999px;background:rgba(255,255,255,.16);font-size:11px;font-weight:1000;padding:0 6px}
     .sideBtn.active .num{background:#eaf3fb;color:#0b2a66}
-    .sidebarContent{flex:1;min-width:0;direction:rtl}
+    .sidebarContent{flex:1;min-width:0;direction:rtl;display:flex;justify-content:center}
+.sidebarContent > .sidebarSection{width:min(760px,100%)}
     #classPage .sidebarShell{direction:rtl}
     #classPage .sidebarNav{order:2}
     #classPage .sidebarContent{order:1}
@@ -398,7 +399,8 @@
     .dualSidebarShell{display:block;position:relative;margin-top:12px;padding-left:234px;padding-right:234px}
     .dualSidebarShell .sidebarNav{position:fixed;top:118px;z-index:1200}
     .teacherSidebarClone{left:max(12px, calc((100vw - 1040px) / 2 + 12px))}
-    .dualContent{min-width:0}
+    .dualContent{min-width:0;display:flex;justify-content:center}
+.dualContent > .sidebarSection{width:min(760px,100%)}
     .classSidebarRight{right:max(12px, calc((100vw - 1040px) / 2 + 12px))}
     @media(max-width:980px){
       .dualSidebarShell{padding-left:100px;padding-right:100px}
@@ -410,7 +412,8 @@
       }
       .teacherSidebarClone{left:6px}
       .classSidebarRight{right:6px}
-      .dualContent{min-width:0}
+      .dualContent{min-width:0;display:flex;justify-content:center}
+.dualContent > .sidebarSection{width:min(760px,100%)}
     }
     @media(max-width:520px){
       .sidebarNav{width:80px;flex-basis:80px}
@@ -794,8 +797,8 @@
       <div class="card soft" id="freezeAccountCard" style="margin-top:10px">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
           <div>
-            <div style="font-weight:1000;color:#0b2a66">🧊 تجميد الحساب</div>
-            <div class="small" style="margin-top:4px;color:#47607e">اختاري الفصل ثم الطالب ثم السبب، ويمكن كتابة ملاحظة إضافية قبل التنفيذ.</div>
+            <div style="font-weight:1000;color:#0b2a66">🧊 تجميد الحساب / فك التجميد</div>
+            <div class="small" style="margin-top:4px;color:#47607e">اختاري الفصل ثم الطالب ثم السبب، ويمكن كتابة ملاحظة إضافية قبل التنفيذ أو فك التجميد.</div>
           </div>
         </div>
         <div class="row" style="margin-top:12px">
@@ -823,8 +826,13 @@
             <div class="small">مربع للكتابة</div>
             <input id="freezeReasonText" type="text" placeholder="اكتبي السبب أو الملاحظة هنا" />
           </div>
+        </div>
+        <div class="row" style="margin-top:10px">
           <div class="col" style="align-self:flex-end">
-            <button class="btnRed" onclick="executeFreezeAccount()">تنفيذ</button>
+            <button class="btnRed" onclick="executeFreezeAccount()">تنفيذ التجميد</button>
+          </div>
+          <div class="col" style="align-self:flex-end">
+            <button class="btn" onclick="executeUnfreezeAccount()">فك التجميد</button>
           </div>
         </div>
       </div>
@@ -1129,6 +1137,17 @@
           <div class="miniTab" id="tabRoulette" onclick="setMiniTab('paneRoulette',this)" style="display:none">🎡 روليت الهدايا</div>
           <div class="miniTab" onclick="setMiniTab('paneCard',this)">💳 تفاصيل البطاقة</div>
           <div class="miniTab" onclick="setMiniTab('paneHonorStudent',this)">🏆 لوحة الشرف</div>
+          <div class="miniTab hidden" id="tabFrozen" onclick="setMiniTab('paneFrozen',this)">🧊 تم تجميد الحساب</div>
+        </div>
+
+        <div id="paneFrozen" class="miniPane">
+          <div class="card soft" style="margin:12px 0 0 0;border:2px solid rgba(176,0,32,.18);background:linear-gradient(180deg,#fff7f8,#ffffff)">
+            <div style="font-weight:1000;color:#b00020;font-size:18px">🧊 تم تجميد الحساب</div>
+            <div class="small" style="margin-top:8px;color:#5f1a22;line-height:1.9">
+              سبب التجميد: <b id="studentFreezeReason">—</b><br>
+              راجع/ي إدارة البنك: <b>المعلمة سارة حقوي</b> لفك التجميد.
+            </div>
+          </div>
         </div>
 
         <div id="paneStmt" class="miniPane active">
@@ -2274,8 +2293,12 @@ ${SIGNATURE}`;
         const doc = snap.docs[0];
         currentStudentId = doc.id;
         const s = doc.data() || {};
-        if(!s.active) return warn("الحساب مقفل");
         if(String(pin) !== String(s.pin||"")) return warn("كلمة المرور غير صحيحة");
+        if(s.frozen){
+          await openStudentAccount(s);
+          return;
+        }
+        if(!s.active) return warn("الحساب مقفل");
         await playWelcome();
         await openStudentAccount(s);
       }catch(e){ console.log(e); warn("صار خطأ… جرّبي مرة ثانية"); }
@@ -2330,6 +2353,29 @@ ${SIGNATURE}`;
       $("detailAcc").textContent = makeAccountNumber(currentStudentId);
       $("detailExp").textContent = exp;
       $("detailPin").textContent = String(s.pin || "—");
+
+      const isFrozen = !!s.frozen;
+      const tabFrozen = document.getElementById('tabFrozen');
+      const paneFrozen = document.getElementById('paneFrozen');
+      const freezeReasonEl = document.getElementById('studentFreezeReason');
+      if($("statusBadge")){
+        $("statusBadge").className = "badge " + (isFrozen ? "off" : (s.active ? "on":"off"));
+        $("statusBadge").textContent = isFrozen ? "🧊 مجمد" : (s.active ? "🟢 نشط" : "🔴 مقفل");
+      }
+      if(tabFrozen) tabFrozen.classList.toggle('hidden', !isFrozen);
+      if(freezeReasonEl) freezeReasonEl.textContent = s.freezeReason || 'غير محدد';
+      const allTabs = Array.from(document.querySelectorAll('#studentAccountPage .miniTabs .miniTab'));
+      const regularTabs = allTabs.filter(t=>t.id !== 'tabFrozen');
+      regularTabs.forEach(t=> t.classList.toggle('hidden', isFrozen));
+      if(isFrozen){
+        document.querySelectorAll('#studentAccountPage .miniPane').forEach(p=>p.classList.remove('active'));
+        if(paneFrozen) paneFrozen.classList.add('active');
+        allTabs.forEach(t=>t.classList.remove('active'));
+        if(tabFrozen) tabFrozen.classList.add('active');
+      } else {
+        if(paneFrozen) paneFrozen.classList.remove('active');
+        if(tabFrozen) tabFrozen.classList.remove('active');
+      }
 
       setupReasonUI($("op").value,'reasonStudent','reasonOtherStudent');
       await showStatement();
@@ -5205,6 +5251,35 @@ function renderRoulettePane(){
     }catch(e){
       console.error(e);
       openModal('تنبيه', 'تعذر تنفيذ تجميد الحساب حالياً.', '<button class="btn" onclick="closeModal()">تمام</button>');
+    }
+  };
+
+  window.executeUnfreezeAccount = async function(){
+    const classPick = document.getElementById('freezeClassPick');
+    const studentPick = document.getElementById('freezeStudentPick');
+    const reasonText = document.getElementById(freezeReasonTextId);
+    if(!classPick || !studentPick) return;
+    const classId = classPick.value || '';
+    const studentId = studentPick.value || '';
+    const note = (reasonText?.value || '').trim();
+    if(!classId) return warn('اختاري الفصل');
+    if(!studentId) return warn('اختاري الطالب');
+    try{
+      await db.collection('students').doc(studentId).update({
+        active:true,
+        frozen:false,
+        freezeReason:'',
+        freezeClassId:classId,
+        unfrozenAt: Date.now(),
+        unfreezeNote: note
+      });
+      if(currentClassId === classId){
+        await renderStudents();
+      }
+      openModal('تم ✅', 'تم فك التجميد بنجاح.', '<button class="btn" onclick="closeModal()">تمام</button>');
+    }catch(e){
+      console.error(e);
+      openModal('تنبيه', 'تعذر فك التجميد حالياً.', '<button class="btn" onclick="closeModal()">تمام</button>');
     }
   };
 
