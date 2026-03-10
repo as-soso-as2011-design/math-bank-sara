@@ -351,6 +351,9 @@
     .sideBtn .num{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:24px;border-radius:999px;background:rgba(255,255,255,.16);font-size:11px;font-weight:1000;padding:0 6px}
     .sideBtn.active .num{background:#eaf3fb;color:#0b2a66}
     .sidebarContent{flex:1;min-width:0;direction:rtl}
+    #classPage .sidebarShell{direction:rtl}
+    #classPage .sidebarNav{order:2}
+    #classPage .sidebarContent{order:1}
     .sidebarSection.hiddenBySidebar{display:none !important}
     .sidebarSection{scroll-margin-top:92px}
     .sidebarHint{font-size:11px;color:rgba(255,255,255,.78);padding:6px 10px 2px}
@@ -655,16 +658,6 @@
       </div>
 
       <div class="tabs" id="classTabs"></div>
-      <div class="card soft" style="margin-top:10px">
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
-          <div>
-            <div style="font-weight:1000;color:#0b2a66">📚 دخول الفصل</div>
-            <div class="small" style="margin-top:4px;color:#47607e">اختاري الفصل من التبويبات أعلاه ثم اضغطي دخول الفصل.</div>
-          </div>
-          <button class="btn" onclick="openClassPage()">دخول الفصل</button>
-        </div>
-      </div>
-
       <div class="card soft" style="margin-top:10px">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
           <div>
@@ -2003,7 +1996,11 @@ ${SIGNATURE}`
         const t=document.createElement("div");
         t.className="tab"+(c.id===currentClassId?" active":"");
         t.textContent=c.name;
-        t.onclick=()=>{ currentClassId=c.id; renderTabs(); };
+        t.onclick=async ()=>{
+          currentClassId=c.id;
+          await renderTabs();
+          await openClassPage();
+        };
         tabs.appendChild(t);
       });
       const c = classes.find(x=>x.id===currentClassId);
@@ -4839,7 +4836,7 @@ function renderRoulettePane(){
       {id:'teacher-wa', label:'واتساب', childIndex:1},
       {id:'teacher-bio', label:'قفل البصمة', childIndex:2},
       {id:'teacher-manage', label:'إدارة الفصول', childIndex:3},
-      {id:'teacher-tabs', label:'الفصول', selector:'#classTabs', wrap:true, wrapTitle:'الفصول'},
+      {id:'teacher-tabs', label:'الفصول', selector:'#classTabs', wrap:true, wrapTitle:'الفصول — اضغطي على اسم الفصل للدخول مباشرة'},
       {id:'teacher-quick', label:'إعدادات سريعة', childIndex:5}
     ]);
   }
