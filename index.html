@@ -791,6 +791,44 @@
         </div>
       </div>
 
+      <div class="card soft" id="freezeAccountCard" style="margin-top:10px">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+          <div>
+            <div style="font-weight:1000;color:#0b2a66">🧊 تجميد الحساب</div>
+            <div class="small" style="margin-top:4px;color:#47607e">اختاري الفصل ثم الطالب ثم السبب، ويمكن كتابة ملاحظة إضافية قبل التنفيذ.</div>
+          </div>
+        </div>
+        <div class="row" style="margin-top:12px">
+          <div class="col">
+            <div class="small">الفصل</div>
+            <select id="freezeClassPick"></select>
+          </div>
+          <div class="col">
+            <div class="small">اختار الطالب</div>
+            <select id="freezeStudentPick"></select>
+          </div>
+        </div>
+        <div class="row" style="margin-top:10px">
+          <div class="col">
+            <div class="small">السبب</div>
+            <select id="freezeReasonPick">
+              <option value="">اختاري السبب…</option>
+              <option value="مخالفة سلوكية">مخالفة سلوكية</option>
+              <option value="سوء استخدام الحساب">سوء استخدام الحساب</option>
+              <option value="طلب من المعلمة">طلب من المعلمة</option>
+              <option value="أخرى">أخرى</option>
+            </select>
+          </div>
+          <div class="col">
+            <div class="small">مربع للكتابة</div>
+            <input id="freezeReasonText" type="text" placeholder="اكتبي السبب أو الملاحظة هنا" />
+          </div>
+          <div class="col" style="align-self:flex-end">
+            <button class="btnRed" onclick="executeFreezeAccount()">تنفيذ</button>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -4960,7 +4998,8 @@ function renderRoulettePane(){
       {id:'teacher-bio', label:'قفل البصمة', childIndex:2},
       {id:'teacher-manage', label:'إدارة الفصول', childIndex:3},
       {id:'teacher-tabs', label:'الفصول', selector:'#classTabs', wrap:true, wrapTitle:'الفصول — اضغطي على اسم الفصل للدخول مباشرة'},
-      {id:'teacher-quick', label:'إعدادات سريعة', childIndex:5}
+      {id:'teacher-quick', label:'إعدادات سريعة', childIndex:5},
+      {id:'teacher-freeze', label:'تجميد الحساب', selector:'#freezeAccountCard'}
     ]);
   }
 
@@ -5005,7 +5044,8 @@ function renderRoulettePane(){
       {id:'teacher-bio', label:'قفل البصمة'},
       {id:'teacher-manage', label:'إدارة الفصول'},
       {id:'teacher-tabs', label:'الفصول'},
-      {id:'teacher-quick', label:'إعدادات سريعة'}
+      {id:'teacher-quick', label:'إعدادات سريعة'},
+      {id:'teacher-freeze', label:'تجميد الحساب'}
     ];
     teacherLinks.forEach((item, idx)=>{
       const btn = document.createElement('button');
@@ -5076,6 +5116,120 @@ function renderRoulettePane(){
 
 
 
+
+(function(){
+  const freezeReasonTextId = 'freezeReasonText';
+
+  async function populateFreezeClassOptions(){
+    const pick = document.getElementById('freezeClassPick');
+    if(!pick) return;
+    try{ await loadClasses(); }catch(e){}
+    pick.innerHTML = '';
+    (classes || []).forEach(c=>{
+      const o = document.createElement('option');
+      o.value = c.id;
+      o.textContent = c.name || '—';
+      pick.appendChild(o);
+    });
+    if(currentClassId) pick.value = currentClassId;
+    await populateFreezeStudentOptions(pick.value || '');
+  }
+
+  async function populateFreezeStudentOptions(classId){
+    const pick = document.getElementById('freezeStudentPick');
+    if(!pick) return;
+    pick.innerHTML = '';
+    if(!classId) return;
+    try{
+      const snap = await db.collection('students').where('classId','==',classId).get();
+      const arr = [];
+      snap.forEach(d=>arr.push({id:d.id,...d.data()}));
+      arr.sort((a,b)=>(a.name||'').localeCompare((b.name||''),'ar'));
+      arr.forEach(s=>{
+        const o = document.createElement('option');
+        o.value = s.id;
+        o.textContent = s.name || '—';
+        pick.appendChild(o);
+      });
+    }catch(e){ console.error('freeze student options', e); }
+  }
+
+  function syncFreezeReasonText(){
+    const sel = document.getElementById('freezeReasonPick');
+    const txt = document.getElementById(freezeReasonTextId);
+    if(!sel || !txt) return;
+    if(sel.value && sel.value !== 'أخرى' && !txt.value.trim()) txt.value = sel.value;
+    if(sel.value === 'أخرى') txt.placeholder = 'اكتبي السبب هنا';
+    else txt.placeholder = 'يمكنك إضافة ملاحظة إضافية';
+  }
+
+  async function wireFreezeControls(){
+    const classPick = document.getElementById('freezeClassPick');
+    const reasonPick = document.getElementById('freezeReasonPick');
+    if(!classPick || classPick.dataset.wired === '1') return;
+    classPick.dataset.wired = '1';
+    await populateFreezeClassOptions();
+    classPick.addEventListener('change', ()=> populateFreezeStudentOptions(classPick.value || ''));
+    if(reasonPick){
+      reasonPick.addEventListener('change', syncFreezeReasonText);
+      syncFreezeReasonText();
+    }
+  }
+
+  window.executeFreezeAccount = async function(){
+    const classPick = document.getElementById('freezeClassPick');
+    const studentPick = document.getElementById('freezeStudentPick');
+    const reasonPick = document.getElementById('freezeReasonPick');
+    const reasonText = document.getElementById(freezeReasonTextId);
+    if(!classPick || !studentPick) return;
+    const classId = classPick.value || '';
+    const studentId = studentPick.value || '';
+    const selectedClass = (classes || []).find(c=>c.id === classId);
+    const reason = (reasonText?.value || '').trim() || (reasonPick?.value || '').trim();
+    if(!classId) return warn('اختاري الفصل');
+    if(!studentId) return warn('اختاري الطالب');
+    if(!reason) return warn('اكتبي السبب أو اختاريه');
+    try{
+      await db.collection('students').doc(studentId).update({
+        active:false,
+        frozen:true,
+        freezeReason:reason,
+        freezeClassId:classId,
+        freezeClassName:selectedClass?.name || '',
+        frozenAt: Date.now()
+      });
+      if(currentClassId === classId){
+        await renderStudents();
+      }
+      openModal('تم ✅', 'تم تجميد الحساب بنجاح.', '<button class="btn" onclick="closeModal()">تمام</button>');
+    }catch(e){
+      console.error(e);
+      openModal('تنبيه', 'تعذر تنفيذ تجميد الحساب حالياً.', '<button class="btn" onclick="closeModal()">تمام</button>');
+    }
+  };
+
+  const _renderTabsFreeze = window.renderTabs;
+  if(typeof _renderTabsFreeze === 'function'){
+    window.renderTabs = async function(){
+      const out = await _renderTabsFreeze.apply(this, arguments);
+      setTimeout(()=>{ populateFreezeClassOptions().catch(()=>{}); }, 30);
+      return out;
+    };
+  }
+
+  const _openClassPageFreeze = window.openClassPage;
+  if(typeof _openClassPageFreeze === 'function'){
+    window.openClassPage = async function(){
+      const out = await _openClassPageFreeze.apply(this, arguments);
+      setTimeout(()=>{ populateFreezeClassOptions().catch(()=>{}); }, 50);
+      return out;
+    };
+  }
+
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', ()=> wireFreezeControls().catch(()=>{}));
+  else wireFreezeControls().catch(()=>{});
+})();
+
 (function(){
   const LAYOUT_KEY = 'MB_LAYOUT_PREF';
   function getLayoutMode(){
@@ -5131,21 +5285,13 @@ function renderRoulettePane(){
     const classesPage = document.getElementById('classesPage');
     if(classesPage){
       const container = classesPage.querySelector('.container');
-      if(container && !container.querySelector('.layoutChooserCard')){
+      const homeCard = container ? container.firstElementChild : null;
+      if(homeCard && !homeCard.querySelector('.layoutChooserCard')){
         const wrap = document.createElement('div');
         wrap.innerHTML = buildLayoutChooserHTML();
         const card = wrap.firstElementChild;
-        container.insertBefore(card, container.firstElementChild || null);
-      }
-    }
-    const classPage = document.getElementById('classPage');
-    if(classPage){
-      const container = classPage.querySelector('.container');
-      if(container && !container.querySelector('.layoutChooserCard')){
-        const wrap = document.createElement('div');
-        wrap.innerHTML = buildLayoutChooserHTML();
-        const card = wrap.firstElementChild;
-        container.insertBefore(card, container.firstElementChild || null);
+        card.style.marginTop = '12px';
+        homeCard.appendChild(card);
       }
     }
     wireLayoutChoosers(document);
