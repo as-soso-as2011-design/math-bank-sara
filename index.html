@@ -361,6 +361,12 @@
       .sideBtn{display:inline-flex;width:auto;min-width:160px;margin:4px}
     }
 
+
+    .studentHomeBack{
+      display:flex;justify-content:flex-start;margin:0 0 12px 0;
+    }
+    .studentHomeBack .btn3{min-width:220px;font-weight:1000}
+
 </style>
 </head>
 
@@ -649,6 +655,15 @@
       </div>
 
       <div class="tabs" id="classTabs"></div>
+      <div class="card soft" style="margin-top:10px">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+          <div>
+            <div style="font-weight:1000;color:#0b2a66">📚 دخول الفصل</div>
+            <div class="small" style="margin-top:4px;color:#47607e">اختاري الفصل من التبويبات أعلاه ثم اضغطي دخول الفصل.</div>
+          </div>
+          <button class="btn" onclick="openClassPage()">دخول الفصل</button>
+        </div>
+      </div>
 
       <div class="card soft" style="margin-top:10px">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
@@ -660,10 +675,6 @@
         </div>
       </div>
 
-
-      <div class="card">
-        <button class="btn" onclick="openClassPage()">دخول الفصل</button>
-      </div>
     </div>
   </div>
 
@@ -4829,8 +4840,7 @@ function renderRoulettePane(){
       {id:'teacher-bio', label:'قفل البصمة', childIndex:2},
       {id:'teacher-manage', label:'إدارة الفصول', childIndex:3},
       {id:'teacher-tabs', label:'الفصول', selector:'#classTabs', wrap:true, wrapTitle:'الفصول'},
-      {id:'teacher-quick', label:'إعدادات سريعة', childIndex:5},
-      {id:'teacher-enter', label:'دخول الفصل', childIndex:6}
+      {id:'teacher-quick', label:'إعدادات سريعة', childIndex:5}
     ]);
   }
 
@@ -4869,6 +4879,39 @@ function renderRoulettePane(){
       const out = _backToClasses.apply(this, arguments);
       setTimeout(initSidebars, 60);
       setTimeout(()=>sidebarShowSection('classesPage','teacher-home'), 90);
+      return out;
+    };
+  }
+})();
+
+
+(function(){
+  function ensureStudentPaneBackButtons(){
+    const panes = document.querySelectorAll('#studentAccountPage .miniPane');
+    panes.forEach(pane=>{
+      if(pane.querySelector('.studentHomeBack')) return;
+      const wrap = document.createElement('div');
+      wrap.className = 'studentHomeBack';
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'btn3';
+      btn.textContent = 'الرجوع للصفحة الرئيسية';
+      btn.addEventListener('click', ()=>{
+        if(typeof backToClasses === 'function') backToClasses();
+      });
+      wrap.appendChild(btn);
+      pane.insertBefore(wrap, pane.firstChild);
+    });
+  }
+
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', ensureStudentPaneBackButtons);
+  else ensureStudentPaneBackButtons();
+
+  const _setMiniTab = window.setMiniTab;
+  if(typeof _setMiniTab === 'function'){
+    window.setMiniTab = function(){
+      const out = _setMiniTab.apply(this, arguments);
+      setTimeout(ensureStudentPaneBackButtons, 0);
       return out;
     };
   }
