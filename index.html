@@ -3537,6 +3537,54 @@ document.addEventListener("DOMContentLoaded", async()=>{
 <script>
   window.onload = ()=>{ setTimeout(()=>window.print(), 300); };
 <\/script>
+
+
+<script>
+/* ===== Sidebar hotfix: static left menu ===== */
+(function(){
+  function _pageId(scope){ return scope === 'teacher' ? 'classesPage' : 'classPage'; }
+  window.showSidebarSection = function(scope, sectionId, btn){
+    try{
+      const pageId = _pageId(scope);
+      const page = document.getElementById(pageId);
+      if(!page) return;
+      page.querySelectorAll('.sideSection').forEach(sec=>{
+        const isTarget = sec.id === sectionId;
+        sec.classList.toggle('active', isTarget);
+        sec.classList.toggle('hiddenBySidebar', !isTarget);
+        sec.style.display = isTarget ? 'block' : 'none';
+      });
+      page.querySelectorAll('.sideNavBtn').forEach(b=>b.classList.remove('active'));
+      if(btn) btn.classList.add('active');
+      else {
+        const autoBtn = page.querySelector('.sideNavBtn[onclick*="'+sectionId+'"]');
+        if(autoBtn) autoBtn.classList.add('active');
+      }
+    }catch(e){ console.error('sidebar error', e); }
+  };
+
+  window.initTeacherClassSidebars = function(){
+    try{
+      const tBtn = document.querySelector('#classesPage .sideNavBtn.active') || document.querySelector('#classesPage .sideNavBtn');
+      if(tBtn){
+        const m = (tBtn.getAttribute('onclick')||'').match(/showSidebarSection\('teacher','([^']+)'/);
+        showSidebarSection('teacher', m ? m[1] : 'teacherSecOverview', tBtn);
+      }
+      const cBtn = document.querySelector('#classPage .sideNavBtn.active') || document.querySelector('#classPage .sideNavBtn');
+      if(cBtn){
+        const m = (cBtn.getAttribute('onclick')||'').match(/showSidebarSection\('class','([^']+)'/);
+        showSidebarSection('class', m ? m[1] : 'classSecOps', cBtn);
+      }
+    }catch(e){ console.error('sidebar init error', e); }
+  };
+
+  document.addEventListener('DOMContentLoaded', function(){
+    setTimeout(function(){
+      try{ window.initTeacherClassSidebars(); }catch(e){}
+    }, 50);
+  });
+})();
+</script>
 </body></html>`);
       w.document.close();
     }
@@ -5245,6 +5293,54 @@ function showSidebarSection(scope, sectionId, btn){
       ], 'single');
     }
 
+</script>
+
+
+<script>
+/* ===== Sidebar hotfix: static left menu ===== */
+(function(){
+  function _pageId(scope){ return scope === 'teacher' ? 'classesPage' : 'classPage'; }
+  window.showSidebarSection = function(scope, sectionId, btn){
+    try{
+      const pageId = _pageId(scope);
+      const page = document.getElementById(pageId);
+      if(!page) return;
+      page.querySelectorAll('.sideSection').forEach(sec=>{
+        const isTarget = sec.id === sectionId;
+        sec.classList.toggle('active', isTarget);
+        sec.classList.toggle('hiddenBySidebar', !isTarget);
+        sec.style.display = isTarget ? 'block' : 'none';
+      });
+      page.querySelectorAll('.sideNavBtn').forEach(b=>b.classList.remove('active'));
+      if(btn) btn.classList.add('active');
+      else {
+        const autoBtn = page.querySelector('.sideNavBtn[onclick*="'+sectionId+'"]');
+        if(autoBtn) autoBtn.classList.add('active');
+      }
+    }catch(e){ console.error('sidebar error', e); }
+  };
+
+  window.initTeacherClassSidebars = function(){
+    try{
+      const tBtn = document.querySelector('#classesPage .sideNavBtn.active') || document.querySelector('#classesPage .sideNavBtn');
+      if(tBtn){
+        const m = (tBtn.getAttribute('onclick')||'').match(/showSidebarSection\('teacher','([^']+)'/);
+        showSidebarSection('teacher', m ? m[1] : 'teacherSecOverview', tBtn);
+      }
+      const cBtn = document.querySelector('#classPage .sideNavBtn.active') || document.querySelector('#classPage .sideNavBtn');
+      if(cBtn){
+        const m = (cBtn.getAttribute('onclick')||'').match(/showSidebarSection\('class','([^']+)'/);
+        showSidebarSection('class', m ? m[1] : 'classSecOps', cBtn);
+      }
+    }catch(e){ console.error('sidebar init error', e); }
+  };
+
+  document.addEventListener('DOMContentLoaded', function(){
+    setTimeout(function(){
+      try{ window.initTeacherClassSidebars(); }catch(e){}
+    }, 50);
+  });
+})();
 </script>
 </body>
 </html>
