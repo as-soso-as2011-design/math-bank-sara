@@ -1806,6 +1806,7 @@
 
     function $(id){return document.getElementById(id);}
     function fmt(x){ return (Math.round((Number(x||0)+Number.EPSILON)*100)/100).toFixed(2); }
+    let lastDeletedClassSnapshot = null;
 
     function openModal(title, bodyHtml, actionsHtml){
       $("mTitle").textContent = title;
@@ -2217,17 +2218,150 @@ ${SIGNATURE}`
     }
     async function deleteClassMove(){
       if(classes.length<=1) return warn("ما نقدر نحذف آخر فصل");
-      const others=classes.filter(c=>c.id!==currentClassId);
-      const destName=prompt("ننقل طلاب الفصل لأي فصل?\n"+others.map(c=>c.name).join(" / "), others[0].name);
-      if(!destName) return;
-      const dest=classes.find(c=>c.name===destName); if(!dest) return warn("اسم الفصل غير موجود");
-      const studs=await db.collection("students").where("classId","==",currentClassId).get();
-      const batch=db.batch();
-      studs.forEach(d=>batch.update(db.collection("students").doc(d.id), {classId: dest.id}));
-      batch.delete(db.collection("classes").doc(currentClassId));
+      const sourceOptions = classes.map(c=>`<option value="${c.id}" ${c.id===currentClassId?"selected":""}>${escapeHtml(c.name)}</option>`).join("");
+      const destOptions = classes.filter(c=>c.id!==currentClassId).map(c=>`<option value="${c.id}">${escapeHtml(c.name)}</option>`).join("");
+      openModal(
+        "حذف فصل + نقل الطلاب",
+        `
+        <div class="small" style="line-height:1.9;color:#47607e">اختاري الفصل المراد حذفه، ثم حددي جهة نقل الطلاب قبل التنفيذ.</div>
+        <div class="row" style="margin-top:12px">
+          <div class="col">
+            <div class="small">قائمة الفصل</div>
+            <select id="delClassSource" onchange="refreshDeleteClassDestinations()">${sourceOptions}</select>
+          </div>
+          <div class="col">
+            <div class="small">خيار</div>
+            <select id="delClassAction"><option value="delete">حذف</option></select>
+          </div>
+        </div>
+        <div class="row" style="margin-top:10px">
+          <div class="col">
+            <div class="small">نقل الصف لفصل جديد</div>
+            <select id="delClassDestination">${destOptions}</select>
+          </div>
+          <div class="col" style="align-self:flex-end">
+            <button class="btn3" type="button" onclick="openSelectedDeleteTargetClass()">فتح فصل</button>
+          </div>
+        </div>
+        <div class="row" style="margin-top:10px">
+          <div class="col">
+            <div class="small">اسم الفصل</div>
+            <input id="delClassNewName" type="text" placeholder="اختياري: اكتبي اسم فصل جديد" />
+          </div>
+          <div class="col" style="align-self:flex-end">
+            <button class="btnRed" type="button" onclick="confirmDeleteClassMoveFromModal()">تنفيذ</button>
+          </div>
+        </div>
+        `,
+        '<button class="btn3" onclick="closeModal()">إلغاء</button>'
+      );
+      setTimeout(refreshDeleteClassDestinations, 0);
+    }
+
+    function refreshDeleteClassDestinations(){
+      const srcId = $("delClassSource")?.value || currentClassId || "";
+      const dest = $("delClassDestination");
+      if(!dest) return;
+      const current = dest.value;
+      const opts = classes.filter(c=>c.id!==srcId).map(c=>`<option value="${c.id}">${escapeHtml(c.name)}</option>`).join("");
+      dest.innerHTML = opts || '<option value="">لا يوجد فصل بديل</option>';
+      if(classes.some(c=>c.id===current && c.id!==srcId)) dest.value = current;
+    }
+
+    async function openSelectedDeleteTargetClass(){
+      const targetId = $("delClassDestination")?.value || "";
+      if(!targetId) return warn("اختاري الفصل أولاً");
+      currentClassId = targetId;
+      closeModal();
+      await openClassPage();
+    }
+
+    async function confirmDeleteClassMoveFromModal(){
+      const srcId = $("delClassSource")?.value || "";
+      const src = classes.find(c=>c.id===srcId);
+      if(!src) return warn("اختاري الفصل المراد حذفه");
+      if(classes.length<=1) return warn("ما نقدر نحذف آخر فصل");
+      const typedName = ($("delClassNewName")?.value || "").trim();
+      let destLabel = "";
+      let destId = $("delClassDestination")?.value || "";
+      if(typedName){
+        destLabel = typedName;
+      }else{
+        const dest = classes.find(c=>c.id===destId);
+        if(!dest) return warn("اختاري فصلًا لنقل الطلاب");
+        destLabel = dest.name;
+      }
+      openModal(
+        "تأكيد الحذف",
+        `هل تريدين حذف فصل <b>${escapeHtml(src.name)}</b>؟<div class="small" style="margin-top:8px;color:#6b7b8f">سيتم نقل جميع الطلاب إلى: <b>${escapeHtml(destLabel)}</b></div>`,
+        `<div class="row" style="gap:10px;justify-content:flex-end">
+          <button class="btn3" onclick="closeModal()">تراجع عن الحذف</button>
+          <button class="btnRed" onclick="executeDeleteClassMove('${srcId}','${destId}','${escapeHtml(typedName).replace(/'/g,"&#39;")}')">تأكيد الحذف</button>
+        </div>`
+      );
+    }
+
+    async function executeDeleteClassMove(srcId, destId, typedNameEsc){
+      const typedName = String(typedNameEsc||"").replace(/&#39;/g,"'").trim();
+      const src = classes.find(c=>c.id===srcId);
+      if(!src) return warn("الفصل المراد حذفه غير موجود");
+      let destinationId = destId;
+      let createdDoc = null;
+      if(typedName){
+        const existing = classes.find(c=>c.name===typedName);
+        if(existing) destinationId = existing.id;
+        else{
+          const last = await db.collection("classes").orderBy("order","desc").limit(1).get();
+          const max = last.empty?0:(last.docs[0].data().order||0);
+          createdDoc = await db.collection("classes").add({name: typedName, order:max+1});
+          destinationId = createdDoc.id;
+        }
+      }
+      if(!destinationId || destinationId===srcId) return warn("اختاري فصلًا مختلفًا لنقل الطلاب");
+      const studs = await db.collection("students").where("classId","==",srcId).get();
+      lastDeletedClassSnapshot = {
+        classDoc: {id: srcId, ...src},
+        destinationId,
+        movedStudents: studs.docs.map(d=>({id:d.id, oldClassId: srcId})),
+        createdDestination: createdDoc ? {id: createdDoc.id, name: typedName} : null
+      };
+      const batch = db.batch();
+      studs.forEach(d=>batch.update(db.collection("students").doc(d.id), {classId: destinationId}));
+      batch.delete(db.collection("classes").doc(srcId));
       await batch.commit();
-      currentClassId=null;
+      currentClassId = destinationId;
+      closeModal();
       await renderTabs();
+      openModal("تم الحذف ✅", `تم حذف الفصل <b>${escapeHtml(src.name)}</b> ونقل الطلاب بنجاح.`, `
+        <div class="row" style="gap:10px;justify-content:flex-end">
+          <button class="btn3" onclick="closeModal()">موافق</button>
+          <button class="btn" onclick="undoDeleteClassMove()">تراجع عن الحذف</button>
+        </div>`);
+    }
+
+    async function undoDeleteClassMove(){
+      if(!lastDeletedClassSnapshot) return warn("لا توجد عملية حذف للتراجع عنها");
+      const snap = lastDeletedClassSnapshot;
+      const classRef = db.collection("classes").doc(snap.classDoc.id);
+      const classDoc = await classRef.get();
+      if(!classDoc.exists){
+        const restoreData = {...snap.classDoc}; delete restoreData.id;
+        await classRef.set(restoreData);
+      }
+      const batch = db.batch();
+      snap.movedStudents.forEach(s=> batch.update(db.collection("students").doc(s.id), {classId: snap.classDoc.id}));
+      if(snap.createdDestination){
+        const count = await db.collection("students").where("classId","==",snap.createdDestination.id).limit(1).get();
+        if(count.empty){
+          batch.delete(db.collection("classes").doc(snap.createdDestination.id));
+        }
+      }
+      await batch.commit();
+      currentClassId = snap.classDoc.id;
+      lastDeletedClassSnapshot = null;
+      closeModal();
+      await renderTabs();
+      openModal("تم التراجع ✅","تم استرجاع الفصل المحذوف وإرجاع الطلاب إليه.",'<button class="btn" onclick="closeModal()">موافق</button>');
     }
     async function syncStudentsToClasses(){
       await ensureSeed();
