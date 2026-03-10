@@ -470,7 +470,23 @@
     body.layout-mobiletop .dualSidebarShell .teacherSidebarClone{order:1}
     body.layout-mobiletop .dualSidebarShell .classSidebarRight{order:2;top:136px !important}
     body.layout-mobiletop .dualSidebarShell .dualContent{order:3;min-width:0}
-
+    body.layout-mobiletop #studentsGrid.grid2{
+      display:grid !important;
+      grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+      gap:12px !important;
+    }
+    body.layout-mobiletop #studentsGrid.grid2 > .card{
+      min-width:0;
+      margin:0;
+    }
+    @media(max-width:560px){
+      body.layout-mobiletop #studentsGrid.grid2 > .card{
+        padding:10px;
+      }
+      body.layout-mobiletop #studentsGrid.grid2 .row{
+        gap:8px;
+      }
+    }
 
     .studentHomeBack{
       display:flex;justify-content:flex-start;margin:0 0 12px 0;
@@ -5073,7 +5089,7 @@ function renderRoulettePane(){
       btn.classList.toggle('active', btn.dataset.layoutMode === m);
     });
     document.querySelectorAll('[data-layout-mode-label]').forEach(el=>{
-      el.textContent = (m === 'mobiletop') ? 'نسخة الجوال' : 'نسخة الكمبيوتر والآيباد';
+      el.textContent = (m === 'mobiletop') ? 'نسخة الجوال' : 'نسخة الكمبيوتر، الآيباد';
     });
   }
   function setLayoutMode(mode){
@@ -5096,8 +5112,8 @@ function renderRoulettePane(){
           </div>
         </div>
         <div class="layoutChooser">
-          <button type="button" class="layoutChoiceBtn" data-layout-mode="desktop">نسخة الكمبيوتر والآيباد<br><span class="small" style="color:inherit;opacity:.9">تبويبات جانبية يمين ويسار</span></button>
-          <button type="button" class="layoutChoiceBtn" data-layout-mode="mobiletop">نسخة الجوال<br><span class="small" style="color:inherit;opacity:.9">التبويبات أعلى الصفحة مع تمرير</span></button>
+          <button type="button" class="layoutChoiceBtn" data-layout-mode="desktop">نسخة الكمبيوتر، الآيباد</button>
+          <button type="button" class="layoutChoiceBtn" data-layout-mode="mobiletop">نسخة الجوال</button>
         </div>
       </div>`;
   }
