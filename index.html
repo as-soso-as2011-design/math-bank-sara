@@ -341,13 +341,15 @@
 
 
 
-    /* ===== Sidebar navigation for teacher/classes pages ===== */
+    /* ===== Sidebar navigation (teacher + class pages) ===== */
     .sidebarShell{display:flex;gap:14px;align-items:flex-start;direction:ltr;margin-top:12px}
     .sidebarNav{width:220px;flex:0 0 220px;position:sticky;top:86px;background:linear-gradient(180deg,#0b2a66,#0b3b85);border-radius:18px;padding:10px;box-shadow:0 14px 34px rgba(0,0,0,.18)}
     .sidebarNav .sideTitle{color:#fff;font-weight:1000;font-size:14px;padding:8px 10px 10px 10px;opacity:.95}
-    .sideBtn{display:flex;align-items:center;justify-content:flex-start;gap:8px;width:100%;text-align:right;direction:rtl;background:rgba(255,255,255,.10);color:#fff;border:1px solid rgba(255,255,255,.10);border-radius:14px;padding:12px 12px;margin:7px 0;font-weight:1000;cursor:pointer}
-    .sideBtn:hover{background:rgba(255,255,255,.18)}
-    .sideBtn.active{background:#fff;color:#0b2a66;box-shadow:0 10px 24px rgba(0,0,0,.12)}
+    .sideBtn{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;border:0;border-radius:14px;padding:12px 14px;margin:6px 0;background:rgba(255,255,255,.08);color:#fff;font-weight:1000;cursor:pointer}
+    .sideBtn:hover{background:rgba(255,255,255,.14)}
+    .sideBtn.active{background:#fff;color:#0b2a66;box-shadow:0 8px 18px rgba(0,0,0,.14)}
+    .sideBtn .num{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:24px;border-radius:999px;background:rgba(255,255,255,.16);font-size:11px;font-weight:1000;padding:0 6px}
+    .sideBtn.active .num{background:#eaf3fb;color:#0b2a66}
     .sidebarContent{flex:1;min-width:0;direction:rtl}
     .sidebarSection.hiddenBySidebar{display:none !important}
     .sidebarSection{scroll-margin-top:92px}
@@ -356,39 +358,7 @@
       .sidebarShell{display:block;direction:rtl}
       .sidebarNav{position:static;width:100%;margin-bottom:12px;padding:10px;overflow:auto;white-space:nowrap}
       .sidebarNav .sideTitle,.sidebarHint{display:none}
-      .sideBtn{display:inline-flex;width:auto;margin:4px;justify-content:center}
-    }
-
-
-    /* ===== Sidebar navigation for teacher + class pages ===== */
-    .sideApp{display:flex;gap:16px;align-items:flex-start;direction:ltr}
-    .sideNav{
-      width:220px;flex:0 0 220px;position:sticky;top:86px;
-      background:linear-gradient(180deg,#0a275d,#0b3f8a);
-      border-radius:20px;padding:12px;box-shadow:0 14px 34px rgba(0,0,0,.18)
-    }
-    .sideNavTitle{color:#fff;font-weight:1000;font-size:15px;margin:4px 4px 10px 4px;text-align:right;direction:rtl}
-    .sideNavSub{color:rgba(255,255,255,.78);font-size:11px;font-weight:700;margin:0 4px 10px 4px;text-align:right;direction:rtl;line-height:1.7}
-    .sideNavBtn{
-      width:100%;display:flex;align-items:center;justify-content:flex-start;gap:8px;
-      border:1px solid rgba(255,255,255,.14);border-radius:14px;
-      background:rgba(255,255,255,.08);color:#fff;padding:11px 12px;
-      margin:7px 0;font-weight:1000;font-size:14px;cursor:pointer;direction:rtl
-    }
-    .sideNavBtn:hover{background:rgba(255,255,255,.14)}
-    .sideNavBtn.active{background:#fff;color:#0b2a66;border-color:#fff}
-    .sideNavBtn .ico{font-size:16px;line-height:1}
-    .sideContent{flex:1;min-width:0;direction:rtl}
-    .sideSection{display:none}
-    .sideSection.active{display:block}
-    @media(max-width:980px){
-      .sideApp{display:block;direction:rtl}
-      .sideNav{
-        width:auto;position:static;margin-bottom:12px;padding:10px;
-        display:flex;gap:8px;overflow:auto;white-space:nowrap;border-radius:18px
-      }
-      .sideNavTitle,.sideNavSub{display:none}
-      .sideNavBtn{width:auto;min-width:max-content;margin:0}
+      .sideBtn{display:inline-flex;width:auto;min-width:160px;margin:4px}
     }
 
 </style>
@@ -611,337 +581,283 @@
 
   <div id="classesPage" class="hidden">
     <div class="container">
-      <div class="sideApp">
-        <aside class="sideNav" id="teacherSideNav">
-          <div class="sideNavTitle">لوحة المعلمة</div>
-          <div class="sideNavSub">تبويب جانبي مرتب — اضغطي على القسم المطلوب لعرضه فقط.</div>
-          <button class="sideNavBtn active" type="button" onclick="showSidebarSection('teacher','teacherSecOverview',this)"><span class="ico">🏠</span><span>الرئيسية</span></button>
-          <button class="sideNavBtn" type="button" onclick="showSidebarSection('teacher','teacherSecWA',this)"><span class="ico">📲</span><span>واتساب</span></button>
-          <button class="sideNavBtn" type="button" onclick="showSidebarSection('teacher','teacherSecBio',this)"><span class="ico">🔒</span><span>قفل البصمة</span></button>
-          <button class="sideNavBtn" type="button" onclick="showSidebarSection('teacher','teacherSecManage',this)"><span class="ico">🏫</span><span>إدارة الفصول</span></button>
-          <button class="sideNavBtn" type="button" onclick="showSidebarSection('teacher','teacherSecTabs',this)"><span class="ico">🗂️</span><span>الفصول</span></button>
-          <button class="sideNavBtn" type="button" onclick="showSidebarSection('teacher','teacherSecQuick',this)"><span class="ico">⚙️</span><span>إعدادات سريعة</span></button>
-          <button class="sideNavBtn" type="button" onclick="showSidebarSection('teacher','teacherSecEnter',this)"><span class="ico">➡️</span><span>دخول الفصل</span></button>
-        </aside>
-
-        <div class="sideContent">
-          <section id="teacherSecOverview" class="sideSection active">
-            <div class="card soft">
-              <div class="row" style="align-items:center">
-                <div class="col">
-                  <div style="font-weight:1000;color:#0b2a66">لوحة المعلمة</div>
-                  <div class="small">إدارة الفصول والطلاب + إرسال إشعار واتساب + تقارير PDF</div>
-                </div>
-                <div class="col" style="text-align:left">
-                  <button class="btn3" onclick="logout()">تسجيل خروج</button>
-                  <button class="btn2" style="margin-top:8px" onclick="openDailyOps()">📅 العمليات اليومية</button>
-                  <button class="btn2" style="margin-right:8px" onclick="pdfBankReport()">تقرير PDF شامل</button>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          <section id="teacherSecWA" class="sideSection">
-            <div class="card soft">
-              <h3 style="margin:0 0 8px 0;color:#0b2a66">إعدادات الإرسال السريع (WhatsApp)</h3>
-              <div class="row">
-                <label class="col small" style="display:flex;gap:8px;align-items:center">
-                  <input type="checkbox" id="autoWA" checked style="width:auto">
-                  فتح واتساب بعد العملية مباشرة
-                </label>
-                <label class="col small" style="display:flex;gap:8px;align-items:center">
-                  <input type="checkbox" id="copyToTeacher" checked style="width:auto">
-                  إرسال نسخة للمعلمة
-                </label>
-              </div>
-              <div class="small" style="margin-top:6px">
-                * يتطلب واتساب «نقرة إرسال» أخيرة ✅
-              </div>
-            </div>
-          </section>
-
-          <section id="teacherSecBio" class="sideSection">
-            <div class="card soft">
-              <h3 style="margin:0 0 8px 0;color:#0b2a66">🔒 إعدادات قفل البصمة</h3>
-              <div class="small" style="margin-bottom:10px;line-height:1.8">
-                • قفل <b>المعلمة</b> بالبصمة: <b>مفعل دائمًا</b> لحماية البيانات.<br>
-                • قفل <b>الطالب</b> بالبصمة: اختياري (لتجنب إلزام كل طالبة بتفعيل بصمة على جهازها).
-              </div>
-              <label class="small" style="display:flex;gap:10px;align-items:center">
-                <input type="checkbox" id="bioStudentToggle" style="width:auto">
-                تفعيل قفل الطالب بالبصمة (اختياري)
-              </label>
-              <div class="small" style="margin-top:8px;color:#57606a">
-                ملاحظة: عند تفعيل قفل الطالب على هذا الجهاز لأول مرة قد يطلب المتصفح "تفعيل البصمة" (Passkey) مرة واحدة.
-              </div>
-            </div>
-          </section>
-
-          <section id="teacherSecManage" class="sideSection">
-            <div class="card soft">
-              <div class="row">
-                <div class="col">
-                  <div class="small">إضافة فصل</div>
-                  <input id="newClassName" placeholder="مثال: خامس بنات">
-                </div>
-                <div class="col" style="align-self:flex-end">
-                  <button class="btn2" onclick="addClass()">إضافة فصل</button>
-                </div>
-              </div>
-              <hr>
-              <div class="row">
-                <button class="btn2 col" onclick="renameClass()">تعديل اسم الفصل</button>
-                <button class="btnRed col" onclick="deleteClassMove()">حذف فصل + نقل الطلاب</button>
-                <button class="btn3 col" onclick="syncStudentsToClasses()">تثبيت أسماء الطلاب</button>
-                <button class="btn3 col" onclick="toggleForgotPinForAll()">تعطيل/تفعيل نسيت الرقم السري</button>
-              </div>
-              <div class="small">زر "تثبيت أسماء الطلاب" يرجع كل طالب لفصله الصحيح + يضيف الناقص.</div>
-            </div>
-          </section>
-
-          <section id="teacherSecTabs" class="sideSection">
-            <div class="tabs" id="classTabs"></div>
-          </section>
-
-          <section id="teacherSecQuick" class="sideSection">
-            <div class="card soft" style="margin-top:10px">
-              <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
-                <div>
-                  <div style="font-weight:1000;color:#0b2a66">⚙️ إعدادات الفصول</div>
-                  <div class="small" style="margin-top:4px;color:#47607e">تحكم سريع: قفل بصمة الطالب + فرص الروليت للحسابات (ذهبي/ماسي/ألماسي).</div>
-                </div>
-                <button class="btn3" onclick="openClassQuickSettings()">فتح الإعدادات</button>
-              </div>
-            </div>
-          </section>
-
-          <section id="teacherSecEnter" class="sideSection">
-            <div class="card">
-              <button class="btn" onclick="openClassPage()">دخول الفصل</button>
-            </div>
-          </section>
+      <div class="card soft">
+        <div class="row" style="align-items:center">
+          <div class="col">
+            <div style="font-weight:1000;color:#0b2a66">لوحة المعلمة</div>
+            <div class="small">إدارة الفصول والطلاب + إرسال إشعار واتساب + تقارير PDF</div>
+          </div>
+          <div class="col" style="text-align:left">
+            <button class="btn3" onclick="logout()">تسجيل خروج</button>
+            <button class="btn2" style="margin-top:8px" onclick="openDailyOps()">📅 العمليات اليومية</button>
+            <button class="btn2" style="margin-right:8px" onclick="pdfBankReport()">تقرير PDF شامل</button>
+          </div>
         </div>
+      </div>
+
+      <div class="card soft">
+        <h3 style="margin:0 0 8px 0;color:#0b2a66">إعدادات الإرسال السريع (WhatsApp)</h3>
+        <div class="row">
+          <label class="col small" style="display:flex;gap:8px;align-items:center">
+            <input type="checkbox" id="autoWA" checked style="width:auto">
+            فتح واتساب بعد العملية مباشرة
+          </label>
+          <label class="col small" style="display:flex;gap:8px;align-items:center">
+            <input type="checkbox" id="copyToTeacher" checked style="width:auto">
+            إرسال نسخة للمعلمة
+          </label>
+        </div>
+        <div class="small" style="margin-top:6px">
+          * يتطلب واتساب «نقرة إرسال» أخيرة ✅
+        </div>
+      </div>
+
+
+      <div class="card soft">
+        <h3 style="margin:0 0 8px 0;color:#0b2a66">🔒 إعدادات قفل البصمة</h3>
+        <div class="small" style="margin-bottom:10px;line-height:1.8">
+          • قفل <b>المعلمة</b> بالبصمة: <b>مفعل دائمًا</b> لحماية البيانات.<br>
+          • قفل <b>الطالب</b> بالبصمة: اختياري (لتجنب إلزام كل طالبة بتفعيل بصمة على جهازها).
+        </div>
+        <label class="small" style="display:flex;gap:10px;align-items:center">
+          <input type="checkbox" id="bioStudentToggle" style="width:auto">
+          تفعيل قفل الطالب بالبصمة (اختياري)
+        </label>
+        <div class="small" style="margin-top:8px;color:#57606a">
+          ملاحظة: عند تفعيل قفل الطالب على هذا الجهاز لأول مرة قد يطلب المتصفح "تفعيل البصمة" (Passkey) مرة واحدة.
+        </div>
+      </div>
+
+      <div class="card soft">
+        <div class="row">
+          <div class="col">
+            <div class="small">إضافة فصل</div>
+            <input id="newClassName" placeholder="مثال: خامس بنات">
+          </div>
+          <div class="col" style="align-self:flex-end">
+            <button class="btn2" onclick="addClass()">إضافة فصل</button>
+          </div>
+        </div>
+        <hr>
+        <div class="row">
+          <button class="btn2 col" onclick="renameClass()">تعديل اسم الفصل</button>
+          <button class="btnRed col" onclick="deleteClassMove()">حذف فصل + نقل الطلاب</button>
+          <button class="btn3 col" onclick="syncStudentsToClasses()">تثبيت أسماء الطلاب</button>
+          <button class="btn3 col" onclick="toggleForgotPinForAll()">تعطيل/تفعيل نسيت الرقم السري</button>
+        </div>
+        <div class="small">زر "تثبيت أسماء الطلاب" يرجع كل طالب لفصله الصحيح + يضيف الناقص.</div>
+      </div>
+
+      <div class="tabs" id="classTabs"></div>
+
+      <div class="card soft" style="margin-top:10px">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+          <div>
+            <div style="font-weight:1000;color:#0b2a66">⚙️ إعدادات الفصول</div>
+            <div class="small" style="margin-top:4px;color:#47607e">تحكم سريع: قفل بصمة الطالب + فرص الروليت للحسابات (ذهبي/ماسي/ألماسي).</div>
+          </div>
+          <button class="btn3" onclick="openClassQuickSettings()">فتح الإعدادات</button>
+        </div>
+      </div>
+
+
+      <div class="card">
+        <button class="btn" onclick="openClassPage()">دخول الفصل</button>
       </div>
     </div>
   </div>
 
   <div id="classPage" class="hidden">
     <div class="container">
-      <div class="sideApp">
-        <aside class="sideNav" id="classSideNav">
-          <div class="sideNavTitle">أقسام الفصل</div>
-          <div class="sideNavSub">اضغطي على التبويب المطلوب ليظهر القسم فقط داخل صفحة الفصل.</div>
-          <button class="sideNavBtn active" type="button" onclick="showSidebarSection('class','classSecOps',this)"><span class="ico">💳</span><span>العمليات</span></button>
-          <button class="sideNavBtn" type="button" onclick="showSidebarSection('class','classSecHonorWeek',this)"><span class="ico">🏅</span><span>شرف الأسبوع</span></button>
-          <button class="sideNavBtn" type="button" onclick="showSidebarSection('class','classSecPdf',this)"><span class="ico">📄</span><span>التقارير PDF</span></button>
-          <button class="sideNavBtn" type="button" onclick="showSidebarSection('class','classSecHonorBoard',this)"><span class="ico">🏆</span><span>لوحة الشرف</span></button>
-          <button class="sideNavBtn" type="button" onclick="showSidebarSection('class','classSecRoulette',this)"><span class="ico">🎡</span><span>الروليت</span></button>
-          <button class="sideNavBtn" type="button" onclick="showSidebarSection('class','classSecStudents',this)"><span class="ico">👩‍🎓</span><span>الطلاب</span></button>
-        </aside>
+      <div class="card soft">
+        <div class="row" style="align-items:center">
+          <div class="col">
+            <div style="font-weight:1000;color:#0b2a66" id="classTitle">الفصل</div>
+            <div class="small">الإيداع/السحب مع الأسباب ثابتة</div>
+          </div>
+          <div class="col" style="text-align:left">
+            <button class="btn3" onclick="backToClasses()">رجوع للفصول</button>
+          </div>
+        </div>
 
-        <div class="sideContent">
-          <section id="classSecOps" class="sideSection active">
-            <div class="card soft">
-              <div class="row" style="align-items:center">
-                <div class="col">
-                  <div style="font-weight:1000;color:#0b2a66" id="classTitle">الفصل</div>
-                  <div class="small">الإيداع/السحب مع الأسباب ثابتة</div>
-                </div>
-                <div class="col" style="text-align:left">
-                  <button class="btn3" onclick="backToClasses()">رجوع للفصول</button>
-                </div>
-              </div>
+        <hr>
 
-              <hr>
+        <div class="row">
+          <div class="col">
+            <div class="small">إضافة طالب</div>
+            <input id="newStudentName" placeholder="اسم الطالب/الطالبة">
+          </div>
+          <div class="col" style="align-self:flex-end">
+            <button class="btn2" onclick="addStudent()">إضافة طالب</button>
+          </div>
+        </div>
 
-              <div class="row">
-                <div class="col">
-                  <div class="small">إضافة طالب</div>
-                  <input id="newStudentName" placeholder="اسم الطالب/الطالبة">
-                </div>
-                <div class="col" style="align-self:flex-end">
-                  <button class="btn2" onclick="addStudent()">إضافة طالب</button>
-                </div>
-              </div>
+        <hr>
 
-              <hr>
+        <div class="row">
+          <div class="col">
+            <div class="small">مبلغ الإيداع للكل</div>
+            <input id="bulkAmount" type="number" step="0.01" placeholder="مثال: 10">
+          </div>
+          <div class="col" style="align-self:flex-end">
+            <button class="btn" onclick="depositAll()">إيداع للكل</button>
+          </div>
 
-              <div class="row">
-                <div class="col">
-                  <div class="small">مبلغ الإيداع للكل</div>
-                  <input id="bulkAmount" type="number" step="0.01" placeholder="مثال: 10">
-                </div>
-                <div class="col" style="align-self:flex-end">
-                  <button class="btn" onclick="depositAll()">إيداع للكل</button>
-                </div>
+          <div class="col">
+            <div class="small">مبلغ السحب من الكل</div>
+            <input id="bulkWithdrawAmount" type="number" step="0.01" placeholder="مثال: 5">
+          </div>
+          <div class="col" style="align-self:flex-end">
+            <button class="btnRed" onclick="withdrawAll()">سحب للكل</button>
+          </div>
+        </div>
 
-                <div class="col">
-                  <div class="small">مبلغ السحب من الكل</div>
-                  <input id="bulkWithdrawAmount" type="number" step="0.01" placeholder="مثال: 5">
-                </div>
-                <div class="col" style="align-self:flex-end">
-                  <button class="btnRed" onclick="withdrawAll()">سحب للكل</button>
-                </div>
-              </div>
+        <hr>
 
-              <hr>
+        <div class="row">
+          <div class="col">
+            <div class="small">طالب محدد</div>
+            <select id="pickStudent"></select>
+          </div>
+          <div class="col">
+            <div class="small">المبلغ</div>
+            <input id="pickAmount" type="number" step="0.01" placeholder="مثال: 5">
+          </div>
+          <div class="col" style="align-self:flex-end">
+            <button class="btn2" onclick="depositToStudent()">إيداع لطالب</button>
+          </div>
+          <div class="col" style="align-self:flex-end">
+            <button class="btnRed" onclick="withdrawFromStudent()">سحب من طالب</button>
+          </div>
+        </div>
 
-              <div class="row">
-                <div class="col">
-                  <div class="small">طالب محدد</div>
-                  <select id="pickStudent"></select>
-                </div>
-                <div class="col">
-                  <div class="small">المبلغ</div>
-                  <input id="pickAmount" type="number" step="0.01" placeholder="مثال: 5">
-                </div>
-                <div class="col" style="align-self:flex-end">
-                  <button class="btn2" onclick="depositToStudent()">إيداع لطالب</button>
-                </div>
-                <div class="col" style="align-self:flex-end">
-                  <button class="btnRed" onclick="withdrawFromStudent()">سحب من طالب</button>
-                </div>
-              </div>
+        <hr>
 
-              <hr>
+        <div class="row">
+          <div class="col">
+            <div class="small">تحويل من</div>
+            <select id="transferFromTeacher"></select>
+          </div>
+          <div class="col">
+            <div class="small">تحويل إلى</div>
+            <select id="transferToTeacher"></select>
+            <div class="small" id="transferTeacherPreview" style="margin-top:6px;color:#0b2a66;font-weight:1000"></div>
+          </div>
+          <div class="col">
+            <div class="small">المبلغ</div>
+            <input id="transferAmtTeacher" type="number" step="0.01" placeholder="مثال: 5">
+          </div>
+          <div class="col" style="align-self:flex-end">
+            <button class="btn" onclick="teacherTransfer()">تحويل</button>
+          </div>
+        </div>
 
-              <div class="row">
-                <div class="col">
-                  <div class="small">تحويل من</div>
-                  <select id="transferFromTeacher"></select>
-                </div>
-                <div class="col">
-                  <div class="small">تحويل إلى</div>
-                  <select id="transferToTeacher"></select>
-                  <div class="small" id="transferTeacherPreview" style="margin-top:6px;color:#0b2a66;font-weight:1000"></div>
-                </div>
-                <div class="col">
-                  <div class="small">المبلغ</div>
-                  <input id="transferAmtTeacher" type="number" step="0.01" placeholder="مثال: 5">
-                </div>
-                <div class="col" style="align-self:flex-end">
-                  <button class="btn" onclick="teacherTransfer()">تحويل</button>
-                </div>
-              </div>
+        <hr>
 
-              <hr>
+        <div class="row">
+          <div class="col">
+            <div class="small">سبب العملية (ثابت)</div>
+            <select id="reasonTeacher"></select>
+            <input id="reasonOtherTeacher" class="hidden" placeholder="أخرى: اكتب السبب هنا..." style="margin-top:8px">
+          </div>
+        </div>
 
-              <div class="row">
-                <div class="col">
-                  <div class="small">سبب العملية (ثابت)</div>
-                  <select id="reasonTeacher"></select>
-                  <input id="reasonOtherTeacher" class="hidden" placeholder="أخرى: اكتب السبب هنا..." style="margin-top:8px">
-                </div>
-              </div>
+        <hr>
 
-              <hr>
-
-              <div class="row" style="align-items:center">
-                <label class="small" style="display:flex;gap:8px;align-items:center">
-                  <input type="checkbox" id="selAll" onchange="toggleSelectAll()" style="width:auto"> تحديد الكل
-                </label>
-                <button class="btn2" onclick="depositSelected()">إيداع للمحددين</button>
-                <button class="btnRed" onclick="withdrawSelected()">سحب للمحددين</button>
-                <div class="small" id="selCount">المحدد: 0</div>
-              </div>
-            </div>
-          </section>
-
-          <section id="classSecHonorWeek" class="sideSection">
-            <div class="card soft" style="margin-top:12px">
-              <div class="row" style="align-items:center;gap:10px;flex-wrap:wrap">
-                <div style="font-weight:1000;color:#0b2a66">🏅 لوحة شرف الأسبوع (الأحد → الخميس)</div>
-                <div class="small" id="honorWeekLabel" style="margin-right:auto;color:#47607e"></div>
-                <label class="small" style="display:flex;gap:8px;align-items:center">
-                  <input type="checkbox" id="autoCongrats" style="width:auto"> إرسال تهنئة تلقائية للفائزات
-                </label>
-                <button class="btn2" onclick="renderHonorRoll()">تحديث اللوحة</button>
-              </div>
-              <div id="honorRollList" style="margin-top:10px"></div>
-            </div>
-          </section>
-
-          <section id="classSecPdf" class="sideSection">
-            <div class="card soft" style="margin-top:12px">
-              <div style="font-weight:1000;color:#0b2a66">📄 تقرير PDF (من تاريخ إلى تاريخ)</div>
-              <div class="row" style="margin-top:10px;gap:10px;flex-wrap:wrap;align-items:flex-end">
-                <div class="col" style="min-width:200px">
-                  <div class="small">اختر الطالب/الطالبة</div>
-                  <select id="repPickStudentTeacher"></select>
-                </div>
-                <div class="col" style="min-width:160px">
-                  <div class="small">من تاريخ</div>
-                  <input id="repFromTeacher" type="date">
-                </div>
-                <div class="col" style="min-width:160px">
-                  <div class="small">إلى تاريخ</div>
-                  <input id="repToTeacher" type="date">
-                </div>
-                <div class="col" style="align-self:flex-end">
-                  <button class="btn" onclick="exportPdfTeacher()">إصدار PDF</button>
-                </div>
-              </div>
-              <div class="small" style="margin-top:8px;color:#47607e">* يتم استخراج التقرير حسب العمليات المسجلة ضمن الفترة المحددة.</div>
-            </div>
-          </section>
-
-          <section id="classSecHonorBoard" class="sideSection">
-            <div class="card soft" style="margin-top:12px">
-              <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
-                <div>
-                  <div style="font-weight:1000;color:#0b2a66">🏅 لوحة الشرف (تبويب خاص)</div>
-                  <div class="small" style="margin-top:4px;color:#47607e">تُحسب محليًا من بيانات طلاب الفصل داخل النظام — بدون تعذّر.</div>
-                </div>
-              </div>
-
-              <div class="row" style="margin-top:10px">
-                <div class="col">
-                  <div class="small">فلترة الشعبة/المجموعة</div>
-                  <select id="hbSection"></select>
-                </div>
-                <div class="col">
-                  <div class="small">نوع الترتيب</div>
-                  <select id="hbSort">
-                    <option value="weekPoints">نقاط الأسبوع</option>
-                    <option value="balance">الرصيد</option>
-                    <option value="ops">مشاركات الأسبوع</option>
-                  </select>
-                </div>
-                <div class="col" style="align-self:flex-end">
-                  <button class="btn3" onclick="renderHonorBoard()">تحديث تلقائي</button>
-                </div>
-              </div>
-
-              <div id="honorBoardTop3" class="grid3" style="margin-top:12px"></div>
-              <div id="honorBoardList" class="card" style="margin-top:10px"></div>
-            </div>
-          </section>
-
-          <section id="classSecRoulette" class="sideSection">
-            <div class="card soft" style="margin-top:12px">
-              <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
-                <div>
-                  <div style="font-weight:1000;color:#0b2a66">🎡 إدارة الروليت (تبويب خاص)</div>
-                  <div class="small" style="margin-top:4px;color:#47607e">تغيير الجوائز يظهر فورًا للطلاب المؤهلين (ذهبي/ماسي/ألماسي).</div>
-                </div>
-                <button class="btn" onclick="saveRoulettePrizes()">حفظ الجوائز</button>
-              </div>
-
-              <div class="row" style="margin-top:10px">
-                <div class="col">
-                  <div class="small">قائمة الجوائز (كل سطر = جائزة)</div>
-                  <textarea id="roulettePrizes" rows="5" style="width:100%;resize:vertical" placeholder="إعفاء واجب&#10;إعفاء واجبان&#10;زيادة درجات في الاختبار&#10;وجبة ماكدونالدز"></textarea>
-                  <div class="small" style="margin-top:6px;color:#47607e">* فرصة تدوير واحدة لكل طالب في الأسبوع.</div>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          <section id="classSecStudents" class="sideSection">
-            <div id="studentsGrid" class="grid2"></div>
-          </section>
+        <div class="row" style="align-items:center">
+          <label class="small" style="display:flex;gap:8px;align-items:center">
+            <input type="checkbox" id="selAll" onchange="toggleSelectAll()" style="width:auto"> تحديد الكل
+          </label>
+          <button class="btn2" onclick="depositSelected()">إيداع للمحددين</button>
+          <button class="btnRed" onclick="withdrawSelected()">سحب للمحددين</button>
+          <div class="small" id="selCount">المحدد: 0</div>
         </div>
       </div>
+
+      
+      <div class="card soft" style="margin-top:12px">
+        <div class="row" style="align-items:center;gap:10px;flex-wrap:wrap">
+          <div style="font-weight:1000;color:#0b2a66">🏅 لوحة شرف الأسبوع (الأحد → الخميس)</div>
+          <div class="small" id="honorWeekLabel" style="margin-right:auto;color:#47607e"></div>
+          <label class="small" style="display:flex;gap:8px;align-items:center">
+            <input type="checkbox" id="autoCongrats" style="width:auto"> إرسال تهنئة تلقائية للفائزات
+          </label>
+          <button class="btn2" onclick="renderHonorRoll()">تحديث اللوحة</button>
+        </div>
+        <div id="honorRollList" style="margin-top:10px"></div>
+      </div>
+
+      <div class="card soft" style="margin-top:12px">
+        <div style="font-weight:1000;color:#0b2a66">📄 تقرير PDF (من تاريخ إلى تاريخ)</div>
+        <div class="row" style="margin-top:10px;gap:10px;flex-wrap:wrap;align-items:flex-end">
+          <div class="col" style="min-width:200px">
+            <div class="small">اختر الطالب/الطالبة</div>
+            <select id="repPickStudentTeacher"></select>
+          </div>
+          <div class="col" style="min-width:160px">
+            <div class="small">من تاريخ</div>
+            <input id="repFromTeacher" type="date">
+          </div>
+          <div class="col" style="min-width:160px">
+            <div class="small">إلى تاريخ</div>
+            <input id="repToTeacher" type="date">
+          </div>
+          <div class="col" style="align-self:flex-end">
+            <button class="btn" onclick="exportPdfTeacher()">إصدار PDF</button>
+          </div>
+        </div>
+        <div class="small" style="margin-top:8px;color:#47607e">* يتم استخراج التقرير حسب العمليات المسجلة ضمن الفترة المحددة.</div>
+      </div>
+
+      <div class="card soft" style="margin-top:12px">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+          <div>
+            <div style="font-weight:1000;color:#0b2a66">🏅 لوحة الشرف (تبويب خاص)</div>
+            <div class="small" style="margin-top:4px;color:#47607e">تُحسب محليًا من بيانات طلاب الفصل داخل النظام — بدون تعذّر.</div>
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:10px">
+          <div class="col">
+            <div class="small">فلترة الشعبة/المجموعة</div>
+            <select id="hbSection"></select>
+          </div>
+          <div class="col">
+            <div class="small">نوع الترتيب</div>
+            <select id="hbSort">
+              <option value="weekPoints">نقاط الأسبوع</option>
+              <option value="balance">الرصيد</option>
+              <option value="ops">مشاركات الأسبوع</option>
+            </select>
+          </div>
+          <div class="col" style="align-self:flex-end">
+            <button class="btn3" onclick="renderHonorBoard()">تحديث تلقائي</button>
+          </div>
+        </div>
+
+        <div id="honorBoardTop3" class="grid3" style="margin-top:12px"></div>
+        <div id="honorBoardList" class="card" style="margin-top:10px"></div>
+      </div>
+
+      <div class="card soft" style="margin-top:12px">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+          <div>
+            <div style="font-weight:1000;color:#0b2a66">🎡 إدارة الروليت (تبويب خاص)</div>
+            <div class="small" style="margin-top:4px;color:#47607e">تغيير الجوائز يظهر فورًا للطلاب المؤهلين (ذهبي/ماسي/ألماسي).</div>
+          </div>
+          <button class="btn" onclick="saveRoulettePrizes()">حفظ الجوائز</button>
+        </div>
+
+        <div class="row" style="margin-top:10px">
+          <div class="col">
+            <div class="small">قائمة الجوائز (كل سطر = جائزة)</div>
+            <textarea id="roulettePrizes" rows="5" style="width:100%;resize:vertical" placeholder="إعفاء واجب&#10;إعفاء واجبان&#10;زيادة درجات في الاختبار&#10;وجبة ماكدونالدز"></textarea>
+            <div class="small" style="margin-top:6px;color:#47607e">* فرصة تدوير واحدة لكل طالب في الأسبوع.</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="studentsGrid" class="grid2"></div>
     </div>
   </div>
 
@@ -1339,246 +1255,9 @@
     </div>
     <div class="footerNote">الرياضيات لغة الأذكياء ✨</div>
   </div>
-<script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-app-compat.js">
-
-    /* ===== Sidebar navigation: teacher page + class page ===== */
-    function buildSidebarLayout(pageId, title, items, mode){
-      const page = document.getElementById(pageId);
-      if(!page || page.dataset.sidebarBuilt === '1') return;
-      const container = page.querySelector('.container');
-      if(!container) return;
-      const children = Array.from(container.children);
-      if(!children.length) return;
-
-      const keepTop = (pageId === 'classesPage') ? children[0] : null;
-      const shell = document.createElement('div');
-      shell.className = 'sidebarShell';
-      shell.id = pageId + 'SidebarShell';
-
-      const nav = document.createElement('div');
-      nav.className = 'sidebarNav';
-      nav.innerHTML = `<div class="sideTitle">${title}</div><div class="sidebarHint">اضغطي على التبويب لفتح الجزء المطلوب</div>`;
-
-      const content = document.createElement('div');
-      content.className = 'sidebarContent';
-
-      items.forEach((item, idx)=>{
-        const el = document.getElementById(item.id);
-        if(!el) return;
-        el.classList.add('sidebarSection');
-        el.dataset.sidebarGroup = pageId;
-        content.appendChild(el);
-        const b = document.createElement('button');
-        b.type = 'button';
-        b.className = 'sideBtn' + (idx===0 ? ' active' : '');
-        b.dataset.target = item.id;
-        b.innerHTML = item.label;
-        b.onclick = ()=> sidebarShowSection(pageId, item.id, mode);
-        nav.appendChild(b);
-      });
-
-      shell.appendChild(nav);
-      shell.appendChild(content);
-if(keepTop){ container.appendChild(shell); } else { container.prepend(shell); }
-      page.dataset.sidebarBuilt = '1';
-      if(items[0]) sidebarShowSection(pageId, items[0].id, mode || 'single');
-    }
-
-    function sidebarShowSection(pageId, sectionId, mode){
-      const page = document.getElementById(pageId);
-      if(!page) return;
-      const sections = page.querySelectorAll('.sidebarSection[data-sidebar-group="'+pageId+'"]');
-      sections.forEach(el=>{
-        if((mode||'single') === 'single'){
-          el.classList.toggle('hiddenBySidebar', el.id !== sectionId);
-        } else {
-          el.classList.remove('hiddenBySidebar');
-        }
-      });
-      page.querySelectorAll('.sideBtn').forEach(btn=>btn.classList.toggle('active', btn.dataset.target === sectionId));
-    }
-
-    function initTeacherClassSidebars(){
-      buildSidebarLayout('classesPage','تنقل صفحة المعلمة',[
-        {id:'teacherSecWhats', label:'⚙️ الإرسال السريع'},
-        {id:'teacherSecBio', label:'🔒 قفل البصمة'},
-        {id:'teacherSecManage', label:'🏫 إدارة الفصول'},
-        {id:'teacherSecTabs', label:'📚 تبويبات الفصول'},
-        {id:'teacherSecQuick', label:'🛠️ إعدادات الفصول'},
-        {id:'teacherSecEnter', label:'➡️ دخول الفصل'}
-      ], 'single');
-
-      buildSidebarLayout('classPage','تنقل داخل الفصل',[
-        {id:'classSecOps', label:'💳 العمليات'},
-        {id:'classSecHonorWeek', label:'🏅 شرف الأسبوع'},
-        {id:'classSecPdf', label:'📄 تقرير PDF'},
-        {id:'classSecHonorBoard', label:'🏆 لوحة الشرف'},
-        {id:'classSecRoulette', label:'🎡 إدارة الروليت'},
-        {id:'classSecStudents', label:'👩‍🎓 الطالبات'}
-      ], 'single');
-    }
-
-</script>
-  <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore-compat.js">
-
-    /* ===== Sidebar navigation: teacher page + class page ===== */
-    function buildSidebarLayout(pageId, title, items, mode){
-      const page = document.getElementById(pageId);
-      if(!page || page.dataset.sidebarBuilt === '1') return;
-      const container = page.querySelector('.container');
-      if(!container) return;
-      const children = Array.from(container.children);
-      if(!children.length) return;
-
-      const keepTop = children[0];
-      const shell = document.createElement('div');
-      shell.className = 'sidebarShell';
-      shell.id = pageId + 'SidebarShell';
-
-      const nav = document.createElement('div');
-      nav.className = 'sidebarNav';
-      nav.innerHTML = `<div class="sideTitle">${title}</div><div class="sidebarHint">اضغطي على التبويب لفتح الجزء المطلوب</div>`;
-
-      const content = document.createElement('div');
-      content.className = 'sidebarContent';
-
-      items.forEach((item, idx)=>{
-        const el = document.getElementById(item.id);
-        if(!el) return;
-        el.classList.add('sidebarSection');
-        el.dataset.sidebarGroup = pageId;
-        content.appendChild(el);
-        const b = document.createElement('button');
-        b.type = 'button';
-        b.className = 'sideBtn' + (idx===0 ? ' active' : '');
-        b.dataset.target = item.id;
-        b.innerHTML = item.label;
-        b.onclick = ()=> sidebarShowSection(pageId, item.id, mode);
-        nav.appendChild(b);
-      });
-
-      shell.appendChild(nav);
-      shell.appendChild(content);
-      container.appendChild(shell);
-      page.dataset.sidebarBuilt = '1';
-      if(items[0]) sidebarShowSection(pageId, items[0].id, mode || 'single');
-    }
-
-    function sidebarShowSection(pageId, sectionId, mode){
-      const page = document.getElementById(pageId);
-      if(!page) return;
-      const sections = page.querySelectorAll('.sidebarSection[data-sidebar-group="'+pageId+'"]');
-      sections.forEach(el=>{
-        if((mode||'single') === 'single'){
-          el.classList.toggle('hiddenBySidebar', el.id !== sectionId);
-        } else {
-          el.classList.remove('hiddenBySidebar');
-        }
-      });
-      page.querySelectorAll('.sideBtn').forEach(btn=>btn.classList.toggle('active', btn.dataset.target === sectionId));
-    }
-
-    function initTeacherClassSidebars(){
-      buildSidebarLayout('classesPage','تنقل صفحة المعلمة',[
-        {id:'teacherSecWhats', label:'⚙️ الإرسال السريع'},
-        {id:'teacherSecBio', label:'🔒 قفل البصمة'},
-        {id:'teacherSecManage', label:'🏫 إدارة الفصول'},
-        {id:'teacherSecTabs', label:'📚 تبويبات الفصول'},
-        {id:'teacherSecQuick', label:'🛠️ إعدادات الفصول'},
-        {id:'teacherSecEnter', label:'➡️ دخول الفصل'}
-      ], 'single');
-
-      buildSidebarLayout('classPage','تنقل داخل الفصل',[
-        {id:'classSecOps', label:'💳 العمليات'},
-        {id:'classSecHonorWeek', label:'🏅 شرف الأسبوع'},
-        {id:'classSecPdf', label:'📄 تقرير PDF'},
-        {id:'classSecHonorBoard', label:'🏆 لوحة الشرف'},
-        {id:'classSecRoulette', label:'🎡 إدارة الروليت'},
-        {id:'classSecStudents', label:'👩‍🎓 الطالبات'}
-      ], 'single');
-    }
-
-</script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js">
-
-    /* ===== Sidebar navigation: teacher page + class page ===== */
-    function buildSidebarLayout(pageId, title, items, mode){
-      const page = document.getElementById(pageId);
-      if(!page || page.dataset.sidebarBuilt === '1') return;
-      const container = page.querySelector('.container');
-      if(!container) return;
-      const children = Array.from(container.children);
-      if(!children.length) return;
-
-      const keepTop = children[0];
-      const shell = document.createElement('div');
-      shell.className = 'sidebarShell';
-      shell.id = pageId + 'SidebarShell';
-
-      const nav = document.createElement('div');
-      nav.className = 'sidebarNav';
-      nav.innerHTML = `<div class="sideTitle">${title}</div><div class="sidebarHint">اضغطي على التبويب لفتح الجزء المطلوب</div>`;
-
-      const content = document.createElement('div');
-      content.className = 'sidebarContent';
-
-      items.forEach((item, idx)=>{
-        const el = document.getElementById(item.id);
-        if(!el) return;
-        el.classList.add('sidebarSection');
-        el.dataset.sidebarGroup = pageId;
-        content.appendChild(el);
-        const b = document.createElement('button');
-        b.type = 'button';
-        b.className = 'sideBtn' + (idx===0 ? ' active' : '');
-        b.dataset.target = item.id;
-        b.innerHTML = item.label;
-        b.onclick = ()=> sidebarShowSection(pageId, item.id, mode);
-        nav.appendChild(b);
-      });
-
-      shell.appendChild(nav);
-      shell.appendChild(content);
-      container.appendChild(shell);
-      page.dataset.sidebarBuilt = '1';
-      if(items[0]) sidebarShowSection(pageId, items[0].id, mode || 'single');
-    }
-
-    function sidebarShowSection(pageId, sectionId, mode){
-      const page = document.getElementById(pageId);
-      if(!page) return;
-      const sections = page.querySelectorAll('.sidebarSection[data-sidebar-group="'+pageId+'"]');
-      sections.forEach(el=>{
-        if((mode||'single') === 'single'){
-          el.classList.toggle('hiddenBySidebar', el.id !== sectionId);
-        } else {
-          el.classList.remove('hiddenBySidebar');
-        }
-      });
-      page.querySelectorAll('.sideBtn').forEach(btn=>btn.classList.toggle('active', btn.dataset.target === sectionId));
-    }
-
-    function initTeacherClassSidebars(){
-      buildSidebarLayout('classesPage','تنقل صفحة المعلمة',[
-        {id:'teacherSecWhats', label:'⚙️ الإرسال السريع'},
-        {id:'teacherSecBio', label:'🔒 قفل البصمة'},
-        {id:'teacherSecManage', label:'🏫 إدارة الفصول'},
-        {id:'teacherSecTabs', label:'📚 تبويبات الفصول'},
-        {id:'teacherSecQuick', label:'🛠️ إعدادات الفصول'},
-        {id:'teacherSecEnter', label:'➡️ دخول الفصل'}
-      ], 'single');
-
-      buildSidebarLayout('classPage','تنقل داخل الفصل',[
-        {id:'classSecOps', label:'💳 العمليات'},
-        {id:'classSecHonorWeek', label:'🏅 شرف الأسبوع'},
-        {id:'classSecPdf', label:'📄 تقرير PDF'},
-        {id:'classSecHonorBoard', label:'🏆 لوحة الشرف'},
-        {id:'classSecRoulette', label:'🎡 إدارة الروليت'},
-        {id:'classSecStudents', label:'👩‍🎓 الطالبات'}
-      ], 'single');
-    }
-
-</script>
+<script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore-compat.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
   <div id="pdfTemp"></div>
 
@@ -2513,8 +2192,8 @@ ${SIGNATURE}`;
       $(paneId).classList.add("active");
     }
 
-    function backToClasses(){ hideAllPages(); show("classesPage"); renderTabs(); try{showSidebarSection('teacher','teacherSecOverview',document.querySelector('#classesPage .sideNavBtn'));}catch(e){} }
-    async function openClassPage(){ hideAllPages(); show("classPage"); selectedIds.clear(); $("selAll").checked=false; await renderTabs(); await renderStudents(); initTeacherReasonAlways(); try{showSidebarSection('class','classSecOps',document.querySelector('#classPage .sideNavBtn'));}catch(e){} }
+    function backToClasses(){ hideAllPages(); show("classesPage"); renderTabs(); }
+    async function openClassPage(){ hideAllPages(); show("classPage"); selectedIds.clear(); $("selAll").checked=false; await renderTabs(); await renderStudents(); initTeacherReasonAlways(); }
 
     async function addStudent(){
       const n=$("newStudentName").value.trim();
@@ -3204,7 +2883,6 @@ document.addEventListener("DOMContentLoaded", async()=>{
       await loadForgotSetting();
       try{ await ensureSeed(); await renderTabs(); $("connPill").textContent="جاهز ✅"; }catch(e){ $("connPill").textContent="جاهز ✅"; }
       initTeacherReasonAlways();
-      initTeacherClassSidebars();
       bindClickSounds();
     });
   
@@ -3493,27 +3171,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
     .opLine{margin-top:8px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
     .pill2{display:inline-block;background:#eef6ff;border:1px solid rgba(0,0,0,.06);padding:6px 10px;border-radius:999px;font-weight:1000;font-size:12px;color:#0b2a66}
 
-  
-
-    /* ===== Sidebar navigation for teacher/classes pages ===== */
-    .sidebarShell{display:flex;gap:14px;align-items:flex-start;direction:ltr;margin-top:12px}
-    .sidebarNav{width:220px;flex:0 0 220px;position:sticky;top:86px;background:linear-gradient(180deg,#0b2a66,#0b3b85);border-radius:18px;padding:10px;box-shadow:0 14px 34px rgba(0,0,0,.18)}
-    .sidebarNav .sideTitle{color:#fff;font-weight:1000;font-size:14px;padding:8px 10px 10px 10px;opacity:.95}
-    .sideBtn{display:flex;align-items:center;justify-content:flex-start;gap:8px;width:100%;text-align:right;direction:rtl;background:rgba(255,255,255,.10);color:#fff;border:1px solid rgba(255,255,255,.10);border-radius:14px;padding:12px 12px;margin:7px 0;font-weight:1000;cursor:pointer}
-    .sideBtn:hover{background:rgba(255,255,255,.18)}
-    .sideBtn.active{background:#fff;color:#0b2a66;box-shadow:0 10px 24px rgba(0,0,0,.12)}
-    .sidebarContent{flex:1;min-width:0;direction:rtl}
-    .sidebarSection.hiddenBySidebar{display:none !important}
-    .sidebarSection{scroll-margin-top:92px}
-    .sidebarHint{font-size:11px;color:rgba(255,255,255,.78);padding:6px 10px 2px}
-    @media(max-width:980px){
-      .sidebarShell{display:block;direction:rtl}
-      .sidebarNav{position:static;width:100%;margin-bottom:12px;padding:10px;overflow:auto;white-space:nowrap}
-      .sidebarNav .sideTitle,.sidebarHint{display:none}
-      .sideBtn{display:inline-flex;width:auto;margin:4px;justify-content:center}
-    }
-
-</style>
+  </style>
 </head><body>
 <div class="paper">
   <div class="head">
@@ -3537,54 +3195,6 @@ document.addEventListener("DOMContentLoaded", async()=>{
 <script>
   window.onload = ()=>{ setTimeout(()=>window.print(), 300); };
 <\/script>
-
-
-<script>
-/* ===== Sidebar hotfix: static left menu ===== */
-(function(){
-  function _pageId(scope){ return scope === 'teacher' ? 'classesPage' : 'classPage'; }
-  window.showSidebarSection = function(scope, sectionId, btn){
-    try{
-      const pageId = _pageId(scope);
-      const page = document.getElementById(pageId);
-      if(!page) return;
-      page.querySelectorAll('.sideSection').forEach(sec=>{
-        const isTarget = sec.id === sectionId;
-        sec.classList.toggle('active', isTarget);
-        sec.classList.toggle('hiddenBySidebar', !isTarget);
-        sec.style.display = isTarget ? 'block' : 'none';
-      });
-      page.querySelectorAll('.sideNavBtn').forEach(b=>b.classList.remove('active'));
-      if(btn) btn.classList.add('active');
-      else {
-        const autoBtn = page.querySelector('.sideNavBtn[onclick*="'+sectionId+'"]');
-        if(autoBtn) autoBtn.classList.add('active');
-      }
-    }catch(e){ console.error('sidebar error', e); }
-  };
-
-  window.initTeacherClassSidebars = function(){
-    try{
-      const tBtn = document.querySelector('#classesPage .sideNavBtn.active') || document.querySelector('#classesPage .sideNavBtn');
-      if(tBtn){
-        const m = (tBtn.getAttribute('onclick')||'').match(/showSidebarSection\('teacher','([^']+)'/);
-        showSidebarSection('teacher', m ? m[1] : 'teacherSecOverview', tBtn);
-      }
-      const cBtn = document.querySelector('#classPage .sideNavBtn.active') || document.querySelector('#classPage .sideNavBtn');
-      if(cBtn){
-        const m = (cBtn.getAttribute('onclick')||'').match(/showSidebarSection\('class','([^']+)'/);
-        showSidebarSection('class', m ? m[1] : 'classSecOps', cBtn);
-      }
-    }catch(e){ console.error('sidebar init error', e); }
-  };
-
-  document.addEventListener('DOMContentLoaded', function(){
-    setTimeout(function(){
-      try{ window.initTeacherClassSidebars(); }catch(e){}
-    }, 50);
-  });
-})();
-</script>
 </body></html>`);
       w.document.close();
     }
@@ -5135,18 +4745,134 @@ function renderRoulettePane(){
 
 
 
-/* ===== Sidebar sections ===== */
-function showSidebarSection(scope, sectionId, btn){
-  try{
-    const pageId = (scope==='teacher'?'classesPage':'classPage');
-    document.querySelectorAll('#'+pageId+' .sideSection').forEach(sec=>sec.classList.remove('active'));
-    const target=document.getElementById(sectionId);
-    if(target) target.classList.add('active');
-    document.querySelectorAll('#'+pageId+' .sideNavBtn').forEach(b=>b.classList.remove('active'));
-    if(btn) btn.classList.add('active');
-    try{ window.scrollTo({top:0,behavior:'smooth'}); }catch(e){ window.scrollTo(0,0); }
-  }catch(e){}
-}
+/* ===== Sidebar navigation for teacher page + class page ===== */
+(function(){
+  function makeWrappedSection(el, title){
+    if(!el) return null;
+    const wrap = document.createElement('div');
+    wrap.className = 'card soft sidebarSectionWrap';
+    if(title){
+      const head = document.createElement('div');
+      head.style.cssText = 'font-weight:1000;color:#0b2a66;margin-bottom:10px';
+      head.textContent = title;
+      wrap.appendChild(head);
+    }
+    el.parentNode.insertBefore(wrap, el);
+    wrap.appendChild(el);
+    return wrap;
+  }
+
+  function sidebarShowSection(pageId, sectionId){
+    const page = document.getElementById(pageId);
+    if(!page) return;
+    page.querySelectorAll('.sidebarSection').forEach(sec=>{
+      sec.classList.toggle('hiddenBySidebar', sec.dataset.sidebarItem !== sectionId);
+    });
+    page.querySelectorAll('.sideBtn').forEach(btn=>{
+      btn.classList.toggle('active', btn.dataset.target === sectionId && btn.dataset.page === pageId);
+    });
+  }
+  window.sidebarShowSection = sidebarShowSection;
+
+  function buildSidebar(pageId, title, specs){
+    const page = document.getElementById(pageId);
+    if(!page) return;
+    const container = page.querySelector('.container');
+    if(!container || container.dataset.sidebarReady === '1') return;
+
+    const shell = document.createElement('div');
+    shell.className = 'sidebarShell';
+    const nav = document.createElement('aside');
+    nav.className = 'sidebarNav';
+    nav.innerHTML = '<div class="sideTitle">'+title+'</div><div class="sidebarHint">اضغطي على التبويب لفتح الجزء المطلوب</div>';
+    const content = document.createElement('div');
+    content.className = 'sidebarContent';
+
+    const directChildren = Array.from(container.children);
+    const resolved = [];
+    specs.forEach((spec,idx)=>{
+      let el = null;
+      if(spec.selector) el = container.querySelector(spec.selector);
+      else if(typeof spec.childIndex === 'number') el = directChildren[spec.childIndex] || null;
+      if(!el) return;
+      if(spec.wrap) el = makeWrappedSection(el, spec.wrapTitle || '');
+      el.classList.add('sidebarSection');
+      el.dataset.sidebarItem = spec.id;
+      resolved.push({el, spec, idx});
+    });
+
+    if(!resolved.length) return;
+
+    resolved.forEach(({el, spec, idx})=>{
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'sideBtn';
+      btn.dataset.target = spec.id;
+      btn.dataset.page = pageId;
+      btn.innerHTML = '<span>'+spec.label+'</span><span class="num">'+String(idx+1).padStart(2,'0')+'</span>';
+      btn.addEventListener('click', ()=> sidebarShowSection(pageId, spec.id));
+      nav.appendChild(btn);
+      content.appendChild(el);
+    });
+
+    container.appendChild(shell);
+    shell.appendChild(nav);
+    shell.appendChild(content);
+    container.dataset.sidebarReady = '1';
+    sidebarShowSection(pageId, specs[0].id);
+  }
+
+  function initTeacherSidebar(){
+    buildSidebar('classesPage', 'صفحة المعلمة', [
+      {id:'teacher-home', label:'الرئيسية', childIndex:0},
+      {id:'teacher-wa', label:'واتساب', childIndex:1},
+      {id:'teacher-bio', label:'قفل البصمة', childIndex:2},
+      {id:'teacher-manage', label:'إدارة الفصول', childIndex:3},
+      {id:'teacher-tabs', label:'الفصول', selector:'#classTabs', wrap:true, wrapTitle:'الفصول'},
+      {id:'teacher-quick', label:'إعدادات سريعة', childIndex:5},
+      {id:'teacher-enter', label:'دخول الفصل', childIndex:6}
+    ]);
+  }
+
+  function initClassSidebar(){
+    buildSidebar('classPage', 'صفحة الفصل', [
+      {id:'class-ops', label:'العمليات', childIndex:0},
+      {id:'class-week', label:'شرف الأسبوع', childIndex:1},
+      {id:'class-pdf', label:'التقارير PDF', childIndex:2},
+      {id:'class-board', label:'لوحة الشرف', childIndex:3},
+      {id:'class-roulette', label:'الروليت', childIndex:4},
+      {id:'class-students', label:'الطلاب', selector:'#studentsGrid', wrap:true, wrapTitle:'الطلاب'}
+    ]);
+  }
+
+  function initSidebars(){
+    try{ initTeacherSidebar(); }catch(e){ console.error('teacher sidebar error', e); }
+    try{ initClassSidebar(); }catch(e){ console.error('class sidebar error', e); }
+  }
+
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initSidebars);
+  else initSidebars();
+
+  const _openClassPage = window.openClassPage;
+  if(typeof _openClassPage === 'function'){
+    window.openClassPage = async function(){
+      const out = await _openClassPage.apply(this, arguments);
+      setTimeout(initSidebars, 60);
+      setTimeout(()=>sidebarShowSection('classPage','class-ops'), 90);
+      return out;
+    };
+  }
+
+  const _backToClasses = window.backToClasses;
+  if(typeof _backToClasses === 'function'){
+    window.backToClasses = function(){
+      const out = _backToClasses.apply(this, arguments);
+      setTimeout(initSidebars, 60);
+      setTimeout(()=>sidebarShowSection('classesPage','teacher-home'), 90);
+      return out;
+    };
+  }
+})();
 
 /* ================== START BUTTON FIX (iOS/Safari safe) ==================
    الهدف: ضمان أن زر "ابدأ الآن" ينقل للواجهة التالية حتى لو حصل خطأ في الـ Onboarding
@@ -5214,133 +4940,6 @@ function showSidebarSection(scope, sectionId, btn){
   window.startAppSafe = window.startApp;
 })();
 
-
-
-    /* ===== Sidebar navigation: teacher page + class page ===== */
-    function buildSidebarLayout(pageId, title, items, mode){
-      const page = document.getElementById(pageId);
-      if(!page || page.dataset.sidebarBuilt === '1') return;
-      const container = page.querySelector('.container');
-      if(!container) return;
-      const children = Array.from(container.children);
-      if(!children.length) return;
-
-      const keepTop = children[0];
-      const shell = document.createElement('div');
-      shell.className = 'sidebarShell';
-      shell.id = pageId + 'SidebarShell';
-
-      const nav = document.createElement('div');
-      nav.className = 'sidebarNav';
-      nav.innerHTML = `<div class="sideTitle">${title}</div><div class="sidebarHint">اضغطي على التبويب لفتح الجزء المطلوب</div>`;
-
-      const content = document.createElement('div');
-      content.className = 'sidebarContent';
-
-      items.forEach((item, idx)=>{
-        const el = document.getElementById(item.id);
-        if(!el) return;
-        el.classList.add('sidebarSection');
-        el.dataset.sidebarGroup = pageId;
-        content.appendChild(el);
-        const b = document.createElement('button');
-        b.type = 'button';
-        b.className = 'sideBtn' + (idx===0 ? ' active' : '');
-        b.dataset.target = item.id;
-        b.innerHTML = item.label;
-        b.onclick = ()=> sidebarShowSection(pageId, item.id, mode);
-        nav.appendChild(b);
-      });
-
-      shell.appendChild(nav);
-      shell.appendChild(content);
-      container.appendChild(shell);
-      page.dataset.sidebarBuilt = '1';
-      if(items[0]) sidebarShowSection(pageId, items[0].id, mode || 'single');
-    }
-
-    function sidebarShowSection(pageId, sectionId, mode){
-      const page = document.getElementById(pageId);
-      if(!page) return;
-      const sections = page.querySelectorAll('.sidebarSection[data-sidebar-group="'+pageId+'"]');
-      sections.forEach(el=>{
-        if((mode||'single') === 'single'){
-          el.classList.toggle('hiddenBySidebar', el.id !== sectionId);
-        } else {
-          el.classList.remove('hiddenBySidebar');
-        }
-      });
-      page.querySelectorAll('.sideBtn').forEach(btn=>btn.classList.toggle('active', btn.dataset.target === sectionId));
-    }
-
-    function initTeacherClassSidebars(){
-      buildSidebarLayout('classesPage','تنقل صفحة المعلمة',[
-        {id:'teacherSecWhats', label:'⚙️ الإرسال السريع'},
-        {id:'teacherSecBio', label:'🔒 قفل البصمة'},
-        {id:'teacherSecManage', label:'🏫 إدارة الفصول'},
-        {id:'teacherSecTabs', label:'📚 تبويبات الفصول'},
-        {id:'teacherSecQuick', label:'🛠️ إعدادات الفصول'},
-        {id:'teacherSecEnter', label:'➡️ دخول الفصل'}
-      ], 'single');
-
-      buildSidebarLayout('classPage','تنقل داخل الفصل',[
-        {id:'classSecOps', label:'💳 العمليات'},
-        {id:'classSecHonorWeek', label:'🏅 شرف الأسبوع'},
-        {id:'classSecPdf', label:'📄 تقرير PDF'},
-        {id:'classSecHonorBoard', label:'🏆 لوحة الشرف'},
-        {id:'classSecRoulette', label:'🎡 إدارة الروليت'},
-        {id:'classSecStudents', label:'👩‍🎓 الطالبات'}
-      ], 'single');
-    }
-
-</script>
-
-
-<script>
-/* ===== Sidebar hotfix: static left menu ===== */
-(function(){
-  function _pageId(scope){ return scope === 'teacher' ? 'classesPage' : 'classPage'; }
-  window.showSidebarSection = function(scope, sectionId, btn){
-    try{
-      const pageId = _pageId(scope);
-      const page = document.getElementById(pageId);
-      if(!page) return;
-      page.querySelectorAll('.sideSection').forEach(sec=>{
-        const isTarget = sec.id === sectionId;
-        sec.classList.toggle('active', isTarget);
-        sec.classList.toggle('hiddenBySidebar', !isTarget);
-        sec.style.display = isTarget ? 'block' : 'none';
-      });
-      page.querySelectorAll('.sideNavBtn').forEach(b=>b.classList.remove('active'));
-      if(btn) btn.classList.add('active');
-      else {
-        const autoBtn = page.querySelector('.sideNavBtn[onclick*="'+sectionId+'"]');
-        if(autoBtn) autoBtn.classList.add('active');
-      }
-    }catch(e){ console.error('sidebar error', e); }
-  };
-
-  window.initTeacherClassSidebars = function(){
-    try{
-      const tBtn = document.querySelector('#classesPage .sideNavBtn.active') || document.querySelector('#classesPage .sideNavBtn');
-      if(tBtn){
-        const m = (tBtn.getAttribute('onclick')||'').match(/showSidebarSection\('teacher','([^']+)'/);
-        showSidebarSection('teacher', m ? m[1] : 'teacherSecOverview', tBtn);
-      }
-      const cBtn = document.querySelector('#classPage .sideNavBtn.active') || document.querySelector('#classPage .sideNavBtn');
-      if(cBtn){
-        const m = (cBtn.getAttribute('onclick')||'').match(/showSidebarSection\('class','([^']+)'/);
-        showSidebarSection('class', m ? m[1] : 'classSecOps', cBtn);
-      }
-    }catch(e){ console.error('sidebar init error', e); }
-  };
-
-  document.addEventListener('DOMContentLoaded', function(){
-    setTimeout(function(){
-      try{ window.initTeacherClassSidebars(); }catch(e){}
-    }, 50);
-  });
-})();
 </script>
 </body>
 </html>
