@@ -161,6 +161,12 @@
     .tab{background:#e9f4fb;color:#003;padding:8px 12px;border-radius:999px;cursor:pointer;font-size:14px;font-weight:900;border:1px solid rgba(0,0,0,.06)}
     .tab.active{background:var(--rajhi);color:#fff}
 
+    .topTabs{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0 14px 0}
+    .topTab{background:#eef6ff;color:#0b2a66;padding:10px 14px;border-radius:14px;cursor:pointer;font-size:14px;font-weight:1000;border:1px solid rgba(0,0,0,.06);box-shadow:0 6px 14px rgba(0,0,0,.04)}
+    .topTab.active{background:linear-gradient(90deg,#0b2a66,#0b5bb5);color:#fff}
+    .topPane{display:none}
+    .topPane.active{display:block}
+
     .grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
     .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
     @media(max-width:820px){.grid3{grid-template-columns:1fr}}
@@ -3203,7 +3209,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
             الاسم: <b>${s.name||"—"}</b> • الرصيد: <b>${fmt(s.balance)}</b> ر.س • PIN: <b>${s.pin||"—"}</b>
           </div>
           <table>
-            <thead><tr><th>الوقت</th><th>العملية</th><th>السبب</th><th>المبلغ</th><th>الرصيد بعد العملية</th></tr></thead>
+            <thead><tr><th>الوقت</th><th>العملية</th><th>السبب</th><th>المبلغ</th><th>الرصيد بعد العملية</th><th>المرفقات</th></tr></thead>
             <tbody>${rows}</tbody>
           </table>
         `;
@@ -4110,11 +4116,21 @@ document.addEventListener("DOMContentLoaded", async()=>{
         const t = x.createdAtClient ? new Date(x.createdAtClient).toLocaleString("ar-SA") : "";
         const amt = Number(x.amount||0);
         const typ = x.type || "";
+        const noteImg = x.noteImage || "";
+        const noteVideo = x.noteVideoUrl || "";
         // تصنيف دخول/خروج
         const isIn = (typ.includes("إيداع") || typ.includes("تحويل وارد") || typ==="deposit" || typ==="transfer_in");
         const isOut = (typ.includes("سحب") || typ.includes("تحويل صادر") || typ==="withdraw" || typ==="transfer_out");
         if(isIn) sumIn += amt;
         if(isOut) sumOut += amt;
+
+        let attachments = "—";
+        if(noteImg || noteVideo){
+          const parts = [];
+          if(noteImg) parts.push(`<div style="display:flex;justify-content:center"><img src="${noteImg}" alt="صورة مرفقة" style="max-width:88px;max-height:88px;border-radius:10px;border:1px solid #dbe4ef"></div>`);
+          if(noteVideo) parts.push(`<div style="margin-top:6px"><a href="${noteVideo}" target="_blank" rel="noopener" style="font-weight:900;color:#0b5bb5;text-decoration:none">🎥 فتح الفيديو</a></div>`);
+          attachments = parts.join("");
+        }
 
         rows += `<tr>
           <td>${t}</td>
@@ -4122,11 +4138,12 @@ document.addEventListener("DOMContentLoaded", async()=>{
           <td>${x.reason||""}</td>
           <td>${fmt(amt)}</td>
           <td>${fmt(x.balanceAfter)}</td>
+          <td>${attachments}</td>
         </tr>`;
         count++;
       });
 
-      if(!rows) rows = `<tr><td colspan="5" class="muted" style="padding:18px">لا توجد عمليات ضمن الفترة المحددة.</td></tr>`;
+      if(!rows) rows = `<tr><td colspan="6" class="muted" style="padding:18px">لا توجد عمليات ضمن الفترة المحددة.</td></tr>`;
 
       const fromTxt = new Date(fromMs).toLocaleDateString("ar-SA");
       const toTxt   = new Date(toMs).toLocaleDateString("ar-SA");
@@ -4157,7 +4174,7 @@ document.addEventListener("DOMContentLoaded", async()=>{
         </div>
 
         <table>
-          <thead><tr><th>الوقت</th><th>العملية</th><th>السبب</th><th>المبلغ</th><th>الرصيد بعد العملية</th></tr></thead>
+          <thead><tr><th>الوقت</th><th>العملية</th><th>السبب</th><th>المبلغ</th><th>الرصيد بعد العملية</th><th>المرفقات</th></tr></thead>
           <tbody>${rows}</tbody>
         </table>
       `;
