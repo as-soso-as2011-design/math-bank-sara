@@ -432,7 +432,7 @@
     .layoutChoiceBtn.active{background:linear-gradient(90deg,#0b2a66,#0b5bb5);color:#fff;box-shadow:0 10px 20px rgba(11,42,102,.18)}
     .layoutModeBadge{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:#eef6ff;color:#0b2a66;font-weight:1000;font-size:12px}
 
-    .layoutChooserHost{max-width:760px;margin:12px auto 0 auto;width:100%}
+    .layoutChooserHost{width:100%;max-width:760px;margin:0 auto 14px auto;box-sizing:border-box}
     .layoutChooserHost .layoutChooserCard{margin:0}
     #classesPage .sidebarShell{display:flex;align-items:flex-start}
     #classesPage .sidebarContent{display:flex;flex-direction:column;align-items:center;width:100%}
@@ -5153,6 +5153,7 @@ function renderRoulettePane(){
   function initSidebars(){
     try{ initTeacherSidebar(); }catch(e){ console.error('teacher sidebar error', e); }
     try{ initClassSidebar(); }catch(e){ console.error('class sidebar error', e); }
+    try{ if(window.injectLayoutChoosers) window.injectLayoutChoosers(); }catch(e){}
   }
 
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initSidebars);
@@ -5384,13 +5385,20 @@ function renderRoulettePane(){
         if(!host){
           host = document.createElement('div');
           host.className = 'layoutChooserHost';
-          container.insertBefore(host, container.firstChild);
         }
         if(!host.querySelector('.layoutChooserCard')){
           const wrap = document.createElement('div');
           wrap.innerHTML = buildLayoutChooserHTML();
           host.innerHTML = '';
           host.appendChild(wrap.firstElementChild);
+        }
+        const sidebarContent = container.querySelector('.sidebarContent');
+        if(sidebarContent){
+          if(host.parentElement !== sidebarContent || sidebarContent.firstElementChild !== host){
+            sidebarContent.insertBefore(host, sidebarContent.firstChild);
+          }
+        }else if(host.parentElement !== container){
+          container.insertBefore(host, container.firstChild);
         }
         const homeCard = container.querySelector('.sidebarSection[data-sidebar-item="teacher-home"], .sidebarSectionWrap[data-sidebar-item="teacher-home"], .sidebarContent .sidebarSection:first-child');
         if(homeCard){
@@ -5401,6 +5409,7 @@ function renderRoulettePane(){
     wireLayoutChoosers(document);
   }
 
+  window.injectLayoutChoosers = injectLayoutChoosers;
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', injectLayoutChoosers);
   else injectLayoutChoosers();
 })();
