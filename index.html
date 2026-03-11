@@ -34,9 +34,9 @@ button,input,select{font-family:inherit}
 .brand h1{margin:0;font-size:21px}
 .brand p{margin:4px 0 0;color:var(--muted);font-size:13px}
 .ghost{border:none;background:#fff;border-radius:14px;padding:11px 12px;box-shadow:0 8px 18px rgba(16,58,46,.08);color:var(--deep);font-weight:800}
-.hero{padding-top:70px;
+.hero{
   background:linear-gradient(135deg,var(--deep),var(--green));
-  border-radius:32px;padding:24px 20px;color:#fff;position:relative;overflow:hidden;box-shadow:var(--shadow);margin-bottom:16px
+  border-radius:32px;padding:80px 20px 24px;color:#fff;position:relative;overflow:hidden;box-shadow:var(--shadow);margin-bottom:16px
 }
 .hero:before{content:"";position:absolute;width:180px;height:180px;border-radius:50%;left:-55px;bottom:-95px;background:rgba(255,255,255,.07)}
 .hero:after{content:"";position:absolute;width:150px;height:150px;border-radius:50%;left:118px;top:-70px;background:rgba(199,164,101,.22)}
@@ -275,60 +275,31 @@ button,input,select{font-family:inherit}
 }
 
 
-
 .top-tools{
-  position:absolute;
-  top:14px;
-  right:14px;
-  display:flex;
-  gap:10px;
-  z-index:3;
+position:absolute;
+top:14px;
+left:18px;
+display:flex;
+gap:8px;
+z-index:5;
 }
 .top-tool{
-  min-height:46px;
-  border-radius:18px;
-  padding:0 14px;
-  text-decoration:none;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:8px;
-  background:rgba(255,255,255,.12);
-  border:1px solid rgba(255,255,255,.18);
-  box-shadow:0 8px 18px rgba(0,0,0,.08);
-  backdrop-filter:blur(8px);
-  color:#fff;
-  font-weight:900;
-  cursor:pointer;
+min-height:36px;
+border-radius:16px;
+padding:4px 10px;
+display:flex;
+align-items:center;
+gap:6px;
+font-weight:800;
+background:#bfe8d2;
+border:1px solid rgba(0,0,0,.05);
+color:#0f3d2f;
+font-size:13px;
+box-shadow:0 6px 14px rgba(0,0,0,.08);
 }
-.top-tool.lang{min-width:112px}
-.top-tool.location{width:56px;min-width:56px;padding:0}
-.top-tool .tool-icon{
-  width:24px;height:24px;border-radius:9px;
-  display:grid;place-items:center;
-  background:rgba(255,255,255,.16);
-  font-size:14px;
-}
-.top-tool .label-en{font-size:16px;letter-spacing:.3px}
-html[dir="ltr"] .top-tools{
-  position:absolute;
-  top:14px;
-  right:14px;
-  display:flex;
-  gap:10px;
-  z-index:3;
-}
-html[dir="ltr"] body,
-html[dir="ltr"] .app{direction:ltr}
-html[dir="ltr"] .topbar,
-html[dir="ltr"] .brand,
-html[dir="ltr"] .login-head,
-html[dir="ltr"] .section-head,
-html[dir="ltr"] .row,
-html[dir="ltr"] .menu-item,
-html[dir="ltr"] .bank-top,
-html[dir="ltr"] .bank-footer,
-html[dir="ltr"] .balance-head{direction:ltr}
+.top-tool.lang{padding:0 18px; min-width:136px;}
+.top-tool.icon-only{width:76px; min-width:76px;}
+.top-tool .emoji{font-size:22px; line-height:1}
 
 </style>
 </head>
@@ -336,21 +307,21 @@ html[dir="ltr"] .balance-head{direction:ltr}
 <div class="app">
 
 <section id="home" class="screen active">
+  <div class="top-tools">
+    <a class="top-tool lang" href="javascript:void(0)" aria-label="language">
+      <span class="emoji">🌐</span><span>En</span>
+    </a>
+    <a class="top-tool icon-only" href="https://www.google.com/maps/dir//5077+%D8%A7%D9%84%D8%AE%D8%B4%D9%86%D9%8A,+%D8%AD%D9%8A+%D8%A7%D9%84%D8%AE%D8%B2%D8%A7%D9%85%D9%89%D8%8C,+7780,+Al+Khobar+34721%E2%80%AD/data=!4m6!4m5!1m1!4e2!1m2!1m1!1s0x3e49dda6a95ad4e5:0xc47a8297d1b47749?entry=s&sa=X&ved=2ahUKEwjGiNbI1JiTAxVeg_0HHb9kNvgQlDt6BAgKEAA&hl=ar" target="_blank" rel="noopener noreferrer" aria-label="location">
+      <span class="emoji">📍</span>
+    </a>
+  </div>
   <div class="hero">
-        <div class="top-tools">
-          <button class="top-tool lang" id="langToggle" type="button" onclick="toggleLanguage()">
-            <span class="tool-icon">🌐</span><span class="label-en" id="langToggleLabel">En</span>
-          </button>
-          <a class="top-tool location" href="https://www.google.com/maps/dir//5077+%D8%A7%D9%84%D8%AE%D8%B4%D9%86%D9%8A,+%D8%AD%D9%8A+%D8%A7%D9%84%D8%AE%D8%B2%D8%A7%D9%85%D9%89%D8%8C,+7780,+Al+Khobar+34721%E2%80%AD/data=!4m6!4m5!1m1!4e2!1m2!1m1!1s0x3e49dda6a95ad4e5:0xc47a8297d1b47749?entry=s&sa=X&ved=2ahUKEwjGiNbI1JiTAxVeg_0HHb9kNvgQlDt6BAgKEAA&hl=ar" target="_blank" rel="noopener noreferrer" aria-label="location">
-            <span class="tool-icon">📍</span>
-          </a>
-        </div>
-    <div class="badge" id="homeBadge">واجهة رئيسية مطورة • بنك الرياضيات</div>
-    <h2 id="homeTitle">بنك الرياضيات</h2>
-    <p id="homeDesc">منصة تعليمية تحفيزية تعرض الحسابات والعمليات والجوائز ولوحة الشرف داخل واجهة بنكية أنيقة وسهلة الاستخدام.</p>
+    <div class="badge">واجهة رئيسية مطورة • بنك الرياضيات</div>
+    <h2>بنك الرياضيات</h2>
+    <p>منصة تعليمية تحفيزية تعرض الحسابات والعمليات والجوائز ولوحة الشرف داخل واجهة بنكية أنيقة وسهلة الاستخدام.</p>
     <div class="hero-actions">
-      <button class="btn btn-light" id="openAccountBtn" onclick="go('account_choice')">الدخول للحساب</button>
-      <button class="btn btn-gold" id="honorBtn" onclick="go('honor')">لوحة الشرف</button>
+      <button class="btn btn-light" onclick="go('account_choice')">الدخول للحساب</button>
+      <button class="btn btn-gold" onclick="go('honor')">لوحة الشرف</button>
     </div>
   </div>
 
@@ -382,16 +353,16 @@ html[dir="ltr"] .balance-head{direction:ltr}
   </div>
 
   <div class="card">
-    <div class="section-head"><h3 id="latestOpsTitle">آخر العمليات</h3><span class="pill" id="latestOpsPill">حديث</span></div>
+    <div class="section-head"><h3>آخر العمليات</h3><span class="pill">حديث</span></div>
     <div class="list">
-      <div class="row"><div><div class="name">إيداع مشاركة مميزة</div><div class="meta">الأربعاء ١١ / ٠٣ / ٢٠٢٦ • ١٠:٣٠ ص</div></div><div class="value green">+٥٠٠</div></div>
-      <div class="row"><div><div class="name">سحب بسبب تأخر بسيط</div><div class="meta">الثلاثاء ١٠ / ٠٣ / ٢٠٢٦ • ٠٨:٤٠ ص</div></div><div class="value red">-٥٠</div></div>
-      <div class="row"><div><div class="name">جائزة إنجاز</div><div class="meta">الاثنين ٠٩ / ٠٣ / ٢٠٢٦ • ١١:١٥ ص</div></div><div class="value gold">+١٠٠٠</div></div>
+      <div class="row"><div><div class="name">إيداع مشاركة مميزة</div><div class="meta">الأربعاء 11 / 03 / 2026 • 10:30 ص</div></div><div class="value green">+500</div></div>
+      <div class="row"><div><div class="name">سحب بسبب تأخر بسيط</div><div class="meta">الثلاثاء 10 / 03 / 2026 • 08:40 ص</div></div><div class="value red">-50</div></div>
+      <div class="row"><div><div class="name">جائزة إنجاز</div><div class="meta">الاثنين 09 / 03 / 2026 • 11:15 ص</div></div><div class="value gold">+1000</div></div>
     </div>
   </div>
 
   <div class="card">
-    <div class="section-head"><h3 id="shortcutsTitle">اختصارات سريعة</h3><span class="pill" id="shortcutsPill">الوصول السريع</span></div>
+    <div class="section-head"><h3>اختصارات سريعة</h3><span class="pill">الوصول السريع</span></div>
     <div class="shortcuts">
       <div class="shortcut"><div class="icon">🧾</div><span>كشف الحساب</span></div>
       <div class="shortcut"><div class="icon">🔄</div><span>العمليات</span></div>
@@ -659,10 +630,10 @@ html[dir="ltr"] .balance-head{direction:ltr}
 </section>
 
 <nav class="bottom-nav">
-  <button class="nav-btn active" data-screen="home" onclick="go('home', this)"><span class="emoji">🏠</span><span id="navHome">الرئيسية</span></button>
-  <button class="nav-btn" data-screen="account" onclick="go('account', this)"><span class="emoji">💳</span><span id="navAccount">الحساب</span></button>
-  <button class="nav-btn" data-screen="honor" onclick="go('honor', this)"><span class="emoji">🏆</span><span id="navHonor">الشرف</span></button>
-  <button class="nav-btn" data-screen="more" onclick="go('more', this)"><span class="emoji">⚙️</span><span id="navMore">المزيد</span></button>
+  <button class="nav-btn active" data-screen="home" onclick="go('home', this)"><span class="emoji">🏠</span><span>الرئيسية</span></button>
+  <button class="nav-btn" data-screen="account" onclick="go('account', this)"><span class="emoji">💳</span><span>الحساب</span></button>
+  <button class="nav-btn" data-screen="honor" onclick="go('honor', this)"><span class="emoji">🏆</span><span>الشرف</span></button>
+  <button class="nav-btn" data-screen="more" onclick="go('more', this)"><span class="emoji">⚙️</span><span>المزيد</span></button>
   <button class="nav-btn" data-screen="account_choice" onclick="go('account_choice', this)"><span class="emoji">🔐</span><span>الدخول</span></button>
 </nav>
 
@@ -808,31 +779,44 @@ window.addEventListener('load', convertDigitsToArabic);
 </script>
 
 <script>
-let currentLang = "ar";
+const translations={
+ar:{title:"بنك الرياضيات",home:"الرئيسية",account:"الحساب",honor:"الشرف",more:"المزيد"},
+en:{title:"Math Bank",home:"Home",account:"Account",honor:"Honor",more:"More"}
+};
+
+function convertNumbers(text,lang){
+const ar=["٠","١","٢","٣","٤","٥","٦","٧","٨","٩"];
+const en=["0","1","2","3","4","5","6","7","8","9"];
+return text.replace(/[0-9٠-٩]/g,d=>{
+if(lang==="ar") return ar[d]||ar[+d];
+else return en[d]||en[ar.indexOf(d)];
+});
+}
+
+function setLanguage(lang){
+localStorage.setItem("mathbank_lang",lang);
+document.documentElement.lang=lang;
+document.documentElement.dir=lang==="ar"?"rtl":"ltr";
+
+document.querySelectorAll("h2").forEach(e=>{
+e.innerText=translations[lang].title;
+});
+
+document.body.innerHTML=convertNumbers(document.body.innerHTML,lang);
+
+document.getElementById("langToggleLabel").innerText=lang==="ar"?"En":"ع";
+}
 
 function toggleLanguage(){
-  if(currentLang === "ar"){
-    currentLang = "en";
-    document.documentElement.lang = "en";
-    document.documentElement.dir = "ltr";
-    document.getElementById("langToggleLabel").innerText = "ع";
-
-    const map = {
-      "بنك الرياضيات":"Math Bank",
-      "واجهة رئيسية مطورة • بنك الرياضيات":"Advanced Home • Math Bank",
-      "آخر العمليات":"Recent Operations",
-      "اختصارات سريعة":"Quick Shortcuts",
-      "الوصول السريع":"Quick Access"
-    };
-
-    document.querySelectorAll("*").forEach(el=>{
-      if(map[el.innerText]) el.innerText = map[el.innerText];
-    });
-
-  }else{
-    location.reload();
-  }
+let lang=localStorage.getItem("mathbank_lang")||"ar";
+lang=lang==="ar"?"en":"ar";
+setLanguage(lang);
 }
+
+window.addEventListener("load",()=>{
+let saved=localStorage.getItem("mathbank_lang")||"ar";
+setLanguage(saved);
+});
 </script>
 
 </body>
