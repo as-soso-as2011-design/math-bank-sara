@@ -4258,7 +4258,7 @@ function loadBankTheme(){
   if(t!=="default"){document.body.setAttribute("data-theme",t);}
 }
 document.addEventListener("DOMContentLoaded",loadBankTheme);
-</script>
+<\/script>
 <style>
 body[data-theme="alinma"]{
 background:linear-gradient(180deg,#4a2d20 0%, #6a422f 24%, #f8f2ec 24%);
@@ -6392,5 +6392,26 @@ background:linear-gradient(180deg,#014c39 0%, #0b6d52 24%, #f6fbf8 24%);
 }
 </style>
 
+
+<script>
+(function(){
+  function bindStart(){
+    var btns=document.querySelectorAll('[onclick="startApp()"], #startOverlay .btn');
+    btns.forEach(function(btn){
+      btn.addEventListener('click', function(ev){
+        try{ ev.preventDefault(); }catch(e){}
+        if(typeof window.startApp==='function') window.startApp();
+      }, {passive:false});
+    });
+    var so=document.getElementById('startOverlay');
+    if(so && !location.search.includes('autostart=1')){
+      so.classList.remove('hidden');
+      so.style.display='flex';
+    }
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', bindStart);
+  else bindStart();
+})();
+</script>
 </body>
 </html>
