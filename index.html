@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>بنك الرياضيات | معاينة مطورة 5</title>
+<title>بنك الرياضيات | معاينة مطورة 3</title>
 <style>
 :root{
   --deep:#103a2e; --green:#1f7f57; --mint:#edf6f0; --gold:#c7a465; --gold2:#e0c98f;
@@ -31,7 +31,8 @@ button,input,select{font-family:inherit}
   display:grid;place-items:center;color:#fff;font-size:22px;font-weight:900;box-shadow:var(--shadow);position:relative
 }
 .logo:after{content:"";position:absolute;inset:7px;border-radius:12px;border:1px solid rgba(255,255,255,.18)}
-.brand h1{margin:0;font-size:21px}.brand p{margin:4px 0 0;color:var(--muted);font-size:13px}
+.brand h1{margin:0;font-size:21px}
+.brand p{margin:4px 0 0;color:var(--muted);font-size:13px}
 .ghost{border:none;background:#fff;border-radius:14px;padding:11px 12px;box-shadow:0 8px 18px rgba(16,58,46,.08);color:var(--deep);font-weight:800}
 .hero{
   background:linear-gradient(135deg,var(--deep),var(--green));
@@ -58,28 +59,20 @@ button,input,select{font-family:inherit}
 .section-head h3{margin:0;font-size:18px}
 .muted{color:var(--muted);font-size:13px;line-height:1.8}
 .pill{background:var(--mint);color:var(--green);padding:8px 12px;border-radius:999px;font-size:12px;font-weight:800}
-.selector-grid{display:grid;gap:14px}
+.selector-grid,.login-grid{display:grid;gap:14px}
 .selector-card,.login-card{
   border:1px solid var(--line);background:#fff;border-radius:26px;padding:18px;box-shadow:0 12px 28px rgba(16,58,46,.06)
 }
 .selector-card{display:flex;align-items:center;justify-content:space-between;gap:14px}
 .selector-left{display:flex;align-items:center;gap:12px}
 .icon-box{width:50px;height:50px;border-radius:16px;background:var(--mint);display:grid;place-items:center;font-size:22px}
-.selector-title{margin:0 0 4px;font-size:17px;font-weight:800}
-.selector-sub{margin:0;color:var(--muted);font-size:12px;line-height:1.7}
+.selector-title,.login-head h4{margin:0 0 4px;font-size:17px;font-weight:800}
+.selector-sub,.login-head p{margin:0;color:var(--muted);font-size:12px;line-height:1.7}
 .field{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
 .field label{font-size:13px;font-weight:800}
-.input-wrap{position:relative}
-.input-wrap input,.input-wrap select{
-  width:100%;border:1px solid var(--line);background:#f8fbf9;border-radius:16px;padding:14px 48px 14px 14px;font-size:14px;outline:none
-}
-.input-icon{position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:18px;opacity:.85}
+.field input,.field select{border:1px solid var(--line);background:#f8fbf9;border-radius:16px;padding:14px 14px;font-size:14px;outline:none}
 .login-links{display:flex;justify-content:space-between;gap:12px;margin:4px 0 14px}
 .login-links a{font-size:12px;color:var(--green);text-decoration:none;font-weight:700}
-.monkey-btn{
-  position:absolute;left:12px;top:50%;transform:translateY(-50%);
-  border:none;background:transparent;font-size:26px;cursor:pointer;line-height:1
-}
 .balance-panel{
   background:
     radial-gradient(circle at 85% 20%, rgba(255,255,255,.10), transparent 26%),
@@ -99,6 +92,16 @@ button,input,select{font-family:inherit}
 .balance-mini .mini{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:18px;padding:12px}
 .balance-mini strong{display:block;font-size:16px}
 .balance-mini span{display:block;font-size:11px;color:rgba(255,255,255,.75);margin-top:3px}
+.shortcuts{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.shortcut{border:1px solid var(--line);background:#fff;border-radius:22px;padding:14px 8px;text-align:center}
+.shortcut .icon{width:42px;height:42px;border-radius:14px;background:var(--mint);display:grid;place-items:center;margin:0 auto 8px;font-size:19px}
+.shortcut span{display:block;font-size:12px;font-weight:800;color:var(--deep);line-height:1.5}
+.list{display:flex;flex-direction:column;gap:10px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:12px;border:1px solid var(--line);background:#fff;border-radius:20px;padding:14px}
+.name{font-size:14px;font-weight:800}
+.meta{font-size:12px;color:var(--muted);margin-top:4px}
+.value{font-size:15px;font-weight:900}
+.green{color:var(--green)} .red{color:var(--danger)} .gold{color:#a27a30}
 .bank-card{
   background:
     radial-gradient(circle at 80% 20%, rgba(255,255,255,.16), transparent 26%),
@@ -112,13 +115,11 @@ button,input,select{font-family:inherit}
 .card-number{font-size:22px;font-weight:900;letter-spacing:2px;margin:16px 0 18px}
 .bank-footer{display:flex;justify-content:space-between;gap:12px;align-items:end}
 .bank-footer small{display:block;color:rgba(255,255,255,.8);margin-bottom:4px;font-size:11px}
-.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
-.kpi{background:#fff;border:1px solid var(--line);border-radius:20px;padding:14px;text-align:center}
-.kpi strong{display:block;font-size:19px;color:var(--deep)}
-.kpi span{display:block;font-size:11px;color:var(--muted);margin-top:4px}
 .statement-table{width:100%;border-collapse:separate;border-spacing:0 10px}
 .statement-table th{font-size:12px;color:var(--muted);font-weight:800;padding:0 8px 6px;text-align:right}
-.statement-table td{background:#fff;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:12px 8px;font-size:12px;vertical-align:top}
+.statement-table td{
+  background:#fff;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:12px 8px;font-size:12px;vertical-align:top
+}
 .statement-table td:first-child{border-right:1px solid var(--line);border-radius:0 16px 16px 0}
 .statement-table td:last-child{border-left:1px solid var(--line);border-radius:16px 0 0 16px}
 .tabbar{display:flex;gap:8px;overflow:auto;padding-bottom:4px;margin-bottom:12px}
@@ -135,7 +136,9 @@ button,input,select{font-family:inherit}
 .gold-tier{background:linear-gradient(135deg,var(--gold),var(--gold2))}
 .platinum{background:linear-gradient(135deg,#6e7a89,#adb8c3)}
 .diamond{background:linear-gradient(135deg,#69afc3,#c7f0fa);color:#174654}
-.honor-hero{background:linear-gradient(135deg,#0f3529,#1d6b4a);border-radius:32px;padding:22px;color:#fff;position:relative;overflow:hidden;box-shadow:var(--shadow);margin-bottom:14px}
+.honor-hero{
+  background:linear-gradient(135deg,#0f3529,#1d6b4a);border-radius:32px;padding:22px;color:#fff;position:relative;overflow:hidden;box-shadow:var(--shadow);margin-bottom:14px
+}
 .honor-hero:before{content:"";position:absolute;width:180px;height:180px;border-radius:50%;left:-60px;top:-70px;background:rgba(255,255,255,.07)}
 .podium{display:grid;grid-template-columns:1fr 1.2fr 1fr;gap:10px;align-items:end;margin-top:18px;position:relative;z-index:1}
 .podium-card{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.14);border-radius:22px;padding:14px 10px;text-align:center}
@@ -168,9 +171,16 @@ button,input,select{font-family:inherit}
     <div class="badge">واجهة رئيسية مطورة • اختيار نوع الحساب أولًا</div>
     <h2>بنك الرياضيات</h2>
     <p>في الصفحة الرئيسية يبدأ المستخدم باختيار نوع الحساب، ثم ينتقل إلى صفحة دخول مستقلة للطالب/ـة أو المعلم/ـة مع خيارات تغيير الرقم السري واسترجاعه.</p>
+
     <div class="hero-actions">
       <button class="btn btn-light" onclick="go('account_choice')">الدخول للحساب</button>
       <button class="btn btn-gold" onclick="go('honor')">لوحة الشرف</button>
+    </div>
+    <div class="home-tabs">
+      <button class="active" onclick="go('account')">كشف الحساب</button>
+      <button onclick="go('account')">آخر العمليات</button>
+      <button onclick="go('account')">العمليات</button>
+      <button onclick="go('account')">الجوائز المستبدلة</button>
     </div>
   </div>
 
@@ -180,7 +190,10 @@ button,input,select{font-family:inherit}
         <div style="width:100%">
           <div class="balance-tag">الرصيد الحالي</div>
           <div class="money-card">
-            <div class="money-main"><div class="money-amount">8,450</div><div class="money-currency">ر.س</div></div>
+            <div class="money-main">
+              <div class="money-amount">8,450</div>
+              <div class="money-currency">ر.س</div>
+            </div>
             <div class="money-sub">الرصيد المالي التشغيلي الناتج عن الإيداع والسحب والتحويل</div>
           </div>
         </div>
@@ -193,6 +206,16 @@ button,input,select{font-family:inherit}
       </div>
     </div>
   </div>
+
+  <div class="card">
+    <div class="section-head"><h3>اختصارات سريعة</h3><span class="pill">الوصول السريع</span></div>
+    <div class="shortcuts">
+      <div class="shortcut"><div class="icon">🧾</div><span>كشف الحساب</span></div>
+      <div class="shortcut"><div class="icon">🏦</div><span>العمليات</span></div>
+      <div class="shortcut"><div class="icon">🎡</div><span>روليت الهدايا</span></div>
+      <div class="shortcut"><div class="icon">📄</div><span>تقرير PDF</span></div>
+    </div>
+  </div>
 </section>
 
 <section id="account_choice" class="screen">
@@ -200,6 +223,7 @@ button,input,select{font-family:inherit}
     <div class="brand"><div class="logo">BN</div><div><h1>الدخول للحساب</h1><p>اختيار نوع الحساب</p></div></div>
     <button class="ghost" onclick="go('home')">⌂</button>
   </div>
+
   <div class="card">
     <div class="section-head"><h3>اختر نوع الحساب</h3><span class="pill">الخطوة الأولى</span></div>
     <div class="selector-grid">
@@ -222,19 +246,9 @@ button,input,select{font-family:inherit}
   </div>
   <div class="card">
     <div class="login-card">
-      <div class="selector-left" style="margin-bottom:12px"><div class="icon-box">🎓</div><div><div class="selector-title">حساب الطالب / الطالبة</div><div class="selector-sub">أدخل اسم المستخدم وكلمة المرور</div></div></div>
-      <div class="field">
-        <label>اسم المستخدم</label>
-        <div class="input-wrap"><span class="input-icon">👤</span><input type="text" placeholder="أدخل اسم المستخدم" /></div>
-      </div>
-      <div class="field">
-        <label>كلمة المرور</label>
-        <div class="input-wrap">
-          <span class="input-icon">🔒</span>
-          <button class="monkey-btn" type="button" onclick="togglePassword('studentPass', this)">🙈</button>
-          <input id="studentPass" type="password" placeholder="أدخل كلمة المرور" />
-        </div>
-      </div>
+      <div class="selector-left" style="margin-bottom:12px"><div class="icon-box">🎓</div><div><div class="selector-title">حساب الطالب / الطالبة</div><div class="selector-sub">أدخل الرقم السري وكلمة المرور</div></div></div>
+      <div class="field"><label>الرقم السري</label><input type="password" placeholder="أدخل الرقم السري" /></div>
+      <div class="field"><label>كلمة المرور</label><input type="password" placeholder="أدخل كلمة المرور" /></div>
       <div class="login-links"><a href="#">تغيير الرقم السري</a><a href="#">استرجاع الرقم السري</a></div>
       <button class="btn btn-green" style="width:100%">دخول الطالب / الطالبة</button>
     </div>
@@ -248,19 +262,9 @@ button,input,select{font-family:inherit}
   </div>
   <div class="card">
     <div class="login-card">
-      <div class="selector-left" style="margin-bottom:12px"><div class="icon-box">👩🏻‍🏫</div><div><div class="selector-title">حساب المعلم / المعلمة</div><div class="selector-sub">أدخل اسم المستخدم وكلمة المرور</div></div></div>
-      <div class="field">
-        <label>اسم المستخدم</label>
-        <div class="input-wrap"><span class="input-icon">👤</span><input type="text" placeholder="أدخل اسم المستخدم" /></div>
-      </div>
-      <div class="field">
-        <label>كلمة المرور</label>
-        <div class="input-wrap">
-          <span class="input-icon">🔒</span>
-          <button class="monkey-btn" type="button" onclick="togglePassword('teacherPass', this)">🙈</button>
-          <input id="teacherPass" type="password" placeholder="أدخل كلمة المرور" />
-        </div>
-      </div>
+      <div class="selector-left" style="margin-bottom:12px"><div class="icon-box">👩🏻‍🏫</div><div><div class="selector-title">حساب المعلم / المعلمة</div><div class="selector-sub">أدخل الرقم السري وكلمة المرور</div></div></div>
+      <div class="field"><label>الرقم السري</label><input type="password" placeholder="أدخل الرقم السري" /></div>
+      <div class="field"><label>كلمة المرور</label><input type="password" placeholder="أدخل كلمة المرور" /></div>
       <div class="login-links"><a href="#">تغيير الرقم السري</a><a href="#">استرجاع الرقم السري</a></div>
       <button class="btn btn-gold" style="width:100%">دخول المعلم / المعلمة</button>
     </div>
@@ -272,6 +276,56 @@ button,input,select{font-family:inherit}
     <div class="brand"><div class="logo">BN</div><div><h1>الحساب</h1><p>الرصيد والبطاقة والعمليات</p></div></div>
     <button class="ghost" onclick="go('home')">⌂</button>
   </div>
+
+  <div class="card">
+    <div class="tabbar">
+      <button class="active" onclick="showTab('statement', this)">كشف الحساب</button>
+      <button onclick="showTab('latest', this)">آخر العمليات</button>
+      <button onclick="showTab('operations', this)">العمليات</button>
+      <button onclick="showTab('redeemed', this)">الجوائز المستبدلة</button>
+    </div>
+
+    <div id="statement" class="tab-content active">
+      <table class="statement-table">
+        <thead>
+          <tr>
+            <th>اليوم</th>
+            <th>التاريخ</th>
+            <th>السبب</th>
+            <th>القيمة</th>
+            <th>النوع</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>الأربعاء</td><td>11 / 03 / 2026</td><td>مشاركة مميزة</td><td class="green">+500 ر.س</td><td>إيداع</td></tr>
+          <tr><td>الثلاثاء</td><td>10 / 03 / 2026</td><td>خصم تأخر</td><td class="red">-50 ر.س</td><td>سحب</td></tr>
+          <tr><td>الاثنين</td><td>09 / 03 / 2026</td><td>تحويل إلى لينا</td><td class="gold">-100 ر.س</td><td>تحويل</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div id="latest" class="tab-content">
+      <div class="list">
+        <div class="row"><div><div class="name">إيداع مشاركة مميزة</div><div class="meta">الأربعاء • 11 / 03 / 2026</div></div><div class="value green">+500 ر.س</div></div>
+        <div class="row"><div><div class="name">سحب بسبب تأخر</div><div class="meta">الثلاثاء • 10 / 03 / 2026</div></div><div class="value red">-50 ر.س</div></div>
+      </div>
+    </div>
+
+    <div id="operations" class="tab-content">
+      <div class="field"><label>نوع العملية</label><select><option>إيداع</option><option>سحب</option><option>تحويل</option></select></div>
+      <div class="field"><label>السبب / اسم المحول له</label><input type="text" placeholder="اكتب اسم المحول له أو سبب العملية" /></div>
+      <div class="field"><label>المبلغ</label><input type="number" placeholder="أدخل المبلغ بالريال" /></div>
+      <button class="btn btn-green" style="width:100%">تنفيذ</button>
+    </div>
+
+    <div id="redeemed" class="tab-content">
+      <div class="list">
+        <div class="row"><div><div class="name">هدية تميز</div><div class="meta">تم الاستبدال بتاريخ 07 / 03 / 2026</div></div><div class="value red">-500 ر.س</div></div>
+        <div class="row"><div><div class="name">بطاقة تعزيز</div><div class="meta">تم الاستبدال بتاريخ 02 / 03 / 2026</div></div><div class="value red">-300 ر.س</div></div>
+      </div>
+    </div>
+  </div>
+
 
   <div class="bank-card">
     <div class="bank-top"><div><div class="chip"></div><div class="card-type">بطاقة برونزية</div></div><div style="font-weight:900;font-size:22px">BN</div></div>
@@ -289,8 +343,11 @@ button,input,select{font-family:inherit}
         <div style="width:100%">
           <div class="balance-tag">الرصيد الحالي داخل حساب الطالب</div>
           <div class="money-card">
-            <div class="money-main"><div class="money-amount">8,450</div><div class="money-currency">ر.س</div></div>
-            <div class="money-sub">الرصيد يظهر بالريال لأنه يمثل عمليات الإيداع والسحب والتحويل، بينما النقاط التحفيزية تُحسب بشكل منفصل للترقية.</div>
+            <div class="money-main">
+              <div class="money-amount">8,450</div>
+              <div class="money-currency">ر.س</div>
+            </div>
+            <div class="money-sub">هذا الرصيد يظهر بالريال لأنه يمثل عمليات الإيداع والسحب والتحويل، وليس رصيد النقاط التحفيزية.</div>
           </div>
         </div>
       </div>
@@ -302,16 +359,7 @@ button,input,select{font-family:inherit}
     </div>
   </div>
 
-  <div class="card">
-    <div class="section-head"><h3>تحليل بياناتي</h3><span class="pill">ملخص الحساب</span></div>
-    <div class="kpis">
-      <div class="kpi"><strong>12</strong><span>عدد العمليات</span></div>
-      <div class="kpi"><strong>3</strong><span>عدد التحويلات</span></div>
-      <div class="kpi"><strong>87%</strong><span>مستوى النشاط</span></div>
-    </div>
-  </div>
-
-  <div class="card">
+  <div class="card details-card">
     <div class="section-head"><h3>تفاصيل البطاقة</h3><span class="pill">برونزي</span></div>
     <div class="list">
       <div class="row"><div><div class="name">رقم الحساب</div></div><div class="value">BN-20458</div></div>
@@ -321,122 +369,16 @@ button,input,select{font-family:inherit}
   </div>
 
   <div class="card">
-    <div class="tabbar">
-      <button class="active" onclick="showTab('statement', this)">كشف الحساب</button>
-      <button onclick="showTab('latest', this)">آخر العمليات</button>
-      <button onclick="showTab('operations', this)">العمليات</button>
-      <button onclick="showTab('redeemed', this)">الجوائز المستبدلة</button>
-    </div>
-
-    <div id="statement" class="tab-content active">
-      <table class="statement-table">
-        <thead><tr><th>اليوم</th><th>التاريخ</th><th>السبب</th><th>القيمة</th><th>النوع</th></tr></thead>
-        <tbody>
-          <tr><td>الأربعاء</td><td>11 / 03 / 2026</td><td>مشاركة مميزة</td><td class="green">+500 ر.س</td><td>إيداع</td></tr>
-          <tr><td>الثلاثاء</td><td>10 / 03 / 2026</td><td>خصم تأخر</td><td class="red">-50 ر.س</td><td>سحب</td></tr>
-          <tr><td>الاثنين</td><td>09 / 03 / 2026</td><td>تحويل إلى لينا</td><td class="gold">-100 ر.س</td><td>تحويل</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div id="latest" class="tab-content">
-      <div class="list">
-        <div class="row"><div><div class="name">إيداع مشاركة مميزة</div><div class="meta">الأربعاء • 11 / 03 / 2026</div></div><div class="value green">+500 ر.س</div></div>
-        <div class="row"><div><div class="name">سحب بسبب تأخر</div><div class="meta">الثلاثاء • 10 / 03 / 2026</div></div><div class="value red">-50 ر.س</div></div>
-      </div>
-    </div>
-
-    <div id="operations" class="tab-content">
-      <div class="field">
-        <label>طريقة التحويل</label>
-        <div class="input-wrap">
-          <select id="transferMethod" onchange="updateTransferMode()">
-            <option value="account">تحويل برقم الحساب</option>
-            <option value="student">تحويل باسم الطالب / الطالبة</option>
-          </select>
-        </div>
-      </div>
-
-      <div id="byAccount">
-        <div class="field">
-          <label>رقم الحساب</label>
-          <div class="input-wrap"><input type="text" placeholder="أدخل رقم الحساب" /></div>
-        </div>
-        <div class="field">
-          <label>اسم الطالب / الطالبة</label>
-          <div class="input-wrap"><input type="text" placeholder="أدخل اسم الطالب / الطالبة" /></div>
-        </div>
-      </div>
-
-      <div id="byStudent" style="display:none">
-        <div class="field">
-          <label>الفصل</label>
-          <div class="input-wrap">
-            <select>
-              <option>اختر الفصل</option>
-              <option>سادس 1</option>
-              <option>سادس 2</option>
-              <option>أول متوسط</option>
-            </select>
-          </div>
-        </div>
-        <div class="field">
-          <label>الطالب / الطالبة</label>
-          <div class="input-wrap">
-            <select>
-              <option>اختر اسم الطالب / الطالبة</option>
-              <option>لينا</option>
-              <option>شهد</option>
-              <option>جود</option>
-              <option>ريم</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      <div class="field">
-        <label>السبب</label>
-        <div class="input-wrap"><input type="text" placeholder="اكتب السبب هنا" /></div>
-      </div>
-
-      <div class="field">
-        <label>خانة تنفيذ العملية</label>
-        <div class="input-wrap">
-          <select>
-            <option>إيداع</option>
-            <option>سحب</option>
-            <option>تحويل</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="field">
-        <label>المبلغ</label>
-        <div class="input-wrap"><input type="number" placeholder="أدخل المبلغ بالريال" /></div>
-      </div>
-
-      <button class="btn btn-green" style="width:100%">تنفيذ</button>
-    </div>
-
-    <div id="redeemed" class="tab-content">
-      <div class="list">
-        <div class="row"><div><div class="name">هدية تميز</div><div class="meta">تم الاستبدال بتاريخ 07 / 03 / 2026</div></div><div class="value red">-500 ر.س</div></div>
-        <div class="row"><div><div class="name">بطاقة تعزيز</div><div class="meta">تم الاستبدال بتاريخ 02 / 03 / 2026</div></div><div class="value red">-300 ر.س</div></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="section-head"><h3>ترقية الحساب</h3><span class="pill">يعتمد على الرصيد</span></div>
-    <div class="muted">ترقية الحساب تعتمد على الرصيد المالي الحالي، وليس على النقاط. كلما ارتفع الرصيد ينتقل الحساب تلقائيًا إلى المستوى المناسب.</div>
+    <div class="section-head"><h3>ترقية الحساب</h3><span class="pill">متى يترقى؟</span></div>
+    <div class="muted">الترقية تعتمد على رصيد النقاط التحفيزية الكلي، وليس على الرصيد المالي المعروض بالريال. الرصيد الحالي لهذا النموذج يضعه في المستوى البرونزي، وينتقل إلى الفضي عند بلوغ 11,000 نقطة.</div>
     <div class="progress"><div></div></div>
-    <div class="muted">بما أن الرصيد الحالي 8,450 ر.س فالحساب الآن ضمن المستوى البرونزي، وينتقل إلى الفضي عند تجاوز 11,000 ر.س.</div>
+    <div class="muted">باقي 2,550 نقطة للترقية إلى المستوى الفضي.</div>
     <div class="levels">
-      <div class="level"><div><div class="name">برونزي</div><div class="meta">10,000 ر.س وأقل</div></div><div class="badge-tier bronze">Bronze</div></div>
-      <div class="level"><div><div class="name">فضي</div><div class="meta">من 11,000 إلى 15,000 ر.س</div></div><div class="badge-tier silver">Silver</div></div>
-      <div class="level"><div><div class="name">ذهبي</div><div class="meta">من 16,000 إلى 30,000 ر.س</div></div><div class="badge-tier gold-tier">Gold</div></div>
-      <div class="level"><div><div class="name">بلاتيني</div><div class="meta">من 31,000 إلى 40,000 ر.س</div></div><div class="badge-tier platinum">Platinum</div></div>
-      <div class="level"><div><div class="name">ألماسي</div><div class="meta">41,000 ر.س فأكثر</div></div><div class="badge-tier diamond">Diamond</div></div>
+      <div class="level"><div><div class="name">برونزي</div><div class="meta">10,000 نقطة وأقل</div></div><div class="badge-tier bronze">Bronze</div></div>
+      <div class="level"><div><div class="name">فضي</div><div class="meta">من 11,000 إلى 15,000 نقطة</div></div><div class="badge-tier silver">Silver</div></div>
+      <div class="level"><div><div class="name">ذهبي</div><div class="meta">من 16,000 إلى 30,000 نقطة</div></div><div class="badge-tier gold-tier">Gold</div></div>
+      <div class="level"><div><div class="name">بلاتيني</div><div class="meta">من 31,000 إلى 40,000 نقطة</div></div><div class="badge-tier platinum">Platinum</div></div>
+      <div class="level"><div><div class="name">ألماسي</div><div class="meta">41,000 نقطة فأكثر</div></div><div class="badge-tier diamond">Diamond</div></div>
     </div>
   </div>
 </section>
@@ -515,29 +457,8 @@ function showTab(id, btn){
   const target = document.getElementById(id);
   if(target) target.classList.add('active');
 }
-function togglePassword(inputId, btn){
-  const input = document.getElementById(inputId);
-  if(!input) return;
-  if(input.type === 'password'){
-    input.type = 'text';
-    btn.textContent = '🐵';
-  }else{
-    input.type = 'password';
-    btn.textContent = '🙈';
-  }
-}
-function updateTransferMode(){
-  const mode = document.getElementById('transferMethod').value;
-  const byAccount = document.getElementById('byAccount');
-  const byStudent = document.getElementById('byStudent');
-  if(mode === 'account'){
-    byAccount.style.display = 'block';
-    byStudent.style.display = 'none';
-  }else{
-    byAccount.style.display = 'none';
-    byStudent.style.display = 'block';
-  }
-}
+window.addEventListener('load', drawLineChart);
+window.addEventListener('resize', drawLineChart);
 </script>
 </body>
 </html>
