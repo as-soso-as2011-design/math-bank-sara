@@ -384,6 +384,23 @@ html[dir="ltr"] .balance-head{direction:ltr}
   text-align:center;
 }
 
+
+.roulette-modal{
+  position:fixed;inset:0;background:rgba(0,0,0,.38);
+  display:none;align-items:center;justify-content:center;
+  z-index:9999;padding:24px;
+}
+.roulette-modal.show{display:flex}
+.roulette-modal-box{
+  width:min(360px,100%);
+  background:#fff;border-radius:28px;padding:24px 20px;text-align:center;
+  box-shadow:0 24px 60px rgba(0,0,0,.22);
+  border:1px solid rgba(16,58,46,.08);
+}
+.roulette-modal-title{font-size:24px;font-weight:900;color:var(--deep);margin:0 0 10px}
+.roulette-modal-text{font-size:17px;font-weight:800;color:var(--text);margin:0 0 18px;line-height:1.8}
+.roulette-result{min-height:24px;font-size:14px;font-weight:800;color:var(--deep);text-align:center}
+
 </style>
 </head>
 <body>
@@ -969,11 +986,24 @@ function spinRoulette(){
     const index = Math.floor(((pointerAngle + sliceDeg/2) % 360) / sliceDeg);
     const item = rouletteItems[index];
     result.textContent = `النتيجة: ${item.label}`;
+    showRouletteModal(item.label);
     rouletteBusy = false;
   }, 4400);
 }
 
 document.addEventListener("DOMContentLoaded", drawRouletteWheel);
+
+
+function showRouletteModal(label){
+  const modal = document.getElementById("rouletteModal");
+  const text = document.getElementById("rouletteModalText");
+  if(text) text.textContent = `مبروك، نتيجة الفوز: ${label}`;
+  if(modal) modal.classList.add("show");
+}
+function closeRouletteModal(){
+  const modal = document.getElementById("rouletteModal");
+  if(modal) modal.classList.remove("show");
+}
 
 </script>
 
@@ -1004,6 +1034,15 @@ function toggleLanguage(){
   }
 }
 </script>
+
+
+<div id="rouletteModal" class="roulette-modal">
+  <div class="roulette-modal-box">
+    <div class="roulette-modal-title">مبروك 🎉</div>
+    <div id="rouletteModalText" class="roulette-modal-text">نتيجة الفوز: ٢٠٠</div>
+    <button class="btn btn-gold" type="button" onclick="closeRouletteModal()">حسنًا</button>
+  </div>
+</div>
 
 </body>
 </html>
