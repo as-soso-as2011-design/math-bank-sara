@@ -34,7 +34,7 @@ button,input,select{font-family:inherit}
 .brand h1{margin:0;font-size:21px}
 .brand p{margin:4px 0 0;color:var(--muted);font-size:13px}
 .ghost{border:none;background:#fff;border-radius:14px;padding:11px 12px;box-shadow:0 8px 18px rgba(16,58,46,.08);color:var(--deep);font-weight:800}
-.hero{
+.hero{padding-top:70px;
   background:linear-gradient(135deg,var(--deep),var(--green));
   border-radius:32px;padding:24px 20px;color:#fff;position:relative;overflow:hidden;box-shadow:var(--shadow);margin-bottom:16px
 }
@@ -278,8 +278,8 @@ button,input,select{font-family:inherit}
 
 .top-tools{
   position:absolute;
-  top:16px;
-  left:16px;
+  top:14px;
+  right:14px;
   display:flex;
   gap:10px;
   z-index:3;
@@ -310,7 +310,14 @@ button,input,select{font-family:inherit}
   font-size:14px;
 }
 .top-tool .label-en{font-size:16px;letter-spacing:.3px}
-html[dir="ltr"] .top-tools{left:auto;right:16px}
+html[dir="ltr"] .top-tools{
+  position:absolute;
+  top:14px;
+  right:14px;
+  display:flex;
+  gap:10px;
+  z-index:3;
+}
 html[dir="ltr"] body,
 html[dir="ltr"] .app{direction:ltr}
 html[dir="ltr"] .topbar,
@@ -799,5 +806,34 @@ function convertDigitsToArabic(root=document.body){
 
 window.addEventListener('load', convertDigitsToArabic);
 </script>
+
+<script>
+let currentLang = "ar";
+
+function toggleLanguage(){
+  if(currentLang === "ar"){
+    currentLang = "en";
+    document.documentElement.lang = "en";
+    document.documentElement.dir = "ltr";
+    document.getElementById("langToggleLabel").innerText = "ع";
+
+    const map = {
+      "بنك الرياضيات":"Math Bank",
+      "واجهة رئيسية مطورة • بنك الرياضيات":"Advanced Home • Math Bank",
+      "آخر العمليات":"Recent Operations",
+      "اختصارات سريعة":"Quick Shortcuts",
+      "الوصول السريع":"Quick Access"
+    };
+
+    document.querySelectorAll("*").forEach(el=>{
+      if(map[el.innerText]) el.innerText = map[el.innerText];
+    });
+
+  }else{
+    location.reload();
+  }
+}
+</script>
+
 </body>
 </html>
