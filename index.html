@@ -402,7 +402,6 @@ html[dir="ltr"] .balance-head{direction:ltr}
 .roulette-result{min-height:24px;font-size:14px;font-weight:800;color:var(--deep);text-align:center}
 
 </style>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 <div class="app">
@@ -615,6 +614,10 @@ html[dir="ltr"] .balance-head{direction:ltr}
     <div class="roulette-pointer-wrap"><div class="roulette-pointer"></div></div>
     <div class="roulette-lights">
       <canvas id="rouletteWheel" width="320" height="320" aria-label="روليت الهدايا"></canvas>
+    <button class="btn btn-gold roulette-spin-btn" onclick="spinRoulette()" style="margin-top:14px">
+    تشغيل الروليت
+    </button>
+    
     </div>
     
     <div id="rouletteResult" class="roulette-result">اضغطي على تشغيل الروليت</div>
@@ -986,8 +989,8 @@ function spinRoulette(){
     const sliceDeg = 360 / rouletteItems.length;
     const index = Math.floor(((pointerAngle + sliceDeg/2) % 360) / sliceDeg);
     const item = rouletteItems[index];
-    result.textContent = `النتيجة: ${item.label}`;
-    showRouletteModal(item.label);
+    result.textContent = `🎉 تهانينا\nتم الفوز بـ: ${item.label}`;
+    showRouletteModal('🎉 تهانينا\nتم الفوز بـ: ' + item.label);
     rouletteBusy = false;
   }, 4400);
 }
@@ -1039,57 +1042,12 @@ function toggleLanguage(){
 
 <div id="rouletteModal" class="roulette-modal">
   <div class="roulette-modal-box">
-    <div class="roulette-modal-title">مبروك 🎉</div>
-    <div id="rouletteModalText" class="roulette-modal-text">نتيجة الفوز: ٢٠٠</div>
+    <div class="roulette-modal-title">🎉 تهانينا</div>
+    <div id="rouletteModalText" class="roulette-modal-text">🎉 تهانينا
+تم الفوز بـ: الجائزة</div>
     <button class="btn btn-gold" type="button" onclick="closeRouletteModal()">حسنًا</button>
   </div>
 </div>
-
-
-<script>
-document.addEventListener("DOMContentLoaded", function(){
-  const ctx = document.getElementById('statsChart');
-  if(!ctx) return;
-  new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس'],
-      datasets: [
-        {
-          label:'إيداع',
-          data:[500,300,450,600,700],
-          borderColor:'#1f7f57',
-          backgroundColor:'rgba(31,127,87,0.2)',
-          tension:0.4
-        },
-        {
-          label:'سحب',
-          data:[50,30,60,40,20],
-          borderColor:'#b9514f',
-          backgroundColor:'rgba(185,81,79,0.2)',
-          tension:0.4
-        },
-        {
-          label:'تحويل',
-          data:[100,80,120,60,90],
-          borderColor:'#c7a465',
-          backgroundColor:'rgba(199,164,101,0.2)',
-          tension:0.4
-        }
-      ]
-    },
-    options:{
-      responsive:true,
-      plugins:{
-        legend:{position:'bottom'}
-      },
-      scales:{
-        y:{beginAtZero:true}
-      }
-    }
-  });
-});
-</script>
 
 </body>
 </html>
