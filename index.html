@@ -275,29 +275,53 @@ button,input,select{font-family:inherit}
 }
 
 
+
 .top-tools{
+  position:absolute;
+  top:16px;
+  left:16px;
   display:flex;
-  gap:14px;
-  align-items:center;
-  margin:6px 0 14px;
+  gap:10px;
+  z-index:3;
 }
 .top-tool{
-  border:2px solid rgba(199,164,101,.7);
-  color:var(--deep);
-  background:rgba(255,255,255,.72);
-  border-radius:28px;
-  min-height:54px;
+  min-height:46px;
+  border-radius:18px;
+  padding:0 14px;
+  text-decoration:none;
   display:flex;
   align-items:center;
   justify-content:center;
-  gap:10px;
-  text-decoration:none;
+  gap:8px;
+  background:rgba(255,255,255,.12);
+  border:1px solid rgba(255,255,255,.18);
+  box-shadow:0 8px 18px rgba(0,0,0,.08);
+  backdrop-filter:blur(8px);
+  color:#fff;
   font-weight:900;
-  box-shadow:0 10px 24px rgba(16,58,46,.06);
+  cursor:pointer;
 }
-.top-tool.lang{padding:0 18px; min-width:136px;}
-.top-tool.icon-only{width:76px; min-width:76px;}
-.top-tool .emoji{font-size:22px; line-height:1}
+.top-tool.lang{min-width:112px}
+.top-tool.location{width:56px;min-width:56px;padding:0}
+.top-tool .tool-icon{
+  width:24px;height:24px;border-radius:9px;
+  display:grid;place-items:center;
+  background:rgba(255,255,255,.16);
+  font-size:14px;
+}
+.top-tool .label-en{font-size:16px;letter-spacing:.3px}
+html[dir="ltr"] .top-tools{left:auto;right:16px}
+html[dir="ltr"] body,
+html[dir="ltr"] .app{direction:ltr}
+html[dir="ltr"] .topbar,
+html[dir="ltr"] .brand,
+html[dir="ltr"] .login-head,
+html[dir="ltr"] .section-head,
+html[dir="ltr"] .row,
+html[dir="ltr"] .menu-item,
+html[dir="ltr"] .bank-top,
+html[dir="ltr"] .bank-footer,
+html[dir="ltr"] .balance-head{direction:ltr}
 
 </style>
 </head>
@@ -305,21 +329,21 @@ button,input,select{font-family:inherit}
 <div class="app">
 
 <section id="home" class="screen active">
-  <div class="top-tools">
-    <a class="top-tool lang" href="javascript:void(0)" aria-label="language">
-      <span class="emoji">🌐</span><span>En</span>
-    </a>
-    <a class="top-tool icon-only" href="https://www.google.com/maps/dir//5077+%D8%A7%D9%84%D8%AE%D8%B4%D9%86%D9%8A,+%D8%AD%D9%8A+%D8%A7%D9%84%D8%AE%D8%B2%D8%A7%D9%85%D9%89%D8%8C,+7780,+Al+Khobar+34721%E2%80%AD/data=!4m6!4m5!1m1!4e2!1m2!1m1!1s0x3e49dda6a95ad4e5:0xc47a8297d1b47749?entry=s&sa=X&ved=2ahUKEwjGiNbI1JiTAxVeg_0HHb9kNvgQlDt6BAgKEAA&hl=ar" target="_blank" rel="noopener noreferrer" aria-label="location">
-      <span class="emoji">📍</span>
-    </a>
-  </div>
   <div class="hero">
-    <div class="badge">واجهة رئيسية مطورة • بنك الرياضيات</div>
-    <h2>بنك الرياضيات</h2>
-    <p>منصة تعليمية تحفيزية تعرض الحسابات والعمليات والجوائز ولوحة الشرف داخل واجهة بنكية أنيقة وسهلة الاستخدام.</p>
+        <div class="top-tools">
+          <button class="top-tool lang" id="langToggle" type="button" onclick="toggleLanguage()">
+            <span class="tool-icon">🌐</span><span class="label-en" id="langToggleLabel">En</span>
+          </button>
+          <a class="top-tool location" href="https://www.google.com/maps/dir//5077+%D8%A7%D9%84%D8%AE%D8%B4%D9%86%D9%8A,+%D8%AD%D9%8A+%D8%A7%D9%84%D8%AE%D8%B2%D8%A7%D9%85%D9%89%D8%8C,+7780,+Al+Khobar+34721%E2%80%AD/data=!4m6!4m5!1m1!4e2!1m2!1m1!1s0x3e49dda6a95ad4e5:0xc47a8297d1b47749?entry=s&sa=X&ved=2ahUKEwjGiNbI1JiTAxVeg_0HHb9kNvgQlDt6BAgKEAA&hl=ar" target="_blank" rel="noopener noreferrer" aria-label="location">
+            <span class="tool-icon">📍</span>
+          </a>
+        </div>
+    <div class="badge" id="homeBadge">واجهة رئيسية مطورة • بنك الرياضيات</div>
+    <h2 id="homeTitle">بنك الرياضيات</h2>
+    <p id="homeDesc">منصة تعليمية تحفيزية تعرض الحسابات والعمليات والجوائز ولوحة الشرف داخل واجهة بنكية أنيقة وسهلة الاستخدام.</p>
     <div class="hero-actions">
-      <button class="btn btn-light" onclick="go('account_choice')">الدخول للحساب</button>
-      <button class="btn btn-gold" onclick="go('honor')">لوحة الشرف</button>
+      <button class="btn btn-light" id="openAccountBtn" onclick="go('account_choice')">الدخول للحساب</button>
+      <button class="btn btn-gold" id="honorBtn" onclick="go('honor')">لوحة الشرف</button>
     </div>
   </div>
 
@@ -351,16 +375,16 @@ button,input,select{font-family:inherit}
   </div>
 
   <div class="card">
-    <div class="section-head"><h3>آخر العمليات</h3><span class="pill">حديث</span></div>
+    <div class="section-head"><h3 id="latestOpsTitle">آخر العمليات</h3><span class="pill" id="latestOpsPill">حديث</span></div>
     <div class="list">
-      <div class="row"><div><div class="name">إيداع مشاركة مميزة</div><div class="meta">الأربعاء 11 / 03 / 2026 • 10:30 ص</div></div><div class="value green">+500</div></div>
-      <div class="row"><div><div class="name">سحب بسبب تأخر بسيط</div><div class="meta">الثلاثاء 10 / 03 / 2026 • 08:40 ص</div></div><div class="value red">-50</div></div>
-      <div class="row"><div><div class="name">جائزة إنجاز</div><div class="meta">الاثنين 09 / 03 / 2026 • 11:15 ص</div></div><div class="value gold">+1000</div></div>
+      <div class="row"><div><div class="name">إيداع مشاركة مميزة</div><div class="meta">الأربعاء ١١ / ٠٣ / ٢٠٢٦ • ١٠:٣٠ ص</div></div><div class="value green">+٥٠٠</div></div>
+      <div class="row"><div><div class="name">سحب بسبب تأخر بسيط</div><div class="meta">الثلاثاء ١٠ / ٠٣ / ٢٠٢٦ • ٠٨:٤٠ ص</div></div><div class="value red">-٥٠</div></div>
+      <div class="row"><div><div class="name">جائزة إنجاز</div><div class="meta">الاثنين ٠٩ / ٠٣ / ٢٠٢٦ • ١١:١٥ ص</div></div><div class="value gold">+١٠٠٠</div></div>
     </div>
   </div>
 
   <div class="card">
-    <div class="section-head"><h3>اختصارات سريعة</h3><span class="pill">الوصول السريع</span></div>
+    <div class="section-head"><h3 id="shortcutsTitle">اختصارات سريعة</h3><span class="pill" id="shortcutsPill">الوصول السريع</span></div>
     <div class="shortcuts">
       <div class="shortcut"><div class="icon">🧾</div><span>كشف الحساب</span></div>
       <div class="shortcut"><div class="icon">🔄</div><span>العمليات</span></div>
@@ -628,10 +652,10 @@ button,input,select{font-family:inherit}
 </section>
 
 <nav class="bottom-nav">
-  <button class="nav-btn active" data-screen="home" onclick="go('home', this)"><span class="emoji">🏠</span><span>الرئيسية</span></button>
-  <button class="nav-btn" data-screen="account" onclick="go('account', this)"><span class="emoji">💳</span><span>الحساب</span></button>
-  <button class="nav-btn" data-screen="honor" onclick="go('honor', this)"><span class="emoji">🏆</span><span>الشرف</span></button>
-  <button class="nav-btn" data-screen="more" onclick="go('more', this)"><span class="emoji">⚙️</span><span>المزيد</span></button>
+  <button class="nav-btn active" data-screen="home" onclick="go('home', this)"><span class="emoji">🏠</span><span id="navHome">الرئيسية</span></button>
+  <button class="nav-btn" data-screen="account" onclick="go('account', this)"><span class="emoji">💳</span><span id="navAccount">الحساب</span></button>
+  <button class="nav-btn" data-screen="honor" onclick="go('honor', this)"><span class="emoji">🏆</span><span id="navHonor">الشرف</span></button>
+  <button class="nav-btn" data-screen="more" onclick="go('more', this)"><span class="emoji">⚙️</span><span id="navMore">المزيد</span></button>
   <button class="nav-btn" data-screen="account_choice" onclick="go('account_choice', this)"><span class="emoji">🔐</span><span>الدخول</span></button>
 </nav>
 
