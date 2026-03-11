@@ -4063,6 +4063,180 @@ background:linear-gradient(180deg,#014c39 0%, #0b6d52 24%, #f6fbf8 24%);
 }
 </style>
 
+
+<style id="theme-design-pack-v1">
+/* ===== Distinct design language for each theme ===== */
+body:not([data-theme]), body[data-theme="default"]{
+  --themeRadius:18px;
+}
+
+/* Blue = original bank style (stable) */
+body:not([data-theme]) .btn, body[data-theme="default"] .btn{border-radius:16px;box-shadow:0 10px 24px rgba(0,32,91,.18);}
+body:not([data-theme]) .btn2, body[data-theme="default"] .btn2,
+body:not([data-theme]) .btn3, body[data-theme="default"] .btn3{border-radius:14px;}
+body:not([data-theme]) .tab, body[data-theme="default"] .tab,
+body:not([data-theme]) .miniTab, body[data-theme="default"] .miniTab{border-radius:14px;}
+body:not([data-theme]) .sideBtn, body[data-theme="default"] .sideBtn{border-radius:14px;}
+body:not([data-theme]) .bankCard, body[data-theme="default"] .bankCard{border-radius:26px;}
+
+/* Brown = premium classic bank */
+body[data-theme="alinma"] .topbar{
+  box-shadow:0 16px 34px rgba(74,45,32,.30) !important;
+  border-bottom:1px solid rgba(255,255,255,.12);
+}
+body[data-theme="alinma"] .topbar .logo{
+  background:linear-gradient(135deg,rgba(255,255,255,.18),rgba(255,255,255,.08));
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:18px;
+  padding:8px 12px;
+}
+body[data-theme="alinma"] .card,
+body[data-theme="alinma"] .authCard,
+body[data-theme="alinma"] .modalBox,
+body[data-theme="alinma"] .onbBox,
+body[data-theme="alinma"] .tableWrap{
+  border-radius:24px !important;
+  border:1px solid rgba(122,82,54,.16) !important;
+  box-shadow:0 18px 42px rgba(74,45,32,.12) !important;
+}
+body[data-theme="alinma"] .btn{
+  border-radius:12px !important;
+  border:1px solid rgba(255,255,255,.20);
+  box-shadow:0 10px 22px rgba(91,58,41,.24) !important;
+  letter-spacing:.2px;
+}
+body[data-theme="alinma"] .btn2,
+body[data-theme="alinma"] .btn3{
+  border-radius:12px !important;
+  border:1px solid rgba(122,82,54,.16);
+}
+body[data-theme="alinma"] .tab,
+body[data-theme="alinma"] .miniTab{
+  border-radius:12px !important;
+  border:1px solid rgba(122,82,54,.15);
+  background:linear-gradient(180deg,#fffdfa,#f5ece4) !important;
+}
+body[data-theme="alinma"] .tab.active,
+body[data-theme="alinma"] .miniTab.active{
+  background:linear-gradient(180deg,#7a5236,#5b3a29) !important;
+  color:#fff !important;
+  box-shadow:0 10px 20px rgba(91,58,41,.24);
+}
+body[data-theme="alinma"] .sideBtn{
+  border-radius:12px !important;
+  border-inline-start:4px solid transparent;
+}
+body[data-theme="alinma"] .sideBtn.active,
+body[data-theme="alinma"] .sideBtn:hover{
+  border-inline-start-color:#d7b08f !important;
+}
+body[data-theme="alinma"] .bankCard{
+  border-radius:30px !important;
+  border:1px solid rgba(255,255,255,.14);
+  box-shadow:0 24px 44px rgba(74,45,32,.26) !important;
+}
+body[data-theme="alinma"] .chip{
+  border-radius:10px !important;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.3);
+}
+body[data-theme="alinma"] .badge,
+body[data-theme="alinma"] .aBadge{
+  border-radius:999px;
+}
+body[data-theme="alinma"] #startOverlay{
+  background:radial-gradient(circle at top, #8d6548 0%, #5b3a29 55%, #22140e 100%) !important;
+}
+body[data-theme="alinma"] .startBox,
+body[data-theme="alinma"] .authCard{
+  backdrop-filter:blur(8px);
+}
+
+/* Green = modern digital bank */
+body[data-theme="ahli"] .topbar{
+  box-shadow:0 16px 34px rgba(1,76,57,.24) !important;
+}
+body[data-theme="ahli"] .topbar .logo{
+  border-radius:999px;
+  padding:8px 14px;
+  background:rgba(255,255,255,.14);
+  border:1px solid rgba(255,255,255,.16);
+}
+body[data-theme="ahli"] .card,
+body[data-theme="ahli"] .authCard,
+body[data-theme="ahli"] .modalBox,
+body[data-theme="ahli"] .onbBox,
+body[data-theme="ahli"] .tableWrap{
+  border-radius:28px !important;
+  border:1px solid rgba(11,138,99,.12) !important;
+  box-shadow:0 18px 40px rgba(1,76,57,.10) !important;
+}
+body[data-theme="ahli"] .btn{
+  border-radius:999px !important;
+  box-shadow:0 12px 24px rgba(1,76,57,.22) !important;
+  border:1px solid rgba(255,255,255,.18);
+}
+body[data-theme="ahli"] .btn2,
+body[data-theme="ahli"] .btn3{
+  border-radius:999px !important;
+  border:1px solid rgba(11,138,99,.14);
+}
+body[data-theme="ahli"] .tab,
+body[data-theme="ahli"] .miniTab{
+  border-radius:999px !important;
+  border:1px solid rgba(11,138,99,.12);
+  background:#f6fbf8 !important;
+}
+body[data-theme="ahli"] .tab.active,
+body[data-theme="ahli"] .miniTab.active{
+  background:linear-gradient(90deg,#005b45,#0b8a63) !important;
+  color:#fff !important;
+  box-shadow:0 10px 22px rgba(1,76,57,.20);
+}
+body[data-theme="ahli"] .sideBtn{
+  border-radius:18px !important;
+  position:relative;
+  overflow:hidden;
+}
+body[data-theme="ahli"] .sideBtn.active::after,
+body[data-theme="ahli"] .sideBtn:hover::after{
+  content:"";
+  position:absolute;
+  inset-inline-start:10px; top:50%; transform:translateY(-50%);
+  width:8px; height:8px; border-radius:50%; background:#7fe3bd;
+  box-shadow:0 0 0 6px rgba(127,227,189,.14);
+}
+body[data-theme="ahli"] .bankCard{
+  border-radius:34px !important;
+  border:1px solid rgba(255,255,255,.16);
+  box-shadow:0 24px 46px rgba(1,76,57,.24) !important;
+}
+body[data-theme="ahli"] .kpi,
+body[data-theme="ahli"] .awardKpi,
+body[data-theme="ahli"] .awardCard,
+body[data-theme="ahli"] .opCard{
+  border-radius:24px !important;
+}
+body[data-theme="ahli"] .badge,
+body[data-theme="ahli"] .aBadge{
+  border-radius:999px;
+}
+body[data-theme="ahli"] th{
+  letter-spacing:.2px;
+}
+body[data-theme="ahli"] #startOverlay{
+  background:radial-gradient(circle at top, #11a97a 0%, #005b45 55%, #01231b 100%) !important;
+}
+body[data-theme="ahli"] .startBox{
+  border-radius:30px !important;
+}
+
+/* Start page buttons and tabs inherit theme better */
+body[data-theme="alinma"] #startOverlay .btn,
+body[data-theme="ahli"] #startOverlay .btn{
+  min-height:52px;
+}
+</style>
+
 </body></html>`);
       w.document.close();
     }
@@ -6215,6 +6389,180 @@ body[data-theme="alinma"] .authHead{background:linear-gradient(90deg,#5b3a29,#7a
 body[data-theme="ahli"] .authHead{background:linear-gradient(90deg,#005b45,#0b8a63) !important;}
 body[data-theme="alinma"] .pill{background:rgba(122,82,54,.28);border-color:rgba(255,255,255,.18) !important;}
 body[data-theme="ahli"] .pill{background:rgba(11,138,99,.24);border-color:rgba(255,255,255,.18) !important;}
+</style>
+
+
+<style id="theme-design-pack-v1">
+/* ===== Distinct design language for each theme ===== */
+body:not([data-theme]), body[data-theme="default"]{
+  --themeRadius:18px;
+}
+
+/* Blue = original bank style (stable) */
+body:not([data-theme]) .btn, body[data-theme="default"] .btn{border-radius:16px;box-shadow:0 10px 24px rgba(0,32,91,.18);}
+body:not([data-theme]) .btn2, body[data-theme="default"] .btn2,
+body:not([data-theme]) .btn3, body[data-theme="default"] .btn3{border-radius:14px;}
+body:not([data-theme]) .tab, body[data-theme="default"] .tab,
+body:not([data-theme]) .miniTab, body[data-theme="default"] .miniTab{border-radius:14px;}
+body:not([data-theme]) .sideBtn, body[data-theme="default"] .sideBtn{border-radius:14px;}
+body:not([data-theme]) .bankCard, body[data-theme="default"] .bankCard{border-radius:26px;}
+
+/* Brown = premium classic bank */
+body[data-theme="alinma"] .topbar{
+  box-shadow:0 16px 34px rgba(74,45,32,.30) !important;
+  border-bottom:1px solid rgba(255,255,255,.12);
+}
+body[data-theme="alinma"] .topbar .logo{
+  background:linear-gradient(135deg,rgba(255,255,255,.18),rgba(255,255,255,.08));
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:18px;
+  padding:8px 12px;
+}
+body[data-theme="alinma"] .card,
+body[data-theme="alinma"] .authCard,
+body[data-theme="alinma"] .modalBox,
+body[data-theme="alinma"] .onbBox,
+body[data-theme="alinma"] .tableWrap{
+  border-radius:24px !important;
+  border:1px solid rgba(122,82,54,.16) !important;
+  box-shadow:0 18px 42px rgba(74,45,32,.12) !important;
+}
+body[data-theme="alinma"] .btn{
+  border-radius:12px !important;
+  border:1px solid rgba(255,255,255,.20);
+  box-shadow:0 10px 22px rgba(91,58,41,.24) !important;
+  letter-spacing:.2px;
+}
+body[data-theme="alinma"] .btn2,
+body[data-theme="alinma"] .btn3{
+  border-radius:12px !important;
+  border:1px solid rgba(122,82,54,.16);
+}
+body[data-theme="alinma"] .tab,
+body[data-theme="alinma"] .miniTab{
+  border-radius:12px !important;
+  border:1px solid rgba(122,82,54,.15);
+  background:linear-gradient(180deg,#fffdfa,#f5ece4) !important;
+}
+body[data-theme="alinma"] .tab.active,
+body[data-theme="alinma"] .miniTab.active{
+  background:linear-gradient(180deg,#7a5236,#5b3a29) !important;
+  color:#fff !important;
+  box-shadow:0 10px 20px rgba(91,58,41,.24);
+}
+body[data-theme="alinma"] .sideBtn{
+  border-radius:12px !important;
+  border-inline-start:4px solid transparent;
+}
+body[data-theme="alinma"] .sideBtn.active,
+body[data-theme="alinma"] .sideBtn:hover{
+  border-inline-start-color:#d7b08f !important;
+}
+body[data-theme="alinma"] .bankCard{
+  border-radius:30px !important;
+  border:1px solid rgba(255,255,255,.14);
+  box-shadow:0 24px 44px rgba(74,45,32,.26) !important;
+}
+body[data-theme="alinma"] .chip{
+  border-radius:10px !important;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.3);
+}
+body[data-theme="alinma"] .badge,
+body[data-theme="alinma"] .aBadge{
+  border-radius:999px;
+}
+body[data-theme="alinma"] #startOverlay{
+  background:radial-gradient(circle at top, #8d6548 0%, #5b3a29 55%, #22140e 100%) !important;
+}
+body[data-theme="alinma"] .startBox,
+body[data-theme="alinma"] .authCard{
+  backdrop-filter:blur(8px);
+}
+
+/* Green = modern digital bank */
+body[data-theme="ahli"] .topbar{
+  box-shadow:0 16px 34px rgba(1,76,57,.24) !important;
+}
+body[data-theme="ahli"] .topbar .logo{
+  border-radius:999px;
+  padding:8px 14px;
+  background:rgba(255,255,255,.14);
+  border:1px solid rgba(255,255,255,.16);
+}
+body[data-theme="ahli"] .card,
+body[data-theme="ahli"] .authCard,
+body[data-theme="ahli"] .modalBox,
+body[data-theme="ahli"] .onbBox,
+body[data-theme="ahli"] .tableWrap{
+  border-radius:28px !important;
+  border:1px solid rgba(11,138,99,.12) !important;
+  box-shadow:0 18px 40px rgba(1,76,57,.10) !important;
+}
+body[data-theme="ahli"] .btn{
+  border-radius:999px !important;
+  box-shadow:0 12px 24px rgba(1,76,57,.22) !important;
+  border:1px solid rgba(255,255,255,.18);
+}
+body[data-theme="ahli"] .btn2,
+body[data-theme="ahli"] .btn3{
+  border-radius:999px !important;
+  border:1px solid rgba(11,138,99,.14);
+}
+body[data-theme="ahli"] .tab,
+body[data-theme="ahli"] .miniTab{
+  border-radius:999px !important;
+  border:1px solid rgba(11,138,99,.12);
+  background:#f6fbf8 !important;
+}
+body[data-theme="ahli"] .tab.active,
+body[data-theme="ahli"] .miniTab.active{
+  background:linear-gradient(90deg,#005b45,#0b8a63) !important;
+  color:#fff !important;
+  box-shadow:0 10px 22px rgba(1,76,57,.20);
+}
+body[data-theme="ahli"] .sideBtn{
+  border-radius:18px !important;
+  position:relative;
+  overflow:hidden;
+}
+body[data-theme="ahli"] .sideBtn.active::after,
+body[data-theme="ahli"] .sideBtn:hover::after{
+  content:"";
+  position:absolute;
+  inset-inline-start:10px; top:50%; transform:translateY(-50%);
+  width:8px; height:8px; border-radius:50%; background:#7fe3bd;
+  box-shadow:0 0 0 6px rgba(127,227,189,.14);
+}
+body[data-theme="ahli"] .bankCard{
+  border-radius:34px !important;
+  border:1px solid rgba(255,255,255,.16);
+  box-shadow:0 24px 46px rgba(1,76,57,.24) !important;
+}
+body[data-theme="ahli"] .kpi,
+body[data-theme="ahli"] .awardKpi,
+body[data-theme="ahli"] .awardCard,
+body[data-theme="ahli"] .opCard{
+  border-radius:24px !important;
+}
+body[data-theme="ahli"] .badge,
+body[data-theme="ahli"] .aBadge{
+  border-radius:999px;
+}
+body[data-theme="ahli"] th{
+  letter-spacing:.2px;
+}
+body[data-theme="ahli"] #startOverlay{
+  background:radial-gradient(circle at top, #11a97a 0%, #005b45 55%, #01231b 100%) !important;
+}
+body[data-theme="ahli"] .startBox{
+  border-radius:30px !important;
+}
+
+/* Start page buttons and tabs inherit theme better */
+body[data-theme="alinma"] #startOverlay .btn,
+body[data-theme="ahli"] #startOverlay .btn{
+  min-height:52px;
+}
 </style>
 
 </body>
