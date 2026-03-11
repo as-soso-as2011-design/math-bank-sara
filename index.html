@@ -16,6 +16,67 @@
       --muted:rgba(255,255,255,.75);
       --glass:rgba(255,255,255,.10);
     }
+
+    body[data-theme="alinma"]{
+      --navy:#5b3a29; --rajhi:#7a5236; --sky:#f6efe9; --sky2:#e7d2c0; --beige:#f8f2ec;
+      --green:#8b6a4b; --red:#9a3d2d; --text:#2f241d; --card:#fffdfa;
+      background:linear-gradient(180deg,#4a2d20 0%, #6a422f 24%, var(--beige) 24%);
+    }
+    body[data-theme="ahli"]{
+      --navy:#005b45; --rajhi:#0b8a63; --sky:#edf8f3; --sky2:#cfeee1; --beige:#f6fbf8;
+      --green:#0b8a63; --red:#a12828; --text:#123027; --card:#ffffff;
+      background:linear-gradient(180deg,#014c39 0%, #0b6d52 24%, var(--beige) 24%);
+    }
+
+    body[data-theme="alinma"] .topbar{
+      background:linear-gradient(90deg,#553324,#7a5236);
+    }
+    body[data-theme="ahli"] .topbar{
+      background:linear-gradient(90deg,#014c39,#0b8a63);
+    }
+    body[data-theme="alinma"] .sidebarNav{
+      background:linear-gradient(180deg,#5b3a29,#7a5236);
+    }
+    body[data-theme="ahli"] .sidebarNav{
+      background:linear-gradient(180deg,#01513d,#0b8a63);
+    }
+    body[data-theme="alinma"] .card.soft{
+      background:linear-gradient(180deg,#fffaf6,#ffffff);
+    }
+    body[data-theme="ahli"] .card.soft{
+      background:linear-gradient(180deg,#f5fffb,#ffffff);
+    }
+    body[data-theme="alinma"] .bankCard{
+      background:linear-gradient(180deg,#fffdfb,#f8efe7);
+      border-color:rgba(91,58,41,.18);
+    }
+    body[data-theme="ahli"] .bankCard{
+      background:linear-gradient(180deg,#ffffff,#eefaf5);
+      border-color:rgba(1,76,57,.14);
+    }
+    body[data-theme="alinma"] .btn{background:#7a5236}
+    body[data-theme="ahli"] .btn{background:#0b8a63}
+    body[data-theme="alinma"] .btn2{background:#e7d2c0;color:#3a2418}
+    body[data-theme="ahli"] .btn2{background:#cfeee1;color:#073a2b}
+    body[data-theme="alinma"] .btn3{background:#f3e7dc;color:#3a2418}
+    body[data-theme="ahli"] .btn3{background:#e8f7f0;color:#073a2b}
+    body[data-theme="alinma"] input:focus, body[data-theme="alinma"] select:focus{
+      border-color:rgba(122,82,54,.55); box-shadow:0 0 0 3px rgba(122,82,54,.12)
+    }
+    body[data-theme="ahli"] input:focus, body[data-theme="ahli"] select:focus{
+      border-color:rgba(11,138,99,.55); box-shadow:0 0 0 3px rgba(11,138,99,.12)
+    }
+    .themeTile{
+      border:1px solid rgba(0,0,0,.08); border-radius:18px; padding:14px;
+      background:linear-gradient(180deg,#ffffff,#f8fbff); box-shadow:0 8px 18px rgba(0,0,0,.05);
+    }
+    .themePreview{height:90px;border-radius:16px;border:1px solid rgba(0,0,0,.08);position:relative;overflow:hidden}
+    .themePreview:before{content:"";position:absolute;inset:0}
+    .themePreview:after{content:"";position:absolute;left:12px;right:12px;bottom:12px;height:26px;border-radius:10px;background:rgba(255,255,255,.8)}
+    .themePreview.alinma:before{background:linear-gradient(180deg,#5b3a29 0 34%, #f8f2ec 34% 100%)}
+    .themePreview.ahli:before{background:linear-gradient(180deg,#005b45 0 34%, #f6fbf8 34% 100%)}
+    .themePreview.defaultTheme:before{background:linear-gradient(180deg,#00205B 0 34%, #FAF9F7 34% 100%)}
+
     *{box-sizing:border-box;font-family:Tahoma,Arial,sans-serif}
     body{margin:0;background:linear-gradient(180deg,#061a3d 0%, #071f4a 24%, var(--beige) 24%);color:var(--text)}
     a{color:inherit}
@@ -519,6 +580,183 @@
     }
 
 </style>
+
+<style id="theme-full-transform-v25">
+body[data-theme="alinma"]{
+  color:#2f241d;
+}
+body[data-theme="ahli"]{
+  color:#123027;
+}
+body[data-theme="alinma"] .topbar .logo,
+body[data-theme="ahli"] .topbar .logo{
+  background:rgba(255,255,255,.96);
+  box-shadow:0 10px 22px rgba(0,0,0,.14);
+}
+body[data-theme="alinma"] .card,
+body[data-theme="alinma"] .authCard,
+body[data-theme="alinma"] .modalBox,
+body[data-theme="alinma"] .onbBox{
+  background:linear-gradient(180deg,#fffdfa,#f8efe7);
+  border-color:rgba(91,58,41,.12);
+}
+body[data-theme="ahli"] .card,
+body[data-theme="ahli"] .authCard,
+body[data-theme="ahli"] .modalBox,
+body[data-theme="ahli"] .onbBox{
+  background:linear-gradient(180deg,#ffffff,#eff9f4);
+  border-color:rgba(1,76,57,.10);
+}
+body[data-theme="alinma"] .sidebarNav .sideTitle,
+body[data-theme="ahli"] .sidebarNav .sideTitle{
+  color:#fff;
+}
+body[data-theme="alinma"] .sideBtn{
+  background:rgba(255,255,255,.12);
+  color:#fff;
+  border:1px solid rgba(255,255,255,.12);
+}
+body[data-theme="ahli"] .sideBtn{
+  background:rgba(255,255,255,.10);
+  color:#fff;
+  border:1px solid rgba(255,255,255,.12);
+}
+body[data-theme="alinma"] .sideBtn.active,
+body[data-theme="alinma"] .sideBtn:hover{
+  background:#fff5ee;
+  color:#5b3a29;
+}
+body[data-theme="ahli"] .sideBtn.active,
+body[data-theme="ahli"] .sideBtn:hover{
+  background:#f2fff9;
+  color:#005b45;
+}
+body[data-theme="alinma"] .tab.active,
+body[data-theme="alinma"] .miniTab.active{
+  background:linear-gradient(90deg,#5b3a29,#7a5236);
+  color:#fff;
+}
+body[data-theme="ahli"] .tab.active,
+body[data-theme="ahli"] .miniTab.active{
+  background:linear-gradient(90deg,#005b45,#0b8a63);
+  color:#fff;
+}
+body[data-theme="alinma"] .tab,
+body[data-theme="alinma"] .miniTab{
+  background:#f6ece3;
+  color:#4a3022;
+}
+body[data-theme="ahli"] .tab,
+body[data-theme="ahli"] .miniTab{
+  background:#eaf8f1;
+  color:#0c4a38;
+}
+body[data-theme="alinma"] .kpi,
+body[data-theme="alinma"] .awardKpi,
+body[data-theme="alinma"] .leaderWrap,
+body[data-theme="alinma"] .awardCard,
+body[data-theme="alinma"] .opCard{
+  background:linear-gradient(180deg,#fffdfa,#f8efe7);
+  border-color:rgba(91,58,41,.10);
+}
+body[data-theme="ahli"] .kpi,
+body[data-theme="ahli"] .awardKpi,
+body[data-theme="ahli"] .leaderWrap,
+body[data-theme="ahli"] .awardCard,
+body[data-theme="ahli"] .opCard{
+  background:linear-gradient(180deg,#ffffff,#eef8f3);
+  border-color:rgba(1,76,57,.10);
+}
+body[data-theme="alinma"] .kpi .v,
+body[data-theme="alinma"] .aTitle,
+body[data-theme="alinma"] .lbName,
+body[data-theme="alinma"] .bankBrand,
+body[data-theme="alinma"] .cardNum,
+body[data-theme="alinma"] .cardMeta,
+body[data-theme="alinma"] .holder,
+body[data-theme="alinma"] .pdfTitle,
+body[data-theme="alinma"] .lbRank{
+  color:#5b3a29 !important;
+}
+body[data-theme="ahli"] .kpi .v,
+body[data-theme="ahli"] .aTitle,
+body[data-theme="ahli"] .lbName,
+body[data-theme="ahli"] .bankBrand,
+body[data-theme="ahli"] .cardNum,
+body[data-theme="ahli"] .cardMeta,
+body[data-theme="ahli"] .holder,
+body[data-theme="ahli"] .pdfTitle,
+body[data-theme="ahli"] .lbRank{
+  color:#005b45 !important;
+}
+body[data-theme="alinma"] .tableWrap{
+  background:#fffaf6;
+  border-color:#ead8ca;
+}
+body[data-theme="ahli"] .tableWrap{
+  background:#f5fffa;
+  border-color:#dbeee6;
+}
+body[data-theme="alinma"] th{
+  background:#f3e4d8;
+  color:#5b3a29;
+}
+body[data-theme="ahli"] th{
+  background:#e4f5ed;
+  color:#005b45;
+}
+body[data-theme="alinma"] .badge.on,
+body[data-theme="alinma"] .aBadge.ok{
+  background:#ead8ca;
+  color:#5b3a29;
+}
+body[data-theme="ahli"] .badge.on,
+body[data-theme="ahli"] .aBadge.ok{
+  background:#dff3ea;
+  color:#005b45;
+}
+body[data-theme="alinma"] .bankCard:before{
+  background:
+    radial-gradient(circle at 12% 18%, rgba(122,82,54,.24) 0%, rgba(122,82,54,0) 45%),
+    radial-gradient(circle at 88% 72%, rgba(91,58,41,.18) 0%, rgba(91,58,41,0) 48%),
+    linear-gradient(135deg, rgba(0,0,0,.00) 0%, rgba(0,0,0,.03) 100%);
+}
+body[data-theme="ahli"] .bankCard:before{
+  background:
+    radial-gradient(circle at 12% 18%, rgba(11,138,99,.20) 0%, rgba(11,138,99,0) 45%),
+    radial-gradient(circle at 88% 72%, rgba(0,91,69,.16) 0%, rgba(0,91,69,0) 48%),
+    linear-gradient(135deg, rgba(0,0,0,.00) 0%, rgba(0,0,0,.03) 100%);
+}
+body[data-theme="alinma"] .chip{
+  background:linear-gradient(180deg,#d7b28e,#a67855);
+}
+body[data-theme="ahli"] .chip{
+  background:linear-gradient(180deg,#b5e2d1,#5ba98a);
+}
+body[data-theme="alinma"] .footerLinks{
+  background:rgba(91,58,41,.08);
+  border-color:rgba(91,58,41,.16);
+}
+body[data-theme="ahli"] .footerLinks{
+  background:rgba(0,91,69,.06);
+  border-color:rgba(0,91,69,.16);
+}
+body[data-theme="alinma"] .footerLinks a,
+body[data-theme="alinma"] .footerNote{
+  color:#5b3a29;
+}
+body[data-theme="ahli"] .footerLinks a,
+body[data-theme="ahli"] .footerNote{
+  color:#005b45;
+}
+body[data-theme="alinma"] .themeTile{
+  background:linear-gradient(180deg,#fffdfa,#f8efe7);
+}
+body[data-theme="ahli"] .themeTile{
+  background:linear-gradient(180deg,#ffffff,#eef8f3);
+}
+</style>
+
 </head>
 
 <body>
@@ -855,6 +1093,37 @@
           </div>
           <div class="col" style="align-self:flex-end">
             <button class="btn" onclick="executeUnfreezeAccount()">فك التجميد</button>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="card soft" id="themeBankCard" style="margin-top:10px">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+          <div>
+            <div style="font-weight:1000;color:var(--navy)">🎨 ألوان البنك وتنسيقه</div>
+            <div class="small" style="margin-top:4px;color:#47607e">اختاري شكل البنك بالكامل: اللون البني مثل واجهة مصرف الإنماء أو اللون الأخضر مثل واجهة البنك الأهلي.</div>
+          </div>
+          <div class="badge on" id="themeStateBadge">الثيم الحالي: الأزرق الأساسي</div>
+        </div>
+        <div class="grid3" style="margin-top:12px">
+          <div class="themeTile">
+            <div class="themePreview defaultTheme"></div>
+            <div style="margin-top:10px;font-weight:1000;color:var(--navy)">الأزرق الأساسي</div>
+            <div class="small" style="margin-top:4px">واجهة بنك الرياضيات الحالية.</div>
+            <button class="btn3" style="margin-top:10px;width:100%" onclick="setBankTheme('default')">تفعيل الأزرق</button>
+          </div>
+          <div class="themeTile">
+            <div class="themePreview alinma"></div>
+            <div style="margin-top:10px;font-weight:1000;color:var(--navy)">ثيم مصرف الإنماء</div>
+            <div class="small" style="margin-top:4px">بني دافئ مع تنسيق فاخر قريب من واجهة الإنماء.</div>
+            <button class="btn" style="margin-top:10px;width:100%" onclick="setBankTheme('alinma')">تفعيل البني</button>
+          </div>
+          <div class="themeTile">
+            <div class="themePreview ahli"></div>
+            <div style="margin-top:10px;font-weight:1000;color:var(--navy)">ثيم البنك الأهلي</div>
+            <div class="small" style="margin-top:4px">أخضر أنيق مع إحساس مصرفي حديث.</div>
+            <button class="btn" style="margin-top:10px;width:100%" onclick="setBankTheme('ahli')">تفعيل الأخضر</button>
           </div>
         </div>
       </div>
@@ -3229,6 +3498,7 @@ async function renderStudents(){
     }
 
 document.addEventListener("DOMContentLoaded", async()=>{
+      try{ loadBankTheme(); }catch(e){}
       $("modePill").textContent = IS_STUDENT_ENTRY ? "وضع: الطالب" : "وضع: المعلمة";
       // حفظ/تبديل وضع الدخول (معلمة/طالب)
       try{
@@ -3553,6 +3823,183 @@ document.addEventListener("DOMContentLoaded", async()=>{
     }
 
 </style>
+
+<style id="theme-full-transform-v25">
+body[data-theme="alinma"]{
+  color:#2f241d;
+}
+body[data-theme="ahli"]{
+  color:#123027;
+}
+body[data-theme="alinma"] .topbar .logo,
+body[data-theme="ahli"] .topbar .logo{
+  background:rgba(255,255,255,.96);
+  box-shadow:0 10px 22px rgba(0,0,0,.14);
+}
+body[data-theme="alinma"] .card,
+body[data-theme="alinma"] .authCard,
+body[data-theme="alinma"] .modalBox,
+body[data-theme="alinma"] .onbBox{
+  background:linear-gradient(180deg,#fffdfa,#f8efe7);
+  border-color:rgba(91,58,41,.12);
+}
+body[data-theme="ahli"] .card,
+body[data-theme="ahli"] .authCard,
+body[data-theme="ahli"] .modalBox,
+body[data-theme="ahli"] .onbBox{
+  background:linear-gradient(180deg,#ffffff,#eff9f4);
+  border-color:rgba(1,76,57,.10);
+}
+body[data-theme="alinma"] .sidebarNav .sideTitle,
+body[data-theme="ahli"] .sidebarNav .sideTitle{
+  color:#fff;
+}
+body[data-theme="alinma"] .sideBtn{
+  background:rgba(255,255,255,.12);
+  color:#fff;
+  border:1px solid rgba(255,255,255,.12);
+}
+body[data-theme="ahli"] .sideBtn{
+  background:rgba(255,255,255,.10);
+  color:#fff;
+  border:1px solid rgba(255,255,255,.12);
+}
+body[data-theme="alinma"] .sideBtn.active,
+body[data-theme="alinma"] .sideBtn:hover{
+  background:#fff5ee;
+  color:#5b3a29;
+}
+body[data-theme="ahli"] .sideBtn.active,
+body[data-theme="ahli"] .sideBtn:hover{
+  background:#f2fff9;
+  color:#005b45;
+}
+body[data-theme="alinma"] .tab.active,
+body[data-theme="alinma"] .miniTab.active{
+  background:linear-gradient(90deg,#5b3a29,#7a5236);
+  color:#fff;
+}
+body[data-theme="ahli"] .tab.active,
+body[data-theme="ahli"] .miniTab.active{
+  background:linear-gradient(90deg,#005b45,#0b8a63);
+  color:#fff;
+}
+body[data-theme="alinma"] .tab,
+body[data-theme="alinma"] .miniTab{
+  background:#f6ece3;
+  color:#4a3022;
+}
+body[data-theme="ahli"] .tab,
+body[data-theme="ahli"] .miniTab{
+  background:#eaf8f1;
+  color:#0c4a38;
+}
+body[data-theme="alinma"] .kpi,
+body[data-theme="alinma"] .awardKpi,
+body[data-theme="alinma"] .leaderWrap,
+body[data-theme="alinma"] .awardCard,
+body[data-theme="alinma"] .opCard{
+  background:linear-gradient(180deg,#fffdfa,#f8efe7);
+  border-color:rgba(91,58,41,.10);
+}
+body[data-theme="ahli"] .kpi,
+body[data-theme="ahli"] .awardKpi,
+body[data-theme="ahli"] .leaderWrap,
+body[data-theme="ahli"] .awardCard,
+body[data-theme="ahli"] .opCard{
+  background:linear-gradient(180deg,#ffffff,#eef8f3);
+  border-color:rgba(1,76,57,.10);
+}
+body[data-theme="alinma"] .kpi .v,
+body[data-theme="alinma"] .aTitle,
+body[data-theme="alinma"] .lbName,
+body[data-theme="alinma"] .bankBrand,
+body[data-theme="alinma"] .cardNum,
+body[data-theme="alinma"] .cardMeta,
+body[data-theme="alinma"] .holder,
+body[data-theme="alinma"] .pdfTitle,
+body[data-theme="alinma"] .lbRank{
+  color:#5b3a29 !important;
+}
+body[data-theme="ahli"] .kpi .v,
+body[data-theme="ahli"] .aTitle,
+body[data-theme="ahli"] .lbName,
+body[data-theme="ahli"] .bankBrand,
+body[data-theme="ahli"] .cardNum,
+body[data-theme="ahli"] .cardMeta,
+body[data-theme="ahli"] .holder,
+body[data-theme="ahli"] .pdfTitle,
+body[data-theme="ahli"] .lbRank{
+  color:#005b45 !important;
+}
+body[data-theme="alinma"] .tableWrap{
+  background:#fffaf6;
+  border-color:#ead8ca;
+}
+body[data-theme="ahli"] .tableWrap{
+  background:#f5fffa;
+  border-color:#dbeee6;
+}
+body[data-theme="alinma"] th{
+  background:#f3e4d8;
+  color:#5b3a29;
+}
+body[data-theme="ahli"] th{
+  background:#e4f5ed;
+  color:#005b45;
+}
+body[data-theme="alinma"] .badge.on,
+body[data-theme="alinma"] .aBadge.ok{
+  background:#ead8ca;
+  color:#5b3a29;
+}
+body[data-theme="ahli"] .badge.on,
+body[data-theme="ahli"] .aBadge.ok{
+  background:#dff3ea;
+  color:#005b45;
+}
+body[data-theme="alinma"] .bankCard:before{
+  background:
+    radial-gradient(circle at 12% 18%, rgba(122,82,54,.24) 0%, rgba(122,82,54,0) 45%),
+    radial-gradient(circle at 88% 72%, rgba(91,58,41,.18) 0%, rgba(91,58,41,0) 48%),
+    linear-gradient(135deg, rgba(0,0,0,.00) 0%, rgba(0,0,0,.03) 100%);
+}
+body[data-theme="ahli"] .bankCard:before{
+  background:
+    radial-gradient(circle at 12% 18%, rgba(11,138,99,.20) 0%, rgba(11,138,99,0) 45%),
+    radial-gradient(circle at 88% 72%, rgba(0,91,69,.16) 0%, rgba(0,91,69,0) 48%),
+    linear-gradient(135deg, rgba(0,0,0,.00) 0%, rgba(0,0,0,.03) 100%);
+}
+body[data-theme="alinma"] .chip{
+  background:linear-gradient(180deg,#d7b28e,#a67855);
+}
+body[data-theme="ahli"] .chip{
+  background:linear-gradient(180deg,#b5e2d1,#5ba98a);
+}
+body[data-theme="alinma"] .footerLinks{
+  background:rgba(91,58,41,.08);
+  border-color:rgba(91,58,41,.16);
+}
+body[data-theme="ahli"] .footerLinks{
+  background:rgba(0,91,69,.06);
+  border-color:rgba(0,91,69,.16);
+}
+body[data-theme="alinma"] .footerLinks a,
+body[data-theme="alinma"] .footerNote{
+  color:#5b3a29;
+}
+body[data-theme="ahli"] .footerLinks a,
+body[data-theme="ahli"] .footerNote{
+  color:#005b45;
+}
+body[data-theme="alinma"] .themeTile{
+  background:linear-gradient(180deg,#fffdfa,#f8efe7);
+}
+body[data-theme="ahli"] .themeTile{
+  background:linear-gradient(180deg,#ffffff,#eef8f3);
+}
+</style>
+
 </head><body>
 <div class="paper">
   <div class="head">
@@ -3576,6 +4023,33 @@ document.addEventListener("DOMContentLoaded", async()=>{
 <script>
   window.onload = ()=>{ setTimeout(()=>window.print(), 300); };
 <\/script>
+
+<script>
+function setBankTheme(theme){
+  const body=document.body;
+  body.removeAttribute("data-theme");
+  if(theme!=="default"){body.setAttribute("data-theme",theme);}
+  localStorage.setItem("BANK_THEME",theme);
+}
+function loadBankTheme(){
+  const t=localStorage.getItem("BANK_THEME")||"default";
+  if(t!=="default"){document.body.setAttribute("data-theme",t);}
+}
+document.addEventListener("DOMContentLoaded",loadBankTheme);
+</script>
+<style>
+body[data-theme="alinma"]{
+background:linear-gradient(180deg,#4a2d20 0%, #6a422f 24%, #f8f2ec 24%);
+--navy:#5b3a29;
+--green:#8b6a4b;
+}
+body[data-theme="ahli"]{
+background:linear-gradient(180deg,#014c39 0%, #0b6d52 24%, #f6fbf8 24%);
+--navy:#005b45;
+--green:#0b8a63;
+}
+</style>
+
 </body></html>`);
       w.document.close();
     }
@@ -5217,7 +5691,8 @@ function renderRoulettePane(){
       {id:'teacher-manage', label:'إدارة الفصول', childIndex:3},
       {id:'teacher-tabs', label:'الفصول', selector:'#classTabs', wrap:true, wrapTitle:'الفصول — اضغطي على اسم الفصل للدخول مباشرة'},
       {id:'teacher-quick', label:'إعدادات سريعة', childIndex:5},
-      {id:'teacher-freeze', label:'تجميد الحساب', selector:'#freezeAccountCard'}
+      {id:'teacher-freeze', label:'تجميد الحساب', selector:'#freezeAccountCard'},
+      {id:'teacher-theme', label:'ألوان البنك', selector:'#themeBankCard'}
     ]);
   }
 
@@ -5263,7 +5738,8 @@ function renderRoulettePane(){
       {id:'teacher-manage', label:'إدارة الفصول'},
       {id:'teacher-tabs', label:'الفصول'},
       {id:'teacher-quick', label:'إعدادات سريعة'},
-      {id:'teacher-freeze', label:'تجميد الحساب'}
+      {id:'teacher-freeze', label:'تجميد الحساب'},
+      {id:'teacher-theme', label:'ألوان البنك'}
     ];
     teacherLinks.forEach((item, idx)=>{
       const btn = document.createElement('button');
@@ -5667,5 +6143,32 @@ function renderRoulettePane(){
 })();
 
 </script>
+
+<script>
+function setBankTheme(theme){
+  const body=document.body;
+  body.removeAttribute("data-theme");
+  if(theme!=="default"){body.setAttribute("data-theme",theme);}
+  localStorage.setItem("BANK_THEME",theme);
+}
+function loadBankTheme(){
+  const t=localStorage.getItem("BANK_THEME")||"default";
+  if(t!=="default"){document.body.setAttribute("data-theme",t);}
+}
+document.addEventListener("DOMContentLoaded",loadBankTheme);
+</script>
+<style>
+body[data-theme="alinma"]{
+background:linear-gradient(180deg,#4a2d20 0%, #6a422f 24%, #f8f2ec 24%);
+--navy:#5b3a29;
+--green:#8b6a4b;
+}
+body[data-theme="ahli"]{
+background:linear-gradient(180deg,#014c39 0%, #0b6d52 24%, #f6fbf8 24%);
+--navy:#005b45;
+--green:#0b8a63;
+}
+</style>
+
 </body>
 </html>
