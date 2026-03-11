@@ -791,7 +791,7 @@ body[data-theme="ahli"] .themeTile{
         </div>
 
         <div class="startActions">
-          <button class="btn" id="startBtn" type="button" onclick="startAppSafe(); return false;">ابدأ الآن</button>
+          <button class="btn" type="button" onclick="startAppSafe()">ابدأ الآن</button>
           <button class="ghostBtn" onclick="openHelp()">هل تحتاج إلى مساعدة؟</button>
         </div>
       </div>
@@ -4020,11 +4020,11 @@ body[data-theme="ahli"] .themeTile{
     <div class="sigBox" style="text-align:left;direction:ltr">التاريخ<br>${greg}</div>
   </div>
 </div>
-<script>
+<scr"+"ipt>
   window.onload = ()=>{ setTimeout(()=>window.print(), 300); };
-<\/script>
+<\/scr"+"ipt>
 
-<script>
+<scr"+"ipt>
 function setBankTheme(theme){
   const body=document.body;
   body.removeAttribute("data-theme");
@@ -4036,7 +4036,7 @@ function loadBankTheme(){
   if(t!=="default"){document.body.setAttribute("data-theme",t);}
 }
 document.addEventListener("DOMContentLoaded",loadBankTheme);
-</script>
+<\/scr"+"ipt>
 <style>
 body[data-theme="alinma"]{
 background:linear-gradient(180deg,#4a2d20 0%, #6a422f 24%, #f8f2ec 24%);
@@ -6140,27 +6140,6 @@ function renderRoulettePane(){
 
   // في حال زر البداية كان مرتبط بدالة مختلفة بالخطأ، اربطها هنا أيضاً
   window.startAppSafe = window.startApp;
-
-  // ربط إضافي لزر البداية لزيادة التوافق مع iPhone / Safari
-  function bindStartButtonSafe(){
-    try{
-      const btn = document.getElementById("startBtn");
-      if(!btn || btn.dataset.bound === "1") return;
-      const handler = function(ev){
-        try{ if(ev){ ev.preventDefault(); ev.stopPropagation(); } }catch(e){}
-        try{ window.startAppSafe(); }catch(e){ try{ window.startApp(); }catch(_){} }
-        return false;
-      };
-      btn.dataset.bound = "1";
-      btn.addEventListener("click", handler, {passive:false});
-      btn.addEventListener("touchend", handler, {passive:false});
-      btn.addEventListener("pointerup", handler, {passive:false});
-    }catch(e){}
-  }
-
-  if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", bindStartButtonSafe);
-  else bindStartButtonSafe();
-  window.addEventListener("pageshow", bindStartButtonSafe);
 })();
 
 </script>
