@@ -985,8 +985,8 @@ function spinRoulette(){
     const sliceDeg = 360 / rouletteItems.length;
     const index = Math.floor(((pointerAngle + sliceDeg/2) % 360) / sliceDeg);
     const item = rouletteItems[index];
-    result.textContent = `النتيجة: ${item.label}`;
-    showRouletteModal(item.label);
+    result.textContent = `🎉 تهانينا\nتم الفوز بـ: ${item.label}`;
+    showRouletteModal('🎉 تهانينا\nتم الفوز بـ: ' + item.label);
     rouletteBusy = false;
   }, 4400);
 }
@@ -1038,8 +1038,8 @@ function toggleLanguage(){
 
 <div id="rouletteModal" class="roulette-modal">
   <div class="roulette-modal-box">
-    <div class="roulette-modal-title">مبروك 🎉</div>
-    <div id="rouletteModalText" class="roulette-modal-text">نتيجة الفوز: ٢٠٠</div>
+    <div class="roulette-modal-title">🎉 تهانينا</div>
+    <div id="rouletteModalText" class="roulette-modal-text">تم الفوز بـ: الجائزة</div>
     <button class="btn btn-gold" type="button" onclick="closeRouletteModal()">حسنًا</button>
   </div>
 </div>
