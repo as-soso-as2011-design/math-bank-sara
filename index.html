@@ -304,6 +304,13 @@ button,input,select{font-family:inherit}
 
 html[dir="ltr"] .top-tools{left:auto;right:20px}
 </style>
+
+<style>
+body{margin-top:0!important;padding-top:0!important;}
+.screen{margin-top:0!important;padding-top:0!important;}
+.topbar{margin-top:0!important;}
+</style>
+
 </head>
 <body>
 <div class="app">
@@ -781,5 +788,21 @@ function convertDigitsToArabic(root=document.body){
 
 window.addEventListener('load', convertDigitsToArabic);
 </script>
+
+<script>
+function toArabicDigits(str){
+ const map={'0':'٠','1':'١','2':'٢','3':'٣','4':'٤','5':'٥','6':'٦','7':'٧','8':'٨','9':'٩'};
+ return str.replace(/[0-9]/g,d=>map[d]);
+}
+function convertPageNumbers(){
+ document.querySelectorAll("body *").forEach(el=>{
+   if(el.children.length===0){
+     el.textContent=toArabicDigits(el.textContent);
+   }
+ });
+}
+document.addEventListener("DOMContentLoaded",convertPageNumbers);
+</script>
+
 </body>
 </html>
