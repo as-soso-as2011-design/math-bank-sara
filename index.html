@@ -791,7 +791,7 @@ body[data-theme="ahli"] .themeTile{
         </div>
 
         <div class="startActions">
-          <button class="btn" onclick="startAppDirect()">ابدأ الآن</button>
+          <button class="btn" onclick="startAppSafe()">ابدأ الآن</button>
           <button class="ghostBtn" onclick="openHelp()">هل تحتاج إلى مساعدة؟</button>
         </div>
       </div>
@@ -4035,21 +4035,110 @@ function loadBankTheme(){
   const t=localStorage.getItem("BANK_THEME")||"default";
   if(t!=="default"){document.body.setAttribute("data-theme",t);}
 }
-document.addEventListener("DOMContentLoaded",loadBankTheme);
-</script>
-<style>
-body[data-theme="alinma"]{
-background:linear-gradient(180deg,#4a2d20 0%, #6a422f 24%, #f8f2ec 24%);
---navy:#5b3a29;
---green:#8b6a4b;
-}
-body[data-theme="ahli"]{
-background:linear-gradient(180deg,#014c39 0%, #0b6d52 24%, #f6fbf8 24%);
---navy:#005b45;
---green:#0b8a63;
-}
-</style>
 
+<script id="oai-safe-fixes-v1">
+(function(){
+  function $(id){ return document.getElementById(id); }
+  function showOnly(id){
+    ["startOverlay","onboardOverlay","teacherLoginPage","studentLoginPage","classesPage","classPage","studentAccountPage","dailyOpsPage"].forEach(function(pid){
+      var el=$(pid); if(!el) return;
+      if(pid===id){ el.classList.remove("hidden"); el.style.display=""; }
+      else { el.classList.add("hidden"); el.style.display="none"; }
+    });
+  }
+  function getThemeFromUrl(){
+    try{
+      var p = new URLSearchParams(location.search);
+      return p.get("theme") || "";
+    }catch(e){ return ""; }
+  }
+  function persistTheme(theme){
+    try{ localStorage.setItem("BANK_THEME", theme || "default"); }catch(e){}
+    try{
+      var u = new URL(location.href);
+      if(theme && theme!=="default") u.searchParams.set("theme", theme);
+      else u.searchParams.delete("theme");
+      history.replaceState(null,"",u.toString());
+    }catch(e){}
+  }
+  window.setBankTheme = function(theme){
+    theme = theme || "default";
+    document.body.removeAttribute("data-theme");
+    if(theme!=="default"){ document.body.setAttribute("data-theme", theme); }
+    persistTheme(theme);
+  };
+  window.loadBankTheme = function(){
+    var theme = getThemeFromUrl();
+    if(!theme){
+      try{ theme = localStorage.getItem("BANK_THEME") || "default"; }catch(e){ theme="default"; }
+    }
+    window.setBankTheme(theme);
+  };
+
+  window.startAppSafe = function(){
+    try{
+      var so = $("startOverlay");
+      if(so){ so.classList.add("hidden"); so.style.display="none"; }
+      var ob = $("onboardOverlay");
+      if(ob){ ob.classList.add("hidden"); ob.style.display="none"; }
+      if(window.IS_STUDENT_ENTRY){
+        showOnly("studentLoginPage");
+        window.currentAccess = "student";
+      }else{
+        showOnly("teacherLoginPage");
+        window.currentAccess = "teacher";
+      }
+      return false;
+    }catch(err){
+      console.error("startAppSafe error", err);
+      return false;
+    }
+  };
+
+  function bindStart(){
+    var btn = document.querySelector('#startOverlay .btn');
+    if(!btn) return;
+    btn.setAttribute("type","button");
+    btn.onclick = function(ev){ if(ev) ev.preventDefault(); return window.startAppSafe(); };
+    ["click","touchend","pointerup"].forEach(function(evt){
+      btn.addEventListener(evt, function(ev){ if(ev) ev.preventDefault(); window.startAppSafe(); }, {passive:false});
+    });
+  }
+
+  function directModeEntry(){
+    try{
+      var params = new URLSearchParams(location.search);
+      var mode = params.get("mode");
+      if(mode==="teacher"){
+        setTimeout(function(){
+          var so = $("startOverlay"); if(so){ so.classList.add("hidden"); so.style.display="none"; }
+          var ob = $("onboardOverlay"); if(ob){ ob.classList.add("hidden"); ob.style.display="none"; }
+          showOnly("teacherLoginPage");
+          window.currentAccess = "teacher";
+        }, 40);
+      }else if(mode==="student"){
+        setTimeout(function(){
+          var so = $("startOverlay"); if(so){ so.classList.add("hidden"); so.style.display="none"; }
+          var ob = $("onboardOverlay"); if(ob){ ob.classList.add("hidden"); ob.style.display="none"; }
+          showOnly("studentLoginPage");
+          window.currentAccess = "student";
+        }, 40);
+      }
+    }catch(e){}
+  }
+
+  document.addEventListener("DOMContentLoaded", function(){
+    window.loadBankTheme();
+    bindStart();
+    directModeEntry();
+  });
+  window.addEventListener("pageshow", function(){
+    window.loadBankTheme();
+    bindStart();
+    directModeEntry();
+  });
+})();
+</script>
 </body></html>`);
       w.document.close();
     }
@@ -6170,48 +6259,5 @@ background:linear-gradient(180deg,#014c39 0%, #0b6d52 24%, #f6fbf8 24%);
 }
 </style>
 
-
-<script>
-(function(){
-  function directGo(){
-    try{
-      var so=document.getElementById('startOverlay');
-      if(so){ so.classList.add('hidden'); so.style.display='none'; so.style.visibility='hidden'; so.style.pointerEvents='none'; }
-    }catch(e){}
-    try{
-      if(typeof hideAllPages==='function') hideAllPages();
-    }catch(e){}
-    try{
-      var target=(window.IS_STUDENT_ENTRY?'studentLoginPage':'teacherLoginPage');
-      var other=(window.IS_STUDENT_ENTRY?'teacherLoginPage':'studentLoginPage');
-      var t=document.getElementById(target);
-      var o=document.getElementById(other);
-      if(o) o.classList.add('hidden');
-      if(t){ t.classList.remove('hidden'); t.style.display=''; }
-      window.currentAccess = window.IS_STUDENT_ENTRY ? 'student' : 'teacher';
-      return false;
-    }catch(e){ return false; }
-  }
-  window.startAppDirect = directGo;
-  document.addEventListener('DOMContentLoaded', function(){
-    var btn=document.querySelector('#startOverlay .btn');
-    if(btn){
-      btn.setAttribute('type','button');
-      btn.onclick=directGo;
-      ['click','touchend','pointerup'].forEach(function(ev){
-        btn.addEventListener(ev,function(e){ e.preventDefault(); directGo(); },{passive:false});
-      });
-    }
-    // لو دخل المستخدم برابط فيه mode افتح مباشرة بدون شاشة البداية
-    try{
-      var q=new URLSearchParams(location.search);
-      if(q.get('mode')==='teacher' || q.get('mode')==='student'){
-        window.IS_STUDENT_ENTRY=(q.get('mode')==='student');
-        setTimeout(directGo, 50);
-      }
-    }catch(e){}
-  });
-})();
-</script>
 </body>
 </html>
