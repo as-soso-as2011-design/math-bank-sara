@@ -1852,9 +1852,18 @@ body[data-theme="ahli"] .themeTile{
           try{
             const u = new URL(window.location.href);
             u.searchParams.set("mode","student");
+            try{
+              const th = u.searchParams.get("theme") || localStorage.getItem("BANK_THEME") || "default";
+              if(th === "default") u.searchParams.delete("theme"); else u.searchParams.set("theme", th);
+            }catch(e){}
             window.location.href = u.toString();
           }catch(e){
-            window.location.href = window.location.pathname + "?mode=student";
+            try{
+              const th = localStorage.getItem("BANK_THEME") || "default";
+              window.location.href = window.location.pathname + "?mode=student" + (th && th !== "default" ? "&theme=" + encodeURIComponent(th) : "");
+            }catch(e){
+              window.location.href = window.location.pathname + "?mode=student";
+            }
           }
         }
       };
@@ -3511,6 +3520,10 @@ document.addEventListener("DOMContentLoaded", async()=>{
         mp.addEventListener("click", ()=>{
           const u = new URL(window.location.href);
           u.searchParams.set("mode", IS_STUDENT_ENTRY ? "teacher" : "student");
+          try{
+            const th = u.searchParams.get("theme") || localStorage.getItem("BANK_THEME") || "default";
+            if(th === "default") u.searchParams.delete("theme"); else u.searchParams.set("theme", th);
+          }catch(e){}
           window.location.href = u.toString();
         });
       }
@@ -6149,11 +6162,39 @@ function setBankTheme(theme){
   const body=document.body;
   body.removeAttribute("data-theme");
   if(theme!=="default"){body.setAttribute("data-theme",theme);}
-  localStorage.setItem("BANK_THEME",theme);
+  try{ localStorage.setItem("BANK_THEME",theme); }catch(e){}
+  try{
+    const u = new URL(window.location.href);
+    if(theme === "default") u.searchParams.delete("theme");
+    else u.searchParams.set("theme", theme);
+    history.replaceState({}, "", u.toString());
+  }catch(e){}
+  try{
+    const badge = document.getElementById("themeStateBadge");
+    if(badge){
+      const map = {default:"الأزرق الأساسي", alinma:"البني - الإنماء", ahli:"الأخضر - الأهلي"};
+      badge.textContent = "الثيم الحالي: " + (map[theme] || map.default);
+    }
+  }catch(e){}
 }
 function loadBankTheme(){
-  const t=localStorage.getItem("BANK_THEME")||"default";
+  let t = "default";
+  try{
+    const u = new URL(window.location.href);
+    t = u.searchParams.get("theme") || localStorage.getItem("BANK_THEME") || "default";
+  }catch(e){
+    t = localStorage.getItem("BANK_THEME") || "default";
+  }
+  document.body.removeAttribute("data-theme");
   if(t!=="default"){document.body.setAttribute("data-theme",t);}
+  try{ localStorage.setItem("BANK_THEME", t); }catch(e){}
+  try{
+    const badge = document.getElementById("themeStateBadge");
+    if(badge){
+      const map = {default:"الأزرق الأساسي", alinma:"البني - الإنماء", ahli:"الأخضر - الأهلي"};
+      badge.textContent = "الثيم الحالي: " + (map[t] || map.default);
+    }
+  }catch(e){}
 }
 document.addEventListener("DOMContentLoaded",loadBankTheme);
 </script>
@@ -6168,6 +6209,12 @@ background:linear-gradient(180deg,#014c39 0%, #0b6d52 24%, #f6fbf8 24%);
 --navy:#005b45;
 --green:#0b8a63;
 }
+body[data-theme="alinma"] #startOverlay{background:radial-gradient(circle at top, #7a5236 0%, #5b3a29 55%, #2f1d15 100%) !important;}
+body[data-theme="ahli"] #startOverlay{background:radial-gradient(circle at top, #0b8a63 0%, #005b45 55%, #013528 100%) !important;}
+body[data-theme="alinma"] .authHead{background:linear-gradient(90deg,#5b3a29,#7a5236) !important;}
+body[data-theme="ahli"] .authHead{background:linear-gradient(90deg,#005b45,#0b8a63) !important;}
+body[data-theme="alinma"] .pill{background:rgba(122,82,54,.28);border-color:rgba(255,255,255,.18) !important;}
+body[data-theme="ahli"] .pill{background:rgba(11,138,99,.24);border-color:rgba(255,255,255,.18) !important;}
 </style>
 
 </body>
