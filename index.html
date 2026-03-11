@@ -3322,7 +3322,7 @@ async function renderStudents(){
       showOnboarding(()=>{
         hideAllPages();
         if(IS_STUDENT_ENTRY){ show("studentLoginPage"); currentAccess="student"; }
-        else{ alert("هذه الصفحة خاصة بالمعلمة"); currentAccess="teacher"; }
+        else{ show("teacherLoginPage"); currentAccess="teacher"; }
       });
     }
 
@@ -6090,7 +6090,7 @@ function renderRoulettePane(){
     try{
       if(typeof show === "function"){
         if(window.IS_STUDENT_ENTRY){ show("studentLoginPage"); window.currentAccess="student"; }
-        else{ alert("هذه الصفحة خاصة بالمعلمة"); window.currentAccess="teacher"; }
+        else{ show("teacherLoginPage"); window.currentAccess="teacher"; }
         return;
       }
     }catch(e){}
