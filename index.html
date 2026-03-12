@@ -415,10 +415,11 @@ html[dir="ltr"] .balance-head{direction:ltr}
 .analysis-pie-wrap{max-width:220px;margin:0 auto}
 
 
-.chart-wrap{height:260px;position:relative}
-.analysis-pie-wrap{height:240px;position:relative}
+.analysis-card .chart-wrap{height:260px;position:relative}
+.analysis-card .analysis-pie-wrap{height:240px;position:relative}
+.analysis-card canvas{display:block;max-width:100%}
+.roulette-spin-btn{width:220px;font-weight:900;font-size:16px}
 </style>
-
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
@@ -632,16 +633,11 @@ html[dir="ltr"] .balance-head{direction:ltr}
     <div class="roulette-pointer-wrap"><div class="roulette-pointer"></div></div>
     <div class="roulette-lights">
       <canvas id="rouletteWheel" width="320" height="320" aria-label="روليت الهدايا"></canvas>
-<button class="btn btn-gold roulette-spin-btn" onclick="spinRoulette()" style="margin-top:14px">تشغيل الروليت</button>
     </div>
-    
+    <button class="btn btn-gold roulette-spin-btn" type="button" onclick="spinRoulette()">تشغيل الروليت</button>
     <div id="rouletteResult" class="roulette-result">اضغطي على تشغيل الروليت</div>
   </div>
 </div>
-</div>
-<div>🎡</div></div>
-      
-    </div>
 
     <div id="analysisTab" class="tab-content">
       <div class="section-head"><h3>تحليل بياناتي</h3><span class="pill">تحليل بياني</span></div>
@@ -1033,7 +1029,8 @@ document.addEventListener("DOMContentLoaded", drawRouletteWheel);
 function showRouletteModal(label){
   const modal = document.getElementById("rouletteModal");
   const text = document.getElementById("rouletteModalText");
-  if(text) text.textContent = `مبروك، نتيجة الفوز: ${label}`;
+  if(text) text.textContent = `🎉 تهانينا
+تم الفوز بـ: ${label}`;
   if(modal) modal.classList.add("show");
 }
 function closeRouletteModal(){
@@ -1084,129 +1081,44 @@ function toggleLanguage(){
 
 
 
+
+
+
 <script>
 document.addEventListener("DOMContentLoaded", function(){
-  const lineCanvas = document.getElementById("lineChart");
-  if (lineCanvas && typeof Chart !== "undefined") {
-    const existingLine = Chart.getChart(lineCanvas);
-    if (existingLine) existingLine.destroy();
-
-    new Chart(lineCanvas, {
-      type: "line",
-      data: {
-        labels: ["الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس"],
-        datasets: [
-          {
-            label: "إيداع",
-            data: [500, 300, 450, 600, 700],
-            borderColor: "#1f7f57",
-            backgroundColor: "rgba(31,127,87,0.14)",
-            fill: true,
-            tension: 0.4,
-            pointRadius: 4,
-            pointHoverRadius: 5
-          },
-          {
-            label: "سحب",
-            data: [50, 30, 60, 40, 20],
-            borderColor: "#b9514f",
-            backgroundColor: "rgba(185,81,79,0.10)",
-            fill: true,
-            tension: 0.4,
-            pointRadius: 4,
-            pointHoverRadius: 5
-          },
-          {
-            label: "تحويل",
-            data: [100, 80, 120, 60, 90],
-            borderColor: "#c7a465",
-            backgroundColor: "rgba(199,164,101,0.10)",
-            fill: true,
-            tension: 0.4,
-            pointRadius: 4,
-            pointHoverRadius: 5
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: { position: "bottom" }
+  if (typeof Chart !== "undefined") {
+    const lineCanvas = document.getElementById("lineChart");
+    if (lineCanvas) {
+      const oldLine = Chart.getChart(lineCanvas);
+      if (oldLine) oldLine.destroy();
+      new Chart(lineCanvas, {
+        type: "line",
+        data: {
+          labels: ["الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس"],
+          datasets: [
+            {label:"إيداع", data:[500,300,450,600,700], borderColor:"#1f7f57", backgroundColor:"rgba(31,127,87,.12)", fill:true, tension:.4, pointRadius:4},
+            {label:"سحب", data:[50,30,60,40,20], borderColor:"#b9514f", backgroundColor:"rgba(185,81,79,.08)", fill:true, tension:.4, pointRadius:4},
+            {label:"تحويل", data:[100,80,120,60,90], borderColor:"#c7a465", backgroundColor:"rgba(199,164,101,.10)", fill:true, tension:.4, pointRadius:4}
+          ]
         },
-        scales: {
-          y: { beginAtZero: true }
-        }
-      }
-    });
-  }
-
-  const pieCanvas = document.getElementById("pieChart");
-  if (pieCanvas && typeof Chart !== "undefined") {
-    const existingPie = Chart.getChart(pieCanvas);
-    if (existingPie) existingPie.destroy();
-
-    new Chart(pieCanvas, {
-      type: "doughnut",
-      data: {
-        labels: ["إيداع","سحب","تحويل"],
-        datasets: [{
-          data: [2300, 850, 420],
-          backgroundColor: ["#1f7f57","#b9514f","#c7a465"],
-          borderColor: "#ffffff",
-          borderWidth: 3,
-          hoverOffset: 6
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: true,
-        plugins: {
-          legend: { position: "bottom" }
+        options: {responsive:true, maintainAspectRatio:false, plugins:{legend:{position:"bottom"}}, scales:{y:{beginAtZero:true}}}
+      });
+    }
+    const pieCanvas = document.getElementById("pieChart");
+    if (pieCanvas) {
+      const oldPie = Chart.getChart(pieCanvas);
+      if (oldPie) oldPie.destroy();
+      new Chart(pieCanvas, {
+        type: "doughnut",
+        data: {
+          labels: ["إيداع","سحب","تحويل"],
+          datasets: [{data:[2300,850,420], backgroundColor:["#1f7f57","#b9514f","#c7a465"], borderColor:"#fff", borderWidth:3, hoverOffset:6}]
         },
-        cutout: "62%"
-      }
-    });
+        options: {responsive:true, maintainAspectRatio:false, plugins:{legend:{position:"bottom"}}, cutout:"60%"}
+      });
+    }
   }
-});
-</script>
-
-
-<script>
-document.addEventListener("DOMContentLoaded",function(){
-
- if(typeof Chart!=="undefined"){
-
-  const line=document.getElementById("lineChart");
-  if(line){
-   new Chart(line,{
-    type:"line",
-    data:{
-     labels:["الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس"],
-     datasets:[
-      {label:"إيداع",data:[500,300,450,600,700],borderColor:"#1f7f57",backgroundColor:"rgba(31,127,87,.12)",fill:true,tension:.4},
-      {label:"سحب",data:[50,30,60,40,20],borderColor:"#b9514f",backgroundColor:"rgba(185,81,79,.08)",fill:true,tension:.4},
-      {label:"تحويل",data:[100,80,120,60,90],borderColor:"#c7a465",backgroundColor:"rgba(199,164,101,.10)",fill:true,tension:.4}
-     ]
-    },
-    options:{responsive:true,plugins:{legend:{position:"bottom"}},scales:{y:{beginAtZero:true}}}
-   });
-  }
-
-  const pie=document.getElementById("pieChart");
-  if(pie){
-   new Chart(pie,{
-    type:"doughnut",
-    data:{
-     labels:["إيداع","سحب","تحويل"],
-     datasets:[{data:[2300,850,420],backgroundColor:["#1f7f57","#b9514f","#c7a465"]}]
-    },
-    options:{plugins:{legend:{position:"bottom"}},cutout:"60%"}
-   });
-  }
-
- }
-
+  if (typeof drawRouletteWheel === 'function') drawRouletteWheel();
 });
 </script>
 
