@@ -401,6 +401,19 @@ html[dir="ltr"] .balance-head{direction:ltr}
 .roulette-modal-text{font-size:17px;font-weight:800;color:var(--text);margin:0 0 18px;line-height:1.8}
 .roulette-result{min-height:24px;font-size:14px;font-weight:800;color:var(--deep);text-align:center}
 
+
+.analysis-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px}
+.analysis-kpi{background:#fff;border:1px solid var(--line);border-radius:20px;padding:12px;text-align:center;box-shadow:0 8px 18px rgba(16,58,46,.05)}
+.analysis-kpi strong{display:block;font-size:18px;color:var(--deep);margin-bottom:4px}
+.analysis-kpi span{display:block;font-size:11px;color:var(--muted);font-weight:700}
+.analysis-grid{display:grid;gap:12px}
+.analysis-card{background:#fff;border:1px solid var(--line);border-radius:22px;padding:12px;box-shadow:0 8px 18px rgba(16,58,46,.05)}
+.analysis-card h4{margin:0 0 10px;font-size:14px;color:var(--deep)}
+.analysis-progress-track{height:16px;background:#edf3ef;border-radius:999px;overflow:hidden}
+.analysis-progress-fill{height:100%;width:76.8%;background:linear-gradient(135deg,var(--gold),var(--gold2));border-radius:999px}
+.analysis-progress-meta{display:flex;justify-content:space-between;gap:10px;margin-top:8px;font-size:12px;color:var(--muted);font-weight:700}
+.analysis-pie-wrap{max-width:220px;margin:0 auto}
+
 </style>
 </head>
 <body>
@@ -614,10 +627,6 @@ html[dir="ltr"] .balance-head{direction:ltr}
     <div class="roulette-pointer-wrap"><div class="roulette-pointer"></div></div>
     <div class="roulette-lights">
       <canvas id="rouletteWheel" width="320" height="320" aria-label="روليت الهدايا"></canvas>
-    <button class="btn btn-gold roulette-spin-btn" onclick="spinRoulette()" style="margin-top:14px">
-    تشغيل الروليت
-    </button>
-    
     </div>
     
     <div id="rouletteResult" class="roulette-result">اضغطي على تشغيل الروليت</div>
@@ -630,10 +639,32 @@ html[dir="ltr"] .balance-head{direction:ltr}
 
     <div id="analysisTab" class="tab-content">
       <div class="section-head"><h3>تحليل بياناتي</h3><span class="pill">تحليل بياني</span></div>
-      <div class="chart-wrap"><canvas id="lineChart" class="chart-canvas"></canvas></div>
+      <div class="analysis-kpis">
+        <div class="analysis-kpi"><strong>٢٬٣٠٠</strong><span>إجمالي الإيداع</span></div>
+        <div class="analysis-kpi"><strong>٨٥٠</strong><span>إجمالي السحب</span></div>
+        <div class="analysis-kpi"><strong>٤٢٠</strong><span>إجمالي التحويل</span></div>
+      </div>
+      <div class="analysis-grid">
+        <div class="analysis-card">
+          <h4>الرسم البياني للعمليات</h4>
+          <div class="chart-wrap"><canvas id="lineChart" class="chart-canvas"></canvas></div>
+        </div>
+        <div class="analysis-card">
+          <h4>رسم دائري لتوزيع العمليات</h4>
+          <div class="analysis-pie-wrap"><canvas id="pieChart" width="220" height="220"></canvas></div>
+        </div>
+        <div class="analysis-card">
+          <h4>تقدم الرصيد نحو الترقية</h4>
+          <div class="analysis-progress-track"><div class="analysis-progress-fill"></div></div>
+          <div class="analysis-progress-meta">
+            <span>الرصيد الحالي: ٨٬٤٥٠ ر.س</span>
+            <span>المستوى التالي: ١١٬٠٠٠ ر.س</span>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <div id="redeemed" class="tab-content"> class="tab-content">
+    <div id="redeemed" class="tab-content"> class="tab-content"> class="tab-content">
       <div class="list">
         <div class="row"><div><div class="name">هدية تميز</div><div class="meta">تم الاستبدال بتاريخ 07 / 03 / 2026</div></div><div class="value red">-500 ر.س</div></div>
         <div class="row"><div><div class="name">بطاقة تعزيز</div><div class="meta">تم الاستبدال بتاريخ 02 / 03 / 2026</div></div><div class="value red">-300 ر.س</div></div>
@@ -1043,11 +1074,77 @@ function toggleLanguage(){
 <div id="rouletteModal" class="roulette-modal">
   <div class="roulette-modal-box">
     <div class="roulette-modal-title">🎉 تهانينا</div>
-    <div id="rouletteModalText" class="roulette-modal-text">🎉 تهانينا
-تم الفوز بـ: الجائزة</div>
+    <div id="rouletteModalText" class="roulette-modal-text">تم الفوز بـ: الجائزة</div>
     <button class="btn btn-gold" type="button" onclick="closeRouletteModal()">حسنًا</button>
   </div>
 </div>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function(){
+  const lineCtx = document.getElementById('lineChart');
+  if(lineCtx){
+    new Chart(lineCtx, {
+      type: 'line',
+      data: {
+        labels: ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس'],
+        datasets: [
+          {
+            label:'إيداع',
+            data:[500,300,450,600,700],
+            borderColor:'#1f7f57',
+            backgroundColor:'rgba(31,127,87,0.18)',
+            tension:0.4,
+            fill:true
+          },
+          {
+            label:'سحب',
+            data:[50,30,60,40,20],
+            borderColor:'#b9514f',
+            backgroundColor:'rgba(185,81,79,0.12)',
+            tension:0.4,
+            fill:true
+          },
+          {
+            label:'تحويل',
+            data:[100,80,120,60,90],
+            borderColor:'#c7a465',
+            backgroundColor:'rgba(199,164,101,0.12)',
+            tension:0.4,
+            fill:true
+          }
+        ]
+      },
+      options:{
+        responsive:true,
+        plugins:{legend:{position:'bottom'}},
+        scales:{y:{beginAtZero:true}}
+      }
+    });
+  }
+
+  const pieCtx = document.getElementById('pieChart');
+  if(pieCtx){
+    new Chart(pieCtx, {
+      type: 'doughnut',
+      data: {
+        labels: ['إيداع','سحب','تحويل'],
+        datasets: [{
+          data: [2300,850,420],
+          backgroundColor: ['#1f7f57','#b9514f','#c7a465'],
+          borderColor: '#ffffff',
+          borderWidth: 3,
+          hoverOffset: 6
+        }]
+      },
+      options:{
+        plugins:{legend:{position:'bottom'}},
+        cutout:'62%'
+      }
+    });
+  }
+});
+</script>
 
 </body>
 </html>
