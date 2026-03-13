@@ -455,6 +455,21 @@ html[dir="ltr"] .balance-head{direction:ltr}
 .chip-pill{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:999px;background:#edf6f0;color:var(--green);font-size:12px;font-weight:800}
 @media(max-width:820px){.teacher-grid,.teacher-actions,.teacher-kpis{grid-template-columns:1fr 1fr}}
 @media(max-width:560px){.teacher-grid,.teacher-actions,.teacher-kpis{grid-template-columns:1fr}}
+
+.teacher-subgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.teacher-chart-card{background:#fff;border:1px solid var(--line);border-radius:22px;padding:14px;box-shadow:0 8px 18px rgba(16,58,46,.05)}
+.teacher-chart-card h4{margin:0 0 10px;font-size:15px;color:var(--deep)}
+.teacher-mini-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px}
+.teacher-mini-kpi{background:#fff;border:1px solid var(--line);border-radius:20px;padding:12px;text-align:center;box-shadow:0 8px 18px rgba(16,58,46,.05)}
+.teacher-mini-kpi strong{display:block;font-size:20px;color:var(--deep);margin-bottom:4px}
+.teacher-mini-kpi span{display:block;font-size:11px;color:var(--muted);font-weight:700}
+.teacher-top-list{display:flex;flex-direction:column;gap:10px}
+.teacher-top-item{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid var(--line);background:#fff;border-radius:18px;padding:12px}
+.teacher-rank{width:34px;height:34px;border-radius:12px;background:linear-gradient(135deg,var(--gold),var(--gold2));display:grid;place-items:center;color:#fff;font-weight:900}
+.teacher-inline-actions{display:flex;gap:8px;flex-wrap:wrap}
+.teacher-note{font-size:12px;color:var(--muted);line-height:1.8;margin-top:8px}
+@media(max-width:820px){.teacher-mini-kpis,.teacher-subgrid{grid-template-columns:1fr}}
+
 </style>
 
 </head>
@@ -545,6 +560,36 @@ html[dir="ltr"] .balance-head{direction:ltr}
         <div class="selector-left"><div class="icon-box">👩🏻‍🏫</div><div><div class="selector-title">حساب المعلم / المعلمة</div><div class="selector-sub">دخول إداري لإدارة العمليات والحسابات</div></div></div>
         <div style="font-size:22px;color:var(--green)">‹</div>
       </div>
+    <div id="teacherPaneReports" class="teacher-pane card">
+      <div class="teacher-mini-kpis">
+        <div class="teacher-mini-kpi"><strong id="reportDeposits">0</strong><span>إجمالي الإيداع</span></div>
+        <div class="teacher-mini-kpi"><strong id="reportWithdrawals">0</strong><span>إجمالي السحب</span></div>
+        <div class="teacher-mini-kpi"><strong id="reportTransfers">0</strong><span>إجمالي التحويل</span></div>
+      </div>
+      <div class="teacher-grid">
+        <div class="teacher-chart-card">
+          <h4>تحليل العمليات حسب النوع</h4>
+          <canvas id="teacherOpsChart" width="320" height="220" style="width:100%;height:220px"></canvas>
+          <div class="teacher-note">يظهر هذا الرسم توزيع الإيداع والسحب والتحويل داخل النظام الحالي.</div>
+        </div>
+        <div class="teacher-chart-card">
+          <h4>لوحة الشرف التلقائية</h4>
+          <div class="teacher-top-list" id="teacherHonorList"></div>
+        </div>
+      </div>
+      <div class="teacher-grid" style="margin-top:12px">
+        <div class="teacher-chart-card">
+          <h4>ملخص الفصول</h4>
+          <div class="teacher-top-list" id="teacherClassBalances"></div>
+        </div>
+        <div class="teacher-chart-card">
+          <h4>روليت الجوائز — إعداد سريع</h4>
+          <div class="field"><label>جوائز الروليت</label><input id="roulettePrizesInput" type="text" placeholder="مثال: 100, 200, 500, هدية, حظ أوفر" /></div>
+          <button class="btn btn-gold" style="width:100%" onclick="saveRoulettePrizes()">حفظ جوائز الروليت</button>
+          <div id="rouletteMsg" class="notice ok hidden">تم حفظ جوائز الروليت</div>
+          <div class="teacher-note">هذه الإعدادات تُستخدم كمرجع سريع داخل النظام ويمكن تطويرها لاحقًا للروليت التفاعلي.</div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -575,6 +620,36 @@ html[dir="ltr"] .balance-head{direction:ltr}
       </div>
       <div class="login-links"><a href="#">تغيير كلمة المرور</a><a href="#">استرجاع كلمة المرور</a></div>
       <button class="btn btn-green" style="width:100%" onclick="studentLogin()">دخول الطالب / الطالبة</button><div id="studentLoginError" class="muted" style="color:#b9514f;margin-top:10px"></div>
+    <div id="teacherPaneReports" class="teacher-pane card">
+      <div class="teacher-mini-kpis">
+        <div class="teacher-mini-kpi"><strong id="reportDeposits">0</strong><span>إجمالي الإيداع</span></div>
+        <div class="teacher-mini-kpi"><strong id="reportWithdrawals">0</strong><span>إجمالي السحب</span></div>
+        <div class="teacher-mini-kpi"><strong id="reportTransfers">0</strong><span>إجمالي التحويل</span></div>
+      </div>
+      <div class="teacher-grid">
+        <div class="teacher-chart-card">
+          <h4>تحليل العمليات حسب النوع</h4>
+          <canvas id="teacherOpsChart" width="320" height="220" style="width:100%;height:220px"></canvas>
+          <div class="teacher-note">يظهر هذا الرسم توزيع الإيداع والسحب والتحويل داخل النظام الحالي.</div>
+        </div>
+        <div class="teacher-chart-card">
+          <h4>لوحة الشرف التلقائية</h4>
+          <div class="teacher-top-list" id="teacherHonorList"></div>
+        </div>
+      </div>
+      <div class="teacher-grid" style="margin-top:12px">
+        <div class="teacher-chart-card">
+          <h4>ملخص الفصول</h4>
+          <div class="teacher-top-list" id="teacherClassBalances"></div>
+        </div>
+        <div class="teacher-chart-card">
+          <h4>روليت الجوائز — إعداد سريع</h4>
+          <div class="field"><label>جوائز الروليت</label><input id="roulettePrizesInput" type="text" placeholder="مثال: 100, 200, 500, هدية, حظ أوفر" /></div>
+          <button class="btn btn-gold" style="width:100%" onclick="saveRoulettePrizes()">حفظ جوائز الروليت</button>
+          <div id="rouletteMsg" class="notice ok hidden">تم حفظ جوائز الروليت</div>
+          <div class="teacher-note">هذه الإعدادات تُستخدم كمرجع سريع داخل النظام ويمكن تطويرها لاحقًا للروليت التفاعلي.</div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -607,6 +682,36 @@ html[dir="ltr"] .balance-head{direction:ltr}
       <div class="login-links"><a href="#">تغيير كلمة المرور</a><a href="#">استرجاع كلمة المرور</a></div>
       <button class="btn btn-gold" style="width:100%" onclick="teacherLogin()">دخول المعلم / المعلمة</button>
       <div id="teacherLoginError" class="muted" style="color:#b9514f;margin-top:10px"></div>
+    <div id="teacherPaneReports" class="teacher-pane card">
+      <div class="teacher-mini-kpis">
+        <div class="teacher-mini-kpi"><strong id="reportDeposits">0</strong><span>إجمالي الإيداع</span></div>
+        <div class="teacher-mini-kpi"><strong id="reportWithdrawals">0</strong><span>إجمالي السحب</span></div>
+        <div class="teacher-mini-kpi"><strong id="reportTransfers">0</strong><span>إجمالي التحويل</span></div>
+      </div>
+      <div class="teacher-grid">
+        <div class="teacher-chart-card">
+          <h4>تحليل العمليات حسب النوع</h4>
+          <canvas id="teacherOpsChart" width="320" height="220" style="width:100%;height:220px"></canvas>
+          <div class="teacher-note">يظهر هذا الرسم توزيع الإيداع والسحب والتحويل داخل النظام الحالي.</div>
+        </div>
+        <div class="teacher-chart-card">
+          <h4>لوحة الشرف التلقائية</h4>
+          <div class="teacher-top-list" id="teacherHonorList"></div>
+        </div>
+      </div>
+      <div class="teacher-grid" style="margin-top:12px">
+        <div class="teacher-chart-card">
+          <h4>ملخص الفصول</h4>
+          <div class="teacher-top-list" id="teacherClassBalances"></div>
+        </div>
+        <div class="teacher-chart-card">
+          <h4>روليت الجوائز — إعداد سريع</h4>
+          <div class="field"><label>جوائز الروليت</label><input id="roulettePrizesInput" type="text" placeholder="مثال: 100, 200, 500, هدية, حظ أوفر" /></div>
+          <button class="btn btn-gold" style="width:100%" onclick="saveRoulettePrizes()">حفظ جوائز الروليت</button>
+          <div id="rouletteMsg" class="notice ok hidden">تم حفظ جوائز الروليت</div>
+          <div class="teacher-note">هذه الإعدادات تُستخدم كمرجع سريع داخل النظام ويمكن تطويرها لاحقًا للروليت التفاعلي.</div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -798,6 +903,36 @@ html[dir="ltr"] .balance-head{direction:ltr}
       <div class="level"><div><div class="name">ذهبي</div><div class="meta">من 16,000 إلى 30,000 ر.س</div></div><div class="badge-tier gold-tier">Gold</div></div>
       <div class="level"><div><div class="name">بلاتيني</div><div class="meta">من 31,000 إلى 40,000 ر.س</div></div><div class="badge-tier platinum">Platinum</div></div>
       <div class="level"><div><div class="name">ألماسي</div><div class="meta">41,000 ر.س فأكثر</div></div><div class="badge-tier diamond">Diamond</div></div>
+    <div id="teacherPaneReports" class="teacher-pane card">
+      <div class="teacher-mini-kpis">
+        <div class="teacher-mini-kpi"><strong id="reportDeposits">0</strong><span>إجمالي الإيداع</span></div>
+        <div class="teacher-mini-kpi"><strong id="reportWithdrawals">0</strong><span>إجمالي السحب</span></div>
+        <div class="teacher-mini-kpi"><strong id="reportTransfers">0</strong><span>إجمالي التحويل</span></div>
+      </div>
+      <div class="teacher-grid">
+        <div class="teacher-chart-card">
+          <h4>تحليل العمليات حسب النوع</h4>
+          <canvas id="teacherOpsChart" width="320" height="220" style="width:100%;height:220px"></canvas>
+          <div class="teacher-note">يظهر هذا الرسم توزيع الإيداع والسحب والتحويل داخل النظام الحالي.</div>
+        </div>
+        <div class="teacher-chart-card">
+          <h4>لوحة الشرف التلقائية</h4>
+          <div class="teacher-top-list" id="teacherHonorList"></div>
+        </div>
+      </div>
+      <div class="teacher-grid" style="margin-top:12px">
+        <div class="teacher-chart-card">
+          <h4>ملخص الفصول</h4>
+          <div class="teacher-top-list" id="teacherClassBalances"></div>
+        </div>
+        <div class="teacher-chart-card">
+          <h4>روليت الجوائز — إعداد سريع</h4>
+          <div class="field"><label>جوائز الروليت</label><input id="roulettePrizesInput" type="text" placeholder="مثال: 100, 200, 500, هدية, حظ أوفر" /></div>
+          <button class="btn btn-gold" style="width:100%" onclick="saveRoulettePrizes()">حفظ جوائز الروليت</button>
+          <div id="rouletteMsg" class="notice ok hidden">تم حفظ جوائز الروليت</div>
+          <div class="teacher-note">هذه الإعدادات تُستخدم كمرجع سريع داخل النظام ويمكن تطويرها لاحقًا للروليت التفاعلي.</div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -826,6 +961,36 @@ html[dir="ltr"] .balance-head{direction:ltr}
       <div class="rank"><div class="rank-num">3</div><div class="rank-info"><strong>جود</strong><span>9010 نقطة • وسام التفوق</span></div><div>✨</div></div>
       <div class="rank"><div class="rank-num">4</div><div class="rank-info"><strong>ريم</strong><span>8740 نقطة • وسام الالتزام</span></div><div>💫</div></div>
       <div class="rank"><div class="rank-num">5</div><div class="rank-info"><strong>تالا</strong><span>8600 نقطة • وسام الحضور</span></div><div>⭐</div></div>
+    <div id="teacherPaneReports" class="teacher-pane card">
+      <div class="teacher-mini-kpis">
+        <div class="teacher-mini-kpi"><strong id="reportDeposits">0</strong><span>إجمالي الإيداع</span></div>
+        <div class="teacher-mini-kpi"><strong id="reportWithdrawals">0</strong><span>إجمالي السحب</span></div>
+        <div class="teacher-mini-kpi"><strong id="reportTransfers">0</strong><span>إجمالي التحويل</span></div>
+      </div>
+      <div class="teacher-grid">
+        <div class="teacher-chart-card">
+          <h4>تحليل العمليات حسب النوع</h4>
+          <canvas id="teacherOpsChart" width="320" height="220" style="width:100%;height:220px"></canvas>
+          <div class="teacher-note">يظهر هذا الرسم توزيع الإيداع والسحب والتحويل داخل النظام الحالي.</div>
+        </div>
+        <div class="teacher-chart-card">
+          <h4>لوحة الشرف التلقائية</h4>
+          <div class="teacher-top-list" id="teacherHonorList"></div>
+        </div>
+      </div>
+      <div class="teacher-grid" style="margin-top:12px">
+        <div class="teacher-chart-card">
+          <h4>ملخص الفصول</h4>
+          <div class="teacher-top-list" id="teacherClassBalances"></div>
+        </div>
+        <div class="teacher-chart-card">
+          <h4>روليت الجوائز — إعداد سريع</h4>
+          <div class="field"><label>جوائز الروليت</label><input id="roulettePrizesInput" type="text" placeholder="مثال: 100, 200, 500, هدية, حظ أوفر" /></div>
+          <button class="btn btn-gold" style="width:100%" onclick="saveRoulettePrizes()">حفظ جوائز الروليت</button>
+          <div id="rouletteMsg" class="notice ok hidden">تم حفظ جوائز الروليت</div>
+          <div class="teacher-note">هذه الإعدادات تُستخدم كمرجع سريع داخل النظام ويمكن تطويرها لاحقًا للروليت التفاعلي.</div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -857,6 +1022,7 @@ html[dir="ltr"] .balance-head{direction:ltr}
         <button onclick="showTeacherPane('teacherPaneStudents', this)">إدارة الطلاب</button>
         <button onclick="showTeacherPane('teacherPaneOps', this)">العمليات البنكية</button>
         <button onclick="showTeacherPane('teacherPaneWA', this)">واتساب</button>
+        <button onclick="showTeacherPane('teacherPaneReports', this)">التقارير الذكية</button>
       </div>
     </div>
 
@@ -900,11 +1066,18 @@ html[dir="ltr"] .balance-head{direction:ltr}
           <div class="field"><label>الرصيد الافتتاحي</label><input id="studentBalanceInput" type="number" placeholder="0" /></div>
           <button class="btn btn-green" style="width:100%" onclick="addStudent()">إضافة الطالب</button>
           <div id="studentMsg" class="notice ok hidden">تمت إضافة الطالب بنجاح</div>
+          <div class="teacher-note">يمكنك من هنا أيضًا نقل الطالب بين الفصول بدون حذف بياناته.</div>
+          <div class="teacher-subgrid">
+            <div class="field"><label>نقل الطالب / الطالبة</label><select id="moveStudentSelect"></select></div>
+            <div class="field"><label>إلى الفصل</label><select id="moveTargetClass"></select></div>
+          </div>
+          <button class="btn btn-gold" style="width:100%" onclick="moveStudentToClass()">نقل الطالب بين الفصول</button>
+          <div id="moveMsg" class="notice ok hidden">تم نقل الطالب بنجاح</div>
         </div>
         <div class="teacher-box">
           <h3>قائمة الطلاب</h3>
           <div class="field"><label>تصفية حسب الفصل</label><select id="studentFilterClass" onchange="renderStudentsManager()"></select></div>
-          <div style="overflow:auto"><table class="teacher-table"><thead><tr><th>الاسم</th><th>الفصل</th><th>الرصيد</th><th>ولي الأمر</th><th>حذف</th></tr></thead><tbody id="studentsTableBody"></tbody></table></div>
+          <div style="overflow:auto"><table class="teacher-table"><thead><tr><th>الاسم</th><th>اسم المستخدم</th><th>الفصل</th><th>الرصيد</th><th>ولي الأمر</th><th>حذف</th></tr></thead><tbody id="studentsTableBody"></tbody></table></div>
         </div>
       </div>
     </div>
@@ -946,6 +1119,40 @@ html[dir="ltr"] .balance-head{direction:ltr}
           <div class="field"><label>الطالب / الطالبة</label><select id="waStudentSelect"></select></div>
           <div class="field"><label>الرسالة</label><input id="waCustomMessage" type="text" placeholder="اكتبي رسالة مخصصة" /></div>
           <button class="btn btn-gold" style="width:100%" onclick="sendCustomWhatsApp()">إرسال واتساب</button>
+          <div class="teacher-note">إرسال جماعي لطلاب فصل كامل برسالة واحدة.</div>
+          <div class="field"><label>الفصل</label><select id="waClassSelect"></select></div>
+          <div class="field"><label>رسالة الفصل</label><input id="waClassMessage" type="text" placeholder="رسالة جماعية لأولياء أمور الفصل" /></div>
+          <button class="btn btn-green" style="width:100%" onclick="sendClassWhatsApp()">إرسال جماعي لواتساب</button>
+        </div>
+      </div>
+    <div id="teacherPaneReports" class="teacher-pane card">
+      <div class="teacher-mini-kpis">
+        <div class="teacher-mini-kpi"><strong id="reportDeposits">0</strong><span>إجمالي الإيداع</span></div>
+        <div class="teacher-mini-kpi"><strong id="reportWithdrawals">0</strong><span>إجمالي السحب</span></div>
+        <div class="teacher-mini-kpi"><strong id="reportTransfers">0</strong><span>إجمالي التحويل</span></div>
+      </div>
+      <div class="teacher-grid">
+        <div class="teacher-chart-card">
+          <h4>تحليل العمليات حسب النوع</h4>
+          <canvas id="teacherOpsChart" width="320" height="220" style="width:100%;height:220px"></canvas>
+          <div class="teacher-note">يظهر هذا الرسم توزيع الإيداع والسحب والتحويل داخل النظام الحالي.</div>
+        </div>
+        <div class="teacher-chart-card">
+          <h4>لوحة الشرف التلقائية</h4>
+          <div class="teacher-top-list" id="teacherHonorList"></div>
+        </div>
+      </div>
+      <div class="teacher-grid" style="margin-top:12px">
+        <div class="teacher-chart-card">
+          <h4>ملخص الفصول</h4>
+          <div class="teacher-top-list" id="teacherClassBalances"></div>
+        </div>
+        <div class="teacher-chart-card">
+          <h4>روليت الجوائز — إعداد سريع</h4>
+          <div class="field"><label>جوائز الروليت</label><input id="roulettePrizesInput" type="text" placeholder="مثال: 100, 200, 500, هدية, حظ أوفر" /></div>
+          <button class="btn btn-gold" style="width:100%" onclick="saveRoulettePrizes()">حفظ جوائز الروليت</button>
+          <div id="rouletteMsg" class="notice ok hidden">تم حفظ جوائز الروليت</div>
+          <div class="teacher-note">هذه الإعدادات تُستخدم كمرجع سريع داخل النظام ويمكن تطويرها لاحقًا للروليت التفاعلي.</div>
         </div>
       </div>
     </div>
@@ -1411,6 +1618,84 @@ function togglePassword(inputId, btn){
   }
 }
 
+
+function moveStudentToClass(){
+  const sid = document.getElementById('moveStudentSelect')?.value;
+  const cid = document.getElementById('moveTargetClass')?.value;
+  const msg = document.getElementById('moveMsg');
+  const st = getStudent(sid);
+  if(!st || !cid) return;
+  st.classId = cid;
+  saveBankData();
+  if(msg){ msg.classList.remove('hidden'); setTimeout(()=>msg.classList.add('hidden'), 1800); }
+  refreshTeacherUI();
+  if(sessionStorage.getItem('currentStudentId')===st.id) renderStudentAccount();
+}
+function sendClassWhatsApp(){
+  const cid = document.getElementById('waClassSelect')?.value;
+  const text = (document.getElementById('waClassMessage')?.value || '').trim();
+  if(!cid || !text) return;
+  const list = bankData.students.filter(s=>s.classId===cid && s.guardian);
+  list.forEach((s, idx)=> setTimeout(()=>openWhatsAppNumber(s.guardian, text.replace('{الطالب}', s.name).replace('{الفصل}', getClassName(cid))), idx*250));
+}
+function saveRoulettePrizes(){
+  const input = document.getElementById('roulettePrizesInput');
+  const msg = document.getElementById('rouletteMsg');
+  bankData.roulettePrizes = (input?.value || '').split(',').map(x=>x.trim()).filter(Boolean);
+  saveBankData();
+  if(msg){ msg.classList.remove('hidden'); setTimeout(()=>msg.classList.add('hidden'),1800); }
+}
+function drawTeacherOpsChart(){
+  const canvas = document.getElementById('teacherOpsChart');
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const rect = canvas.getBoundingClientRect();
+  const ratio = window.devicePixelRatio || 1;
+  canvas.width = rect.width * ratio; canvas.height = rect.height * ratio;
+  ctx.setTransform(ratio,0,0,ratio,0,0);
+  const w = rect.width, h = rect.height; ctx.clearRect(0,0,w,h);
+  const totals = getOpsTotals();
+  const items = [
+    {label:'إيداع', value:totals.deposit},
+    {label:'سحب', value:totals.withdraw},
+    {label:'تحويل', value:totals.transfer}
+  ];
+  const max = Math.max(1, ...items.map(i=>i.value));
+  const barW = 60, gap = 30, startX = (w - (items.length*barW + (items.length-1)*gap))/2;
+  const baseY = h - 32;
+  items.forEach((item,idx)=>{
+    const x = startX + idx*(barW+gap);
+    const barH = (item.value/max)*(h-80);
+    ctx.fillStyle = '#edf6f0'; ctx.fillRect(x, 24, barW, h-56);
+    ctx.fillStyle = idx===0 ? '#1f7f57' : idx===1 ? '#b9514f' : '#c7a465';
+    ctx.fillRect(x, baseY-barH, barW, barH);
+    ctx.fillStyle = '#183229'; ctx.font = 'bold 12px Arial'; ctx.textAlign='center';
+    ctx.fillText(item.label, x+barW/2, h-10);
+    ctx.fillText(new Intl.NumberFormat('ar-SA').format(item.value), x+barW/2, baseY-barH-8);
+  });
+}
+function renderTeacherReports(){
+  const totals = getOpsTotals();
+  const setText = (id,val)=>{ const el=document.getElementById(id); if(el) el.textContent = formatMoney(val); };
+  setText('reportDeposits', totals.deposit); setText('reportWithdrawals', totals.withdraw); setText('reportTransfers', totals.transfer);
+  const honor = document.getElementById('teacherHonorList');
+  if(honor){
+    const top = [...bankData.students].sort((a,b)=>Number(b.balance||0)-Number(a.balance||0)).slice(0,5);
+    honor.innerHTML = top.map((s,i)=>`<div class="teacher-top-item"><div style="display:flex;align-items:center;gap:10px"><div class="teacher-rank">${i+1}</div><div><strong>${s.name}</strong><div class="teacher-note">${getClassName(s.classId)}</div></div></div><div class="chip-pill">${formatMoney(s.balance)} ر.س</div></div>`).join('') || '<div class="muted">لا توجد بيانات</div>';
+  }
+  const cls = document.getElementById('teacherClassBalances');
+  if(cls){
+    cls.innerHTML = bankData.classes.map(c=>{
+      const students = bankData.students.filter(s=>s.classId===c.id);
+      const total = students.reduce((a,s)=>a+Number(s.balance||0),0);
+      return `<div class="teacher-top-item"><div><strong>${c.name}</strong><div class="teacher-note">${students.length} طالب / طالبة</div></div><div class="chip-pill">${formatMoney(total)} ر.س</div></div>`;
+    }).join('') || '<div class="muted">لا توجد فصول</div>';
+  }
+  const rp = document.getElementById('roulettePrizesInput');
+  if(rp) rp.value = (bankData.roulettePrizes || ['100','200','500','هدية','حظ أوفر']).join(', ');
+  setTimeout(drawTeacherOpsChart, 50);
+}
+
 function studentLogin(){
   const user = document.getElementById('studentUser');
   const pass = document.getElementById('studentPassword');
@@ -1459,7 +1744,8 @@ function defaultBankData(){
     ],
     operations:[
       {id:'op1', studentId:'s1', studentName:'لينا محمد', type:'deposit', amount:500, reason:'مشاركة مميزة', date:'2026-03-11 10:30'}
-    ]
+    ],
+    roulettePrizes:['100','200','500','هدية','حظ أوفر']
   };
 }
 function saveBankData(){ localStorage.setItem(BANK_KEY, JSON.stringify(bankData)); }
@@ -1490,7 +1776,7 @@ function logoutTeacher(){ sessionStorage.removeItem('teacherLogged'); go('teache
 function logoutStudent(){ sessionStorage.removeItem('studentLogged'); sessionStorage.removeItem('currentStudentId'); go('student_login'); }
 
 function populateClassSelects(){
-  const selects = ['studentClassSelect','studentFilterClass'];
+  const selects = ['studentClassSelect','studentFilterClass','moveTargetClass','waClassSelect'];
   selects.forEach(id=>{
     const el = document.getElementById(id); if(!el) return;
     const keep = id==='studentFilterClass' ? '<option value="all">كل الفصول</option>' : '<option value="">اختر الفصل</option>';
@@ -1499,7 +1785,15 @@ function populateClassSelects(){
 }
 function populateStudentSelects(){
   const html = '<option value="">اختر الطالب / الطالبة</option>' + bankData.students.map(s=>`<option value="${s.id}">${s.name} — ${getClassName(s.classId)}</option>`).join('');
-  ['opStudent','transferTarget','waStudentSelect'].forEach(id=>{ const el=document.getElementById(id); if(el) el.innerHTML = html; });
+  ['opStudent','transferTarget','waStudentSelect','moveStudentSelect'].forEach(id=>{ const el=document.getElementById(id); if(el) el.innerHTML = html; });
+}
+function getOpsTotals(){
+  return bankData.operations.reduce((acc,op)=>{
+    if(op.type==='deposit') acc.deposit += Number(op.amount||0);
+    else if(op.type==='withdraw') acc.withdraw += Number(op.amount||0);
+    else if(op.type==='transfer') acc.transfer += Number(op.amount||0);
+    return acc;
+  }, {deposit:0, withdraw:0, transfer:0});
 }
 function toggleTransferTarget(){
   const type = document.getElementById('opType');
@@ -1560,7 +1854,7 @@ function renderStudentsManager(){
   const body = document.getElementById('studentsTableBody'); if(!body) return;
   const filter = document.getElementById('studentFilterClass')?.value || 'all';
   const arr = bankData.students.filter(s=> filter==='all' ? true : s.classId===filter);
-  body.innerHTML = arr.map(s=>`<tr><td>${s.name}</td><td>${getClassName(s.classId)}</td><td>${formatMoney(s.balance)} ر.س</td><td>${s.guardian || '—'}</td><td><button class="ghost" onclick="deleteStudent('${s.id}')">حذف</button></td></tr>`).join('') || '<tr><td colspan="5" class="muted">لا يوجد طلاب</td></tr>';
+  body.innerHTML = arr.map(s=>`<tr><td>${s.name}</td><td>${s.username}</td><td>${getClassName(s.classId)}</td><td>${formatMoney(s.balance)} ر.س</td><td>${s.guardian || '—'}</td><td><button class="ghost" onclick="deleteStudent('${s.id}')">حذف</button></td></tr>`).join('') || '<tr><td colspan="6" class="muted">لا يوجد طلاب</td></tr>';
 }
 function renderOperations(){
   const wrap = document.getElementById('opsList'); if(!wrap) return;
@@ -1667,6 +1961,84 @@ function renderStudentAccount(){
   const details = document.querySelector('#detailsTab .list');
   if(details){ details.innerHTML = `<div class="row"><div><div class="name">رقم الحساب</div></div><div class="value">${student.account}</div></div><div class="row"><div><div class="name">الفصل</div></div><div class="value">${getClassName(student.classId)}</div></div><div class="row"><div><div class="name">المستوى الحالي</div></div><div class="value gold">${student.balance>=16000?'ذهبي':student.balance>=11000?'فضي':'برونزي'}</div></div>`; }
 }
+
+function moveStudentToClass(){
+  const sid = document.getElementById('moveStudentSelect')?.value;
+  const cid = document.getElementById('moveTargetClass')?.value;
+  const msg = document.getElementById('moveMsg');
+  const st = getStudent(sid);
+  if(!st || !cid) return;
+  st.classId = cid;
+  saveBankData();
+  if(msg){ msg.classList.remove('hidden'); setTimeout(()=>msg.classList.add('hidden'), 1800); }
+  refreshTeacherUI();
+  if(sessionStorage.getItem('currentStudentId')===st.id) renderStudentAccount();
+}
+function sendClassWhatsApp(){
+  const cid = document.getElementById('waClassSelect')?.value;
+  const text = (document.getElementById('waClassMessage')?.value || '').trim();
+  if(!cid || !text) return;
+  const list = bankData.students.filter(s=>s.classId===cid && s.guardian);
+  list.forEach((s, idx)=> setTimeout(()=>openWhatsAppNumber(s.guardian, text.replace('{الطالب}', s.name).replace('{الفصل}', getClassName(cid))), idx*250));
+}
+function saveRoulettePrizes(){
+  const input = document.getElementById('roulettePrizesInput');
+  const msg = document.getElementById('rouletteMsg');
+  bankData.roulettePrizes = (input?.value || '').split(',').map(x=>x.trim()).filter(Boolean);
+  saveBankData();
+  if(msg){ msg.classList.remove('hidden'); setTimeout(()=>msg.classList.add('hidden'),1800); }
+}
+function drawTeacherOpsChart(){
+  const canvas = document.getElementById('teacherOpsChart');
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const rect = canvas.getBoundingClientRect();
+  const ratio = window.devicePixelRatio || 1;
+  canvas.width = rect.width * ratio; canvas.height = rect.height * ratio;
+  ctx.setTransform(ratio,0,0,ratio,0,0);
+  const w = rect.width, h = rect.height; ctx.clearRect(0,0,w,h);
+  const totals = getOpsTotals();
+  const items = [
+    {label:'إيداع', value:totals.deposit},
+    {label:'سحب', value:totals.withdraw},
+    {label:'تحويل', value:totals.transfer}
+  ];
+  const max = Math.max(1, ...items.map(i=>i.value));
+  const barW = 60, gap = 30, startX = (w - (items.length*barW + (items.length-1)*gap))/2;
+  const baseY = h - 32;
+  items.forEach((item,idx)=>{
+    const x = startX + idx*(barW+gap);
+    const barH = (item.value/max)*(h-80);
+    ctx.fillStyle = '#edf6f0'; ctx.fillRect(x, 24, barW, h-56);
+    ctx.fillStyle = idx===0 ? '#1f7f57' : idx===1 ? '#b9514f' : '#c7a465';
+    ctx.fillRect(x, baseY-barH, barW, barH);
+    ctx.fillStyle = '#183229'; ctx.font = 'bold 12px Arial'; ctx.textAlign='center';
+    ctx.fillText(item.label, x+barW/2, h-10);
+    ctx.fillText(new Intl.NumberFormat('ar-SA').format(item.value), x+barW/2, baseY-barH-8);
+  });
+}
+function renderTeacherReports(){
+  const totals = getOpsTotals();
+  const setText = (id,val)=>{ const el=document.getElementById(id); if(el) el.textContent = formatMoney(val); };
+  setText('reportDeposits', totals.deposit); setText('reportWithdrawals', totals.withdraw); setText('reportTransfers', totals.transfer);
+  const honor = document.getElementById('teacherHonorList');
+  if(honor){
+    const top = [...bankData.students].sort((a,b)=>Number(b.balance||0)-Number(a.balance||0)).slice(0,5);
+    honor.innerHTML = top.map((s,i)=>`<div class="teacher-top-item"><div style="display:flex;align-items:center;gap:10px"><div class="teacher-rank">${i+1}</div><div><strong>${s.name}</strong><div class="teacher-note">${getClassName(s.classId)}</div></div></div><div class="chip-pill">${formatMoney(s.balance)} ر.س</div></div>`).join('') || '<div class="muted">لا توجد بيانات</div>';
+  }
+  const cls = document.getElementById('teacherClassBalances');
+  if(cls){
+    cls.innerHTML = bankData.classes.map(c=>{
+      const students = bankData.students.filter(s=>s.classId===c.id);
+      const total = students.reduce((a,s)=>a+Number(s.balance||0),0);
+      return `<div class="teacher-top-item"><div><strong>${c.name}</strong><div class="teacher-note">${students.length} طالب / طالبة</div></div><div class="chip-pill">${formatMoney(total)} ر.س</div></div>`;
+    }).join('') || '<div class="muted">لا توجد فصول</div>';
+  }
+  const rp = document.getElementById('roulettePrizesInput');
+  if(rp) rp.value = (bankData.roulettePrizes || ['100','200','500','هدية','حظ أوفر']).join(', ');
+  setTimeout(drawTeacherOpsChart, 50);
+}
+
 function studentLogin(){
   const user = document.getElementById('studentUser');
   const pass = document.getElementById('studentPassword');
@@ -1698,6 +2070,7 @@ function refreshTeacherUI(){
   renderStudentsManager();
   renderOperations();
   updateTeacherKPIs();
+  renderTeacherReports();
   const wa = document.getElementById('teacherWhatsappInput'); if(wa) wa.value = bankData.teacher.whatsapp || '';
   const auto = document.getElementById('autoOpenWA'); if(auto) auto.checked = !!bankData.teacher.autoOpenWA;
 }
