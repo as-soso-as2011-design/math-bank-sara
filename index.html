@@ -3565,3 +3565,264 @@ window.addEventListener('load', function(){
   });
 })();
 </script>
+
+
+<script id="ultimate-performance-fix-v7">
+(function(){
+  function ensureBank(){
+    try{
+      if(typeof bankData==='undefined' || !bankData){
+        if(typeof loadBankData==='function') loadBankData();
+      }
+      if(typeof bankData==='undefined' || !bankData) return false;
+      if(!Array.isArray(bankData.performanceTasks)) bankData.performanceTasks=[];
+      if(!Array.isArray(bankData.classes)) bankData.classes=[];
+      if(!Array.isArray(bankData.students)) bankData.students=[];
+      window.bankData = bankData;
+      return true;
+    }catch(e){console.error(e);return false;}
+  }
+  function esc(s){ return String(s||'').replace(/[&<>\"]/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]; }); }
+  function fmtDate(v){ if(!v) return '—'; try{ return new Date(v).toLocaleDateString('ar-SA'); }catch(e){ return v; } }
+  function getClassNameSafe(id){
+    try{ if(typeof getClassName==='function') return getClassName(id)||id; }catch(e){}
+    var c=(bankData.classes||[]).find(function(x){return x.id===id;});
+    return c ? c.name : (id||'—');
+  }
+  function getCurrentStudentSafe(){
+    try{ if(typeof getCurrentStudent==='function') return getCurrentStudent(); }catch(e){}
+    try{ if(typeof sessionStorage!=='undefined' && typeof getStudent==='function') return getStudent(sessionStorage.getItem('currentStudentId')); }catch(e){}
+    return null;
+  }
+  function showMsg(msg, ok){
+    var box=document.getElementById('performanceTaskMsg');
+    if(!box){
+      var btn=document.getElementById('createPerformanceTaskBtn');
+      if(btn && btn.parentNode){
+        box=document.createElement('div');
+        box.id='performanceTaskMsg';
+        btn.parentNode.insertBefore(box, btn.nextSibling);
+      }
+    }
+    if(!box) return;
+    box.className='notice ' + (ok ? 'ok' : 'err');
+    box.textContent=msg;
+    box.style.display='block';
+    clearTimeout(box._t);
+    box._t=setTimeout(function(){ box.style.display='none'; },2600);
+  }
+  function fillClassSelect(){
+    if(!ensureBank()) return;
+    var el=document.getElementById('perfTaskClassSelect');
+    if(!el) return;
+    var current=el.value;
+    el.innerHTML='<option value="">اختر الفصل</option>' + (bankData.classes||[]).map(function(c){
+      return '<option value="'+esc(c.id)+'">'+esc(c.name||c.id)+'</option>';
+    }).join('');
+    if(current && Array.from(el.options).some(function(o){return o.value===current;})) el.value=current;
+  }
+  function cleanupDuplicates(){
+    if(!ensureBank()) return;
+    var seen=new Set();
+    bankData.performanceTasks = (bankData.performanceTasks||[]).filter(function(task){
+      var key=[task.title||'', task.classId||'', task.startDate||'', task.dueDate||''].join('|');
+      if(seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+    if(typeof saveBankData==='function') saveBankData();
+  }
+  window.deletePerformanceTask = function(taskId){
+    if(!ensureBank()) return;
+    var ok = confirm('هل تريدين حذف المهمة الأدائية؟');
+    if(!ok) return;
+    bankData.performanceTasks = (bankData.performanceTasks||[]).filter(function(t){ return t.id!==taskId; });
+    if(typeof saveBankData==='function') saveBankData();
+    renderTeacherPerformanceTasks();
+    var st=getCurrentStudentSafe();
+    if(st) renderStudentPerformanceTasks(st);
+    if(typeof refreshTeacherUI==='function') refreshTeacherUI();
+    showMsg('تم حذف المهمة الأدائية.', true);
+  };
+  window.openTaskAttachment = function(taskId, studentId){
+    if(!ensureBank()) return;
+    var task=(bankData.performanceTasks||[]).find(function(t){return t.id===taskId;});
+    if(!task) return;
+    var url='';
+    var name='المرفق';
+    if(studentId && task.entries && task.entries[studentId] && task.entries[studentId].attachmentData){
+      url=task.entries[studentId].attachmentData;
+      name=task.entries[studentId].attachmentName||name;
+    } else if(task.taskAttachmentData){
+      url=task.taskAttachmentData;
+      name=task.taskAttachmentName||name;
+    }
+    if(!url){ alert('لا يوجد مرفق ظاهر.'); return; }
+    var w=window.open(url,'_blank');
+    if(!w){
+      var a=document.createElement('a'); a.href=url; a.target='_blank'; a.download=name; document.body.appendChild(a); a.click(); a.remove();
+    }
+  };
+  function renderTeacherPerformanceTasks(){
+    if(!ensureBank()) return;
+    cleanupDuplicates();
+    var wrap=document.getElementById('teacherPerformanceTasks');
+    if(!wrap) return;
+    var tasks=bankData.performanceTasks||[];
+    var countEl=document.getElementById('teacherPerfCount');
+    var attachEl=document.getElementById('teacherPerfAttachCount');
+    var ratedEl=document.getElementById('teacherPerfRatedCount');
+    if(countEl) countEl.textContent=String(tasks.length);
+    var attachCount=0, ratedCount=0;
+    tasks.forEach(function(task){
+      if(task.taskAttachmentData || task.taskVideoLink) attachCount++;
+      Object.values(task.entries||{}).forEach(function(e){ if(e.status==='rated' || Number(e.score||0)>0) ratedCount++; });
+    });
+    if(attachEl) attachEl.textContent=String(attachCount);
+    if(ratedEl) ratedEl.textContent=String(ratedCount);
+    if(!tasks.length){
+      wrap.innerHTML='<div class="performance-empty">لا توجد مهام أدائية بعد. أضيفي عنوان المهمة وتاريخها والفصل من الأعلى.</div>';
+      return;
+    }
+    wrap.innerHTML = tasks.map(function(task){
+      return '<div class="performance-card">'
+      + '<div class="performance-student-head"><div><div class="performance-student-name">'+esc(task.title)+'</div><div class="teacher-note">'+esc(getClassNameSafe(task.classId))+' • '+fmtDate(task.startDate)+' ← '+fmtDate(task.dueDate)+'</div></div>'
+      + '<div class="teacher-inline-actions"><button class="ghost" type="button" onclick="deletePerformanceTask(\''+esc(task.id)+'\')">حذف المهمة</button></div></div>'
+      + '<div class="perf-meta-grid">'
+      + '<div class="perf-meta-box"><span class="label">عنوان المهمة</span><span class="value">'+esc(task.title)+'</span></div>'
+      + '<div class="perf-meta-box"><span class="label">تاريخ البداية</span><span class="value">'+fmtDate(task.startDate)+'</span></div>'
+      + '<div class="perf-meta-box"><span class="label">آخر موعد للتسليم</span><span class="value">'+fmtDate(task.dueDate)+'</span></div>'
+      + '</div>'
+      + '<div class="performance-note" style="margin-top:10px">'+(task.taskAttachmentName ? ('📎 '+esc(task.taskAttachmentName)) : (task.taskVideoLink ? '▶️ تم إضافة رابط للمهمة' : 'بدون مرفق عام'))+'</div>'
+      + '</div>';
+    }).join('');
+  }
+  window.renderTeacherPerformanceTasks = renderTeacherPerformanceTasks;
+  window.renderStudentPerformanceTasks = function(student){
+    if(!ensureBank() || !student) return;
+    cleanupDuplicates();
+    var wrap=document.getElementById('studentPerformanceTaskList'); if(!wrap) return;
+    var tasks=(bankData.performanceTasks||[]).filter(function(t){ return t.classId===student.classId; });
+    var countEl=document.getElementById('studentPerfCount');
+    var doneEl=document.getElementById('studentPerfDone');
+    var ptsEl=document.getElementById('studentPerfPoints');
+    if(countEl) countEl.textContent=String(tasks.length);
+    var done=0, pts=0;
+    tasks.forEach(function(task){
+      var entry=(task.entries&&task.entries[student.id]) || {score:0,status:'pending',showToStudent:!!task.visibleDefault,awardedPoints:0};
+      if(entry.status==='rated' || Number(entry.score||0)>0) done++;
+      pts += Number(entry.awardedPoints||0);
+    });
+    if(doneEl) doneEl.textContent=String(done);
+    if(ptsEl) ptsEl.textContent=new Intl.NumberFormat('ar-SA').format(pts);
+    if(!tasks.length){
+      wrap.innerHTML='<div class="performance-empty">لا توجد مهام أدائية مضافة لهذا الفصل حاليًا.</div>';
+      return;
+    }
+    var statusMap={pending:'بانتظار الاستلام',submitted:'تم التسليم',rated:'تم التقييم'};
+    wrap.innerHTML = tasks.map(function(task){
+      var entry=(task.entries&&task.entries[student.id]) || {score:0,status:'pending',showToStudent:!!task.visibleDefault,awardedPoints:0};
+      var canShow = entry.showToStudent!==false;
+      var showAttachment = canShow && (task.taskAttachmentData || task.taskVideoLink || entry.videoLink || entry.attachmentData);
+      return '<div class="performance-student-row">'
+      + '<div class="perf-highlight"><strong>'+esc(task.title)+'</strong><div>'+(statusMap[entry.status]||'بانتظار الاستلام')+'</div></div>'
+      + '<div class="perf-meta-grid">'
+      + '<div class="perf-meta-box"><span class="label">عنوان المهمة</span><span class="value">'+esc(task.title)+'</span></div>'
+      + '<div class="perf-meta-box"><span class="label">تاريخ البداية</span><span class="value">'+fmtDate(task.startDate)+'</span></div>'
+      + '<div class="perf-meta-box"><span class="label">آخر موعد للتسليم</span><span class="value">'+fmtDate(task.dueDate)+'</span></div>'
+      + '</div>'
+      + '<div class="teacher-subgrid"><div class="field"><label>الدرجة</label><input type="text" readonly value="'+Number(entry.score||0)+' / '+Number(task.maxScore||0)+'"></div><div class="field"><label>الحالة</label><input type="text" readonly value="'+(statusMap[entry.status]||'بانتظار الاستلام')+'"></div></div>'
+      + '<div class="student-attach-hero"><div><div class="tag">📎 مرفق العمل</div><div class="sub">المرفق يظهر إذا سمحت المعلمة بإظهاره.</div></div><div>'+(showAttachment ? 'مرفق خاص 🔒' : 'لا يوجد مرفق ظاهر')+'</div></div>'
+      + '<div class="performance-attach">'
+      + (canShow && task.taskAttachmentData ? '<button class="ghost" type="button" onclick="openTaskAttachment(\''+esc(task.id)+'\')">فتح المرفق</button>' : '')
+      + (canShow && task.taskVideoLink ? '<a class="performance-link" href="'+esc(task.taskVideoLink)+'" target="_blank" rel="noopener">فتح الرابط</a>' : '')
+      + '</div></div>';
+    }).join('');
+  };
+
+  function clearFields(){
+    ['perfTaskTitle','perfTaskSkill','perfTaskStart','perfTaskDue','perfTaskAttachmentLink'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value='';});
+    var cls=document.getElementById('perfTaskClassSelect'); if(cls) cls.value='';
+    var file=document.getElementById('perfTaskAttachmentFile'); if(file) file.value='';
+  }
+
+  function createTaskFinal(){
+    if(!ensureBank()) return alert('تعذر تحميل بيانات النظام.');
+    var btn=document.getElementById('createPerformanceTaskBtn') || document.querySelector('#teacherPanePerformance button.btn.btn-green');
+    if(btn && btn.dataset.busy==='1') return false;
+    var title=(document.getElementById('perfTaskTitle')?.value || '').trim();
+    var skill=(document.getElementById('perfTaskSkill')?.value || '').trim();
+    var classId=(document.getElementById('perfTaskClassSelect')?.value || '').trim();
+    var startDate=(document.getElementById('perfTaskStart')?.value || '').trim();
+    var dueDate=(document.getElementById('perfTaskDue')?.value || '').trim();
+    var maxScore=Math.max(1, Number(document.getElementById('perfTaskMaxScore')?.value || 20));
+    var pointRate=Math.max(1, Number(document.getElementById('perfTaskPointRate')?.value || 100));
+    var visibleDefault=(document.getElementById('perfTaskVisibleDefault')?.value || 'yes')==='yes';
+    var attachLink=(document.getElementById('perfTaskAttachmentLink')?.value || '').trim();
+    var file=document.getElementById('perfTaskAttachmentFile')?.files?.[0] || null;
+    if(!title) return showMsg('اكتبي عنوان المهمة الأدائية.', false);
+    if(!classId) return showMsg('اختاري الفصل أولًا.', false);
+    if(!startDate) return showMsg('حددي تاريخ بدء المهمة.', false);
+    if(!dueDate) return showMsg('حددي آخر موعد للتسليم.', false);
+    var dup=(bankData.performanceTasks||[]).find(function(t){ return (t.title||'').trim()===title && (t.classId||'')===classId && (t.startDate||'')===startDate && (t.dueDate||'')===dueDate;});
+    if(dup) return showMsg('هذه المهمة موجودة بالفعل، لذلك لن تتكرر مرتين.', false);
+    if(btn){ btn.dataset.busy='1'; btn.disabled=true; }
+    function finish(fileData, fileMime, fileName){
+      var task={
+        id:'pt'+Date.now()+Math.floor(Math.random()*1000),
+        title:title, skill:skill, classId:classId, startDate:startDate, dueDate:dueDate,
+        maxScore:maxScore, pointRate:pointRate, visibleDefault:visibleDefault,
+        taskAttachmentName:fileName||'', taskAttachmentData:fileData||'', taskAttachmentMime:fileMime||'', taskVideoLink:attachLink||'',
+        createdAt:new Date().toISOString(), entries:{}
+      };
+      (bankData.students||[]).filter(function(st){ return st.classId===classId; }).forEach(function(st){
+        task.entries[st.id]={score:0,status:'pending',noteInternal:'',showToStudent:visibleDefault,attachmentName:'',attachmentData:'',attachmentMime:'',videoLink:'',awardedPoints:0};
+      });
+      bankData.performanceTasks.push(task);
+      cleanupDuplicates();
+      if(typeof saveBankData==='function') saveBankData();
+      clearFields();
+      renderTeacherPerformanceTasks();
+      if(typeof refreshTeacherUI==='function') refreshTeacherUI();
+      var st=getCurrentStudentSafe(); if(st) window.renderStudentPerformanceTasks(st);
+      if(btn){ btn.dataset.busy='0'; btn.disabled=false; }
+      showMsg('تم إنشاء المهمة الأدائية بنجاح.', true);
+    }
+    if(file){
+      var reader=new FileReader();
+      reader.onload=function(e){ finish(e.target.result, file.type||'', file.name||''); };
+      reader.onerror=function(){ if(btn){ btn.dataset.busy='0'; btn.disabled=false; } showMsg('تعذر قراءة المرفق. أعيدي المحاولة.', false); };
+      reader.readAsDataURL(file);
+    }else{
+      finish('', '', '');
+    }
+    return false;
+  }
+  window.createPerformanceTask = createTaskFinal;
+  function bind(){
+    fillClassSelect();
+    var btn=document.getElementById('createPerformanceTaskBtn') || document.querySelector('#teacherPanePerformance button.btn.btn-green');
+    if(!btn) return;
+    var fresh=btn.cloneNode(true);
+    btn.parentNode.replaceChild(fresh, btn);
+    fresh.addEventListener('click', function(ev){ ev.preventDefault(); ev.stopPropagation(); createTaskFinal(); });
+  }
+  var oldShowTeacherPane=window.showTeacherPane;
+  if(typeof oldShowTeacherPane==='function'){
+    window.showTeacherPane=function(id, btn){
+      var res=oldShowTeacherPane.apply(this, arguments);
+      if(id==='teacherPanePerformance'){ setTimeout(function(){ bind(); renderTeacherPerformanceTasks(); }, 0); }
+      return res;
+    };
+  }
+  var oldShowTab=window.showTab;
+  if(typeof oldShowTab==='function'){
+    window.showTab=function(id, btn){
+      var res=oldShowTab.apply(this, arguments);
+      if(id==='performanceStudentTab'){ var st=getCurrentStudentSafe(); if(st) setTimeout(function(){ window.renderStudentPerformanceTasks(st); }, 0); }
+      return res;
+    };
+  }
+  document.addEventListener('DOMContentLoaded', function(){ setTimeout(function(){ bind(); renderTeacherPerformanceTasks(); var st=getCurrentStudentSafe(); if(st) window.renderStudentPerformanceTasks(st); }, 300); });
+})();
+</script>
