@@ -1310,6 +1310,11 @@ html[dir="ltr"] .balance-head{direction:ltr}
           <div class="teacher-subgrid">
             <div class="field"><label>النقاط القصوى المضافة للبنك</label><input id="perfTaskPointRate" type="number" min="1" value="100" /></div>
             <div class="field"><label>إظهار المرفقات للطالبة</label><select id="perfTaskVisibleDefault"><option value="yes">نعم</option><option value="no">لا</option></select></div>
+          <div class="teacher-subgrid">
+            <div class="field"><label>إرفاق ملف للمهمة</label><input id="perfTaskAttachmentFile" type="file" accept=".pdf,image/*,video/*" /></div>
+            <div class="field"><label>رابط فيديو / درايف للمهمة</label><input id="perfTaskAttachmentLink" type="text" placeholder="اختياري" /></div>
+          </div>
+
           </div>
           <button id="createPerformanceTaskBtn" type="button" class="btn btn-green" style="width:100%">إنشاء المهمة الأدائية</button>
           <div id="performanceTaskMsg" class="notice ok hidden">تم إنشاء المهمة الأدائية</div>
@@ -3246,6 +3251,135 @@ window.addEventListener('load', function(){
     if(typeof populatePerformanceClassSelect === 'function') populatePerformanceClassSelect();
     bindCreateButton();
   });
+})();
+</script>
+
+
+<script id="performance-attachment-create-fix">
+(function(){
+  function toDataUrl(file){
+    return new Promise(function(resolve){
+      if(!file){ resolve(null); return; }
+      try{
+        var reader = new FileReader();
+        reader.onload = function(){ resolve(String(reader.result || '')); };
+        reader.onerror = function(){ resolve(null); };
+        reader.readAsDataURL(file);
+      }catch(e){ resolve(null); }
+    });
+  }
+  function getBankDataSafe(){
+    try{
+      if(typeof bankData !== 'undefined' && bankData) return bankData;
+      if(typeof window.bankData !== 'undefined' && window.bankData) return window.bankData;
+    }catch(e){}
+    return null;
+  }
+  function getStudentsByClassId(classId){
+    var data = getBankDataSafe();
+    if(!data || !Array.isArray(data.students)) return [];
+    return data.students.filter(function(s){ return s.classId === classId; });
+  }
+  function clearCreateFields(){
+    ['perfTaskTitle','perfTaskSkill','perfTaskStart','perfTaskDue','perfTaskAttachmentLink'].forEach(function(id){
+      var el = document.getElementById(id);
+      if(el) el.value = '';
+    });
+    var cls = document.getElementById('perfTaskClassSelect'); if(cls) cls.value = '';
+    var file = document.getElementById('perfTaskAttachmentFile'); if(file) file.value = '';
+  }
+  async function createTaskWithAttachment(){
+    var data = getBankDataSafe();
+    if(!data){ alert('تعذر تحميل بيانات النظام'); return; }
+    if(!Array.isArray(data.performanceTasks)) data.performanceTasks = [];
+    var title = (document.getElementById('perfTaskTitle')?.value || '').trim();
+    var skill = (document.getElementById('perfTaskSkill')?.value || '').trim();
+    var classId = (document.getElementById('perfTaskClassSelect')?.value || '').trim();
+    var startDate = (document.getElementById('perfTaskStart')?.value || '').trim();
+    var dueDate = (document.getElementById('perfTaskDue')?.value || '').trim();
+    var maxScore = Math.max(1, Number(document.getElementById('perfTaskMaxScore')?.value || 20));
+    var pointRate = Math.max(1, Number(document.getElementById('perfTaskPointRate')?.value || 100));
+    var visibleDefault = (document.getElementById('perfTaskVisibleDefault')?.value || 'yes') === 'yes';
+    var attachLink = (document.getElementById('perfTaskAttachmentLink')?.value || '').trim();
+    var attachFile = document.getElementById('perfTaskAttachmentFile')?.files?.[0] || null;
+
+    if(!title){ alert('اكتبي عنوان المهمة الأدائية'); return; }
+    if(!classId){ alert('اختاري الفصل أولًا'); return; }
+    if(!startDate || !dueDate){ alert('حددي تاريخ البداية وآخر موعد للتسليم'); return; }
+
+    var attachmentData = await toDataUrl(attachFile);
+    var attachmentName = attachFile ? attachFile.name : '';
+    var attachmentMime = attachFile ? (attachFile.type || 'application/octet-stream') : '';
+
+    var task = {
+      id:'pt'+Date.now(),
+      title:title,
+      skill:skill,
+      classId:classId,
+      startDate:startDate,
+      dueDate:dueDate,
+      maxScore:maxScore,
+      pointRate:pointRate,
+      visibleDefault:visibleDefault,
+      createdAt:new Date().toISOString(),
+      entries:{}
+    };
+
+    getStudentsByClassId(classId).forEach(function(st){
+      task.entries[st.id] = {
+        score:0,
+        status:'pending',
+        noteInternal:'',
+        showToStudent:visibleDefault,
+        attachmentName:attachmentName,
+        attachmentData:attachmentData || '',
+        attachmentMime:attachmentMime,
+        videoLink:attachLink,
+        awardedPoints:0
+      };
+    });
+
+    data.performanceTasks.push(task);
+    try{
+      if(typeof saveBankData === 'function') saveBankData();
+      else localStorage.setItem('greenBankTeacherData_v1', JSON.stringify(data));
+    }catch(e){}
+
+    clearCreateFields();
+
+    try{
+      if(typeof window.renderTeacherPerformanceTasks === 'function') window.renderTeacherPerformanceTasks();
+      if(typeof window.refreshTeacherUI === 'function') window.refreshTeacherUI();
+      if(typeof window.updatePerformanceSummary === 'function') window.updatePerformanceSummary();
+      if(typeof window.getCurrentStudent === 'function' && typeof window.renderStudentPerformanceTasks === 'function'){
+        var st = window.getCurrentStudent();
+        if(st) window.renderStudentPerformanceTasks(st);
+      }
+    }catch(e){}
+
+    alert('تم إنشاء المهمة الأدائية بنجاح');
+  }
+
+  function bind(){
+    var btn = document.getElementById('createPerformanceTaskBtn') || document.querySelector('#teacherPanePerformance button.btn.btn-green');
+    if(!btn) return;
+    btn.onclick = function(ev){
+      ev.preventDefault();
+      ev.stopPropagation();
+      createTaskWithAttachment();
+      return false;
+    };
+  }
+
+  var oldShowTeacherPane = window.showTeacherPane;
+  if(typeof oldShowTeacherPane === 'function'){
+    window.showTeacherPane = function(id, btn){
+      oldShowTeacherPane(id, btn);
+      if(id === 'teacherPanePerformance') setTimeout(bind, 0);
+    };
+  }
+
+  window.addEventListener('load', function(){ setTimeout(bind, 300); });
 })();
 </script>
 
