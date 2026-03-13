@@ -3100,5 +3100,154 @@ window.addEventListener('load', function(){
   });
 })();
 </script>
+
+<script id="performance-task-final-fix">
+(function(){
+  function ensureBank(){
+    try{
+      if(typeof bankData === 'undefined' || !bankData || typeof bankData !== 'object'){
+        if(typeof loadBankData === 'function') loadBankData();
+      }
+      if(typeof bankData === 'undefined' || !bankData || typeof bankData !== 'object'){
+        if(typeof defaultBankData === 'function') bankData = defaultBankData();
+      }
+      if(bankData){
+        if(!Array.isArray(bankData.performanceTasks)) bankData.performanceTasks = [];
+        if(!Array.isArray(bankData.students)) bankData.students = [];
+        if(!Array.isArray(bankData.classes)) bankData.classes = [];
+        window.bankData = bankData;
+      }
+      return !!bankData;
+    }catch(err){
+      console.error(err);
+      return false;
+    }
+  }
+
+  function showMsg(msg, ok){
+    const box = document.getElementById('performanceTaskMsg');
+    if(!box) return;
+    box.textContent = msg;
+    box.classList.remove('hidden','ok','err');
+    box.classList.add(ok ? 'ok' : 'err');
+    clearTimeout(box._t);
+    box._t = setTimeout(function(){ box.classList.add('hidden'); }, 2200);
+  }
+
+  function bindCreateButton(){
+    const btn = document.getElementById('createPerformanceTaskBtn') || document.querySelector('#teacherPanePerformance button.btn.btn-green');
+    if(!btn) return;
+    btn.type = 'button';
+    btn.onclick = function(ev){
+      if(ev){ ev.preventDefault(); ev.stopPropagation(); }
+      window.createPerformanceTask();
+      return false;
+    };
+  }
+
+  window.createPerformanceTask = function(){
+    try{
+      if(!ensureBank()){
+        alert('تعذر تحميل بيانات النظام.');
+        return false;
+      }
+      if(typeof populatePerformanceClassSelect === 'function') populatePerformanceClassSelect();
+
+      const title = (document.getElementById('perfTaskTitle')?.value || '').trim();
+      const skill = (document.getElementById('perfTaskSkill')?.value || '').trim();
+      const classId = (document.getElementById('perfTaskClassSelect')?.value || '').trim();
+      const startDate = (document.getElementById('perfTaskStart')?.value || '').trim();
+      const dueDate = (document.getElementById('perfTaskDue')?.value || '').trim();
+      const maxScore = Math.max(1, Number(document.getElementById('perfTaskMaxScore')?.value || 20));
+      const pointRate = Math.max(1, Number(document.getElementById('perfTaskPointRate')?.value || 100));
+      const visibleDefault = (document.getElementById('perfTaskVisibleDefault')?.value || 'yes') === 'yes';
+
+      if(!title){ showMsg('اكتبي عنوان المهمة الأدائية.', false); return false; }
+      if(!classId){ showMsg('اختاري الفصل أولاً.', false); return false; }
+      if(!startDate){ showMsg('حددي تاريخ بدء المهمة.', false); return false; }
+      if(!dueDate){ showMsg('حددي آخر موعد للتسليم.', false); return false; }
+
+      const task = {
+        id:'pt'+Date.now()+Math.floor(Math.random()*1000),
+        title:title,
+        skill:skill,
+        classId:classId,
+        startDate:startDate,
+        dueDate:dueDate,
+        maxScore:maxScore,
+        pointRate:pointRate,
+        visibleDefault:visibleDefault,
+        createdAt:new Date().toISOString(),
+        entries:{}
+      };
+
+      (bankData.students || []).filter(function(st){ return st.classId === classId; }).forEach(function(st){
+        task.entries[st.id] = {
+          score:0,
+          status:'pending',
+          noteInternal:'',
+          showToStudent:visibleDefault,
+          attachmentName:'',
+          attachmentData:'',
+          attachmentMime:'',
+          videoLink:'',
+          awardedPoints:0
+        };
+      });
+
+      bankData.performanceTasks.push(task);
+      if(typeof saveBankData === 'function') saveBankData();
+      window.bankData = bankData;
+
+      ['perfTaskTitle','perfTaskSkill','perfTaskStart','perfTaskDue'].forEach(function(id){
+        const el = document.getElementById(id);
+        if(el) el.value = '';
+      });
+      const classSelect = document.getElementById('perfTaskClassSelect');
+      if(classSelect) classSelect.value = '';
+
+      if(typeof renderTeacherPerformanceTasks === 'function') renderTeacherPerformanceTasks();
+      if(typeof refreshTeacherUI === 'function') refreshTeacherUI();
+      if(typeof renderStudentAccount === 'function') renderStudentAccount();
+      showMsg('تم إنشاء المهمة الأدائية بنجاح', true);
+      return false;
+    }catch(err){
+      console.error(err);
+      alert('حدث خطأ أثناء إنشاء المهمة الأدائية.');
+      return false;
+    }
+  };
+
+  const baseLoad = window.loadBankData;
+  if(typeof baseLoad === 'function'){
+    window.loadBankData = function(){
+      const out = baseLoad.apply(this, arguments);
+      try{ if(typeof bankData !== 'undefined' && bankData) window.bankData = bankData; }catch(e){}
+      return out;
+    };
+  }
+
+  const baseShowTeacherPane = window.showTeacherPane;
+  if(typeof baseShowTeacherPane === 'function'){
+    window.showTeacherPane = function(id, btn){
+      const out = baseShowTeacherPane.apply(this, arguments);
+      if(id === 'teacherPanePerformance'){
+        ensureBank();
+        if(typeof populatePerformanceClassSelect === 'function') populatePerformanceClassSelect();
+        bindCreateButton();
+        if(typeof renderTeacherPerformanceTasks === 'function') renderTeacherPerformanceTasks();
+      }
+      return out;
+    };
+  }
+
+  window.addEventListener('load', function(){
+    ensureBank();
+    if(typeof populatePerformanceClassSelect === 'function') populatePerformanceClassSelect();
+    bindCreateButton();
+  });
+})();
+</script>
+
 </body>
 </html>
