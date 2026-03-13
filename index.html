@@ -1123,43 +1123,14 @@ document.addEventListener("DOMContentLoaded", function(){
 </script>
 
 
-<!-- ===== Teacher Login Screen ===== -->
-<section id="teacherLogin" class="screen">
+<!-- ===== نظام متابعة الواجبات والمشاركات ===== -->
+<section id="performanceSystem" class="screen">
   <div class="topbar">
     <div class="brand">
       <div class="logo">BN</div>
       <div>
-        <h1>دخول المعلمة</h1>
-        <p>لوحة التحكم</p>
-      </div>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="field">
-      <label>اسم المستخدم</label>
-      <input id="tUser" type="text" placeholder="اسم المستخدم">
-    </div>
-
-    <div class="field">
-      <label>كلمة المرور</label>
-      <input id="tPass" type="password" placeholder="كلمة المرور">
-    </div>
-
-    <button class="btn btn-green" style="width:100%" onclick="teacherLogin()">دخول</button>
-    <div id="tError" class="muted" style="color:#b9514f;margin-top:10px"></div>
-  </div>
-</section>
-
-
-<!-- ===== Teacher Dashboard ===== -->
-<section id="teacher" class="screen">
-  <div class="topbar">
-    <div class="brand">
-      <div class="logo">BN</div>
-      <div>
-        <h1>حساب المعلمة</h1>
-        <p>لوحة التحكم التعليمية</p>
+        <h1>متابعة الأداء</h1>
+        <p>الواجبات والمشاركات</p>
       </div>
     </div>
     <button class="ghost" onclick="go('home')">⌂</button>
@@ -1167,64 +1138,81 @@ document.addEventListener("DOMContentLoaded", function(){
 
   <div class="card">
     <div class="section-head">
-      <h3>لوحة التحكم</h3>
-      <span class="pill">إحصاءات</span>
+      <h3>الواجبات</h3>
+      <span class="pill">أسبوعي / شهري</span>
     </div>
 
     <div class="list">
-      <div class="row"><div class="name">عدد الفصول</div><div class="value">٣</div></div>
-      <div class="row"><div class="name">عدد الطلاب</div><div class="value">٢٨</div></div>
-      <div class="row"><div class="name">إجمالي العمليات</div><div class="value">١٢٤</div></div>
-      <div class="row"><div class="name">الطلاب النشطون</div><div class="value">١٧</div></div>
+      <div class="row">
+        <div class="name">الواجبات المطلوبة هذا الأسبوع</div>
+        <div class="value" id="weeklyRequired">٥</div>
+      </div>
+
+      <div class="row">
+        <div class="name">الواجبات المحلولة هذا الأسبوع</div>
+        <div class="value" id="weeklySolved">٣</div>
+      </div>
+
+      <div class="row">
+        <div class="name">غير المحلولة</div>
+        <div class="value" id="weeklyUnsolved">٢</div>
+      </div>
+
+      <div class="row">
+        <div class="name">الواجبات هذا الشهر</div>
+        <div class="value" id="monthlySolved">١٢</div>
+      </div>
     </div>
   </div>
 
   <div class="card">
     <div class="section-head">
-      <h3>إدارة العمليات</h3>
+      <h3>المشاركات</h3>
+      <span class="pill">تفاعل الطالب</span>
     </div>
 
-    <div class="field">
-      <label>اسم الطالب</label>
-      <input placeholder="اسم الطالب">
+    <div class="list">
+      <div class="row">
+        <div class="name">المشاركات هذا الأسبوع</div>
+        <div class="value" id="weeklyParticipation">٦</div>
+      </div>
+
+      <div class="row">
+        <div class="name">المشاركات هذا الشهر</div>
+        <div class="value" id="monthlyParticipation">٢٠</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-head">
+      <h3>الإنجاز الأكاديمي</h3>
+      <span class="pill">أسئلة متقدمة</span>
     </div>
 
-    <div class="field">
-      <label>نوع العملية</label>
-      <select>
-        <option>إيداع</option>
-        <option>سحب</option>
-        <option>تحويل</option>
-      </select>
-    </div>
+    <div class="list">
+      <div class="row">
+        <div class="name">أسئلة التفكير العليا</div>
+        <div class="value">٣</div>
+      </div>
 
-    <div class="field">
-      <label>المبلغ</label>
-      <input type="number" placeholder="المبلغ">
+      <div class="row">
+        <div class="name">الأسئلة الإثرائية</div>
+        <div class="value">٢</div>
+      </div>
     </div>
-
-    <div class="field">
-      <label>السبب</label>
-      <input placeholder="سبب العملية">
-    </div>
-
-    <button class="btn btn-green" style="width:100%">تنفيذ العملية</button>
   </div>
 </section>
 
 
 <script>
-function teacherLogin(){
-  const u=document.getElementById("tUser").value.trim();
-  const p=document.getElementById("tPass").value.trim();
-  const e=document.getElementById("tError");
-
-  if(u==="teacher" && p==="1234"){
-    go("teacher");
-  }else{
-    e.textContent="بيانات الدخول غير صحيحة";
-  }
-}
+const homeworkPoints = {
+  homework:100,
+  excellence:200,
+  participation:50,
+  thinking:300,
+  enrichment:200
+};
 </script>
 
 </body>
