@@ -885,7 +885,7 @@ html[dir="ltr"] .balance-head{direction:ltr}
         <div class="mini"><strong id="studentPerfPoints">0</strong><span>النقاط المضافة</span></div>
       </div>
       <div id="studentPerformanceTaskList" class="performance-student-list"></div>
-      <div class="performance-note">يظهر للطالبة داخل تبويب المهام الأدائية: عنوان المهمة، تاريخ البداية، آخر موعد للتسليم، مع الدرجة والمرفق عند توفره. الملاحظات الداخلية تبقى للمعلمة فقط.</div>
+      <div class="performance-note">سيظهر للطالبة داخل هذا التبويب: عنوان المهمة، تاريخ البداية، وآخر موعد للتسليم بشكل واضح داخل كل بطاقة مهمة. الملاحظات الداخلية تبقى للمعلمة فقط.</div>
     </div>
 
     <div id="redeemed" class="tab-content"> class="tab-content"> class="tab-content">
@@ -992,8 +992,12 @@ html[dir="ltr"] .balance-head{direction:ltr}
             <div class="field"><label>الفصل</label><select id="perfTaskClassSelect"></select></div>
           </div>
           <div class="teacher-subgrid">
-            <div class="field"><label>تاريخ التسليم</label><input id="perfTaskDue" type="date" /></div>
+            <div class="field"><label>تاريخ بدء المهمة</label><input id="perfTaskStart" type="date" /></div>
+            <div class="field"><label>آخر موعد للتسليم</label><input id="perfTaskDue" type="date" /></div>
+          </div>
+          <div class="teacher-subgrid">
             <div class="field"><label>الدرجة القصوى</label><input id="perfTaskMaxScore" type="number" min="1" value="20" /></div>
+            <div class="field"><label>النقاط المضافة عند التقييم</label><input id="perfTaskPointRate" type="number" min="0" value="100" /></div>
           </div>
           <div class="teacher-subgrid">
             <div class="field"><label>النقاط القصوى المضافة للبنك</label><input id="perfTaskPointRate" type="number" min="1" value="100" /></div>
@@ -2694,7 +2698,7 @@ window.addEventListener('load', function(){
     }
     titleEl.closest('.field').querySelector('label').textContent='عنوان المهمة الأدائية';
     const help=document.querySelector('#teacherPanePerformance .teacher-note');
-    if(help) help.textContent='أنشئي مهمة للفصل كامل بعنوان وتاريخ بداية ونهاية، ثم ستظهر مباشرة في حساب الطالبات داخل نفس الفصل.';
+    if(help) help.textContent='أنشئي مهمة للفصل كامل بعنوان المهمة وتاريخ البداية وآخر موعد للتسليم، ثم ستظهر مباشرة في حساب الطالبات داخل نفس الفصل.';
   }
   const originalCreate = window.createPerformanceTask;
   window.createPerformanceTask = function(){
@@ -2760,7 +2764,7 @@ window.addEventListener('load', function(){
     const wrap=document.getElementById('studentPerformanceTaskList'); if(!wrap) return;
     const tasks=bankData.performanceTasks.filter(task=>task.classId===student.classId);
     let done=0, points=0;
-    if(!tasks.length){ wrap.innerHTML='<div class="performance-empty">لا توجد مهام أدائية مضافة لهذا الفصل حتى الآن.</div>'; }
+    if(!tasks.length){ wrap.innerHTML='<div class="performance-card"><div class="perf-highlight"><div class="label" style="color:rgba(255,255,255,.85);font-size:12px;margin-bottom:6px">المهام الأدائية</div><strong>لا توجد مهمة مضافة الآن</strong><div style="margin-top:4px">ستظهر هنا تلقائيًا بعد أن تضيف المعلمة المهمة لهذا الفصل.</div></div><div class="perf-meta-grid"><div class="perf-meta-box"><span class="label">عنوان المهمة</span><span class="value">—</span></div><div class="perf-meta-box"><span class="label">تاريخ البداية</span><span class="value">—</span></div><div class="perf-meta-box"><span class="label">آخر موعد للتسليم</span><span class="value">—</span></div></div></div>'; }
     else {
       wrap.innerHTML=tasks.map(task=>{
         const entry = (typeof ensurePerformanceEntry==='function') ? ensurePerformanceEntry(task, student.id) : (task.entries[student.id]||(task.entries[student.id]={score:0,status:'pending',showToStudent:!!task.visibleDefault,attachmentData:'',videoLink:'',awardedPoints:0}));
