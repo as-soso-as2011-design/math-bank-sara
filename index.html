@@ -1210,6 +1210,32 @@ html[dir="ltr"] .balance-head{direction:ltr}
         </div>
 
         <div class="teacher-box">
+          <h3>إضافة سريعة للفصل المحدد</h3>
+          <div class="field"><label>الفصل المحدد</label><select id="trackingClassSelect"></select></div>
+          <div class="teacher-subgrid">
+            <div class="field"><label>عدد الواجبات المطلوبة أسبوعيًا</label><input id="classTrkWeeklyRequired" type="number" min="0" placeholder="0" /></div>
+            <div class="field"><label>الواجب الأسبوعي المنجز</label><input id="classTrkWeeklyDone" type="number" min="0" placeholder="0" /></div>
+          </div>
+          <div class="teacher-subgrid">
+            <div class="field"><label>الواجب الشهري المنجز</label><input id="classTrkMonthlyDone" type="number" min="0" placeholder="0" /></div>
+            <div class="field"><label>المشاركة الأسبوعية</label><input id="classTrkWeeklyParticipation" type="number" min="0" placeholder="0" /></div>
+          </div>
+          <div class="teacher-subgrid">
+            <div class="field"><label>المشاركة الشهرية</label><input id="classTrkMonthlyParticipation" type="number" min="0" placeholder="0" /></div>
+            <div class="field"><label>التفكير العليا</label><input id="classTrkHigherOrder" type="number" min="0" placeholder="0" /></div>
+          </div>
+          <div class="field"><label>الإثرائية</label><input id="classTrkEnrichment" type="number" min="0" placeholder="0" /></div>
+          <div class="teacher-actions">
+            <button class="btn btn-green" onclick="saveClassTracking()">حفظ للفصل المحدد واحتساب النقاط</button>
+            <button class="btn btn-gold" onclick="fillClassTrackingFromStudent()">نسخ من بيانات الطالب المحدد</button>
+            <button class="btn btn-green whatsapp-btn" onclick="sendClassTrackingWhatsApp()">إرسال تقرير الفصل واتساب</button>
+          </div>
+          <div id="classTrackingMsg" class="notice ok hidden">تم تطبيق المتابعة على الفصل المحدد</div>
+          <div class="teacher-note">هذا الخيار يطبق نفس القيم على جميع طلاب الفصل المحدد دفعة واحدة، ثم يربطها بالنقاط والرصيد تلقائيًا عند الحفظ.</div>
+          <div class="teacher-note">عند الضغط على إرسال تقرير الفصل واتساب يتم تجهيز رسالة لكل ولي أمر في الفصل المحدد تتضمن الواجبات والمشاركات والأسئلة والنقاط والرصيد الحالي.</div>
+        </div>
+
+        <div class="teacher-box">
           <h3>أوزان النقاط</h3>
           <div class="weights-grid">
             <div class="field"><label>الواجب الأسبوعي</label><input id="weightWeeklyHomework" type="number" min="0" /></div>
@@ -1851,7 +1877,7 @@ function logoutTeacher(){ sessionStorage.removeItem('teacherLogged'); go('teache
 function logoutStudent(){ sessionStorage.removeItem('studentLogged'); sessionStorage.removeItem('currentStudentId'); go('student_login'); }
 
 function populateClassSelects(){
-  const selects = ['studentClassSelect','studentFilterClass','moveTargetClass','waClassSelect'];
+  const selects = ['studentClassSelect','studentFilterClass','moveTargetClass','waClassSelect','trackingClassSelect'];
   selects.forEach(id=>{
     const el = document.getElementById(id); if(!el) return;
     const keep = id==='studentFilterClass' ? '<option value="all">كل الفصول</option>' : '<option value="">اختر الفصل</option>';
@@ -2220,14 +2246,52 @@ function savePointWeights(){
 function saveStudentTracking(){
   const sid = document.getElementById('trackingStudentSelect')?.value;
   const st = getStudent(sid); if(!st) return;
+  applyTrackingToStudent(st, getTrackingInputs(''), 'احتساب نقاط المتابعة والواجبات');
+  saveBankData();
+  const msg = document.getElementById('trackingMsg'); if(msg){ msg.classList.remove('hidden'); setTimeout(()=>msg.classList.add('hidden'),1800); }
+  refreshTeacherUI();
+}
+
+function getTrackingInputs(prefix=''){
+  const ids = {
+    weeklyRequired: prefix + 'TrkWeeklyRequired',
+    weeklyHomeworkDone: prefix + 'TrkWeeklyDone',
+    monthlyHomeworkDone: prefix + 'TrkMonthlyDone',
+    weeklyParticipation: prefix + 'TrkWeeklyParticipation',
+    monthlyParticipation: prefix + 'TrkMonthlyParticipation',
+    higherOrder: prefix + 'TrkHigherOrder',
+    enrichment: prefix + 'TrkEnrichment'
+  };
+  return {
+    weeklyRequired:Number(document.getElementById(ids.weeklyRequired)?.value || 0),
+    weeklyHomeworkDone:Number(document.getElementById(ids.weeklyHomeworkDone)?.value || 0),
+    monthlyHomeworkDone:Number(document.getElementById(ids.monthlyHomeworkDone)?.value || 0),
+    weeklyParticipation:Number(document.getElementById(ids.weeklyParticipation)?.value || 0),
+    monthlyParticipation:Number(document.getElementById(ids.monthlyParticipation)?.value || 0),
+    higherOrder:Number(document.getElementById(ids.higherOrder)?.value || 0),
+    enrichment:Number(document.getElementById(ids.enrichment)?.value || 0)
+  };
+}
+function fillClassTrackingFromStudent(){
+  const sid = document.getElementById('trackingStudentSelect')?.value;
+  const st = getStudent(sid); if(!st) return;
   const tr = ensureTracking(st);
-  tr.weeklyRequired = Number(document.getElementById('trkWeeklyRequired')?.value || 0);
-  tr.weeklyHomeworkDone = Number(document.getElementById('trkWeeklyDone')?.value || 0);
-  tr.monthlyHomeworkDone = Number(document.getElementById('trkMonthlyDone')?.value || 0);
-  tr.weeklyParticipation = Number(document.getElementById('trkWeeklyParticipation')?.value || 0);
-  tr.monthlyParticipation = Number(document.getElementById('trkMonthlyParticipation')?.value || 0);
-  tr.higherOrder = Number(document.getElementById('trkHigherOrder')?.value || 0);
-  tr.enrichment = Number(document.getElementById('trkEnrichment')?.value || 0);
+  const map = {
+    classTrkWeeklyRequired: tr.weeklyRequired,
+    classTrkWeeklyDone: tr.weeklyHomeworkDone,
+    classTrkMonthlyDone: tr.monthlyHomeworkDone,
+    classTrkWeeklyParticipation: tr.weeklyParticipation,
+    classTrkMonthlyParticipation: tr.monthlyParticipation,
+    classTrkHigherOrder: tr.higherOrder,
+    classTrkEnrichment: tr.enrichment
+  };
+  Object.entries(map).forEach(([id,val])=>{ const el=document.getElementById(id); if(el) el.value = val; });
+  const classSel = document.getElementById('trackingClassSelect');
+  if(classSel && st.classId) classSel.value = st.classId;
+}
+function applyTrackingToStudent(st, values, reason){
+  const tr = ensureTracking(st);
+  Object.assign(tr, values);
   const newPoints = calculateTrackingPoints(tr);
   const oldPoints = Number(tr.pointsAwarded || 0);
   const delta = newPoints - oldPoints;
@@ -2236,15 +2300,73 @@ function saveStudentTracking(){
     st.balance = Number(st.balance || 0) + delta;
     const now = new Date();
     const date = now.toLocaleDateString('en-CA') + ' ' + now.toLocaleTimeString('ar-SA', {hour:'2-digit', minute:'2-digit'});
-    const op = {id:'op'+Date.now(), studentId:st.id, studentName:st.name, type: delta >= 0 ? 'deposit' : 'withdraw', amount: Math.abs(delta), reason:'احتساب نقاط المتابعة والواجبات', date};
-    st.history.push({id:'h'+Date.now(), type: op.type, amount: Math.abs(delta), reason: op.reason, date});
+    const op = {id:'op'+Date.now()+Math.floor(Math.random()*1000), studentId:st.id, studentName:st.name, type: delta >= 0 ? 'deposit' : 'withdraw', amount: Math.abs(delta), reason, date};
+    st.history.push({id:'h'+Date.now()+Math.floor(Math.random()*1000), type: op.type, amount: Math.abs(delta), reason: op.reason, date});
     bankData.operations.push(op);
     lastOperation = op;
   }
-  saveBankData();
-  const msg = document.getElementById('trackingMsg'); if(msg){ msg.classList.remove('hidden'); setTimeout(()=>msg.classList.add('hidden'),1800); }
-  refreshTeacherUI();
   if(sessionStorage.getItem('currentStudentId')===st.id) renderStudentAccount();
+  return delta;
+}
+function saveClassTracking(){
+  const classId = document.getElementById('trackingClassSelect')?.value;
+  if(!classId) return;
+  const classStudents = bankData.students.filter(s=>s.classId===classId);
+  if(!classStudents.length) return;
+  const values = getTrackingInputs('class');
+  let applied = 0;
+  classStudents.forEach(st=>{
+    applyTrackingToStudent(st, values, 'احتساب نقاط المتابعة والواجبات للفصل');
+    applied += 1;
+  });
+  saveBankData();
+  refreshTeacherUI();
+  const msg = document.getElementById('classTrackingMsg');
+  if(msg){
+    msg.textContent = `تم تطبيق المتابعة على ${applied} من طلاب الفصل المحدد واحتساب النقاط تلقائيًا`;
+    msg.classList.remove('hidden');
+    setTimeout(()=>msg.classList.add('hidden'),2200);
+  }
+}
+function buildTrackingWhatsAppMessage(student){
+  const tr = ensureTracking(student);
+  return `رسالة تلقائية من بنك الرياضيات
+` +
+    `الفصل: ${getClassName(student.classId)}
+` +
+    `الطالب / الطالبة: ${student.name}
+` +
+    `الواجب الأسبوعي: ${Number(tr.weeklyHomeworkDone||0)} من ${Number(tr.weeklyRequired||0)}
+` +
+    `الواجب الشهري: ${Number(tr.monthlyHomeworkDone||0)}
+` +
+    `المشاركة الأسبوعية: ${Number(tr.weeklyParticipation||0)}
+` +
+    `المشاركة الشهرية: ${Number(tr.monthlyParticipation||0)}
+` +
+    `أسئلة التفكير العليا: ${Number(tr.higherOrder||0)}
+` +
+    `الأسئلة الإثرائية: ${Number(tr.enrichment||0)}
+` +
+    `النقاط المحتسبة: ${Number(tr.pointsAwarded||0)}
+` +
+    `الرصيد الحالي: ${formatMoney(student.balance)} ر.س`;
+}
+function sendClassTrackingWhatsApp(){
+  const classId = document.getElementById('trackingClassSelect')?.value;
+  if(!classId) return;
+  const list = bankData.students.filter(s=>s.classId===classId && s.guardian);
+  if(!list.length) return;
+  list.forEach((student, idx)=>{
+    const message = buildTrackingWhatsAppMessage(student);
+    setTimeout(()=>openWhatsAppNumber(student.guardian, message), idx*250);
+  });
+  const msg = document.getElementById('classTrackingMsg');
+  if(msg){
+    msg.textContent = `تم تجهيز تقارير واتساب لعدد ${list.length} من أولياء أمور الفصل المحدد`;
+    msg.classList.remove('hidden');
+    setTimeout(()=>msg.classList.add('hidden'),2400);
+  }
 }
 function renderTrackingSummary(){
   const sums = {weeklyRequired:0, weeklyDone:0, monthlyDone:0, weeklyParticipation:0, monthlyParticipation:0, higherOrder:0, enrichment:0, points:0};
