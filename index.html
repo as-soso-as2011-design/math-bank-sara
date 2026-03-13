@@ -2665,43 +2665,119 @@ window.addEventListener('load', function(){
 </script>
 
 
-<!-- ===== Performance Tasks System Added ===== -->
-<script>
-if(!window.performanceTasks){window.performanceTasks=[];}
-
-function addPerformanceTask(){
-  const title=document.getElementById('taskTitle').value;
-  const start=document.getElementById('taskStart').value;
-  const end=document.getElementById('taskEnd').value;
-  const cls=document.getElementById('taskClass').value;
-
-  if(!title||!start||!end||!cls){alert("أكملي البيانات");return;}
-
-  const task={id:Date.now(),title,start,end,cls};
-  performanceTasks.push(task);
-  renderStudentTasks();
-  alert("تم إضافة المهمة");
-}
-
-function renderStudentTasks(){
-  const box=document.getElementById("studentTasksBox");
-  if(!box) return;
-  box.innerHTML="";
-  performanceTasks.forEach(t=>{
-    const div=document.createElement("div");
-    div.style.padding="12px";
-    div.style.margin="10px 0";
-    div.style.background="#fff";
-    div.style.borderRadius="12px";
-    div.innerHTML=`
-      <b>${t.title}</b><br>
-      تاريخ البدء: ${t.start}<br>
-      آخر موعد: ${t.end}<br>
-      <input type="file">
-    `;
-    box.appendChild(div);
-  });
-}
+<style id="performance-upgrade-v2">
+.perf-highlight{background:linear-gradient(135deg,#103a2e,#1f7f57);color:#fff;border-radius:22px;padding:14px 16px;margin-bottom:12px;box-shadow:0 10px 22px rgba(16,58,46,.10)}
+.perf-highlight strong{display:block;font-size:18px;margin-bottom:6px}
+.perf-meta-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}
+@media(max-width:800px){.perf-meta-grid{grid-template-columns:1fr}}
+.perf-meta-box{background:#fff;border:1px solid var(--line);border-radius:18px;padding:12px}
+.perf-meta-box .label{font-size:12px;color:var(--muted);display:block;margin-bottom:5px}
+.perf-meta-box .value{font-size:14px;font-weight:800;color:var(--deep)}
+.student-attach-hero{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:12px;padding:14px 16px;border-radius:18px;background:#edf6f0;border:1px solid #d8e9dd}
+.student-attach-hero .tag{display:inline-flex;align-items:center;gap:8px;font-weight:900;color:#176242}
+.student-attach-hero .sub{font-size:12px;color:#56736a}
+</style>
+<script id="performance-upgrade-v2-script">
+(function(){
+  function fmtDate(v){ if(!v) return '—'; try{ return new Date(v).toLocaleDateString('ar-SA'); }catch(e){ return v; } }
+  function esc(s){ return String(s||'').replace(/[&<>"]/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]; }); }
+  function installPerformanceForm(){
+    const titleEl=document.getElementById('perfTaskTitle');
+    if(!titleEl || document.getElementById('perfTaskStart')) return;
+    const dueField=document.getElementById('perfTaskDue')?.closest('.field');
+    if(dueField){
+      dueField.querySelector('label').textContent='آخر موعد للتسليم';
+      const startField=document.createElement('div');
+      startField.className='field';
+      startField.innerHTML='<label>تاريخ بدء المهمة</label><input id="perfTaskStart" type="date" />';
+      dueField.parentNode.insertBefore(startField, dueField);
+    }
+    titleEl.closest('.field').querySelector('label').textContent='عنوان المهمة الأدائية';
+    const help=document.querySelector('#teacherPanePerformance .teacher-note');
+    if(help) help.textContent='أنشئي مهمة للفصل كامل بعنوان وتاريخ بداية ونهاية، ثم ستظهر مباشرة في حساب الطالبات داخل نفس الفصل.';
+  }
+  const originalCreate = window.createPerformanceTask;
+  window.createPerformanceTask = function(){
+    if(!window.bankData) return;
+    if(!Array.isArray(bankData.performanceTasks)) bankData.performanceTasks=[];
+    const title=(document.getElementById('perfTaskTitle')?.value||'').trim();
+    const skill=(document.getElementById('perfTaskSkill')?.value||'').trim();
+    const classId=document.getElementById('perfTaskClassSelect')?.value||'';
+    const startDate=document.getElementById('perfTaskStart')?.value||'';
+    const dueDate=document.getElementById('perfTaskDue')?.value||'';
+    const maxScore=Number(document.getElementById('perfTaskMaxScore')?.value||20);
+    const pointRate=Number(document.getElementById('perfTaskPointRate')?.value||100);
+    const visibleDefault=(document.getElementById('perfTaskVisibleDefault')?.value||'yes')==='yes';
+    if(!title || !classId || !startDate || !dueDate){ alert('أكملي عنوان المهمة وتاريخ البداية والنهاية واختيار الفصل.'); return; }
+    const task={id:'pt'+Date.now(),title,skill,classId,startDate,dueDate,maxScore,pointRate,visibleDefault,createdAt:new Date().toISOString(),entries:{}};
+    bankData.performanceTasks.push(task);
+    if(typeof saveBankData==='function') saveBankData();
+    ['perfTaskTitle','perfTaskSkill','perfTaskStart','perfTaskDue'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+    const msg=document.getElementById('performanceTaskMsg'); if(msg){ msg.classList.remove('hidden'); setTimeout(()=>msg.classList.add('hidden'),1800); }
+    if(typeof refreshTeacherUI==='function') refreshTeacherUI();
+  };
+  window.renderTeacherPerformanceTasks = function(){
+    if(!window.bankData) return;
+    if(!Array.isArray(bankData.performanceTasks)) bankData.performanceTasks=[];
+    const wrap=document.getElementById('teacherPerformanceTasks'); if(!wrap) return;
+    if(!bankData.performanceTasks.length){ wrap.innerHTML='<div class="performance-empty">لا توجد مهام أدائية بعد. أضيفي عنوان المهمة وتاريخها والفصل من الأعلى.</div>'; }
+    else {
+      wrap.innerHTML = bankData.performanceTasks.map(task=>{
+        const students=(bankData.students||[]).filter(s=>s.classId===task.classId);
+        const className=(typeof getClassName==='function')? getClassName(task.classId): task.classId;
+        const rows=students.length ? students.map(st=>{
+          const entry = (typeof ensurePerformanceEntry==='function') ? ensurePerformanceEntry(task, st.id) : (task.entries[st.id]||(task.entries[st.id]={score:0,status:'pending',noteInternal:'',showToStudent:!!task.visibleDefault,attachmentName:'',attachmentData:'',attachmentMime:'',videoLink:'',awardedPoints:0}));
+          return `<div class="performance-student-row">
+            <div class="performance-student-head"><div><div class="performance-student-name">${esc(st.name)}</div><div class="teacher-note">${esc(className)} • الرصيد الحالي ${typeof formatMoney==='function'?formatMoney(st.balance):st.balance} ر.س</div></div><div class="performance-private">${entry.attachmentName ? 'مرفق محفوظ 🔒' : 'بدون مرفق'}</div></div>
+            <div class="teacher-subgrid">
+              <div class="field"><label>الدرجة</label><input id="perfScore_${task.id}_${st.id}" type="number" min="0" max="${Number(task.maxScore||0)}" value="${Number(entry.score||0)}"></div>
+              <div class="field"><label>الحالة</label><select id="perfStatus_${task.id}_${st.id}"><option value="pending" ${entry.status==='pending'?'selected':''}>بانتظار الاستلام</option><option value="received" ${entry.status==='received'?'selected':''}>تم الاستلام</option><option value="rated" ${entry.status==='rated'?'selected':''}>تم التقييم</option><option value="closed" ${entry.status==='closed'?'selected':''}>مغلق</option></select></div>
+            </div>
+            <div class="teacher-subgrid">
+              <div class="field"><label>ملاحظة داخلية</label><input id="perfNote_${task.id}_${st.id}" type="text" value="${esc(entry.noteInternal||'')}" placeholder="خاصة بالمعلمة"></div>
+              <div class="field"><label>رابط فيديو/درايف</label><input id="perfVideo_${task.id}_${st.id}" type="text" value="${esc(entry.videoLink||'')}" placeholder="اختياري"></div>
+            </div>
+            <div class="performance-attach">
+              <label class="ghost" style="cursor:pointer">إرفاق العمل الآن<input type="file" accept="image/*,.pdf,video/*" style="display:none" onchange="cacheTaskAttachment('${task.id}','${st.id}',this)"></label>
+              <label class="chip-pill"><input id="perfShow_${task.id}_${st.id}" type="checkbox" style="width:auto" ${entry.showToStudent?'checked':''}> إظهار المرفق للطالبة</label>
+              ${entry.attachmentData ? `<button class="ghost" type="button" onclick="openTaskAttachment('${task.id}','${st.id}')">فتح المرفق</button>` : ''}
+            </div>
+            <div class="teacher-actions" style="margin-top:10px"><button class="btn btn-green" type="button" onclick="savePerformanceAssessment('${task.id}','${st.id}')">حفظ تقييم الطالبة</button><div class="performance-private">النقاط الحالية: ${new Intl.NumberFormat('ar-SA').format(Number(entry.awardedPoints||0))}</div></div>
+          </div>`;
+        }).join('') : '<div class="performance-empty">لا يوجد طلاب في هذا الفصل بعد.</div>';
+        return `<div class="performance-card"><div class="perf-highlight"><strong>${esc(task.title)}</strong><div>${esc(className)}</div></div><div class="perf-meta-grid"><div class="perf-meta-box"><span class="label">تاريخ الإضافة</span><span class="value">${fmtDate(task.createdAt)}</span></div><div class="perf-meta-box"><span class="label">تاريخ بدء المهمة</span><span class="value">${fmtDate(task.startDate)}</span></div><div class="perf-meta-box"><span class="label">آخر موعد للتسليم</span><span class="value">${fmtDate(task.dueDate)}</span></div></div><div class="performance-meta"><span class="pill">${esc(task.skill||'بدون مهارة محددة')}</span><span class="pill">الدرجة ${Number(task.maxScore||0)}</span><span class="pill">النقاط ${Number(task.pointRate||0)}</span></div>${rows}</div>`;
+      }).join('');
+    }
+    let attachCount=0, rated=0;
+    bankData.performanceTasks.forEach(task=>Object.values(task.entries||{}).forEach(entry=>{ if(entry.attachmentData||entry.videoLink) attachCount++; if(entry.status==='rated'||Number(entry.score||0)>0) rated++; }));
+    const s1=document.getElementById('perfSummaryTasks'); if(s1) s1.textContent=new Intl.NumberFormat('ar-SA').format(bankData.performanceTasks.length);
+    const s2=document.getElementById('perfSummaryAttachments'); if(s2) s2.textContent=new Intl.NumberFormat('ar-SA').format(attachCount);
+    const s3=document.getElementById('perfSummaryRated'); if(s3) s3.textContent=new Intl.NumberFormat('ar-SA').format(rated);
+  };
+  window.renderStudentPerformanceTasks = function(student){
+    if(!window.bankData || !student) return;
+    if(!Array.isArray(bankData.performanceTasks)) bankData.performanceTasks=[];
+    const wrap=document.getElementById('studentPerformanceTaskList'); if(!wrap) return;
+    const tasks=bankData.performanceTasks.filter(task=>task.classId===student.classId);
+    let done=0, points=0;
+    if(!tasks.length){ wrap.innerHTML='<div class="performance-empty">لا توجد مهام أدائية مضافة لهذا الفصل حتى الآن.</div>'; }
+    else {
+      wrap.innerHTML=tasks.map(task=>{
+        const entry = (typeof ensurePerformanceEntry==='function') ? ensurePerformanceEntry(task, student.id) : (task.entries[student.id]||(task.entries[student.id]={score:0,status:'pending',showToStudent:!!task.visibleDefault,attachmentData:'',videoLink:'',awardedPoints:0}));
+        if(entry.status==='rated'||Number(entry.score||0)>0) done++;
+        points += Number(entry.awardedPoints||0);
+        const statusMap={pending:'بانتظار الاستلام',received:'تم الاستلام',rated:'تم التقييم',closed:'مغلق'};
+        const canShow=entry.showToStudent;
+        return `<div class="performance-student-row"><div class="perf-highlight"><strong>${esc(task.title)}</strong><div>${statusMap[entry.status]||'بانتظار الاستلام'}</div></div><div class="perf-meta-grid"><div class="perf-meta-box"><span class="label">تاريخ الإضافة</span><span class="value">${fmtDate(task.createdAt)}</span></div><div class="perf-meta-box"><span class="label">تاريخ بدء المهمة</span><span class="value">${fmtDate(task.startDate)}</span></div><div class="perf-meta-box"><span class="label">آخر موعد للتسليم</span><span class="value">${fmtDate(task.dueDate)}</span></div></div><div class="teacher-subgrid"><div class="field"><label>الدرجة</label><input type="text" readonly value="${Number(entry.score||0)} / ${Number(task.maxScore||0)}"></div><div class="field"><label>النقاط المضافة</label><input type="text" readonly value="${new Intl.NumberFormat('ar-SA').format(Number(entry.awardedPoints||0))}"></div></div><div class="student-attach-hero"><div><div class="tag">📎 مرفق العمل</div><div class="sub">المرفق ظاهر بشكل واضح داخل المهمة إذا سمحت المعلمة بإظهاره.</div></div><div>${canShow && (entry.attachmentData||entry.videoLink) ? 'مرفق خاص 🔒' : 'لا يوجد مرفق ظاهر'}</div></div><div class="performance-attach">${canShow && entry.attachmentData ? `<button class="ghost" type="button" onclick="openTaskAttachment('${task.id}','${student.id}')">فتح المرفق</button>` : ''}${canShow && entry.videoLink ? `<a class="performance-link" href="${entry.videoLink}" target="_blank" rel="noopener">فتح الرابط</a>` : ''}</div></div>`;
+      }).join('');
+    }
+    const c=document.getElementById('studentPerfCount'); if(c) c.textContent=new Intl.NumberFormat('ar-SA').format(tasks.length);
+    const d=document.getElementById('studentPerfDone'); if(d) d.textContent=new Intl.NumberFormat('ar-SA').format(done);
+    const p=document.getElementById('studentPerfPoints'); if(p) p.textContent=new Intl.NumberFormat('ar-SA').format(points);
+  };
+  document.addEventListener('DOMContentLoaded', function(){ installPerformanceForm(); setTimeout(()=>{ try{ if(typeof populatePerformanceClassSelect==='function') populatePerformanceClassSelect(); if(typeof renderTeacherPerformanceTasks==='function') renderTeacherPerformanceTasks(); if(typeof sessionStorage!=='undefined' && sessionStorage.getItem('currentStudentId') && typeof renderStudentAccount==='function') renderStudentAccount(); }catch(e){} }, 50); });
+  window.addEventListener('load', installPerformanceForm);
+})();
 </script>
 
 </body>
