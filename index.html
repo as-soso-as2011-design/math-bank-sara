@@ -1311,7 +1311,7 @@ html[dir="ltr"] .balance-head{direction:ltr}
             <div class="field"><label>النقاط القصوى المضافة للبنك</label><input id="perfTaskPointRate" type="number" min="1" value="100" /></div>
             <div class="field"><label>إظهار المرفقات للطالبة</label><select id="perfTaskVisibleDefault"><option value="yes">نعم</option><option value="no">لا</option></select></div>
           </div>
-          <button class="btn btn-green" style="width:100%" onclick="createPerformanceTask()">إنشاء المهمة الأدائية</button>
+          <button id="createPerformanceTaskBtn" type="button" class="btn btn-green" style="width:100%">إنشاء المهمة الأدائية</button>
           <div id="performanceTaskMsg" class="notice ok hidden">تم إنشاء المهمة الأدائية</div>
           <div class="teacher-note">بعد إنشاء المهمة يظهر لك تقييم كل طالبة مع رفع صورة أو PDF أو رابط فيديو بشكل يدوي وفوري، مع بقاء الوصف الداخلي مخفيًا عن حساب الطالبة.</div>
         </div>
@@ -2945,6 +2945,158 @@ window.addEventListener('load', function(){
         if(student) window.renderStudentPerformanceTasks(student);
       }
     }catch(e){ console.warn(e); }
+  });
+})();
+</script>
+
+<script id="performance-hard-fix">
+(function(){
+  function fmtDate(v){ if(!v) return '—'; try{ return new Date(v).toLocaleDateString('ar-SA'); }catch(e){ return v; } }
+  function esc(s){ return String(s||'').replace(/[&<>"]/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]; }); }
+  function ensurePerf(){
+    if(!window.bankData) return [];
+    if(!Array.isArray(bankData.performanceTasks)) bankData.performanceTasks=[];
+    bankData.performanceTasks.forEach(function(task){ if(!task.entries || typeof task.entries!=='object') task.entries={}; });
+    return bankData.performanceTasks;
+  }
+  function ensureEntry(task, studentId){
+    if(!task.entries) task.entries={};
+    if(!task.entries[studentId]) task.entries[studentId]={score:0,status:'pending',noteInternal:'',showToStudent:!!task.visibleDefault,attachmentName:'',attachmentData:'',attachmentMime:'',videoLink:'',awardedPoints:0};
+    return task.entries[studentId];
+  }
+  function getCurrentStudentSafe(){
+    const sid = sessionStorage.getItem('currentStudentId');
+    if(!sid || !window.bankData) return null;
+    return (bankData.students||[]).find(function(s){ return s.id===sid; }) || null;
+  }
+  function fillClassSelect(){
+    const el=document.getElementById('perfTaskClassSelect');
+    if(!el || !window.bankData) return;
+    const current=el.value;
+    el.innerHTML='<option value="">اختر الفصل</option>' + (bankData.classes||[]).map(function(c){ return '<option value="'+c.id+'">'+esc(c.name)+'</option>'; }).join('');
+    if(current) el.value=current;
+  }
+  function showMsg(id){ const msg=document.getElementById(id); if(msg){ msg.classList.remove('hidden'); setTimeout(function(){ msg.classList.add('hidden'); }, 1800); } }
+
+  window.renderTeacherPerformanceTasks = function(){
+    if(!window.bankData) return;
+    ensurePerf();
+    fillClassSelect();
+    const wrap=document.getElementById('teacherPerformanceTasks');
+    const s1=document.getElementById('perfSummaryTasks');
+    const s2=document.getElementById('perfSummaryAttachments');
+    const s3=document.getElementById('perfSummaryRated');
+    if(!wrap) return;
+    let attachments=0, rated=0;
+    bankData.performanceTasks.forEach(function(task){
+      (bankData.students||[]).filter(function(st){ return st.classId===task.classId; }).forEach(function(st){
+        const entry=ensureEntry(task, st.id);
+        if(entry.attachmentData || entry.videoLink) attachments++;
+        if(entry.status==='rated' || Number(entry.score||0)>0) rated++;
+      });
+    });
+    if(s1) s1.textContent=String(bankData.performanceTasks.length);
+    if(s2) s2.textContent=String(attachments);
+    if(s3) s3.textContent=String(rated);
+    if(!bankData.performanceTasks.length){
+      wrap.innerHTML='<div class="performance-empty">لا توجد مهام أدائية بعد. أضيفي عنوان المهمة وتاريخ البداية والنهاية ثم اضغطي إنشاء المهمة الأدائية.</div>';
+      return;
+    }
+    wrap.innerHTML = bankData.performanceTasks.map(function(task){
+      const className=(typeof getClassName==='function') ? getClassName(task.classId) : task.classId;
+      const students=(bankData.students||[]).filter(function(st){ return st.classId===task.classId; });
+      const rows = students.length ? students.map(function(st){
+        const entry=ensureEntry(task, st.id);
+        const statusMap={pending:'بانتظار الاستلام',received:'تم الاستلام',rated:'تم التقييم',closed:'مغلق'};
+        return '<div class="performance-student-row"><div class="performance-student-head"><div><div class="performance-student-name">'+esc(st.name)+'</div><div class="teacher-note">'+esc(className)+' • الرصيد الحالي '+(typeof formatMoney==='function' ? formatMoney(st.balance) : st.balance)+' ر.س</div></div><div class="performance-private">'+(statusMap[entry.status]||'بانتظار الاستلام')+'</div></div></div>';
+      }).join('') : '<div class="performance-empty">لا يوجد طالبات داخل هذا الفصل حاليًا.</div>';
+      return '<div class="performance-card"><h4>'+esc(task.title)+'</h4><div class="performance-meta"><span class="pill">'+esc(className)+'</span><span class="pill">بدء: '+fmtDate(task.startDate)+'</span><span class="pill">التسليم: '+fmtDate(task.dueDate)+'</span></div>'+rows+'</div>';
+    }).join('');
+  };
+
+  window.renderStudentPerformanceTasks = function(student){
+    if(!window.bankData || !student) return;
+    ensurePerf();
+    const wrap=document.getElementById('studentPerformanceTaskList');
+    const c=document.getElementById('studentPerfCount');
+    const d=document.getElementById('studentPerfDone');
+    const p=document.getElementById('studentPerfPoints');
+    if(!wrap) return;
+    const tasks=bankData.performanceTasks.filter(function(task){ return task.classId===student.classId; });
+    let done=0, points=0;
+    if(!tasks.length){
+      wrap.innerHTML='<div class="performance-empty">لا توجد مهام أدائية مضافة لهذا الفصل حتى الآن.</div>';
+    } else {
+      wrap.innerHTML=tasks.map(function(task){
+        const entry=ensureEntry(task, student.id);
+        if(entry.status==='rated' || Number(entry.score||0)>0) done++;
+        points += Number(entry.awardedPoints||0);
+        const statusMap={pending:'بانتظار الاستلام',received:'تم الاستلام',rated:'تم التقييم',closed:'مغلق'};
+        const canShow=entry.showToStudent;
+        return '<div class="performance-student-row"><div class="perf-highlight"><strong>'+esc(task.title)+'</strong><div>'+(statusMap[entry.status]||'بانتظار الاستلام')+'</div></div><div class="perf-meta-grid"><div class="perf-meta-box"><span class="label">عنوان المهمة</span><span class="value">'+esc(task.title)+'</span></div><div class="perf-meta-box"><span class="label">تاريخ البداية</span><span class="value">'+fmtDate(task.startDate)+'</span></div><div class="perf-meta-box"><span class="label">آخر موعد للتسليم</span><span class="value">'+fmtDate(task.dueDate)+'</span></div></div><div class="teacher-subgrid"><div class="field"><label>الدرجة</label><input type="text" readonly value="'+Number(entry.score||0)+' / '+Number(task.maxScore||0)+'"></div><div class="field"><label>الحالة</label><input type="text" readonly value="'+(statusMap[entry.status]||'بانتظار الاستلام')+'"></div></div><div class="student-attach-hero"><div><div class="tag">📎 مرفق العمل</div><div class="sub">المرفق يظهر إذا سمحت المعلمة بإظهاره.</div></div><div>'+(canShow && (entry.attachmentData||entry.videoLink) ? 'مرفق خاص 🔒' : 'لا يوجد مرفق ظاهر')+'</div></div></div>';
+      }).join('');
+    }
+    if(c) c.textContent=String(tasks.length);
+    if(d) d.textContent=String(done);
+    if(p) p.textContent=String(points);
+  };
+
+  window.createPerformanceTask = function(){
+    try{
+      if(!window.bankData){ alert('تعذر تحميل بيانات النظام.'); return false; }
+      ensurePerf();
+      fillClassSelect();
+      const title=(document.getElementById('perfTaskTitle')?.value||'').trim();
+      const skill=(document.getElementById('perfTaskSkill')?.value||'').trim();
+      const classId=(document.getElementById('perfTaskClassSelect')?.value||'').trim();
+      const startDate=(document.getElementById('perfTaskStart')?.value||'').trim();
+      const dueDate=(document.getElementById('perfTaskDue')?.value||'').trim();
+      const maxScore=Math.max(0, Number(document.getElementById('perfTaskMaxScore')?.value||20));
+      const pointRate=Math.max(0, Number(document.getElementById('perfTaskPointRate')?.value||100));
+      const visibleDefault=(document.getElementById('perfTaskVisibleDefault')?.value||'yes')==='yes';
+      if(!title || !classId || !startDate || !dueDate){ alert('أكملي عنوان المهمة وتاريخ البداية وآخر موعد للتسليم واختيار الفصل.'); return false; }
+      const task={id:'pt'+Date.now(), title:title, skill:skill, classId:classId, startDate:startDate, dueDate:dueDate, maxScore:maxScore||20, pointRate:pointRate||100, visibleDefault:visibleDefault, createdAt:new Date().toISOString(), entries:{}};
+      (bankData.students||[]).filter(function(st){ return st.classId===classId; }).forEach(function(st){ ensureEntry(task, st.id); });
+      bankData.performanceTasks.push(task);
+      if(typeof saveBankData==='function') saveBankData();
+      ['perfTaskTitle','perfTaskSkill','perfTaskStart','perfTaskDue'].forEach(function(id){ const el=document.getElementById(id); if(el) el.value=''; });
+      const classSelect=document.getElementById('perfTaskClassSelect'); if(classSelect) classSelect.value='';
+      showMsg('performanceTaskMsg');
+      window.renderTeacherPerformanceTasks();
+      const currentStudent=getCurrentStudentSafe();
+      if(currentStudent) window.renderStudentPerformanceTasks(currentStudent);
+      return false;
+    }catch(err){ console.error(err); alert('حدث خطأ أثناء إنشاء المهمة الأدائية.'); return false; }
+  };
+
+  function bindCreateBtn(){
+    const btn=document.getElementById('createPerformanceTaskBtn');
+    if(!btn || btn.dataset.bound==='1') return;
+    btn.dataset.bound='1';
+    btn.addEventListener('click', function(ev){ ev.preventDefault(); ev.stopPropagation(); window.createPerformanceTask(); });
+  }
+
+  const baseShowTeacherPane = window.showTeacherPane;
+  window.showTeacherPane = function(id, btn){
+    if(typeof baseShowTeacherPane==='function') baseShowTeacherPane(id, btn);
+    if(id==='teacherPanePerformance') setTimeout(function(){ bindCreateBtn(); window.renderTeacherPerformanceTasks(); }, 0);
+  };
+
+  const baseShowTab = window.showTab;
+  window.showTab = function(id, btn){
+    if(typeof baseShowTab==='function') baseShowTab(id, btn);
+    if(id==='performanceStudentTab'){ const st=getCurrentStudentSafe(); if(st) setTimeout(function(){ window.renderStudentPerformanceTasks(st); }, 0); }
+  };
+
+  const baseRenderStudentAccount = window.renderStudentAccount;
+  window.renderStudentAccount = function(){
+    if(typeof baseRenderStudentAccount==='function') baseRenderStudentAccount();
+    const st=getCurrentStudentSafe();
+    if(st) window.renderStudentPerformanceTasks(st);
+  };
+
+  window.addEventListener('load', function(){
+    setTimeout(function(){ fillClassSelect(); bindCreateBtn(); window.renderTeacherPerformanceTasks(); const st=getCurrentStudentSafe(); if(st) window.renderStudentPerformanceTasks(st); }, 300);
   });
 })();
 </script>
