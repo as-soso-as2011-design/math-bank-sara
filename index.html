@@ -520,6 +520,7 @@ html[dir="ltr"] .balance-head{direction:ltr}
 
 </head>
 <body>
+<script>window.Chart=window.Chart||function(){return {destroy:function(){}, update:function(){}}};</script>
 <div class="app">
 
 <section id="home" class="screen active">
@@ -2706,6 +2707,58 @@ window.addEventListener('load',, function(){
   toggleTransferTarget();
   if(sessionStorage.getItem('studentLogged')==='1') setTimeout(renderStudentAccount, 80);
 });
+</script>
+
+
+<script id="oai-recovery-patch-v2">
+(function(){
+  function safeRefresh(){
+    try{ if(typeof loadBankData==='function') loadBankData(); }catch(e){}
+    try{ if(typeof ensurePerformanceTasks==='function') ensurePerformanceTasks(); }catch(e){}
+    try{ if(typeof refreshTeacherUI==='function') refreshTeacherUI(); }catch(e){}
+    try{ if(sessionStorage.getItem('studentLogged')==='1' && typeof renderStudentAccount==='function') renderStudentAccount(); }catch(e){}
+  }
+  window.showTeacherPane = function(id, btn){
+    try{
+      var root = document.getElementById('teacher');
+      if(!root) return;
+      root.querySelectorAll('.teacher-pane').forEach(function(p){ p.classList.remove('active'); p.style.display='none'; });
+      var target = document.getElementById(id);
+      if(target){ target.classList.add('active'); target.style.display='block'; }
+      var tabs = document.getElementById('teacherTabs');
+      if(tabs) tabs.querySelectorAll('button').forEach(function(b){ b.classList.remove('active'); });
+      if(btn) btn.classList.add('active');
+      safeRefresh();
+    }catch(e){ console.error(e); }
+  };
+  window.goToTeacherPerformance = function(){
+    var btn=[].slice.call(document.querySelectorAll('#teacherTabs button')).find(function(b){ return b.textContent.indexOf('المهام الأدائية')>-1;});
+    window.showTeacherPane('teacherPanePerformance', btn||null);
+  };
+  window.goToTeacherHome = function(){
+    var btn=[].slice.call(document.querySelectorAll('#teacherTabs button')).find(function(b){ return b.textContent.indexOf('الرئيسية')>-1;});
+    window.showTeacherPane('teacherPaneHome', btn||null);
+  };
+  function wireStudentTab(){
+    var btn=[].slice.call(document.querySelectorAll('#account .tabbar button')).find(function(b){ return b.textContent.indexOf('المهام الأدائية')>-1;});
+    if(btn){ btn.setAttribute('onclick',"showTab('performanceStudentTab', this); try{renderStudentPerformanceTasks(getCurrentStudent())}catch(e){}"); }
+  }
+  function patchCreateTask(){
+    if(typeof createPerformanceTask!=='function') return;
+    var old=window.createPerformanceTask;
+    window.createPerformanceTask=function(){ old.apply(this, arguments); safeRefresh(); };
+  }
+  window.addEventListener('load', function(){
+    safeRefresh();
+    wireStudentTab();
+    patchCreateTask();
+    try{
+      if(sessionStorage.getItem('teacherLogged')==='1'){
+        window.goToTeacherHome();
+      }
+    }catch(e){}
+  });
+})();
 </script>
 
 </body>
