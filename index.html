@@ -4085,6 +4085,7 @@ window.addEventListener('load', function(){
     });
     const stats = buildClassStats(cls);
     detail.classList.remove('hidden');
+    detail.classList.add('page-mode');
     detail.innerHTML = `
       <div class="student-detail-header">
         <div class="student-detail-title"><h3>${cls.name}</h3><p>صفحة مستقلة لإدارة الطلاب / الطالبات داخل الفصل مع أدوات جماعية وأزرار خاصة بكل طالب / طالبة.</p></div>
@@ -4255,55 +4256,7 @@ window.addEventListener('load', function(){
   };
   function openPrintWindow(title, bodyHtml){
     const w = window.open('', '_blank'); if(!w) return;
-    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}
-<script id="student-settings-v10-safe-classpage-patch">
-(function(){
-  function cleanCurrentLevelText(){
-    document.querySelectorAll('.student-card-sub').forEach(function(el){
-      el.innerHTML = el.innerHTML.replace(/[^<]*المستوى الحالي:[^<]*<br\s*\/?\s*>?/g,'');
-      el.innerHTML = el.innerHTML.replace(/^\s*<br\s*\/?\s*>/,'');
-    });
-  }
-  function setClassPageMode(isClassOpen){
-    var cards = document.getElementById('studentClassCards');
-    var detail = document.getElementById('studentClassDetail');
-    if(cards){ cards.style.display = isClassOpen ? 'none' : ''; }
-    if(detail){ detail.style.display = isClassOpen ? '' : ''; }
-    var detailHeader = detail ? detail.querySelector('.student-detail-header p') : null;
-    if(detailHeader && isClassOpen){
-      detailHeader.textContent = 'صفحة خاصة بمحتوى الفصل مع بطاقات الطلاب / الطالبات وأدوات الفصل وزر رجوع للخلف.';
-    }
-  }
-  function afterRender(){
-    cleanCurrentLevelText();
-    var state = window.__studentSettingsState || {};
-    setClassPageMode(!!state.classId);
-  }
-  var oldOpen = window.openStudentSettingsClass;
-  window.openStudentSettingsClass = function(classId){
-    if(typeof oldOpen === 'function') oldOpen(classId);
-    setTimeout(afterRender, 20);
-  };
-  var oldClose = window.closeStudentSettingsClass;
-  window.closeStudentSettingsClass = function(){
-    if(typeof oldClose === 'function') oldClose();
-    setTimeout(afterRender, 20);
-  };
-  var oldRender = window.renderStudentSettingsDashboard;
-  window.renderStudentSettingsDashboard = function(){
-    if(typeof oldRender === 'function') oldRender();
-    setTimeout(afterRender, 20);
-  };
-  var oldRefresh = window.refreshTeacherUI;
-  window.refreshTeacherUI = function(){
-    if(typeof oldRefresh === 'function') oldRefresh();
-    setTimeout(afterRender, 20);
-  };
-  document.addEventListener('DOMContentLoaded', function(){ setTimeout(afterRender, 50); });
-})();
-</script>
-
-</body></html>`);
+    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}</body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
   window.printStudentReport = function(studentId){
@@ -4324,54 +4277,6 @@ window.addEventListener('load', function(){
   const prevShowPane = window.showTeacherPane;
   window.showTeacherPane = function(id, btn){ if(typeof prevShowPane==='function') prevShowPane(id, btn); if(id==='teacherPaneStudents') setTimeout(function(){ try{ renderStudentSettingsDashboard(); }catch(e){} }, 60); };
   document.addEventListener('DOMContentLoaded', function(){ setTimeout(function(){ try{ renderStudentSettingsDashboard(); }catch(e){} }, 250); });
-})();
-</script>
-
-
-<script id="student-settings-v10-safe-classpage-patch">
-(function(){
-  function cleanCurrentLevelText(){
-    document.querySelectorAll('.student-card-sub').forEach(function(el){
-      el.innerHTML = el.innerHTML.replace(/[^<]*المستوى الحالي:[^<]*<br\s*\/?\s*>?/g,'');
-      el.innerHTML = el.innerHTML.replace(/^\s*<br\s*\/?\s*>/,'');
-    });
-  }
-  function setClassPageMode(isClassOpen){
-    var cards = document.getElementById('studentClassCards');
-    var detail = document.getElementById('studentClassDetail');
-    if(cards){ cards.style.display = isClassOpen ? 'none' : ''; }
-    if(detail){ detail.style.display = isClassOpen ? '' : ''; }
-    var detailHeader = detail ? detail.querySelector('.student-detail-header p') : null;
-    if(detailHeader && isClassOpen){
-      detailHeader.textContent = 'صفحة خاصة بمحتوى الفصل مع بطاقات الطلاب / الطالبات وأدوات الفصل وزر رجوع للخلف.';
-    }
-  }
-  function afterRender(){
-    cleanCurrentLevelText();
-    var state = window.__studentSettingsState || {};
-    setClassPageMode(!!state.classId);
-  }
-  var oldOpen = window.openStudentSettingsClass;
-  window.openStudentSettingsClass = function(classId){
-    if(typeof oldOpen === 'function') oldOpen(classId);
-    setTimeout(afterRender, 20);
-  };
-  var oldClose = window.closeStudentSettingsClass;
-  window.closeStudentSettingsClass = function(){
-    if(typeof oldClose === 'function') oldClose();
-    setTimeout(afterRender, 20);
-  };
-  var oldRender = window.renderStudentSettingsDashboard;
-  window.renderStudentSettingsDashboard = function(){
-    if(typeof oldRender === 'function') oldRender();
-    setTimeout(afterRender, 20);
-  };
-  var oldRefresh = window.refreshTeacherUI;
-  window.refreshTeacherUI = function(){
-    if(typeof oldRefresh === 'function') oldRefresh();
-    setTimeout(afterRender, 20);
-  };
-  document.addEventListener('DOMContentLoaded', function(){ setTimeout(afterRender, 50); });
 })();
 </script>
 
@@ -4529,6 +4434,7 @@ window.addEventListener('load', function(){
     });
     const stats = buildClassStats(cls);
     detail.classList.remove('hidden');
+    detail.classList.add('page-mode');
     detail.innerHTML = `
       <div class="student-detail-header">
         <div class="student-detail-title"><h3>${cls.name}</h3><p>صفحة مستقلة لإدارة الطلاب / الطالبات داخل الفصل مع أدوات جماعية وأزرار خاصة بكل طالب / طالبة.</p></div>
@@ -4699,55 +4605,7 @@ window.addEventListener('load', function(){
   };
   function openPrintWindow(title, bodyHtml){
     const w = window.open('', '_blank'); if(!w) return;
-    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}
-<script id="student-settings-v10-safe-classpage-patch">
-(function(){
-  function cleanCurrentLevelText(){
-    document.querySelectorAll('.student-card-sub').forEach(function(el){
-      el.innerHTML = el.innerHTML.replace(/[^<]*المستوى الحالي:[^<]*<br\s*\/?\s*>?/g,'');
-      el.innerHTML = el.innerHTML.replace(/^\s*<br\s*\/?\s*>/,'');
-    });
-  }
-  function setClassPageMode(isClassOpen){
-    var cards = document.getElementById('studentClassCards');
-    var detail = document.getElementById('studentClassDetail');
-    if(cards){ cards.style.display = isClassOpen ? 'none' : ''; }
-    if(detail){ detail.style.display = isClassOpen ? '' : ''; }
-    var detailHeader = detail ? detail.querySelector('.student-detail-header p') : null;
-    if(detailHeader && isClassOpen){
-      detailHeader.textContent = 'صفحة خاصة بمحتوى الفصل مع بطاقات الطلاب / الطالبات وأدوات الفصل وزر رجوع للخلف.';
-    }
-  }
-  function afterRender(){
-    cleanCurrentLevelText();
-    var state = window.__studentSettingsState || {};
-    setClassPageMode(!!state.classId);
-  }
-  var oldOpen = window.openStudentSettingsClass;
-  window.openStudentSettingsClass = function(classId){
-    if(typeof oldOpen === 'function') oldOpen(classId);
-    setTimeout(afterRender, 20);
-  };
-  var oldClose = window.closeStudentSettingsClass;
-  window.closeStudentSettingsClass = function(){
-    if(typeof oldClose === 'function') oldClose();
-    setTimeout(afterRender, 20);
-  };
-  var oldRender = window.renderStudentSettingsDashboard;
-  window.renderStudentSettingsDashboard = function(){
-    if(typeof oldRender === 'function') oldRender();
-    setTimeout(afterRender, 20);
-  };
-  var oldRefresh = window.refreshTeacherUI;
-  window.refreshTeacherUI = function(){
-    if(typeof oldRefresh === 'function') oldRefresh();
-    setTimeout(afterRender, 20);
-  };
-  document.addEventListener('DOMContentLoaded', function(){ setTimeout(afterRender, 50); });
-})();
-</script>
-
-</body></html>`);
+    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}</body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
   window.printStudentReport = function(studentId){
@@ -4768,54 +4626,6 @@ window.addEventListener('load', function(){
   const prevShowPane = window.showTeacherPane;
   window.showTeacherPane = function(id, btn){ if(typeof prevShowPane==='function') prevShowPane(id, btn); if(id==='teacherPaneStudents') setTimeout(function(){ try{ renderStudentSettingsDashboard(); }catch(e){} }, 60); };
   document.addEventListener('DOMContentLoaded', function(){ setTimeout(function(){ try{ renderStudentSettingsDashboard(); }catch(e){} }, 250); });
-})();
-</script>
-
-
-<script id="student-settings-v10-safe-classpage-patch">
-(function(){
-  function cleanCurrentLevelText(){
-    document.querySelectorAll('.student-card-sub').forEach(function(el){
-      el.innerHTML = el.innerHTML.replace(/[^<]*المستوى الحالي:[^<]*<br\s*\/?\s*>?/g,'');
-      el.innerHTML = el.innerHTML.replace(/^\s*<br\s*\/?\s*>/,'');
-    });
-  }
-  function setClassPageMode(isClassOpen){
-    var cards = document.getElementById('studentClassCards');
-    var detail = document.getElementById('studentClassDetail');
-    if(cards){ cards.style.display = isClassOpen ? 'none' : ''; }
-    if(detail){ detail.style.display = isClassOpen ? '' : ''; }
-    var detailHeader = detail ? detail.querySelector('.student-detail-header p') : null;
-    if(detailHeader && isClassOpen){
-      detailHeader.textContent = 'صفحة خاصة بمحتوى الفصل مع بطاقات الطلاب / الطالبات وأدوات الفصل وزر رجوع للخلف.';
-    }
-  }
-  function afterRender(){
-    cleanCurrentLevelText();
-    var state = window.__studentSettingsState || {};
-    setClassPageMode(!!state.classId);
-  }
-  var oldOpen = window.openStudentSettingsClass;
-  window.openStudentSettingsClass = function(classId){
-    if(typeof oldOpen === 'function') oldOpen(classId);
-    setTimeout(afterRender, 20);
-  };
-  var oldClose = window.closeStudentSettingsClass;
-  window.closeStudentSettingsClass = function(){
-    if(typeof oldClose === 'function') oldClose();
-    setTimeout(afterRender, 20);
-  };
-  var oldRender = window.renderStudentSettingsDashboard;
-  window.renderStudentSettingsDashboard = function(){
-    if(typeof oldRender === 'function') oldRender();
-    setTimeout(afterRender, 20);
-  };
-  var oldRefresh = window.refreshTeacherUI;
-  window.refreshTeacherUI = function(){
-    if(typeof oldRefresh === 'function') oldRefresh();
-    setTimeout(afterRender, 20);
-  };
-  document.addEventListener('DOMContentLoaded', function(){ setTimeout(afterRender, 50); });
 })();
 </script>
 
@@ -5084,6 +4894,7 @@ window.addEventListener('load', function(){
     });
     const stats = buildClassStats(cls);
     detail.classList.remove('hidden');
+    detail.classList.add('page-mode');
     detail.innerHTML = `
       <div class="student-detail-header">
         <div class="student-detail-title"><h3>${cls.name}</h3><p>صفحة مستقلة لإدارة الطلاب / الطالبات داخل الفصل مع أدوات جماعية وأزرار خاصة بكل طالب / طالبة.</p></div>
@@ -5254,55 +5065,7 @@ window.addEventListener('load', function(){
   };
   function openPrintWindow(title, bodyHtml){
     const w = window.open('', '_blank'); if(!w) return;
-    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}
-<script id="student-settings-v10-safe-classpage-patch">
-(function(){
-  function cleanCurrentLevelText(){
-    document.querySelectorAll('.student-card-sub').forEach(function(el){
-      el.innerHTML = el.innerHTML.replace(/[^<]*المستوى الحالي:[^<]*<br\s*\/?\s*>?/g,'');
-      el.innerHTML = el.innerHTML.replace(/^\s*<br\s*\/?\s*>/,'');
-    });
-  }
-  function setClassPageMode(isClassOpen){
-    var cards = document.getElementById('studentClassCards');
-    var detail = document.getElementById('studentClassDetail');
-    if(cards){ cards.style.display = isClassOpen ? 'none' : ''; }
-    if(detail){ detail.style.display = isClassOpen ? '' : ''; }
-    var detailHeader = detail ? detail.querySelector('.student-detail-header p') : null;
-    if(detailHeader && isClassOpen){
-      detailHeader.textContent = 'صفحة خاصة بمحتوى الفصل مع بطاقات الطلاب / الطالبات وأدوات الفصل وزر رجوع للخلف.';
-    }
-  }
-  function afterRender(){
-    cleanCurrentLevelText();
-    var state = window.__studentSettingsState || {};
-    setClassPageMode(!!state.classId);
-  }
-  var oldOpen = window.openStudentSettingsClass;
-  window.openStudentSettingsClass = function(classId){
-    if(typeof oldOpen === 'function') oldOpen(classId);
-    setTimeout(afterRender, 20);
-  };
-  var oldClose = window.closeStudentSettingsClass;
-  window.closeStudentSettingsClass = function(){
-    if(typeof oldClose === 'function') oldClose();
-    setTimeout(afterRender, 20);
-  };
-  var oldRender = window.renderStudentSettingsDashboard;
-  window.renderStudentSettingsDashboard = function(){
-    if(typeof oldRender === 'function') oldRender();
-    setTimeout(afterRender, 20);
-  };
-  var oldRefresh = window.refreshTeacherUI;
-  window.refreshTeacherUI = function(){
-    if(typeof oldRefresh === 'function') oldRefresh();
-    setTimeout(afterRender, 20);
-  };
-  document.addEventListener('DOMContentLoaded', function(){ setTimeout(afterRender, 50); });
-})();
-</script>
-
-</body></html>`);
+    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}</body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
   window.printStudentReport = function(studentId){
@@ -5323,54 +5086,6 @@ window.addEventListener('load', function(){
   const prevShowPane = window.showTeacherPane;
   window.showTeacherPane = function(id, btn){ if(typeof prevShowPane==='function') prevShowPane(id, btn); if(id==='teacherPaneStudents') setTimeout(function(){ try{ renderStudentSettingsDashboard(); }catch(e){} }, 60); };
   document.addEventListener('DOMContentLoaded', function(){ setTimeout(function(){ try{ renderStudentSettingsDashboard(); }catch(e){} }, 250); });
-})();
-</script>
-
-
-<script id="student-settings-v10-safe-classpage-patch">
-(function(){
-  function cleanCurrentLevelText(){
-    document.querySelectorAll('.student-card-sub').forEach(function(el){
-      el.innerHTML = el.innerHTML.replace(/[^<]*المستوى الحالي:[^<]*<br\s*\/?\s*>?/g,'');
-      el.innerHTML = el.innerHTML.replace(/^\s*<br\s*\/?\s*>/,'');
-    });
-  }
-  function setClassPageMode(isClassOpen){
-    var cards = document.getElementById('studentClassCards');
-    var detail = document.getElementById('studentClassDetail');
-    if(cards){ cards.style.display = isClassOpen ? 'none' : ''; }
-    if(detail){ detail.style.display = isClassOpen ? '' : ''; }
-    var detailHeader = detail ? detail.querySelector('.student-detail-header p') : null;
-    if(detailHeader && isClassOpen){
-      detailHeader.textContent = 'صفحة خاصة بمحتوى الفصل مع بطاقات الطلاب / الطالبات وأدوات الفصل وزر رجوع للخلف.';
-    }
-  }
-  function afterRender(){
-    cleanCurrentLevelText();
-    var state = window.__studentSettingsState || {};
-    setClassPageMode(!!state.classId);
-  }
-  var oldOpen = window.openStudentSettingsClass;
-  window.openStudentSettingsClass = function(classId){
-    if(typeof oldOpen === 'function') oldOpen(classId);
-    setTimeout(afterRender, 20);
-  };
-  var oldClose = window.closeStudentSettingsClass;
-  window.closeStudentSettingsClass = function(){
-    if(typeof oldClose === 'function') oldClose();
-    setTimeout(afterRender, 20);
-  };
-  var oldRender = window.renderStudentSettingsDashboard;
-  window.renderStudentSettingsDashboard = function(){
-    if(typeof oldRender === 'function') oldRender();
-    setTimeout(afterRender, 20);
-  };
-  var oldRefresh = window.refreshTeacherUI;
-  window.refreshTeacherUI = function(){
-    if(typeof oldRefresh === 'function') oldRefresh();
-    setTimeout(afterRender, 20);
-  };
-  document.addEventListener('DOMContentLoaded', function(){ setTimeout(afterRender, 50); });
 })();
 </script>
 
@@ -5528,6 +5243,7 @@ window.addEventListener('load', function(){
     });
     const stats = buildClassStats(cls);
     detail.classList.remove('hidden');
+    detail.classList.add('page-mode');
     detail.innerHTML = `
       <div class="student-detail-header">
         <div class="student-detail-title"><h3>${cls.name}</h3><p>صفحة مستقلة لإدارة الطلاب / الطالبات داخل الفصل مع أدوات جماعية وأزرار خاصة بكل طالب / طالبة.</p></div>
@@ -5698,55 +5414,7 @@ window.addEventListener('load', function(){
   };
   function openPrintWindow(title, bodyHtml){
     const w = window.open('', '_blank'); if(!w) return;
-    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}
-<script id="student-settings-v10-safe-classpage-patch">
-(function(){
-  function cleanCurrentLevelText(){
-    document.querySelectorAll('.student-card-sub').forEach(function(el){
-      el.innerHTML = el.innerHTML.replace(/[^<]*المستوى الحالي:[^<]*<br\s*\/?\s*>?/g,'');
-      el.innerHTML = el.innerHTML.replace(/^\s*<br\s*\/?\s*>/,'');
-    });
-  }
-  function setClassPageMode(isClassOpen){
-    var cards = document.getElementById('studentClassCards');
-    var detail = document.getElementById('studentClassDetail');
-    if(cards){ cards.style.display = isClassOpen ? 'none' : ''; }
-    if(detail){ detail.style.display = isClassOpen ? '' : ''; }
-    var detailHeader = detail ? detail.querySelector('.student-detail-header p') : null;
-    if(detailHeader && isClassOpen){
-      detailHeader.textContent = 'صفحة خاصة بمحتوى الفصل مع بطاقات الطلاب / الطالبات وأدوات الفصل وزر رجوع للخلف.';
-    }
-  }
-  function afterRender(){
-    cleanCurrentLevelText();
-    var state = window.__studentSettingsState || {};
-    setClassPageMode(!!state.classId);
-  }
-  var oldOpen = window.openStudentSettingsClass;
-  window.openStudentSettingsClass = function(classId){
-    if(typeof oldOpen === 'function') oldOpen(classId);
-    setTimeout(afterRender, 20);
-  };
-  var oldClose = window.closeStudentSettingsClass;
-  window.closeStudentSettingsClass = function(){
-    if(typeof oldClose === 'function') oldClose();
-    setTimeout(afterRender, 20);
-  };
-  var oldRender = window.renderStudentSettingsDashboard;
-  window.renderStudentSettingsDashboard = function(){
-    if(typeof oldRender === 'function') oldRender();
-    setTimeout(afterRender, 20);
-  };
-  var oldRefresh = window.refreshTeacherUI;
-  window.refreshTeacherUI = function(){
-    if(typeof oldRefresh === 'function') oldRefresh();
-    setTimeout(afterRender, 20);
-  };
-  document.addEventListener('DOMContentLoaded', function(){ setTimeout(afterRender, 50); });
-})();
-</script>
-
-</body></html>`);
+    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}</body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
   window.printStudentReport = function(studentId){
@@ -5767,54 +5435,6 @@ window.addEventListener('load', function(){
   const prevShowPane = window.showTeacherPane;
   window.showTeacherPane = function(id, btn){ if(typeof prevShowPane==='function') prevShowPane(id, btn); if(id==='teacherPaneStudents') setTimeout(function(){ try{ renderStudentSettingsDashboard(); }catch(e){} }, 60); };
   document.addEventListener('DOMContentLoaded', function(){ setTimeout(function(){ try{ renderStudentSettingsDashboard(); }catch(e){} }, 250); });
-})();
-</script>
-
-
-<script id="student-settings-v10-safe-classpage-patch">
-(function(){
-  function cleanCurrentLevelText(){
-    document.querySelectorAll('.student-card-sub').forEach(function(el){
-      el.innerHTML = el.innerHTML.replace(/[^<]*المستوى الحالي:[^<]*<br\s*\/?\s*>?/g,'');
-      el.innerHTML = el.innerHTML.replace(/^\s*<br\s*\/?\s*>/,'');
-    });
-  }
-  function setClassPageMode(isClassOpen){
-    var cards = document.getElementById('studentClassCards');
-    var detail = document.getElementById('studentClassDetail');
-    if(cards){ cards.style.display = isClassOpen ? 'none' : ''; }
-    if(detail){ detail.style.display = isClassOpen ? '' : ''; }
-    var detailHeader = detail ? detail.querySelector('.student-detail-header p') : null;
-    if(detailHeader && isClassOpen){
-      detailHeader.textContent = 'صفحة خاصة بمحتوى الفصل مع بطاقات الطلاب / الطالبات وأدوات الفصل وزر رجوع للخلف.';
-    }
-  }
-  function afterRender(){
-    cleanCurrentLevelText();
-    var state = window.__studentSettingsState || {};
-    setClassPageMode(!!state.classId);
-  }
-  var oldOpen = window.openStudentSettingsClass;
-  window.openStudentSettingsClass = function(classId){
-    if(typeof oldOpen === 'function') oldOpen(classId);
-    setTimeout(afterRender, 20);
-  };
-  var oldClose = window.closeStudentSettingsClass;
-  window.closeStudentSettingsClass = function(){
-    if(typeof oldClose === 'function') oldClose();
-    setTimeout(afterRender, 20);
-  };
-  var oldRender = window.renderStudentSettingsDashboard;
-  window.renderStudentSettingsDashboard = function(){
-    if(typeof oldRender === 'function') oldRender();
-    setTimeout(afterRender, 20);
-  };
-  var oldRefresh = window.refreshTeacherUI;
-  window.refreshTeacherUI = function(){
-    if(typeof oldRefresh === 'function') oldRefresh();
-    setTimeout(afterRender, 20);
-  };
-  document.addEventListener('DOMContentLoaded', function(){ setTimeout(afterRender, 50); });
 })();
 </script>
 
@@ -6194,6 +5814,7 @@ window.addEventListener('load', function(){
     });
     const stats = buildClassStats(cls);
     detail.classList.remove('hidden');
+    detail.classList.add('page-mode');
     detail.innerHTML = `
       <div class="student-detail-header">
         <div class="student-detail-title"><h3>${cls.name}</h3><p>صفحة مستقلة لإدارة الطلاب / الطالبات داخل الفصل مع أدوات جماعية وأزرار خاصة بكل طالب / طالبة.</p></div>
@@ -6364,55 +5985,7 @@ window.addEventListener('load', function(){
   };
   function openPrintWindow(title, bodyHtml){
     const w = window.open('', '_blank'); if(!w) return;
-    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}
-<script id="student-settings-v10-safe-classpage-patch">
-(function(){
-  function cleanCurrentLevelText(){
-    document.querySelectorAll('.student-card-sub').forEach(function(el){
-      el.innerHTML = el.innerHTML.replace(/[^<]*المستوى الحالي:[^<]*<br\s*\/?\s*>?/g,'');
-      el.innerHTML = el.innerHTML.replace(/^\s*<br\s*\/?\s*>/,'');
-    });
-  }
-  function setClassPageMode(isClassOpen){
-    var cards = document.getElementById('studentClassCards');
-    var detail = document.getElementById('studentClassDetail');
-    if(cards){ cards.style.display = isClassOpen ? 'none' : ''; }
-    if(detail){ detail.style.display = isClassOpen ? '' : ''; }
-    var detailHeader = detail ? detail.querySelector('.student-detail-header p') : null;
-    if(detailHeader && isClassOpen){
-      detailHeader.textContent = 'صفحة خاصة بمحتوى الفصل مع بطاقات الطلاب / الطالبات وأدوات الفصل وزر رجوع للخلف.';
-    }
-  }
-  function afterRender(){
-    cleanCurrentLevelText();
-    var state = window.__studentSettingsState || {};
-    setClassPageMode(!!state.classId);
-  }
-  var oldOpen = window.openStudentSettingsClass;
-  window.openStudentSettingsClass = function(classId){
-    if(typeof oldOpen === 'function') oldOpen(classId);
-    setTimeout(afterRender, 20);
-  };
-  var oldClose = window.closeStudentSettingsClass;
-  window.closeStudentSettingsClass = function(){
-    if(typeof oldClose === 'function') oldClose();
-    setTimeout(afterRender, 20);
-  };
-  var oldRender = window.renderStudentSettingsDashboard;
-  window.renderStudentSettingsDashboard = function(){
-    if(typeof oldRender === 'function') oldRender();
-    setTimeout(afterRender, 20);
-  };
-  var oldRefresh = window.refreshTeacherUI;
-  window.refreshTeacherUI = function(){
-    if(typeof oldRefresh === 'function') oldRefresh();
-    setTimeout(afterRender, 20);
-  };
-  document.addEventListener('DOMContentLoaded', function(){ setTimeout(afterRender, 50); });
-})();
-</script>
-
-</body></html>`);
+    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}</body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
   window.printStudentReport = function(studentId){
@@ -6433,54 +6006,6 @@ window.addEventListener('load', function(){
   const prevShowPane = window.showTeacherPane;
   window.showTeacherPane = function(id, btn){ if(typeof prevShowPane==='function') prevShowPane(id, btn); if(id==='teacherPaneStudents') setTimeout(function(){ try{ renderStudentSettingsDashboard(); }catch(e){} }, 60); };
   document.addEventListener('DOMContentLoaded', function(){ setTimeout(function(){ try{ renderStudentSettingsDashboard(); }catch(e){} }, 250); });
-})();
-</script>
-
-
-<script id="student-settings-v10-safe-classpage-patch">
-(function(){
-  function cleanCurrentLevelText(){
-    document.querySelectorAll('.student-card-sub').forEach(function(el){
-      el.innerHTML = el.innerHTML.replace(/[^<]*المستوى الحالي:[^<]*<br\s*\/?\s*>?/g,'');
-      el.innerHTML = el.innerHTML.replace(/^\s*<br\s*\/?\s*>/,'');
-    });
-  }
-  function setClassPageMode(isClassOpen){
-    var cards = document.getElementById('studentClassCards');
-    var detail = document.getElementById('studentClassDetail');
-    if(cards){ cards.style.display = isClassOpen ? 'none' : ''; }
-    if(detail){ detail.style.display = isClassOpen ? '' : ''; }
-    var detailHeader = detail ? detail.querySelector('.student-detail-header p') : null;
-    if(detailHeader && isClassOpen){
-      detailHeader.textContent = 'صفحة خاصة بمحتوى الفصل مع بطاقات الطلاب / الطالبات وأدوات الفصل وزر رجوع للخلف.';
-    }
-  }
-  function afterRender(){
-    cleanCurrentLevelText();
-    var state = window.__studentSettingsState || {};
-    setClassPageMode(!!state.classId);
-  }
-  var oldOpen = window.openStudentSettingsClass;
-  window.openStudentSettingsClass = function(classId){
-    if(typeof oldOpen === 'function') oldOpen(classId);
-    setTimeout(afterRender, 20);
-  };
-  var oldClose = window.closeStudentSettingsClass;
-  window.closeStudentSettingsClass = function(){
-    if(typeof oldClose === 'function') oldClose();
-    setTimeout(afterRender, 20);
-  };
-  var oldRender = window.renderStudentSettingsDashboard;
-  window.renderStudentSettingsDashboard = function(){
-    if(typeof oldRender === 'function') oldRender();
-    setTimeout(afterRender, 20);
-  };
-  var oldRefresh = window.refreshTeacherUI;
-  window.refreshTeacherUI = function(){
-    if(typeof oldRefresh === 'function') oldRefresh();
-    setTimeout(afterRender, 20);
-  };
-  document.addEventListener('DOMContentLoaded', function(){ setTimeout(afterRender, 50); });
 })();
 </script>
 
@@ -6638,6 +6163,7 @@ window.addEventListener('load', function(){
     });
     const stats = buildClassStats(cls);
     detail.classList.remove('hidden');
+    detail.classList.add('page-mode');
     detail.innerHTML = `
       <div class="student-detail-header">
         <div class="student-detail-title"><h3>${cls.name}</h3><p>صفحة مستقلة لإدارة الطلاب / الطالبات داخل الفصل مع أدوات جماعية وأزرار خاصة بكل طالب / طالبة.</p></div>
@@ -6808,55 +6334,7 @@ window.addEventListener('load', function(){
   };
   function openPrintWindow(title, bodyHtml){
     const w = window.open('', '_blank'); if(!w) return;
-    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}
-<script id="student-settings-v10-safe-classpage-patch">
-(function(){
-  function cleanCurrentLevelText(){
-    document.querySelectorAll('.student-card-sub').forEach(function(el){
-      el.innerHTML = el.innerHTML.replace(/[^<]*المستوى الحالي:[^<]*<br\s*\/?\s*>?/g,'');
-      el.innerHTML = el.innerHTML.replace(/^\s*<br\s*\/?\s*>/,'');
-    });
-  }
-  function setClassPageMode(isClassOpen){
-    var cards = document.getElementById('studentClassCards');
-    var detail = document.getElementById('studentClassDetail');
-    if(cards){ cards.style.display = isClassOpen ? 'none' : ''; }
-    if(detail){ detail.style.display = isClassOpen ? '' : ''; }
-    var detailHeader = detail ? detail.querySelector('.student-detail-header p') : null;
-    if(detailHeader && isClassOpen){
-      detailHeader.textContent = 'صفحة خاصة بمحتوى الفصل مع بطاقات الطلاب / الطالبات وأدوات الفصل وزر رجوع للخلف.';
-    }
-  }
-  function afterRender(){
-    cleanCurrentLevelText();
-    var state = window.__studentSettingsState || {};
-    setClassPageMode(!!state.classId);
-  }
-  var oldOpen = window.openStudentSettingsClass;
-  window.openStudentSettingsClass = function(classId){
-    if(typeof oldOpen === 'function') oldOpen(classId);
-    setTimeout(afterRender, 20);
-  };
-  var oldClose = window.closeStudentSettingsClass;
-  window.closeStudentSettingsClass = function(){
-    if(typeof oldClose === 'function') oldClose();
-    setTimeout(afterRender, 20);
-  };
-  var oldRender = window.renderStudentSettingsDashboard;
-  window.renderStudentSettingsDashboard = function(){
-    if(typeof oldRender === 'function') oldRender();
-    setTimeout(afterRender, 20);
-  };
-  var oldRefresh = window.refreshTeacherUI;
-  window.refreshTeacherUI = function(){
-    if(typeof oldRefresh === 'function') oldRefresh();
-    setTimeout(afterRender, 20);
-  };
-  document.addEventListener('DOMContentLoaded', function(){ setTimeout(afterRender, 50); });
-})();
-</script>
-
-</body></html>`);
+    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}</body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
   window.printStudentReport = function(studentId){
@@ -6877,54 +6355,6 @@ window.addEventListener('load', function(){
   const prevShowPane = window.showTeacherPane;
   window.showTeacherPane = function(id, btn){ if(typeof prevShowPane==='function') prevShowPane(id, btn); if(id==='teacherPaneStudents') setTimeout(function(){ try{ renderStudentSettingsDashboard(); }catch(e){} }, 60); };
   document.addEventListener('DOMContentLoaded', function(){ setTimeout(function(){ try{ renderStudentSettingsDashboard(); }catch(e){} }, 250); });
-})();
-</script>
-
-
-<script id="student-settings-v10-safe-classpage-patch">
-(function(){
-  function cleanCurrentLevelText(){
-    document.querySelectorAll('.student-card-sub').forEach(function(el){
-      el.innerHTML = el.innerHTML.replace(/[^<]*المستوى الحالي:[^<]*<br\s*\/?\s*>?/g,'');
-      el.innerHTML = el.innerHTML.replace(/^\s*<br\s*\/?\s*>/,'');
-    });
-  }
-  function setClassPageMode(isClassOpen){
-    var cards = document.getElementById('studentClassCards');
-    var detail = document.getElementById('studentClassDetail');
-    if(cards){ cards.style.display = isClassOpen ? 'none' : ''; }
-    if(detail){ detail.style.display = isClassOpen ? '' : ''; }
-    var detailHeader = detail ? detail.querySelector('.student-detail-header p') : null;
-    if(detailHeader && isClassOpen){
-      detailHeader.textContent = 'صفحة خاصة بمحتوى الفصل مع بطاقات الطلاب / الطالبات وأدوات الفصل وزر رجوع للخلف.';
-    }
-  }
-  function afterRender(){
-    cleanCurrentLevelText();
-    var state = window.__studentSettingsState || {};
-    setClassPageMode(!!state.classId);
-  }
-  var oldOpen = window.openStudentSettingsClass;
-  window.openStudentSettingsClass = function(classId){
-    if(typeof oldOpen === 'function') oldOpen(classId);
-    setTimeout(afterRender, 20);
-  };
-  var oldClose = window.closeStudentSettingsClass;
-  window.closeStudentSettingsClass = function(){
-    if(typeof oldClose === 'function') oldClose();
-    setTimeout(afterRender, 20);
-  };
-  var oldRender = window.renderStudentSettingsDashboard;
-  window.renderStudentSettingsDashboard = function(){
-    if(typeof oldRender === 'function') oldRender();
-    setTimeout(afterRender, 20);
-  };
-  var oldRefresh = window.refreshTeacherUI;
-  window.refreshTeacherUI = function(){
-    if(typeof oldRefresh === 'function') oldRefresh();
-    setTimeout(afterRender, 20);
-  };
-  document.addEventListener('DOMContentLoaded', function(){ setTimeout(afterRender, 50); });
 })();
 </script>
 
@@ -7193,6 +6623,7 @@ window.addEventListener('load', function(){
     });
     const stats = buildClassStats(cls);
     detail.classList.remove('hidden');
+    detail.classList.add('page-mode');
     detail.innerHTML = `
       <div class="student-detail-header">
         <div class="student-detail-title"><h3>${cls.name}</h3><p>صفحة مستقلة لإدارة الطلاب / الطالبات داخل الفصل مع أدوات جماعية وأزرار خاصة بكل طالب / طالبة.</p></div>
@@ -7363,55 +6794,7 @@ window.addEventListener('load', function(){
   };
   function openPrintWindow(title, bodyHtml){
     const w = window.open('', '_blank'); if(!w) return;
-    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}
-<script id="student-settings-v10-safe-classpage-patch">
-(function(){
-  function cleanCurrentLevelText(){
-    document.querySelectorAll('.student-card-sub').forEach(function(el){
-      el.innerHTML = el.innerHTML.replace(/[^<]*المستوى الحالي:[^<]*<br\s*\/?\s*>?/g,'');
-      el.innerHTML = el.innerHTML.replace(/^\s*<br\s*\/?\s*>/,'');
-    });
-  }
-  function setClassPageMode(isClassOpen){
-    var cards = document.getElementById('studentClassCards');
-    var detail = document.getElementById('studentClassDetail');
-    if(cards){ cards.style.display = isClassOpen ? 'none' : ''; }
-    if(detail){ detail.style.display = isClassOpen ? '' : ''; }
-    var detailHeader = detail ? detail.querySelector('.student-detail-header p') : null;
-    if(detailHeader && isClassOpen){
-      detailHeader.textContent = 'صفحة خاصة بمحتوى الفصل مع بطاقات الطلاب / الطالبات وأدوات الفصل وزر رجوع للخلف.';
-    }
-  }
-  function afterRender(){
-    cleanCurrentLevelText();
-    var state = window.__studentSettingsState || {};
-    setClassPageMode(!!state.classId);
-  }
-  var oldOpen = window.openStudentSettingsClass;
-  window.openStudentSettingsClass = function(classId){
-    if(typeof oldOpen === 'function') oldOpen(classId);
-    setTimeout(afterRender, 20);
-  };
-  var oldClose = window.closeStudentSettingsClass;
-  window.closeStudentSettingsClass = function(){
-    if(typeof oldClose === 'function') oldClose();
-    setTimeout(afterRender, 20);
-  };
-  var oldRender = window.renderStudentSettingsDashboard;
-  window.renderStudentSettingsDashboard = function(){
-    if(typeof oldRender === 'function') oldRender();
-    setTimeout(afterRender, 20);
-  };
-  var oldRefresh = window.refreshTeacherUI;
-  window.refreshTeacherUI = function(){
-    if(typeof oldRefresh === 'function') oldRefresh();
-    setTimeout(afterRender, 20);
-  };
-  document.addEventListener('DOMContentLoaded', function(){ setTimeout(afterRender, 50); });
-})();
-</script>
-
-</body></html>`);
+    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}</body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
   window.printStudentReport = function(studentId){
@@ -7432,54 +6815,6 @@ window.addEventListener('load', function(){
   const prevShowPane = window.showTeacherPane;
   window.showTeacherPane = function(id, btn){ if(typeof prevShowPane==='function') prevShowPane(id, btn); if(id==='teacherPaneStudents') setTimeout(function(){ try{ renderStudentSettingsDashboard(); }catch(e){} }, 60); };
   document.addEventListener('DOMContentLoaded', function(){ setTimeout(function(){ try{ renderStudentSettingsDashboard(); }catch(e){} }, 250); });
-})();
-</script>
-
-
-<script id="student-settings-v10-safe-classpage-patch">
-(function(){
-  function cleanCurrentLevelText(){
-    document.querySelectorAll('.student-card-sub').forEach(function(el){
-      el.innerHTML = el.innerHTML.replace(/[^<]*المستوى الحالي:[^<]*<br\s*\/?\s*>?/g,'');
-      el.innerHTML = el.innerHTML.replace(/^\s*<br\s*\/?\s*>/,'');
-    });
-  }
-  function setClassPageMode(isClassOpen){
-    var cards = document.getElementById('studentClassCards');
-    var detail = document.getElementById('studentClassDetail');
-    if(cards){ cards.style.display = isClassOpen ? 'none' : ''; }
-    if(detail){ detail.style.display = isClassOpen ? '' : ''; }
-    var detailHeader = detail ? detail.querySelector('.student-detail-header p') : null;
-    if(detailHeader && isClassOpen){
-      detailHeader.textContent = 'صفحة خاصة بمحتوى الفصل مع بطاقات الطلاب / الطالبات وأدوات الفصل وزر رجوع للخلف.';
-    }
-  }
-  function afterRender(){
-    cleanCurrentLevelText();
-    var state = window.__studentSettingsState || {};
-    setClassPageMode(!!state.classId);
-  }
-  var oldOpen = window.openStudentSettingsClass;
-  window.openStudentSettingsClass = function(classId){
-    if(typeof oldOpen === 'function') oldOpen(classId);
-    setTimeout(afterRender, 20);
-  };
-  var oldClose = window.closeStudentSettingsClass;
-  window.closeStudentSettingsClass = function(){
-    if(typeof oldClose === 'function') oldClose();
-    setTimeout(afterRender, 20);
-  };
-  var oldRender = window.renderStudentSettingsDashboard;
-  window.renderStudentSettingsDashboard = function(){
-    if(typeof oldRender === 'function') oldRender();
-    setTimeout(afterRender, 20);
-  };
-  var oldRefresh = window.refreshTeacherUI;
-  window.refreshTeacherUI = function(){
-    if(typeof oldRefresh === 'function') oldRefresh();
-    setTimeout(afterRender, 20);
-  };
-  document.addEventListener('DOMContentLoaded', function(){ setTimeout(afterRender, 50); });
 })();
 </script>
 
@@ -7637,6 +6972,7 @@ window.addEventListener('load', function(){
     });
     const stats = buildClassStats(cls);
     detail.classList.remove('hidden');
+    detail.classList.add('page-mode');
     detail.innerHTML = `
       <div class="student-detail-header">
         <div class="student-detail-title"><h3>${cls.name}</h3><p>صفحة مستقلة لإدارة الطلاب / الطالبات داخل الفصل مع أدوات جماعية وأزرار خاصة بكل طالب / طالبة.</p></div>
@@ -7807,55 +7143,7 @@ window.addEventListener('load', function(){
   };
   function openPrintWindow(title, bodyHtml){
     const w = window.open('', '_blank'); if(!w) return;
-    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}
-<script id="student-settings-v10-safe-classpage-patch">
-(function(){
-  function cleanCurrentLevelText(){
-    document.querySelectorAll('.student-card-sub').forEach(function(el){
-      el.innerHTML = el.innerHTML.replace(/[^<]*المستوى الحالي:[^<]*<br\s*\/?\s*>?/g,'');
-      el.innerHTML = el.innerHTML.replace(/^\s*<br\s*\/?\s*>/,'');
-    });
-  }
-  function setClassPageMode(isClassOpen){
-    var cards = document.getElementById('studentClassCards');
-    var detail = document.getElementById('studentClassDetail');
-    if(cards){ cards.style.display = isClassOpen ? 'none' : ''; }
-    if(detail){ detail.style.display = isClassOpen ? '' : ''; }
-    var detailHeader = detail ? detail.querySelector('.student-detail-header p') : null;
-    if(detailHeader && isClassOpen){
-      detailHeader.textContent = 'صفحة خاصة بمحتوى الفصل مع بطاقات الطلاب / الطالبات وأدوات الفصل وزر رجوع للخلف.';
-    }
-  }
-  function afterRender(){
-    cleanCurrentLevelText();
-    var state = window.__studentSettingsState || {};
-    setClassPageMode(!!state.classId);
-  }
-  var oldOpen = window.openStudentSettingsClass;
-  window.openStudentSettingsClass = function(classId){
-    if(typeof oldOpen === 'function') oldOpen(classId);
-    setTimeout(afterRender, 20);
-  };
-  var oldClose = window.closeStudentSettingsClass;
-  window.closeStudentSettingsClass = function(){
-    if(typeof oldClose === 'function') oldClose();
-    setTimeout(afterRender, 20);
-  };
-  var oldRender = window.renderStudentSettingsDashboard;
-  window.renderStudentSettingsDashboard = function(){
-    if(typeof oldRender === 'function') oldRender();
-    setTimeout(afterRender, 20);
-  };
-  var oldRefresh = window.refreshTeacherUI;
-  window.refreshTeacherUI = function(){
-    if(typeof oldRefresh === 'function') oldRefresh();
-    setTimeout(afterRender, 20);
-  };
-  document.addEventListener('DOMContentLoaded', function(){ setTimeout(afterRender, 50); });
-})();
-</script>
-
-</body></html>`);
+    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}</body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
   window.printStudentReport = function(studentId){
@@ -8036,54 +7324,6 @@ window.addEventListener('load', function(){
   document.addEventListener('DOMContentLoaded', function(){ setTimeout(function(){ try{ initStudentsManagerRouter(); }catch(e){} }, 400); });
 })();
 </script>
-
-<script id="student-settings-v10-safe-classpage-patch">
-(function(){
-  function cleanCurrentLevelText(){
-    document.querySelectorAll('.student-card-sub').forEach(function(el){
-      el.innerHTML = el.innerHTML.replace(/[^<]*المستوى الحالي:[^<]*<br\s*\/?\s*>?/g,'');
-      el.innerHTML = el.innerHTML.replace(/^\s*<br\s*\/?\s*>/,'');
-    });
-  }
-  function setClassPageMode(isClassOpen){
-    var cards = document.getElementById('studentClassCards');
-    var detail = document.getElementById('studentClassDetail');
-    if(cards){ cards.style.display = isClassOpen ? 'none' : ''; }
-    if(detail){ detail.style.display = isClassOpen ? '' : ''; }
-    var detailHeader = detail ? detail.querySelector('.student-detail-header p') : null;
-    if(detailHeader && isClassOpen){
-      detailHeader.textContent = 'صفحة خاصة بمحتوى الفصل مع بطاقات الطلاب / الطالبات وأدوات الفصل وزر رجوع للخلف.';
-    }
-  }
-  function afterRender(){
-    cleanCurrentLevelText();
-    var state = window.__studentSettingsState || {};
-    setClassPageMode(!!state.classId);
-  }
-  var oldOpen = window.openStudentSettingsClass;
-  window.openStudentSettingsClass = function(classId){
-    if(typeof oldOpen === 'function') oldOpen(classId);
-    setTimeout(afterRender, 20);
-  };
-  var oldClose = window.closeStudentSettingsClass;
-  window.closeStudentSettingsClass = function(){
-    if(typeof oldClose === 'function') oldClose();
-    setTimeout(afterRender, 20);
-  };
-  var oldRender = window.renderStudentSettingsDashboard;
-  window.renderStudentSettingsDashboard = function(){
-    if(typeof oldRender === 'function') oldRender();
-    setTimeout(afterRender, 20);
-  };
-  var oldRefresh = window.refreshTeacherUI;
-  window.refreshTeacherUI = function(){
-    if(typeof oldRefresh === 'function') oldRefresh();
-    setTimeout(afterRender, 20);
-  };
-  document.addEventListener('DOMContentLoaded', function(){ setTimeout(afterRender, 50); });
-})();
-</script>
-
 </body>
 </html>
 
@@ -8720,6 +7960,7 @@ window.addEventListener('load', function(){
 .student-absence-meta{display:flex;justify-content:space-between;gap:10px;font-size:12px;color:var(--muted);font-weight:800}
 .student-note-summary{margin-top:10px;font-size:12px;color:var(--muted);line-height:1.8}
 .student-card-actions .btn.btn-muted{background:#f4f8f5;color:var(--deep)}
+.student-detail-shell.page-mode{display:block !important;background:#fff;border:1px solid var(--line);border-radius:28px;padding:18px;box-shadow:0 12px 28px rgba(16,58,46,.06);margin-top:6px}
 </style>
 <div id="studentNoteModal" class="student-note-modal" aria-hidden="true">
   <div class="student-note-box">
@@ -8808,7 +8049,7 @@ window.addEventListener('load', function(){
       <div class="student-card-top">
         <div>
           <div class="student-card-name">${esc(student.name||'—')}</div>
-          <div class="student-card-sub">${levelEmoji(level)} المستوى الحالي: ${level}<br>PIN: ${esc(student.password||'—')}<br>ولي الأمر: ${esc(student.guardian||'—')}</div>
+          <div class="student-card-sub">PIN: ${esc(student.password||'—')}<br>ولي الأمر: ${esc(student.guardian||'—')}</div>
           <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
             <span class="account-type-badge">💳 <span>نوع الحساب: ${level}</span> <small>${levelEmoji(level)}</small></span>
           </div>
@@ -8847,10 +8088,18 @@ window.addEventListener('load', function(){
   }
   function renderClassDetailCustom(){
     const detail = document.getElementById('studentClassDetail'); if(!detail || !window.bankData) return;
+    const holder = document.getElementById('studentClassCards');
     const state = getState();
-    if(!state.classId){ detail.classList.add('hidden'); detail.innerHTML=''; renderClassCardsCustom(); return; }
+    if(!state.classId){
+      if(holder) holder.style.display='grid';
+      detail.classList.remove('page-mode'); detail.classList.add('hidden'); detail.innerHTML=''; renderClassCardsCustom(); return;
+    }
     const cls = (bankData.classes||[]).find(c=>c.id===state.classId);
-    if(!cls){ detail.classList.add('hidden'); detail.innerHTML=''; renderClassCardsCustom(); return; }
+    if(!cls){
+      if(holder) holder.style.display='grid';
+      detail.classList.remove('page-mode'); detail.classList.add('hidden'); detail.innerHTML=''; renderClassCardsCustom(); return;
+    }
+    if(holder) holder.style.display='none';
     const students = getStudentsByClass(cls.id).filter(function(s){
       const q=(state.query||'').trim();
       const levelOk = state.level==='all' || getLevel(s.balance)===state.level;
@@ -8860,6 +8109,7 @@ window.addEventListener('load', function(){
     });
     const stats = buildClassStats(cls);
     detail.classList.remove('hidden');
+    detail.classList.add('page-mode');
     detail.innerHTML = `
       <div class="student-detail-header">
         <div class="student-detail-title"><h3>${esc(cls.name)}</h3><p>صفحة خاصة بالفصل تتضمن بطاقات الطلاب / الطالبات مع أدوات فردية واضحة وزر رجوع للخلف.</p></div>
