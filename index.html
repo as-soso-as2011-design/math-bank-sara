@@ -4514,6 +4514,123 @@ function openMoreInfo(type){
   alert(messages[type]||'تم فتح العنصر.');
 }
 </script>
+
+<style id="advanced-class-actions-style">
+.class-action-page{display:grid;gap:14px}
+.class-action-bar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;background:#fff;border:1px solid var(--line);border-radius:24px;padding:14px 16px;box-shadow:0 8px 20px rgba(16,58,46,.05)}
+.class-action-bar h3{margin:0;color:var(--deep);font-size:22px}
+.class-action-bar p{margin:6px 0 0;color:var(--muted);font-size:13px;line-height:1.8}
+.class-action-card{background:#fff;border:1px solid var(--line);border-radius:26px;padding:18px;box-shadow:0 10px 24px rgba(16,58,46,.06);display:grid;gap:14px}
+.class-action-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.class-action-grid .mini{background:#fbfcfb;border:1px solid var(--line);border-radius:22px;padding:18px;text-align:center}
+.class-action-grid .mini strong{display:block;font-size:18px;color:var(--deep);margin-bottom:6px}
+.class-action-grid .mini span{display:block;font-size:12px;color:var(--muted)}
+.class-action-form textarea,.class-action-form select{width:100%;border:1px solid var(--line);background:#f8fbf9;border-radius:16px;padding:14px;font-family:inherit;font-size:14px;outline:none}
+.class-action-danger{background:#fff6f5;border:1px solid #f2d7d2;color:#a63f3c;border-radius:20px;padding:14px;line-height:1.9}
+.class-card-buttons{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.class-card-buttons .btn{width:100%}
+@media(max-width:980px){.class-action-grid,.class-card-buttons{grid-template-columns:1fr}}
+</style>
+<script id="advanced-class-actions-script">
+(function(){
+  function esc(s){return String(s||'').replace(/[&<>\"]/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c];});}
+  function money(n){return (typeof formatMoney==='function') ? formatMoney(Number(n||0)) : String(Number(n||0));}
+  function classes(){return (window.bankData&&Array.isArray(bankData.classes))?bankData.classes:[];}
+  function studentsOf(classId){return (window.bankData&&Array.isArray(bankData.students))?bankData.students.filter(function(s){return s.classId===classId;}):[];}
+  const state = window.__advancedClassActionState || (window.__advancedClassActionState={mode:'home',classId:'',action:''});
+  const oldOpenClass = window.openStudentSettingsClass;
+  const oldCloseClass = window.closeStudentSettingsClass;
+  function getWrap(){return document.getElementById('studentSettingsProWrap');}
+  function getCards(){return document.getElementById('studentClassCards');}
+  function getDetail(){return document.getElementById('studentClassDetail');}
+  function buildStats(c){
+    const sts=studentsOf(c.id); const total=sts.reduce((a,b)=>a+Number(b.balance||0),0);
+    const pending=sts.filter(function(st){return (window.bankData?.performanceTasks||[]).some(function(task){return task.classId===c.id && (!task.entries?.[st.id] || !['submitted','graded'].includes(task.entries?.[st.id]?.status));});}).length;
+    const near=sts.filter(function(s){var b=Number(s.balance||0); var next=b<11000?11000:b<16000?16000:b<31000?31000:b<41000?41000:null; return next && (next-b)<=3000;}).length;
+    return {count:sts.length,total:total,pending:pending,near:near};
+  }
+  function renderHome(){
+    const cards=getCards(), detail=getDetail(); if(!cards||!detail) return;
+    cards.style.display='grid'; detail.classList.add('hidden'); detail.classList.remove('page-mode'); detail.innerHTML='';
+    cards.innerHTML = classes().map(function(c){
+      const st=buildStats(c);
+      return '<div class="student-class-card">'+
+        '<div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start"><div><h4>'+esc(c.name)+'</h4><div class="teacher-note">عدد الطلاب / الطالبات في الفصل: '+st.count+'</div></div><span class="pill">'+st.count+' نشط</span></div>'+
+        '<div class="student-class-meta">'+
+          '<div class="mini"><strong>'+st.count+'</strong><span>عدد الطلاب / الطالبات</span></div>'+
+          '<div class="mini"><strong>'+money(st.total)+'</strong><span>إجمالي الأرصدة</span></div>'+
+          '<div class="mini"><strong>'+st.pending+'</strong><span>مهام غير مسلّمة</span></div>'+
+          '<div class="mini"><strong>'+st.near+'</strong><span>قريبون من الترقية</span></div>'+
+        '</div>'+
+        '<div class="class-card-buttons">'+
+          '<button class="btn btn-green" onclick="openStudentSettingsClass(\''+c.id+'\')">دخول الفصل</button>'+
+          '<button class="btn btn-gold" onclick="openClassMessagePage(\''+c.id+'\')">رسالة جماعية</button>'+
+          '<button class="btn" style="background:#c4002f;color:#fff" onclick="openClassDeletePage(\''+c.id+'\')">حذف الفصل</button>'+
+        '</div>'+
+      '</div>';
+    }).join('') || '<div class="student-empty">لا توجد فصول بعد.</div>';
+  }
+  function showActionPage(classId, action){
+    const cards=getCards(), detail=getDetail(); if(!cards||!detail) return;
+    const cls=classes().find(function(c){return c.id===classId;}); if(!cls) return;
+    state.mode='page'; state.classId=classId; state.action=action;
+    cards.style.display='none'; detail.classList.remove('hidden'); detail.classList.add('page-mode');
+    const sts=studentsOf(classId); const total=sts.reduce((a,b)=>a+Number(b.balance||0),0);
+    if(action==='message'){
+      detail.innerHTML = '<div class="class-action-page">'+
+        '<div class="class-action-bar"><div><h3>رسالة جماعية — '+esc(cls.name)+'</h3><p>إرسلي رسالة موحدة إلى أولياء أمور الفصل من صفحة مستقلة داخل لوحة التحكم المتقدمة.</p></div><button class="ghost" onclick="backClassCardsHome()">رجوع للخلف</button></div>'+
+        '<div class="class-action-grid"><div class="mini"><strong>'+sts.length+'</strong><span>عدد الطلاب / الطالبات</span></div><div class="mini"><strong>'+money(total)+'</strong><span>إجمالي الأرصدة</span></div></div>'+
+        '<div class="class-action-card class-action-form"><div class="field"><label>نص الرسالة</label><textarea id="bulkClassMessageText" rows="6" placeholder="اكتبي الرسالة الجماعية هنا...">السلام عليكم ورحمة الله وبركاته، هذه رسالة من بنك الرياضيات بخصوص {الطالب / الطالبة}.</textarea></div><button class="btn btn-gold" onclick="sendBulkClassMessageNow(\''+classId+'\')">إرسال الرسالة الجماعية</button></div>'+
+      '</div>';
+    } else if(action==='delete'){
+      const canDelete = sts.length===0;
+      detail.innerHTML = '<div class="class-action-page">'+
+        '<div class="class-action-bar"><div><h3>حذف الفصل — '+esc(cls.name)+'</h3><p>صفحة مستقلة لتأكيد الحذف مع إبقاء الرجوع السريع إلى بطاقات الفصول.</p></div><button class="ghost" onclick="backClassCardsHome()">رجوع للخلف</button></div>'+
+        '<div class="class-action-grid"><div class="mini"><strong>'+sts.length+'</strong><span>عدد الطلاب / الطالبات الحالي</span></div><div class="mini"><strong>'+money(total)+'</strong><span>إجمالي الأرصدة</span></div></div>'+
+        '<div class="class-action-card"><div class="class-action-danger">'+(canDelete?'سيتم حذف الفصل فقط لأنه فارغ حاليًا.':'لا يمكن حذف هذا الفصل الآن لأنه يحتوي على طلاب / طالبات. أفرغي الفصل أولًا ثم أعيدي المحاولة.')+'</div>'+
+        (canDelete?'<button class="btn" style="background:#c4002f;color:#fff" onclick="confirmDeleteClassNow(\''+classId+'\')">تأكيد حذف الفصل</button>':'<button class="btn btn-light" disabled>الفصل غير قابل للحذف حاليًا</button>')+
+        '</div></div>';
+    }
+  }
+  window.openClassMessagePage = function(classId){ showActionPage(classId,'message'); };
+  window.openClassDeletePage = function(classId){ showActionPage(classId,'delete'); };
+  window.sendBulkClassMessageNow = function(classId){
+    const txt=(document.getElementById('bulkClassMessageText')?.value||'').trim(); if(!txt) return;
+    studentsOf(classId).filter(function(s){return s.guardian;}).forEach(function(s,idx){ setTimeout(function(){ if(typeof openWhatsAppNumber==='function') openWhatsAppNumber(s.guardian, txt.replace('{الطالب / الطالبة}', s.name)); }, idx*250); });
+  };
+  window.confirmDeleteClassNow = function(classId){
+    const clsIndex = classes().findIndex(function(c){return c.id===classId;}); if(clsIndex<0) return;
+    if(!confirm('هل تريدين حذف الفصل نهائيًا؟')) return;
+    bankData.classes.splice(clsIndex,1);
+    if(typeof saveBankData==='function') saveBankData();
+    if(typeof refreshTeacherUI==='function') refreshTeacherUI();
+    backClassCardsHome();
+  };
+  window.backClassCardsHome = function(){
+    state.mode='home'; state.classId=''; state.action='';
+    try{ if(typeof oldCloseClass==='function') oldCloseClass(); }catch(e){}
+    setTimeout(renderHome, 30);
+  };
+  window.openStudentSettingsClass = function(classId){
+    state.mode='class'; state.classId=classId; state.action='open';
+    const cards=getCards(); if(cards) cards.style.display='none';
+    if(typeof oldOpenClass==='function') oldOpenClass(classId);
+  };
+  window.closeStudentSettingsClass = function(){ backClassCardsHome(); };
+  function apply(){ const wrap=getWrap(); if(!wrap) return; renderHome(); }
+  const prevShow=window.showTeacherPane;
+  if(prevShow && !window.__advancedClassActionHooked){
+    window.__advancedClassActionHooked=true;
+    window.showTeacherPane=function(id,btn){ prevShow(id,btn); if(id==='teacherPaneStudents'){ setTimeout(apply,120); } };
+    const prevRefresh=window.refreshTeacherUI;
+    if(prevRefresh){ window.refreshTeacherUI=function(){ prevRefresh(); setTimeout(apply,120); }; }
+    document.addEventListener('DOMContentLoaded', function(){ setTimeout(apply,500); });
+  } else {
+    document.addEventListener('DOMContentLoaded', function(){ setTimeout(apply,500); });
+  }
+})();
+</script>
+
 </body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
@@ -4563,6 +4680,123 @@ function openMoreInfo(type){
   alert(messages[type]||'تم فتح العنصر.');
 }
 </script>
+
+<style id="advanced-class-actions-style">
+.class-action-page{display:grid;gap:14px}
+.class-action-bar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;background:#fff;border:1px solid var(--line);border-radius:24px;padding:14px 16px;box-shadow:0 8px 20px rgba(16,58,46,.05)}
+.class-action-bar h3{margin:0;color:var(--deep);font-size:22px}
+.class-action-bar p{margin:6px 0 0;color:var(--muted);font-size:13px;line-height:1.8}
+.class-action-card{background:#fff;border:1px solid var(--line);border-radius:26px;padding:18px;box-shadow:0 10px 24px rgba(16,58,46,.06);display:grid;gap:14px}
+.class-action-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.class-action-grid .mini{background:#fbfcfb;border:1px solid var(--line);border-radius:22px;padding:18px;text-align:center}
+.class-action-grid .mini strong{display:block;font-size:18px;color:var(--deep);margin-bottom:6px}
+.class-action-grid .mini span{display:block;font-size:12px;color:var(--muted)}
+.class-action-form textarea,.class-action-form select{width:100%;border:1px solid var(--line);background:#f8fbf9;border-radius:16px;padding:14px;font-family:inherit;font-size:14px;outline:none}
+.class-action-danger{background:#fff6f5;border:1px solid #f2d7d2;color:#a63f3c;border-radius:20px;padding:14px;line-height:1.9}
+.class-card-buttons{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.class-card-buttons .btn{width:100%}
+@media(max-width:980px){.class-action-grid,.class-card-buttons{grid-template-columns:1fr}}
+</style>
+<script id="advanced-class-actions-script">
+(function(){
+  function esc(s){return String(s||'').replace(/[&<>\"]/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c];});}
+  function money(n){return (typeof formatMoney==='function') ? formatMoney(Number(n||0)) : String(Number(n||0));}
+  function classes(){return (window.bankData&&Array.isArray(bankData.classes))?bankData.classes:[];}
+  function studentsOf(classId){return (window.bankData&&Array.isArray(bankData.students))?bankData.students.filter(function(s){return s.classId===classId;}):[];}
+  const state = window.__advancedClassActionState || (window.__advancedClassActionState={mode:'home',classId:'',action:''});
+  const oldOpenClass = window.openStudentSettingsClass;
+  const oldCloseClass = window.closeStudentSettingsClass;
+  function getWrap(){return document.getElementById('studentSettingsProWrap');}
+  function getCards(){return document.getElementById('studentClassCards');}
+  function getDetail(){return document.getElementById('studentClassDetail');}
+  function buildStats(c){
+    const sts=studentsOf(c.id); const total=sts.reduce((a,b)=>a+Number(b.balance||0),0);
+    const pending=sts.filter(function(st){return (window.bankData?.performanceTasks||[]).some(function(task){return task.classId===c.id && (!task.entries?.[st.id] || !['submitted','graded'].includes(task.entries?.[st.id]?.status));});}).length;
+    const near=sts.filter(function(s){var b=Number(s.balance||0); var next=b<11000?11000:b<16000?16000:b<31000?31000:b<41000?41000:null; return next && (next-b)<=3000;}).length;
+    return {count:sts.length,total:total,pending:pending,near:near};
+  }
+  function renderHome(){
+    const cards=getCards(), detail=getDetail(); if(!cards||!detail) return;
+    cards.style.display='grid'; detail.classList.add('hidden'); detail.classList.remove('page-mode'); detail.innerHTML='';
+    cards.innerHTML = classes().map(function(c){
+      const st=buildStats(c);
+      return '<div class="student-class-card">'+
+        '<div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start"><div><h4>'+esc(c.name)+'</h4><div class="teacher-note">عدد الطلاب / الطالبات في الفصل: '+st.count+'</div></div><span class="pill">'+st.count+' نشط</span></div>'+
+        '<div class="student-class-meta">'+
+          '<div class="mini"><strong>'+st.count+'</strong><span>عدد الطلاب / الطالبات</span></div>'+
+          '<div class="mini"><strong>'+money(st.total)+'</strong><span>إجمالي الأرصدة</span></div>'+
+          '<div class="mini"><strong>'+st.pending+'</strong><span>مهام غير مسلّمة</span></div>'+
+          '<div class="mini"><strong>'+st.near+'</strong><span>قريبون من الترقية</span></div>'+
+        '</div>'+
+        '<div class="class-card-buttons">'+
+          '<button class="btn btn-green" onclick="openStudentSettingsClass(\''+c.id+'\')">دخول الفصل</button>'+
+          '<button class="btn btn-gold" onclick="openClassMessagePage(\''+c.id+'\')">رسالة جماعية</button>'+
+          '<button class="btn" style="background:#c4002f;color:#fff" onclick="openClassDeletePage(\''+c.id+'\')">حذف الفصل</button>'+
+        '</div>'+
+      '</div>';
+    }).join('') || '<div class="student-empty">لا توجد فصول بعد.</div>';
+  }
+  function showActionPage(classId, action){
+    const cards=getCards(), detail=getDetail(); if(!cards||!detail) return;
+    const cls=classes().find(function(c){return c.id===classId;}); if(!cls) return;
+    state.mode='page'; state.classId=classId; state.action=action;
+    cards.style.display='none'; detail.classList.remove('hidden'); detail.classList.add('page-mode');
+    const sts=studentsOf(classId); const total=sts.reduce((a,b)=>a+Number(b.balance||0),0);
+    if(action==='message'){
+      detail.innerHTML = '<div class="class-action-page">'+
+        '<div class="class-action-bar"><div><h3>رسالة جماعية — '+esc(cls.name)+'</h3><p>إرسلي رسالة موحدة إلى أولياء أمور الفصل من صفحة مستقلة داخل لوحة التحكم المتقدمة.</p></div><button class="ghost" onclick="backClassCardsHome()">رجوع للخلف</button></div>'+
+        '<div class="class-action-grid"><div class="mini"><strong>'+sts.length+'</strong><span>عدد الطلاب / الطالبات</span></div><div class="mini"><strong>'+money(total)+'</strong><span>إجمالي الأرصدة</span></div></div>'+
+        '<div class="class-action-card class-action-form"><div class="field"><label>نص الرسالة</label><textarea id="bulkClassMessageText" rows="6" placeholder="اكتبي الرسالة الجماعية هنا...">السلام عليكم ورحمة الله وبركاته، هذه رسالة من بنك الرياضيات بخصوص {الطالب / الطالبة}.</textarea></div><button class="btn btn-gold" onclick="sendBulkClassMessageNow(\''+classId+'\')">إرسال الرسالة الجماعية</button></div>'+
+      '</div>';
+    } else if(action==='delete'){
+      const canDelete = sts.length===0;
+      detail.innerHTML = '<div class="class-action-page">'+
+        '<div class="class-action-bar"><div><h3>حذف الفصل — '+esc(cls.name)+'</h3><p>صفحة مستقلة لتأكيد الحذف مع إبقاء الرجوع السريع إلى بطاقات الفصول.</p></div><button class="ghost" onclick="backClassCardsHome()">رجوع للخلف</button></div>'+
+        '<div class="class-action-grid"><div class="mini"><strong>'+sts.length+'</strong><span>عدد الطلاب / الطالبات الحالي</span></div><div class="mini"><strong>'+money(total)+'</strong><span>إجمالي الأرصدة</span></div></div>'+
+        '<div class="class-action-card"><div class="class-action-danger">'+(canDelete?'سيتم حذف الفصل فقط لأنه فارغ حاليًا.':'لا يمكن حذف هذا الفصل الآن لأنه يحتوي على طلاب / طالبات. أفرغي الفصل أولًا ثم أعيدي المحاولة.')+'</div>'+
+        (canDelete?'<button class="btn" style="background:#c4002f;color:#fff" onclick="confirmDeleteClassNow(\''+classId+'\')">تأكيد حذف الفصل</button>':'<button class="btn btn-light" disabled>الفصل غير قابل للحذف حاليًا</button>')+
+        '</div></div>';
+    }
+  }
+  window.openClassMessagePage = function(classId){ showActionPage(classId,'message'); };
+  window.openClassDeletePage = function(classId){ showActionPage(classId,'delete'); };
+  window.sendBulkClassMessageNow = function(classId){
+    const txt=(document.getElementById('bulkClassMessageText')?.value||'').trim(); if(!txt) return;
+    studentsOf(classId).filter(function(s){return s.guardian;}).forEach(function(s,idx){ setTimeout(function(){ if(typeof openWhatsAppNumber==='function') openWhatsAppNumber(s.guardian, txt.replace('{الطالب / الطالبة}', s.name)); }, idx*250); });
+  };
+  window.confirmDeleteClassNow = function(classId){
+    const clsIndex = classes().findIndex(function(c){return c.id===classId;}); if(clsIndex<0) return;
+    if(!confirm('هل تريدين حذف الفصل نهائيًا؟')) return;
+    bankData.classes.splice(clsIndex,1);
+    if(typeof saveBankData==='function') saveBankData();
+    if(typeof refreshTeacherUI==='function') refreshTeacherUI();
+    backClassCardsHome();
+  };
+  window.backClassCardsHome = function(){
+    state.mode='home'; state.classId=''; state.action='';
+    try{ if(typeof oldCloseClass==='function') oldCloseClass(); }catch(e){}
+    setTimeout(renderHome, 30);
+  };
+  window.openStudentSettingsClass = function(classId){
+    state.mode='class'; state.classId=classId; state.action='open';
+    const cards=getCards(); if(cards) cards.style.display='none';
+    if(typeof oldOpenClass==='function') oldOpenClass(classId);
+  };
+  window.closeStudentSettingsClass = function(){ backClassCardsHome(); };
+  function apply(){ const wrap=getWrap(); if(!wrap) return; renderHome(); }
+  const prevShow=window.showTeacherPane;
+  if(prevShow && !window.__advancedClassActionHooked){
+    window.__advancedClassActionHooked=true;
+    window.showTeacherPane=function(id,btn){ prevShow(id,btn); if(id==='teacherPaneStudents'){ setTimeout(apply,120); } };
+    const prevRefresh=window.refreshTeacherUI;
+    if(prevRefresh){ window.refreshTeacherUI=function(){ prevRefresh(); setTimeout(apply,120); }; }
+    document.addEventListener('DOMContentLoaded', function(){ setTimeout(apply,500); });
+  } else {
+    document.addEventListener('DOMContentLoaded', function(){ setTimeout(apply,500); });
+  }
+})();
+</script>
+
 </body></html>`;
     const w=window.open('','_blank'); if(w){ w.document.write(html); w.document.close(); setTimeout(()=>w.print(),400); }
     const status=document.getElementById('smartReportStatus'); if(status){ status.classList.remove('hidden'); setTimeout(()=>status.classList.add('hidden'),2000); }
@@ -4943,6 +5177,123 @@ function openMoreInfo(type){
   alert(messages[type]||'تم فتح العنصر.');
 }
 </script>
+
+<style id="advanced-class-actions-style">
+.class-action-page{display:grid;gap:14px}
+.class-action-bar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;background:#fff;border:1px solid var(--line);border-radius:24px;padding:14px 16px;box-shadow:0 8px 20px rgba(16,58,46,.05)}
+.class-action-bar h3{margin:0;color:var(--deep);font-size:22px}
+.class-action-bar p{margin:6px 0 0;color:var(--muted);font-size:13px;line-height:1.8}
+.class-action-card{background:#fff;border:1px solid var(--line);border-radius:26px;padding:18px;box-shadow:0 10px 24px rgba(16,58,46,.06);display:grid;gap:14px}
+.class-action-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.class-action-grid .mini{background:#fbfcfb;border:1px solid var(--line);border-radius:22px;padding:18px;text-align:center}
+.class-action-grid .mini strong{display:block;font-size:18px;color:var(--deep);margin-bottom:6px}
+.class-action-grid .mini span{display:block;font-size:12px;color:var(--muted)}
+.class-action-form textarea,.class-action-form select{width:100%;border:1px solid var(--line);background:#f8fbf9;border-radius:16px;padding:14px;font-family:inherit;font-size:14px;outline:none}
+.class-action-danger{background:#fff6f5;border:1px solid #f2d7d2;color:#a63f3c;border-radius:20px;padding:14px;line-height:1.9}
+.class-card-buttons{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.class-card-buttons .btn{width:100%}
+@media(max-width:980px){.class-action-grid,.class-card-buttons{grid-template-columns:1fr}}
+</style>
+<script id="advanced-class-actions-script">
+(function(){
+  function esc(s){return String(s||'').replace(/[&<>\"]/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c];});}
+  function money(n){return (typeof formatMoney==='function') ? formatMoney(Number(n||0)) : String(Number(n||0));}
+  function classes(){return (window.bankData&&Array.isArray(bankData.classes))?bankData.classes:[];}
+  function studentsOf(classId){return (window.bankData&&Array.isArray(bankData.students))?bankData.students.filter(function(s){return s.classId===classId;}):[];}
+  const state = window.__advancedClassActionState || (window.__advancedClassActionState={mode:'home',classId:'',action:''});
+  const oldOpenClass = window.openStudentSettingsClass;
+  const oldCloseClass = window.closeStudentSettingsClass;
+  function getWrap(){return document.getElementById('studentSettingsProWrap');}
+  function getCards(){return document.getElementById('studentClassCards');}
+  function getDetail(){return document.getElementById('studentClassDetail');}
+  function buildStats(c){
+    const sts=studentsOf(c.id); const total=sts.reduce((a,b)=>a+Number(b.balance||0),0);
+    const pending=sts.filter(function(st){return (window.bankData?.performanceTasks||[]).some(function(task){return task.classId===c.id && (!task.entries?.[st.id] || !['submitted','graded'].includes(task.entries?.[st.id]?.status));});}).length;
+    const near=sts.filter(function(s){var b=Number(s.balance||0); var next=b<11000?11000:b<16000?16000:b<31000?31000:b<41000?41000:null; return next && (next-b)<=3000;}).length;
+    return {count:sts.length,total:total,pending:pending,near:near};
+  }
+  function renderHome(){
+    const cards=getCards(), detail=getDetail(); if(!cards||!detail) return;
+    cards.style.display='grid'; detail.classList.add('hidden'); detail.classList.remove('page-mode'); detail.innerHTML='';
+    cards.innerHTML = classes().map(function(c){
+      const st=buildStats(c);
+      return '<div class="student-class-card">'+
+        '<div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start"><div><h4>'+esc(c.name)+'</h4><div class="teacher-note">عدد الطلاب / الطالبات في الفصل: '+st.count+'</div></div><span class="pill">'+st.count+' نشط</span></div>'+
+        '<div class="student-class-meta">'+
+          '<div class="mini"><strong>'+st.count+'</strong><span>عدد الطلاب / الطالبات</span></div>'+
+          '<div class="mini"><strong>'+money(st.total)+'</strong><span>إجمالي الأرصدة</span></div>'+
+          '<div class="mini"><strong>'+st.pending+'</strong><span>مهام غير مسلّمة</span></div>'+
+          '<div class="mini"><strong>'+st.near+'</strong><span>قريبون من الترقية</span></div>'+
+        '</div>'+
+        '<div class="class-card-buttons">'+
+          '<button class="btn btn-green" onclick="openStudentSettingsClass(\''+c.id+'\')">دخول الفصل</button>'+
+          '<button class="btn btn-gold" onclick="openClassMessagePage(\''+c.id+'\')">رسالة جماعية</button>'+
+          '<button class="btn" style="background:#c4002f;color:#fff" onclick="openClassDeletePage(\''+c.id+'\')">حذف الفصل</button>'+
+        '</div>'+
+      '</div>';
+    }).join('') || '<div class="student-empty">لا توجد فصول بعد.</div>';
+  }
+  function showActionPage(classId, action){
+    const cards=getCards(), detail=getDetail(); if(!cards||!detail) return;
+    const cls=classes().find(function(c){return c.id===classId;}); if(!cls) return;
+    state.mode='page'; state.classId=classId; state.action=action;
+    cards.style.display='none'; detail.classList.remove('hidden'); detail.classList.add('page-mode');
+    const sts=studentsOf(classId); const total=sts.reduce((a,b)=>a+Number(b.balance||0),0);
+    if(action==='message'){
+      detail.innerHTML = '<div class="class-action-page">'+
+        '<div class="class-action-bar"><div><h3>رسالة جماعية — '+esc(cls.name)+'</h3><p>إرسلي رسالة موحدة إلى أولياء أمور الفصل من صفحة مستقلة داخل لوحة التحكم المتقدمة.</p></div><button class="ghost" onclick="backClassCardsHome()">رجوع للخلف</button></div>'+
+        '<div class="class-action-grid"><div class="mini"><strong>'+sts.length+'</strong><span>عدد الطلاب / الطالبات</span></div><div class="mini"><strong>'+money(total)+'</strong><span>إجمالي الأرصدة</span></div></div>'+
+        '<div class="class-action-card class-action-form"><div class="field"><label>نص الرسالة</label><textarea id="bulkClassMessageText" rows="6" placeholder="اكتبي الرسالة الجماعية هنا...">السلام عليكم ورحمة الله وبركاته، هذه رسالة من بنك الرياضيات بخصوص {الطالب / الطالبة}.</textarea></div><button class="btn btn-gold" onclick="sendBulkClassMessageNow(\''+classId+'\')">إرسال الرسالة الجماعية</button></div>'+
+      '</div>';
+    } else if(action==='delete'){
+      const canDelete = sts.length===0;
+      detail.innerHTML = '<div class="class-action-page">'+
+        '<div class="class-action-bar"><div><h3>حذف الفصل — '+esc(cls.name)+'</h3><p>صفحة مستقلة لتأكيد الحذف مع إبقاء الرجوع السريع إلى بطاقات الفصول.</p></div><button class="ghost" onclick="backClassCardsHome()">رجوع للخلف</button></div>'+
+        '<div class="class-action-grid"><div class="mini"><strong>'+sts.length+'</strong><span>عدد الطلاب / الطالبات الحالي</span></div><div class="mini"><strong>'+money(total)+'</strong><span>إجمالي الأرصدة</span></div></div>'+
+        '<div class="class-action-card"><div class="class-action-danger">'+(canDelete?'سيتم حذف الفصل فقط لأنه فارغ حاليًا.':'لا يمكن حذف هذا الفصل الآن لأنه يحتوي على طلاب / طالبات. أفرغي الفصل أولًا ثم أعيدي المحاولة.')+'</div>'+
+        (canDelete?'<button class="btn" style="background:#c4002f;color:#fff" onclick="confirmDeleteClassNow(\''+classId+'\')">تأكيد حذف الفصل</button>':'<button class="btn btn-light" disabled>الفصل غير قابل للحذف حاليًا</button>')+
+        '</div></div>';
+    }
+  }
+  window.openClassMessagePage = function(classId){ showActionPage(classId,'message'); };
+  window.openClassDeletePage = function(classId){ showActionPage(classId,'delete'); };
+  window.sendBulkClassMessageNow = function(classId){
+    const txt=(document.getElementById('bulkClassMessageText')?.value||'').trim(); if(!txt) return;
+    studentsOf(classId).filter(function(s){return s.guardian;}).forEach(function(s,idx){ setTimeout(function(){ if(typeof openWhatsAppNumber==='function') openWhatsAppNumber(s.guardian, txt.replace('{الطالب / الطالبة}', s.name)); }, idx*250); });
+  };
+  window.confirmDeleteClassNow = function(classId){
+    const clsIndex = classes().findIndex(function(c){return c.id===classId;}); if(clsIndex<0) return;
+    if(!confirm('هل تريدين حذف الفصل نهائيًا؟')) return;
+    bankData.classes.splice(clsIndex,1);
+    if(typeof saveBankData==='function') saveBankData();
+    if(typeof refreshTeacherUI==='function') refreshTeacherUI();
+    backClassCardsHome();
+  };
+  window.backClassCardsHome = function(){
+    state.mode='home'; state.classId=''; state.action='';
+    try{ if(typeof oldCloseClass==='function') oldCloseClass(); }catch(e){}
+    setTimeout(renderHome, 30);
+  };
+  window.openStudentSettingsClass = function(classId){
+    state.mode='class'; state.classId=classId; state.action='open';
+    const cards=getCards(); if(cards) cards.style.display='none';
+    if(typeof oldOpenClass==='function') oldOpenClass(classId);
+  };
+  window.closeStudentSettingsClass = function(){ backClassCardsHome(); };
+  function apply(){ const wrap=getWrap(); if(!wrap) return; renderHome(); }
+  const prevShow=window.showTeacherPane;
+  if(prevShow && !window.__advancedClassActionHooked){
+    window.__advancedClassActionHooked=true;
+    window.showTeacherPane=function(id,btn){ prevShow(id,btn); if(id==='teacherPaneStudents'){ setTimeout(apply,120); } };
+    const prevRefresh=window.refreshTeacherUI;
+    if(prevRefresh){ window.refreshTeacherUI=function(){ prevRefresh(); setTimeout(apply,120); }; }
+    document.addEventListener('DOMContentLoaded', function(){ setTimeout(apply,500); });
+  } else {
+    document.addEventListener('DOMContentLoaded', function(){ setTimeout(apply,500); });
+  }
+})();
+</script>
+
 </body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
@@ -4992,6 +5343,123 @@ function openMoreInfo(type){
   alert(messages[type]||'تم فتح العنصر.');
 }
 </script>
+
+<style id="advanced-class-actions-style">
+.class-action-page{display:grid;gap:14px}
+.class-action-bar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;background:#fff;border:1px solid var(--line);border-radius:24px;padding:14px 16px;box-shadow:0 8px 20px rgba(16,58,46,.05)}
+.class-action-bar h3{margin:0;color:var(--deep);font-size:22px}
+.class-action-bar p{margin:6px 0 0;color:var(--muted);font-size:13px;line-height:1.8}
+.class-action-card{background:#fff;border:1px solid var(--line);border-radius:26px;padding:18px;box-shadow:0 10px 24px rgba(16,58,46,.06);display:grid;gap:14px}
+.class-action-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.class-action-grid .mini{background:#fbfcfb;border:1px solid var(--line);border-radius:22px;padding:18px;text-align:center}
+.class-action-grid .mini strong{display:block;font-size:18px;color:var(--deep);margin-bottom:6px}
+.class-action-grid .mini span{display:block;font-size:12px;color:var(--muted)}
+.class-action-form textarea,.class-action-form select{width:100%;border:1px solid var(--line);background:#f8fbf9;border-radius:16px;padding:14px;font-family:inherit;font-size:14px;outline:none}
+.class-action-danger{background:#fff6f5;border:1px solid #f2d7d2;color:#a63f3c;border-radius:20px;padding:14px;line-height:1.9}
+.class-card-buttons{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.class-card-buttons .btn{width:100%}
+@media(max-width:980px){.class-action-grid,.class-card-buttons{grid-template-columns:1fr}}
+</style>
+<script id="advanced-class-actions-script">
+(function(){
+  function esc(s){return String(s||'').replace(/[&<>\"]/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c];});}
+  function money(n){return (typeof formatMoney==='function') ? formatMoney(Number(n||0)) : String(Number(n||0));}
+  function classes(){return (window.bankData&&Array.isArray(bankData.classes))?bankData.classes:[];}
+  function studentsOf(classId){return (window.bankData&&Array.isArray(bankData.students))?bankData.students.filter(function(s){return s.classId===classId;}):[];}
+  const state = window.__advancedClassActionState || (window.__advancedClassActionState={mode:'home',classId:'',action:''});
+  const oldOpenClass = window.openStudentSettingsClass;
+  const oldCloseClass = window.closeStudentSettingsClass;
+  function getWrap(){return document.getElementById('studentSettingsProWrap');}
+  function getCards(){return document.getElementById('studentClassCards');}
+  function getDetail(){return document.getElementById('studentClassDetail');}
+  function buildStats(c){
+    const sts=studentsOf(c.id); const total=sts.reduce((a,b)=>a+Number(b.balance||0),0);
+    const pending=sts.filter(function(st){return (window.bankData?.performanceTasks||[]).some(function(task){return task.classId===c.id && (!task.entries?.[st.id] || !['submitted','graded'].includes(task.entries?.[st.id]?.status));});}).length;
+    const near=sts.filter(function(s){var b=Number(s.balance||0); var next=b<11000?11000:b<16000?16000:b<31000?31000:b<41000?41000:null; return next && (next-b)<=3000;}).length;
+    return {count:sts.length,total:total,pending:pending,near:near};
+  }
+  function renderHome(){
+    const cards=getCards(), detail=getDetail(); if(!cards||!detail) return;
+    cards.style.display='grid'; detail.classList.add('hidden'); detail.classList.remove('page-mode'); detail.innerHTML='';
+    cards.innerHTML = classes().map(function(c){
+      const st=buildStats(c);
+      return '<div class="student-class-card">'+
+        '<div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start"><div><h4>'+esc(c.name)+'</h4><div class="teacher-note">عدد الطلاب / الطالبات في الفصل: '+st.count+'</div></div><span class="pill">'+st.count+' نشط</span></div>'+
+        '<div class="student-class-meta">'+
+          '<div class="mini"><strong>'+st.count+'</strong><span>عدد الطلاب / الطالبات</span></div>'+
+          '<div class="mini"><strong>'+money(st.total)+'</strong><span>إجمالي الأرصدة</span></div>'+
+          '<div class="mini"><strong>'+st.pending+'</strong><span>مهام غير مسلّمة</span></div>'+
+          '<div class="mini"><strong>'+st.near+'</strong><span>قريبون من الترقية</span></div>'+
+        '</div>'+
+        '<div class="class-card-buttons">'+
+          '<button class="btn btn-green" onclick="openStudentSettingsClass(\''+c.id+'\')">دخول الفصل</button>'+
+          '<button class="btn btn-gold" onclick="openClassMessagePage(\''+c.id+'\')">رسالة جماعية</button>'+
+          '<button class="btn" style="background:#c4002f;color:#fff" onclick="openClassDeletePage(\''+c.id+'\')">حذف الفصل</button>'+
+        '</div>'+
+      '</div>';
+    }).join('') || '<div class="student-empty">لا توجد فصول بعد.</div>';
+  }
+  function showActionPage(classId, action){
+    const cards=getCards(), detail=getDetail(); if(!cards||!detail) return;
+    const cls=classes().find(function(c){return c.id===classId;}); if(!cls) return;
+    state.mode='page'; state.classId=classId; state.action=action;
+    cards.style.display='none'; detail.classList.remove('hidden'); detail.classList.add('page-mode');
+    const sts=studentsOf(classId); const total=sts.reduce((a,b)=>a+Number(b.balance||0),0);
+    if(action==='message'){
+      detail.innerHTML = '<div class="class-action-page">'+
+        '<div class="class-action-bar"><div><h3>رسالة جماعية — '+esc(cls.name)+'</h3><p>إرسلي رسالة موحدة إلى أولياء أمور الفصل من صفحة مستقلة داخل لوحة التحكم المتقدمة.</p></div><button class="ghost" onclick="backClassCardsHome()">رجوع للخلف</button></div>'+
+        '<div class="class-action-grid"><div class="mini"><strong>'+sts.length+'</strong><span>عدد الطلاب / الطالبات</span></div><div class="mini"><strong>'+money(total)+'</strong><span>إجمالي الأرصدة</span></div></div>'+
+        '<div class="class-action-card class-action-form"><div class="field"><label>نص الرسالة</label><textarea id="bulkClassMessageText" rows="6" placeholder="اكتبي الرسالة الجماعية هنا...">السلام عليكم ورحمة الله وبركاته، هذه رسالة من بنك الرياضيات بخصوص {الطالب / الطالبة}.</textarea></div><button class="btn btn-gold" onclick="sendBulkClassMessageNow(\''+classId+'\')">إرسال الرسالة الجماعية</button></div>'+
+      '</div>';
+    } else if(action==='delete'){
+      const canDelete = sts.length===0;
+      detail.innerHTML = '<div class="class-action-page">'+
+        '<div class="class-action-bar"><div><h3>حذف الفصل — '+esc(cls.name)+'</h3><p>صفحة مستقلة لتأكيد الحذف مع إبقاء الرجوع السريع إلى بطاقات الفصول.</p></div><button class="ghost" onclick="backClassCardsHome()">رجوع للخلف</button></div>'+
+        '<div class="class-action-grid"><div class="mini"><strong>'+sts.length+'</strong><span>عدد الطلاب / الطالبات الحالي</span></div><div class="mini"><strong>'+money(total)+'</strong><span>إجمالي الأرصدة</span></div></div>'+
+        '<div class="class-action-card"><div class="class-action-danger">'+(canDelete?'سيتم حذف الفصل فقط لأنه فارغ حاليًا.':'لا يمكن حذف هذا الفصل الآن لأنه يحتوي على طلاب / طالبات. أفرغي الفصل أولًا ثم أعيدي المحاولة.')+'</div>'+
+        (canDelete?'<button class="btn" style="background:#c4002f;color:#fff" onclick="confirmDeleteClassNow(\''+classId+'\')">تأكيد حذف الفصل</button>':'<button class="btn btn-light" disabled>الفصل غير قابل للحذف حاليًا</button>')+
+        '</div></div>';
+    }
+  }
+  window.openClassMessagePage = function(classId){ showActionPage(classId,'message'); };
+  window.openClassDeletePage = function(classId){ showActionPage(classId,'delete'); };
+  window.sendBulkClassMessageNow = function(classId){
+    const txt=(document.getElementById('bulkClassMessageText')?.value||'').trim(); if(!txt) return;
+    studentsOf(classId).filter(function(s){return s.guardian;}).forEach(function(s,idx){ setTimeout(function(){ if(typeof openWhatsAppNumber==='function') openWhatsAppNumber(s.guardian, txt.replace('{الطالب / الطالبة}', s.name)); }, idx*250); });
+  };
+  window.confirmDeleteClassNow = function(classId){
+    const clsIndex = classes().findIndex(function(c){return c.id===classId;}); if(clsIndex<0) return;
+    if(!confirm('هل تريدين حذف الفصل نهائيًا؟')) return;
+    bankData.classes.splice(clsIndex,1);
+    if(typeof saveBankData==='function') saveBankData();
+    if(typeof refreshTeacherUI==='function') refreshTeacherUI();
+    backClassCardsHome();
+  };
+  window.backClassCardsHome = function(){
+    state.mode='home'; state.classId=''; state.action='';
+    try{ if(typeof oldCloseClass==='function') oldCloseClass(); }catch(e){}
+    setTimeout(renderHome, 30);
+  };
+  window.openStudentSettingsClass = function(classId){
+    state.mode='class'; state.classId=classId; state.action='open';
+    const cards=getCards(); if(cards) cards.style.display='none';
+    if(typeof oldOpenClass==='function') oldOpenClass(classId);
+  };
+  window.closeStudentSettingsClass = function(){ backClassCardsHome(); };
+  function apply(){ const wrap=getWrap(); if(!wrap) return; renderHome(); }
+  const prevShow=window.showTeacherPane;
+  if(prevShow && !window.__advancedClassActionHooked){
+    window.__advancedClassActionHooked=true;
+    window.showTeacherPane=function(id,btn){ prevShow(id,btn); if(id==='teacherPaneStudents'){ setTimeout(apply,120); } };
+    const prevRefresh=window.refreshTeacherUI;
+    if(prevRefresh){ window.refreshTeacherUI=function(){ prevRefresh(); setTimeout(apply,120); }; }
+    document.addEventListener('DOMContentLoaded', function(){ setTimeout(apply,500); });
+  } else {
+    document.addEventListener('DOMContentLoaded', function(){ setTimeout(apply,500); });
+  }
+})();
+</script>
+
 </body></html>`;
     const w=window.open('','_blank'); if(w){ w.document.write(html); w.document.close(); setTimeout(()=>w.print(),400); }
     const status=document.getElementById('smartReportStatus'); if(status){ status.classList.remove('hidden'); setTimeout(()=>status.classList.add('hidden'),2000); }
@@ -5513,6 +5981,123 @@ function openMoreInfo(type){
   alert(messages[type]||'تم فتح العنصر.');
 }
 </script>
+
+<style id="advanced-class-actions-style">
+.class-action-page{display:grid;gap:14px}
+.class-action-bar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;background:#fff;border:1px solid var(--line);border-radius:24px;padding:14px 16px;box-shadow:0 8px 20px rgba(16,58,46,.05)}
+.class-action-bar h3{margin:0;color:var(--deep);font-size:22px}
+.class-action-bar p{margin:6px 0 0;color:var(--muted);font-size:13px;line-height:1.8}
+.class-action-card{background:#fff;border:1px solid var(--line);border-radius:26px;padding:18px;box-shadow:0 10px 24px rgba(16,58,46,.06);display:grid;gap:14px}
+.class-action-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.class-action-grid .mini{background:#fbfcfb;border:1px solid var(--line);border-radius:22px;padding:18px;text-align:center}
+.class-action-grid .mini strong{display:block;font-size:18px;color:var(--deep);margin-bottom:6px}
+.class-action-grid .mini span{display:block;font-size:12px;color:var(--muted)}
+.class-action-form textarea,.class-action-form select{width:100%;border:1px solid var(--line);background:#f8fbf9;border-radius:16px;padding:14px;font-family:inherit;font-size:14px;outline:none}
+.class-action-danger{background:#fff6f5;border:1px solid #f2d7d2;color:#a63f3c;border-radius:20px;padding:14px;line-height:1.9}
+.class-card-buttons{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.class-card-buttons .btn{width:100%}
+@media(max-width:980px){.class-action-grid,.class-card-buttons{grid-template-columns:1fr}}
+</style>
+<script id="advanced-class-actions-script">
+(function(){
+  function esc(s){return String(s||'').replace(/[&<>\"]/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c];});}
+  function money(n){return (typeof formatMoney==='function') ? formatMoney(Number(n||0)) : String(Number(n||0));}
+  function classes(){return (window.bankData&&Array.isArray(bankData.classes))?bankData.classes:[];}
+  function studentsOf(classId){return (window.bankData&&Array.isArray(bankData.students))?bankData.students.filter(function(s){return s.classId===classId;}):[];}
+  const state = window.__advancedClassActionState || (window.__advancedClassActionState={mode:'home',classId:'',action:''});
+  const oldOpenClass = window.openStudentSettingsClass;
+  const oldCloseClass = window.closeStudentSettingsClass;
+  function getWrap(){return document.getElementById('studentSettingsProWrap');}
+  function getCards(){return document.getElementById('studentClassCards');}
+  function getDetail(){return document.getElementById('studentClassDetail');}
+  function buildStats(c){
+    const sts=studentsOf(c.id); const total=sts.reduce((a,b)=>a+Number(b.balance||0),0);
+    const pending=sts.filter(function(st){return (window.bankData?.performanceTasks||[]).some(function(task){return task.classId===c.id && (!task.entries?.[st.id] || !['submitted','graded'].includes(task.entries?.[st.id]?.status));});}).length;
+    const near=sts.filter(function(s){var b=Number(s.balance||0); var next=b<11000?11000:b<16000?16000:b<31000?31000:b<41000?41000:null; return next && (next-b)<=3000;}).length;
+    return {count:sts.length,total:total,pending:pending,near:near};
+  }
+  function renderHome(){
+    const cards=getCards(), detail=getDetail(); if(!cards||!detail) return;
+    cards.style.display='grid'; detail.classList.add('hidden'); detail.classList.remove('page-mode'); detail.innerHTML='';
+    cards.innerHTML = classes().map(function(c){
+      const st=buildStats(c);
+      return '<div class="student-class-card">'+
+        '<div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start"><div><h4>'+esc(c.name)+'</h4><div class="teacher-note">عدد الطلاب / الطالبات في الفصل: '+st.count+'</div></div><span class="pill">'+st.count+' نشط</span></div>'+
+        '<div class="student-class-meta">'+
+          '<div class="mini"><strong>'+st.count+'</strong><span>عدد الطلاب / الطالبات</span></div>'+
+          '<div class="mini"><strong>'+money(st.total)+'</strong><span>إجمالي الأرصدة</span></div>'+
+          '<div class="mini"><strong>'+st.pending+'</strong><span>مهام غير مسلّمة</span></div>'+
+          '<div class="mini"><strong>'+st.near+'</strong><span>قريبون من الترقية</span></div>'+
+        '</div>'+
+        '<div class="class-card-buttons">'+
+          '<button class="btn btn-green" onclick="openStudentSettingsClass(\''+c.id+'\')">دخول الفصل</button>'+
+          '<button class="btn btn-gold" onclick="openClassMessagePage(\''+c.id+'\')">رسالة جماعية</button>'+
+          '<button class="btn" style="background:#c4002f;color:#fff" onclick="openClassDeletePage(\''+c.id+'\')">حذف الفصل</button>'+
+        '</div>'+
+      '</div>';
+    }).join('') || '<div class="student-empty">لا توجد فصول بعد.</div>';
+  }
+  function showActionPage(classId, action){
+    const cards=getCards(), detail=getDetail(); if(!cards||!detail) return;
+    const cls=classes().find(function(c){return c.id===classId;}); if(!cls) return;
+    state.mode='page'; state.classId=classId; state.action=action;
+    cards.style.display='none'; detail.classList.remove('hidden'); detail.classList.add('page-mode');
+    const sts=studentsOf(classId); const total=sts.reduce((a,b)=>a+Number(b.balance||0),0);
+    if(action==='message'){
+      detail.innerHTML = '<div class="class-action-page">'+
+        '<div class="class-action-bar"><div><h3>رسالة جماعية — '+esc(cls.name)+'</h3><p>إرسلي رسالة موحدة إلى أولياء أمور الفصل من صفحة مستقلة داخل لوحة التحكم المتقدمة.</p></div><button class="ghost" onclick="backClassCardsHome()">رجوع للخلف</button></div>'+
+        '<div class="class-action-grid"><div class="mini"><strong>'+sts.length+'</strong><span>عدد الطلاب / الطالبات</span></div><div class="mini"><strong>'+money(total)+'</strong><span>إجمالي الأرصدة</span></div></div>'+
+        '<div class="class-action-card class-action-form"><div class="field"><label>نص الرسالة</label><textarea id="bulkClassMessageText" rows="6" placeholder="اكتبي الرسالة الجماعية هنا...">السلام عليكم ورحمة الله وبركاته، هذه رسالة من بنك الرياضيات بخصوص {الطالب / الطالبة}.</textarea></div><button class="btn btn-gold" onclick="sendBulkClassMessageNow(\''+classId+'\')">إرسال الرسالة الجماعية</button></div>'+
+      '</div>';
+    } else if(action==='delete'){
+      const canDelete = sts.length===0;
+      detail.innerHTML = '<div class="class-action-page">'+
+        '<div class="class-action-bar"><div><h3>حذف الفصل — '+esc(cls.name)+'</h3><p>صفحة مستقلة لتأكيد الحذف مع إبقاء الرجوع السريع إلى بطاقات الفصول.</p></div><button class="ghost" onclick="backClassCardsHome()">رجوع للخلف</button></div>'+
+        '<div class="class-action-grid"><div class="mini"><strong>'+sts.length+'</strong><span>عدد الطلاب / الطالبات الحالي</span></div><div class="mini"><strong>'+money(total)+'</strong><span>إجمالي الأرصدة</span></div></div>'+
+        '<div class="class-action-card"><div class="class-action-danger">'+(canDelete?'سيتم حذف الفصل فقط لأنه فارغ حاليًا.':'لا يمكن حذف هذا الفصل الآن لأنه يحتوي على طلاب / طالبات. أفرغي الفصل أولًا ثم أعيدي المحاولة.')+'</div>'+
+        (canDelete?'<button class="btn" style="background:#c4002f;color:#fff" onclick="confirmDeleteClassNow(\''+classId+'\')">تأكيد حذف الفصل</button>':'<button class="btn btn-light" disabled>الفصل غير قابل للحذف حاليًا</button>')+
+        '</div></div>';
+    }
+  }
+  window.openClassMessagePage = function(classId){ showActionPage(classId,'message'); };
+  window.openClassDeletePage = function(classId){ showActionPage(classId,'delete'); };
+  window.sendBulkClassMessageNow = function(classId){
+    const txt=(document.getElementById('bulkClassMessageText')?.value||'').trim(); if(!txt) return;
+    studentsOf(classId).filter(function(s){return s.guardian;}).forEach(function(s,idx){ setTimeout(function(){ if(typeof openWhatsAppNumber==='function') openWhatsAppNumber(s.guardian, txt.replace('{الطالب / الطالبة}', s.name)); }, idx*250); });
+  };
+  window.confirmDeleteClassNow = function(classId){
+    const clsIndex = classes().findIndex(function(c){return c.id===classId;}); if(clsIndex<0) return;
+    if(!confirm('هل تريدين حذف الفصل نهائيًا؟')) return;
+    bankData.classes.splice(clsIndex,1);
+    if(typeof saveBankData==='function') saveBankData();
+    if(typeof refreshTeacherUI==='function') refreshTeacherUI();
+    backClassCardsHome();
+  };
+  window.backClassCardsHome = function(){
+    state.mode='home'; state.classId=''; state.action='';
+    try{ if(typeof oldCloseClass==='function') oldCloseClass(); }catch(e){}
+    setTimeout(renderHome, 30);
+  };
+  window.openStudentSettingsClass = function(classId){
+    state.mode='class'; state.classId=classId; state.action='open';
+    const cards=getCards(); if(cards) cards.style.display='none';
+    if(typeof oldOpenClass==='function') oldOpenClass(classId);
+  };
+  window.closeStudentSettingsClass = function(){ backClassCardsHome(); };
+  function apply(){ const wrap=getWrap(); if(!wrap) return; renderHome(); }
+  const prevShow=window.showTeacherPane;
+  if(prevShow && !window.__advancedClassActionHooked){
+    window.__advancedClassActionHooked=true;
+    window.showTeacherPane=function(id,btn){ prevShow(id,btn); if(id==='teacherPaneStudents'){ setTimeout(apply,120); } };
+    const prevRefresh=window.refreshTeacherUI;
+    if(prevRefresh){ window.refreshTeacherUI=function(){ prevRefresh(); setTimeout(apply,120); }; }
+    document.addEventListener('DOMContentLoaded', function(){ setTimeout(apply,500); });
+  } else {
+    document.addEventListener('DOMContentLoaded', function(){ setTimeout(apply,500); });
+  }
+})();
+</script>
+
 </body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
@@ -5562,6 +6147,123 @@ function openMoreInfo(type){
   alert(messages[type]||'تم فتح العنصر.');
 }
 </script>
+
+<style id="advanced-class-actions-style">
+.class-action-page{display:grid;gap:14px}
+.class-action-bar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;background:#fff;border:1px solid var(--line);border-radius:24px;padding:14px 16px;box-shadow:0 8px 20px rgba(16,58,46,.05)}
+.class-action-bar h3{margin:0;color:var(--deep);font-size:22px}
+.class-action-bar p{margin:6px 0 0;color:var(--muted);font-size:13px;line-height:1.8}
+.class-action-card{background:#fff;border:1px solid var(--line);border-radius:26px;padding:18px;box-shadow:0 10px 24px rgba(16,58,46,.06);display:grid;gap:14px}
+.class-action-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.class-action-grid .mini{background:#fbfcfb;border:1px solid var(--line);border-radius:22px;padding:18px;text-align:center}
+.class-action-grid .mini strong{display:block;font-size:18px;color:var(--deep);margin-bottom:6px}
+.class-action-grid .mini span{display:block;font-size:12px;color:var(--muted)}
+.class-action-form textarea,.class-action-form select{width:100%;border:1px solid var(--line);background:#f8fbf9;border-radius:16px;padding:14px;font-family:inherit;font-size:14px;outline:none}
+.class-action-danger{background:#fff6f5;border:1px solid #f2d7d2;color:#a63f3c;border-radius:20px;padding:14px;line-height:1.9}
+.class-card-buttons{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.class-card-buttons .btn{width:100%}
+@media(max-width:980px){.class-action-grid,.class-card-buttons{grid-template-columns:1fr}}
+</style>
+<script id="advanced-class-actions-script">
+(function(){
+  function esc(s){return String(s||'').replace(/[&<>\"]/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c];});}
+  function money(n){return (typeof formatMoney==='function') ? formatMoney(Number(n||0)) : String(Number(n||0));}
+  function classes(){return (window.bankData&&Array.isArray(bankData.classes))?bankData.classes:[];}
+  function studentsOf(classId){return (window.bankData&&Array.isArray(bankData.students))?bankData.students.filter(function(s){return s.classId===classId;}):[];}
+  const state = window.__advancedClassActionState || (window.__advancedClassActionState={mode:'home',classId:'',action:''});
+  const oldOpenClass = window.openStudentSettingsClass;
+  const oldCloseClass = window.closeStudentSettingsClass;
+  function getWrap(){return document.getElementById('studentSettingsProWrap');}
+  function getCards(){return document.getElementById('studentClassCards');}
+  function getDetail(){return document.getElementById('studentClassDetail');}
+  function buildStats(c){
+    const sts=studentsOf(c.id); const total=sts.reduce((a,b)=>a+Number(b.balance||0),0);
+    const pending=sts.filter(function(st){return (window.bankData?.performanceTasks||[]).some(function(task){return task.classId===c.id && (!task.entries?.[st.id] || !['submitted','graded'].includes(task.entries?.[st.id]?.status));});}).length;
+    const near=sts.filter(function(s){var b=Number(s.balance||0); var next=b<11000?11000:b<16000?16000:b<31000?31000:b<41000?41000:null; return next && (next-b)<=3000;}).length;
+    return {count:sts.length,total:total,pending:pending,near:near};
+  }
+  function renderHome(){
+    const cards=getCards(), detail=getDetail(); if(!cards||!detail) return;
+    cards.style.display='grid'; detail.classList.add('hidden'); detail.classList.remove('page-mode'); detail.innerHTML='';
+    cards.innerHTML = classes().map(function(c){
+      const st=buildStats(c);
+      return '<div class="student-class-card">'+
+        '<div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start"><div><h4>'+esc(c.name)+'</h4><div class="teacher-note">عدد الطلاب / الطالبات في الفصل: '+st.count+'</div></div><span class="pill">'+st.count+' نشط</span></div>'+
+        '<div class="student-class-meta">'+
+          '<div class="mini"><strong>'+st.count+'</strong><span>عدد الطلاب / الطالبات</span></div>'+
+          '<div class="mini"><strong>'+money(st.total)+'</strong><span>إجمالي الأرصدة</span></div>'+
+          '<div class="mini"><strong>'+st.pending+'</strong><span>مهام غير مسلّمة</span></div>'+
+          '<div class="mini"><strong>'+st.near+'</strong><span>قريبون من الترقية</span></div>'+
+        '</div>'+
+        '<div class="class-card-buttons">'+
+          '<button class="btn btn-green" onclick="openStudentSettingsClass(\''+c.id+'\')">دخول الفصل</button>'+
+          '<button class="btn btn-gold" onclick="openClassMessagePage(\''+c.id+'\')">رسالة جماعية</button>'+
+          '<button class="btn" style="background:#c4002f;color:#fff" onclick="openClassDeletePage(\''+c.id+'\')">حذف الفصل</button>'+
+        '</div>'+
+      '</div>';
+    }).join('') || '<div class="student-empty">لا توجد فصول بعد.</div>';
+  }
+  function showActionPage(classId, action){
+    const cards=getCards(), detail=getDetail(); if(!cards||!detail) return;
+    const cls=classes().find(function(c){return c.id===classId;}); if(!cls) return;
+    state.mode='page'; state.classId=classId; state.action=action;
+    cards.style.display='none'; detail.classList.remove('hidden'); detail.classList.add('page-mode');
+    const sts=studentsOf(classId); const total=sts.reduce((a,b)=>a+Number(b.balance||0),0);
+    if(action==='message'){
+      detail.innerHTML = '<div class="class-action-page">'+
+        '<div class="class-action-bar"><div><h3>رسالة جماعية — '+esc(cls.name)+'</h3><p>إرسلي رسالة موحدة إلى أولياء أمور الفصل من صفحة مستقلة داخل لوحة التحكم المتقدمة.</p></div><button class="ghost" onclick="backClassCardsHome()">رجوع للخلف</button></div>'+
+        '<div class="class-action-grid"><div class="mini"><strong>'+sts.length+'</strong><span>عدد الطلاب / الطالبات</span></div><div class="mini"><strong>'+money(total)+'</strong><span>إجمالي الأرصدة</span></div></div>'+
+        '<div class="class-action-card class-action-form"><div class="field"><label>نص الرسالة</label><textarea id="bulkClassMessageText" rows="6" placeholder="اكتبي الرسالة الجماعية هنا...">السلام عليكم ورحمة الله وبركاته، هذه رسالة من بنك الرياضيات بخصوص {الطالب / الطالبة}.</textarea></div><button class="btn btn-gold" onclick="sendBulkClassMessageNow(\''+classId+'\')">إرسال الرسالة الجماعية</button></div>'+
+      '</div>';
+    } else if(action==='delete'){
+      const canDelete = sts.length===0;
+      detail.innerHTML = '<div class="class-action-page">'+
+        '<div class="class-action-bar"><div><h3>حذف الفصل — '+esc(cls.name)+'</h3><p>صفحة مستقلة لتأكيد الحذف مع إبقاء الرجوع السريع إلى بطاقات الفصول.</p></div><button class="ghost" onclick="backClassCardsHome()">رجوع للخلف</button></div>'+
+        '<div class="class-action-grid"><div class="mini"><strong>'+sts.length+'</strong><span>عدد الطلاب / الطالبات الحالي</span></div><div class="mini"><strong>'+money(total)+'</strong><span>إجمالي الأرصدة</span></div></div>'+
+        '<div class="class-action-card"><div class="class-action-danger">'+(canDelete?'سيتم حذف الفصل فقط لأنه فارغ حاليًا.':'لا يمكن حذف هذا الفصل الآن لأنه يحتوي على طلاب / طالبات. أفرغي الفصل أولًا ثم أعيدي المحاولة.')+'</div>'+
+        (canDelete?'<button class="btn" style="background:#c4002f;color:#fff" onclick="confirmDeleteClassNow(\''+classId+'\')">تأكيد حذف الفصل</button>':'<button class="btn btn-light" disabled>الفصل غير قابل للحذف حاليًا</button>')+
+        '</div></div>';
+    }
+  }
+  window.openClassMessagePage = function(classId){ showActionPage(classId,'message'); };
+  window.openClassDeletePage = function(classId){ showActionPage(classId,'delete'); };
+  window.sendBulkClassMessageNow = function(classId){
+    const txt=(document.getElementById('bulkClassMessageText')?.value||'').trim(); if(!txt) return;
+    studentsOf(classId).filter(function(s){return s.guardian;}).forEach(function(s,idx){ setTimeout(function(){ if(typeof openWhatsAppNumber==='function') openWhatsAppNumber(s.guardian, txt.replace('{الطالب / الطالبة}', s.name)); }, idx*250); });
+  };
+  window.confirmDeleteClassNow = function(classId){
+    const clsIndex = classes().findIndex(function(c){return c.id===classId;}); if(clsIndex<0) return;
+    if(!confirm('هل تريدين حذف الفصل نهائيًا؟')) return;
+    bankData.classes.splice(clsIndex,1);
+    if(typeof saveBankData==='function') saveBankData();
+    if(typeof refreshTeacherUI==='function') refreshTeacherUI();
+    backClassCardsHome();
+  };
+  window.backClassCardsHome = function(){
+    state.mode='home'; state.classId=''; state.action='';
+    try{ if(typeof oldCloseClass==='function') oldCloseClass(); }catch(e){}
+    setTimeout(renderHome, 30);
+  };
+  window.openStudentSettingsClass = function(classId){
+    state.mode='class'; state.classId=classId; state.action='open';
+    const cards=getCards(); if(cards) cards.style.display='none';
+    if(typeof oldOpenClass==='function') oldOpenClass(classId);
+  };
+  window.closeStudentSettingsClass = function(){ backClassCardsHome(); };
+  function apply(){ const wrap=getWrap(); if(!wrap) return; renderHome(); }
+  const prevShow=window.showTeacherPane;
+  if(prevShow && !window.__advancedClassActionHooked){
+    window.__advancedClassActionHooked=true;
+    window.showTeacherPane=function(id,btn){ prevShow(id,btn); if(id==='teacherPaneStudents'){ setTimeout(apply,120); } };
+    const prevRefresh=window.refreshTeacherUI;
+    if(prevRefresh){ window.refreshTeacherUI=function(){ prevRefresh(); setTimeout(apply,120); }; }
+    document.addEventListener('DOMContentLoaded', function(){ setTimeout(apply,500); });
+  } else {
+    document.addEventListener('DOMContentLoaded', function(){ setTimeout(apply,500); });
+  }
+})();
+</script>
+
 </body></html>`;
     const w=window.open('','_blank'); if(w){ w.document.write(html); w.document.close(); setTimeout(()=>w.print(),400); }
     const status=document.getElementById('smartReportStatus'); if(status){ status.classList.remove('hidden'); setTimeout(()=>status.classList.add('hidden'),2000); }
@@ -5942,6 +6644,123 @@ function openMoreInfo(type){
   alert(messages[type]||'تم فتح العنصر.');
 }
 </script>
+
+<style id="advanced-class-actions-style">
+.class-action-page{display:grid;gap:14px}
+.class-action-bar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;background:#fff;border:1px solid var(--line);border-radius:24px;padding:14px 16px;box-shadow:0 8px 20px rgba(16,58,46,.05)}
+.class-action-bar h3{margin:0;color:var(--deep);font-size:22px}
+.class-action-bar p{margin:6px 0 0;color:var(--muted);font-size:13px;line-height:1.8}
+.class-action-card{background:#fff;border:1px solid var(--line);border-radius:26px;padding:18px;box-shadow:0 10px 24px rgba(16,58,46,.06);display:grid;gap:14px}
+.class-action-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.class-action-grid .mini{background:#fbfcfb;border:1px solid var(--line);border-radius:22px;padding:18px;text-align:center}
+.class-action-grid .mini strong{display:block;font-size:18px;color:var(--deep);margin-bottom:6px}
+.class-action-grid .mini span{display:block;font-size:12px;color:var(--muted)}
+.class-action-form textarea,.class-action-form select{width:100%;border:1px solid var(--line);background:#f8fbf9;border-radius:16px;padding:14px;font-family:inherit;font-size:14px;outline:none}
+.class-action-danger{background:#fff6f5;border:1px solid #f2d7d2;color:#a63f3c;border-radius:20px;padding:14px;line-height:1.9}
+.class-card-buttons{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.class-card-buttons .btn{width:100%}
+@media(max-width:980px){.class-action-grid,.class-card-buttons{grid-template-columns:1fr}}
+</style>
+<script id="advanced-class-actions-script">
+(function(){
+  function esc(s){return String(s||'').replace(/[&<>\"]/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c];});}
+  function money(n){return (typeof formatMoney==='function') ? formatMoney(Number(n||0)) : String(Number(n||0));}
+  function classes(){return (window.bankData&&Array.isArray(bankData.classes))?bankData.classes:[];}
+  function studentsOf(classId){return (window.bankData&&Array.isArray(bankData.students))?bankData.students.filter(function(s){return s.classId===classId;}):[];}
+  const state = window.__advancedClassActionState || (window.__advancedClassActionState={mode:'home',classId:'',action:''});
+  const oldOpenClass = window.openStudentSettingsClass;
+  const oldCloseClass = window.closeStudentSettingsClass;
+  function getWrap(){return document.getElementById('studentSettingsProWrap');}
+  function getCards(){return document.getElementById('studentClassCards');}
+  function getDetail(){return document.getElementById('studentClassDetail');}
+  function buildStats(c){
+    const sts=studentsOf(c.id); const total=sts.reduce((a,b)=>a+Number(b.balance||0),0);
+    const pending=sts.filter(function(st){return (window.bankData?.performanceTasks||[]).some(function(task){return task.classId===c.id && (!task.entries?.[st.id] || !['submitted','graded'].includes(task.entries?.[st.id]?.status));});}).length;
+    const near=sts.filter(function(s){var b=Number(s.balance||0); var next=b<11000?11000:b<16000?16000:b<31000?31000:b<41000?41000:null; return next && (next-b)<=3000;}).length;
+    return {count:sts.length,total:total,pending:pending,near:near};
+  }
+  function renderHome(){
+    const cards=getCards(), detail=getDetail(); if(!cards||!detail) return;
+    cards.style.display='grid'; detail.classList.add('hidden'); detail.classList.remove('page-mode'); detail.innerHTML='';
+    cards.innerHTML = classes().map(function(c){
+      const st=buildStats(c);
+      return '<div class="student-class-card">'+
+        '<div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start"><div><h4>'+esc(c.name)+'</h4><div class="teacher-note">عدد الطلاب / الطالبات في الفصل: '+st.count+'</div></div><span class="pill">'+st.count+' نشط</span></div>'+
+        '<div class="student-class-meta">'+
+          '<div class="mini"><strong>'+st.count+'</strong><span>عدد الطلاب / الطالبات</span></div>'+
+          '<div class="mini"><strong>'+money(st.total)+'</strong><span>إجمالي الأرصدة</span></div>'+
+          '<div class="mini"><strong>'+st.pending+'</strong><span>مهام غير مسلّمة</span></div>'+
+          '<div class="mini"><strong>'+st.near+'</strong><span>قريبون من الترقية</span></div>'+
+        '</div>'+
+        '<div class="class-card-buttons">'+
+          '<button class="btn btn-green" onclick="openStudentSettingsClass(\''+c.id+'\')">دخول الفصل</button>'+
+          '<button class="btn btn-gold" onclick="openClassMessagePage(\''+c.id+'\')">رسالة جماعية</button>'+
+          '<button class="btn" style="background:#c4002f;color:#fff" onclick="openClassDeletePage(\''+c.id+'\')">حذف الفصل</button>'+
+        '</div>'+
+      '</div>';
+    }).join('') || '<div class="student-empty">لا توجد فصول بعد.</div>';
+  }
+  function showActionPage(classId, action){
+    const cards=getCards(), detail=getDetail(); if(!cards||!detail) return;
+    const cls=classes().find(function(c){return c.id===classId;}); if(!cls) return;
+    state.mode='page'; state.classId=classId; state.action=action;
+    cards.style.display='none'; detail.classList.remove('hidden'); detail.classList.add('page-mode');
+    const sts=studentsOf(classId); const total=sts.reduce((a,b)=>a+Number(b.balance||0),0);
+    if(action==='message'){
+      detail.innerHTML = '<div class="class-action-page">'+
+        '<div class="class-action-bar"><div><h3>رسالة جماعية — '+esc(cls.name)+'</h3><p>إرسلي رسالة موحدة إلى أولياء أمور الفصل من صفحة مستقلة داخل لوحة التحكم المتقدمة.</p></div><button class="ghost" onclick="backClassCardsHome()">رجوع للخلف</button></div>'+
+        '<div class="class-action-grid"><div class="mini"><strong>'+sts.length+'</strong><span>عدد الطلاب / الطالبات</span></div><div class="mini"><strong>'+money(total)+'</strong><span>إجمالي الأرصدة</span></div></div>'+
+        '<div class="class-action-card class-action-form"><div class="field"><label>نص الرسالة</label><textarea id="bulkClassMessageText" rows="6" placeholder="اكتبي الرسالة الجماعية هنا...">السلام عليكم ورحمة الله وبركاته، هذه رسالة من بنك الرياضيات بخصوص {الطالب / الطالبة}.</textarea></div><button class="btn btn-gold" onclick="sendBulkClassMessageNow(\''+classId+'\')">إرسال الرسالة الجماعية</button></div>'+
+      '</div>';
+    } else if(action==='delete'){
+      const canDelete = sts.length===0;
+      detail.innerHTML = '<div class="class-action-page">'+
+        '<div class="class-action-bar"><div><h3>حذف الفصل — '+esc(cls.name)+'</h3><p>صفحة مستقلة لتأكيد الحذف مع إبقاء الرجوع السريع إلى بطاقات الفصول.</p></div><button class="ghost" onclick="backClassCardsHome()">رجوع للخلف</button></div>'+
+        '<div class="class-action-grid"><div class="mini"><strong>'+sts.length+'</strong><span>عدد الطلاب / الطالبات الحالي</span></div><div class="mini"><strong>'+money(total)+'</strong><span>إجمالي الأرصدة</span></div></div>'+
+        '<div class="class-action-card"><div class="class-action-danger">'+(canDelete?'سيتم حذف الفصل فقط لأنه فارغ حاليًا.':'لا يمكن حذف هذا الفصل الآن لأنه يحتوي على طلاب / طالبات. أفرغي الفصل أولًا ثم أعيدي المحاولة.')+'</div>'+
+        (canDelete?'<button class="btn" style="background:#c4002f;color:#fff" onclick="confirmDeleteClassNow(\''+classId+'\')">تأكيد حذف الفصل</button>':'<button class="btn btn-light" disabled>الفصل غير قابل للحذف حاليًا</button>')+
+        '</div></div>';
+    }
+  }
+  window.openClassMessagePage = function(classId){ showActionPage(classId,'message'); };
+  window.openClassDeletePage = function(classId){ showActionPage(classId,'delete'); };
+  window.sendBulkClassMessageNow = function(classId){
+    const txt=(document.getElementById('bulkClassMessageText')?.value||'').trim(); if(!txt) return;
+    studentsOf(classId).filter(function(s){return s.guardian;}).forEach(function(s,idx){ setTimeout(function(){ if(typeof openWhatsAppNumber==='function') openWhatsAppNumber(s.guardian, txt.replace('{الطالب / الطالبة}', s.name)); }, idx*250); });
+  };
+  window.confirmDeleteClassNow = function(classId){
+    const clsIndex = classes().findIndex(function(c){return c.id===classId;}); if(clsIndex<0) return;
+    if(!confirm('هل تريدين حذف الفصل نهائيًا؟')) return;
+    bankData.classes.splice(clsIndex,1);
+    if(typeof saveBankData==='function') saveBankData();
+    if(typeof refreshTeacherUI==='function') refreshTeacherUI();
+    backClassCardsHome();
+  };
+  window.backClassCardsHome = function(){
+    state.mode='home'; state.classId=''; state.action='';
+    try{ if(typeof oldCloseClass==='function') oldCloseClass(); }catch(e){}
+    setTimeout(renderHome, 30);
+  };
+  window.openStudentSettingsClass = function(classId){
+    state.mode='class'; state.classId=classId; state.action='open';
+    const cards=getCards(); if(cards) cards.style.display='none';
+    if(typeof oldOpenClass==='function') oldOpenClass(classId);
+  };
+  window.closeStudentSettingsClass = function(){ backClassCardsHome(); };
+  function apply(){ const wrap=getWrap(); if(!wrap) return; renderHome(); }
+  const prevShow=window.showTeacherPane;
+  if(prevShow && !window.__advancedClassActionHooked){
+    window.__advancedClassActionHooked=true;
+    window.showTeacherPane=function(id,btn){ prevShow(id,btn); if(id==='teacherPaneStudents'){ setTimeout(apply,120); } };
+    const prevRefresh=window.refreshTeacherUI;
+    if(prevRefresh){ window.refreshTeacherUI=function(){ prevRefresh(); setTimeout(apply,120); }; }
+    document.addEventListener('DOMContentLoaded', function(){ setTimeout(apply,500); });
+  } else {
+    document.addEventListener('DOMContentLoaded', function(){ setTimeout(apply,500); });
+  }
+})();
+</script>
+
 </body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
@@ -6601,6 +7420,123 @@ function openMoreInfo(type){
   alert(messages[type]||'تم فتح العنصر.');
 }
 </script>
+
+<style id="advanced-class-actions-style">
+.class-action-page{display:grid;gap:14px}
+.class-action-bar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;background:#fff;border:1px solid var(--line);border-radius:24px;padding:14px 16px;box-shadow:0 8px 20px rgba(16,58,46,.05)}
+.class-action-bar h3{margin:0;color:var(--deep);font-size:22px}
+.class-action-bar p{margin:6px 0 0;color:var(--muted);font-size:13px;line-height:1.8}
+.class-action-card{background:#fff;border:1px solid var(--line);border-radius:26px;padding:18px;box-shadow:0 10px 24px rgba(16,58,46,.06);display:grid;gap:14px}
+.class-action-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.class-action-grid .mini{background:#fbfcfb;border:1px solid var(--line);border-radius:22px;padding:18px;text-align:center}
+.class-action-grid .mini strong{display:block;font-size:18px;color:var(--deep);margin-bottom:6px}
+.class-action-grid .mini span{display:block;font-size:12px;color:var(--muted)}
+.class-action-form textarea,.class-action-form select{width:100%;border:1px solid var(--line);background:#f8fbf9;border-radius:16px;padding:14px;font-family:inherit;font-size:14px;outline:none}
+.class-action-danger{background:#fff6f5;border:1px solid #f2d7d2;color:#a63f3c;border-radius:20px;padding:14px;line-height:1.9}
+.class-card-buttons{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.class-card-buttons .btn{width:100%}
+@media(max-width:980px){.class-action-grid,.class-card-buttons{grid-template-columns:1fr}}
+</style>
+<script id="advanced-class-actions-script">
+(function(){
+  function esc(s){return String(s||'').replace(/[&<>\"]/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c];});}
+  function money(n){return (typeof formatMoney==='function') ? formatMoney(Number(n||0)) : String(Number(n||0));}
+  function classes(){return (window.bankData&&Array.isArray(bankData.classes))?bankData.classes:[];}
+  function studentsOf(classId){return (window.bankData&&Array.isArray(bankData.students))?bankData.students.filter(function(s){return s.classId===classId;}):[];}
+  const state = window.__advancedClassActionState || (window.__advancedClassActionState={mode:'home',classId:'',action:''});
+  const oldOpenClass = window.openStudentSettingsClass;
+  const oldCloseClass = window.closeStudentSettingsClass;
+  function getWrap(){return document.getElementById('studentSettingsProWrap');}
+  function getCards(){return document.getElementById('studentClassCards');}
+  function getDetail(){return document.getElementById('studentClassDetail');}
+  function buildStats(c){
+    const sts=studentsOf(c.id); const total=sts.reduce((a,b)=>a+Number(b.balance||0),0);
+    const pending=sts.filter(function(st){return (window.bankData?.performanceTasks||[]).some(function(task){return task.classId===c.id && (!task.entries?.[st.id] || !['submitted','graded'].includes(task.entries?.[st.id]?.status));});}).length;
+    const near=sts.filter(function(s){var b=Number(s.balance||0); var next=b<11000?11000:b<16000?16000:b<31000?31000:b<41000?41000:null; return next && (next-b)<=3000;}).length;
+    return {count:sts.length,total:total,pending:pending,near:near};
+  }
+  function renderHome(){
+    const cards=getCards(), detail=getDetail(); if(!cards||!detail) return;
+    cards.style.display='grid'; detail.classList.add('hidden'); detail.classList.remove('page-mode'); detail.innerHTML='';
+    cards.innerHTML = classes().map(function(c){
+      const st=buildStats(c);
+      return '<div class="student-class-card">'+
+        '<div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start"><div><h4>'+esc(c.name)+'</h4><div class="teacher-note">عدد الطلاب / الطالبات في الفصل: '+st.count+'</div></div><span class="pill">'+st.count+' نشط</span></div>'+
+        '<div class="student-class-meta">'+
+          '<div class="mini"><strong>'+st.count+'</strong><span>عدد الطلاب / الطالبات</span></div>'+
+          '<div class="mini"><strong>'+money(st.total)+'</strong><span>إجمالي الأرصدة</span></div>'+
+          '<div class="mini"><strong>'+st.pending+'</strong><span>مهام غير مسلّمة</span></div>'+
+          '<div class="mini"><strong>'+st.near+'</strong><span>قريبون من الترقية</span></div>'+
+        '</div>'+
+        '<div class="class-card-buttons">'+
+          '<button class="btn btn-green" onclick="openStudentSettingsClass(\''+c.id+'\')">دخول الفصل</button>'+
+          '<button class="btn btn-gold" onclick="openClassMessagePage(\''+c.id+'\')">رسالة جماعية</button>'+
+          '<button class="btn" style="background:#c4002f;color:#fff" onclick="openClassDeletePage(\''+c.id+'\')">حذف الفصل</button>'+
+        '</div>'+
+      '</div>';
+    }).join('') || '<div class="student-empty">لا توجد فصول بعد.</div>';
+  }
+  function showActionPage(classId, action){
+    const cards=getCards(), detail=getDetail(); if(!cards||!detail) return;
+    const cls=classes().find(function(c){return c.id===classId;}); if(!cls) return;
+    state.mode='page'; state.classId=classId; state.action=action;
+    cards.style.display='none'; detail.classList.remove('hidden'); detail.classList.add('page-mode');
+    const sts=studentsOf(classId); const total=sts.reduce((a,b)=>a+Number(b.balance||0),0);
+    if(action==='message'){
+      detail.innerHTML = '<div class="class-action-page">'+
+        '<div class="class-action-bar"><div><h3>رسالة جماعية — '+esc(cls.name)+'</h3><p>إرسلي رسالة موحدة إلى أولياء أمور الفصل من صفحة مستقلة داخل لوحة التحكم المتقدمة.</p></div><button class="ghost" onclick="backClassCardsHome()">رجوع للخلف</button></div>'+
+        '<div class="class-action-grid"><div class="mini"><strong>'+sts.length+'</strong><span>عدد الطلاب / الطالبات</span></div><div class="mini"><strong>'+money(total)+'</strong><span>إجمالي الأرصدة</span></div></div>'+
+        '<div class="class-action-card class-action-form"><div class="field"><label>نص الرسالة</label><textarea id="bulkClassMessageText" rows="6" placeholder="اكتبي الرسالة الجماعية هنا...">السلام عليكم ورحمة الله وبركاته، هذه رسالة من بنك الرياضيات بخصوص {الطالب / الطالبة}.</textarea></div><button class="btn btn-gold" onclick="sendBulkClassMessageNow(\''+classId+'\')">إرسال الرسالة الجماعية</button></div>'+
+      '</div>';
+    } else if(action==='delete'){
+      const canDelete = sts.length===0;
+      detail.innerHTML = '<div class="class-action-page">'+
+        '<div class="class-action-bar"><div><h3>حذف الفصل — '+esc(cls.name)+'</h3><p>صفحة مستقلة لتأكيد الحذف مع إبقاء الرجوع السريع إلى بطاقات الفصول.</p></div><button class="ghost" onclick="backClassCardsHome()">رجوع للخلف</button></div>'+
+        '<div class="class-action-grid"><div class="mini"><strong>'+sts.length+'</strong><span>عدد الطلاب / الطالبات الحالي</span></div><div class="mini"><strong>'+money(total)+'</strong><span>إجمالي الأرصدة</span></div></div>'+
+        '<div class="class-action-card"><div class="class-action-danger">'+(canDelete?'سيتم حذف الفصل فقط لأنه فارغ حاليًا.':'لا يمكن حذف هذا الفصل الآن لأنه يحتوي على طلاب / طالبات. أفرغي الفصل أولًا ثم أعيدي المحاولة.')+'</div>'+
+        (canDelete?'<button class="btn" style="background:#c4002f;color:#fff" onclick="confirmDeleteClassNow(\''+classId+'\')">تأكيد حذف الفصل</button>':'<button class="btn btn-light" disabled>الفصل غير قابل للحذف حاليًا</button>')+
+        '</div></div>';
+    }
+  }
+  window.openClassMessagePage = function(classId){ showActionPage(classId,'message'); };
+  window.openClassDeletePage = function(classId){ showActionPage(classId,'delete'); };
+  window.sendBulkClassMessageNow = function(classId){
+    const txt=(document.getElementById('bulkClassMessageText')?.value||'').trim(); if(!txt) return;
+    studentsOf(classId).filter(function(s){return s.guardian;}).forEach(function(s,idx){ setTimeout(function(){ if(typeof openWhatsAppNumber==='function') openWhatsAppNumber(s.guardian, txt.replace('{الطالب / الطالبة}', s.name)); }, idx*250); });
+  };
+  window.confirmDeleteClassNow = function(classId){
+    const clsIndex = classes().findIndex(function(c){return c.id===classId;}); if(clsIndex<0) return;
+    if(!confirm('هل تريدين حذف الفصل نهائيًا؟')) return;
+    bankData.classes.splice(clsIndex,1);
+    if(typeof saveBankData==='function') saveBankData();
+    if(typeof refreshTeacherUI==='function') refreshTeacherUI();
+    backClassCardsHome();
+  };
+  window.backClassCardsHome = function(){
+    state.mode='home'; state.classId=''; state.action='';
+    try{ if(typeof oldCloseClass==='function') oldCloseClass(); }catch(e){}
+    setTimeout(renderHome, 30);
+  };
+  window.openStudentSettingsClass = function(classId){
+    state.mode='class'; state.classId=classId; state.action='open';
+    const cards=getCards(); if(cards) cards.style.display='none';
+    if(typeof oldOpenClass==='function') oldOpenClass(classId);
+  };
+  window.closeStudentSettingsClass = function(){ backClassCardsHome(); };
+  function apply(){ const wrap=getWrap(); if(!wrap) return; renderHome(); }
+  const prevShow=window.showTeacherPane;
+  if(prevShow && !window.__advancedClassActionHooked){
+    window.__advancedClassActionHooked=true;
+    window.showTeacherPane=function(id,btn){ prevShow(id,btn); if(id==='teacherPaneStudents'){ setTimeout(apply,120); } };
+    const prevRefresh=window.refreshTeacherUI;
+    if(prevRefresh){ window.refreshTeacherUI=function(){ prevRefresh(); setTimeout(apply,120); }; }
+    document.addEventListener('DOMContentLoaded', function(){ setTimeout(apply,500); });
+  } else {
+    document.addEventListener('DOMContentLoaded', function(){ setTimeout(apply,500); });
+  }
+})();
+</script>
+
 </body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
@@ -6650,6 +7586,123 @@ function openMoreInfo(type){
   alert(messages[type]||'تم فتح العنصر.');
 }
 </script>
+
+<style id="advanced-class-actions-style">
+.class-action-page{display:grid;gap:14px}
+.class-action-bar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;background:#fff;border:1px solid var(--line);border-radius:24px;padding:14px 16px;box-shadow:0 8px 20px rgba(16,58,46,.05)}
+.class-action-bar h3{margin:0;color:var(--deep);font-size:22px}
+.class-action-bar p{margin:6px 0 0;color:var(--muted);font-size:13px;line-height:1.8}
+.class-action-card{background:#fff;border:1px solid var(--line);border-radius:26px;padding:18px;box-shadow:0 10px 24px rgba(16,58,46,.06);display:grid;gap:14px}
+.class-action-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.class-action-grid .mini{background:#fbfcfb;border:1px solid var(--line);border-radius:22px;padding:18px;text-align:center}
+.class-action-grid .mini strong{display:block;font-size:18px;color:var(--deep);margin-bottom:6px}
+.class-action-grid .mini span{display:block;font-size:12px;color:var(--muted)}
+.class-action-form textarea,.class-action-form select{width:100%;border:1px solid var(--line);background:#f8fbf9;border-radius:16px;padding:14px;font-family:inherit;font-size:14px;outline:none}
+.class-action-danger{background:#fff6f5;border:1px solid #f2d7d2;color:#a63f3c;border-radius:20px;padding:14px;line-height:1.9}
+.class-card-buttons{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.class-card-buttons .btn{width:100%}
+@media(max-width:980px){.class-action-grid,.class-card-buttons{grid-template-columns:1fr}}
+</style>
+<script id="advanced-class-actions-script">
+(function(){
+  function esc(s){return String(s||'').replace(/[&<>\"]/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c];});}
+  function money(n){return (typeof formatMoney==='function') ? formatMoney(Number(n||0)) : String(Number(n||0));}
+  function classes(){return (window.bankData&&Array.isArray(bankData.classes))?bankData.classes:[];}
+  function studentsOf(classId){return (window.bankData&&Array.isArray(bankData.students))?bankData.students.filter(function(s){return s.classId===classId;}):[];}
+  const state = window.__advancedClassActionState || (window.__advancedClassActionState={mode:'home',classId:'',action:''});
+  const oldOpenClass = window.openStudentSettingsClass;
+  const oldCloseClass = window.closeStudentSettingsClass;
+  function getWrap(){return document.getElementById('studentSettingsProWrap');}
+  function getCards(){return document.getElementById('studentClassCards');}
+  function getDetail(){return document.getElementById('studentClassDetail');}
+  function buildStats(c){
+    const sts=studentsOf(c.id); const total=sts.reduce((a,b)=>a+Number(b.balance||0),0);
+    const pending=sts.filter(function(st){return (window.bankData?.performanceTasks||[]).some(function(task){return task.classId===c.id && (!task.entries?.[st.id] || !['submitted','graded'].includes(task.entries?.[st.id]?.status));});}).length;
+    const near=sts.filter(function(s){var b=Number(s.balance||0); var next=b<11000?11000:b<16000?16000:b<31000?31000:b<41000?41000:null; return next && (next-b)<=3000;}).length;
+    return {count:sts.length,total:total,pending:pending,near:near};
+  }
+  function renderHome(){
+    const cards=getCards(), detail=getDetail(); if(!cards||!detail) return;
+    cards.style.display='grid'; detail.classList.add('hidden'); detail.classList.remove('page-mode'); detail.innerHTML='';
+    cards.innerHTML = classes().map(function(c){
+      const st=buildStats(c);
+      return '<div class="student-class-card">'+
+        '<div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start"><div><h4>'+esc(c.name)+'</h4><div class="teacher-note">عدد الطلاب / الطالبات في الفصل: '+st.count+'</div></div><span class="pill">'+st.count+' نشط</span></div>'+
+        '<div class="student-class-meta">'+
+          '<div class="mini"><strong>'+st.count+'</strong><span>عدد الطلاب / الطالبات</span></div>'+
+          '<div class="mini"><strong>'+money(st.total)+'</strong><span>إجمالي الأرصدة</span></div>'+
+          '<div class="mini"><strong>'+st.pending+'</strong><span>مهام غير مسلّمة</span></div>'+
+          '<div class="mini"><strong>'+st.near+'</strong><span>قريبون من الترقية</span></div>'+
+        '</div>'+
+        '<div class="class-card-buttons">'+
+          '<button class="btn btn-green" onclick="openStudentSettingsClass(\''+c.id+'\')">دخول الفصل</button>'+
+          '<button class="btn btn-gold" onclick="openClassMessagePage(\''+c.id+'\')">رسالة جماعية</button>'+
+          '<button class="btn" style="background:#c4002f;color:#fff" onclick="openClassDeletePage(\''+c.id+'\')">حذف الفصل</button>'+
+        '</div>'+
+      '</div>';
+    }).join('') || '<div class="student-empty">لا توجد فصول بعد.</div>';
+  }
+  function showActionPage(classId, action){
+    const cards=getCards(), detail=getDetail(); if(!cards||!detail) return;
+    const cls=classes().find(function(c){return c.id===classId;}); if(!cls) return;
+    state.mode='page'; state.classId=classId; state.action=action;
+    cards.style.display='none'; detail.classList.remove('hidden'); detail.classList.add('page-mode');
+    const sts=studentsOf(classId); const total=sts.reduce((a,b)=>a+Number(b.balance||0),0);
+    if(action==='message'){
+      detail.innerHTML = '<div class="class-action-page">'+
+        '<div class="class-action-bar"><div><h3>رسالة جماعية — '+esc(cls.name)+'</h3><p>إرسلي رسالة موحدة إلى أولياء أمور الفصل من صفحة مستقلة داخل لوحة التحكم المتقدمة.</p></div><button class="ghost" onclick="backClassCardsHome()">رجوع للخلف</button></div>'+
+        '<div class="class-action-grid"><div class="mini"><strong>'+sts.length+'</strong><span>عدد الطلاب / الطالبات</span></div><div class="mini"><strong>'+money(total)+'</strong><span>إجمالي الأرصدة</span></div></div>'+
+        '<div class="class-action-card class-action-form"><div class="field"><label>نص الرسالة</label><textarea id="bulkClassMessageText" rows="6" placeholder="اكتبي الرسالة الجماعية هنا...">السلام عليكم ورحمة الله وبركاته، هذه رسالة من بنك الرياضيات بخصوص {الطالب / الطالبة}.</textarea></div><button class="btn btn-gold" onclick="sendBulkClassMessageNow(\''+classId+'\')">إرسال الرسالة الجماعية</button></div>'+
+      '</div>';
+    } else if(action==='delete'){
+      const canDelete = sts.length===0;
+      detail.innerHTML = '<div class="class-action-page">'+
+        '<div class="class-action-bar"><div><h3>حذف الفصل — '+esc(cls.name)+'</h3><p>صفحة مستقلة لتأكيد الحذف مع إبقاء الرجوع السريع إلى بطاقات الفصول.</p></div><button class="ghost" onclick="backClassCardsHome()">رجوع للخلف</button></div>'+
+        '<div class="class-action-grid"><div class="mini"><strong>'+sts.length+'</strong><span>عدد الطلاب / الطالبات الحالي</span></div><div class="mini"><strong>'+money(total)+'</strong><span>إجمالي الأرصدة</span></div></div>'+
+        '<div class="class-action-card"><div class="class-action-danger">'+(canDelete?'سيتم حذف الفصل فقط لأنه فارغ حاليًا.':'لا يمكن حذف هذا الفصل الآن لأنه يحتوي على طلاب / طالبات. أفرغي الفصل أولًا ثم أعيدي المحاولة.')+'</div>'+
+        (canDelete?'<button class="btn" style="background:#c4002f;color:#fff" onclick="confirmDeleteClassNow(\''+classId+'\')">تأكيد حذف الفصل</button>':'<button class="btn btn-light" disabled>الفصل غير قابل للحذف حاليًا</button>')+
+        '</div></div>';
+    }
+  }
+  window.openClassMessagePage = function(classId){ showActionPage(classId,'message'); };
+  window.openClassDeletePage = function(classId){ showActionPage(classId,'delete'); };
+  window.sendBulkClassMessageNow = function(classId){
+    const txt=(document.getElementById('bulkClassMessageText')?.value||'').trim(); if(!txt) return;
+    studentsOf(classId).filter(function(s){return s.guardian;}).forEach(function(s,idx){ setTimeout(function(){ if(typeof openWhatsAppNumber==='function') openWhatsAppNumber(s.guardian, txt.replace('{الطالب / الطالبة}', s.name)); }, idx*250); });
+  };
+  window.confirmDeleteClassNow = function(classId){
+    const clsIndex = classes().findIndex(function(c){return c.id===classId;}); if(clsIndex<0) return;
+    if(!confirm('هل تريدين حذف الفصل نهائيًا؟')) return;
+    bankData.classes.splice(clsIndex,1);
+    if(typeof saveBankData==='function') saveBankData();
+    if(typeof refreshTeacherUI==='function') refreshTeacherUI();
+    backClassCardsHome();
+  };
+  window.backClassCardsHome = function(){
+    state.mode='home'; state.classId=''; state.action='';
+    try{ if(typeof oldCloseClass==='function') oldCloseClass(); }catch(e){}
+    setTimeout(renderHome, 30);
+  };
+  window.openStudentSettingsClass = function(classId){
+    state.mode='class'; state.classId=classId; state.action='open';
+    const cards=getCards(); if(cards) cards.style.display='none';
+    if(typeof oldOpenClass==='function') oldOpenClass(classId);
+  };
+  window.closeStudentSettingsClass = function(){ backClassCardsHome(); };
+  function apply(){ const wrap=getWrap(); if(!wrap) return; renderHome(); }
+  const prevShow=window.showTeacherPane;
+  if(prevShow && !window.__advancedClassActionHooked){
+    window.__advancedClassActionHooked=true;
+    window.showTeacherPane=function(id,btn){ prevShow(id,btn); if(id==='teacherPaneStudents'){ setTimeout(apply,120); } };
+    const prevRefresh=window.refreshTeacherUI;
+    if(prevRefresh){ window.refreshTeacherUI=function(){ prevRefresh(); setTimeout(apply,120); }; }
+    document.addEventListener('DOMContentLoaded', function(){ setTimeout(apply,500); });
+  } else {
+    document.addEventListener('DOMContentLoaded', function(){ setTimeout(apply,500); });
+  }
+})();
+</script>
+
 </body></html>`;
     const w=window.open('','_blank'); if(w){ w.document.write(html); w.document.close(); setTimeout(()=>w.print(),400); }
     const status=document.getElementById('smartReportStatus'); if(status){ status.classList.remove('hidden'); setTimeout(()=>status.classList.add('hidden'),2000); }
@@ -7030,6 +8083,123 @@ function openMoreInfo(type){
   alert(messages[type]||'تم فتح العنصر.');
 }
 </script>
+
+<style id="advanced-class-actions-style">
+.class-action-page{display:grid;gap:14px}
+.class-action-bar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;background:#fff;border:1px solid var(--line);border-radius:24px;padding:14px 16px;box-shadow:0 8px 20px rgba(16,58,46,.05)}
+.class-action-bar h3{margin:0;color:var(--deep);font-size:22px}
+.class-action-bar p{margin:6px 0 0;color:var(--muted);font-size:13px;line-height:1.8}
+.class-action-card{background:#fff;border:1px solid var(--line);border-radius:26px;padding:18px;box-shadow:0 10px 24px rgba(16,58,46,.06);display:grid;gap:14px}
+.class-action-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.class-action-grid .mini{background:#fbfcfb;border:1px solid var(--line);border-radius:22px;padding:18px;text-align:center}
+.class-action-grid .mini strong{display:block;font-size:18px;color:var(--deep);margin-bottom:6px}
+.class-action-grid .mini span{display:block;font-size:12px;color:var(--muted)}
+.class-action-form textarea,.class-action-form select{width:100%;border:1px solid var(--line);background:#f8fbf9;border-radius:16px;padding:14px;font-family:inherit;font-size:14px;outline:none}
+.class-action-danger{background:#fff6f5;border:1px solid #f2d7d2;color:#a63f3c;border-radius:20px;padding:14px;line-height:1.9}
+.class-card-buttons{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.class-card-buttons .btn{width:100%}
+@media(max-width:980px){.class-action-grid,.class-card-buttons{grid-template-columns:1fr}}
+</style>
+<script id="advanced-class-actions-script">
+(function(){
+  function esc(s){return String(s||'').replace(/[&<>\"]/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c];});}
+  function money(n){return (typeof formatMoney==='function') ? formatMoney(Number(n||0)) : String(Number(n||0));}
+  function classes(){return (window.bankData&&Array.isArray(bankData.classes))?bankData.classes:[];}
+  function studentsOf(classId){return (window.bankData&&Array.isArray(bankData.students))?bankData.students.filter(function(s){return s.classId===classId;}):[];}
+  const state = window.__advancedClassActionState || (window.__advancedClassActionState={mode:'home',classId:'',action:''});
+  const oldOpenClass = window.openStudentSettingsClass;
+  const oldCloseClass = window.closeStudentSettingsClass;
+  function getWrap(){return document.getElementById('studentSettingsProWrap');}
+  function getCards(){return document.getElementById('studentClassCards');}
+  function getDetail(){return document.getElementById('studentClassDetail');}
+  function buildStats(c){
+    const sts=studentsOf(c.id); const total=sts.reduce((a,b)=>a+Number(b.balance||0),0);
+    const pending=sts.filter(function(st){return (window.bankData?.performanceTasks||[]).some(function(task){return task.classId===c.id && (!task.entries?.[st.id] || !['submitted','graded'].includes(task.entries?.[st.id]?.status));});}).length;
+    const near=sts.filter(function(s){var b=Number(s.balance||0); var next=b<11000?11000:b<16000?16000:b<31000?31000:b<41000?41000:null; return next && (next-b)<=3000;}).length;
+    return {count:sts.length,total:total,pending:pending,near:near};
+  }
+  function renderHome(){
+    const cards=getCards(), detail=getDetail(); if(!cards||!detail) return;
+    cards.style.display='grid'; detail.classList.add('hidden'); detail.classList.remove('page-mode'); detail.innerHTML='';
+    cards.innerHTML = classes().map(function(c){
+      const st=buildStats(c);
+      return '<div class="student-class-card">'+
+        '<div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start"><div><h4>'+esc(c.name)+'</h4><div class="teacher-note">عدد الطلاب / الطالبات في الفصل: '+st.count+'</div></div><span class="pill">'+st.count+' نشط</span></div>'+
+        '<div class="student-class-meta">'+
+          '<div class="mini"><strong>'+st.count+'</strong><span>عدد الطلاب / الطالبات</span></div>'+
+          '<div class="mini"><strong>'+money(st.total)+'</strong><span>إجمالي الأرصدة</span></div>'+
+          '<div class="mini"><strong>'+st.pending+'</strong><span>مهام غير مسلّمة</span></div>'+
+          '<div class="mini"><strong>'+st.near+'</strong><span>قريبون من الترقية</span></div>'+
+        '</div>'+
+        '<div class="class-card-buttons">'+
+          '<button class="btn btn-green" onclick="openStudentSettingsClass(\''+c.id+'\')">دخول الفصل</button>'+
+          '<button class="btn btn-gold" onclick="openClassMessagePage(\''+c.id+'\')">رسالة جماعية</button>'+
+          '<button class="btn" style="background:#c4002f;color:#fff" onclick="openClassDeletePage(\''+c.id+'\')">حذف الفصل</button>'+
+        '</div>'+
+      '</div>';
+    }).join('') || '<div class="student-empty">لا توجد فصول بعد.</div>';
+  }
+  function showActionPage(classId, action){
+    const cards=getCards(), detail=getDetail(); if(!cards||!detail) return;
+    const cls=classes().find(function(c){return c.id===classId;}); if(!cls) return;
+    state.mode='page'; state.classId=classId; state.action=action;
+    cards.style.display='none'; detail.classList.remove('hidden'); detail.classList.add('page-mode');
+    const sts=studentsOf(classId); const total=sts.reduce((a,b)=>a+Number(b.balance||0),0);
+    if(action==='message'){
+      detail.innerHTML = '<div class="class-action-page">'+
+        '<div class="class-action-bar"><div><h3>رسالة جماعية — '+esc(cls.name)+'</h3><p>إرسلي رسالة موحدة إلى أولياء أمور الفصل من صفحة مستقلة داخل لوحة التحكم المتقدمة.</p></div><button class="ghost" onclick="backClassCardsHome()">رجوع للخلف</button></div>'+
+        '<div class="class-action-grid"><div class="mini"><strong>'+sts.length+'</strong><span>عدد الطلاب / الطالبات</span></div><div class="mini"><strong>'+money(total)+'</strong><span>إجمالي الأرصدة</span></div></div>'+
+        '<div class="class-action-card class-action-form"><div class="field"><label>نص الرسالة</label><textarea id="bulkClassMessageText" rows="6" placeholder="اكتبي الرسالة الجماعية هنا...">السلام عليكم ورحمة الله وبركاته، هذه رسالة من بنك الرياضيات بخصوص {الطالب / الطالبة}.</textarea></div><button class="btn btn-gold" onclick="sendBulkClassMessageNow(\''+classId+'\')">إرسال الرسالة الجماعية</button></div>'+
+      '</div>';
+    } else if(action==='delete'){
+      const canDelete = sts.length===0;
+      detail.innerHTML = '<div class="class-action-page">'+
+        '<div class="class-action-bar"><div><h3>حذف الفصل — '+esc(cls.name)+'</h3><p>صفحة مستقلة لتأكيد الحذف مع إبقاء الرجوع السريع إلى بطاقات الفصول.</p></div><button class="ghost" onclick="backClassCardsHome()">رجوع للخلف</button></div>'+
+        '<div class="class-action-grid"><div class="mini"><strong>'+sts.length+'</strong><span>عدد الطلاب / الطالبات الحالي</span></div><div class="mini"><strong>'+money(total)+'</strong><span>إجمالي الأرصدة</span></div></div>'+
+        '<div class="class-action-card"><div class="class-action-danger">'+(canDelete?'سيتم حذف الفصل فقط لأنه فارغ حاليًا.':'لا يمكن حذف هذا الفصل الآن لأنه يحتوي على طلاب / طالبات. أفرغي الفصل أولًا ثم أعيدي المحاولة.')+'</div>'+
+        (canDelete?'<button class="btn" style="background:#c4002f;color:#fff" onclick="confirmDeleteClassNow(\''+classId+'\')">تأكيد حذف الفصل</button>':'<button class="btn btn-light" disabled>الفصل غير قابل للحذف حاليًا</button>')+
+        '</div></div>';
+    }
+  }
+  window.openClassMessagePage = function(classId){ showActionPage(classId,'message'); };
+  window.openClassDeletePage = function(classId){ showActionPage(classId,'delete'); };
+  window.sendBulkClassMessageNow = function(classId){
+    const txt=(document.getElementById('bulkClassMessageText')?.value||'').trim(); if(!txt) return;
+    studentsOf(classId).filter(function(s){return s.guardian;}).forEach(function(s,idx){ setTimeout(function(){ if(typeof openWhatsAppNumber==='function') openWhatsAppNumber(s.guardian, txt.replace('{الطالب / الطالبة}', s.name)); }, idx*250); });
+  };
+  window.confirmDeleteClassNow = function(classId){
+    const clsIndex = classes().findIndex(function(c){return c.id===classId;}); if(clsIndex<0) return;
+    if(!confirm('هل تريدين حذف الفصل نهائيًا؟')) return;
+    bankData.classes.splice(clsIndex,1);
+    if(typeof saveBankData==='function') saveBankData();
+    if(typeof refreshTeacherUI==='function') refreshTeacherUI();
+    backClassCardsHome();
+  };
+  window.backClassCardsHome = function(){
+    state.mode='home'; state.classId=''; state.action='';
+    try{ if(typeof oldCloseClass==='function') oldCloseClass(); }catch(e){}
+    setTimeout(renderHome, 30);
+  };
+  window.openStudentSettingsClass = function(classId){
+    state.mode='class'; state.classId=classId; state.action='open';
+    const cards=getCards(); if(cards) cards.style.display='none';
+    if(typeof oldOpenClass==='function') oldOpenClass(classId);
+  };
+  window.closeStudentSettingsClass = function(){ backClassCardsHome(); };
+  function apply(){ const wrap=getWrap(); if(!wrap) return; renderHome(); }
+  const prevShow=window.showTeacherPane;
+  if(prevShow && !window.__advancedClassActionHooked){
+    window.__advancedClassActionHooked=true;
+    window.showTeacherPane=function(id,btn){ prevShow(id,btn); if(id==='teacherPaneStudents'){ setTimeout(apply,120); } };
+    const prevRefresh=window.refreshTeacherUI;
+    if(prevRefresh){ window.refreshTeacherUI=function(){ prevRefresh(); setTimeout(apply,120); }; }
+    document.addEventListener('DOMContentLoaded', function(){ setTimeout(apply,500); });
+  } else {
+    document.addEventListener('DOMContentLoaded', function(){ setTimeout(apply,500); });
+  }
+})();
+</script>
+
 </body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
@@ -7079,6 +8249,123 @@ function openMoreInfo(type){
   alert(messages[type]||'تم فتح العنصر.');
 }
 </script>
+
+<style id="advanced-class-actions-style">
+.class-action-page{display:grid;gap:14px}
+.class-action-bar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;background:#fff;border:1px solid var(--line);border-radius:24px;padding:14px 16px;box-shadow:0 8px 20px rgba(16,58,46,.05)}
+.class-action-bar h3{margin:0;color:var(--deep);font-size:22px}
+.class-action-bar p{margin:6px 0 0;color:var(--muted);font-size:13px;line-height:1.8}
+.class-action-card{background:#fff;border:1px solid var(--line);border-radius:26px;padding:18px;box-shadow:0 10px 24px rgba(16,58,46,.06);display:grid;gap:14px}
+.class-action-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.class-action-grid .mini{background:#fbfcfb;border:1px solid var(--line);border-radius:22px;padding:18px;text-align:center}
+.class-action-grid .mini strong{display:block;font-size:18px;color:var(--deep);margin-bottom:6px}
+.class-action-grid .mini span{display:block;font-size:12px;color:var(--muted)}
+.class-action-form textarea,.class-action-form select{width:100%;border:1px solid var(--line);background:#f8fbf9;border-radius:16px;padding:14px;font-family:inherit;font-size:14px;outline:none}
+.class-action-danger{background:#fff6f5;border:1px solid #f2d7d2;color:#a63f3c;border-radius:20px;padding:14px;line-height:1.9}
+.class-card-buttons{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.class-card-buttons .btn{width:100%}
+@media(max-width:980px){.class-action-grid,.class-card-buttons{grid-template-columns:1fr}}
+</style>
+<script id="advanced-class-actions-script">
+(function(){
+  function esc(s){return String(s||'').replace(/[&<>\"]/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c];});}
+  function money(n){return (typeof formatMoney==='function') ? formatMoney(Number(n||0)) : String(Number(n||0));}
+  function classes(){return (window.bankData&&Array.isArray(bankData.classes))?bankData.classes:[];}
+  function studentsOf(classId){return (window.bankData&&Array.isArray(bankData.students))?bankData.students.filter(function(s){return s.classId===classId;}):[];}
+  const state = window.__advancedClassActionState || (window.__advancedClassActionState={mode:'home',classId:'',action:''});
+  const oldOpenClass = window.openStudentSettingsClass;
+  const oldCloseClass = window.closeStudentSettingsClass;
+  function getWrap(){return document.getElementById('studentSettingsProWrap');}
+  function getCards(){return document.getElementById('studentClassCards');}
+  function getDetail(){return document.getElementById('studentClassDetail');}
+  function buildStats(c){
+    const sts=studentsOf(c.id); const total=sts.reduce((a,b)=>a+Number(b.balance||0),0);
+    const pending=sts.filter(function(st){return (window.bankData?.performanceTasks||[]).some(function(task){return task.classId===c.id && (!task.entries?.[st.id] || !['submitted','graded'].includes(task.entries?.[st.id]?.status));});}).length;
+    const near=sts.filter(function(s){var b=Number(s.balance||0); var next=b<11000?11000:b<16000?16000:b<31000?31000:b<41000?41000:null; return next && (next-b)<=3000;}).length;
+    return {count:sts.length,total:total,pending:pending,near:near};
+  }
+  function renderHome(){
+    const cards=getCards(), detail=getDetail(); if(!cards||!detail) return;
+    cards.style.display='grid'; detail.classList.add('hidden'); detail.classList.remove('page-mode'); detail.innerHTML='';
+    cards.innerHTML = classes().map(function(c){
+      const st=buildStats(c);
+      return '<div class="student-class-card">'+
+        '<div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start"><div><h4>'+esc(c.name)+'</h4><div class="teacher-note">عدد الطلاب / الطالبات في الفصل: '+st.count+'</div></div><span class="pill">'+st.count+' نشط</span></div>'+
+        '<div class="student-class-meta">'+
+          '<div class="mini"><strong>'+st.count+'</strong><span>عدد الطلاب / الطالبات</span></div>'+
+          '<div class="mini"><strong>'+money(st.total)+'</strong><span>إجمالي الأرصدة</span></div>'+
+          '<div class="mini"><strong>'+st.pending+'</strong><span>مهام غير مسلّمة</span></div>'+
+          '<div class="mini"><strong>'+st.near+'</strong><span>قريبون من الترقية</span></div>'+
+        '</div>'+
+        '<div class="class-card-buttons">'+
+          '<button class="btn btn-green" onclick="openStudentSettingsClass(\''+c.id+'\')">دخول الفصل</button>'+
+          '<button class="btn btn-gold" onclick="openClassMessagePage(\''+c.id+'\')">رسالة جماعية</button>'+
+          '<button class="btn" style="background:#c4002f;color:#fff" onclick="openClassDeletePage(\''+c.id+'\')">حذف الفصل</button>'+
+        '</div>'+
+      '</div>';
+    }).join('') || '<div class="student-empty">لا توجد فصول بعد.</div>';
+  }
+  function showActionPage(classId, action){
+    const cards=getCards(), detail=getDetail(); if(!cards||!detail) return;
+    const cls=classes().find(function(c){return c.id===classId;}); if(!cls) return;
+    state.mode='page'; state.classId=classId; state.action=action;
+    cards.style.display='none'; detail.classList.remove('hidden'); detail.classList.add('page-mode');
+    const sts=studentsOf(classId); const total=sts.reduce((a,b)=>a+Number(b.balance||0),0);
+    if(action==='message'){
+      detail.innerHTML = '<div class="class-action-page">'+
+        '<div class="class-action-bar"><div><h3>رسالة جماعية — '+esc(cls.name)+'</h3><p>إرسلي رسالة موحدة إلى أولياء أمور الفصل من صفحة مستقلة داخل لوحة التحكم المتقدمة.</p></div><button class="ghost" onclick="backClassCardsHome()">رجوع للخلف</button></div>'+
+        '<div class="class-action-grid"><div class="mini"><strong>'+sts.length+'</strong><span>عدد الطلاب / الطالبات</span></div><div class="mini"><strong>'+money(total)+'</strong><span>إجمالي الأرصدة</span></div></div>'+
+        '<div class="class-action-card class-action-form"><div class="field"><label>نص الرسالة</label><textarea id="bulkClassMessageText" rows="6" placeholder="اكتبي الرسالة الجماعية هنا...">السلام عليكم ورحمة الله وبركاته، هذه رسالة من بنك الرياضيات بخصوص {الطالب / الطالبة}.</textarea></div><button class="btn btn-gold" onclick="sendBulkClassMessageNow(\''+classId+'\')">إرسال الرسالة الجماعية</button></div>'+
+      '</div>';
+    } else if(action==='delete'){
+      const canDelete = sts.length===0;
+      detail.innerHTML = '<div class="class-action-page">'+
+        '<div class="class-action-bar"><div><h3>حذف الفصل — '+esc(cls.name)+'</h3><p>صفحة مستقلة لتأكيد الحذف مع إبقاء الرجوع السريع إلى بطاقات الفصول.</p></div><button class="ghost" onclick="backClassCardsHome()">رجوع للخلف</button></div>'+
+        '<div class="class-action-grid"><div class="mini"><strong>'+sts.length+'</strong><span>عدد الطلاب / الطالبات الحالي</span></div><div class="mini"><strong>'+money(total)+'</strong><span>إجمالي الأرصدة</span></div></div>'+
+        '<div class="class-action-card"><div class="class-action-danger">'+(canDelete?'سيتم حذف الفصل فقط لأنه فارغ حاليًا.':'لا يمكن حذف هذا الفصل الآن لأنه يحتوي على طلاب / طالبات. أفرغي الفصل أولًا ثم أعيدي المحاولة.')+'</div>'+
+        (canDelete?'<button class="btn" style="background:#c4002f;color:#fff" onclick="confirmDeleteClassNow(\''+classId+'\')">تأكيد حذف الفصل</button>':'<button class="btn btn-light" disabled>الفصل غير قابل للحذف حاليًا</button>')+
+        '</div></div>';
+    }
+  }
+  window.openClassMessagePage = function(classId){ showActionPage(classId,'message'); };
+  window.openClassDeletePage = function(classId){ showActionPage(classId,'delete'); };
+  window.sendBulkClassMessageNow = function(classId){
+    const txt=(document.getElementById('bulkClassMessageText')?.value||'').trim(); if(!txt) return;
+    studentsOf(classId).filter(function(s){return s.guardian;}).forEach(function(s,idx){ setTimeout(function(){ if(typeof openWhatsAppNumber==='function') openWhatsAppNumber(s.guardian, txt.replace('{الطالب / الطالبة}', s.name)); }, idx*250); });
+  };
+  window.confirmDeleteClassNow = function(classId){
+    const clsIndex = classes().findIndex(function(c){return c.id===classId;}); if(clsIndex<0) return;
+    if(!confirm('هل تريدين حذف الفصل نهائيًا؟')) return;
+    bankData.classes.splice(clsIndex,1);
+    if(typeof saveBankData==='function') saveBankData();
+    if(typeof refreshTeacherUI==='function') refreshTeacherUI();
+    backClassCardsHome();
+  };
+  window.backClassCardsHome = function(){
+    state.mode='home'; state.classId=''; state.action='';
+    try{ if(typeof oldCloseClass==='function') oldCloseClass(); }catch(e){}
+    setTimeout(renderHome, 30);
+  };
+  window.openStudentSettingsClass = function(classId){
+    state.mode='class'; state.classId=classId; state.action='open';
+    const cards=getCards(); if(cards) cards.style.display='none';
+    if(typeof oldOpenClass==='function') oldOpenClass(classId);
+  };
+  window.closeStudentSettingsClass = function(){ backClassCardsHome(); };
+  function apply(){ const wrap=getWrap(); if(!wrap) return; renderHome(); }
+  const prevShow=window.showTeacherPane;
+  if(prevShow && !window.__advancedClassActionHooked){
+    window.__advancedClassActionHooked=true;
+    window.showTeacherPane=function(id,btn){ prevShow(id,btn); if(id==='teacherPaneStudents'){ setTimeout(apply,120); } };
+    const prevRefresh=window.refreshTeacherUI;
+    if(prevRefresh){ window.refreshTeacherUI=function(){ prevRefresh(); setTimeout(apply,120); }; }
+    document.addEventListener('DOMContentLoaded', function(){ setTimeout(apply,500); });
+  } else {
+    document.addEventListener('DOMContentLoaded', function(){ setTimeout(apply,500); });
+  }
+})();
+</script>
+
 </body></html>`;
     const w=window.open('','_blank'); if(w){ w.document.write(html); w.document.close(); setTimeout(()=>w.print(),400); }
     const status=document.getElementById('smartReportStatus'); if(status){ status.classList.remove('hidden'); setTimeout(()=>status.classList.add('hidden'),2000); }
@@ -7600,6 +8887,123 @@ function openMoreInfo(type){
   alert(messages[type]||'تم فتح العنصر.');
 }
 </script>
+
+<style id="advanced-class-actions-style">
+.class-action-page{display:grid;gap:14px}
+.class-action-bar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;background:#fff;border:1px solid var(--line);border-radius:24px;padding:14px 16px;box-shadow:0 8px 20px rgba(16,58,46,.05)}
+.class-action-bar h3{margin:0;color:var(--deep);font-size:22px}
+.class-action-bar p{margin:6px 0 0;color:var(--muted);font-size:13px;line-height:1.8}
+.class-action-card{background:#fff;border:1px solid var(--line);border-radius:26px;padding:18px;box-shadow:0 10px 24px rgba(16,58,46,.06);display:grid;gap:14px}
+.class-action-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.class-action-grid .mini{background:#fbfcfb;border:1px solid var(--line);border-radius:22px;padding:18px;text-align:center}
+.class-action-grid .mini strong{display:block;font-size:18px;color:var(--deep);margin-bottom:6px}
+.class-action-grid .mini span{display:block;font-size:12px;color:var(--muted)}
+.class-action-form textarea,.class-action-form select{width:100%;border:1px solid var(--line);background:#f8fbf9;border-radius:16px;padding:14px;font-family:inherit;font-size:14px;outline:none}
+.class-action-danger{background:#fff6f5;border:1px solid #f2d7d2;color:#a63f3c;border-radius:20px;padding:14px;line-height:1.9}
+.class-card-buttons{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.class-card-buttons .btn{width:100%}
+@media(max-width:980px){.class-action-grid,.class-card-buttons{grid-template-columns:1fr}}
+</style>
+<script id="advanced-class-actions-script">
+(function(){
+  function esc(s){return String(s||'').replace(/[&<>\"]/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c];});}
+  function money(n){return (typeof formatMoney==='function') ? formatMoney(Number(n||0)) : String(Number(n||0));}
+  function classes(){return (window.bankData&&Array.isArray(bankData.classes))?bankData.classes:[];}
+  function studentsOf(classId){return (window.bankData&&Array.isArray(bankData.students))?bankData.students.filter(function(s){return s.classId===classId;}):[];}
+  const state = window.__advancedClassActionState || (window.__advancedClassActionState={mode:'home',classId:'',action:''});
+  const oldOpenClass = window.openStudentSettingsClass;
+  const oldCloseClass = window.closeStudentSettingsClass;
+  function getWrap(){return document.getElementById('studentSettingsProWrap');}
+  function getCards(){return document.getElementById('studentClassCards');}
+  function getDetail(){return document.getElementById('studentClassDetail');}
+  function buildStats(c){
+    const sts=studentsOf(c.id); const total=sts.reduce((a,b)=>a+Number(b.balance||0),0);
+    const pending=sts.filter(function(st){return (window.bankData?.performanceTasks||[]).some(function(task){return task.classId===c.id && (!task.entries?.[st.id] || !['submitted','graded'].includes(task.entries?.[st.id]?.status));});}).length;
+    const near=sts.filter(function(s){var b=Number(s.balance||0); var next=b<11000?11000:b<16000?16000:b<31000?31000:b<41000?41000:null; return next && (next-b)<=3000;}).length;
+    return {count:sts.length,total:total,pending:pending,near:near};
+  }
+  function renderHome(){
+    const cards=getCards(), detail=getDetail(); if(!cards||!detail) return;
+    cards.style.display='grid'; detail.classList.add('hidden'); detail.classList.remove('page-mode'); detail.innerHTML='';
+    cards.innerHTML = classes().map(function(c){
+      const st=buildStats(c);
+      return '<div class="student-class-card">'+
+        '<div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start"><div><h4>'+esc(c.name)+'</h4><div class="teacher-note">عدد الطلاب / الطالبات في الفصل: '+st.count+'</div></div><span class="pill">'+st.count+' نشط</span></div>'+
+        '<div class="student-class-meta">'+
+          '<div class="mini"><strong>'+st.count+'</strong><span>عدد الطلاب / الطالبات</span></div>'+
+          '<div class="mini"><strong>'+money(st.total)+'</strong><span>إجمالي الأرصدة</span></div>'+
+          '<div class="mini"><strong>'+st.pending+'</strong><span>مهام غير مسلّمة</span></div>'+
+          '<div class="mini"><strong>'+st.near+'</strong><span>قريبون من الترقية</span></div>'+
+        '</div>'+
+        '<div class="class-card-buttons">'+
+          '<button class="btn btn-green" onclick="openStudentSettingsClass(\''+c.id+'\')">دخول الفصل</button>'+
+          '<button class="btn btn-gold" onclick="openClassMessagePage(\''+c.id+'\')">رسالة جماعية</button>'+
+          '<button class="btn" style="background:#c4002f;color:#fff" onclick="openClassDeletePage(\''+c.id+'\')">حذف الفصل</button>'+
+        '</div>'+
+      '</div>';
+    }).join('') || '<div class="student-empty">لا توجد فصول بعد.</div>';
+  }
+  function showActionPage(classId, action){
+    const cards=getCards(), detail=getDetail(); if(!cards||!detail) return;
+    const cls=classes().find(function(c){return c.id===classId;}); if(!cls) return;
+    state.mode='page'; state.classId=classId; state.action=action;
+    cards.style.display='none'; detail.classList.remove('hidden'); detail.classList.add('page-mode');
+    const sts=studentsOf(classId); const total=sts.reduce((a,b)=>a+Number(b.balance||0),0);
+    if(action==='message'){
+      detail.innerHTML = '<div class="class-action-page">'+
+        '<div class="class-action-bar"><div><h3>رسالة جماعية — '+esc(cls.name)+'</h3><p>إرسلي رسالة موحدة إلى أولياء أمور الفصل من صفحة مستقلة داخل لوحة التحكم المتقدمة.</p></div><button class="ghost" onclick="backClassCardsHome()">رجوع للخلف</button></div>'+
+        '<div class="class-action-grid"><div class="mini"><strong>'+sts.length+'</strong><span>عدد الطلاب / الطالبات</span></div><div class="mini"><strong>'+money(total)+'</strong><span>إجمالي الأرصدة</span></div></div>'+
+        '<div class="class-action-card class-action-form"><div class="field"><label>نص الرسالة</label><textarea id="bulkClassMessageText" rows="6" placeholder="اكتبي الرسالة الجماعية هنا...">السلام عليكم ورحمة الله وبركاته، هذه رسالة من بنك الرياضيات بخصوص {الطالب / الطالبة}.</textarea></div><button class="btn btn-gold" onclick="sendBulkClassMessageNow(\''+classId+'\')">إرسال الرسالة الجماعية</button></div>'+
+      '</div>';
+    } else if(action==='delete'){
+      const canDelete = sts.length===0;
+      detail.innerHTML = '<div class="class-action-page">'+
+        '<div class="class-action-bar"><div><h3>حذف الفصل — '+esc(cls.name)+'</h3><p>صفحة مستقلة لتأكيد الحذف مع إبقاء الرجوع السريع إلى بطاقات الفصول.</p></div><button class="ghost" onclick="backClassCardsHome()">رجوع للخلف</button></div>'+
+        '<div class="class-action-grid"><div class="mini"><strong>'+sts.length+'</strong><span>عدد الطلاب / الطالبات الحالي</span></div><div class="mini"><strong>'+money(total)+'</strong><span>إجمالي الأرصدة</span></div></div>'+
+        '<div class="class-action-card"><div class="class-action-danger">'+(canDelete?'سيتم حذف الفصل فقط لأنه فارغ حاليًا.':'لا يمكن حذف هذا الفصل الآن لأنه يحتوي على طلاب / طالبات. أفرغي الفصل أولًا ثم أعيدي المحاولة.')+'</div>'+
+        (canDelete?'<button class="btn" style="background:#c4002f;color:#fff" onclick="confirmDeleteClassNow(\''+classId+'\')">تأكيد حذف الفصل</button>':'<button class="btn btn-light" disabled>الفصل غير قابل للحذف حاليًا</button>')+
+        '</div></div>';
+    }
+  }
+  window.openClassMessagePage = function(classId){ showActionPage(classId,'message'); };
+  window.openClassDeletePage = function(classId){ showActionPage(classId,'delete'); };
+  window.sendBulkClassMessageNow = function(classId){
+    const txt=(document.getElementById('bulkClassMessageText')?.value||'').trim(); if(!txt) return;
+    studentsOf(classId).filter(function(s){return s.guardian;}).forEach(function(s,idx){ setTimeout(function(){ if(typeof openWhatsAppNumber==='function') openWhatsAppNumber(s.guardian, txt.replace('{الطالب / الطالبة}', s.name)); }, idx*250); });
+  };
+  window.confirmDeleteClassNow = function(classId){
+    const clsIndex = classes().findIndex(function(c){return c.id===classId;}); if(clsIndex<0) return;
+    if(!confirm('هل تريدين حذف الفصل نهائيًا؟')) return;
+    bankData.classes.splice(clsIndex,1);
+    if(typeof saveBankData==='function') saveBankData();
+    if(typeof refreshTeacherUI==='function') refreshTeacherUI();
+    backClassCardsHome();
+  };
+  window.backClassCardsHome = function(){
+    state.mode='home'; state.classId=''; state.action='';
+    try{ if(typeof oldCloseClass==='function') oldCloseClass(); }catch(e){}
+    setTimeout(renderHome, 30);
+  };
+  window.openStudentSettingsClass = function(classId){
+    state.mode='class'; state.classId=classId; state.action='open';
+    const cards=getCards(); if(cards) cards.style.display='none';
+    if(typeof oldOpenClass==='function') oldOpenClass(classId);
+  };
+  window.closeStudentSettingsClass = function(){ backClassCardsHome(); };
+  function apply(){ const wrap=getWrap(); if(!wrap) return; renderHome(); }
+  const prevShow=window.showTeacherPane;
+  if(prevShow && !window.__advancedClassActionHooked){
+    window.__advancedClassActionHooked=true;
+    window.showTeacherPane=function(id,btn){ prevShow(id,btn); if(id==='teacherPaneStudents'){ setTimeout(apply,120); } };
+    const prevRefresh=window.refreshTeacherUI;
+    if(prevRefresh){ window.refreshTeacherUI=function(){ prevRefresh(); setTimeout(apply,120); }; }
+    document.addEventListener('DOMContentLoaded', function(){ setTimeout(apply,500); });
+  } else {
+    document.addEventListener('DOMContentLoaded', function(){ setTimeout(apply,500); });
+  }
+})();
+</script>
+
 </body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
@@ -7649,6 +9053,123 @@ function openMoreInfo(type){
   alert(messages[type]||'تم فتح العنصر.');
 }
 </script>
+
+<style id="advanced-class-actions-style">
+.class-action-page{display:grid;gap:14px}
+.class-action-bar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;background:#fff;border:1px solid var(--line);border-radius:24px;padding:14px 16px;box-shadow:0 8px 20px rgba(16,58,46,.05)}
+.class-action-bar h3{margin:0;color:var(--deep);font-size:22px}
+.class-action-bar p{margin:6px 0 0;color:var(--muted);font-size:13px;line-height:1.8}
+.class-action-card{background:#fff;border:1px solid var(--line);border-radius:26px;padding:18px;box-shadow:0 10px 24px rgba(16,58,46,.06);display:grid;gap:14px}
+.class-action-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.class-action-grid .mini{background:#fbfcfb;border:1px solid var(--line);border-radius:22px;padding:18px;text-align:center}
+.class-action-grid .mini strong{display:block;font-size:18px;color:var(--deep);margin-bottom:6px}
+.class-action-grid .mini span{display:block;font-size:12px;color:var(--muted)}
+.class-action-form textarea,.class-action-form select{width:100%;border:1px solid var(--line);background:#f8fbf9;border-radius:16px;padding:14px;font-family:inherit;font-size:14px;outline:none}
+.class-action-danger{background:#fff6f5;border:1px solid #f2d7d2;color:#a63f3c;border-radius:20px;padding:14px;line-height:1.9}
+.class-card-buttons{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.class-card-buttons .btn{width:100%}
+@media(max-width:980px){.class-action-grid,.class-card-buttons{grid-template-columns:1fr}}
+</style>
+<script id="advanced-class-actions-script">
+(function(){
+  function esc(s){return String(s||'').replace(/[&<>\"]/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c];});}
+  function money(n){return (typeof formatMoney==='function') ? formatMoney(Number(n||0)) : String(Number(n||0));}
+  function classes(){return (window.bankData&&Array.isArray(bankData.classes))?bankData.classes:[];}
+  function studentsOf(classId){return (window.bankData&&Array.isArray(bankData.students))?bankData.students.filter(function(s){return s.classId===classId;}):[];}
+  const state = window.__advancedClassActionState || (window.__advancedClassActionState={mode:'home',classId:'',action:''});
+  const oldOpenClass = window.openStudentSettingsClass;
+  const oldCloseClass = window.closeStudentSettingsClass;
+  function getWrap(){return document.getElementById('studentSettingsProWrap');}
+  function getCards(){return document.getElementById('studentClassCards');}
+  function getDetail(){return document.getElementById('studentClassDetail');}
+  function buildStats(c){
+    const sts=studentsOf(c.id); const total=sts.reduce((a,b)=>a+Number(b.balance||0),0);
+    const pending=sts.filter(function(st){return (window.bankData?.performanceTasks||[]).some(function(task){return task.classId===c.id && (!task.entries?.[st.id] || !['submitted','graded'].includes(task.entries?.[st.id]?.status));});}).length;
+    const near=sts.filter(function(s){var b=Number(s.balance||0); var next=b<11000?11000:b<16000?16000:b<31000?31000:b<41000?41000:null; return next && (next-b)<=3000;}).length;
+    return {count:sts.length,total:total,pending:pending,near:near};
+  }
+  function renderHome(){
+    const cards=getCards(), detail=getDetail(); if(!cards||!detail) return;
+    cards.style.display='grid'; detail.classList.add('hidden'); detail.classList.remove('page-mode'); detail.innerHTML='';
+    cards.innerHTML = classes().map(function(c){
+      const st=buildStats(c);
+      return '<div class="student-class-card">'+
+        '<div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start"><div><h4>'+esc(c.name)+'</h4><div class="teacher-note">عدد الطلاب / الطالبات في الفصل: '+st.count+'</div></div><span class="pill">'+st.count+' نشط</span></div>'+
+        '<div class="student-class-meta">'+
+          '<div class="mini"><strong>'+st.count+'</strong><span>عدد الطلاب / الطالبات</span></div>'+
+          '<div class="mini"><strong>'+money(st.total)+'</strong><span>إجمالي الأرصدة</span></div>'+
+          '<div class="mini"><strong>'+st.pending+'</strong><span>مهام غير مسلّمة</span></div>'+
+          '<div class="mini"><strong>'+st.near+'</strong><span>قريبون من الترقية</span></div>'+
+        '</div>'+
+        '<div class="class-card-buttons">'+
+          '<button class="btn btn-green" onclick="openStudentSettingsClass(\''+c.id+'\')">دخول الفصل</button>'+
+          '<button class="btn btn-gold" onclick="openClassMessagePage(\''+c.id+'\')">رسالة جماعية</button>'+
+          '<button class="btn" style="background:#c4002f;color:#fff" onclick="openClassDeletePage(\''+c.id+'\')">حذف الفصل</button>'+
+        '</div>'+
+      '</div>';
+    }).join('') || '<div class="student-empty">لا توجد فصول بعد.</div>';
+  }
+  function showActionPage(classId, action){
+    const cards=getCards(), detail=getDetail(); if(!cards||!detail) return;
+    const cls=classes().find(function(c){return c.id===classId;}); if(!cls) return;
+    state.mode='page'; state.classId=classId; state.action=action;
+    cards.style.display='none'; detail.classList.remove('hidden'); detail.classList.add('page-mode');
+    const sts=studentsOf(classId); const total=sts.reduce((a,b)=>a+Number(b.balance||0),0);
+    if(action==='message'){
+      detail.innerHTML = '<div class="class-action-page">'+
+        '<div class="class-action-bar"><div><h3>رسالة جماعية — '+esc(cls.name)+'</h3><p>إرسلي رسالة موحدة إلى أولياء أمور الفصل من صفحة مستقلة داخل لوحة التحكم المتقدمة.</p></div><button class="ghost" onclick="backClassCardsHome()">رجوع للخلف</button></div>'+
+        '<div class="class-action-grid"><div class="mini"><strong>'+sts.length+'</strong><span>عدد الطلاب / الطالبات</span></div><div class="mini"><strong>'+money(total)+'</strong><span>إجمالي الأرصدة</span></div></div>'+
+        '<div class="class-action-card class-action-form"><div class="field"><label>نص الرسالة</label><textarea id="bulkClassMessageText" rows="6" placeholder="اكتبي الرسالة الجماعية هنا...">السلام عليكم ورحمة الله وبركاته، هذه رسالة من بنك الرياضيات بخصوص {الطالب / الطالبة}.</textarea></div><button class="btn btn-gold" onclick="sendBulkClassMessageNow(\''+classId+'\')">إرسال الرسالة الجماعية</button></div>'+
+      '</div>';
+    } else if(action==='delete'){
+      const canDelete = sts.length===0;
+      detail.innerHTML = '<div class="class-action-page">'+
+        '<div class="class-action-bar"><div><h3>حذف الفصل — '+esc(cls.name)+'</h3><p>صفحة مستقلة لتأكيد الحذف مع إبقاء الرجوع السريع إلى بطاقات الفصول.</p></div><button class="ghost" onclick="backClassCardsHome()">رجوع للخلف</button></div>'+
+        '<div class="class-action-grid"><div class="mini"><strong>'+sts.length+'</strong><span>عدد الطلاب / الطالبات الحالي</span></div><div class="mini"><strong>'+money(total)+'</strong><span>إجمالي الأرصدة</span></div></div>'+
+        '<div class="class-action-card"><div class="class-action-danger">'+(canDelete?'سيتم حذف الفصل فقط لأنه فارغ حاليًا.':'لا يمكن حذف هذا الفصل الآن لأنه يحتوي على طلاب / طالبات. أفرغي الفصل أولًا ثم أعيدي المحاولة.')+'</div>'+
+        (canDelete?'<button class="btn" style="background:#c4002f;color:#fff" onclick="confirmDeleteClassNow(\''+classId+'\')">تأكيد حذف الفصل</button>':'<button class="btn btn-light" disabled>الفصل غير قابل للحذف حاليًا</button>')+
+        '</div></div>';
+    }
+  }
+  window.openClassMessagePage = function(classId){ showActionPage(classId,'message'); };
+  window.openClassDeletePage = function(classId){ showActionPage(classId,'delete'); };
+  window.sendBulkClassMessageNow = function(classId){
+    const txt=(document.getElementById('bulkClassMessageText')?.value||'').trim(); if(!txt) return;
+    studentsOf(classId).filter(function(s){return s.guardian;}).forEach(function(s,idx){ setTimeout(function(){ if(typeof openWhatsAppNumber==='function') openWhatsAppNumber(s.guardian, txt.replace('{الطالب / الطالبة}', s.name)); }, idx*250); });
+  };
+  window.confirmDeleteClassNow = function(classId){
+    const clsIndex = classes().findIndex(function(c){return c.id===classId;}); if(clsIndex<0) return;
+    if(!confirm('هل تريدين حذف الفصل نهائيًا؟')) return;
+    bankData.classes.splice(clsIndex,1);
+    if(typeof saveBankData==='function') saveBankData();
+    if(typeof refreshTeacherUI==='function') refreshTeacherUI();
+    backClassCardsHome();
+  };
+  window.backClassCardsHome = function(){
+    state.mode='home'; state.classId=''; state.action='';
+    try{ if(typeof oldCloseClass==='function') oldCloseClass(); }catch(e){}
+    setTimeout(renderHome, 30);
+  };
+  window.openStudentSettingsClass = function(classId){
+    state.mode='class'; state.classId=classId; state.action='open';
+    const cards=getCards(); if(cards) cards.style.display='none';
+    if(typeof oldOpenClass==='function') oldOpenClass(classId);
+  };
+  window.closeStudentSettingsClass = function(){ backClassCardsHome(); };
+  function apply(){ const wrap=getWrap(); if(!wrap) return; renderHome(); }
+  const prevShow=window.showTeacherPane;
+  if(prevShow && !window.__advancedClassActionHooked){
+    window.__advancedClassActionHooked=true;
+    window.showTeacherPane=function(id,btn){ prevShow(id,btn); if(id==='teacherPaneStudents'){ setTimeout(apply,120); } };
+    const prevRefresh=window.refreshTeacherUI;
+    if(prevRefresh){ window.refreshTeacherUI=function(){ prevRefresh(); setTimeout(apply,120); }; }
+    document.addEventListener('DOMContentLoaded', function(){ setTimeout(apply,500); });
+  } else {
+    document.addEventListener('DOMContentLoaded', function(){ setTimeout(apply,500); });
+  }
+})();
+</script>
+
 </body></html>`;
     const w=window.open('','_blank'); if(w){ w.document.write(html); w.document.close(); setTimeout(()=>w.print(),400); }
     const status=document.getElementById('smartReportStatus'); if(status){ status.classList.remove('hidden'); setTimeout(()=>status.classList.add('hidden'),2000); }
@@ -8029,6 +9550,123 @@ function openMoreInfo(type){
   alert(messages[type]||'تم فتح العنصر.');
 }
 </script>
+
+<style id="advanced-class-actions-style">
+.class-action-page{display:grid;gap:14px}
+.class-action-bar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;background:#fff;border:1px solid var(--line);border-radius:24px;padding:14px 16px;box-shadow:0 8px 20px rgba(16,58,46,.05)}
+.class-action-bar h3{margin:0;color:var(--deep);font-size:22px}
+.class-action-bar p{margin:6px 0 0;color:var(--muted);font-size:13px;line-height:1.8}
+.class-action-card{background:#fff;border:1px solid var(--line);border-radius:26px;padding:18px;box-shadow:0 10px 24px rgba(16,58,46,.06);display:grid;gap:14px}
+.class-action-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.class-action-grid .mini{background:#fbfcfb;border:1px solid var(--line);border-radius:22px;padding:18px;text-align:center}
+.class-action-grid .mini strong{display:block;font-size:18px;color:var(--deep);margin-bottom:6px}
+.class-action-grid .mini span{display:block;font-size:12px;color:var(--muted)}
+.class-action-form textarea,.class-action-form select{width:100%;border:1px solid var(--line);background:#f8fbf9;border-radius:16px;padding:14px;font-family:inherit;font-size:14px;outline:none}
+.class-action-danger{background:#fff6f5;border:1px solid #f2d7d2;color:#a63f3c;border-radius:20px;padding:14px;line-height:1.9}
+.class-card-buttons{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.class-card-buttons .btn{width:100%}
+@media(max-width:980px){.class-action-grid,.class-card-buttons{grid-template-columns:1fr}}
+</style>
+<script id="advanced-class-actions-script">
+(function(){
+  function esc(s){return String(s||'').replace(/[&<>\"]/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c];});}
+  function money(n){return (typeof formatMoney==='function') ? formatMoney(Number(n||0)) : String(Number(n||0));}
+  function classes(){return (window.bankData&&Array.isArray(bankData.classes))?bankData.classes:[];}
+  function studentsOf(classId){return (window.bankData&&Array.isArray(bankData.students))?bankData.students.filter(function(s){return s.classId===classId;}):[];}
+  const state = window.__advancedClassActionState || (window.__advancedClassActionState={mode:'home',classId:'',action:''});
+  const oldOpenClass = window.openStudentSettingsClass;
+  const oldCloseClass = window.closeStudentSettingsClass;
+  function getWrap(){return document.getElementById('studentSettingsProWrap');}
+  function getCards(){return document.getElementById('studentClassCards');}
+  function getDetail(){return document.getElementById('studentClassDetail');}
+  function buildStats(c){
+    const sts=studentsOf(c.id); const total=sts.reduce((a,b)=>a+Number(b.balance||0),0);
+    const pending=sts.filter(function(st){return (window.bankData?.performanceTasks||[]).some(function(task){return task.classId===c.id && (!task.entries?.[st.id] || !['submitted','graded'].includes(task.entries?.[st.id]?.status));});}).length;
+    const near=sts.filter(function(s){var b=Number(s.balance||0); var next=b<11000?11000:b<16000?16000:b<31000?31000:b<41000?41000:null; return next && (next-b)<=3000;}).length;
+    return {count:sts.length,total:total,pending:pending,near:near};
+  }
+  function renderHome(){
+    const cards=getCards(), detail=getDetail(); if(!cards||!detail) return;
+    cards.style.display='grid'; detail.classList.add('hidden'); detail.classList.remove('page-mode'); detail.innerHTML='';
+    cards.innerHTML = classes().map(function(c){
+      const st=buildStats(c);
+      return '<div class="student-class-card">'+
+        '<div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start"><div><h4>'+esc(c.name)+'</h4><div class="teacher-note">عدد الطلاب / الطالبات في الفصل: '+st.count+'</div></div><span class="pill">'+st.count+' نشط</span></div>'+
+        '<div class="student-class-meta">'+
+          '<div class="mini"><strong>'+st.count+'</strong><span>عدد الطلاب / الطالبات</span></div>'+
+          '<div class="mini"><strong>'+money(st.total)+'</strong><span>إجمالي الأرصدة</span></div>'+
+          '<div class="mini"><strong>'+st.pending+'</strong><span>مهام غير مسلّمة</span></div>'+
+          '<div class="mini"><strong>'+st.near+'</strong><span>قريبون من الترقية</span></div>'+
+        '</div>'+
+        '<div class="class-card-buttons">'+
+          '<button class="btn btn-green" onclick="openStudentSettingsClass(\''+c.id+'\')">دخول الفصل</button>'+
+          '<button class="btn btn-gold" onclick="openClassMessagePage(\''+c.id+'\')">رسالة جماعية</button>'+
+          '<button class="btn" style="background:#c4002f;color:#fff" onclick="openClassDeletePage(\''+c.id+'\')">حذف الفصل</button>'+
+        '</div>'+
+      '</div>';
+    }).join('') || '<div class="student-empty">لا توجد فصول بعد.</div>';
+  }
+  function showActionPage(classId, action){
+    const cards=getCards(), detail=getDetail(); if(!cards||!detail) return;
+    const cls=classes().find(function(c){return c.id===classId;}); if(!cls) return;
+    state.mode='page'; state.classId=classId; state.action=action;
+    cards.style.display='none'; detail.classList.remove('hidden'); detail.classList.add('page-mode');
+    const sts=studentsOf(classId); const total=sts.reduce((a,b)=>a+Number(b.balance||0),0);
+    if(action==='message'){
+      detail.innerHTML = '<div class="class-action-page">'+
+        '<div class="class-action-bar"><div><h3>رسالة جماعية — '+esc(cls.name)+'</h3><p>إرسلي رسالة موحدة إلى أولياء أمور الفصل من صفحة مستقلة داخل لوحة التحكم المتقدمة.</p></div><button class="ghost" onclick="backClassCardsHome()">رجوع للخلف</button></div>'+
+        '<div class="class-action-grid"><div class="mini"><strong>'+sts.length+'</strong><span>عدد الطلاب / الطالبات</span></div><div class="mini"><strong>'+money(total)+'</strong><span>إجمالي الأرصدة</span></div></div>'+
+        '<div class="class-action-card class-action-form"><div class="field"><label>نص الرسالة</label><textarea id="bulkClassMessageText" rows="6" placeholder="اكتبي الرسالة الجماعية هنا...">السلام عليكم ورحمة الله وبركاته، هذه رسالة من بنك الرياضيات بخصوص {الطالب / الطالبة}.</textarea></div><button class="btn btn-gold" onclick="sendBulkClassMessageNow(\''+classId+'\')">إرسال الرسالة الجماعية</button></div>'+
+      '</div>';
+    } else if(action==='delete'){
+      const canDelete = sts.length===0;
+      detail.innerHTML = '<div class="class-action-page">'+
+        '<div class="class-action-bar"><div><h3>حذف الفصل — '+esc(cls.name)+'</h3><p>صفحة مستقلة لتأكيد الحذف مع إبقاء الرجوع السريع إلى بطاقات الفصول.</p></div><button class="ghost" onclick="backClassCardsHome()">رجوع للخلف</button></div>'+
+        '<div class="class-action-grid"><div class="mini"><strong>'+sts.length+'</strong><span>عدد الطلاب / الطالبات الحالي</span></div><div class="mini"><strong>'+money(total)+'</strong><span>إجمالي الأرصدة</span></div></div>'+
+        '<div class="class-action-card"><div class="class-action-danger">'+(canDelete?'سيتم حذف الفصل فقط لأنه فارغ حاليًا.':'لا يمكن حذف هذا الفصل الآن لأنه يحتوي على طلاب / طالبات. أفرغي الفصل أولًا ثم أعيدي المحاولة.')+'</div>'+
+        (canDelete?'<button class="btn" style="background:#c4002f;color:#fff" onclick="confirmDeleteClassNow(\''+classId+'\')">تأكيد حذف الفصل</button>':'<button class="btn btn-light" disabled>الفصل غير قابل للحذف حاليًا</button>')+
+        '</div></div>';
+    }
+  }
+  window.openClassMessagePage = function(classId){ showActionPage(classId,'message'); };
+  window.openClassDeletePage = function(classId){ showActionPage(classId,'delete'); };
+  window.sendBulkClassMessageNow = function(classId){
+    const txt=(document.getElementById('bulkClassMessageText')?.value||'').trim(); if(!txt) return;
+    studentsOf(classId).filter(function(s){return s.guardian;}).forEach(function(s,idx){ setTimeout(function(){ if(typeof openWhatsAppNumber==='function') openWhatsAppNumber(s.guardian, txt.replace('{الطالب / الطالبة}', s.name)); }, idx*250); });
+  };
+  window.confirmDeleteClassNow = function(classId){
+    const clsIndex = classes().findIndex(function(c){return c.id===classId;}); if(clsIndex<0) return;
+    if(!confirm('هل تريدين حذف الفصل نهائيًا؟')) return;
+    bankData.classes.splice(clsIndex,1);
+    if(typeof saveBankData==='function') saveBankData();
+    if(typeof refreshTeacherUI==='function') refreshTeacherUI();
+    backClassCardsHome();
+  };
+  window.backClassCardsHome = function(){
+    state.mode='home'; state.classId=''; state.action='';
+    try{ if(typeof oldCloseClass==='function') oldCloseClass(); }catch(e){}
+    setTimeout(renderHome, 30);
+  };
+  window.openStudentSettingsClass = function(classId){
+    state.mode='class'; state.classId=classId; state.action='open';
+    const cards=getCards(); if(cards) cards.style.display='none';
+    if(typeof oldOpenClass==='function') oldOpenClass(classId);
+  };
+  window.closeStudentSettingsClass = function(){ backClassCardsHome(); };
+  function apply(){ const wrap=getWrap(); if(!wrap) return; renderHome(); }
+  const prevShow=window.showTeacherPane;
+  if(prevShow && !window.__advancedClassActionHooked){
+    window.__advancedClassActionHooked=true;
+    window.showTeacherPane=function(id,btn){ prevShow(id,btn); if(id==='teacherPaneStudents'){ setTimeout(apply,120); } };
+    const prevRefresh=window.refreshTeacherUI;
+    if(prevRefresh){ window.refreshTeacherUI=function(){ prevRefresh(); setTimeout(apply,120); }; }
+    document.addEventListener('DOMContentLoaded', function(){ setTimeout(apply,500); });
+  } else {
+    document.addEventListener('DOMContentLoaded', function(){ setTimeout(apply,500); });
+  }
+})();
+</script>
+
 </body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
@@ -8235,6 +9873,123 @@ function openMoreInfo(type){
   alert(messages[type]||'تم فتح العنصر.');
 }
 </script>
+
+<style id="advanced-class-actions-style">
+.class-action-page{display:grid;gap:14px}
+.class-action-bar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;background:#fff;border:1px solid var(--line);border-radius:24px;padding:14px 16px;box-shadow:0 8px 20px rgba(16,58,46,.05)}
+.class-action-bar h3{margin:0;color:var(--deep);font-size:22px}
+.class-action-bar p{margin:6px 0 0;color:var(--muted);font-size:13px;line-height:1.8}
+.class-action-card{background:#fff;border:1px solid var(--line);border-radius:26px;padding:18px;box-shadow:0 10px 24px rgba(16,58,46,.06);display:grid;gap:14px}
+.class-action-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.class-action-grid .mini{background:#fbfcfb;border:1px solid var(--line);border-radius:22px;padding:18px;text-align:center}
+.class-action-grid .mini strong{display:block;font-size:18px;color:var(--deep);margin-bottom:6px}
+.class-action-grid .mini span{display:block;font-size:12px;color:var(--muted)}
+.class-action-form textarea,.class-action-form select{width:100%;border:1px solid var(--line);background:#f8fbf9;border-radius:16px;padding:14px;font-family:inherit;font-size:14px;outline:none}
+.class-action-danger{background:#fff6f5;border:1px solid #f2d7d2;color:#a63f3c;border-radius:20px;padding:14px;line-height:1.9}
+.class-card-buttons{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.class-card-buttons .btn{width:100%}
+@media(max-width:980px){.class-action-grid,.class-card-buttons{grid-template-columns:1fr}}
+</style>
+<script id="advanced-class-actions-script">
+(function(){
+  function esc(s){return String(s||'').replace(/[&<>\"]/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c];});}
+  function money(n){return (typeof formatMoney==='function') ? formatMoney(Number(n||0)) : String(Number(n||0));}
+  function classes(){return (window.bankData&&Array.isArray(bankData.classes))?bankData.classes:[];}
+  function studentsOf(classId){return (window.bankData&&Array.isArray(bankData.students))?bankData.students.filter(function(s){return s.classId===classId;}):[];}
+  const state = window.__advancedClassActionState || (window.__advancedClassActionState={mode:'home',classId:'',action:''});
+  const oldOpenClass = window.openStudentSettingsClass;
+  const oldCloseClass = window.closeStudentSettingsClass;
+  function getWrap(){return document.getElementById('studentSettingsProWrap');}
+  function getCards(){return document.getElementById('studentClassCards');}
+  function getDetail(){return document.getElementById('studentClassDetail');}
+  function buildStats(c){
+    const sts=studentsOf(c.id); const total=sts.reduce((a,b)=>a+Number(b.balance||0),0);
+    const pending=sts.filter(function(st){return (window.bankData?.performanceTasks||[]).some(function(task){return task.classId===c.id && (!task.entries?.[st.id] || !['submitted','graded'].includes(task.entries?.[st.id]?.status));});}).length;
+    const near=sts.filter(function(s){var b=Number(s.balance||0); var next=b<11000?11000:b<16000?16000:b<31000?31000:b<41000?41000:null; return next && (next-b)<=3000;}).length;
+    return {count:sts.length,total:total,pending:pending,near:near};
+  }
+  function renderHome(){
+    const cards=getCards(), detail=getDetail(); if(!cards||!detail) return;
+    cards.style.display='grid'; detail.classList.add('hidden'); detail.classList.remove('page-mode'); detail.innerHTML='';
+    cards.innerHTML = classes().map(function(c){
+      const st=buildStats(c);
+      return '<div class="student-class-card">'+
+        '<div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start"><div><h4>'+esc(c.name)+'</h4><div class="teacher-note">عدد الطلاب / الطالبات في الفصل: '+st.count+'</div></div><span class="pill">'+st.count+' نشط</span></div>'+
+        '<div class="student-class-meta">'+
+          '<div class="mini"><strong>'+st.count+'</strong><span>عدد الطلاب / الطالبات</span></div>'+
+          '<div class="mini"><strong>'+money(st.total)+'</strong><span>إجمالي الأرصدة</span></div>'+
+          '<div class="mini"><strong>'+st.pending+'</strong><span>مهام غير مسلّمة</span></div>'+
+          '<div class="mini"><strong>'+st.near+'</strong><span>قريبون من الترقية</span></div>'+
+        '</div>'+
+        '<div class="class-card-buttons">'+
+          '<button class="btn btn-green" onclick="openStudentSettingsClass(\''+c.id+'\')">دخول الفصل</button>'+
+          '<button class="btn btn-gold" onclick="openClassMessagePage(\''+c.id+'\')">رسالة جماعية</button>'+
+          '<button class="btn" style="background:#c4002f;color:#fff" onclick="openClassDeletePage(\''+c.id+'\')">حذف الفصل</button>'+
+        '</div>'+
+      '</div>';
+    }).join('') || '<div class="student-empty">لا توجد فصول بعد.</div>';
+  }
+  function showActionPage(classId, action){
+    const cards=getCards(), detail=getDetail(); if(!cards||!detail) return;
+    const cls=classes().find(function(c){return c.id===classId;}); if(!cls) return;
+    state.mode='page'; state.classId=classId; state.action=action;
+    cards.style.display='none'; detail.classList.remove('hidden'); detail.classList.add('page-mode');
+    const sts=studentsOf(classId); const total=sts.reduce((a,b)=>a+Number(b.balance||0),0);
+    if(action==='message'){
+      detail.innerHTML = '<div class="class-action-page">'+
+        '<div class="class-action-bar"><div><h3>رسالة جماعية — '+esc(cls.name)+'</h3><p>إرسلي رسالة موحدة إلى أولياء أمور الفصل من صفحة مستقلة داخل لوحة التحكم المتقدمة.</p></div><button class="ghost" onclick="backClassCardsHome()">رجوع للخلف</button></div>'+
+        '<div class="class-action-grid"><div class="mini"><strong>'+sts.length+'</strong><span>عدد الطلاب / الطالبات</span></div><div class="mini"><strong>'+money(total)+'</strong><span>إجمالي الأرصدة</span></div></div>'+
+        '<div class="class-action-card class-action-form"><div class="field"><label>نص الرسالة</label><textarea id="bulkClassMessageText" rows="6" placeholder="اكتبي الرسالة الجماعية هنا...">السلام عليكم ورحمة الله وبركاته، هذه رسالة من بنك الرياضيات بخصوص {الطالب / الطالبة}.</textarea></div><button class="btn btn-gold" onclick="sendBulkClassMessageNow(\''+classId+'\')">إرسال الرسالة الجماعية</button></div>'+
+      '</div>';
+    } else if(action==='delete'){
+      const canDelete = sts.length===0;
+      detail.innerHTML = '<div class="class-action-page">'+
+        '<div class="class-action-bar"><div><h3>حذف الفصل — '+esc(cls.name)+'</h3><p>صفحة مستقلة لتأكيد الحذف مع إبقاء الرجوع السريع إلى بطاقات الفصول.</p></div><button class="ghost" onclick="backClassCardsHome()">رجوع للخلف</button></div>'+
+        '<div class="class-action-grid"><div class="mini"><strong>'+sts.length+'</strong><span>عدد الطلاب / الطالبات الحالي</span></div><div class="mini"><strong>'+money(total)+'</strong><span>إجمالي الأرصدة</span></div></div>'+
+        '<div class="class-action-card"><div class="class-action-danger">'+(canDelete?'سيتم حذف الفصل فقط لأنه فارغ حاليًا.':'لا يمكن حذف هذا الفصل الآن لأنه يحتوي على طلاب / طالبات. أفرغي الفصل أولًا ثم أعيدي المحاولة.')+'</div>'+
+        (canDelete?'<button class="btn" style="background:#c4002f;color:#fff" onclick="confirmDeleteClassNow(\''+classId+'\')">تأكيد حذف الفصل</button>':'<button class="btn btn-light" disabled>الفصل غير قابل للحذف حاليًا</button>')+
+        '</div></div>';
+    }
+  }
+  window.openClassMessagePage = function(classId){ showActionPage(classId,'message'); };
+  window.openClassDeletePage = function(classId){ showActionPage(classId,'delete'); };
+  window.sendBulkClassMessageNow = function(classId){
+    const txt=(document.getElementById('bulkClassMessageText')?.value||'').trim(); if(!txt) return;
+    studentsOf(classId).filter(function(s){return s.guardian;}).forEach(function(s,idx){ setTimeout(function(){ if(typeof openWhatsAppNumber==='function') openWhatsAppNumber(s.guardian, txt.replace('{الطالب / الطالبة}', s.name)); }, idx*250); });
+  };
+  window.confirmDeleteClassNow = function(classId){
+    const clsIndex = classes().findIndex(function(c){return c.id===classId;}); if(clsIndex<0) return;
+    if(!confirm('هل تريدين حذف الفصل نهائيًا؟')) return;
+    bankData.classes.splice(clsIndex,1);
+    if(typeof saveBankData==='function') saveBankData();
+    if(typeof refreshTeacherUI==='function') refreshTeacherUI();
+    backClassCardsHome();
+  };
+  window.backClassCardsHome = function(){
+    state.mode='home'; state.classId=''; state.action='';
+    try{ if(typeof oldCloseClass==='function') oldCloseClass(); }catch(e){}
+    setTimeout(renderHome, 30);
+  };
+  window.openStudentSettingsClass = function(classId){
+    state.mode='class'; state.classId=classId; state.action='open';
+    const cards=getCards(); if(cards) cards.style.display='none';
+    if(typeof oldOpenClass==='function') oldOpenClass(classId);
+  };
+  window.closeStudentSettingsClass = function(){ backClassCardsHome(); };
+  function apply(){ const wrap=getWrap(); if(!wrap) return; renderHome(); }
+  const prevShow=window.showTeacherPane;
+  if(prevShow && !window.__advancedClassActionHooked){
+    window.__advancedClassActionHooked=true;
+    window.showTeacherPane=function(id,btn){ prevShow(id,btn); if(id==='teacherPaneStudents'){ setTimeout(apply,120); } };
+    const prevRefresh=window.refreshTeacherUI;
+    if(prevRefresh){ window.refreshTeacherUI=function(){ prevRefresh(); setTimeout(apply,120); }; }
+    document.addEventListener('DOMContentLoaded', function(){ setTimeout(apply,500); });
+  } else {
+    document.addEventListener('DOMContentLoaded', function(){ setTimeout(apply,500); });
+  }
+})();
+</script>
+
 </body>
 </html>
 
