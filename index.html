@@ -541,6 +541,29 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
 .screen.active{display:block!important;}
 .topbar,.card:first-child,.hero:first-child{margin-top:0!important;}
 </style>
+
+<style id="more-pages-enhancement">
+.more-view{display:none}
+.more-view.active{display:block}
+.more-detail-shell{display:grid;gap:14px}
+.more-back-btn{border:none;background:#fff;border-radius:16px;padding:12px 14px;box-shadow:0 8px 18px rgba(16,58,46,.08);color:var(--deep);font-weight:900;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.more-header-card{background:linear-gradient(135deg,var(--deep),var(--green));color:#fff;border-radius:28px;padding:22px;box-shadow:var(--shadow)}
+.more-header-card h3{margin:0 0 8px;font-size:24px}
+.more-header-card p{margin:0;color:rgba(255,255,255,.92);line-height:1.9;font-size:14px}
+.more-content-card{background:#fff;border:1px solid var(--line);border-radius:24px;padding:18px;box-shadow:0 8px 18px rgba(16,58,46,.05)}
+.more-content-card h4{margin:0 0 10px;color:var(--deep);font-size:18px}
+.more-content-card p{margin:0 0 12px;line-height:2;color:var(--text)}
+.more-content-card p:last-child{margin-bottom:0}
+.more-list{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.more-list li{background:#f8fbf9;border:1px solid var(--line);border-radius:18px;padding:14px 16px;line-height:1.9;color:var(--text)}
+.more-contact-grid{display:grid;gap:12px}
+.more-contact-item{background:#f8fbf9;border:1px solid var(--line);border-radius:18px;padding:14px 16px}
+.more-contact-item strong{display:block;color:var(--deep);margin-bottom:4px}
+.more-contact-item span{display:block;color:var(--text);line-height:1.9}
+.more-footer-custom{text-align:center;color:var(--muted);font-size:14px;line-height:2.1;padding:16px 8px 0}
+.more-footer-custom strong{display:block;color:var(--deep);font-size:18px}
+</style>
+
 </head>
 <body>
 <div class="app">
@@ -1447,24 +1470,97 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
     <div class="brand"><div class="logo">BN</div><div><h1>المزيد</h1><p>روابط وخدمات إضافية</p></div></div>
     <button class="ghost" onclick="go('home')">⌂</button>
   </div>
-  <div class="card">
-    <div class="menu-list">
-      <button type="button" class="menu-item" onclick="openMoreInfo('about')"><div class="left"><div class="circle">👤</div><div><div class="name">من نحن</div><div class="meta">نبذة عن بنك الرياضيات</div></div></div><div>‹</div></button>
-      <button type="button" class="menu-item" onclick="openMoreInfo('contact')"><div class="left"><div class="circle">📞</div><div><div class="name">اتصل بنا</div><div class="meta">قنوات التواصل الرسمية</div></div></div><div>‹</div></button>
-      <button type="button" class="menu-item" onclick="openMoreInfo('settings')"><div class="left"><div class="circle">⚙️</div><div><div class="name">الإعدادات</div><div class="meta">إدارة الحساب والبيانات</div></div></div><div>‹</div></button>
-      <button type="button" class="menu-item" onclick="openMoreInfo('privacy')"><div class="left"><div class="circle">🔒</div><div><div class="name">سياسة الخصوصية</div><div class="meta">استخدام البيانات داخل النظام</div></div></div><div>‹</div></button>
-      <button type="button" class="menu-item" onclick="openMoreInfo('disclaimer')"><div class="left"><div class="circle">⚖️</div><div><div class="name">إخلاء المسؤولية</div><div class="meta">النظام تعليمي تحفيزي وليس ماليًا حقيقيًا</div></div></div><div>‹</div></button>
-      <button type="button" class="menu-item" onclick="openMoreInfo('terms')"><div class="left"><div class="circle">📜</div><div><div class="name">الأحكام والشروط</div><div class="meta">ضوابط استخدام بنك الرياضيات</div></div></div><div>‹</div></button>
+
+  <div id="moreMenuView" class="more-view active">
+    <div class="card">
+      <div class="menu-list">
+        <button type="button" class="menu-item" onclick="openMorePage('about')"><div class="left"><div class="circle">👤</div><div><div class="name">من نحن</div><div class="meta">نبذة عن بنك الرياضيات</div></div></div><div>‹</div></button>
+        <button type="button" class="menu-item" onclick="openMorePage('contact')"><div class="left"><div class="circle">📞</div><div><div class="name">اتصل بنا</div><div class="meta">قنوات التواصل الرسمية</div></div></div><div>‹</div></button>
+        <button type="button" class="menu-item" onclick="openMorePage('settings')"><div class="left"><div class="circle">⚙️</div><div><div class="name">الإعدادات</div><div class="meta">إدارة الحساب والبيانات</div></div></div><div>‹</div></button>
+        <button type="button" class="menu-item" onclick="openMorePage('privacy')"><div class="left"><div class="circle">🔒</div><div><div class="name">سياسة الخصوصية</div><div class="meta">استخدام البيانات داخل النظام</div></div></div><div>‹</div></button>
+        <button type="button" class="menu-item" onclick="openMorePage('disclaimer')"><div class="left"><div class="circle">⚖️</div><div><div class="name">إخلاء المسؤولية</div><div class="meta">النظام تعليمي تحفيزي وليس ماليًا حقيقيًا</div></div></div><div>‹</div></button>
+        <button type="button" class="menu-item" onclick="openMorePage('terms')"><div class="left"><div class="circle">📜</div><div><div class="name">الأحكام والشروط</div><div class="meta">ضوابط استخدام بنك الرياضيات</div></div></div><div>‹</div></button>
+      </div>
+    </div>
+    <div class="card more-footer-custom">
+      <strong>الرياضيات لغة الأذكياء</strong>
+      نحو تعليم محفّز وعقول مفكّرة © بنك الرياضيات – إشراف الأستاذة سارة حقوي<br>
+      🏫 مدرسة رواد الشرق الأهلية
     </div>
   </div>
-  <div id="moreInlineContent" class="card hidden" style="margin-top:12px">
-    <div class="section-head"><h3 id="moreInlineTitle">المحتوى</h3><span class="pill">داخل الصفحة</span></div>
-    <div id="moreInlineBody" class="muted" style="font-size:14px;line-height:2.1"></div>
+
+  <div id="morePage_about" class="more-view">
+    <div class="more-detail-shell">
+      <button class="more-back-btn" type="button" onclick="closeMorePages()">‹ رجوع للخلف</button>
+      <div class="more-header-card"><h3>من نحن</h3><p>نبذة عن بنك الرياضيات</p></div>
+      <div class="more-content-card">
+        <p>بنك الرياضيات منصة تعليمية تحفيزية تهدف إلى تعزيز مشاركة الطلاب داخل الحصة الدراسية من خلال نظام نقاط مستوحى من الأنظمة المصرفية.</p>
+        <p>يمنح البنك الطلاب رصيدًا تحفيزيًا مقابل المشاركة والإنجاز والالتزام، مما يسهم في تنمية روح التنافس الإيجابي وتحفيز التعلم بطريقة ممتعة ومبتكرة.</p>
+        <p>يشرف على بنك الرياضيات<br><strong>الأستاذة: سارة حقوي</strong></p>
+      </div>
+    </div>
   </div>
-  <div class="footer">
-    <div style="font-size:30px;font-weight:900;color:var(--deep);line-height:1.8">الرياضيات لغة الأذكياء</div>
-    <div style="font-size:15px;font-weight:700;line-height:2;color:var(--muted)">نحو تعليم محفّز وعقول مفكّرة © بنك الرياضيات – إشراف الأستاذة سارة حقوي</div>
-    <div style="font-size:15px;font-weight:800;line-height:2;color:var(--muted)">🏫 مدرسة رواد الشرق الأهلية</div>
+
+  <div id="morePage_contact" class="more-view">
+    <div class="more-detail-shell">
+      <button class="more-back-btn" type="button" onclick="closeMorePages()">‹ رجوع للخلف</button>
+      <div class="more-header-card"><h3>اتصل بنا</h3><p>قنوات التواصل الرسمية</p></div>
+      <div class="more-contact-grid">
+        <div class="more-contact-item"><strong>خدمة الطلاب وأولياء الأمور</strong><span>📞 0502234335</span></div>
+        <div class="more-contact-item"><strong>الإدارة العامة</strong><span>📞 0556891201</span></div>
+        <div class="more-contact-item"><strong>البريد الإلكتروني</strong><span>✉ Saramathss@hotmail.com</span></div>
+        <div class="more-contact-item"><strong>الموقع</strong><span>🏫 مدرسة رواد الشرق الأهلية</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="morePage_settings" class="more-view">
+    <div class="more-detail-shell">
+      <button class="more-back-btn" type="button" onclick="closeMorePages()">‹ رجوع للخلف</button>
+      <div class="more-header-card"><h3>الإعدادات</h3><p>إدارة إعدادات الحساب داخل بنك الرياضيات</p></div>
+      <div class="more-content-card">
+        <p>تتيح هذه الصفحة إدارة إعدادات الحساب داخل نظام بنك الرياضيات.</p>
+        <ul class="more-list">
+          <li>تغيير كلمة المرور</li>
+          <li>تعديل بيانات الحساب</li>
+          <li>إدارة الإشعارات داخل النظام</li>
+          <li>تسجيل الخروج من الحساب</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div id="morePage_privacy" class="more-view">
+    <div class="more-detail-shell">
+      <button class="more-back-btn" type="button" onclick="closeMorePages()">‹ رجوع للخلف</button>
+      <div class="more-header-card"><h3>سياسة الخصوصية</h3><p>حماية بيانات المستخدمين داخل النظام</p></div>
+      <div class="more-content-card">
+        <p>يحرص بنك الرياضيات على حماية خصوصية بيانات الطلاب وأولياء الأمور.</p>
+        <p>يتم استخدام المعلومات داخل النظام لأغراض تعليمية فقط، ولا يتم مشاركة أي بيانات خارج إطار المدرسة أو الجهات التعليمية المعنية.</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="morePage_disclaimer" class="more-view">
+    <div class="more-detail-shell">
+      <button class="more-back-btn" type="button" onclick="closeMorePages()">‹ رجوع للخلف</button>
+      <div class="more-header-card"><h3>إخلاء المسؤولية</h3><p>تنويه حول طبيعة النظام</p></div>
+      <div class="more-content-card">
+        <p>بنك الرياضيات نظام تحفيزي تعليمي يهدف إلى تشجيع الطلاب على المشاركة والتفاعل داخل الحصة الدراسية.</p>
+        <p>النقاط والأرصدة المستخدمة داخل النظام هي لأغراض تعليمية وتحفيزية فقط، ولا تمثل أي قيمة مالية حقيقية.</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="morePage_terms" class="more-view">
+    <div class="more-detail-shell">
+      <button class="more-back-btn" type="button" onclick="closeMorePages()">‹ رجوع للخلف</button>
+      <div class="more-header-card"><h3>الأحكام والشروط</h3><p>ضوابط استخدام بنك الرياضيات</p></div>
+      <div class="more-content-card">
+        <p>يهدف بنك الرياضيات إلى تعزيز بيئة تعليمية محفزة داخل الفصل الدراسي.</p>
+        <p>يتم منح النقاط للطلاب وفق معايير تعليمية يحددها المعلم، ويُستخدم النظام كوسيلة تعليمية لتحفيز المشاركة والانضباط وتحقيق التميز.</p>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -3753,6 +3849,29 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
 .screen.active{display:block!important;}
 .topbar,.card:first-child,.hero:first-child{margin-top:0!important;}
 </style>
+
+<style id="more-pages-enhancement">
+.more-view{display:none}
+.more-view.active{display:block}
+.more-detail-shell{display:grid;gap:14px}
+.more-back-btn{border:none;background:#fff;border-radius:16px;padding:12px 14px;box-shadow:0 8px 18px rgba(16,58,46,.08);color:var(--deep);font-weight:900;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.more-header-card{background:linear-gradient(135deg,var(--deep),var(--green));color:#fff;border-radius:28px;padding:22px;box-shadow:var(--shadow)}
+.more-header-card h3{margin:0 0 8px;font-size:24px}
+.more-header-card p{margin:0;color:rgba(255,255,255,.92);line-height:1.9;font-size:14px}
+.more-content-card{background:#fff;border:1px solid var(--line);border-radius:24px;padding:18px;box-shadow:0 8px 18px rgba(16,58,46,.05)}
+.more-content-card h4{margin:0 0 10px;color:var(--deep);font-size:18px}
+.more-content-card p{margin:0 0 12px;line-height:2;color:var(--text)}
+.more-content-card p:last-child{margin-bottom:0}
+.more-list{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.more-list li{background:#f8fbf9;border:1px solid var(--line);border-radius:18px;padding:14px 16px;line-height:1.9;color:var(--text)}
+.more-contact-grid{display:grid;gap:12px}
+.more-contact-item{background:#f8fbf9;border:1px solid var(--line);border-radius:18px;padding:14px 16px}
+.more-contact-item strong{display:block;color:var(--deep);margin-bottom:4px}
+.more-contact-item span{display:block;color:var(--text);line-height:1.9}
+.more-footer-custom{text-align:center;color:var(--muted);font-size:14px;line-height:2.1;padding:16px 8px 0}
+.more-footer-custom strong{display:block;color:var(--deep);font-size:18px}
+</style>
+
 </head><body>'
       + '<h1>تقرير بنك الرياضيات</h1>'
       + '<div class="meta">الطالبة: '+esc(student.name)+'</div>'
@@ -3867,6 +3986,29 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
 .screen.active{display:block!important;}
 .topbar,.card:first-child,.hero:first-child{margin-top:0!important;}
 </style>
+
+<style id="more-pages-enhancement">
+.more-view{display:none}
+.more-view.active{display:block}
+.more-detail-shell{display:grid;gap:14px}
+.more-back-btn{border:none;background:#fff;border-radius:16px;padding:12px 14px;box-shadow:0 8px 18px rgba(16,58,46,.08);color:var(--deep);font-weight:900;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.more-header-card{background:linear-gradient(135deg,var(--deep),var(--green));color:#fff;border-radius:28px;padding:22px;box-shadow:var(--shadow)}
+.more-header-card h3{margin:0 0 8px;font-size:24px}
+.more-header-card p{margin:0;color:rgba(255,255,255,.92);line-height:1.9;font-size:14px}
+.more-content-card{background:#fff;border:1px solid var(--line);border-radius:24px;padding:18px;box-shadow:0 8px 18px rgba(16,58,46,.05)}
+.more-content-card h4{margin:0 0 10px;color:var(--deep);font-size:18px}
+.more-content-card p{margin:0 0 12px;line-height:2;color:var(--text)}
+.more-content-card p:last-child{margin-bottom:0}
+.more-list{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.more-list li{background:#f8fbf9;border:1px solid var(--line);border-radius:18px;padding:14px 16px;line-height:1.9;color:var(--text)}
+.more-contact-grid{display:grid;gap:12px}
+.more-contact-item{background:#f8fbf9;border:1px solid var(--line);border-radius:18px;padding:14px 16px}
+.more-contact-item strong{display:block;color:var(--deep);margin-bottom:4px}
+.more-contact-item span{display:block;color:var(--text);line-height:1.9}
+.more-footer-custom{text-align:center;color:var(--muted);font-size:14px;line-height:2.1;padding:16px 8px 0}
+.more-footer-custom strong{display:block;color:var(--deep);font-size:18px}
+</style>
+
 </head><body><h1>التقرير الشامل - بنك الرياضيات</h1><div class="muted">تم إنشاؤه تلقائيًا من التقارير الذكية</div><div class="grid">${['srStudents','srClasses','srDeposits','srWithdrawals','srTransfers','srTasks','srSubmitted','srPending'].map(id=>{ const el=document.getElementById(id); const label=el&&el.nextElementSibling?el.nextElementSibling.textContent:''; return `<div class="card"><strong>${label}</strong><div style="font-size:24px;margin-top:8px">${el?el.textContent:''}</div></div>`; }).join('')}</div><div class="card"><h3>أفضل الطلاب / الطالبات</h3>${document.getElementById('smartTopStudents')?.innerHTML||''}</div><div class="card"><h3>تحليل الفصول</h3>${document.getElementById('smartClassCards')?.innerHTML||''}</div><div class="card"><h3>التنبيهات الذكية</h3>${document.getElementById('smartAlerts')?.innerHTML||''}</div>
 <script id="smart-reports-override-v7">
 (function(){
@@ -3988,6 +4130,29 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
 .screen.active{display:block!important;}
 .topbar,.card:first-child,.hero:first-child{margin-top:0!important;}
 </style>
+
+<style id="more-pages-enhancement">
+.more-view{display:none}
+.more-view.active{display:block}
+.more-detail-shell{display:grid;gap:14px}
+.more-back-btn{border:none;background:#fff;border-radius:16px;padding:12px 14px;box-shadow:0 8px 18px rgba(16,58,46,.08);color:var(--deep);font-weight:900;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.more-header-card{background:linear-gradient(135deg,var(--deep),var(--green));color:#fff;border-radius:28px;padding:22px;box-shadow:var(--shadow)}
+.more-header-card h3{margin:0 0 8px;font-size:24px}
+.more-header-card p{margin:0;color:rgba(255,255,255,.92);line-height:1.9;font-size:14px}
+.more-content-card{background:#fff;border:1px solid var(--line);border-radius:24px;padding:18px;box-shadow:0 8px 18px rgba(16,58,46,.05)}
+.more-content-card h4{margin:0 0 10px;color:var(--deep);font-size:18px}
+.more-content-card p{margin:0 0 12px;line-height:2;color:var(--text)}
+.more-content-card p:last-child{margin-bottom:0}
+.more-list{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.more-list li{background:#f8fbf9;border:1px solid var(--line);border-radius:18px;padding:14px 16px;line-height:1.9;color:var(--text)}
+.more-contact-grid{display:grid;gap:12px}
+.more-contact-item{background:#f8fbf9;border:1px solid var(--line);border-radius:18px;padding:14px 16px}
+.more-contact-item strong{display:block;color:var(--deep);margin-bottom:4px}
+.more-contact-item span{display:block;color:var(--text);line-height:1.9}
+.more-footer-custom{text-align:center;color:var(--muted);font-size:14px;line-height:2.1;padding:16px 8px 0}
+.more-footer-custom strong{display:block;color:var(--deep);font-size:18px}
+</style>
+
 </head><body><h1>التقرير الشامل - بنك الرياضيات</h1><div class="muted">تم إنشاؤه تلقائيًا من التقارير الذكية</div><div class="grid">${['srStudents','srClasses','srDeposits','srWithdrawals','srTransfers','srTasks','srSubmitted','srPending'].map(id=>{ const el=document.getElementById(id); const label=el&&el.nextElementSibling?el.nextElementSibling.textContent:''; return `<div class="card"><strong>${label}</strong><div style="font-size:24px;margin-top:8px">${el?el.textContent:''}</div></div>`; }).join('')}</div><div class="card"><h3>أفضل الطلاب / الطالبات</h3>${document.getElementById('smartTopStudents')?.innerHTML||''}</div><div class="card"><h3>مؤشر أداء الطالب / الطالبة</h3>${document.getElementById('smartPerformanceIndicators')?.innerHTML||''}</div><div class="card"><h3>تحليل الفصول</h3>${document.getElementById('smartClassCards')?.innerHTML||''}</div><div class="card"><h3>التنبيهات الذكية</h3>${document.getElementById('smartAlerts')?.innerHTML||''}</div>
 <style id="student-settings-pro-style">
 .student-settings-pro{margin-top:16px;display:grid;gap:14px}
@@ -4301,6 +4466,29 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
 .screen.active{display:block!important;}
 .topbar,.card:first-child,.hero:first-child{margin-top:0!important;}
 </style>
+
+<style id="more-pages-enhancement">
+.more-view{display:none}
+.more-view.active{display:block}
+.more-detail-shell{display:grid;gap:14px}
+.more-back-btn{border:none;background:#fff;border-radius:16px;padding:12px 14px;box-shadow:0 8px 18px rgba(16,58,46,.08);color:var(--deep);font-weight:900;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.more-header-card{background:linear-gradient(135deg,var(--deep),var(--green));color:#fff;border-radius:28px;padding:22px;box-shadow:var(--shadow)}
+.more-header-card h3{margin:0 0 8px;font-size:24px}
+.more-header-card p{margin:0;color:rgba(255,255,255,.92);line-height:1.9;font-size:14px}
+.more-content-card{background:#fff;border:1px solid var(--line);border-radius:24px;padding:18px;box-shadow:0 8px 18px rgba(16,58,46,.05)}
+.more-content-card h4{margin:0 0 10px;color:var(--deep);font-size:18px}
+.more-content-card p{margin:0 0 12px;line-height:2;color:var(--text)}
+.more-content-card p:last-child{margin-bottom:0}
+.more-list{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.more-list li{background:#f8fbf9;border:1px solid var(--line);border-radius:18px;padding:14px 16px;line-height:1.9;color:var(--text)}
+.more-contact-grid{display:grid;gap:12px}
+.more-contact-item{background:#f8fbf9;border:1px solid var(--line);border-radius:18px;padding:14px 16px}
+.more-contact-item strong{display:block;color:var(--deep);margin-bottom:4px}
+.more-contact-item span{display:block;color:var(--text);line-height:1.9}
+.more-footer-custom{text-align:center;color:var(--muted);font-size:14px;line-height:2.1;padding:16px 8px 0}
+.more-footer-custom strong{display:block;color:var(--deep);font-size:18px}
+</style>
+
 </head><body><h1>${title}</h1>${bodyHtml}
 <script>
 function goAccountTab(tabId){
@@ -4707,6 +4895,29 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
 .screen.active{display:block!important;}
 .topbar,.card:first-child,.hero:first-child{margin-top:0!important;}
 </style>
+
+<style id="more-pages-enhancement">
+.more-view{display:none}
+.more-view.active{display:block}
+.more-detail-shell{display:grid;gap:14px}
+.more-back-btn{border:none;background:#fff;border-radius:16px;padding:12px 14px;box-shadow:0 8px 18px rgba(16,58,46,.08);color:var(--deep);font-weight:900;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.more-header-card{background:linear-gradient(135deg,var(--deep),var(--green));color:#fff;border-radius:28px;padding:22px;box-shadow:var(--shadow)}
+.more-header-card h3{margin:0 0 8px;font-size:24px}
+.more-header-card p{margin:0;color:rgba(255,255,255,.92);line-height:1.9;font-size:14px}
+.more-content-card{background:#fff;border:1px solid var(--line);border-radius:24px;padding:18px;box-shadow:0 8px 18px rgba(16,58,46,.05)}
+.more-content-card h4{margin:0 0 10px;color:var(--deep);font-size:18px}
+.more-content-card p{margin:0 0 12px;line-height:2;color:var(--text)}
+.more-content-card p:last-child{margin-bottom:0}
+.more-list{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.more-list li{background:#f8fbf9;border:1px solid var(--line);border-radius:18px;padding:14px 16px;line-height:1.9;color:var(--text)}
+.more-contact-grid{display:grid;gap:12px}
+.more-contact-item{background:#f8fbf9;border:1px solid var(--line);border-radius:18px;padding:14px 16px}
+.more-contact-item strong{display:block;color:var(--deep);margin-bottom:4px}
+.more-contact-item span{display:block;color:var(--text);line-height:1.9}
+.more-footer-custom{text-align:center;color:var(--muted);font-size:14px;line-height:2.1;padding:16px 8px 0}
+.more-footer-custom strong{display:block;color:var(--deep);font-size:18px}
+</style>
+
 </head><body><h1>${title}</h1>${bodyHtml}
 <script>
 function goAccountTab(tabId){
@@ -4918,6 +5129,29 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
 .screen.active{display:block!important;}
 .topbar,.card:first-child,.hero:first-child{margin-top:0!important;}
 </style>
+
+<style id="more-pages-enhancement">
+.more-view{display:none}
+.more-view.active{display:block}
+.more-detail-shell{display:grid;gap:14px}
+.more-back-btn{border:none;background:#fff;border-radius:16px;padding:12px 14px;box-shadow:0 8px 18px rgba(16,58,46,.08);color:var(--deep);font-weight:900;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.more-header-card{background:linear-gradient(135deg,var(--deep),var(--green));color:#fff;border-radius:28px;padding:22px;box-shadow:var(--shadow)}
+.more-header-card h3{margin:0 0 8px;font-size:24px}
+.more-header-card p{margin:0;color:rgba(255,255,255,.92);line-height:1.9;font-size:14px}
+.more-content-card{background:#fff;border:1px solid var(--line);border-radius:24px;padding:18px;box-shadow:0 8px 18px rgba(16,58,46,.05)}
+.more-content-card h4{margin:0 0 10px;color:var(--deep);font-size:18px}
+.more-content-card p{margin:0 0 12px;line-height:2;color:var(--text)}
+.more-content-card p:last-child{margin-bottom:0}
+.more-list{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.more-list li{background:#f8fbf9;border:1px solid var(--line);border-radius:18px;padding:14px 16px;line-height:1.9;color:var(--text)}
+.more-contact-grid{display:grid;gap:12px}
+.more-contact-item{background:#f8fbf9;border:1px solid var(--line);border-radius:18px;padding:14px 16px}
+.more-contact-item strong{display:block;color:var(--deep);margin-bottom:4px}
+.more-contact-item span{display:block;color:var(--text);line-height:1.9}
+.more-footer-custom{text-align:center;color:var(--muted);font-size:14px;line-height:2.1;padding:16px 8px 0}
+.more-footer-custom strong{display:block;color:var(--deep);font-size:18px}
+</style>
+
 </head><body><h1>التقرير الشامل - بنك الرياضيات</h1><div class="muted">تم إنشاؤه تلقائيًا من التقارير الذكية</div><div class="grid">${['srStudents','srClasses','srDeposits','srWithdrawals','srTransfers','srTasks','srSubmitted','srPending'].map(id=>{ const el=document.getElementById(id); const label=el&&el.nextElementSibling?el.nextElementSibling.textContent:''; return `<div class="card"><strong>${label}</strong><div style="font-size:24px;margin-top:8px">${el?el.textContent:''}</div></div>`; }).join('')}</div><div class="card"><h3>أفضل الطلاب / الطالبات</h3>${document.getElementById('smartTopStudents')?.innerHTML||''}</div><div class="card"><h3>مؤشر أداء الطالب / الطالبة</h3>${document.getElementById('smartPerformanceIndicators')?.innerHTML||''}</div><div class="card"><h3>تحليل الفصول</h3>${document.getElementById('smartClassCards')?.innerHTML||''}</div><div class="card"><h3>التنبيهات الذكية</h3>${document.getElementById('smartAlerts')?.innerHTML||''}</div>
 <style id="student-settings-pro-style">
 .student-settings-pro{margin-top:16px;display:grid;gap:14px}
@@ -5231,6 +5465,29 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
 .screen.active{display:block!important;}
 .topbar,.card:first-child,.hero:first-child{margin-top:0!important;}
 </style>
+
+<style id="more-pages-enhancement">
+.more-view{display:none}
+.more-view.active{display:block}
+.more-detail-shell{display:grid;gap:14px}
+.more-back-btn{border:none;background:#fff;border-radius:16px;padding:12px 14px;box-shadow:0 8px 18px rgba(16,58,46,.08);color:var(--deep);font-weight:900;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.more-header-card{background:linear-gradient(135deg,var(--deep),var(--green));color:#fff;border-radius:28px;padding:22px;box-shadow:var(--shadow)}
+.more-header-card h3{margin:0 0 8px;font-size:24px}
+.more-header-card p{margin:0;color:rgba(255,255,255,.92);line-height:1.9;font-size:14px}
+.more-content-card{background:#fff;border:1px solid var(--line);border-radius:24px;padding:18px;box-shadow:0 8px 18px rgba(16,58,46,.05)}
+.more-content-card h4{margin:0 0 10px;color:var(--deep);font-size:18px}
+.more-content-card p{margin:0 0 12px;line-height:2;color:var(--text)}
+.more-content-card p:last-child{margin-bottom:0}
+.more-list{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.more-list li{background:#f8fbf9;border:1px solid var(--line);border-radius:18px;padding:14px 16px;line-height:1.9;color:var(--text)}
+.more-contact-grid{display:grid;gap:12px}
+.more-contact-item{background:#f8fbf9;border:1px solid var(--line);border-radius:18px;padding:14px 16px}
+.more-contact-item strong{display:block;color:var(--deep);margin-bottom:4px}
+.more-contact-item span{display:block;color:var(--text);line-height:1.9}
+.more-footer-custom{text-align:center;color:var(--muted);font-size:14px;line-height:2.1;padding:16px 8px 0}
+.more-footer-custom strong{display:block;color:var(--deep);font-size:18px}
+</style>
+
 </head><body><h1>${title}</h1>${bodyHtml}
 <script>
 function goAccountTab(tabId){
@@ -5637,6 +5894,29 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
 .screen.active{display:block!important;}
 .topbar,.card:first-child,.hero:first-child{margin-top:0!important;}
 </style>
+
+<style id="more-pages-enhancement">
+.more-view{display:none}
+.more-view.active{display:block}
+.more-detail-shell{display:grid;gap:14px}
+.more-back-btn{border:none;background:#fff;border-radius:16px;padding:12px 14px;box-shadow:0 8px 18px rgba(16,58,46,.08);color:var(--deep);font-weight:900;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.more-header-card{background:linear-gradient(135deg,var(--deep),var(--green));color:#fff;border-radius:28px;padding:22px;box-shadow:var(--shadow)}
+.more-header-card h3{margin:0 0 8px;font-size:24px}
+.more-header-card p{margin:0;color:rgba(255,255,255,.92);line-height:1.9;font-size:14px}
+.more-content-card{background:#fff;border:1px solid var(--line);border-radius:24px;padding:18px;box-shadow:0 8px 18px rgba(16,58,46,.05)}
+.more-content-card h4{margin:0 0 10px;color:var(--deep);font-size:18px}
+.more-content-card p{margin:0 0 12px;line-height:2;color:var(--text)}
+.more-content-card p:last-child{margin-bottom:0}
+.more-list{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.more-list li{background:#f8fbf9;border:1px solid var(--line);border-radius:18px;padding:14px 16px;line-height:1.9;color:var(--text)}
+.more-contact-grid{display:grid;gap:12px}
+.more-contact-item{background:#f8fbf9;border:1px solid var(--line);border-radius:18px;padding:14px 16px}
+.more-contact-item strong{display:block;color:var(--deep);margin-bottom:4px}
+.more-contact-item span{display:block;color:var(--text);line-height:1.9}
+.more-footer-custom{text-align:center;color:var(--muted);font-size:14px;line-height:2.1;padding:16px 8px 0}
+.more-footer-custom strong{display:block;color:var(--deep);font-size:18px}
+</style>
+
 </head><body><h1>${title}</h1>${bodyHtml}
 <script>
 function goAccountTab(tabId){
@@ -5793,6 +6073,29 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
 .screen.active{display:block!important;}
 .topbar,.card:first-child,.hero:first-child{margin-top:0!important;}
 </style>
+
+<style id="more-pages-enhancement">
+.more-view{display:none}
+.more-view.active{display:block}
+.more-detail-shell{display:grid;gap:14px}
+.more-back-btn{border:none;background:#fff;border-radius:16px;padding:12px 14px;box-shadow:0 8px 18px rgba(16,58,46,.08);color:var(--deep);font-weight:900;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.more-header-card{background:linear-gradient(135deg,var(--deep),var(--green));color:#fff;border-radius:28px;padding:22px;box-shadow:var(--shadow)}
+.more-header-card h3{margin:0 0 8px;font-size:24px}
+.more-header-card p{margin:0;color:rgba(255,255,255,.92);line-height:1.9;font-size:14px}
+.more-content-card{background:#fff;border:1px solid var(--line);border-radius:24px;padding:18px;box-shadow:0 8px 18px rgba(16,58,46,.05)}
+.more-content-card h4{margin:0 0 10px;color:var(--deep);font-size:18px}
+.more-content-card p{margin:0 0 12px;line-height:2;color:var(--text)}
+.more-content-card p:last-child{margin-bottom:0}
+.more-list{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.more-list li{background:#f8fbf9;border:1px solid var(--line);border-radius:18px;padding:14px 16px;line-height:1.9;color:var(--text)}
+.more-contact-grid{display:grid;gap:12px}
+.more-contact-item{background:#f8fbf9;border:1px solid var(--line);border-radius:18px;padding:14px 16px}
+.more-contact-item strong{display:block;color:var(--deep);margin-bottom:4px}
+.more-contact-item span{display:block;color:var(--text);line-height:1.9}
+.more-footer-custom{text-align:center;color:var(--muted);font-size:14px;line-height:2.1;padding:16px 8px 0}
+.more-footer-custom strong{display:block;color:var(--deep);font-size:18px}
+</style>
+
 </head><body><h1>التقرير الشامل - بنك الرياضيات</h1><div class="muted">تم إنشاؤه تلقائيًا من التقارير الذكية</div><div class="grid">${['srStudents','srClasses','srDeposits','srWithdrawals','srTransfers','srTasks','srSubmitted','srPending'].map(id=>{ const el=document.getElementById(id); const label=el&&el.nextElementSibling?el.nextElementSibling.textContent:''; return `<div class="card"><strong>${label}</strong><div style="font-size:24px;margin-top:8px">${el?el.textContent:''}</div></div>`; }).join('')}</div><div class="card"><h3>أفضل الطلاب / الطالبات</h3>${document.getElementById('smartTopStudents')?.innerHTML||''}</div><div class="card"><h3>تحليل الفصول</h3>${document.getElementById('smartClassCards')?.innerHTML||''}</div><div class="card"><h3>التنبيهات الذكية</h3>${document.getElementById('smartAlerts')?.innerHTML||''}</div>
 <script id="smart-reports-override-v7">
 (function(){
@@ -5914,6 +6217,29 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
 .screen.active{display:block!important;}
 .topbar,.card:first-child,.hero:first-child{margin-top:0!important;}
 </style>
+
+<style id="more-pages-enhancement">
+.more-view{display:none}
+.more-view.active{display:block}
+.more-detail-shell{display:grid;gap:14px}
+.more-back-btn{border:none;background:#fff;border-radius:16px;padding:12px 14px;box-shadow:0 8px 18px rgba(16,58,46,.08);color:var(--deep);font-weight:900;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.more-header-card{background:linear-gradient(135deg,var(--deep),var(--green));color:#fff;border-radius:28px;padding:22px;box-shadow:var(--shadow)}
+.more-header-card h3{margin:0 0 8px;font-size:24px}
+.more-header-card p{margin:0;color:rgba(255,255,255,.92);line-height:1.9;font-size:14px}
+.more-content-card{background:#fff;border:1px solid var(--line);border-radius:24px;padding:18px;box-shadow:0 8px 18px rgba(16,58,46,.05)}
+.more-content-card h4{margin:0 0 10px;color:var(--deep);font-size:18px}
+.more-content-card p{margin:0 0 12px;line-height:2;color:var(--text)}
+.more-content-card p:last-child{margin-bottom:0}
+.more-list{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.more-list li{background:#f8fbf9;border:1px solid var(--line);border-radius:18px;padding:14px 16px;line-height:1.9;color:var(--text)}
+.more-contact-grid{display:grid;gap:12px}
+.more-contact-item{background:#f8fbf9;border:1px solid var(--line);border-radius:18px;padding:14px 16px}
+.more-contact-item strong{display:block;color:var(--deep);margin-bottom:4px}
+.more-contact-item span{display:block;color:var(--text);line-height:1.9}
+.more-footer-custom{text-align:center;color:var(--muted);font-size:14px;line-height:2.1;padding:16px 8px 0}
+.more-footer-custom strong{display:block;color:var(--deep);font-size:18px}
+</style>
+
 </head><body><h1>التقرير الشامل - بنك الرياضيات</h1><div class="muted">تم إنشاؤه تلقائيًا من التقارير الذكية</div><div class="grid">${['srStudents','srClasses','srDeposits','srWithdrawals','srTransfers','srTasks','srSubmitted','srPending'].map(id=>{ const el=document.getElementById(id); const label=el&&el.nextElementSibling?el.nextElementSibling.textContent:''; return `<div class="card"><strong>${label}</strong><div style="font-size:24px;margin-top:8px">${el?el.textContent:''}</div></div>`; }).join('')}</div><div class="card"><h3>أفضل الطلاب / الطالبات</h3>${document.getElementById('smartTopStudents')?.innerHTML||''}</div><div class="card"><h3>مؤشر أداء الطالب / الطالبة</h3>${document.getElementById('smartPerformanceIndicators')?.innerHTML||''}</div><div class="card"><h3>تحليل الفصول</h3>${document.getElementById('smartClassCards')?.innerHTML||''}</div><div class="card"><h3>التنبيهات الذكية</h3>${document.getElementById('smartAlerts')?.innerHTML||''}</div>
 <style id="student-settings-pro-style">
 .student-settings-pro{margin-top:16px;display:grid;gap:14px}
@@ -6227,6 +6553,29 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
 .screen.active{display:block!important;}
 .topbar,.card:first-child,.hero:first-child{margin-top:0!important;}
 </style>
+
+<style id="more-pages-enhancement">
+.more-view{display:none}
+.more-view.active{display:block}
+.more-detail-shell{display:grid;gap:14px}
+.more-back-btn{border:none;background:#fff;border-radius:16px;padding:12px 14px;box-shadow:0 8px 18px rgba(16,58,46,.08);color:var(--deep);font-weight:900;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.more-header-card{background:linear-gradient(135deg,var(--deep),var(--green));color:#fff;border-radius:28px;padding:22px;box-shadow:var(--shadow)}
+.more-header-card h3{margin:0 0 8px;font-size:24px}
+.more-header-card p{margin:0;color:rgba(255,255,255,.92);line-height:1.9;font-size:14px}
+.more-content-card{background:#fff;border:1px solid var(--line);border-radius:24px;padding:18px;box-shadow:0 8px 18px rgba(16,58,46,.05)}
+.more-content-card h4{margin:0 0 10px;color:var(--deep);font-size:18px}
+.more-content-card p{margin:0 0 12px;line-height:2;color:var(--text)}
+.more-content-card p:last-child{margin-bottom:0}
+.more-list{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.more-list li{background:#f8fbf9;border:1px solid var(--line);border-radius:18px;padding:14px 16px;line-height:1.9;color:var(--text)}
+.more-contact-grid{display:grid;gap:12px}
+.more-contact-item{background:#f8fbf9;border:1px solid var(--line);border-radius:18px;padding:14px 16px}
+.more-contact-item strong{display:block;color:var(--deep);margin-bottom:4px}
+.more-contact-item span{display:block;color:var(--text);line-height:1.9}
+.more-footer-custom{text-align:center;color:var(--muted);font-size:14px;line-height:2.1;padding:16px 8px 0}
+.more-footer-custom strong{display:block;color:var(--deep);font-size:18px}
+</style>
+
 </head><body><h1>${title}</h1>${bodyHtml}
 <script>
 function goAccountTab(tabId){
@@ -6633,6 +6982,29 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
 .screen.active{display:block!important;}
 .topbar,.card:first-child,.hero:first-child{margin-top:0!important;}
 </style>
+
+<style id="more-pages-enhancement">
+.more-view{display:none}
+.more-view.active{display:block}
+.more-detail-shell{display:grid;gap:14px}
+.more-back-btn{border:none;background:#fff;border-radius:16px;padding:12px 14px;box-shadow:0 8px 18px rgba(16,58,46,.08);color:var(--deep);font-weight:900;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.more-header-card{background:linear-gradient(135deg,var(--deep),var(--green));color:#fff;border-radius:28px;padding:22px;box-shadow:var(--shadow)}
+.more-header-card h3{margin:0 0 8px;font-size:24px}
+.more-header-card p{margin:0;color:rgba(255,255,255,.92);line-height:1.9;font-size:14px}
+.more-content-card{background:#fff;border:1px solid var(--line);border-radius:24px;padding:18px;box-shadow:0 8px 18px rgba(16,58,46,.05)}
+.more-content-card h4{margin:0 0 10px;color:var(--deep);font-size:18px}
+.more-content-card p{margin:0 0 12px;line-height:2;color:var(--text)}
+.more-content-card p:last-child{margin-bottom:0}
+.more-list{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.more-list li{background:#f8fbf9;border:1px solid var(--line);border-radius:18px;padding:14px 16px;line-height:1.9;color:var(--text)}
+.more-contact-grid{display:grid;gap:12px}
+.more-contact-item{background:#f8fbf9;border:1px solid var(--line);border-radius:18px;padding:14px 16px}
+.more-contact-item strong{display:block;color:var(--deep);margin-bottom:4px}
+.more-contact-item span{display:block;color:var(--text);line-height:1.9}
+.more-footer-custom{text-align:center;color:var(--muted);font-size:14px;line-height:2.1;padding:16px 8px 0}
+.more-footer-custom strong{display:block;color:var(--deep);font-size:18px}
+</style>
+
 </head><body><h1>${title}</h1>${bodyHtml}
 <script>
 function goAccountTab(tabId){
@@ -6844,6 +7216,29 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
 .screen.active{display:block!important;}
 .topbar,.card:first-child,.hero:first-child{margin-top:0!important;}
 </style>
+
+<style id="more-pages-enhancement">
+.more-view{display:none}
+.more-view.active{display:block}
+.more-detail-shell{display:grid;gap:14px}
+.more-back-btn{border:none;background:#fff;border-radius:16px;padding:12px 14px;box-shadow:0 8px 18px rgba(16,58,46,.08);color:var(--deep);font-weight:900;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.more-header-card{background:linear-gradient(135deg,var(--deep),var(--green));color:#fff;border-radius:28px;padding:22px;box-shadow:var(--shadow)}
+.more-header-card h3{margin:0 0 8px;font-size:24px}
+.more-header-card p{margin:0;color:rgba(255,255,255,.92);line-height:1.9;font-size:14px}
+.more-content-card{background:#fff;border:1px solid var(--line);border-radius:24px;padding:18px;box-shadow:0 8px 18px rgba(16,58,46,.05)}
+.more-content-card h4{margin:0 0 10px;color:var(--deep);font-size:18px}
+.more-content-card p{margin:0 0 12px;line-height:2;color:var(--text)}
+.more-content-card p:last-child{margin-bottom:0}
+.more-list{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.more-list li{background:#f8fbf9;border:1px solid var(--line);border-radius:18px;padding:14px 16px;line-height:1.9;color:var(--text)}
+.more-contact-grid{display:grid;gap:12px}
+.more-contact-item{background:#f8fbf9;border:1px solid var(--line);border-radius:18px;padding:14px 16px}
+.more-contact-item strong{display:block;color:var(--deep);margin-bottom:4px}
+.more-contact-item span{display:block;color:var(--text);line-height:1.9}
+.more-footer-custom{text-align:center;color:var(--muted);font-size:14px;line-height:2.1;padding:16px 8px 0}
+.more-footer-custom strong{display:block;color:var(--deep);font-size:18px}
+</style>
+
 </head><body><h1>التقرير الشامل - بنك الرياضيات</h1><div class="muted">تم إنشاؤه تلقائيًا من التقارير الذكية</div><div class="grid">${['srStudents','srClasses','srDeposits','srWithdrawals','srTransfers','srTasks','srSubmitted','srPending'].map(id=>{ const el=document.getElementById(id); const label=el&&el.nextElementSibling?el.nextElementSibling.textContent:''; return `<div class="card"><strong>${label}</strong><div style="font-size:24px;margin-top:8px">${el?el.textContent:''}</div></div>`; }).join('')}</div><div class="card"><h3>أفضل الطلاب / الطالبات</h3>${document.getElementById('smartTopStudents')?.innerHTML||''}</div><div class="card"><h3>مؤشر أداء الطالب / الطالبة</h3>${document.getElementById('smartPerformanceIndicators')?.innerHTML||''}</div><div class="card"><h3>تحليل الفصول</h3>${document.getElementById('smartClassCards')?.innerHTML||''}</div><div class="card"><h3>التنبيهات الذكية</h3>${document.getElementById('smartAlerts')?.innerHTML||''}</div>
 <style id="student-settings-pro-style">
 .student-settings-pro{margin-top:16px;display:grid;gap:14px}
@@ -7157,6 +7552,29 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
 .screen.active{display:block!important;}
 .topbar,.card:first-child,.hero:first-child{margin-top:0!important;}
 </style>
+
+<style id="more-pages-enhancement">
+.more-view{display:none}
+.more-view.active{display:block}
+.more-detail-shell{display:grid;gap:14px}
+.more-back-btn{border:none;background:#fff;border-radius:16px;padding:12px 14px;box-shadow:0 8px 18px rgba(16,58,46,.08);color:var(--deep);font-weight:900;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.more-header-card{background:linear-gradient(135deg,var(--deep),var(--green));color:#fff;border-radius:28px;padding:22px;box-shadow:var(--shadow)}
+.more-header-card h3{margin:0 0 8px;font-size:24px}
+.more-header-card p{margin:0;color:rgba(255,255,255,.92);line-height:1.9;font-size:14px}
+.more-content-card{background:#fff;border:1px solid var(--line);border-radius:24px;padding:18px;box-shadow:0 8px 18px rgba(16,58,46,.05)}
+.more-content-card h4{margin:0 0 10px;color:var(--deep);font-size:18px}
+.more-content-card p{margin:0 0 12px;line-height:2;color:var(--text)}
+.more-content-card p:last-child{margin-bottom:0}
+.more-list{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.more-list li{background:#f8fbf9;border:1px solid var(--line);border-radius:18px;padding:14px 16px;line-height:1.9;color:var(--text)}
+.more-contact-grid{display:grid;gap:12px}
+.more-contact-item{background:#f8fbf9;border:1px solid var(--line);border-radius:18px;padding:14px 16px}
+.more-contact-item strong{display:block;color:var(--deep);margin-bottom:4px}
+.more-contact-item span{display:block;color:var(--text);line-height:1.9}
+.more-footer-custom{text-align:center;color:var(--muted);font-size:14px;line-height:2.1;padding:16px 8px 0}
+.more-footer-custom strong{display:block;color:var(--deep);font-size:18px}
+</style>
+
 </head><body><h1>${title}</h1>${bodyHtml}
 <script>
 function goAccountTab(tabId){
@@ -7563,6 +7981,29 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
 .screen.active{display:block!important;}
 .topbar,.card:first-child,.hero:first-child{margin-top:0!important;}
 </style>
+
+<style id="more-pages-enhancement">
+.more-view{display:none}
+.more-view.active{display:block}
+.more-detail-shell{display:grid;gap:14px}
+.more-back-btn{border:none;background:#fff;border-radius:16px;padding:12px 14px;box-shadow:0 8px 18px rgba(16,58,46,.08);color:var(--deep);font-weight:900;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.more-header-card{background:linear-gradient(135deg,var(--deep),var(--green));color:#fff;border-radius:28px;padding:22px;box-shadow:var(--shadow)}
+.more-header-card h3{margin:0 0 8px;font-size:24px}
+.more-header-card p{margin:0;color:rgba(255,255,255,.92);line-height:1.9;font-size:14px}
+.more-content-card{background:#fff;border:1px solid var(--line);border-radius:24px;padding:18px;box-shadow:0 8px 18px rgba(16,58,46,.05)}
+.more-content-card h4{margin:0 0 10px;color:var(--deep);font-size:18px}
+.more-content-card p{margin:0 0 12px;line-height:2;color:var(--text)}
+.more-content-card p:last-child{margin-bottom:0}
+.more-list{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.more-list li{background:#f8fbf9;border:1px solid var(--line);border-radius:18px;padding:14px 16px;line-height:1.9;color:var(--text)}
+.more-contact-grid{display:grid;gap:12px}
+.more-contact-item{background:#f8fbf9;border:1px solid var(--line);border-radius:18px;padding:14px 16px}
+.more-contact-item strong{display:block;color:var(--deep);margin-bottom:4px}
+.more-contact-item span{display:block;color:var(--text);line-height:1.9}
+.more-footer-custom{text-align:center;color:var(--muted);font-size:14px;line-height:2.1;padding:16px 8px 0}
+.more-footer-custom strong{display:block;color:var(--deep);font-size:18px}
+</style>
+
 </head><body><h1>${title}</h1>${bodyHtml}
 <script>
 function goAccountTab(tabId){
@@ -8676,98 +9117,24 @@ function openMoreInfo(type){
 })();
 </script>
 
-<style id="oai-more-inline-style">
-#moreInlineContent ul{margin:10px 0 0;padding-right:18px}
-#moreInlineContent li{margin:6px 0}
-</style>
-<script id="oai-final-safe-fixes">
-(function(){
-  window.goAccountTab=function(tabId){
-    try{
-      if(typeof go==='function'){ go('account'); }
-      setTimeout(function(){
-        var tabs=document.querySelectorAll('#account .tabbar button');
-        var map={statement:0,latest:1,operations:2,detailsTab:3,upgradeTab:4,pdfTab:5,rouletteTab:6,analysisTab:7,performanceStudentTab:8};
-        var btn=(typeof map[tabId] !== 'undefined') ? tabs[map[tabId]] : null;
-        if(typeof showTab==='function'){ showTab(tabId, btn); }
-        var target=document.getElementById(tabId);
-        if(target && target.scrollIntoView){ target.scrollIntoView({behavior:'smooth',block:'start'}); }
-      },150);
-    }catch(e){ console.log(e); }
-  };
 
-  function buildMore(type){
-    var title='';
-    var body='';
-    if(type==='about'){
-      title='من نحن';
-      body=`
-      <p><strong>من نحن</strong></p>
-      <p>بنك الرياضيات منصة تعليمية تحفيزية تهدف إلى تعزيز مشاركة الطلاب داخل الحصة الدراسية من خلال نظام نقاط مستوحى من الأنظمة المصرفية.</p>
-      <p>يمنح البنك الطلاب رصيدًا تحفيزيًا مقابل المشاركة والإنجاز والالتزام، مما يسهم في تنمية روح التنافس الإيجابي وتحفيز التعلم بطريقة ممتعة ومبتكرة.</p>
-      <p>يشرف على بنك الرياضيات<br>الأستاذة: سارة حقوي</p>`;
-    }
-    if(type==='contact'){
-      title='اتصل بنا';
-      body=`
-      <p><strong>اتصل بنا</strong></p>
-      <p>للاستفسارات أو الملاحظات يمكنكم التواصل مع إدارة بنك الرياضيات عبر الوسائل التالية:</p>
-      <p>خدمة الطلاب وأولياء الأمور<br>📞 0502234335</p>
-      <p>الإدارة العامة<br>📞 0556891201</p>
-      <p>البريد الإلكتروني<br>✉ Saramathss@hotmail.com</p>
-      <p>الموقع<br>🏫 مدرسة رواد الشرق الأهلية</p>`;
-    }
-    if(type==='settings'){
-      title='الإعدادات';
-      body=`
-      <p><strong>الإعدادات</strong></p>
-      <p>تتيح هذه الصفحة إدارة إعدادات الحساب داخل نظام بنك الرياضيات.</p>
-      <p>يمكنك من خلال هذه الصفحة:</p>
-      <ul>
-        <li>تغيير كلمة المرور</li>
-        <li>تعديل بيانات الحساب</li>
-        <li>إدارة الإشعارات داخل النظام</li>
-        <li>تسجيل الخروج من الحساب</li>
-      </ul>`;
-    }
-    if(type==='privacy'){
-      title='سياسة الخصوصية';
-      body=`
-      <p><strong>سياسة الخصوصية</strong></p>
-      <p>يحرص بنك الرياضيات على حماية خصوصية بيانات الطلاب وأولياء الأمور.</p>
-      <p>يتم استخدام المعلومات داخل النظام لأغراض تعليمية فقط، ولا يتم مشاركة أي بيانات خارج إطار المدرسة أو الجهات التعليمية المعنية.</p>`;
-    }
-    if(type==='disclaimer'){
-      title='إخلاء المسؤولية';
-      body=`
-      <p><strong>إخلاء المسؤولية</strong></p>
-      <p>بنك الرياضيات نظام تحفيزي تعليمي يهدف إلى تشجيع الطلاب على المشاركة والتفاعل داخل الحصة الدراسية.</p>
-      <p>النقاط والأرصدة المستخدمة داخل النظام هي لأغراض تعليمية وتحفيزية فقط، ولا تمثل أي قيمة مالية حقيقية.</p>`;
-    }
-    if(type==='terms'){
-      title='الأحكام والشروط';
-      body=`
-      <p><strong>الأحكام والشروط</strong></p>
-      <p>يهدف بنك الرياضيات إلى تعزيز بيئة تعليمية محفزة داخل الفصل الدراسي.</p>
-      <p>يتم منح النقاط للطلاب وفق معايير تعليمية يحددها المعلم، ويُستخدم النظام كوسيلة تعليمية لتحفيز المشاركة والانضباط وتحقيق التميز.</p>`;
-    }
-    return {title:title, body:body};
-  }
-
-  window.openMoreInfo=function(type){
-    try{
-      if(typeof go==='function'){ go('more'); }
-      var box=document.getElementById('moreInlineContent');
-      var title=document.getElementById('moreInlineTitle');
-      var body=document.getElementById('moreInlineBody');
-      var data=buildMore(type);
-      if(box && title && body){
-        title.textContent=data.title || 'المحتوى';
-        body.innerHTML=data.body || '';
-        box.classList.remove('hidden');
-        setTimeout(function(){ box.scrollIntoView({behavior:'smooth',block:'start'}); },80);
-      }
-    }catch(e){ console.log(e); }
-  };
-})();
+<script id="more-page-script-fix">
+function closeMorePages(){
+  try{
+    document.querySelectorAll('#more .more-view').forEach(function(el){el.classList.remove('active');});
+    var menu=document.getElementById('moreMenuView'); if(menu) menu.classList.add('active');
+    window.scrollTo({top:0,behavior:'smooth'});
+  }catch(e){console.log(e);}
+}
+function openMorePage(type){
+  try{
+    document.querySelectorAll('#more .more-view').forEach(function(el){el.classList.remove('active');});
+    var page=document.getElementById('morePage_'+type);
+    if(page) page.classList.add('active');
+    else{ var menu=document.getElementById('moreMenuView'); if(menu) menu.classList.add('active'); }
+    window.scrollTo({top:0,behavior:'smooth'});
+  }catch(e){console.log(e);}
+}
+function openMoreInfo(type){ openMorePage(type); }
 </script>
+
