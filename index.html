@@ -9709,3 +9709,60 @@ function openMoreInfo(type){
   document.addEventListener('DOMContentLoaded', function(){ rerenderSettings(); });
 })();
 </script>
+
+<script id="advanced-router-fix-v1">
+(function(){
+  function ensureAdvancedVisible(){
+    try{
+      const pane=document.getElementById('teacherPaneStudents');
+      const slot=document.getElementById('studentsRouterSlot');
+      if(!pane||!slot) return;
+      const adv=(pane.__advancedWrap)||document.getElementById('studentSettingsProWrap');
+      if(!adv) return;
+      adv.style.display='grid';
+      adv.classList.remove('hidden');
+      const cards=adv.querySelector('#studentClassCards');
+      const detail=adv.querySelector('#studentClassDetail');
+      if(cards) cards.style.display='grid';
+      if(detail && !detail.innerHTML.trim()) detail.classList.add('hidden');
+      if(adv.parentElement!==slot) slot.appendChild(adv);
+      if(typeof window.__oldRenderStudentSettingsDashboard==='function'){
+        try{ window.__oldRenderStudentSettingsDashboard(); }catch(e){}
+      }else if(typeof window.renderStudentSettingsDashboardBase==='function'){
+        try{ window.renderStudentSettingsDashboardBase(); }catch(e){}
+      }
+      const titleEl=document.getElementById('studentsRouterTitle');
+      const descEl=document.getElementById('studentsRouterDesc');
+      if(titleEl) titleEl.textContent='لوحة تحكم متقدمة';
+      if(descEl) descEl.textContent='بطاقات الفصول وصفحات الطلاب / الطالبات الفردية والجماعية داخل لوحة مستقلة أكثر احترافية.';
+    }catch(e){ console.log(e); }
+  }
+  const prevOpen=window.openStudentsManagerCard;
+  window.openStudentsManagerCard=function(kind){
+    if(typeof prevOpen==='function') prevOpen(kind);
+    if(kind==='advanced') setTimeout(ensureAdvancedVisible, 60);
+  };
+  const prevBack=window.backStudentsManagerHome;
+  window.backStudentsManagerHome=function(){
+    if(typeof prevBack==='function') prevBack();
+    const pane=document.getElementById('teacherPaneStudents');
+    const adv=(pane&&pane.__advancedWrap)||document.getElementById('studentSettingsProWrap');
+    if(adv && adv.parentElement && adv.parentElement.id==='studentsRouterSlot') adv.style.display='none';
+  };
+  const prevShow=window.showTeacherPane;
+  window.showTeacherPane=function(id,btn){
+    if(typeof prevShow==='function') prevShow(id,btn);
+    if(id==='teacherPaneStudents') setTimeout(function(){
+      const home=document.getElementById('studentsRouterHome');
+      const detail=document.getElementById('studentsRouterDetail');
+      const slot=document.getElementById('studentsRouterSlot');
+      if(home) home.style.display='grid';
+      if(detail) detail.classList.remove('active');
+      if(slot) slot.innerHTML='';
+      const pane=document.getElementById('teacherPaneStudents');
+      const adv=(pane&&pane.__advancedWrap)||document.getElementById('studentSettingsProWrap');
+      if(adv) adv.style.display='none';
+    },120);
+  };
+})();
+</script>
