@@ -4256,7 +4256,145 @@ window.addEventListener('load', function(){
   };
   function openPrintWindow(title, bodyHtml){
     const w = window.open('', '_blank'); if(!w) return;
-    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}</body></html>`);
+    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}
+
+<style id="operation-reasons-style">
+.operation-modal{position:fixed;inset:0;background:rgba(0,0,0,.38);display:none;align-items:center;justify-content:center;z-index:99999;padding:24px}
+.operation-modal.show{display:flex}
+.operation-box{width:min(420px,100%);background:#fff;border-radius:28px;padding:22px;border:1px solid rgba(16,58,46,.08);box-shadow:0 24px 60px rgba(0,0,0,.22)}
+.operation-box h3{margin:0 0 8px;color:var(--deep);font-size:22px}
+.operation-box p{margin:0 0 14px;color:var(--muted);font-size:13px;line-height:1.8}
+.operation-box .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.operation-box textarea{border:1px solid var(--line);background:#f8fbf9;border-radius:16px;padding:14px 14px;font-size:14px;outline:none;font-family:inherit}
+</style>
+<div id="operationReasonModal" class="operation-modal" aria-hidden="true">
+  <div class="operation-box">
+    <h3 id="operationReasonTitle">تنفيذ العملية</h3>
+    <p id="operationReasonDesc">اختاري نوع العملية والسبب ثم حددي المبلغ.</p>
+    <div class="field" id="operationTypeWrap"><label>نوع العملية</label>
+      <select id="operationReasonType">
+        <option value="deposit">إيداع</option>
+        <option value="withdraw">سحب</option>
+      </select>
+    </div>
+    <div class="field"><label>السبب</label>
+      <select id="operationReasonSelect"></select>
+    </div>
+    <div class="field" id="operationOtherWrap" style="display:none"><label>سبب آخر</label><textarea id="operationOtherText" rows="3" placeholder="اكتبي السبب هنا"></textarea></div>
+    <div class="field"><label>المبلغ</label><input id="operationAmountInput" type="number" min="1" placeholder="أدخلي المبلغ"></div>
+    <div class="actions">
+      <button class="btn btn-light" type="button" onclick="closeOperationReasonModal()">إلغاء</button>
+      <button class="btn btn-green" type="button" onclick="saveOperationReasonModal()">تنفيذ</button>
+    </div>
+  </div>
+</div>
+<script id="operation-reasons-script">
+(function(){
+  const DEPOSIT_REASONS = [
+    'مشاركة مميزة في الحصة','حل سؤال صعب','مساعدة زميل / زميلة','إنهاء المهمة الأدائية','تسليم الواجب مبكرًا','الحصول على درجة كاملة','الفوز في تحدي الرياضيات','ترتيب الدفتر','الالتزام والهدوء في الحصة','مبادرة إيجابية','حضور كامل الأسبوع','تميز في العمل الجماعي','أخرى'
+  ];
+  const WITHDRAW_REASONS = [
+    'عدم حل الواجب','التأخر عن الحصة','كثرة الكلام أثناء الشرح','عدم إحضار الأدوات','عدم المشاركة','مخالفة تعليمات الصف','عدم تسليم المهمة الأدائية','إزعاج الزملاء','استخدام الجوال','سحب سلوكي','أخرى'
+  ];
+  const state = {mode:'student', studentId:'', classId:'', fixedType:''};
+
+  function getReasonOptions(type){ return type==='withdraw' ? WITHDRAW_REASONS : DEPOSIT_REASONS; }
+  function reasonDefault(type){ return type==='withdraw' ? 'سحب جماعي' : 'مكافأة جماعية'; }
+  function fillReasonOptions(type){
+    const sel = document.getElementById('operationReasonSelect'); if(!sel) return;
+    sel.innerHTML = '<option value="">اختاري السبب</option>' + getReasonOptions(type).map(r=>'<option value="'+r+'">'+r+'</option>').join('');
+    toggleOtherOperationReason();
+  }
+  window.toggleOtherOperationReason = function(){
+    const val = document.getElementById('operationReasonSelect')?.value;
+    const wrap = document.getElementById('operationOtherWrap');
+    if(wrap) wrap.style.display = val==='أخرى' ? 'block' : 'none';
+  };
+  function openModal(title, desc, fixedType){
+    state.fixedType = fixedType || '';
+    const modal = document.getElementById('operationReasonModal');
+    const titleEl = document.getElementById('operationReasonTitle');
+    const descEl = document.getElementById('operationReasonDesc');
+    const typeWrap = document.getElementById('operationTypeWrap');
+    const typeSel = document.getElementById('operationReasonType');
+    const amount = document.getElementById('operationAmountInput');
+    const other = document.getElementById('operationOtherText');
+    if(titleEl) titleEl.textContent = title;
+    if(descEl) descEl.textContent = desc;
+    if(typeWrap) typeWrap.style.display = fixedType ? 'none' : 'block';
+    if(typeSel) typeSel.value = fixedType || 'deposit';
+    if(amount) amount.value = '';
+    if(other) other.value = '';
+    fillReasonOptions(fixedType || 'deposit');
+    if(modal) modal.classList.add('show');
+  }
+  window.closeOperationReasonModal = function(){
+    const modal = document.getElementById('operationReasonModal'); if(modal) modal.classList.remove('show');
+    state.mode='student'; state.studentId=''; state.classId=''; state.fixedType='';
+  };
+  const typeSel = document.getElementById('operationReasonType');
+  if(typeSel) typeSel.addEventListener('change', function(){ fillReasonOptions(this.value); });
+  const reasonSel = document.getElementById('operationReasonSelect');
+  if(reasonSel) reasonSel.addEventListener('change', window.toggleOtherOperationReason);
+
+  function applyOperationToStudent(st, type, amount, reason){
+    amount = Number(amount||0); if(!st || !amount) return;
+    st.balance = Math.max(0, Number(st.balance||0) + (type==='deposit' ? amount : -amount));
+    if(typeof addHistory==='function') addHistory(st, type, amount, reason);
+    if(window.bankData){
+      if(!Array.isArray(bankData.operations)) bankData.operations = [];
+      bankData.operations.push({id:'op'+Date.now()+Math.random().toString(16).slice(2,6), studentId:st.id, studentName:st.name, type:type, amount:amount, reason:reason, date:new Date().toLocaleDateString('en-CA')});
+    }
+  }
+
+  window.quickClassOperation = function(classId, type){
+    state.mode='class'; state.classId=classId; state.studentId='';
+    openModal(type==='withdraw' ? 'سحب للفصل كامل' : 'إيداع للفصل كامل', 'اختاري السبب ثم حددي المبلغ لتنفيذ العملية على جميع طلاب / طالبات الفصل.', type);
+  };
+  window.quickStudentOperation = function(studentId){
+    state.mode='student'; state.studentId=studentId; state.classId='';
+    const st = typeof getStudentObj==='function' ? getStudentObj(studentId) : null;
+    openModal('عملية سريعة', 'اختاري نوع العملية والسبب للطالب / للطالبة' + (st ? ' '+st.name : '') + ' ثم حددي المبلغ.', '');
+  };
+  window.saveOperationReasonModal = function(){
+    const type = state.fixedType || (document.getElementById('operationReasonType')?.value || 'deposit');
+    const amount = Number(document.getElementById('operationAmountInput')?.value || 0);
+    let reason = document.getElementById('operationReasonSelect')?.value || '';
+    if(reason==='أخرى') reason = (document.getElementById('operationOtherText')?.value || '').trim();
+    if(!reason) reason = reasonDefault(type);
+    if(!amount || amount <= 0) return alert('أدخلي مبلغًا صحيحًا أولًا.');
+    if(state.mode==='class'){
+      const students = typeof getStudentsByClass==='function' ? getStudentsByClass(state.classId) : [];
+      if(!students.length) return alert('لا يوجد طلاب / طالبات داخل هذا الفصل.');
+      students.forEach(st => applyOperationToStudent(st, type, amount, reason));
+    } else {
+      const st = typeof getStudentObj==='function' ? getStudentObj(state.studentId) : null;
+      if(!st) return alert('تعذر العثور على الطالب / الطالبة.');
+      applyOperationToStudent(st, type, amount, reason);
+    }
+    if(typeof saveBankData==='function') saveBankData();
+    if(typeof refreshTeacherUI==='function') refreshTeacherUI();
+    if(typeof rerenderSettings==='function') rerenderSettings();
+    closeOperationReasonModal();
+    alert('تم تنفيذ العملية بنجاح.');
+  };
+
+  function relabelButtons(){
+    document.querySelectorAll('button').forEach(btn=>{
+      const t = (btn.textContent||'').trim();
+      if(t==='خصم للفصل كامل') btn.textContent='سحب للفصل كامل';
+      if(t==='عدد الخصومات') btn.textContent='عدد السحوبات';
+    });
+    document.querySelectorAll('.student-card,.student-settings-card,.student-card-custom,.student-cards-grid .teacher-box,.student-cards-grid > div').forEach(card=>{
+      card.innerHTML = card.innerHTML.replace(/عدد الخصومات/g,'عدد السحوبات');
+    });
+  }
+  const obs = new MutationObserver(function(){ relabelButtons(); });
+  document.addEventListener('DOMContentLoaded', function(){ relabelButtons(); obs.observe(document.body,{childList:true,subtree:true}); });
+})();
+</script>
+
+</body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
   window.printStudentReport = function(studentId){
@@ -4277,6 +4415,144 @@ window.addEventListener('load', function(){
   const prevShowPane = window.showTeacherPane;
   window.showTeacherPane = function(id, btn){ if(typeof prevShowPane==='function') prevShowPane(id, btn); if(id==='teacherPaneStudents') setTimeout(function(){ try{ renderStudentSettingsDashboard(); }catch(e){} }, 60); };
   document.addEventListener('DOMContentLoaded', function(){ setTimeout(function(){ try{ renderStudentSettingsDashboard(); }catch(e){} }, 250); });
+})();
+</script>
+
+
+
+<style id="operation-reasons-style">
+.operation-modal{position:fixed;inset:0;background:rgba(0,0,0,.38);display:none;align-items:center;justify-content:center;z-index:99999;padding:24px}
+.operation-modal.show{display:flex}
+.operation-box{width:min(420px,100%);background:#fff;border-radius:28px;padding:22px;border:1px solid rgba(16,58,46,.08);box-shadow:0 24px 60px rgba(0,0,0,.22)}
+.operation-box h3{margin:0 0 8px;color:var(--deep);font-size:22px}
+.operation-box p{margin:0 0 14px;color:var(--muted);font-size:13px;line-height:1.8}
+.operation-box .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.operation-box textarea{border:1px solid var(--line);background:#f8fbf9;border-radius:16px;padding:14px 14px;font-size:14px;outline:none;font-family:inherit}
+</style>
+<div id="operationReasonModal" class="operation-modal" aria-hidden="true">
+  <div class="operation-box">
+    <h3 id="operationReasonTitle">تنفيذ العملية</h3>
+    <p id="operationReasonDesc">اختاري نوع العملية والسبب ثم حددي المبلغ.</p>
+    <div class="field" id="operationTypeWrap"><label>نوع العملية</label>
+      <select id="operationReasonType">
+        <option value="deposit">إيداع</option>
+        <option value="withdraw">سحب</option>
+      </select>
+    </div>
+    <div class="field"><label>السبب</label>
+      <select id="operationReasonSelect"></select>
+    </div>
+    <div class="field" id="operationOtherWrap" style="display:none"><label>سبب آخر</label><textarea id="operationOtherText" rows="3" placeholder="اكتبي السبب هنا"></textarea></div>
+    <div class="field"><label>المبلغ</label><input id="operationAmountInput" type="number" min="1" placeholder="أدخلي المبلغ"></div>
+    <div class="actions">
+      <button class="btn btn-light" type="button" onclick="closeOperationReasonModal()">إلغاء</button>
+      <button class="btn btn-green" type="button" onclick="saveOperationReasonModal()">تنفيذ</button>
+    </div>
+  </div>
+</div>
+<script id="operation-reasons-script">
+(function(){
+  const DEPOSIT_REASONS = [
+    'مشاركة مميزة في الحصة','حل سؤال صعب','مساعدة زميل / زميلة','إنهاء المهمة الأدائية','تسليم الواجب مبكرًا','الحصول على درجة كاملة','الفوز في تحدي الرياضيات','ترتيب الدفتر','الالتزام والهدوء في الحصة','مبادرة إيجابية','حضور كامل الأسبوع','تميز في العمل الجماعي','أخرى'
+  ];
+  const WITHDRAW_REASONS = [
+    'عدم حل الواجب','التأخر عن الحصة','كثرة الكلام أثناء الشرح','عدم إحضار الأدوات','عدم المشاركة','مخالفة تعليمات الصف','عدم تسليم المهمة الأدائية','إزعاج الزملاء','استخدام الجوال','سحب سلوكي','أخرى'
+  ];
+  const state = {mode:'student', studentId:'', classId:'', fixedType:''};
+
+  function getReasonOptions(type){ return type==='withdraw' ? WITHDRAW_REASONS : DEPOSIT_REASONS; }
+  function reasonDefault(type){ return type==='withdraw' ? 'سحب جماعي' : 'مكافأة جماعية'; }
+  function fillReasonOptions(type){
+    const sel = document.getElementById('operationReasonSelect'); if(!sel) return;
+    sel.innerHTML = '<option value="">اختاري السبب</option>' + getReasonOptions(type).map(r=>'<option value="'+r+'">'+r+'</option>').join('');
+    toggleOtherOperationReason();
+  }
+  window.toggleOtherOperationReason = function(){
+    const val = document.getElementById('operationReasonSelect')?.value;
+    const wrap = document.getElementById('operationOtherWrap');
+    if(wrap) wrap.style.display = val==='أخرى' ? 'block' : 'none';
+  };
+  function openModal(title, desc, fixedType){
+    state.fixedType = fixedType || '';
+    const modal = document.getElementById('operationReasonModal');
+    const titleEl = document.getElementById('operationReasonTitle');
+    const descEl = document.getElementById('operationReasonDesc');
+    const typeWrap = document.getElementById('operationTypeWrap');
+    const typeSel = document.getElementById('operationReasonType');
+    const amount = document.getElementById('operationAmountInput');
+    const other = document.getElementById('operationOtherText');
+    if(titleEl) titleEl.textContent = title;
+    if(descEl) descEl.textContent = desc;
+    if(typeWrap) typeWrap.style.display = fixedType ? 'none' : 'block';
+    if(typeSel) typeSel.value = fixedType || 'deposit';
+    if(amount) amount.value = '';
+    if(other) other.value = '';
+    fillReasonOptions(fixedType || 'deposit');
+    if(modal) modal.classList.add('show');
+  }
+  window.closeOperationReasonModal = function(){
+    const modal = document.getElementById('operationReasonModal'); if(modal) modal.classList.remove('show');
+    state.mode='student'; state.studentId=''; state.classId=''; state.fixedType='';
+  };
+  const typeSel = document.getElementById('operationReasonType');
+  if(typeSel) typeSel.addEventListener('change', function(){ fillReasonOptions(this.value); });
+  const reasonSel = document.getElementById('operationReasonSelect');
+  if(reasonSel) reasonSel.addEventListener('change', window.toggleOtherOperationReason);
+
+  function applyOperationToStudent(st, type, amount, reason){
+    amount = Number(amount||0); if(!st || !amount) return;
+    st.balance = Math.max(0, Number(st.balance||0) + (type==='deposit' ? amount : -amount));
+    if(typeof addHistory==='function') addHistory(st, type, amount, reason);
+    if(window.bankData){
+      if(!Array.isArray(bankData.operations)) bankData.operations = [];
+      bankData.operations.push({id:'op'+Date.now()+Math.random().toString(16).slice(2,6), studentId:st.id, studentName:st.name, type:type, amount:amount, reason:reason, date:new Date().toLocaleDateString('en-CA')});
+    }
+  }
+
+  window.quickClassOperation = function(classId, type){
+    state.mode='class'; state.classId=classId; state.studentId='';
+    openModal(type==='withdraw' ? 'سحب للفصل كامل' : 'إيداع للفصل كامل', 'اختاري السبب ثم حددي المبلغ لتنفيذ العملية على جميع طلاب / طالبات الفصل.', type);
+  };
+  window.quickStudentOperation = function(studentId){
+    state.mode='student'; state.studentId=studentId; state.classId='';
+    const st = typeof getStudentObj==='function' ? getStudentObj(studentId) : null;
+    openModal('عملية سريعة', 'اختاري نوع العملية والسبب للطالب / للطالبة' + (st ? ' '+st.name : '') + ' ثم حددي المبلغ.', '');
+  };
+  window.saveOperationReasonModal = function(){
+    const type = state.fixedType || (document.getElementById('operationReasonType')?.value || 'deposit');
+    const amount = Number(document.getElementById('operationAmountInput')?.value || 0);
+    let reason = document.getElementById('operationReasonSelect')?.value || '';
+    if(reason==='أخرى') reason = (document.getElementById('operationOtherText')?.value || '').trim();
+    if(!reason) reason = reasonDefault(type);
+    if(!amount || amount <= 0) return alert('أدخلي مبلغًا صحيحًا أولًا.');
+    if(state.mode==='class'){
+      const students = typeof getStudentsByClass==='function' ? getStudentsByClass(state.classId) : [];
+      if(!students.length) return alert('لا يوجد طلاب / طالبات داخل هذا الفصل.');
+      students.forEach(st => applyOperationToStudent(st, type, amount, reason));
+    } else {
+      const st = typeof getStudentObj==='function' ? getStudentObj(state.studentId) : null;
+      if(!st) return alert('تعذر العثور على الطالب / الطالبة.');
+      applyOperationToStudent(st, type, amount, reason);
+    }
+    if(typeof saveBankData==='function') saveBankData();
+    if(typeof refreshTeacherUI==='function') refreshTeacherUI();
+    if(typeof rerenderSettings==='function') rerenderSettings();
+    closeOperationReasonModal();
+    alert('تم تنفيذ العملية بنجاح.');
+  };
+
+  function relabelButtons(){
+    document.querySelectorAll('button').forEach(btn=>{
+      const t = (btn.textContent||'').trim();
+      if(t==='خصم للفصل كامل') btn.textContent='سحب للفصل كامل';
+      if(t==='عدد الخصومات') btn.textContent='عدد السحوبات';
+    });
+    document.querySelectorAll('.student-card,.student-settings-card,.student-card-custom,.student-cards-grid .teacher-box,.student-cards-grid > div').forEach(card=>{
+      card.innerHTML = card.innerHTML.replace(/عدد الخصومات/g,'عدد السحوبات');
+    });
+  }
+  const obs = new MutationObserver(function(){ relabelButtons(); });
+  document.addEventListener('DOMContentLoaded', function(){ relabelButtons(); obs.observe(document.body,{childList:true,subtree:true}); });
 })();
 </script>
 
@@ -4605,7 +4881,145 @@ window.addEventListener('load', function(){
   };
   function openPrintWindow(title, bodyHtml){
     const w = window.open('', '_blank'); if(!w) return;
-    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}</body></html>`);
+    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}
+
+<style id="operation-reasons-style">
+.operation-modal{position:fixed;inset:0;background:rgba(0,0,0,.38);display:none;align-items:center;justify-content:center;z-index:99999;padding:24px}
+.operation-modal.show{display:flex}
+.operation-box{width:min(420px,100%);background:#fff;border-radius:28px;padding:22px;border:1px solid rgba(16,58,46,.08);box-shadow:0 24px 60px rgba(0,0,0,.22)}
+.operation-box h3{margin:0 0 8px;color:var(--deep);font-size:22px}
+.operation-box p{margin:0 0 14px;color:var(--muted);font-size:13px;line-height:1.8}
+.operation-box .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.operation-box textarea{border:1px solid var(--line);background:#f8fbf9;border-radius:16px;padding:14px 14px;font-size:14px;outline:none;font-family:inherit}
+</style>
+<div id="operationReasonModal" class="operation-modal" aria-hidden="true">
+  <div class="operation-box">
+    <h3 id="operationReasonTitle">تنفيذ العملية</h3>
+    <p id="operationReasonDesc">اختاري نوع العملية والسبب ثم حددي المبلغ.</p>
+    <div class="field" id="operationTypeWrap"><label>نوع العملية</label>
+      <select id="operationReasonType">
+        <option value="deposit">إيداع</option>
+        <option value="withdraw">سحب</option>
+      </select>
+    </div>
+    <div class="field"><label>السبب</label>
+      <select id="operationReasonSelect"></select>
+    </div>
+    <div class="field" id="operationOtherWrap" style="display:none"><label>سبب آخر</label><textarea id="operationOtherText" rows="3" placeholder="اكتبي السبب هنا"></textarea></div>
+    <div class="field"><label>المبلغ</label><input id="operationAmountInput" type="number" min="1" placeholder="أدخلي المبلغ"></div>
+    <div class="actions">
+      <button class="btn btn-light" type="button" onclick="closeOperationReasonModal()">إلغاء</button>
+      <button class="btn btn-green" type="button" onclick="saveOperationReasonModal()">تنفيذ</button>
+    </div>
+  </div>
+</div>
+<script id="operation-reasons-script">
+(function(){
+  const DEPOSIT_REASONS = [
+    'مشاركة مميزة في الحصة','حل سؤال صعب','مساعدة زميل / زميلة','إنهاء المهمة الأدائية','تسليم الواجب مبكرًا','الحصول على درجة كاملة','الفوز في تحدي الرياضيات','ترتيب الدفتر','الالتزام والهدوء في الحصة','مبادرة إيجابية','حضور كامل الأسبوع','تميز في العمل الجماعي','أخرى'
+  ];
+  const WITHDRAW_REASONS = [
+    'عدم حل الواجب','التأخر عن الحصة','كثرة الكلام أثناء الشرح','عدم إحضار الأدوات','عدم المشاركة','مخالفة تعليمات الصف','عدم تسليم المهمة الأدائية','إزعاج الزملاء','استخدام الجوال','سحب سلوكي','أخرى'
+  ];
+  const state = {mode:'student', studentId:'', classId:'', fixedType:''};
+
+  function getReasonOptions(type){ return type==='withdraw' ? WITHDRAW_REASONS : DEPOSIT_REASONS; }
+  function reasonDefault(type){ return type==='withdraw' ? 'سحب جماعي' : 'مكافأة جماعية'; }
+  function fillReasonOptions(type){
+    const sel = document.getElementById('operationReasonSelect'); if(!sel) return;
+    sel.innerHTML = '<option value="">اختاري السبب</option>' + getReasonOptions(type).map(r=>'<option value="'+r+'">'+r+'</option>').join('');
+    toggleOtherOperationReason();
+  }
+  window.toggleOtherOperationReason = function(){
+    const val = document.getElementById('operationReasonSelect')?.value;
+    const wrap = document.getElementById('operationOtherWrap');
+    if(wrap) wrap.style.display = val==='أخرى' ? 'block' : 'none';
+  };
+  function openModal(title, desc, fixedType){
+    state.fixedType = fixedType || '';
+    const modal = document.getElementById('operationReasonModal');
+    const titleEl = document.getElementById('operationReasonTitle');
+    const descEl = document.getElementById('operationReasonDesc');
+    const typeWrap = document.getElementById('operationTypeWrap');
+    const typeSel = document.getElementById('operationReasonType');
+    const amount = document.getElementById('operationAmountInput');
+    const other = document.getElementById('operationOtherText');
+    if(titleEl) titleEl.textContent = title;
+    if(descEl) descEl.textContent = desc;
+    if(typeWrap) typeWrap.style.display = fixedType ? 'none' : 'block';
+    if(typeSel) typeSel.value = fixedType || 'deposit';
+    if(amount) amount.value = '';
+    if(other) other.value = '';
+    fillReasonOptions(fixedType || 'deposit');
+    if(modal) modal.classList.add('show');
+  }
+  window.closeOperationReasonModal = function(){
+    const modal = document.getElementById('operationReasonModal'); if(modal) modal.classList.remove('show');
+    state.mode='student'; state.studentId=''; state.classId=''; state.fixedType='';
+  };
+  const typeSel = document.getElementById('operationReasonType');
+  if(typeSel) typeSel.addEventListener('change', function(){ fillReasonOptions(this.value); });
+  const reasonSel = document.getElementById('operationReasonSelect');
+  if(reasonSel) reasonSel.addEventListener('change', window.toggleOtherOperationReason);
+
+  function applyOperationToStudent(st, type, amount, reason){
+    amount = Number(amount||0); if(!st || !amount) return;
+    st.balance = Math.max(0, Number(st.balance||0) + (type==='deposit' ? amount : -amount));
+    if(typeof addHistory==='function') addHistory(st, type, amount, reason);
+    if(window.bankData){
+      if(!Array.isArray(bankData.operations)) bankData.operations = [];
+      bankData.operations.push({id:'op'+Date.now()+Math.random().toString(16).slice(2,6), studentId:st.id, studentName:st.name, type:type, amount:amount, reason:reason, date:new Date().toLocaleDateString('en-CA')});
+    }
+  }
+
+  window.quickClassOperation = function(classId, type){
+    state.mode='class'; state.classId=classId; state.studentId='';
+    openModal(type==='withdraw' ? 'سحب للفصل كامل' : 'إيداع للفصل كامل', 'اختاري السبب ثم حددي المبلغ لتنفيذ العملية على جميع طلاب / طالبات الفصل.', type);
+  };
+  window.quickStudentOperation = function(studentId){
+    state.mode='student'; state.studentId=studentId; state.classId='';
+    const st = typeof getStudentObj==='function' ? getStudentObj(studentId) : null;
+    openModal('عملية سريعة', 'اختاري نوع العملية والسبب للطالب / للطالبة' + (st ? ' '+st.name : '') + ' ثم حددي المبلغ.', '');
+  };
+  window.saveOperationReasonModal = function(){
+    const type = state.fixedType || (document.getElementById('operationReasonType')?.value || 'deposit');
+    const amount = Number(document.getElementById('operationAmountInput')?.value || 0);
+    let reason = document.getElementById('operationReasonSelect')?.value || '';
+    if(reason==='أخرى') reason = (document.getElementById('operationOtherText')?.value || '').trim();
+    if(!reason) reason = reasonDefault(type);
+    if(!amount || amount <= 0) return alert('أدخلي مبلغًا صحيحًا أولًا.');
+    if(state.mode==='class'){
+      const students = typeof getStudentsByClass==='function' ? getStudentsByClass(state.classId) : [];
+      if(!students.length) return alert('لا يوجد طلاب / طالبات داخل هذا الفصل.');
+      students.forEach(st => applyOperationToStudent(st, type, amount, reason));
+    } else {
+      const st = typeof getStudentObj==='function' ? getStudentObj(state.studentId) : null;
+      if(!st) return alert('تعذر العثور على الطالب / الطالبة.');
+      applyOperationToStudent(st, type, amount, reason);
+    }
+    if(typeof saveBankData==='function') saveBankData();
+    if(typeof refreshTeacherUI==='function') refreshTeacherUI();
+    if(typeof rerenderSettings==='function') rerenderSettings();
+    closeOperationReasonModal();
+    alert('تم تنفيذ العملية بنجاح.');
+  };
+
+  function relabelButtons(){
+    document.querySelectorAll('button').forEach(btn=>{
+      const t = (btn.textContent||'').trim();
+      if(t==='خصم للفصل كامل') btn.textContent='سحب للفصل كامل';
+      if(t==='عدد الخصومات') btn.textContent='عدد السحوبات';
+    });
+    document.querySelectorAll('.student-card,.student-settings-card,.student-card-custom,.student-cards-grid .teacher-box,.student-cards-grid > div').forEach(card=>{
+      card.innerHTML = card.innerHTML.replace(/عدد الخصومات/g,'عدد السحوبات');
+    });
+  }
+  const obs = new MutationObserver(function(){ relabelButtons(); });
+  document.addEventListener('DOMContentLoaded', function(){ relabelButtons(); obs.observe(document.body,{childList:true,subtree:true}); });
+})();
+</script>
+
+</body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
   window.printStudentReport = function(studentId){
@@ -4626,6 +5040,144 @@ window.addEventListener('load', function(){
   const prevShowPane = window.showTeacherPane;
   window.showTeacherPane = function(id, btn){ if(typeof prevShowPane==='function') prevShowPane(id, btn); if(id==='teacherPaneStudents') setTimeout(function(){ try{ renderStudentSettingsDashboard(); }catch(e){} }, 60); };
   document.addEventListener('DOMContentLoaded', function(){ setTimeout(function(){ try{ renderStudentSettingsDashboard(); }catch(e){} }, 250); });
+})();
+</script>
+
+
+
+<style id="operation-reasons-style">
+.operation-modal{position:fixed;inset:0;background:rgba(0,0,0,.38);display:none;align-items:center;justify-content:center;z-index:99999;padding:24px}
+.operation-modal.show{display:flex}
+.operation-box{width:min(420px,100%);background:#fff;border-radius:28px;padding:22px;border:1px solid rgba(16,58,46,.08);box-shadow:0 24px 60px rgba(0,0,0,.22)}
+.operation-box h3{margin:0 0 8px;color:var(--deep);font-size:22px}
+.operation-box p{margin:0 0 14px;color:var(--muted);font-size:13px;line-height:1.8}
+.operation-box .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.operation-box textarea{border:1px solid var(--line);background:#f8fbf9;border-radius:16px;padding:14px 14px;font-size:14px;outline:none;font-family:inherit}
+</style>
+<div id="operationReasonModal" class="operation-modal" aria-hidden="true">
+  <div class="operation-box">
+    <h3 id="operationReasonTitle">تنفيذ العملية</h3>
+    <p id="operationReasonDesc">اختاري نوع العملية والسبب ثم حددي المبلغ.</p>
+    <div class="field" id="operationTypeWrap"><label>نوع العملية</label>
+      <select id="operationReasonType">
+        <option value="deposit">إيداع</option>
+        <option value="withdraw">سحب</option>
+      </select>
+    </div>
+    <div class="field"><label>السبب</label>
+      <select id="operationReasonSelect"></select>
+    </div>
+    <div class="field" id="operationOtherWrap" style="display:none"><label>سبب آخر</label><textarea id="operationOtherText" rows="3" placeholder="اكتبي السبب هنا"></textarea></div>
+    <div class="field"><label>المبلغ</label><input id="operationAmountInput" type="number" min="1" placeholder="أدخلي المبلغ"></div>
+    <div class="actions">
+      <button class="btn btn-light" type="button" onclick="closeOperationReasonModal()">إلغاء</button>
+      <button class="btn btn-green" type="button" onclick="saveOperationReasonModal()">تنفيذ</button>
+    </div>
+  </div>
+</div>
+<script id="operation-reasons-script">
+(function(){
+  const DEPOSIT_REASONS = [
+    'مشاركة مميزة في الحصة','حل سؤال صعب','مساعدة زميل / زميلة','إنهاء المهمة الأدائية','تسليم الواجب مبكرًا','الحصول على درجة كاملة','الفوز في تحدي الرياضيات','ترتيب الدفتر','الالتزام والهدوء في الحصة','مبادرة إيجابية','حضور كامل الأسبوع','تميز في العمل الجماعي','أخرى'
+  ];
+  const WITHDRAW_REASONS = [
+    'عدم حل الواجب','التأخر عن الحصة','كثرة الكلام أثناء الشرح','عدم إحضار الأدوات','عدم المشاركة','مخالفة تعليمات الصف','عدم تسليم المهمة الأدائية','إزعاج الزملاء','استخدام الجوال','سحب سلوكي','أخرى'
+  ];
+  const state = {mode:'student', studentId:'', classId:'', fixedType:''};
+
+  function getReasonOptions(type){ return type==='withdraw' ? WITHDRAW_REASONS : DEPOSIT_REASONS; }
+  function reasonDefault(type){ return type==='withdraw' ? 'سحب جماعي' : 'مكافأة جماعية'; }
+  function fillReasonOptions(type){
+    const sel = document.getElementById('operationReasonSelect'); if(!sel) return;
+    sel.innerHTML = '<option value="">اختاري السبب</option>' + getReasonOptions(type).map(r=>'<option value="'+r+'">'+r+'</option>').join('');
+    toggleOtherOperationReason();
+  }
+  window.toggleOtherOperationReason = function(){
+    const val = document.getElementById('operationReasonSelect')?.value;
+    const wrap = document.getElementById('operationOtherWrap');
+    if(wrap) wrap.style.display = val==='أخرى' ? 'block' : 'none';
+  };
+  function openModal(title, desc, fixedType){
+    state.fixedType = fixedType || '';
+    const modal = document.getElementById('operationReasonModal');
+    const titleEl = document.getElementById('operationReasonTitle');
+    const descEl = document.getElementById('operationReasonDesc');
+    const typeWrap = document.getElementById('operationTypeWrap');
+    const typeSel = document.getElementById('operationReasonType');
+    const amount = document.getElementById('operationAmountInput');
+    const other = document.getElementById('operationOtherText');
+    if(titleEl) titleEl.textContent = title;
+    if(descEl) descEl.textContent = desc;
+    if(typeWrap) typeWrap.style.display = fixedType ? 'none' : 'block';
+    if(typeSel) typeSel.value = fixedType || 'deposit';
+    if(amount) amount.value = '';
+    if(other) other.value = '';
+    fillReasonOptions(fixedType || 'deposit');
+    if(modal) modal.classList.add('show');
+  }
+  window.closeOperationReasonModal = function(){
+    const modal = document.getElementById('operationReasonModal'); if(modal) modal.classList.remove('show');
+    state.mode='student'; state.studentId=''; state.classId=''; state.fixedType='';
+  };
+  const typeSel = document.getElementById('operationReasonType');
+  if(typeSel) typeSel.addEventListener('change', function(){ fillReasonOptions(this.value); });
+  const reasonSel = document.getElementById('operationReasonSelect');
+  if(reasonSel) reasonSel.addEventListener('change', window.toggleOtherOperationReason);
+
+  function applyOperationToStudent(st, type, amount, reason){
+    amount = Number(amount||0); if(!st || !amount) return;
+    st.balance = Math.max(0, Number(st.balance||0) + (type==='deposit' ? amount : -amount));
+    if(typeof addHistory==='function') addHistory(st, type, amount, reason);
+    if(window.bankData){
+      if(!Array.isArray(bankData.operations)) bankData.operations = [];
+      bankData.operations.push({id:'op'+Date.now()+Math.random().toString(16).slice(2,6), studentId:st.id, studentName:st.name, type:type, amount:amount, reason:reason, date:new Date().toLocaleDateString('en-CA')});
+    }
+  }
+
+  window.quickClassOperation = function(classId, type){
+    state.mode='class'; state.classId=classId; state.studentId='';
+    openModal(type==='withdraw' ? 'سحب للفصل كامل' : 'إيداع للفصل كامل', 'اختاري السبب ثم حددي المبلغ لتنفيذ العملية على جميع طلاب / طالبات الفصل.', type);
+  };
+  window.quickStudentOperation = function(studentId){
+    state.mode='student'; state.studentId=studentId; state.classId='';
+    const st = typeof getStudentObj==='function' ? getStudentObj(studentId) : null;
+    openModal('عملية سريعة', 'اختاري نوع العملية والسبب للطالب / للطالبة' + (st ? ' '+st.name : '') + ' ثم حددي المبلغ.', '');
+  };
+  window.saveOperationReasonModal = function(){
+    const type = state.fixedType || (document.getElementById('operationReasonType')?.value || 'deposit');
+    const amount = Number(document.getElementById('operationAmountInput')?.value || 0);
+    let reason = document.getElementById('operationReasonSelect')?.value || '';
+    if(reason==='أخرى') reason = (document.getElementById('operationOtherText')?.value || '').trim();
+    if(!reason) reason = reasonDefault(type);
+    if(!amount || amount <= 0) return alert('أدخلي مبلغًا صحيحًا أولًا.');
+    if(state.mode==='class'){
+      const students = typeof getStudentsByClass==='function' ? getStudentsByClass(state.classId) : [];
+      if(!students.length) return alert('لا يوجد طلاب / طالبات داخل هذا الفصل.');
+      students.forEach(st => applyOperationToStudent(st, type, amount, reason));
+    } else {
+      const st = typeof getStudentObj==='function' ? getStudentObj(state.studentId) : null;
+      if(!st) return alert('تعذر العثور على الطالب / الطالبة.');
+      applyOperationToStudent(st, type, amount, reason);
+    }
+    if(typeof saveBankData==='function') saveBankData();
+    if(typeof refreshTeacherUI==='function') refreshTeacherUI();
+    if(typeof rerenderSettings==='function') rerenderSettings();
+    closeOperationReasonModal();
+    alert('تم تنفيذ العملية بنجاح.');
+  };
+
+  function relabelButtons(){
+    document.querySelectorAll('button').forEach(btn=>{
+      const t = (btn.textContent||'').trim();
+      if(t==='خصم للفصل كامل') btn.textContent='سحب للفصل كامل';
+      if(t==='عدد الخصومات') btn.textContent='عدد السحوبات';
+    });
+    document.querySelectorAll('.student-card,.student-settings-card,.student-card-custom,.student-cards-grid .teacher-box,.student-cards-grid > div').forEach(card=>{
+      card.innerHTML = card.innerHTML.replace(/عدد الخصومات/g,'عدد السحوبات');
+    });
+  }
+  const obs = new MutationObserver(function(){ relabelButtons(); });
+  document.addEventListener('DOMContentLoaded', function(){ relabelButtons(); obs.observe(document.body,{childList:true,subtree:true}); });
 })();
 </script>
 
@@ -5065,7 +5617,145 @@ window.addEventListener('load', function(){
   };
   function openPrintWindow(title, bodyHtml){
     const w = window.open('', '_blank'); if(!w) return;
-    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}</body></html>`);
+    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}
+
+<style id="operation-reasons-style">
+.operation-modal{position:fixed;inset:0;background:rgba(0,0,0,.38);display:none;align-items:center;justify-content:center;z-index:99999;padding:24px}
+.operation-modal.show{display:flex}
+.operation-box{width:min(420px,100%);background:#fff;border-radius:28px;padding:22px;border:1px solid rgba(16,58,46,.08);box-shadow:0 24px 60px rgba(0,0,0,.22)}
+.operation-box h3{margin:0 0 8px;color:var(--deep);font-size:22px}
+.operation-box p{margin:0 0 14px;color:var(--muted);font-size:13px;line-height:1.8}
+.operation-box .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.operation-box textarea{border:1px solid var(--line);background:#f8fbf9;border-radius:16px;padding:14px 14px;font-size:14px;outline:none;font-family:inherit}
+</style>
+<div id="operationReasonModal" class="operation-modal" aria-hidden="true">
+  <div class="operation-box">
+    <h3 id="operationReasonTitle">تنفيذ العملية</h3>
+    <p id="operationReasonDesc">اختاري نوع العملية والسبب ثم حددي المبلغ.</p>
+    <div class="field" id="operationTypeWrap"><label>نوع العملية</label>
+      <select id="operationReasonType">
+        <option value="deposit">إيداع</option>
+        <option value="withdraw">سحب</option>
+      </select>
+    </div>
+    <div class="field"><label>السبب</label>
+      <select id="operationReasonSelect"></select>
+    </div>
+    <div class="field" id="operationOtherWrap" style="display:none"><label>سبب آخر</label><textarea id="operationOtherText" rows="3" placeholder="اكتبي السبب هنا"></textarea></div>
+    <div class="field"><label>المبلغ</label><input id="operationAmountInput" type="number" min="1" placeholder="أدخلي المبلغ"></div>
+    <div class="actions">
+      <button class="btn btn-light" type="button" onclick="closeOperationReasonModal()">إلغاء</button>
+      <button class="btn btn-green" type="button" onclick="saveOperationReasonModal()">تنفيذ</button>
+    </div>
+  </div>
+</div>
+<script id="operation-reasons-script">
+(function(){
+  const DEPOSIT_REASONS = [
+    'مشاركة مميزة في الحصة','حل سؤال صعب','مساعدة زميل / زميلة','إنهاء المهمة الأدائية','تسليم الواجب مبكرًا','الحصول على درجة كاملة','الفوز في تحدي الرياضيات','ترتيب الدفتر','الالتزام والهدوء في الحصة','مبادرة إيجابية','حضور كامل الأسبوع','تميز في العمل الجماعي','أخرى'
+  ];
+  const WITHDRAW_REASONS = [
+    'عدم حل الواجب','التأخر عن الحصة','كثرة الكلام أثناء الشرح','عدم إحضار الأدوات','عدم المشاركة','مخالفة تعليمات الصف','عدم تسليم المهمة الأدائية','إزعاج الزملاء','استخدام الجوال','سحب سلوكي','أخرى'
+  ];
+  const state = {mode:'student', studentId:'', classId:'', fixedType:''};
+
+  function getReasonOptions(type){ return type==='withdraw' ? WITHDRAW_REASONS : DEPOSIT_REASONS; }
+  function reasonDefault(type){ return type==='withdraw' ? 'سحب جماعي' : 'مكافأة جماعية'; }
+  function fillReasonOptions(type){
+    const sel = document.getElementById('operationReasonSelect'); if(!sel) return;
+    sel.innerHTML = '<option value="">اختاري السبب</option>' + getReasonOptions(type).map(r=>'<option value="'+r+'">'+r+'</option>').join('');
+    toggleOtherOperationReason();
+  }
+  window.toggleOtherOperationReason = function(){
+    const val = document.getElementById('operationReasonSelect')?.value;
+    const wrap = document.getElementById('operationOtherWrap');
+    if(wrap) wrap.style.display = val==='أخرى' ? 'block' : 'none';
+  };
+  function openModal(title, desc, fixedType){
+    state.fixedType = fixedType || '';
+    const modal = document.getElementById('operationReasonModal');
+    const titleEl = document.getElementById('operationReasonTitle');
+    const descEl = document.getElementById('operationReasonDesc');
+    const typeWrap = document.getElementById('operationTypeWrap');
+    const typeSel = document.getElementById('operationReasonType');
+    const amount = document.getElementById('operationAmountInput');
+    const other = document.getElementById('operationOtherText');
+    if(titleEl) titleEl.textContent = title;
+    if(descEl) descEl.textContent = desc;
+    if(typeWrap) typeWrap.style.display = fixedType ? 'none' : 'block';
+    if(typeSel) typeSel.value = fixedType || 'deposit';
+    if(amount) amount.value = '';
+    if(other) other.value = '';
+    fillReasonOptions(fixedType || 'deposit');
+    if(modal) modal.classList.add('show');
+  }
+  window.closeOperationReasonModal = function(){
+    const modal = document.getElementById('operationReasonModal'); if(modal) modal.classList.remove('show');
+    state.mode='student'; state.studentId=''; state.classId=''; state.fixedType='';
+  };
+  const typeSel = document.getElementById('operationReasonType');
+  if(typeSel) typeSel.addEventListener('change', function(){ fillReasonOptions(this.value); });
+  const reasonSel = document.getElementById('operationReasonSelect');
+  if(reasonSel) reasonSel.addEventListener('change', window.toggleOtherOperationReason);
+
+  function applyOperationToStudent(st, type, amount, reason){
+    amount = Number(amount||0); if(!st || !amount) return;
+    st.balance = Math.max(0, Number(st.balance||0) + (type==='deposit' ? amount : -amount));
+    if(typeof addHistory==='function') addHistory(st, type, amount, reason);
+    if(window.bankData){
+      if(!Array.isArray(bankData.operations)) bankData.operations = [];
+      bankData.operations.push({id:'op'+Date.now()+Math.random().toString(16).slice(2,6), studentId:st.id, studentName:st.name, type:type, amount:amount, reason:reason, date:new Date().toLocaleDateString('en-CA')});
+    }
+  }
+
+  window.quickClassOperation = function(classId, type){
+    state.mode='class'; state.classId=classId; state.studentId='';
+    openModal(type==='withdraw' ? 'سحب للفصل كامل' : 'إيداع للفصل كامل', 'اختاري السبب ثم حددي المبلغ لتنفيذ العملية على جميع طلاب / طالبات الفصل.', type);
+  };
+  window.quickStudentOperation = function(studentId){
+    state.mode='student'; state.studentId=studentId; state.classId='';
+    const st = typeof getStudentObj==='function' ? getStudentObj(studentId) : null;
+    openModal('عملية سريعة', 'اختاري نوع العملية والسبب للطالب / للطالبة' + (st ? ' '+st.name : '') + ' ثم حددي المبلغ.', '');
+  };
+  window.saveOperationReasonModal = function(){
+    const type = state.fixedType || (document.getElementById('operationReasonType')?.value || 'deposit');
+    const amount = Number(document.getElementById('operationAmountInput')?.value || 0);
+    let reason = document.getElementById('operationReasonSelect')?.value || '';
+    if(reason==='أخرى') reason = (document.getElementById('operationOtherText')?.value || '').trim();
+    if(!reason) reason = reasonDefault(type);
+    if(!amount || amount <= 0) return alert('أدخلي مبلغًا صحيحًا أولًا.');
+    if(state.mode==='class'){
+      const students = typeof getStudentsByClass==='function' ? getStudentsByClass(state.classId) : [];
+      if(!students.length) return alert('لا يوجد طلاب / طالبات داخل هذا الفصل.');
+      students.forEach(st => applyOperationToStudent(st, type, amount, reason));
+    } else {
+      const st = typeof getStudentObj==='function' ? getStudentObj(state.studentId) : null;
+      if(!st) return alert('تعذر العثور على الطالب / الطالبة.');
+      applyOperationToStudent(st, type, amount, reason);
+    }
+    if(typeof saveBankData==='function') saveBankData();
+    if(typeof refreshTeacherUI==='function') refreshTeacherUI();
+    if(typeof rerenderSettings==='function') rerenderSettings();
+    closeOperationReasonModal();
+    alert('تم تنفيذ العملية بنجاح.');
+  };
+
+  function relabelButtons(){
+    document.querySelectorAll('button').forEach(btn=>{
+      const t = (btn.textContent||'').trim();
+      if(t==='خصم للفصل كامل') btn.textContent='سحب للفصل كامل';
+      if(t==='عدد الخصومات') btn.textContent='عدد السحوبات';
+    });
+    document.querySelectorAll('.student-card,.student-settings-card,.student-card-custom,.student-cards-grid .teacher-box,.student-cards-grid > div').forEach(card=>{
+      card.innerHTML = card.innerHTML.replace(/عدد الخصومات/g,'عدد السحوبات');
+    });
+  }
+  const obs = new MutationObserver(function(){ relabelButtons(); });
+  document.addEventListener('DOMContentLoaded', function(){ relabelButtons(); obs.observe(document.body,{childList:true,subtree:true}); });
+})();
+</script>
+
+</body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
   window.printStudentReport = function(studentId){
@@ -5086,6 +5776,144 @@ window.addEventListener('load', function(){
   const prevShowPane = window.showTeacherPane;
   window.showTeacherPane = function(id, btn){ if(typeof prevShowPane==='function') prevShowPane(id, btn); if(id==='teacherPaneStudents') setTimeout(function(){ try{ renderStudentSettingsDashboard(); }catch(e){} }, 60); };
   document.addEventListener('DOMContentLoaded', function(){ setTimeout(function(){ try{ renderStudentSettingsDashboard(); }catch(e){} }, 250); });
+})();
+</script>
+
+
+
+<style id="operation-reasons-style">
+.operation-modal{position:fixed;inset:0;background:rgba(0,0,0,.38);display:none;align-items:center;justify-content:center;z-index:99999;padding:24px}
+.operation-modal.show{display:flex}
+.operation-box{width:min(420px,100%);background:#fff;border-radius:28px;padding:22px;border:1px solid rgba(16,58,46,.08);box-shadow:0 24px 60px rgba(0,0,0,.22)}
+.operation-box h3{margin:0 0 8px;color:var(--deep);font-size:22px}
+.operation-box p{margin:0 0 14px;color:var(--muted);font-size:13px;line-height:1.8}
+.operation-box .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.operation-box textarea{border:1px solid var(--line);background:#f8fbf9;border-radius:16px;padding:14px 14px;font-size:14px;outline:none;font-family:inherit}
+</style>
+<div id="operationReasonModal" class="operation-modal" aria-hidden="true">
+  <div class="operation-box">
+    <h3 id="operationReasonTitle">تنفيذ العملية</h3>
+    <p id="operationReasonDesc">اختاري نوع العملية والسبب ثم حددي المبلغ.</p>
+    <div class="field" id="operationTypeWrap"><label>نوع العملية</label>
+      <select id="operationReasonType">
+        <option value="deposit">إيداع</option>
+        <option value="withdraw">سحب</option>
+      </select>
+    </div>
+    <div class="field"><label>السبب</label>
+      <select id="operationReasonSelect"></select>
+    </div>
+    <div class="field" id="operationOtherWrap" style="display:none"><label>سبب آخر</label><textarea id="operationOtherText" rows="3" placeholder="اكتبي السبب هنا"></textarea></div>
+    <div class="field"><label>المبلغ</label><input id="operationAmountInput" type="number" min="1" placeholder="أدخلي المبلغ"></div>
+    <div class="actions">
+      <button class="btn btn-light" type="button" onclick="closeOperationReasonModal()">إلغاء</button>
+      <button class="btn btn-green" type="button" onclick="saveOperationReasonModal()">تنفيذ</button>
+    </div>
+  </div>
+</div>
+<script id="operation-reasons-script">
+(function(){
+  const DEPOSIT_REASONS = [
+    'مشاركة مميزة في الحصة','حل سؤال صعب','مساعدة زميل / زميلة','إنهاء المهمة الأدائية','تسليم الواجب مبكرًا','الحصول على درجة كاملة','الفوز في تحدي الرياضيات','ترتيب الدفتر','الالتزام والهدوء في الحصة','مبادرة إيجابية','حضور كامل الأسبوع','تميز في العمل الجماعي','أخرى'
+  ];
+  const WITHDRAW_REASONS = [
+    'عدم حل الواجب','التأخر عن الحصة','كثرة الكلام أثناء الشرح','عدم إحضار الأدوات','عدم المشاركة','مخالفة تعليمات الصف','عدم تسليم المهمة الأدائية','إزعاج الزملاء','استخدام الجوال','سحب سلوكي','أخرى'
+  ];
+  const state = {mode:'student', studentId:'', classId:'', fixedType:''};
+
+  function getReasonOptions(type){ return type==='withdraw' ? WITHDRAW_REASONS : DEPOSIT_REASONS; }
+  function reasonDefault(type){ return type==='withdraw' ? 'سحب جماعي' : 'مكافأة جماعية'; }
+  function fillReasonOptions(type){
+    const sel = document.getElementById('operationReasonSelect'); if(!sel) return;
+    sel.innerHTML = '<option value="">اختاري السبب</option>' + getReasonOptions(type).map(r=>'<option value="'+r+'">'+r+'</option>').join('');
+    toggleOtherOperationReason();
+  }
+  window.toggleOtherOperationReason = function(){
+    const val = document.getElementById('operationReasonSelect')?.value;
+    const wrap = document.getElementById('operationOtherWrap');
+    if(wrap) wrap.style.display = val==='أخرى' ? 'block' : 'none';
+  };
+  function openModal(title, desc, fixedType){
+    state.fixedType = fixedType || '';
+    const modal = document.getElementById('operationReasonModal');
+    const titleEl = document.getElementById('operationReasonTitle');
+    const descEl = document.getElementById('operationReasonDesc');
+    const typeWrap = document.getElementById('operationTypeWrap');
+    const typeSel = document.getElementById('operationReasonType');
+    const amount = document.getElementById('operationAmountInput');
+    const other = document.getElementById('operationOtherText');
+    if(titleEl) titleEl.textContent = title;
+    if(descEl) descEl.textContent = desc;
+    if(typeWrap) typeWrap.style.display = fixedType ? 'none' : 'block';
+    if(typeSel) typeSel.value = fixedType || 'deposit';
+    if(amount) amount.value = '';
+    if(other) other.value = '';
+    fillReasonOptions(fixedType || 'deposit');
+    if(modal) modal.classList.add('show');
+  }
+  window.closeOperationReasonModal = function(){
+    const modal = document.getElementById('operationReasonModal'); if(modal) modal.classList.remove('show');
+    state.mode='student'; state.studentId=''; state.classId=''; state.fixedType='';
+  };
+  const typeSel = document.getElementById('operationReasonType');
+  if(typeSel) typeSel.addEventListener('change', function(){ fillReasonOptions(this.value); });
+  const reasonSel = document.getElementById('operationReasonSelect');
+  if(reasonSel) reasonSel.addEventListener('change', window.toggleOtherOperationReason);
+
+  function applyOperationToStudent(st, type, amount, reason){
+    amount = Number(amount||0); if(!st || !amount) return;
+    st.balance = Math.max(0, Number(st.balance||0) + (type==='deposit' ? amount : -amount));
+    if(typeof addHistory==='function') addHistory(st, type, amount, reason);
+    if(window.bankData){
+      if(!Array.isArray(bankData.operations)) bankData.operations = [];
+      bankData.operations.push({id:'op'+Date.now()+Math.random().toString(16).slice(2,6), studentId:st.id, studentName:st.name, type:type, amount:amount, reason:reason, date:new Date().toLocaleDateString('en-CA')});
+    }
+  }
+
+  window.quickClassOperation = function(classId, type){
+    state.mode='class'; state.classId=classId; state.studentId='';
+    openModal(type==='withdraw' ? 'سحب للفصل كامل' : 'إيداع للفصل كامل', 'اختاري السبب ثم حددي المبلغ لتنفيذ العملية على جميع طلاب / طالبات الفصل.', type);
+  };
+  window.quickStudentOperation = function(studentId){
+    state.mode='student'; state.studentId=studentId; state.classId='';
+    const st = typeof getStudentObj==='function' ? getStudentObj(studentId) : null;
+    openModal('عملية سريعة', 'اختاري نوع العملية والسبب للطالب / للطالبة' + (st ? ' '+st.name : '') + ' ثم حددي المبلغ.', '');
+  };
+  window.saveOperationReasonModal = function(){
+    const type = state.fixedType || (document.getElementById('operationReasonType')?.value || 'deposit');
+    const amount = Number(document.getElementById('operationAmountInput')?.value || 0);
+    let reason = document.getElementById('operationReasonSelect')?.value || '';
+    if(reason==='أخرى') reason = (document.getElementById('operationOtherText')?.value || '').trim();
+    if(!reason) reason = reasonDefault(type);
+    if(!amount || amount <= 0) return alert('أدخلي مبلغًا صحيحًا أولًا.');
+    if(state.mode==='class'){
+      const students = typeof getStudentsByClass==='function' ? getStudentsByClass(state.classId) : [];
+      if(!students.length) return alert('لا يوجد طلاب / طالبات داخل هذا الفصل.');
+      students.forEach(st => applyOperationToStudent(st, type, amount, reason));
+    } else {
+      const st = typeof getStudentObj==='function' ? getStudentObj(state.studentId) : null;
+      if(!st) return alert('تعذر العثور على الطالب / الطالبة.');
+      applyOperationToStudent(st, type, amount, reason);
+    }
+    if(typeof saveBankData==='function') saveBankData();
+    if(typeof refreshTeacherUI==='function') refreshTeacherUI();
+    if(typeof rerenderSettings==='function') rerenderSettings();
+    closeOperationReasonModal();
+    alert('تم تنفيذ العملية بنجاح.');
+  };
+
+  function relabelButtons(){
+    document.querySelectorAll('button').forEach(btn=>{
+      const t = (btn.textContent||'').trim();
+      if(t==='خصم للفصل كامل') btn.textContent='سحب للفصل كامل';
+      if(t==='عدد الخصومات') btn.textContent='عدد السحوبات';
+    });
+    document.querySelectorAll('.student-card,.student-settings-card,.student-card-custom,.student-cards-grid .teacher-box,.student-cards-grid > div').forEach(card=>{
+      card.innerHTML = card.innerHTML.replace(/عدد الخصومات/g,'عدد السحوبات');
+    });
+  }
+  const obs = new MutationObserver(function(){ relabelButtons(); });
+  document.addEventListener('DOMContentLoaded', function(){ relabelButtons(); obs.observe(document.body,{childList:true,subtree:true}); });
 })();
 </script>
 
@@ -5414,7 +6242,145 @@ window.addEventListener('load', function(){
   };
   function openPrintWindow(title, bodyHtml){
     const w = window.open('', '_blank'); if(!w) return;
-    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}</body></html>`);
+    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}
+
+<style id="operation-reasons-style">
+.operation-modal{position:fixed;inset:0;background:rgba(0,0,0,.38);display:none;align-items:center;justify-content:center;z-index:99999;padding:24px}
+.operation-modal.show{display:flex}
+.operation-box{width:min(420px,100%);background:#fff;border-radius:28px;padding:22px;border:1px solid rgba(16,58,46,.08);box-shadow:0 24px 60px rgba(0,0,0,.22)}
+.operation-box h3{margin:0 0 8px;color:var(--deep);font-size:22px}
+.operation-box p{margin:0 0 14px;color:var(--muted);font-size:13px;line-height:1.8}
+.operation-box .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.operation-box textarea{border:1px solid var(--line);background:#f8fbf9;border-radius:16px;padding:14px 14px;font-size:14px;outline:none;font-family:inherit}
+</style>
+<div id="operationReasonModal" class="operation-modal" aria-hidden="true">
+  <div class="operation-box">
+    <h3 id="operationReasonTitle">تنفيذ العملية</h3>
+    <p id="operationReasonDesc">اختاري نوع العملية والسبب ثم حددي المبلغ.</p>
+    <div class="field" id="operationTypeWrap"><label>نوع العملية</label>
+      <select id="operationReasonType">
+        <option value="deposit">إيداع</option>
+        <option value="withdraw">سحب</option>
+      </select>
+    </div>
+    <div class="field"><label>السبب</label>
+      <select id="operationReasonSelect"></select>
+    </div>
+    <div class="field" id="operationOtherWrap" style="display:none"><label>سبب آخر</label><textarea id="operationOtherText" rows="3" placeholder="اكتبي السبب هنا"></textarea></div>
+    <div class="field"><label>المبلغ</label><input id="operationAmountInput" type="number" min="1" placeholder="أدخلي المبلغ"></div>
+    <div class="actions">
+      <button class="btn btn-light" type="button" onclick="closeOperationReasonModal()">إلغاء</button>
+      <button class="btn btn-green" type="button" onclick="saveOperationReasonModal()">تنفيذ</button>
+    </div>
+  </div>
+</div>
+<script id="operation-reasons-script">
+(function(){
+  const DEPOSIT_REASONS = [
+    'مشاركة مميزة في الحصة','حل سؤال صعب','مساعدة زميل / زميلة','إنهاء المهمة الأدائية','تسليم الواجب مبكرًا','الحصول على درجة كاملة','الفوز في تحدي الرياضيات','ترتيب الدفتر','الالتزام والهدوء في الحصة','مبادرة إيجابية','حضور كامل الأسبوع','تميز في العمل الجماعي','أخرى'
+  ];
+  const WITHDRAW_REASONS = [
+    'عدم حل الواجب','التأخر عن الحصة','كثرة الكلام أثناء الشرح','عدم إحضار الأدوات','عدم المشاركة','مخالفة تعليمات الصف','عدم تسليم المهمة الأدائية','إزعاج الزملاء','استخدام الجوال','سحب سلوكي','أخرى'
+  ];
+  const state = {mode:'student', studentId:'', classId:'', fixedType:''};
+
+  function getReasonOptions(type){ return type==='withdraw' ? WITHDRAW_REASONS : DEPOSIT_REASONS; }
+  function reasonDefault(type){ return type==='withdraw' ? 'سحب جماعي' : 'مكافأة جماعية'; }
+  function fillReasonOptions(type){
+    const sel = document.getElementById('operationReasonSelect'); if(!sel) return;
+    sel.innerHTML = '<option value="">اختاري السبب</option>' + getReasonOptions(type).map(r=>'<option value="'+r+'">'+r+'</option>').join('');
+    toggleOtherOperationReason();
+  }
+  window.toggleOtherOperationReason = function(){
+    const val = document.getElementById('operationReasonSelect')?.value;
+    const wrap = document.getElementById('operationOtherWrap');
+    if(wrap) wrap.style.display = val==='أخرى' ? 'block' : 'none';
+  };
+  function openModal(title, desc, fixedType){
+    state.fixedType = fixedType || '';
+    const modal = document.getElementById('operationReasonModal');
+    const titleEl = document.getElementById('operationReasonTitle');
+    const descEl = document.getElementById('operationReasonDesc');
+    const typeWrap = document.getElementById('operationTypeWrap');
+    const typeSel = document.getElementById('operationReasonType');
+    const amount = document.getElementById('operationAmountInput');
+    const other = document.getElementById('operationOtherText');
+    if(titleEl) titleEl.textContent = title;
+    if(descEl) descEl.textContent = desc;
+    if(typeWrap) typeWrap.style.display = fixedType ? 'none' : 'block';
+    if(typeSel) typeSel.value = fixedType || 'deposit';
+    if(amount) amount.value = '';
+    if(other) other.value = '';
+    fillReasonOptions(fixedType || 'deposit');
+    if(modal) modal.classList.add('show');
+  }
+  window.closeOperationReasonModal = function(){
+    const modal = document.getElementById('operationReasonModal'); if(modal) modal.classList.remove('show');
+    state.mode='student'; state.studentId=''; state.classId=''; state.fixedType='';
+  };
+  const typeSel = document.getElementById('operationReasonType');
+  if(typeSel) typeSel.addEventListener('change', function(){ fillReasonOptions(this.value); });
+  const reasonSel = document.getElementById('operationReasonSelect');
+  if(reasonSel) reasonSel.addEventListener('change', window.toggleOtherOperationReason);
+
+  function applyOperationToStudent(st, type, amount, reason){
+    amount = Number(amount||0); if(!st || !amount) return;
+    st.balance = Math.max(0, Number(st.balance||0) + (type==='deposit' ? amount : -amount));
+    if(typeof addHistory==='function') addHistory(st, type, amount, reason);
+    if(window.bankData){
+      if(!Array.isArray(bankData.operations)) bankData.operations = [];
+      bankData.operations.push({id:'op'+Date.now()+Math.random().toString(16).slice(2,6), studentId:st.id, studentName:st.name, type:type, amount:amount, reason:reason, date:new Date().toLocaleDateString('en-CA')});
+    }
+  }
+
+  window.quickClassOperation = function(classId, type){
+    state.mode='class'; state.classId=classId; state.studentId='';
+    openModal(type==='withdraw' ? 'سحب للفصل كامل' : 'إيداع للفصل كامل', 'اختاري السبب ثم حددي المبلغ لتنفيذ العملية على جميع طلاب / طالبات الفصل.', type);
+  };
+  window.quickStudentOperation = function(studentId){
+    state.mode='student'; state.studentId=studentId; state.classId='';
+    const st = typeof getStudentObj==='function' ? getStudentObj(studentId) : null;
+    openModal('عملية سريعة', 'اختاري نوع العملية والسبب للطالب / للطالبة' + (st ? ' '+st.name : '') + ' ثم حددي المبلغ.', '');
+  };
+  window.saveOperationReasonModal = function(){
+    const type = state.fixedType || (document.getElementById('operationReasonType')?.value || 'deposit');
+    const amount = Number(document.getElementById('operationAmountInput')?.value || 0);
+    let reason = document.getElementById('operationReasonSelect')?.value || '';
+    if(reason==='أخرى') reason = (document.getElementById('operationOtherText')?.value || '').trim();
+    if(!reason) reason = reasonDefault(type);
+    if(!amount || amount <= 0) return alert('أدخلي مبلغًا صحيحًا أولًا.');
+    if(state.mode==='class'){
+      const students = typeof getStudentsByClass==='function' ? getStudentsByClass(state.classId) : [];
+      if(!students.length) return alert('لا يوجد طلاب / طالبات داخل هذا الفصل.');
+      students.forEach(st => applyOperationToStudent(st, type, amount, reason));
+    } else {
+      const st = typeof getStudentObj==='function' ? getStudentObj(state.studentId) : null;
+      if(!st) return alert('تعذر العثور على الطالب / الطالبة.');
+      applyOperationToStudent(st, type, amount, reason);
+    }
+    if(typeof saveBankData==='function') saveBankData();
+    if(typeof refreshTeacherUI==='function') refreshTeacherUI();
+    if(typeof rerenderSettings==='function') rerenderSettings();
+    closeOperationReasonModal();
+    alert('تم تنفيذ العملية بنجاح.');
+  };
+
+  function relabelButtons(){
+    document.querySelectorAll('button').forEach(btn=>{
+      const t = (btn.textContent||'').trim();
+      if(t==='خصم للفصل كامل') btn.textContent='سحب للفصل كامل';
+      if(t==='عدد الخصومات') btn.textContent='عدد السحوبات';
+    });
+    document.querySelectorAll('.student-card,.student-settings-card,.student-card-custom,.student-cards-grid .teacher-box,.student-cards-grid > div').forEach(card=>{
+      card.innerHTML = card.innerHTML.replace(/عدد الخصومات/g,'عدد السحوبات');
+    });
+  }
+  const obs = new MutationObserver(function(){ relabelButtons(); });
+  document.addEventListener('DOMContentLoaded', function(){ relabelButtons(); obs.observe(document.body,{childList:true,subtree:true}); });
+})();
+</script>
+
+</body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
   window.printStudentReport = function(studentId){
@@ -5435,6 +6401,144 @@ window.addEventListener('load', function(){
   const prevShowPane = window.showTeacherPane;
   window.showTeacherPane = function(id, btn){ if(typeof prevShowPane==='function') prevShowPane(id, btn); if(id==='teacherPaneStudents') setTimeout(function(){ try{ renderStudentSettingsDashboard(); }catch(e){} }, 60); };
   document.addEventListener('DOMContentLoaded', function(){ setTimeout(function(){ try{ renderStudentSettingsDashboard(); }catch(e){} }, 250); });
+})();
+</script>
+
+
+
+<style id="operation-reasons-style">
+.operation-modal{position:fixed;inset:0;background:rgba(0,0,0,.38);display:none;align-items:center;justify-content:center;z-index:99999;padding:24px}
+.operation-modal.show{display:flex}
+.operation-box{width:min(420px,100%);background:#fff;border-radius:28px;padding:22px;border:1px solid rgba(16,58,46,.08);box-shadow:0 24px 60px rgba(0,0,0,.22)}
+.operation-box h3{margin:0 0 8px;color:var(--deep);font-size:22px}
+.operation-box p{margin:0 0 14px;color:var(--muted);font-size:13px;line-height:1.8}
+.operation-box .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.operation-box textarea{border:1px solid var(--line);background:#f8fbf9;border-radius:16px;padding:14px 14px;font-size:14px;outline:none;font-family:inherit}
+</style>
+<div id="operationReasonModal" class="operation-modal" aria-hidden="true">
+  <div class="operation-box">
+    <h3 id="operationReasonTitle">تنفيذ العملية</h3>
+    <p id="operationReasonDesc">اختاري نوع العملية والسبب ثم حددي المبلغ.</p>
+    <div class="field" id="operationTypeWrap"><label>نوع العملية</label>
+      <select id="operationReasonType">
+        <option value="deposit">إيداع</option>
+        <option value="withdraw">سحب</option>
+      </select>
+    </div>
+    <div class="field"><label>السبب</label>
+      <select id="operationReasonSelect"></select>
+    </div>
+    <div class="field" id="operationOtherWrap" style="display:none"><label>سبب آخر</label><textarea id="operationOtherText" rows="3" placeholder="اكتبي السبب هنا"></textarea></div>
+    <div class="field"><label>المبلغ</label><input id="operationAmountInput" type="number" min="1" placeholder="أدخلي المبلغ"></div>
+    <div class="actions">
+      <button class="btn btn-light" type="button" onclick="closeOperationReasonModal()">إلغاء</button>
+      <button class="btn btn-green" type="button" onclick="saveOperationReasonModal()">تنفيذ</button>
+    </div>
+  </div>
+</div>
+<script id="operation-reasons-script">
+(function(){
+  const DEPOSIT_REASONS = [
+    'مشاركة مميزة في الحصة','حل سؤال صعب','مساعدة زميل / زميلة','إنهاء المهمة الأدائية','تسليم الواجب مبكرًا','الحصول على درجة كاملة','الفوز في تحدي الرياضيات','ترتيب الدفتر','الالتزام والهدوء في الحصة','مبادرة إيجابية','حضور كامل الأسبوع','تميز في العمل الجماعي','أخرى'
+  ];
+  const WITHDRAW_REASONS = [
+    'عدم حل الواجب','التأخر عن الحصة','كثرة الكلام أثناء الشرح','عدم إحضار الأدوات','عدم المشاركة','مخالفة تعليمات الصف','عدم تسليم المهمة الأدائية','إزعاج الزملاء','استخدام الجوال','سحب سلوكي','أخرى'
+  ];
+  const state = {mode:'student', studentId:'', classId:'', fixedType:''};
+
+  function getReasonOptions(type){ return type==='withdraw' ? WITHDRAW_REASONS : DEPOSIT_REASONS; }
+  function reasonDefault(type){ return type==='withdraw' ? 'سحب جماعي' : 'مكافأة جماعية'; }
+  function fillReasonOptions(type){
+    const sel = document.getElementById('operationReasonSelect'); if(!sel) return;
+    sel.innerHTML = '<option value="">اختاري السبب</option>' + getReasonOptions(type).map(r=>'<option value="'+r+'">'+r+'</option>').join('');
+    toggleOtherOperationReason();
+  }
+  window.toggleOtherOperationReason = function(){
+    const val = document.getElementById('operationReasonSelect')?.value;
+    const wrap = document.getElementById('operationOtherWrap');
+    if(wrap) wrap.style.display = val==='أخرى' ? 'block' : 'none';
+  };
+  function openModal(title, desc, fixedType){
+    state.fixedType = fixedType || '';
+    const modal = document.getElementById('operationReasonModal');
+    const titleEl = document.getElementById('operationReasonTitle');
+    const descEl = document.getElementById('operationReasonDesc');
+    const typeWrap = document.getElementById('operationTypeWrap');
+    const typeSel = document.getElementById('operationReasonType');
+    const amount = document.getElementById('operationAmountInput');
+    const other = document.getElementById('operationOtherText');
+    if(titleEl) titleEl.textContent = title;
+    if(descEl) descEl.textContent = desc;
+    if(typeWrap) typeWrap.style.display = fixedType ? 'none' : 'block';
+    if(typeSel) typeSel.value = fixedType || 'deposit';
+    if(amount) amount.value = '';
+    if(other) other.value = '';
+    fillReasonOptions(fixedType || 'deposit');
+    if(modal) modal.classList.add('show');
+  }
+  window.closeOperationReasonModal = function(){
+    const modal = document.getElementById('operationReasonModal'); if(modal) modal.classList.remove('show');
+    state.mode='student'; state.studentId=''; state.classId=''; state.fixedType='';
+  };
+  const typeSel = document.getElementById('operationReasonType');
+  if(typeSel) typeSel.addEventListener('change', function(){ fillReasonOptions(this.value); });
+  const reasonSel = document.getElementById('operationReasonSelect');
+  if(reasonSel) reasonSel.addEventListener('change', window.toggleOtherOperationReason);
+
+  function applyOperationToStudent(st, type, amount, reason){
+    amount = Number(amount||0); if(!st || !amount) return;
+    st.balance = Math.max(0, Number(st.balance||0) + (type==='deposit' ? amount : -amount));
+    if(typeof addHistory==='function') addHistory(st, type, amount, reason);
+    if(window.bankData){
+      if(!Array.isArray(bankData.operations)) bankData.operations = [];
+      bankData.operations.push({id:'op'+Date.now()+Math.random().toString(16).slice(2,6), studentId:st.id, studentName:st.name, type:type, amount:amount, reason:reason, date:new Date().toLocaleDateString('en-CA')});
+    }
+  }
+
+  window.quickClassOperation = function(classId, type){
+    state.mode='class'; state.classId=classId; state.studentId='';
+    openModal(type==='withdraw' ? 'سحب للفصل كامل' : 'إيداع للفصل كامل', 'اختاري السبب ثم حددي المبلغ لتنفيذ العملية على جميع طلاب / طالبات الفصل.', type);
+  };
+  window.quickStudentOperation = function(studentId){
+    state.mode='student'; state.studentId=studentId; state.classId='';
+    const st = typeof getStudentObj==='function' ? getStudentObj(studentId) : null;
+    openModal('عملية سريعة', 'اختاري نوع العملية والسبب للطالب / للطالبة' + (st ? ' '+st.name : '') + ' ثم حددي المبلغ.', '');
+  };
+  window.saveOperationReasonModal = function(){
+    const type = state.fixedType || (document.getElementById('operationReasonType')?.value || 'deposit');
+    const amount = Number(document.getElementById('operationAmountInput')?.value || 0);
+    let reason = document.getElementById('operationReasonSelect')?.value || '';
+    if(reason==='أخرى') reason = (document.getElementById('operationOtherText')?.value || '').trim();
+    if(!reason) reason = reasonDefault(type);
+    if(!amount || amount <= 0) return alert('أدخلي مبلغًا صحيحًا أولًا.');
+    if(state.mode==='class'){
+      const students = typeof getStudentsByClass==='function' ? getStudentsByClass(state.classId) : [];
+      if(!students.length) return alert('لا يوجد طلاب / طالبات داخل هذا الفصل.');
+      students.forEach(st => applyOperationToStudent(st, type, amount, reason));
+    } else {
+      const st = typeof getStudentObj==='function' ? getStudentObj(state.studentId) : null;
+      if(!st) return alert('تعذر العثور على الطالب / الطالبة.');
+      applyOperationToStudent(st, type, amount, reason);
+    }
+    if(typeof saveBankData==='function') saveBankData();
+    if(typeof refreshTeacherUI==='function') refreshTeacherUI();
+    if(typeof rerenderSettings==='function') rerenderSettings();
+    closeOperationReasonModal();
+    alert('تم تنفيذ العملية بنجاح.');
+  };
+
+  function relabelButtons(){
+    document.querySelectorAll('button').forEach(btn=>{
+      const t = (btn.textContent||'').trim();
+      if(t==='خصم للفصل كامل') btn.textContent='سحب للفصل كامل';
+      if(t==='عدد الخصومات') btn.textContent='عدد السحوبات';
+    });
+    document.querySelectorAll('.student-card,.student-settings-card,.student-card-custom,.student-cards-grid .teacher-box,.student-cards-grid > div').forEach(card=>{
+      card.innerHTML = card.innerHTML.replace(/عدد الخصومات/g,'عدد السحوبات');
+    });
+  }
+  const obs = new MutationObserver(function(){ relabelButtons(); });
+  document.addEventListener('DOMContentLoaded', function(){ relabelButtons(); obs.observe(document.body,{childList:true,subtree:true}); });
 })();
 </script>
 
@@ -5985,7 +7089,145 @@ window.addEventListener('load', function(){
   };
   function openPrintWindow(title, bodyHtml){
     const w = window.open('', '_blank'); if(!w) return;
-    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}</body></html>`);
+    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}
+
+<style id="operation-reasons-style">
+.operation-modal{position:fixed;inset:0;background:rgba(0,0,0,.38);display:none;align-items:center;justify-content:center;z-index:99999;padding:24px}
+.operation-modal.show{display:flex}
+.operation-box{width:min(420px,100%);background:#fff;border-radius:28px;padding:22px;border:1px solid rgba(16,58,46,.08);box-shadow:0 24px 60px rgba(0,0,0,.22)}
+.operation-box h3{margin:0 0 8px;color:var(--deep);font-size:22px}
+.operation-box p{margin:0 0 14px;color:var(--muted);font-size:13px;line-height:1.8}
+.operation-box .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.operation-box textarea{border:1px solid var(--line);background:#f8fbf9;border-radius:16px;padding:14px 14px;font-size:14px;outline:none;font-family:inherit}
+</style>
+<div id="operationReasonModal" class="operation-modal" aria-hidden="true">
+  <div class="operation-box">
+    <h3 id="operationReasonTitle">تنفيذ العملية</h3>
+    <p id="operationReasonDesc">اختاري نوع العملية والسبب ثم حددي المبلغ.</p>
+    <div class="field" id="operationTypeWrap"><label>نوع العملية</label>
+      <select id="operationReasonType">
+        <option value="deposit">إيداع</option>
+        <option value="withdraw">سحب</option>
+      </select>
+    </div>
+    <div class="field"><label>السبب</label>
+      <select id="operationReasonSelect"></select>
+    </div>
+    <div class="field" id="operationOtherWrap" style="display:none"><label>سبب آخر</label><textarea id="operationOtherText" rows="3" placeholder="اكتبي السبب هنا"></textarea></div>
+    <div class="field"><label>المبلغ</label><input id="operationAmountInput" type="number" min="1" placeholder="أدخلي المبلغ"></div>
+    <div class="actions">
+      <button class="btn btn-light" type="button" onclick="closeOperationReasonModal()">إلغاء</button>
+      <button class="btn btn-green" type="button" onclick="saveOperationReasonModal()">تنفيذ</button>
+    </div>
+  </div>
+</div>
+<script id="operation-reasons-script">
+(function(){
+  const DEPOSIT_REASONS = [
+    'مشاركة مميزة في الحصة','حل سؤال صعب','مساعدة زميل / زميلة','إنهاء المهمة الأدائية','تسليم الواجب مبكرًا','الحصول على درجة كاملة','الفوز في تحدي الرياضيات','ترتيب الدفتر','الالتزام والهدوء في الحصة','مبادرة إيجابية','حضور كامل الأسبوع','تميز في العمل الجماعي','أخرى'
+  ];
+  const WITHDRAW_REASONS = [
+    'عدم حل الواجب','التأخر عن الحصة','كثرة الكلام أثناء الشرح','عدم إحضار الأدوات','عدم المشاركة','مخالفة تعليمات الصف','عدم تسليم المهمة الأدائية','إزعاج الزملاء','استخدام الجوال','سحب سلوكي','أخرى'
+  ];
+  const state = {mode:'student', studentId:'', classId:'', fixedType:''};
+
+  function getReasonOptions(type){ return type==='withdraw' ? WITHDRAW_REASONS : DEPOSIT_REASONS; }
+  function reasonDefault(type){ return type==='withdraw' ? 'سحب جماعي' : 'مكافأة جماعية'; }
+  function fillReasonOptions(type){
+    const sel = document.getElementById('operationReasonSelect'); if(!sel) return;
+    sel.innerHTML = '<option value="">اختاري السبب</option>' + getReasonOptions(type).map(r=>'<option value="'+r+'">'+r+'</option>').join('');
+    toggleOtherOperationReason();
+  }
+  window.toggleOtherOperationReason = function(){
+    const val = document.getElementById('operationReasonSelect')?.value;
+    const wrap = document.getElementById('operationOtherWrap');
+    if(wrap) wrap.style.display = val==='أخرى' ? 'block' : 'none';
+  };
+  function openModal(title, desc, fixedType){
+    state.fixedType = fixedType || '';
+    const modal = document.getElementById('operationReasonModal');
+    const titleEl = document.getElementById('operationReasonTitle');
+    const descEl = document.getElementById('operationReasonDesc');
+    const typeWrap = document.getElementById('operationTypeWrap');
+    const typeSel = document.getElementById('operationReasonType');
+    const amount = document.getElementById('operationAmountInput');
+    const other = document.getElementById('operationOtherText');
+    if(titleEl) titleEl.textContent = title;
+    if(descEl) descEl.textContent = desc;
+    if(typeWrap) typeWrap.style.display = fixedType ? 'none' : 'block';
+    if(typeSel) typeSel.value = fixedType || 'deposit';
+    if(amount) amount.value = '';
+    if(other) other.value = '';
+    fillReasonOptions(fixedType || 'deposit');
+    if(modal) modal.classList.add('show');
+  }
+  window.closeOperationReasonModal = function(){
+    const modal = document.getElementById('operationReasonModal'); if(modal) modal.classList.remove('show');
+    state.mode='student'; state.studentId=''; state.classId=''; state.fixedType='';
+  };
+  const typeSel = document.getElementById('operationReasonType');
+  if(typeSel) typeSel.addEventListener('change', function(){ fillReasonOptions(this.value); });
+  const reasonSel = document.getElementById('operationReasonSelect');
+  if(reasonSel) reasonSel.addEventListener('change', window.toggleOtherOperationReason);
+
+  function applyOperationToStudent(st, type, amount, reason){
+    amount = Number(amount||0); if(!st || !amount) return;
+    st.balance = Math.max(0, Number(st.balance||0) + (type==='deposit' ? amount : -amount));
+    if(typeof addHistory==='function') addHistory(st, type, amount, reason);
+    if(window.bankData){
+      if(!Array.isArray(bankData.operations)) bankData.operations = [];
+      bankData.operations.push({id:'op'+Date.now()+Math.random().toString(16).slice(2,6), studentId:st.id, studentName:st.name, type:type, amount:amount, reason:reason, date:new Date().toLocaleDateString('en-CA')});
+    }
+  }
+
+  window.quickClassOperation = function(classId, type){
+    state.mode='class'; state.classId=classId; state.studentId='';
+    openModal(type==='withdraw' ? 'سحب للفصل كامل' : 'إيداع للفصل كامل', 'اختاري السبب ثم حددي المبلغ لتنفيذ العملية على جميع طلاب / طالبات الفصل.', type);
+  };
+  window.quickStudentOperation = function(studentId){
+    state.mode='student'; state.studentId=studentId; state.classId='';
+    const st = typeof getStudentObj==='function' ? getStudentObj(studentId) : null;
+    openModal('عملية سريعة', 'اختاري نوع العملية والسبب للطالب / للطالبة' + (st ? ' '+st.name : '') + ' ثم حددي المبلغ.', '');
+  };
+  window.saveOperationReasonModal = function(){
+    const type = state.fixedType || (document.getElementById('operationReasonType')?.value || 'deposit');
+    const amount = Number(document.getElementById('operationAmountInput')?.value || 0);
+    let reason = document.getElementById('operationReasonSelect')?.value || '';
+    if(reason==='أخرى') reason = (document.getElementById('operationOtherText')?.value || '').trim();
+    if(!reason) reason = reasonDefault(type);
+    if(!amount || amount <= 0) return alert('أدخلي مبلغًا صحيحًا أولًا.');
+    if(state.mode==='class'){
+      const students = typeof getStudentsByClass==='function' ? getStudentsByClass(state.classId) : [];
+      if(!students.length) return alert('لا يوجد طلاب / طالبات داخل هذا الفصل.');
+      students.forEach(st => applyOperationToStudent(st, type, amount, reason));
+    } else {
+      const st = typeof getStudentObj==='function' ? getStudentObj(state.studentId) : null;
+      if(!st) return alert('تعذر العثور على الطالب / الطالبة.');
+      applyOperationToStudent(st, type, amount, reason);
+    }
+    if(typeof saveBankData==='function') saveBankData();
+    if(typeof refreshTeacherUI==='function') refreshTeacherUI();
+    if(typeof rerenderSettings==='function') rerenderSettings();
+    closeOperationReasonModal();
+    alert('تم تنفيذ العملية بنجاح.');
+  };
+
+  function relabelButtons(){
+    document.querySelectorAll('button').forEach(btn=>{
+      const t = (btn.textContent||'').trim();
+      if(t==='خصم للفصل كامل') btn.textContent='سحب للفصل كامل';
+      if(t==='عدد الخصومات') btn.textContent='عدد السحوبات';
+    });
+    document.querySelectorAll('.student-card,.student-settings-card,.student-card-custom,.student-cards-grid .teacher-box,.student-cards-grid > div').forEach(card=>{
+      card.innerHTML = card.innerHTML.replace(/عدد الخصومات/g,'عدد السحوبات');
+    });
+  }
+  const obs = new MutationObserver(function(){ relabelButtons(); });
+  document.addEventListener('DOMContentLoaded', function(){ relabelButtons(); obs.observe(document.body,{childList:true,subtree:true}); });
+})();
+</script>
+
+</body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
   window.printStudentReport = function(studentId){
@@ -6006,6 +7248,144 @@ window.addEventListener('load', function(){
   const prevShowPane = window.showTeacherPane;
   window.showTeacherPane = function(id, btn){ if(typeof prevShowPane==='function') prevShowPane(id, btn); if(id==='teacherPaneStudents') setTimeout(function(){ try{ renderStudentSettingsDashboard(); }catch(e){} }, 60); };
   document.addEventListener('DOMContentLoaded', function(){ setTimeout(function(){ try{ renderStudentSettingsDashboard(); }catch(e){} }, 250); });
+})();
+</script>
+
+
+
+<style id="operation-reasons-style">
+.operation-modal{position:fixed;inset:0;background:rgba(0,0,0,.38);display:none;align-items:center;justify-content:center;z-index:99999;padding:24px}
+.operation-modal.show{display:flex}
+.operation-box{width:min(420px,100%);background:#fff;border-radius:28px;padding:22px;border:1px solid rgba(16,58,46,.08);box-shadow:0 24px 60px rgba(0,0,0,.22)}
+.operation-box h3{margin:0 0 8px;color:var(--deep);font-size:22px}
+.operation-box p{margin:0 0 14px;color:var(--muted);font-size:13px;line-height:1.8}
+.operation-box .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.operation-box textarea{border:1px solid var(--line);background:#f8fbf9;border-radius:16px;padding:14px 14px;font-size:14px;outline:none;font-family:inherit}
+</style>
+<div id="operationReasonModal" class="operation-modal" aria-hidden="true">
+  <div class="operation-box">
+    <h3 id="operationReasonTitle">تنفيذ العملية</h3>
+    <p id="operationReasonDesc">اختاري نوع العملية والسبب ثم حددي المبلغ.</p>
+    <div class="field" id="operationTypeWrap"><label>نوع العملية</label>
+      <select id="operationReasonType">
+        <option value="deposit">إيداع</option>
+        <option value="withdraw">سحب</option>
+      </select>
+    </div>
+    <div class="field"><label>السبب</label>
+      <select id="operationReasonSelect"></select>
+    </div>
+    <div class="field" id="operationOtherWrap" style="display:none"><label>سبب آخر</label><textarea id="operationOtherText" rows="3" placeholder="اكتبي السبب هنا"></textarea></div>
+    <div class="field"><label>المبلغ</label><input id="operationAmountInput" type="number" min="1" placeholder="أدخلي المبلغ"></div>
+    <div class="actions">
+      <button class="btn btn-light" type="button" onclick="closeOperationReasonModal()">إلغاء</button>
+      <button class="btn btn-green" type="button" onclick="saveOperationReasonModal()">تنفيذ</button>
+    </div>
+  </div>
+</div>
+<script id="operation-reasons-script">
+(function(){
+  const DEPOSIT_REASONS = [
+    'مشاركة مميزة في الحصة','حل سؤال صعب','مساعدة زميل / زميلة','إنهاء المهمة الأدائية','تسليم الواجب مبكرًا','الحصول على درجة كاملة','الفوز في تحدي الرياضيات','ترتيب الدفتر','الالتزام والهدوء في الحصة','مبادرة إيجابية','حضور كامل الأسبوع','تميز في العمل الجماعي','أخرى'
+  ];
+  const WITHDRAW_REASONS = [
+    'عدم حل الواجب','التأخر عن الحصة','كثرة الكلام أثناء الشرح','عدم إحضار الأدوات','عدم المشاركة','مخالفة تعليمات الصف','عدم تسليم المهمة الأدائية','إزعاج الزملاء','استخدام الجوال','سحب سلوكي','أخرى'
+  ];
+  const state = {mode:'student', studentId:'', classId:'', fixedType:''};
+
+  function getReasonOptions(type){ return type==='withdraw' ? WITHDRAW_REASONS : DEPOSIT_REASONS; }
+  function reasonDefault(type){ return type==='withdraw' ? 'سحب جماعي' : 'مكافأة جماعية'; }
+  function fillReasonOptions(type){
+    const sel = document.getElementById('operationReasonSelect'); if(!sel) return;
+    sel.innerHTML = '<option value="">اختاري السبب</option>' + getReasonOptions(type).map(r=>'<option value="'+r+'">'+r+'</option>').join('');
+    toggleOtherOperationReason();
+  }
+  window.toggleOtherOperationReason = function(){
+    const val = document.getElementById('operationReasonSelect')?.value;
+    const wrap = document.getElementById('operationOtherWrap');
+    if(wrap) wrap.style.display = val==='أخرى' ? 'block' : 'none';
+  };
+  function openModal(title, desc, fixedType){
+    state.fixedType = fixedType || '';
+    const modal = document.getElementById('operationReasonModal');
+    const titleEl = document.getElementById('operationReasonTitle');
+    const descEl = document.getElementById('operationReasonDesc');
+    const typeWrap = document.getElementById('operationTypeWrap');
+    const typeSel = document.getElementById('operationReasonType');
+    const amount = document.getElementById('operationAmountInput');
+    const other = document.getElementById('operationOtherText');
+    if(titleEl) titleEl.textContent = title;
+    if(descEl) descEl.textContent = desc;
+    if(typeWrap) typeWrap.style.display = fixedType ? 'none' : 'block';
+    if(typeSel) typeSel.value = fixedType || 'deposit';
+    if(amount) amount.value = '';
+    if(other) other.value = '';
+    fillReasonOptions(fixedType || 'deposit');
+    if(modal) modal.classList.add('show');
+  }
+  window.closeOperationReasonModal = function(){
+    const modal = document.getElementById('operationReasonModal'); if(modal) modal.classList.remove('show');
+    state.mode='student'; state.studentId=''; state.classId=''; state.fixedType='';
+  };
+  const typeSel = document.getElementById('operationReasonType');
+  if(typeSel) typeSel.addEventListener('change', function(){ fillReasonOptions(this.value); });
+  const reasonSel = document.getElementById('operationReasonSelect');
+  if(reasonSel) reasonSel.addEventListener('change', window.toggleOtherOperationReason);
+
+  function applyOperationToStudent(st, type, amount, reason){
+    amount = Number(amount||0); if(!st || !amount) return;
+    st.balance = Math.max(0, Number(st.balance||0) + (type==='deposit' ? amount : -amount));
+    if(typeof addHistory==='function') addHistory(st, type, amount, reason);
+    if(window.bankData){
+      if(!Array.isArray(bankData.operations)) bankData.operations = [];
+      bankData.operations.push({id:'op'+Date.now()+Math.random().toString(16).slice(2,6), studentId:st.id, studentName:st.name, type:type, amount:amount, reason:reason, date:new Date().toLocaleDateString('en-CA')});
+    }
+  }
+
+  window.quickClassOperation = function(classId, type){
+    state.mode='class'; state.classId=classId; state.studentId='';
+    openModal(type==='withdraw' ? 'سحب للفصل كامل' : 'إيداع للفصل كامل', 'اختاري السبب ثم حددي المبلغ لتنفيذ العملية على جميع طلاب / طالبات الفصل.', type);
+  };
+  window.quickStudentOperation = function(studentId){
+    state.mode='student'; state.studentId=studentId; state.classId='';
+    const st = typeof getStudentObj==='function' ? getStudentObj(studentId) : null;
+    openModal('عملية سريعة', 'اختاري نوع العملية والسبب للطالب / للطالبة' + (st ? ' '+st.name : '') + ' ثم حددي المبلغ.', '');
+  };
+  window.saveOperationReasonModal = function(){
+    const type = state.fixedType || (document.getElementById('operationReasonType')?.value || 'deposit');
+    const amount = Number(document.getElementById('operationAmountInput')?.value || 0);
+    let reason = document.getElementById('operationReasonSelect')?.value || '';
+    if(reason==='أخرى') reason = (document.getElementById('operationOtherText')?.value || '').trim();
+    if(!reason) reason = reasonDefault(type);
+    if(!amount || amount <= 0) return alert('أدخلي مبلغًا صحيحًا أولًا.');
+    if(state.mode==='class'){
+      const students = typeof getStudentsByClass==='function' ? getStudentsByClass(state.classId) : [];
+      if(!students.length) return alert('لا يوجد طلاب / طالبات داخل هذا الفصل.');
+      students.forEach(st => applyOperationToStudent(st, type, amount, reason));
+    } else {
+      const st = typeof getStudentObj==='function' ? getStudentObj(state.studentId) : null;
+      if(!st) return alert('تعذر العثور على الطالب / الطالبة.');
+      applyOperationToStudent(st, type, amount, reason);
+    }
+    if(typeof saveBankData==='function') saveBankData();
+    if(typeof refreshTeacherUI==='function') refreshTeacherUI();
+    if(typeof rerenderSettings==='function') rerenderSettings();
+    closeOperationReasonModal();
+    alert('تم تنفيذ العملية بنجاح.');
+  };
+
+  function relabelButtons(){
+    document.querySelectorAll('button').forEach(btn=>{
+      const t = (btn.textContent||'').trim();
+      if(t==='خصم للفصل كامل') btn.textContent='سحب للفصل كامل';
+      if(t==='عدد الخصومات') btn.textContent='عدد السحوبات';
+    });
+    document.querySelectorAll('.student-card,.student-settings-card,.student-card-custom,.student-cards-grid .teacher-box,.student-cards-grid > div').forEach(card=>{
+      card.innerHTML = card.innerHTML.replace(/عدد الخصومات/g,'عدد السحوبات');
+    });
+  }
+  const obs = new MutationObserver(function(){ relabelButtons(); });
+  document.addEventListener('DOMContentLoaded', function(){ relabelButtons(); obs.observe(document.body,{childList:true,subtree:true}); });
 })();
 </script>
 
@@ -6334,7 +7714,145 @@ window.addEventListener('load', function(){
   };
   function openPrintWindow(title, bodyHtml){
     const w = window.open('', '_blank'); if(!w) return;
-    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}</body></html>`);
+    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}
+
+<style id="operation-reasons-style">
+.operation-modal{position:fixed;inset:0;background:rgba(0,0,0,.38);display:none;align-items:center;justify-content:center;z-index:99999;padding:24px}
+.operation-modal.show{display:flex}
+.operation-box{width:min(420px,100%);background:#fff;border-radius:28px;padding:22px;border:1px solid rgba(16,58,46,.08);box-shadow:0 24px 60px rgba(0,0,0,.22)}
+.operation-box h3{margin:0 0 8px;color:var(--deep);font-size:22px}
+.operation-box p{margin:0 0 14px;color:var(--muted);font-size:13px;line-height:1.8}
+.operation-box .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.operation-box textarea{border:1px solid var(--line);background:#f8fbf9;border-radius:16px;padding:14px 14px;font-size:14px;outline:none;font-family:inherit}
+</style>
+<div id="operationReasonModal" class="operation-modal" aria-hidden="true">
+  <div class="operation-box">
+    <h3 id="operationReasonTitle">تنفيذ العملية</h3>
+    <p id="operationReasonDesc">اختاري نوع العملية والسبب ثم حددي المبلغ.</p>
+    <div class="field" id="operationTypeWrap"><label>نوع العملية</label>
+      <select id="operationReasonType">
+        <option value="deposit">إيداع</option>
+        <option value="withdraw">سحب</option>
+      </select>
+    </div>
+    <div class="field"><label>السبب</label>
+      <select id="operationReasonSelect"></select>
+    </div>
+    <div class="field" id="operationOtherWrap" style="display:none"><label>سبب آخر</label><textarea id="operationOtherText" rows="3" placeholder="اكتبي السبب هنا"></textarea></div>
+    <div class="field"><label>المبلغ</label><input id="operationAmountInput" type="number" min="1" placeholder="أدخلي المبلغ"></div>
+    <div class="actions">
+      <button class="btn btn-light" type="button" onclick="closeOperationReasonModal()">إلغاء</button>
+      <button class="btn btn-green" type="button" onclick="saveOperationReasonModal()">تنفيذ</button>
+    </div>
+  </div>
+</div>
+<script id="operation-reasons-script">
+(function(){
+  const DEPOSIT_REASONS = [
+    'مشاركة مميزة في الحصة','حل سؤال صعب','مساعدة زميل / زميلة','إنهاء المهمة الأدائية','تسليم الواجب مبكرًا','الحصول على درجة كاملة','الفوز في تحدي الرياضيات','ترتيب الدفتر','الالتزام والهدوء في الحصة','مبادرة إيجابية','حضور كامل الأسبوع','تميز في العمل الجماعي','أخرى'
+  ];
+  const WITHDRAW_REASONS = [
+    'عدم حل الواجب','التأخر عن الحصة','كثرة الكلام أثناء الشرح','عدم إحضار الأدوات','عدم المشاركة','مخالفة تعليمات الصف','عدم تسليم المهمة الأدائية','إزعاج الزملاء','استخدام الجوال','سحب سلوكي','أخرى'
+  ];
+  const state = {mode:'student', studentId:'', classId:'', fixedType:''};
+
+  function getReasonOptions(type){ return type==='withdraw' ? WITHDRAW_REASONS : DEPOSIT_REASONS; }
+  function reasonDefault(type){ return type==='withdraw' ? 'سحب جماعي' : 'مكافأة جماعية'; }
+  function fillReasonOptions(type){
+    const sel = document.getElementById('operationReasonSelect'); if(!sel) return;
+    sel.innerHTML = '<option value="">اختاري السبب</option>' + getReasonOptions(type).map(r=>'<option value="'+r+'">'+r+'</option>').join('');
+    toggleOtherOperationReason();
+  }
+  window.toggleOtherOperationReason = function(){
+    const val = document.getElementById('operationReasonSelect')?.value;
+    const wrap = document.getElementById('operationOtherWrap');
+    if(wrap) wrap.style.display = val==='أخرى' ? 'block' : 'none';
+  };
+  function openModal(title, desc, fixedType){
+    state.fixedType = fixedType || '';
+    const modal = document.getElementById('operationReasonModal');
+    const titleEl = document.getElementById('operationReasonTitle');
+    const descEl = document.getElementById('operationReasonDesc');
+    const typeWrap = document.getElementById('operationTypeWrap');
+    const typeSel = document.getElementById('operationReasonType');
+    const amount = document.getElementById('operationAmountInput');
+    const other = document.getElementById('operationOtherText');
+    if(titleEl) titleEl.textContent = title;
+    if(descEl) descEl.textContent = desc;
+    if(typeWrap) typeWrap.style.display = fixedType ? 'none' : 'block';
+    if(typeSel) typeSel.value = fixedType || 'deposit';
+    if(amount) amount.value = '';
+    if(other) other.value = '';
+    fillReasonOptions(fixedType || 'deposit');
+    if(modal) modal.classList.add('show');
+  }
+  window.closeOperationReasonModal = function(){
+    const modal = document.getElementById('operationReasonModal'); if(modal) modal.classList.remove('show');
+    state.mode='student'; state.studentId=''; state.classId=''; state.fixedType='';
+  };
+  const typeSel = document.getElementById('operationReasonType');
+  if(typeSel) typeSel.addEventListener('change', function(){ fillReasonOptions(this.value); });
+  const reasonSel = document.getElementById('operationReasonSelect');
+  if(reasonSel) reasonSel.addEventListener('change', window.toggleOtherOperationReason);
+
+  function applyOperationToStudent(st, type, amount, reason){
+    amount = Number(amount||0); if(!st || !amount) return;
+    st.balance = Math.max(0, Number(st.balance||0) + (type==='deposit' ? amount : -amount));
+    if(typeof addHistory==='function') addHistory(st, type, amount, reason);
+    if(window.bankData){
+      if(!Array.isArray(bankData.operations)) bankData.operations = [];
+      bankData.operations.push({id:'op'+Date.now()+Math.random().toString(16).slice(2,6), studentId:st.id, studentName:st.name, type:type, amount:amount, reason:reason, date:new Date().toLocaleDateString('en-CA')});
+    }
+  }
+
+  window.quickClassOperation = function(classId, type){
+    state.mode='class'; state.classId=classId; state.studentId='';
+    openModal(type==='withdraw' ? 'سحب للفصل كامل' : 'إيداع للفصل كامل', 'اختاري السبب ثم حددي المبلغ لتنفيذ العملية على جميع طلاب / طالبات الفصل.', type);
+  };
+  window.quickStudentOperation = function(studentId){
+    state.mode='student'; state.studentId=studentId; state.classId='';
+    const st = typeof getStudentObj==='function' ? getStudentObj(studentId) : null;
+    openModal('عملية سريعة', 'اختاري نوع العملية والسبب للطالب / للطالبة' + (st ? ' '+st.name : '') + ' ثم حددي المبلغ.', '');
+  };
+  window.saveOperationReasonModal = function(){
+    const type = state.fixedType || (document.getElementById('operationReasonType')?.value || 'deposit');
+    const amount = Number(document.getElementById('operationAmountInput')?.value || 0);
+    let reason = document.getElementById('operationReasonSelect')?.value || '';
+    if(reason==='أخرى') reason = (document.getElementById('operationOtherText')?.value || '').trim();
+    if(!reason) reason = reasonDefault(type);
+    if(!amount || amount <= 0) return alert('أدخلي مبلغًا صحيحًا أولًا.');
+    if(state.mode==='class'){
+      const students = typeof getStudentsByClass==='function' ? getStudentsByClass(state.classId) : [];
+      if(!students.length) return alert('لا يوجد طلاب / طالبات داخل هذا الفصل.');
+      students.forEach(st => applyOperationToStudent(st, type, amount, reason));
+    } else {
+      const st = typeof getStudentObj==='function' ? getStudentObj(state.studentId) : null;
+      if(!st) return alert('تعذر العثور على الطالب / الطالبة.');
+      applyOperationToStudent(st, type, amount, reason);
+    }
+    if(typeof saveBankData==='function') saveBankData();
+    if(typeof refreshTeacherUI==='function') refreshTeacherUI();
+    if(typeof rerenderSettings==='function') rerenderSettings();
+    closeOperationReasonModal();
+    alert('تم تنفيذ العملية بنجاح.');
+  };
+
+  function relabelButtons(){
+    document.querySelectorAll('button').forEach(btn=>{
+      const t = (btn.textContent||'').trim();
+      if(t==='خصم للفصل كامل') btn.textContent='سحب للفصل كامل';
+      if(t==='عدد الخصومات') btn.textContent='عدد السحوبات';
+    });
+    document.querySelectorAll('.student-card,.student-settings-card,.student-card-custom,.student-cards-grid .teacher-box,.student-cards-grid > div').forEach(card=>{
+      card.innerHTML = card.innerHTML.replace(/عدد الخصومات/g,'عدد السحوبات');
+    });
+  }
+  const obs = new MutationObserver(function(){ relabelButtons(); });
+  document.addEventListener('DOMContentLoaded', function(){ relabelButtons(); obs.observe(document.body,{childList:true,subtree:true}); });
+})();
+</script>
+
+</body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
   window.printStudentReport = function(studentId){
@@ -6355,6 +7873,144 @@ window.addEventListener('load', function(){
   const prevShowPane = window.showTeacherPane;
   window.showTeacherPane = function(id, btn){ if(typeof prevShowPane==='function') prevShowPane(id, btn); if(id==='teacherPaneStudents') setTimeout(function(){ try{ renderStudentSettingsDashboard(); }catch(e){} }, 60); };
   document.addEventListener('DOMContentLoaded', function(){ setTimeout(function(){ try{ renderStudentSettingsDashboard(); }catch(e){} }, 250); });
+})();
+</script>
+
+
+
+<style id="operation-reasons-style">
+.operation-modal{position:fixed;inset:0;background:rgba(0,0,0,.38);display:none;align-items:center;justify-content:center;z-index:99999;padding:24px}
+.operation-modal.show{display:flex}
+.operation-box{width:min(420px,100%);background:#fff;border-radius:28px;padding:22px;border:1px solid rgba(16,58,46,.08);box-shadow:0 24px 60px rgba(0,0,0,.22)}
+.operation-box h3{margin:0 0 8px;color:var(--deep);font-size:22px}
+.operation-box p{margin:0 0 14px;color:var(--muted);font-size:13px;line-height:1.8}
+.operation-box .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.operation-box textarea{border:1px solid var(--line);background:#f8fbf9;border-radius:16px;padding:14px 14px;font-size:14px;outline:none;font-family:inherit}
+</style>
+<div id="operationReasonModal" class="operation-modal" aria-hidden="true">
+  <div class="operation-box">
+    <h3 id="operationReasonTitle">تنفيذ العملية</h3>
+    <p id="operationReasonDesc">اختاري نوع العملية والسبب ثم حددي المبلغ.</p>
+    <div class="field" id="operationTypeWrap"><label>نوع العملية</label>
+      <select id="operationReasonType">
+        <option value="deposit">إيداع</option>
+        <option value="withdraw">سحب</option>
+      </select>
+    </div>
+    <div class="field"><label>السبب</label>
+      <select id="operationReasonSelect"></select>
+    </div>
+    <div class="field" id="operationOtherWrap" style="display:none"><label>سبب آخر</label><textarea id="operationOtherText" rows="3" placeholder="اكتبي السبب هنا"></textarea></div>
+    <div class="field"><label>المبلغ</label><input id="operationAmountInput" type="number" min="1" placeholder="أدخلي المبلغ"></div>
+    <div class="actions">
+      <button class="btn btn-light" type="button" onclick="closeOperationReasonModal()">إلغاء</button>
+      <button class="btn btn-green" type="button" onclick="saveOperationReasonModal()">تنفيذ</button>
+    </div>
+  </div>
+</div>
+<script id="operation-reasons-script">
+(function(){
+  const DEPOSIT_REASONS = [
+    'مشاركة مميزة في الحصة','حل سؤال صعب','مساعدة زميل / زميلة','إنهاء المهمة الأدائية','تسليم الواجب مبكرًا','الحصول على درجة كاملة','الفوز في تحدي الرياضيات','ترتيب الدفتر','الالتزام والهدوء في الحصة','مبادرة إيجابية','حضور كامل الأسبوع','تميز في العمل الجماعي','أخرى'
+  ];
+  const WITHDRAW_REASONS = [
+    'عدم حل الواجب','التأخر عن الحصة','كثرة الكلام أثناء الشرح','عدم إحضار الأدوات','عدم المشاركة','مخالفة تعليمات الصف','عدم تسليم المهمة الأدائية','إزعاج الزملاء','استخدام الجوال','سحب سلوكي','أخرى'
+  ];
+  const state = {mode:'student', studentId:'', classId:'', fixedType:''};
+
+  function getReasonOptions(type){ return type==='withdraw' ? WITHDRAW_REASONS : DEPOSIT_REASONS; }
+  function reasonDefault(type){ return type==='withdraw' ? 'سحب جماعي' : 'مكافأة جماعية'; }
+  function fillReasonOptions(type){
+    const sel = document.getElementById('operationReasonSelect'); if(!sel) return;
+    sel.innerHTML = '<option value="">اختاري السبب</option>' + getReasonOptions(type).map(r=>'<option value="'+r+'">'+r+'</option>').join('');
+    toggleOtherOperationReason();
+  }
+  window.toggleOtherOperationReason = function(){
+    const val = document.getElementById('operationReasonSelect')?.value;
+    const wrap = document.getElementById('operationOtherWrap');
+    if(wrap) wrap.style.display = val==='أخرى' ? 'block' : 'none';
+  };
+  function openModal(title, desc, fixedType){
+    state.fixedType = fixedType || '';
+    const modal = document.getElementById('operationReasonModal');
+    const titleEl = document.getElementById('operationReasonTitle');
+    const descEl = document.getElementById('operationReasonDesc');
+    const typeWrap = document.getElementById('operationTypeWrap');
+    const typeSel = document.getElementById('operationReasonType');
+    const amount = document.getElementById('operationAmountInput');
+    const other = document.getElementById('operationOtherText');
+    if(titleEl) titleEl.textContent = title;
+    if(descEl) descEl.textContent = desc;
+    if(typeWrap) typeWrap.style.display = fixedType ? 'none' : 'block';
+    if(typeSel) typeSel.value = fixedType || 'deposit';
+    if(amount) amount.value = '';
+    if(other) other.value = '';
+    fillReasonOptions(fixedType || 'deposit');
+    if(modal) modal.classList.add('show');
+  }
+  window.closeOperationReasonModal = function(){
+    const modal = document.getElementById('operationReasonModal'); if(modal) modal.classList.remove('show');
+    state.mode='student'; state.studentId=''; state.classId=''; state.fixedType='';
+  };
+  const typeSel = document.getElementById('operationReasonType');
+  if(typeSel) typeSel.addEventListener('change', function(){ fillReasonOptions(this.value); });
+  const reasonSel = document.getElementById('operationReasonSelect');
+  if(reasonSel) reasonSel.addEventListener('change', window.toggleOtherOperationReason);
+
+  function applyOperationToStudent(st, type, amount, reason){
+    amount = Number(amount||0); if(!st || !amount) return;
+    st.balance = Math.max(0, Number(st.balance||0) + (type==='deposit' ? amount : -amount));
+    if(typeof addHistory==='function') addHistory(st, type, amount, reason);
+    if(window.bankData){
+      if(!Array.isArray(bankData.operations)) bankData.operations = [];
+      bankData.operations.push({id:'op'+Date.now()+Math.random().toString(16).slice(2,6), studentId:st.id, studentName:st.name, type:type, amount:amount, reason:reason, date:new Date().toLocaleDateString('en-CA')});
+    }
+  }
+
+  window.quickClassOperation = function(classId, type){
+    state.mode='class'; state.classId=classId; state.studentId='';
+    openModal(type==='withdraw' ? 'سحب للفصل كامل' : 'إيداع للفصل كامل', 'اختاري السبب ثم حددي المبلغ لتنفيذ العملية على جميع طلاب / طالبات الفصل.', type);
+  };
+  window.quickStudentOperation = function(studentId){
+    state.mode='student'; state.studentId=studentId; state.classId='';
+    const st = typeof getStudentObj==='function' ? getStudentObj(studentId) : null;
+    openModal('عملية سريعة', 'اختاري نوع العملية والسبب للطالب / للطالبة' + (st ? ' '+st.name : '') + ' ثم حددي المبلغ.', '');
+  };
+  window.saveOperationReasonModal = function(){
+    const type = state.fixedType || (document.getElementById('operationReasonType')?.value || 'deposit');
+    const amount = Number(document.getElementById('operationAmountInput')?.value || 0);
+    let reason = document.getElementById('operationReasonSelect')?.value || '';
+    if(reason==='أخرى') reason = (document.getElementById('operationOtherText')?.value || '').trim();
+    if(!reason) reason = reasonDefault(type);
+    if(!amount || amount <= 0) return alert('أدخلي مبلغًا صحيحًا أولًا.');
+    if(state.mode==='class'){
+      const students = typeof getStudentsByClass==='function' ? getStudentsByClass(state.classId) : [];
+      if(!students.length) return alert('لا يوجد طلاب / طالبات داخل هذا الفصل.');
+      students.forEach(st => applyOperationToStudent(st, type, amount, reason));
+    } else {
+      const st = typeof getStudentObj==='function' ? getStudentObj(state.studentId) : null;
+      if(!st) return alert('تعذر العثور على الطالب / الطالبة.');
+      applyOperationToStudent(st, type, amount, reason);
+    }
+    if(typeof saveBankData==='function') saveBankData();
+    if(typeof refreshTeacherUI==='function') refreshTeacherUI();
+    if(typeof rerenderSettings==='function') rerenderSettings();
+    closeOperationReasonModal();
+    alert('تم تنفيذ العملية بنجاح.');
+  };
+
+  function relabelButtons(){
+    document.querySelectorAll('button').forEach(btn=>{
+      const t = (btn.textContent||'').trim();
+      if(t==='خصم للفصل كامل') btn.textContent='سحب للفصل كامل';
+      if(t==='عدد الخصومات') btn.textContent='عدد السحوبات';
+    });
+    document.querySelectorAll('.student-card,.student-settings-card,.student-card-custom,.student-cards-grid .teacher-box,.student-cards-grid > div').forEach(card=>{
+      card.innerHTML = card.innerHTML.replace(/عدد الخصومات/g,'عدد السحوبات');
+    });
+  }
+  const obs = new MutationObserver(function(){ relabelButtons(); });
+  document.addEventListener('DOMContentLoaded', function(){ relabelButtons(); obs.observe(document.body,{childList:true,subtree:true}); });
 })();
 </script>
 
@@ -6794,7 +8450,145 @@ window.addEventListener('load', function(){
   };
   function openPrintWindow(title, bodyHtml){
     const w = window.open('', '_blank'); if(!w) return;
-    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}</body></html>`);
+    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}
+
+<style id="operation-reasons-style">
+.operation-modal{position:fixed;inset:0;background:rgba(0,0,0,.38);display:none;align-items:center;justify-content:center;z-index:99999;padding:24px}
+.operation-modal.show{display:flex}
+.operation-box{width:min(420px,100%);background:#fff;border-radius:28px;padding:22px;border:1px solid rgba(16,58,46,.08);box-shadow:0 24px 60px rgba(0,0,0,.22)}
+.operation-box h3{margin:0 0 8px;color:var(--deep);font-size:22px}
+.operation-box p{margin:0 0 14px;color:var(--muted);font-size:13px;line-height:1.8}
+.operation-box .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.operation-box textarea{border:1px solid var(--line);background:#f8fbf9;border-radius:16px;padding:14px 14px;font-size:14px;outline:none;font-family:inherit}
+</style>
+<div id="operationReasonModal" class="operation-modal" aria-hidden="true">
+  <div class="operation-box">
+    <h3 id="operationReasonTitle">تنفيذ العملية</h3>
+    <p id="operationReasonDesc">اختاري نوع العملية والسبب ثم حددي المبلغ.</p>
+    <div class="field" id="operationTypeWrap"><label>نوع العملية</label>
+      <select id="operationReasonType">
+        <option value="deposit">إيداع</option>
+        <option value="withdraw">سحب</option>
+      </select>
+    </div>
+    <div class="field"><label>السبب</label>
+      <select id="operationReasonSelect"></select>
+    </div>
+    <div class="field" id="operationOtherWrap" style="display:none"><label>سبب آخر</label><textarea id="operationOtherText" rows="3" placeholder="اكتبي السبب هنا"></textarea></div>
+    <div class="field"><label>المبلغ</label><input id="operationAmountInput" type="number" min="1" placeholder="أدخلي المبلغ"></div>
+    <div class="actions">
+      <button class="btn btn-light" type="button" onclick="closeOperationReasonModal()">إلغاء</button>
+      <button class="btn btn-green" type="button" onclick="saveOperationReasonModal()">تنفيذ</button>
+    </div>
+  </div>
+</div>
+<script id="operation-reasons-script">
+(function(){
+  const DEPOSIT_REASONS = [
+    'مشاركة مميزة في الحصة','حل سؤال صعب','مساعدة زميل / زميلة','إنهاء المهمة الأدائية','تسليم الواجب مبكرًا','الحصول على درجة كاملة','الفوز في تحدي الرياضيات','ترتيب الدفتر','الالتزام والهدوء في الحصة','مبادرة إيجابية','حضور كامل الأسبوع','تميز في العمل الجماعي','أخرى'
+  ];
+  const WITHDRAW_REASONS = [
+    'عدم حل الواجب','التأخر عن الحصة','كثرة الكلام أثناء الشرح','عدم إحضار الأدوات','عدم المشاركة','مخالفة تعليمات الصف','عدم تسليم المهمة الأدائية','إزعاج الزملاء','استخدام الجوال','سحب سلوكي','أخرى'
+  ];
+  const state = {mode:'student', studentId:'', classId:'', fixedType:''};
+
+  function getReasonOptions(type){ return type==='withdraw' ? WITHDRAW_REASONS : DEPOSIT_REASONS; }
+  function reasonDefault(type){ return type==='withdraw' ? 'سحب جماعي' : 'مكافأة جماعية'; }
+  function fillReasonOptions(type){
+    const sel = document.getElementById('operationReasonSelect'); if(!sel) return;
+    sel.innerHTML = '<option value="">اختاري السبب</option>' + getReasonOptions(type).map(r=>'<option value="'+r+'">'+r+'</option>').join('');
+    toggleOtherOperationReason();
+  }
+  window.toggleOtherOperationReason = function(){
+    const val = document.getElementById('operationReasonSelect')?.value;
+    const wrap = document.getElementById('operationOtherWrap');
+    if(wrap) wrap.style.display = val==='أخرى' ? 'block' : 'none';
+  };
+  function openModal(title, desc, fixedType){
+    state.fixedType = fixedType || '';
+    const modal = document.getElementById('operationReasonModal');
+    const titleEl = document.getElementById('operationReasonTitle');
+    const descEl = document.getElementById('operationReasonDesc');
+    const typeWrap = document.getElementById('operationTypeWrap');
+    const typeSel = document.getElementById('operationReasonType');
+    const amount = document.getElementById('operationAmountInput');
+    const other = document.getElementById('operationOtherText');
+    if(titleEl) titleEl.textContent = title;
+    if(descEl) descEl.textContent = desc;
+    if(typeWrap) typeWrap.style.display = fixedType ? 'none' : 'block';
+    if(typeSel) typeSel.value = fixedType || 'deposit';
+    if(amount) amount.value = '';
+    if(other) other.value = '';
+    fillReasonOptions(fixedType || 'deposit');
+    if(modal) modal.classList.add('show');
+  }
+  window.closeOperationReasonModal = function(){
+    const modal = document.getElementById('operationReasonModal'); if(modal) modal.classList.remove('show');
+    state.mode='student'; state.studentId=''; state.classId=''; state.fixedType='';
+  };
+  const typeSel = document.getElementById('operationReasonType');
+  if(typeSel) typeSel.addEventListener('change', function(){ fillReasonOptions(this.value); });
+  const reasonSel = document.getElementById('operationReasonSelect');
+  if(reasonSel) reasonSel.addEventListener('change', window.toggleOtherOperationReason);
+
+  function applyOperationToStudent(st, type, amount, reason){
+    amount = Number(amount||0); if(!st || !amount) return;
+    st.balance = Math.max(0, Number(st.balance||0) + (type==='deposit' ? amount : -amount));
+    if(typeof addHistory==='function') addHistory(st, type, amount, reason);
+    if(window.bankData){
+      if(!Array.isArray(bankData.operations)) bankData.operations = [];
+      bankData.operations.push({id:'op'+Date.now()+Math.random().toString(16).slice(2,6), studentId:st.id, studentName:st.name, type:type, amount:amount, reason:reason, date:new Date().toLocaleDateString('en-CA')});
+    }
+  }
+
+  window.quickClassOperation = function(classId, type){
+    state.mode='class'; state.classId=classId; state.studentId='';
+    openModal(type==='withdraw' ? 'سحب للفصل كامل' : 'إيداع للفصل كامل', 'اختاري السبب ثم حددي المبلغ لتنفيذ العملية على جميع طلاب / طالبات الفصل.', type);
+  };
+  window.quickStudentOperation = function(studentId){
+    state.mode='student'; state.studentId=studentId; state.classId='';
+    const st = typeof getStudentObj==='function' ? getStudentObj(studentId) : null;
+    openModal('عملية سريعة', 'اختاري نوع العملية والسبب للطالب / للطالبة' + (st ? ' '+st.name : '') + ' ثم حددي المبلغ.', '');
+  };
+  window.saveOperationReasonModal = function(){
+    const type = state.fixedType || (document.getElementById('operationReasonType')?.value || 'deposit');
+    const amount = Number(document.getElementById('operationAmountInput')?.value || 0);
+    let reason = document.getElementById('operationReasonSelect')?.value || '';
+    if(reason==='أخرى') reason = (document.getElementById('operationOtherText')?.value || '').trim();
+    if(!reason) reason = reasonDefault(type);
+    if(!amount || amount <= 0) return alert('أدخلي مبلغًا صحيحًا أولًا.');
+    if(state.mode==='class'){
+      const students = typeof getStudentsByClass==='function' ? getStudentsByClass(state.classId) : [];
+      if(!students.length) return alert('لا يوجد طلاب / طالبات داخل هذا الفصل.');
+      students.forEach(st => applyOperationToStudent(st, type, amount, reason));
+    } else {
+      const st = typeof getStudentObj==='function' ? getStudentObj(state.studentId) : null;
+      if(!st) return alert('تعذر العثور على الطالب / الطالبة.');
+      applyOperationToStudent(st, type, amount, reason);
+    }
+    if(typeof saveBankData==='function') saveBankData();
+    if(typeof refreshTeacherUI==='function') refreshTeacherUI();
+    if(typeof rerenderSettings==='function') rerenderSettings();
+    closeOperationReasonModal();
+    alert('تم تنفيذ العملية بنجاح.');
+  };
+
+  function relabelButtons(){
+    document.querySelectorAll('button').forEach(btn=>{
+      const t = (btn.textContent||'').trim();
+      if(t==='خصم للفصل كامل') btn.textContent='سحب للفصل كامل';
+      if(t==='عدد الخصومات') btn.textContent='عدد السحوبات';
+    });
+    document.querySelectorAll('.student-card,.student-settings-card,.student-card-custom,.student-cards-grid .teacher-box,.student-cards-grid > div').forEach(card=>{
+      card.innerHTML = card.innerHTML.replace(/عدد الخصومات/g,'عدد السحوبات');
+    });
+  }
+  const obs = new MutationObserver(function(){ relabelButtons(); });
+  document.addEventListener('DOMContentLoaded', function(){ relabelButtons(); obs.observe(document.body,{childList:true,subtree:true}); });
+})();
+</script>
+
+</body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
   window.printStudentReport = function(studentId){
@@ -6815,6 +8609,144 @@ window.addEventListener('load', function(){
   const prevShowPane = window.showTeacherPane;
   window.showTeacherPane = function(id, btn){ if(typeof prevShowPane==='function') prevShowPane(id, btn); if(id==='teacherPaneStudents') setTimeout(function(){ try{ renderStudentSettingsDashboard(); }catch(e){} }, 60); };
   document.addEventListener('DOMContentLoaded', function(){ setTimeout(function(){ try{ renderStudentSettingsDashboard(); }catch(e){} }, 250); });
+})();
+</script>
+
+
+
+<style id="operation-reasons-style">
+.operation-modal{position:fixed;inset:0;background:rgba(0,0,0,.38);display:none;align-items:center;justify-content:center;z-index:99999;padding:24px}
+.operation-modal.show{display:flex}
+.operation-box{width:min(420px,100%);background:#fff;border-radius:28px;padding:22px;border:1px solid rgba(16,58,46,.08);box-shadow:0 24px 60px rgba(0,0,0,.22)}
+.operation-box h3{margin:0 0 8px;color:var(--deep);font-size:22px}
+.operation-box p{margin:0 0 14px;color:var(--muted);font-size:13px;line-height:1.8}
+.operation-box .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.operation-box textarea{border:1px solid var(--line);background:#f8fbf9;border-radius:16px;padding:14px 14px;font-size:14px;outline:none;font-family:inherit}
+</style>
+<div id="operationReasonModal" class="operation-modal" aria-hidden="true">
+  <div class="operation-box">
+    <h3 id="operationReasonTitle">تنفيذ العملية</h3>
+    <p id="operationReasonDesc">اختاري نوع العملية والسبب ثم حددي المبلغ.</p>
+    <div class="field" id="operationTypeWrap"><label>نوع العملية</label>
+      <select id="operationReasonType">
+        <option value="deposit">إيداع</option>
+        <option value="withdraw">سحب</option>
+      </select>
+    </div>
+    <div class="field"><label>السبب</label>
+      <select id="operationReasonSelect"></select>
+    </div>
+    <div class="field" id="operationOtherWrap" style="display:none"><label>سبب آخر</label><textarea id="operationOtherText" rows="3" placeholder="اكتبي السبب هنا"></textarea></div>
+    <div class="field"><label>المبلغ</label><input id="operationAmountInput" type="number" min="1" placeholder="أدخلي المبلغ"></div>
+    <div class="actions">
+      <button class="btn btn-light" type="button" onclick="closeOperationReasonModal()">إلغاء</button>
+      <button class="btn btn-green" type="button" onclick="saveOperationReasonModal()">تنفيذ</button>
+    </div>
+  </div>
+</div>
+<script id="operation-reasons-script">
+(function(){
+  const DEPOSIT_REASONS = [
+    'مشاركة مميزة في الحصة','حل سؤال صعب','مساعدة زميل / زميلة','إنهاء المهمة الأدائية','تسليم الواجب مبكرًا','الحصول على درجة كاملة','الفوز في تحدي الرياضيات','ترتيب الدفتر','الالتزام والهدوء في الحصة','مبادرة إيجابية','حضور كامل الأسبوع','تميز في العمل الجماعي','أخرى'
+  ];
+  const WITHDRAW_REASONS = [
+    'عدم حل الواجب','التأخر عن الحصة','كثرة الكلام أثناء الشرح','عدم إحضار الأدوات','عدم المشاركة','مخالفة تعليمات الصف','عدم تسليم المهمة الأدائية','إزعاج الزملاء','استخدام الجوال','سحب سلوكي','أخرى'
+  ];
+  const state = {mode:'student', studentId:'', classId:'', fixedType:''};
+
+  function getReasonOptions(type){ return type==='withdraw' ? WITHDRAW_REASONS : DEPOSIT_REASONS; }
+  function reasonDefault(type){ return type==='withdraw' ? 'سحب جماعي' : 'مكافأة جماعية'; }
+  function fillReasonOptions(type){
+    const sel = document.getElementById('operationReasonSelect'); if(!sel) return;
+    sel.innerHTML = '<option value="">اختاري السبب</option>' + getReasonOptions(type).map(r=>'<option value="'+r+'">'+r+'</option>').join('');
+    toggleOtherOperationReason();
+  }
+  window.toggleOtherOperationReason = function(){
+    const val = document.getElementById('operationReasonSelect')?.value;
+    const wrap = document.getElementById('operationOtherWrap');
+    if(wrap) wrap.style.display = val==='أخرى' ? 'block' : 'none';
+  };
+  function openModal(title, desc, fixedType){
+    state.fixedType = fixedType || '';
+    const modal = document.getElementById('operationReasonModal');
+    const titleEl = document.getElementById('operationReasonTitle');
+    const descEl = document.getElementById('operationReasonDesc');
+    const typeWrap = document.getElementById('operationTypeWrap');
+    const typeSel = document.getElementById('operationReasonType');
+    const amount = document.getElementById('operationAmountInput');
+    const other = document.getElementById('operationOtherText');
+    if(titleEl) titleEl.textContent = title;
+    if(descEl) descEl.textContent = desc;
+    if(typeWrap) typeWrap.style.display = fixedType ? 'none' : 'block';
+    if(typeSel) typeSel.value = fixedType || 'deposit';
+    if(amount) amount.value = '';
+    if(other) other.value = '';
+    fillReasonOptions(fixedType || 'deposit');
+    if(modal) modal.classList.add('show');
+  }
+  window.closeOperationReasonModal = function(){
+    const modal = document.getElementById('operationReasonModal'); if(modal) modal.classList.remove('show');
+    state.mode='student'; state.studentId=''; state.classId=''; state.fixedType='';
+  };
+  const typeSel = document.getElementById('operationReasonType');
+  if(typeSel) typeSel.addEventListener('change', function(){ fillReasonOptions(this.value); });
+  const reasonSel = document.getElementById('operationReasonSelect');
+  if(reasonSel) reasonSel.addEventListener('change', window.toggleOtherOperationReason);
+
+  function applyOperationToStudent(st, type, amount, reason){
+    amount = Number(amount||0); if(!st || !amount) return;
+    st.balance = Math.max(0, Number(st.balance||0) + (type==='deposit' ? amount : -amount));
+    if(typeof addHistory==='function') addHistory(st, type, amount, reason);
+    if(window.bankData){
+      if(!Array.isArray(bankData.operations)) bankData.operations = [];
+      bankData.operations.push({id:'op'+Date.now()+Math.random().toString(16).slice(2,6), studentId:st.id, studentName:st.name, type:type, amount:amount, reason:reason, date:new Date().toLocaleDateString('en-CA')});
+    }
+  }
+
+  window.quickClassOperation = function(classId, type){
+    state.mode='class'; state.classId=classId; state.studentId='';
+    openModal(type==='withdraw' ? 'سحب للفصل كامل' : 'إيداع للفصل كامل', 'اختاري السبب ثم حددي المبلغ لتنفيذ العملية على جميع طلاب / طالبات الفصل.', type);
+  };
+  window.quickStudentOperation = function(studentId){
+    state.mode='student'; state.studentId=studentId; state.classId='';
+    const st = typeof getStudentObj==='function' ? getStudentObj(studentId) : null;
+    openModal('عملية سريعة', 'اختاري نوع العملية والسبب للطالب / للطالبة' + (st ? ' '+st.name : '') + ' ثم حددي المبلغ.', '');
+  };
+  window.saveOperationReasonModal = function(){
+    const type = state.fixedType || (document.getElementById('operationReasonType')?.value || 'deposit');
+    const amount = Number(document.getElementById('operationAmountInput')?.value || 0);
+    let reason = document.getElementById('operationReasonSelect')?.value || '';
+    if(reason==='أخرى') reason = (document.getElementById('operationOtherText')?.value || '').trim();
+    if(!reason) reason = reasonDefault(type);
+    if(!amount || amount <= 0) return alert('أدخلي مبلغًا صحيحًا أولًا.');
+    if(state.mode==='class'){
+      const students = typeof getStudentsByClass==='function' ? getStudentsByClass(state.classId) : [];
+      if(!students.length) return alert('لا يوجد طلاب / طالبات داخل هذا الفصل.');
+      students.forEach(st => applyOperationToStudent(st, type, amount, reason));
+    } else {
+      const st = typeof getStudentObj==='function' ? getStudentObj(state.studentId) : null;
+      if(!st) return alert('تعذر العثور على الطالب / الطالبة.');
+      applyOperationToStudent(st, type, amount, reason);
+    }
+    if(typeof saveBankData==='function') saveBankData();
+    if(typeof refreshTeacherUI==='function') refreshTeacherUI();
+    if(typeof rerenderSettings==='function') rerenderSettings();
+    closeOperationReasonModal();
+    alert('تم تنفيذ العملية بنجاح.');
+  };
+
+  function relabelButtons(){
+    document.querySelectorAll('button').forEach(btn=>{
+      const t = (btn.textContent||'').trim();
+      if(t==='خصم للفصل كامل') btn.textContent='سحب للفصل كامل';
+      if(t==='عدد الخصومات') btn.textContent='عدد السحوبات';
+    });
+    document.querySelectorAll('.student-card,.student-settings-card,.student-card-custom,.student-cards-grid .teacher-box,.student-cards-grid > div').forEach(card=>{
+      card.innerHTML = card.innerHTML.replace(/عدد الخصومات/g,'عدد السحوبات');
+    });
+  }
+  const obs = new MutationObserver(function(){ relabelButtons(); });
+  document.addEventListener('DOMContentLoaded', function(){ relabelButtons(); obs.observe(document.body,{childList:true,subtree:true}); });
 })();
 </script>
 
@@ -7143,7 +9075,145 @@ window.addEventListener('load', function(){
   };
   function openPrintWindow(title, bodyHtml){
     const w = window.open('', '_blank'); if(!w) return;
-    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}</body></html>`);
+    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}
+
+<style id="operation-reasons-style">
+.operation-modal{position:fixed;inset:0;background:rgba(0,0,0,.38);display:none;align-items:center;justify-content:center;z-index:99999;padding:24px}
+.operation-modal.show{display:flex}
+.operation-box{width:min(420px,100%);background:#fff;border-radius:28px;padding:22px;border:1px solid rgba(16,58,46,.08);box-shadow:0 24px 60px rgba(0,0,0,.22)}
+.operation-box h3{margin:0 0 8px;color:var(--deep);font-size:22px}
+.operation-box p{margin:0 0 14px;color:var(--muted);font-size:13px;line-height:1.8}
+.operation-box .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.operation-box textarea{border:1px solid var(--line);background:#f8fbf9;border-radius:16px;padding:14px 14px;font-size:14px;outline:none;font-family:inherit}
+</style>
+<div id="operationReasonModal" class="operation-modal" aria-hidden="true">
+  <div class="operation-box">
+    <h3 id="operationReasonTitle">تنفيذ العملية</h3>
+    <p id="operationReasonDesc">اختاري نوع العملية والسبب ثم حددي المبلغ.</p>
+    <div class="field" id="operationTypeWrap"><label>نوع العملية</label>
+      <select id="operationReasonType">
+        <option value="deposit">إيداع</option>
+        <option value="withdraw">سحب</option>
+      </select>
+    </div>
+    <div class="field"><label>السبب</label>
+      <select id="operationReasonSelect"></select>
+    </div>
+    <div class="field" id="operationOtherWrap" style="display:none"><label>سبب آخر</label><textarea id="operationOtherText" rows="3" placeholder="اكتبي السبب هنا"></textarea></div>
+    <div class="field"><label>المبلغ</label><input id="operationAmountInput" type="number" min="1" placeholder="أدخلي المبلغ"></div>
+    <div class="actions">
+      <button class="btn btn-light" type="button" onclick="closeOperationReasonModal()">إلغاء</button>
+      <button class="btn btn-green" type="button" onclick="saveOperationReasonModal()">تنفيذ</button>
+    </div>
+  </div>
+</div>
+<script id="operation-reasons-script">
+(function(){
+  const DEPOSIT_REASONS = [
+    'مشاركة مميزة في الحصة','حل سؤال صعب','مساعدة زميل / زميلة','إنهاء المهمة الأدائية','تسليم الواجب مبكرًا','الحصول على درجة كاملة','الفوز في تحدي الرياضيات','ترتيب الدفتر','الالتزام والهدوء في الحصة','مبادرة إيجابية','حضور كامل الأسبوع','تميز في العمل الجماعي','أخرى'
+  ];
+  const WITHDRAW_REASONS = [
+    'عدم حل الواجب','التأخر عن الحصة','كثرة الكلام أثناء الشرح','عدم إحضار الأدوات','عدم المشاركة','مخالفة تعليمات الصف','عدم تسليم المهمة الأدائية','إزعاج الزملاء','استخدام الجوال','سحب سلوكي','أخرى'
+  ];
+  const state = {mode:'student', studentId:'', classId:'', fixedType:''};
+
+  function getReasonOptions(type){ return type==='withdraw' ? WITHDRAW_REASONS : DEPOSIT_REASONS; }
+  function reasonDefault(type){ return type==='withdraw' ? 'سحب جماعي' : 'مكافأة جماعية'; }
+  function fillReasonOptions(type){
+    const sel = document.getElementById('operationReasonSelect'); if(!sel) return;
+    sel.innerHTML = '<option value="">اختاري السبب</option>' + getReasonOptions(type).map(r=>'<option value="'+r+'">'+r+'</option>').join('');
+    toggleOtherOperationReason();
+  }
+  window.toggleOtherOperationReason = function(){
+    const val = document.getElementById('operationReasonSelect')?.value;
+    const wrap = document.getElementById('operationOtherWrap');
+    if(wrap) wrap.style.display = val==='أخرى' ? 'block' : 'none';
+  };
+  function openModal(title, desc, fixedType){
+    state.fixedType = fixedType || '';
+    const modal = document.getElementById('operationReasonModal');
+    const titleEl = document.getElementById('operationReasonTitle');
+    const descEl = document.getElementById('operationReasonDesc');
+    const typeWrap = document.getElementById('operationTypeWrap');
+    const typeSel = document.getElementById('operationReasonType');
+    const amount = document.getElementById('operationAmountInput');
+    const other = document.getElementById('operationOtherText');
+    if(titleEl) titleEl.textContent = title;
+    if(descEl) descEl.textContent = desc;
+    if(typeWrap) typeWrap.style.display = fixedType ? 'none' : 'block';
+    if(typeSel) typeSel.value = fixedType || 'deposit';
+    if(amount) amount.value = '';
+    if(other) other.value = '';
+    fillReasonOptions(fixedType || 'deposit');
+    if(modal) modal.classList.add('show');
+  }
+  window.closeOperationReasonModal = function(){
+    const modal = document.getElementById('operationReasonModal'); if(modal) modal.classList.remove('show');
+    state.mode='student'; state.studentId=''; state.classId=''; state.fixedType='';
+  };
+  const typeSel = document.getElementById('operationReasonType');
+  if(typeSel) typeSel.addEventListener('change', function(){ fillReasonOptions(this.value); });
+  const reasonSel = document.getElementById('operationReasonSelect');
+  if(reasonSel) reasonSel.addEventListener('change', window.toggleOtherOperationReason);
+
+  function applyOperationToStudent(st, type, amount, reason){
+    amount = Number(amount||0); if(!st || !amount) return;
+    st.balance = Math.max(0, Number(st.balance||0) + (type==='deposit' ? amount : -amount));
+    if(typeof addHistory==='function') addHistory(st, type, amount, reason);
+    if(window.bankData){
+      if(!Array.isArray(bankData.operations)) bankData.operations = [];
+      bankData.operations.push({id:'op'+Date.now()+Math.random().toString(16).slice(2,6), studentId:st.id, studentName:st.name, type:type, amount:amount, reason:reason, date:new Date().toLocaleDateString('en-CA')});
+    }
+  }
+
+  window.quickClassOperation = function(classId, type){
+    state.mode='class'; state.classId=classId; state.studentId='';
+    openModal(type==='withdraw' ? 'سحب للفصل كامل' : 'إيداع للفصل كامل', 'اختاري السبب ثم حددي المبلغ لتنفيذ العملية على جميع طلاب / طالبات الفصل.', type);
+  };
+  window.quickStudentOperation = function(studentId){
+    state.mode='student'; state.studentId=studentId; state.classId='';
+    const st = typeof getStudentObj==='function' ? getStudentObj(studentId) : null;
+    openModal('عملية سريعة', 'اختاري نوع العملية والسبب للطالب / للطالبة' + (st ? ' '+st.name : '') + ' ثم حددي المبلغ.', '');
+  };
+  window.saveOperationReasonModal = function(){
+    const type = state.fixedType || (document.getElementById('operationReasonType')?.value || 'deposit');
+    const amount = Number(document.getElementById('operationAmountInput')?.value || 0);
+    let reason = document.getElementById('operationReasonSelect')?.value || '';
+    if(reason==='أخرى') reason = (document.getElementById('operationOtherText')?.value || '').trim();
+    if(!reason) reason = reasonDefault(type);
+    if(!amount || amount <= 0) return alert('أدخلي مبلغًا صحيحًا أولًا.');
+    if(state.mode==='class'){
+      const students = typeof getStudentsByClass==='function' ? getStudentsByClass(state.classId) : [];
+      if(!students.length) return alert('لا يوجد طلاب / طالبات داخل هذا الفصل.');
+      students.forEach(st => applyOperationToStudent(st, type, amount, reason));
+    } else {
+      const st = typeof getStudentObj==='function' ? getStudentObj(state.studentId) : null;
+      if(!st) return alert('تعذر العثور على الطالب / الطالبة.');
+      applyOperationToStudent(st, type, amount, reason);
+    }
+    if(typeof saveBankData==='function') saveBankData();
+    if(typeof refreshTeacherUI==='function') refreshTeacherUI();
+    if(typeof rerenderSettings==='function') rerenderSettings();
+    closeOperationReasonModal();
+    alert('تم تنفيذ العملية بنجاح.');
+  };
+
+  function relabelButtons(){
+    document.querySelectorAll('button').forEach(btn=>{
+      const t = (btn.textContent||'').trim();
+      if(t==='خصم للفصل كامل') btn.textContent='سحب للفصل كامل';
+      if(t==='عدد الخصومات') btn.textContent='عدد السحوبات';
+    });
+    document.querySelectorAll('.student-card,.student-settings-card,.student-card-custom,.student-cards-grid .teacher-box,.student-cards-grid > div').forEach(card=>{
+      card.innerHTML = card.innerHTML.replace(/عدد الخصومات/g,'عدد السحوبات');
+    });
+  }
+  const obs = new MutationObserver(function(){ relabelButtons(); });
+  document.addEventListener('DOMContentLoaded', function(){ relabelButtons(); obs.observe(document.body,{childList:true,subtree:true}); });
+})();
+</script>
+
+</body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
   window.printStudentReport = function(studentId){
@@ -7324,6 +9394,144 @@ window.addEventListener('load', function(){
   document.addEventListener('DOMContentLoaded', function(){ setTimeout(function(){ try{ initStudentsManagerRouter(); }catch(e){} }, 400); });
 })();
 </script>
+
+
+<style id="operation-reasons-style">
+.operation-modal{position:fixed;inset:0;background:rgba(0,0,0,.38);display:none;align-items:center;justify-content:center;z-index:99999;padding:24px}
+.operation-modal.show{display:flex}
+.operation-box{width:min(420px,100%);background:#fff;border-radius:28px;padding:22px;border:1px solid rgba(16,58,46,.08);box-shadow:0 24px 60px rgba(0,0,0,.22)}
+.operation-box h3{margin:0 0 8px;color:var(--deep);font-size:22px}
+.operation-box p{margin:0 0 14px;color:var(--muted);font-size:13px;line-height:1.8}
+.operation-box .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.operation-box textarea{border:1px solid var(--line);background:#f8fbf9;border-radius:16px;padding:14px 14px;font-size:14px;outline:none;font-family:inherit}
+</style>
+<div id="operationReasonModal" class="operation-modal" aria-hidden="true">
+  <div class="operation-box">
+    <h3 id="operationReasonTitle">تنفيذ العملية</h3>
+    <p id="operationReasonDesc">اختاري نوع العملية والسبب ثم حددي المبلغ.</p>
+    <div class="field" id="operationTypeWrap"><label>نوع العملية</label>
+      <select id="operationReasonType">
+        <option value="deposit">إيداع</option>
+        <option value="withdraw">سحب</option>
+      </select>
+    </div>
+    <div class="field"><label>السبب</label>
+      <select id="operationReasonSelect"></select>
+    </div>
+    <div class="field" id="operationOtherWrap" style="display:none"><label>سبب آخر</label><textarea id="operationOtherText" rows="3" placeholder="اكتبي السبب هنا"></textarea></div>
+    <div class="field"><label>المبلغ</label><input id="operationAmountInput" type="number" min="1" placeholder="أدخلي المبلغ"></div>
+    <div class="actions">
+      <button class="btn btn-light" type="button" onclick="closeOperationReasonModal()">إلغاء</button>
+      <button class="btn btn-green" type="button" onclick="saveOperationReasonModal()">تنفيذ</button>
+    </div>
+  </div>
+</div>
+<script id="operation-reasons-script">
+(function(){
+  const DEPOSIT_REASONS = [
+    'مشاركة مميزة في الحصة','حل سؤال صعب','مساعدة زميل / زميلة','إنهاء المهمة الأدائية','تسليم الواجب مبكرًا','الحصول على درجة كاملة','الفوز في تحدي الرياضيات','ترتيب الدفتر','الالتزام والهدوء في الحصة','مبادرة إيجابية','حضور كامل الأسبوع','تميز في العمل الجماعي','أخرى'
+  ];
+  const WITHDRAW_REASONS = [
+    'عدم حل الواجب','التأخر عن الحصة','كثرة الكلام أثناء الشرح','عدم إحضار الأدوات','عدم المشاركة','مخالفة تعليمات الصف','عدم تسليم المهمة الأدائية','إزعاج الزملاء','استخدام الجوال','سحب سلوكي','أخرى'
+  ];
+  const state = {mode:'student', studentId:'', classId:'', fixedType:''};
+
+  function getReasonOptions(type){ return type==='withdraw' ? WITHDRAW_REASONS : DEPOSIT_REASONS; }
+  function reasonDefault(type){ return type==='withdraw' ? 'سحب جماعي' : 'مكافأة جماعية'; }
+  function fillReasonOptions(type){
+    const sel = document.getElementById('operationReasonSelect'); if(!sel) return;
+    sel.innerHTML = '<option value="">اختاري السبب</option>' + getReasonOptions(type).map(r=>'<option value="'+r+'">'+r+'</option>').join('');
+    toggleOtherOperationReason();
+  }
+  window.toggleOtherOperationReason = function(){
+    const val = document.getElementById('operationReasonSelect')?.value;
+    const wrap = document.getElementById('operationOtherWrap');
+    if(wrap) wrap.style.display = val==='أخرى' ? 'block' : 'none';
+  };
+  function openModal(title, desc, fixedType){
+    state.fixedType = fixedType || '';
+    const modal = document.getElementById('operationReasonModal');
+    const titleEl = document.getElementById('operationReasonTitle');
+    const descEl = document.getElementById('operationReasonDesc');
+    const typeWrap = document.getElementById('operationTypeWrap');
+    const typeSel = document.getElementById('operationReasonType');
+    const amount = document.getElementById('operationAmountInput');
+    const other = document.getElementById('operationOtherText');
+    if(titleEl) titleEl.textContent = title;
+    if(descEl) descEl.textContent = desc;
+    if(typeWrap) typeWrap.style.display = fixedType ? 'none' : 'block';
+    if(typeSel) typeSel.value = fixedType || 'deposit';
+    if(amount) amount.value = '';
+    if(other) other.value = '';
+    fillReasonOptions(fixedType || 'deposit');
+    if(modal) modal.classList.add('show');
+  }
+  window.closeOperationReasonModal = function(){
+    const modal = document.getElementById('operationReasonModal'); if(modal) modal.classList.remove('show');
+    state.mode='student'; state.studentId=''; state.classId=''; state.fixedType='';
+  };
+  const typeSel = document.getElementById('operationReasonType');
+  if(typeSel) typeSel.addEventListener('change', function(){ fillReasonOptions(this.value); });
+  const reasonSel = document.getElementById('operationReasonSelect');
+  if(reasonSel) reasonSel.addEventListener('change', window.toggleOtherOperationReason);
+
+  function applyOperationToStudent(st, type, amount, reason){
+    amount = Number(amount||0); if(!st || !amount) return;
+    st.balance = Math.max(0, Number(st.balance||0) + (type==='deposit' ? amount : -amount));
+    if(typeof addHistory==='function') addHistory(st, type, amount, reason);
+    if(window.bankData){
+      if(!Array.isArray(bankData.operations)) bankData.operations = [];
+      bankData.operations.push({id:'op'+Date.now()+Math.random().toString(16).slice(2,6), studentId:st.id, studentName:st.name, type:type, amount:amount, reason:reason, date:new Date().toLocaleDateString('en-CA')});
+    }
+  }
+
+  window.quickClassOperation = function(classId, type){
+    state.mode='class'; state.classId=classId; state.studentId='';
+    openModal(type==='withdraw' ? 'سحب للفصل كامل' : 'إيداع للفصل كامل', 'اختاري السبب ثم حددي المبلغ لتنفيذ العملية على جميع طلاب / طالبات الفصل.', type);
+  };
+  window.quickStudentOperation = function(studentId){
+    state.mode='student'; state.studentId=studentId; state.classId='';
+    const st = typeof getStudentObj==='function' ? getStudentObj(studentId) : null;
+    openModal('عملية سريعة', 'اختاري نوع العملية والسبب للطالب / للطالبة' + (st ? ' '+st.name : '') + ' ثم حددي المبلغ.', '');
+  };
+  window.saveOperationReasonModal = function(){
+    const type = state.fixedType || (document.getElementById('operationReasonType')?.value || 'deposit');
+    const amount = Number(document.getElementById('operationAmountInput')?.value || 0);
+    let reason = document.getElementById('operationReasonSelect')?.value || '';
+    if(reason==='أخرى') reason = (document.getElementById('operationOtherText')?.value || '').trim();
+    if(!reason) reason = reasonDefault(type);
+    if(!amount || amount <= 0) return alert('أدخلي مبلغًا صحيحًا أولًا.');
+    if(state.mode==='class'){
+      const students = typeof getStudentsByClass==='function' ? getStudentsByClass(state.classId) : [];
+      if(!students.length) return alert('لا يوجد طلاب / طالبات داخل هذا الفصل.');
+      students.forEach(st => applyOperationToStudent(st, type, amount, reason));
+    } else {
+      const st = typeof getStudentObj==='function' ? getStudentObj(state.studentId) : null;
+      if(!st) return alert('تعذر العثور على الطالب / الطالبة.');
+      applyOperationToStudent(st, type, amount, reason);
+    }
+    if(typeof saveBankData==='function') saveBankData();
+    if(typeof refreshTeacherUI==='function') refreshTeacherUI();
+    if(typeof rerenderSettings==='function') rerenderSettings();
+    closeOperationReasonModal();
+    alert('تم تنفيذ العملية بنجاح.');
+  };
+
+  function relabelButtons(){
+    document.querySelectorAll('button').forEach(btn=>{
+      const t = (btn.textContent||'').trim();
+      if(t==='خصم للفصل كامل') btn.textContent='سحب للفصل كامل';
+      if(t==='عدد الخصومات') btn.textContent='عدد السحوبات';
+    });
+    document.querySelectorAll('.student-card,.student-settings-card,.student-card-custom,.student-cards-grid .teacher-box,.student-cards-grid > div').forEach(card=>{
+      card.innerHTML = card.innerHTML.replace(/عدد الخصومات/g,'عدد السحوبات');
+    });
+  }
+  const obs = new MutationObserver(function(){ relabelButtons(); });
+  document.addEventListener('DOMContentLoaded', function(){ relabelButtons(); obs.observe(document.body,{childList:true,subtree:true}); });
+})();
+</script>
+
 </body>
 </html>
 
