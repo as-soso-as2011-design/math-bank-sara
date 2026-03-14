@@ -8597,45 +8597,143 @@ function openMoreInfo(type){
 .students-router-title p{margin:6px 0 0;color:var(--muted);font-size:13px;line-height:1.8}
 .students-router-slot{display:grid;gap:14px}
 .students-router-slot .teacher-grid{margin:0}
-
-#studentsManagerRouter{display:none !important}
-#teacherPaneStudents > .teacher-grid{display:grid !important}
-#studentSettingsProWrap{display:grid !important;margin-top:14px}
 </style>
 <script id="students-manager-router-v9-script">
 (function(){
-  function restoreTeacherStudentsPane(){
-    var pane = document.getElementById('teacherPaneStudents');
+  function initStudentsManagerRouter(){
+    const pane = document.getElementById('teacherPaneStudents');
     if(!pane) return;
-    var router = document.getElementById('studentsManagerRouter');
-    if(router) router.style.display = 'none';
-    var basicGrid = pane.querySelector(':scope > .teacher-grid');
-    if(basicGrid) basicGrid.style.display = 'grid';
-    if(typeof window.renderStudentSettingsDashboard === 'function'){
-      try{ window.renderStudentSettingsDashboard(); }catch(e){}
-    }
-    var advanced = document.getElementById('studentSettingsProWrap');
-    if(advanced){
-      advanced.style.display = 'grid';
-      if(!pane.contains(advanced)) pane.appendChild(advanced);
+    const basicGrid = pane.querySelector(':scope > .teacher-grid');
+    const advancedWrap = document.getElementById('studentSettingsProWrap');
+    if(!basicGrid) return;
+    if(!document.getElementById('studentsManagerRouter')){
+      const addBox = basicGrid.children[0];
+      const listBox = basicGrid.children[1];
+      const router = document.createElement('div');
+      router.id = 'studentsManagerRouter';
+      router.innerHTML = `
+        <div id="studentsRouterHome" class="students-router-home">
+          <div class="students-main-card" onclick="openStudentsManagerCard('add')">
+            <div class="icon">➕</div>
+            <h3>بطاقة إضافة طالب / طالبة ونقل طالب / طالبة</h3>
+            <p>صفحة مستقلة ومنظمة لإضافة طالب / طالبة جديد/ة أو نقل طالب / طالبة بين الفصول مع زر رجوع واضح.</p>
+            <div class="go">فتح الصفحة ‹</div>
+          </div>
+          <div class="students-main-card" onclick="openStudentsManagerCard('list')">
+            <div class="icon">📋</div>
+            <h3>بطاقة قائمة الطلاب / الطالبات</h3>
+            <p>صفحة مخصصة لعرض القائمة بشكل أوضح مع التصفية حسب الفصل والرجوع السريع إلى محتوى إدارة الطلاب.</p>
+            <div class="go">فتح الصفحة ‹</div>
+          </div>
+          <div class="students-main-card" onclick="openStudentsManagerCard('advanced')">
+            <div class="icon">🧭</div>
+            <h3>بطاقة لوحة تحكم متقدمة</h3>
+            <p>صفحة مستقلة للفصول وبطاقات الطلاب / الطالبات والتحكم الفردي والجماعي مع زر رجوع للخلف.</p>
+            <div class="go">فتح الصفحة ‹</div>
+          </div>
+        </div>
+        <div id="studentsRouterDetail" class="students-router-detail">
+          <div class="students-router-bar">
+            <div class="students-router-title"><h3 id="studentsRouterTitle">إدارة الطلاب / الطالبات</h3><p id="studentsRouterDesc">اختاري بطاقة من البطاقات الثلاث لفتح صفحتها الخاصة.</p></div>
+            <button class="ghost" type="button" onclick="backStudentsManagerHome()">رجوع للخلف</button>
+          </div>
+          <div id="studentsRouterSlot" class="students-router-slot"></div>
+        </div>`;
+      pane.insertBefore(router, basicGrid);
+      pane.dataset.routerReady = '1';
+      pane.__addBox = addBox;
+      pane.__listBox = listBox;
+      if(advancedWrap) pane.__advancedWrap = advancedWrap;
+      basicGrid.style.display='none';
+      if(advancedWrap) advancedWrap.style.display='none';
+    } else {
+      basicGrid.style.display='none';
+      const aw = document.getElementById('studentSettingsProWrap');
+      if(aw) aw.style.display='none';
     }
   }
+
+  function moveSectionToSlot(kind){
+    const pane = document.getElementById('teacherPaneStudents');
+    const slot = document.getElementById('studentsRouterSlot');
+    if(!pane || !slot) return;
+    slot.innerHTML='';
+    const addBox = pane.__addBox || pane.querySelector(':scope > .teacher-grid')?.children?.[0];
+    const listBox = pane.__listBox || pane.querySelector(':scope > .teacher-grid')?.children?.[1];
+    const advancedWrap = document.getElementById('studentSettingsProWrap') || pane.__advancedWrap;
+    if(addBox) addBox.style.display='none';
+    if(listBox) listBox.style.display='none';
+    if(advancedWrap) advancedWrap.style.display='none';
+    let title=''; let desc='';
+    if(kind==='add' && addBox){
+      title='إضافة طالب / طالبة ونقل طالب / طالبة';
+      desc='من هنا تتم إضافة طالب / طالبة جديد/ة أو نقل طالب / طالبة بين الفصول داخل صفحة مستقلة ومرتبة.';
+      addBox.style.display='block';
+      slot.appendChild(addBox);
+    } else if(kind==='list' && listBox){
+      title='قائمة الطلاب / الطالبات';
+      desc='عرض منظم لقائمة الطلاب / الطالبات مع التصفية حسب الفصل وزر رجوع واضح إلى محتوى إدارة الطلاب.';
+      listBox.style.display='block';
+      slot.appendChild(listBox);
+    } else if(kind==='advanced'){
+      title='لوحة تحكم متقدمة';
+      desc='بطاقات الفصول وصفحات الطلاب / الطالبات الفردية والجماعية داخل لوحة مستقلة أكثر احترافية.';
+      if(typeof window.__oldRenderStudentSettingsDashboard === 'function'){
+        try{ window.__oldRenderStudentSettingsDashboard(); }catch(e){}
+      }
+      const adv = document.getElementById('studentSettingsProWrap') || advancedWrap;
+      if(adv){ adv.style.display='grid'; slot.appendChild(adv); }
+    }
+    const titleEl = document.getElementById('studentsRouterTitle');
+    const descEl = document.getElementById('studentsRouterDesc');
+    if(titleEl) titleEl.textContent = title;
+    if(descEl) descEl.textContent = desc;
+  }
+
   window.openStudentsManagerCard = function(kind){
-    restoreTeacherStudentsPane();
-    if(kind === 'advanced'){
-      var advanced = document.getElementById('studentSettingsProWrap');
-      if(advanced){ advanced.scrollIntoView({behavior:'smooth', block:'start'}); }
-    }
+    initStudentsManagerRouter();
+    const home = document.getElementById('studentsRouterHome');
+    const detail = document.getElementById('studentsRouterDetail');
+    if(home) home.style.display='none';
+    if(detail) detail.classList.add('active');
+    moveSectionToSlot(kind);
   };
-  window.backStudentsManagerHome = function(){ restoreTeacherStudentsPane(); };
-  var oldShowPane = window.showTeacherPane;
+
+  window.backStudentsManagerHome = function(){
+    initStudentsManagerRouter();
+    const pane = document.getElementById('teacherPaneStudents');
+    const home = document.getElementById('studentsRouterHome');
+    const detail = document.getElementById('studentsRouterDetail');
+    const slot = document.getElementById('studentsRouterSlot');
+    if(slot) slot.innerHTML='';
+    if(pane?.__addBox) pane.__addBox.style.display='none';
+    if(pane?.__listBox) pane.__listBox.style.display='none';
+    const adv = document.getElementById('studentSettingsProWrap') || pane?.__advancedWrap;
+    if(adv) adv.style.display='none';
+    if(home) home.style.display='grid';
+    if(detail) detail.classList.remove('active');
+  };
+
+  if(!window.__oldRenderStudentSettingsDashboard && typeof window.renderStudentSettingsDashboard === 'function'){
+    window.__oldRenderStudentSettingsDashboard = window.renderStudentSettingsDashboard;
+  }
+  const prevRender = window.renderStudentSettingsDashboard;
+  window.renderStudentSettingsDashboard = function(){
+    if(typeof window.__oldRenderStudentSettingsDashboard === 'function'){
+      try{ window.__oldRenderStudentSettingsDashboard(); }catch(e){}
+    } else if(typeof prevRender === 'function'){
+      try{ prevRender(); }catch(e){}
+    }
+    initStudentsManagerRouter();
+  };
+  const prevShowPaneRouter = window.showTeacherPane;
   window.showTeacherPane = function(id, btn){
-    if(typeof oldShowPane === 'function') oldShowPane(id, btn);
-    if(id === 'teacherPaneStudents'){
-      setTimeout(restoreTeacherStudentsPane, 80);
+    if(typeof prevShowPaneRouter === 'function') prevShowPaneRouter(id, btn);
+    if(id==='teacherPaneStudents'){
+      setTimeout(function(){ try{ initStudentsManagerRouter(); backStudentsManagerHome(); }catch(e){} }, 80);
     }
   };
-  document.addEventListener('DOMContentLoaded', function(){ setTimeout(restoreTeacherStudentsPane, 250); });
+  document.addEventListener('DOMContentLoaded', function(){ setTimeout(function(){ try{ initStudentsManagerRouter(); }catch(e){} }, 400); });
 })();
 </script>
 
