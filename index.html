@@ -4256,7 +4256,108 @@ window.addEventListener('load', function(){
   };
   function openPrintWindow(title, bodyHtml){
     const w = window.open('', '_blank'); if(!w) return;
-    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}</body></html>`);
+    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}
+<style id="sara-bulk-arrow-fix">
+#bulkReasonSelect,
+#teacherReasonSelect,
+#opType,
+.student-filters select,
+.teacher-box select,
+.field select{
+  -webkit-appearance:none !important;
+  appearance:none !important;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%23103a2e' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>") !important;
+  background-repeat:no-repeat !important;
+  background-position:left 14px center !important;
+  background-size:18px 18px !important;
+  padding-left:42px !important;
+}
+html[dir="ltr"] #bulkReasonSelect,
+html[dir="ltr"] #teacherReasonSelect,
+html[dir="ltr"] #opType,
+html[dir="ltr"] .student-filters select,
+html[dir="ltr"] .teacher-box select,
+html[dir="ltr"] .field select{
+  background-position:right 14px center !important;
+  padding-right:42px !important;
+  padding-left:14px !important;
+}
+</style>
+<script id="sara-open-class-fix">
+(function(){
+  function removeLeakedCode(){
+    try{
+      const walker=document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null);
+      const bad=[];
+      while(walker.nextNode()){
+        const n=walker.currentNode;
+        const t=(n.nodeValue||'').trim();
+        if(!t) continue;
+        if(t.includes('const w=window.open') || t.includes('document.write(html)') || t.includes('smartReportStatus') || t.includes('smart-reports-override-style')) bad.push(n);
+      }
+      bad.forEach(function(n){ n.nodeValue=''; });
+    }catch(e){}
+  }
+
+  function safeOpenClass(classId){
+    try{
+      if(typeof window.ensureSettingsState==='function'){
+        const state=window.ensureSettingsState();
+        state.classId=classId;
+      }else{
+        window.__studentSettingsState=window.__studentSettingsState||{classId:'',query:'',level:'all',status:'all'};
+        window.__studentSettingsState.classId=classId;
+      }
+      if(typeof window.renderClassDetail==='function') window.renderClassDetail();
+      const detail=document.getElementById('studentClassDetail');
+      if(detail){
+        detail.classList.remove('hidden');
+        detail.scrollIntoView({behavior:'smooth',block:'start'});
+      }
+    }catch(e){ console.error(e); }
+  }
+
+  function bindOpenButtons(){
+    document.querySelectorAll('.student-class-actions .btn, button').forEach(function(btn){
+      const txt=(btn.textContent||'').trim();
+      if(txt==='فتح الفصل'){
+        const oc=btn.getAttribute('onclick')||'';
+        const m=oc.match(/openStudentSettingsClass\('([^']+)'\)/);
+        if(m && !btn.dataset.saraBound){
+          btn.dataset.saraBound='1';
+          btn.onclick=function(ev){ ev.preventDefault(); ev.stopPropagation(); safeOpenClass(m[1]); };
+        }
+      }
+    });
+  }
+
+  const oldOpen=window.openStudentSettingsClass;
+  window.openStudentSettingsClass=function(classId){
+    if(typeof oldOpen==='function'){
+      try{ oldOpen(classId); }catch(e){}
+    }
+    safeOpenClass(classId);
+  };
+
+  const oldRenderAdv=window.renderAdvancedSlot;
+  window.renderAdvancedSlot=function(){
+    if(typeof oldRenderAdv==='function'){
+      try{ oldRenderAdv(); }catch(e){}
+    }
+    bindOpenButtons();
+  };
+
+  function boot(){
+    removeLeakedCode();
+    bindOpenButtons();
+    setTimeout(removeLeakedCode,400);
+    setTimeout(bindOpenButtons,500);
+  }
+  document.addEventListener('DOMContentLoaded',boot);
+  window.addEventListener('load',boot);
+})();
+</script>
+</body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
   window.printStudentReport = function(studentId){
@@ -4280,6 +4381,107 @@ window.addEventListener('load', function(){
 })();
 </script>
 
+
+<style id="sara-bulk-arrow-fix">
+#bulkReasonSelect,
+#teacherReasonSelect,
+#opType,
+.student-filters select,
+.teacher-box select,
+.field select{
+  -webkit-appearance:none !important;
+  appearance:none !important;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%23103a2e' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>") !important;
+  background-repeat:no-repeat !important;
+  background-position:left 14px center !important;
+  background-size:18px 18px !important;
+  padding-left:42px !important;
+}
+html[dir="ltr"] #bulkReasonSelect,
+html[dir="ltr"] #teacherReasonSelect,
+html[dir="ltr"] #opType,
+html[dir="ltr"] .student-filters select,
+html[dir="ltr"] .teacher-box select,
+html[dir="ltr"] .field select{
+  background-position:right 14px center !important;
+  padding-right:42px !important;
+  padding-left:14px !important;
+}
+</style>
+<script id="sara-open-class-fix">
+(function(){
+  function removeLeakedCode(){
+    try{
+      const walker=document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null);
+      const bad=[];
+      while(walker.nextNode()){
+        const n=walker.currentNode;
+        const t=(n.nodeValue||'').trim();
+        if(!t) continue;
+        if(t.includes('const w=window.open') || t.includes('document.write(html)') || t.includes('smartReportStatus') || t.includes('smart-reports-override-style')) bad.push(n);
+      }
+      bad.forEach(function(n){ n.nodeValue=''; });
+    }catch(e){}
+  }
+
+  function safeOpenClass(classId){
+    try{
+      if(typeof window.ensureSettingsState==='function'){
+        const state=window.ensureSettingsState();
+        state.classId=classId;
+      }else{
+        window.__studentSettingsState=window.__studentSettingsState||{classId:'',query:'',level:'all',status:'all'};
+        window.__studentSettingsState.classId=classId;
+      }
+      if(typeof window.renderClassDetail==='function') window.renderClassDetail();
+      const detail=document.getElementById('studentClassDetail');
+      if(detail){
+        detail.classList.remove('hidden');
+        detail.scrollIntoView({behavior:'smooth',block:'start'});
+      }
+    }catch(e){ console.error(e); }
+  }
+
+  function bindOpenButtons(){
+    document.querySelectorAll('.student-class-actions .btn, button').forEach(function(btn){
+      const txt=(btn.textContent||'').trim();
+      if(txt==='فتح الفصل'){
+        const oc=btn.getAttribute('onclick')||'';
+        const m=oc.match(/openStudentSettingsClass\('([^']+)'\)/);
+        if(m && !btn.dataset.saraBound){
+          btn.dataset.saraBound='1';
+          btn.onclick=function(ev){ ev.preventDefault(); ev.stopPropagation(); safeOpenClass(m[1]); };
+        }
+      }
+    });
+  }
+
+  const oldOpen=window.openStudentSettingsClass;
+  window.openStudentSettingsClass=function(classId){
+    if(typeof oldOpen==='function'){
+      try{ oldOpen(classId); }catch(e){}
+    }
+    safeOpenClass(classId);
+  };
+
+  const oldRenderAdv=window.renderAdvancedSlot;
+  window.renderAdvancedSlot=function(){
+    if(typeof oldRenderAdv==='function'){
+      try{ oldRenderAdv(); }catch(e){}
+    }
+    bindOpenButtons();
+  };
+
+  function boot(){
+    removeLeakedCode();
+    bindOpenButtons();
+    setTimeout(removeLeakedCode,400);
+    setTimeout(bindOpenButtons,500);
+  }
+  document.addEventListener('DOMContentLoaded',boot);
+  window.addEventListener('load',boot);
+})();
+</script>
 </body></html>`;
     const w=window.open('','_blank'); if(w){ w.document.write(html); w.document.close(); setTimeout(()=>w.print(),400); }
     const status=document.getElementById('smartReportStatus'); if(status){ status.classList.remove('hidden'); setTimeout(()=>status.classList.add('hidden'),2000); }
@@ -4605,7 +4807,108 @@ window.addEventListener('load', function(){
   };
   function openPrintWindow(title, bodyHtml){
     const w = window.open('', '_blank'); if(!w) return;
-    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}</body></html>`);
+    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}
+<style id="sara-bulk-arrow-fix">
+#bulkReasonSelect,
+#teacherReasonSelect,
+#opType,
+.student-filters select,
+.teacher-box select,
+.field select{
+  -webkit-appearance:none !important;
+  appearance:none !important;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%23103a2e' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>") !important;
+  background-repeat:no-repeat !important;
+  background-position:left 14px center !important;
+  background-size:18px 18px !important;
+  padding-left:42px !important;
+}
+html[dir="ltr"] #bulkReasonSelect,
+html[dir="ltr"] #teacherReasonSelect,
+html[dir="ltr"] #opType,
+html[dir="ltr"] .student-filters select,
+html[dir="ltr"] .teacher-box select,
+html[dir="ltr"] .field select{
+  background-position:right 14px center !important;
+  padding-right:42px !important;
+  padding-left:14px !important;
+}
+</style>
+<script id="sara-open-class-fix">
+(function(){
+  function removeLeakedCode(){
+    try{
+      const walker=document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null);
+      const bad=[];
+      while(walker.nextNode()){
+        const n=walker.currentNode;
+        const t=(n.nodeValue||'').trim();
+        if(!t) continue;
+        if(t.includes('const w=window.open') || t.includes('document.write(html)') || t.includes('smartReportStatus') || t.includes('smart-reports-override-style')) bad.push(n);
+      }
+      bad.forEach(function(n){ n.nodeValue=''; });
+    }catch(e){}
+  }
+
+  function safeOpenClass(classId){
+    try{
+      if(typeof window.ensureSettingsState==='function'){
+        const state=window.ensureSettingsState();
+        state.classId=classId;
+      }else{
+        window.__studentSettingsState=window.__studentSettingsState||{classId:'',query:'',level:'all',status:'all'};
+        window.__studentSettingsState.classId=classId;
+      }
+      if(typeof window.renderClassDetail==='function') window.renderClassDetail();
+      const detail=document.getElementById('studentClassDetail');
+      if(detail){
+        detail.classList.remove('hidden');
+        detail.scrollIntoView({behavior:'smooth',block:'start'});
+      }
+    }catch(e){ console.error(e); }
+  }
+
+  function bindOpenButtons(){
+    document.querySelectorAll('.student-class-actions .btn, button').forEach(function(btn){
+      const txt=(btn.textContent||'').trim();
+      if(txt==='فتح الفصل'){
+        const oc=btn.getAttribute('onclick')||'';
+        const m=oc.match(/openStudentSettingsClass\('([^']+)'\)/);
+        if(m && !btn.dataset.saraBound){
+          btn.dataset.saraBound='1';
+          btn.onclick=function(ev){ ev.preventDefault(); ev.stopPropagation(); safeOpenClass(m[1]); };
+        }
+      }
+    });
+  }
+
+  const oldOpen=window.openStudentSettingsClass;
+  window.openStudentSettingsClass=function(classId){
+    if(typeof oldOpen==='function'){
+      try{ oldOpen(classId); }catch(e){}
+    }
+    safeOpenClass(classId);
+  };
+
+  const oldRenderAdv=window.renderAdvancedSlot;
+  window.renderAdvancedSlot=function(){
+    if(typeof oldRenderAdv==='function'){
+      try{ oldRenderAdv(); }catch(e){}
+    }
+    bindOpenButtons();
+  };
+
+  function boot(){
+    removeLeakedCode();
+    bindOpenButtons();
+    setTimeout(removeLeakedCode,400);
+    setTimeout(bindOpenButtons,500);
+  }
+  document.addEventListener('DOMContentLoaded',boot);
+  window.addEventListener('load',boot);
+})();
+</script>
+</body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
   window.printStudentReport = function(studentId){
@@ -4629,6 +4932,107 @@ window.addEventListener('load', function(){
 })();
 </script>
 
+
+<style id="sara-bulk-arrow-fix">
+#bulkReasonSelect,
+#teacherReasonSelect,
+#opType,
+.student-filters select,
+.teacher-box select,
+.field select{
+  -webkit-appearance:none !important;
+  appearance:none !important;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%23103a2e' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>") !important;
+  background-repeat:no-repeat !important;
+  background-position:left 14px center !important;
+  background-size:18px 18px !important;
+  padding-left:42px !important;
+}
+html[dir="ltr"] #bulkReasonSelect,
+html[dir="ltr"] #teacherReasonSelect,
+html[dir="ltr"] #opType,
+html[dir="ltr"] .student-filters select,
+html[dir="ltr"] .teacher-box select,
+html[dir="ltr"] .field select{
+  background-position:right 14px center !important;
+  padding-right:42px !important;
+  padding-left:14px !important;
+}
+</style>
+<script id="sara-open-class-fix">
+(function(){
+  function removeLeakedCode(){
+    try{
+      const walker=document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null);
+      const bad=[];
+      while(walker.nextNode()){
+        const n=walker.currentNode;
+        const t=(n.nodeValue||'').trim();
+        if(!t) continue;
+        if(t.includes('const w=window.open') || t.includes('document.write(html)') || t.includes('smartReportStatus') || t.includes('smart-reports-override-style')) bad.push(n);
+      }
+      bad.forEach(function(n){ n.nodeValue=''; });
+    }catch(e){}
+  }
+
+  function safeOpenClass(classId){
+    try{
+      if(typeof window.ensureSettingsState==='function'){
+        const state=window.ensureSettingsState();
+        state.classId=classId;
+      }else{
+        window.__studentSettingsState=window.__studentSettingsState||{classId:'',query:'',level:'all',status:'all'};
+        window.__studentSettingsState.classId=classId;
+      }
+      if(typeof window.renderClassDetail==='function') window.renderClassDetail();
+      const detail=document.getElementById('studentClassDetail');
+      if(detail){
+        detail.classList.remove('hidden');
+        detail.scrollIntoView({behavior:'smooth',block:'start'});
+      }
+    }catch(e){ console.error(e); }
+  }
+
+  function bindOpenButtons(){
+    document.querySelectorAll('.student-class-actions .btn, button').forEach(function(btn){
+      const txt=(btn.textContent||'').trim();
+      if(txt==='فتح الفصل'){
+        const oc=btn.getAttribute('onclick')||'';
+        const m=oc.match(/openStudentSettingsClass\('([^']+)'\)/);
+        if(m && !btn.dataset.saraBound){
+          btn.dataset.saraBound='1';
+          btn.onclick=function(ev){ ev.preventDefault(); ev.stopPropagation(); safeOpenClass(m[1]); };
+        }
+      }
+    });
+  }
+
+  const oldOpen=window.openStudentSettingsClass;
+  window.openStudentSettingsClass=function(classId){
+    if(typeof oldOpen==='function'){
+      try{ oldOpen(classId); }catch(e){}
+    }
+    safeOpenClass(classId);
+  };
+
+  const oldRenderAdv=window.renderAdvancedSlot;
+  window.renderAdvancedSlot=function(){
+    if(typeof oldRenderAdv==='function'){
+      try{ oldRenderAdv(); }catch(e){}
+    }
+    bindOpenButtons();
+  };
+
+  function boot(){
+    removeLeakedCode();
+    bindOpenButtons();
+    setTimeout(removeLeakedCode,400);
+    setTimeout(bindOpenButtons,500);
+  }
+  document.addEventListener('DOMContentLoaded',boot);
+  window.addEventListener('load',boot);
+})();
+</script>
 </body></html>`;
     const w=window.open('','_blank'); if(w){ w.document.write(html); w.document.close(); setTimeout(()=>w.print(),400); }
     const status=document.getElementById('smartReportStatus'); if(status){ status.classList.remove('hidden'); setTimeout(()=>status.classList.add('hidden'),2000); }
@@ -5065,7 +5469,108 @@ window.addEventListener('load', function(){
   };
   function openPrintWindow(title, bodyHtml){
     const w = window.open('', '_blank'); if(!w) return;
-    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}</body></html>`);
+    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}
+<style id="sara-bulk-arrow-fix">
+#bulkReasonSelect,
+#teacherReasonSelect,
+#opType,
+.student-filters select,
+.teacher-box select,
+.field select{
+  -webkit-appearance:none !important;
+  appearance:none !important;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%23103a2e' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>") !important;
+  background-repeat:no-repeat !important;
+  background-position:left 14px center !important;
+  background-size:18px 18px !important;
+  padding-left:42px !important;
+}
+html[dir="ltr"] #bulkReasonSelect,
+html[dir="ltr"] #teacherReasonSelect,
+html[dir="ltr"] #opType,
+html[dir="ltr"] .student-filters select,
+html[dir="ltr"] .teacher-box select,
+html[dir="ltr"] .field select{
+  background-position:right 14px center !important;
+  padding-right:42px !important;
+  padding-left:14px !important;
+}
+</style>
+<script id="sara-open-class-fix">
+(function(){
+  function removeLeakedCode(){
+    try{
+      const walker=document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null);
+      const bad=[];
+      while(walker.nextNode()){
+        const n=walker.currentNode;
+        const t=(n.nodeValue||'').trim();
+        if(!t) continue;
+        if(t.includes('const w=window.open') || t.includes('document.write(html)') || t.includes('smartReportStatus') || t.includes('smart-reports-override-style')) bad.push(n);
+      }
+      bad.forEach(function(n){ n.nodeValue=''; });
+    }catch(e){}
+  }
+
+  function safeOpenClass(classId){
+    try{
+      if(typeof window.ensureSettingsState==='function'){
+        const state=window.ensureSettingsState();
+        state.classId=classId;
+      }else{
+        window.__studentSettingsState=window.__studentSettingsState||{classId:'',query:'',level:'all',status:'all'};
+        window.__studentSettingsState.classId=classId;
+      }
+      if(typeof window.renderClassDetail==='function') window.renderClassDetail();
+      const detail=document.getElementById('studentClassDetail');
+      if(detail){
+        detail.classList.remove('hidden');
+        detail.scrollIntoView({behavior:'smooth',block:'start'});
+      }
+    }catch(e){ console.error(e); }
+  }
+
+  function bindOpenButtons(){
+    document.querySelectorAll('.student-class-actions .btn, button').forEach(function(btn){
+      const txt=(btn.textContent||'').trim();
+      if(txt==='فتح الفصل'){
+        const oc=btn.getAttribute('onclick')||'';
+        const m=oc.match(/openStudentSettingsClass\('([^']+)'\)/);
+        if(m && !btn.dataset.saraBound){
+          btn.dataset.saraBound='1';
+          btn.onclick=function(ev){ ev.preventDefault(); ev.stopPropagation(); safeOpenClass(m[1]); };
+        }
+      }
+    });
+  }
+
+  const oldOpen=window.openStudentSettingsClass;
+  window.openStudentSettingsClass=function(classId){
+    if(typeof oldOpen==='function'){
+      try{ oldOpen(classId); }catch(e){}
+    }
+    safeOpenClass(classId);
+  };
+
+  const oldRenderAdv=window.renderAdvancedSlot;
+  window.renderAdvancedSlot=function(){
+    if(typeof oldRenderAdv==='function'){
+      try{ oldRenderAdv(); }catch(e){}
+    }
+    bindOpenButtons();
+  };
+
+  function boot(){
+    removeLeakedCode();
+    bindOpenButtons();
+    setTimeout(removeLeakedCode,400);
+    setTimeout(bindOpenButtons,500);
+  }
+  document.addEventListener('DOMContentLoaded',boot);
+  window.addEventListener('load',boot);
+})();
+</script>
+</body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
   window.printStudentReport = function(studentId){
@@ -5089,6 +5594,107 @@ window.addEventListener('load', function(){
 })();
 </script>
 
+
+<style id="sara-bulk-arrow-fix">
+#bulkReasonSelect,
+#teacherReasonSelect,
+#opType,
+.student-filters select,
+.teacher-box select,
+.field select{
+  -webkit-appearance:none !important;
+  appearance:none !important;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%23103a2e' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>") !important;
+  background-repeat:no-repeat !important;
+  background-position:left 14px center !important;
+  background-size:18px 18px !important;
+  padding-left:42px !important;
+}
+html[dir="ltr"] #bulkReasonSelect,
+html[dir="ltr"] #teacherReasonSelect,
+html[dir="ltr"] #opType,
+html[dir="ltr"] .student-filters select,
+html[dir="ltr"] .teacher-box select,
+html[dir="ltr"] .field select{
+  background-position:right 14px center !important;
+  padding-right:42px !important;
+  padding-left:14px !important;
+}
+</style>
+<script id="sara-open-class-fix">
+(function(){
+  function removeLeakedCode(){
+    try{
+      const walker=document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null);
+      const bad=[];
+      while(walker.nextNode()){
+        const n=walker.currentNode;
+        const t=(n.nodeValue||'').trim();
+        if(!t) continue;
+        if(t.includes('const w=window.open') || t.includes('document.write(html)') || t.includes('smartReportStatus') || t.includes('smart-reports-override-style')) bad.push(n);
+      }
+      bad.forEach(function(n){ n.nodeValue=''; });
+    }catch(e){}
+  }
+
+  function safeOpenClass(classId){
+    try{
+      if(typeof window.ensureSettingsState==='function'){
+        const state=window.ensureSettingsState();
+        state.classId=classId;
+      }else{
+        window.__studentSettingsState=window.__studentSettingsState||{classId:'',query:'',level:'all',status:'all'};
+        window.__studentSettingsState.classId=classId;
+      }
+      if(typeof window.renderClassDetail==='function') window.renderClassDetail();
+      const detail=document.getElementById('studentClassDetail');
+      if(detail){
+        detail.classList.remove('hidden');
+        detail.scrollIntoView({behavior:'smooth',block:'start'});
+      }
+    }catch(e){ console.error(e); }
+  }
+
+  function bindOpenButtons(){
+    document.querySelectorAll('.student-class-actions .btn, button').forEach(function(btn){
+      const txt=(btn.textContent||'').trim();
+      if(txt==='فتح الفصل'){
+        const oc=btn.getAttribute('onclick')||'';
+        const m=oc.match(/openStudentSettingsClass\('([^']+)'\)/);
+        if(m && !btn.dataset.saraBound){
+          btn.dataset.saraBound='1';
+          btn.onclick=function(ev){ ev.preventDefault(); ev.stopPropagation(); safeOpenClass(m[1]); };
+        }
+      }
+    });
+  }
+
+  const oldOpen=window.openStudentSettingsClass;
+  window.openStudentSettingsClass=function(classId){
+    if(typeof oldOpen==='function'){
+      try{ oldOpen(classId); }catch(e){}
+    }
+    safeOpenClass(classId);
+  };
+
+  const oldRenderAdv=window.renderAdvancedSlot;
+  window.renderAdvancedSlot=function(){
+    if(typeof oldRenderAdv==='function'){
+      try{ oldRenderAdv(); }catch(e){}
+    }
+    bindOpenButtons();
+  };
+
+  function boot(){
+    removeLeakedCode();
+    bindOpenButtons();
+    setTimeout(removeLeakedCode,400);
+    setTimeout(bindOpenButtons,500);
+  }
+  document.addEventListener('DOMContentLoaded',boot);
+  window.addEventListener('load',boot);
+})();
+</script>
 </body></html>`;
     const w=window.open('','_blank'); if(w){ w.document.write(html); w.document.close(); setTimeout(()=>w.print(),400); }
     const status=document.getElementById('smartReportStatus'); if(status){ status.classList.remove('hidden'); setTimeout(()=>status.classList.add('hidden'),2000); }
@@ -5414,7 +6020,108 @@ window.addEventListener('load', function(){
   };
   function openPrintWindow(title, bodyHtml){
     const w = window.open('', '_blank'); if(!w) return;
-    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}</body></html>`);
+    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}
+<style id="sara-bulk-arrow-fix">
+#bulkReasonSelect,
+#teacherReasonSelect,
+#opType,
+.student-filters select,
+.teacher-box select,
+.field select{
+  -webkit-appearance:none !important;
+  appearance:none !important;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%23103a2e' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>") !important;
+  background-repeat:no-repeat !important;
+  background-position:left 14px center !important;
+  background-size:18px 18px !important;
+  padding-left:42px !important;
+}
+html[dir="ltr"] #bulkReasonSelect,
+html[dir="ltr"] #teacherReasonSelect,
+html[dir="ltr"] #opType,
+html[dir="ltr"] .student-filters select,
+html[dir="ltr"] .teacher-box select,
+html[dir="ltr"] .field select{
+  background-position:right 14px center !important;
+  padding-right:42px !important;
+  padding-left:14px !important;
+}
+</style>
+<script id="sara-open-class-fix">
+(function(){
+  function removeLeakedCode(){
+    try{
+      const walker=document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null);
+      const bad=[];
+      while(walker.nextNode()){
+        const n=walker.currentNode;
+        const t=(n.nodeValue||'').trim();
+        if(!t) continue;
+        if(t.includes('const w=window.open') || t.includes('document.write(html)') || t.includes('smartReportStatus') || t.includes('smart-reports-override-style')) bad.push(n);
+      }
+      bad.forEach(function(n){ n.nodeValue=''; });
+    }catch(e){}
+  }
+
+  function safeOpenClass(classId){
+    try{
+      if(typeof window.ensureSettingsState==='function'){
+        const state=window.ensureSettingsState();
+        state.classId=classId;
+      }else{
+        window.__studentSettingsState=window.__studentSettingsState||{classId:'',query:'',level:'all',status:'all'};
+        window.__studentSettingsState.classId=classId;
+      }
+      if(typeof window.renderClassDetail==='function') window.renderClassDetail();
+      const detail=document.getElementById('studentClassDetail');
+      if(detail){
+        detail.classList.remove('hidden');
+        detail.scrollIntoView({behavior:'smooth',block:'start'});
+      }
+    }catch(e){ console.error(e); }
+  }
+
+  function bindOpenButtons(){
+    document.querySelectorAll('.student-class-actions .btn, button').forEach(function(btn){
+      const txt=(btn.textContent||'').trim();
+      if(txt==='فتح الفصل'){
+        const oc=btn.getAttribute('onclick')||'';
+        const m=oc.match(/openStudentSettingsClass\('([^']+)'\)/);
+        if(m && !btn.dataset.saraBound){
+          btn.dataset.saraBound='1';
+          btn.onclick=function(ev){ ev.preventDefault(); ev.stopPropagation(); safeOpenClass(m[1]); };
+        }
+      }
+    });
+  }
+
+  const oldOpen=window.openStudentSettingsClass;
+  window.openStudentSettingsClass=function(classId){
+    if(typeof oldOpen==='function'){
+      try{ oldOpen(classId); }catch(e){}
+    }
+    safeOpenClass(classId);
+  };
+
+  const oldRenderAdv=window.renderAdvancedSlot;
+  window.renderAdvancedSlot=function(){
+    if(typeof oldRenderAdv==='function'){
+      try{ oldRenderAdv(); }catch(e){}
+    }
+    bindOpenButtons();
+  };
+
+  function boot(){
+    removeLeakedCode();
+    bindOpenButtons();
+    setTimeout(removeLeakedCode,400);
+    setTimeout(bindOpenButtons,500);
+  }
+  document.addEventListener('DOMContentLoaded',boot);
+  window.addEventListener('load',boot);
+})();
+</script>
+</body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
   window.printStudentReport = function(studentId){
@@ -5438,6 +6145,107 @@ window.addEventListener('load', function(){
 })();
 </script>
 
+
+<style id="sara-bulk-arrow-fix">
+#bulkReasonSelect,
+#teacherReasonSelect,
+#opType,
+.student-filters select,
+.teacher-box select,
+.field select{
+  -webkit-appearance:none !important;
+  appearance:none !important;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%23103a2e' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>") !important;
+  background-repeat:no-repeat !important;
+  background-position:left 14px center !important;
+  background-size:18px 18px !important;
+  padding-left:42px !important;
+}
+html[dir="ltr"] #bulkReasonSelect,
+html[dir="ltr"] #teacherReasonSelect,
+html[dir="ltr"] #opType,
+html[dir="ltr"] .student-filters select,
+html[dir="ltr"] .teacher-box select,
+html[dir="ltr"] .field select{
+  background-position:right 14px center !important;
+  padding-right:42px !important;
+  padding-left:14px !important;
+}
+</style>
+<script id="sara-open-class-fix">
+(function(){
+  function removeLeakedCode(){
+    try{
+      const walker=document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null);
+      const bad=[];
+      while(walker.nextNode()){
+        const n=walker.currentNode;
+        const t=(n.nodeValue||'').trim();
+        if(!t) continue;
+        if(t.includes('const w=window.open') || t.includes('document.write(html)') || t.includes('smartReportStatus') || t.includes('smart-reports-override-style')) bad.push(n);
+      }
+      bad.forEach(function(n){ n.nodeValue=''; });
+    }catch(e){}
+  }
+
+  function safeOpenClass(classId){
+    try{
+      if(typeof window.ensureSettingsState==='function'){
+        const state=window.ensureSettingsState();
+        state.classId=classId;
+      }else{
+        window.__studentSettingsState=window.__studentSettingsState||{classId:'',query:'',level:'all',status:'all'};
+        window.__studentSettingsState.classId=classId;
+      }
+      if(typeof window.renderClassDetail==='function') window.renderClassDetail();
+      const detail=document.getElementById('studentClassDetail');
+      if(detail){
+        detail.classList.remove('hidden');
+        detail.scrollIntoView({behavior:'smooth',block:'start'});
+      }
+    }catch(e){ console.error(e); }
+  }
+
+  function bindOpenButtons(){
+    document.querySelectorAll('.student-class-actions .btn, button').forEach(function(btn){
+      const txt=(btn.textContent||'').trim();
+      if(txt==='فتح الفصل'){
+        const oc=btn.getAttribute('onclick')||'';
+        const m=oc.match(/openStudentSettingsClass\('([^']+)'\)/);
+        if(m && !btn.dataset.saraBound){
+          btn.dataset.saraBound='1';
+          btn.onclick=function(ev){ ev.preventDefault(); ev.stopPropagation(); safeOpenClass(m[1]); };
+        }
+      }
+    });
+  }
+
+  const oldOpen=window.openStudentSettingsClass;
+  window.openStudentSettingsClass=function(classId){
+    if(typeof oldOpen==='function'){
+      try{ oldOpen(classId); }catch(e){}
+    }
+    safeOpenClass(classId);
+  };
+
+  const oldRenderAdv=window.renderAdvancedSlot;
+  window.renderAdvancedSlot=function(){
+    if(typeof oldRenderAdv==='function'){
+      try{ oldRenderAdv(); }catch(e){}
+    }
+    bindOpenButtons();
+  };
+
+  function boot(){
+    removeLeakedCode();
+    bindOpenButtons();
+    setTimeout(removeLeakedCode,400);
+    setTimeout(bindOpenButtons,500);
+  }
+  document.addEventListener('DOMContentLoaded',boot);
+  window.addEventListener('load',boot);
+})();
+</script>
 </body></html>';
     var w = window.open('', '_blank'); if(!w) return;
     w.document.open(); w.document.write(html); w.document.close();
@@ -5985,7 +6793,108 @@ window.addEventListener('load', function(){
   };
   function openPrintWindow(title, bodyHtml){
     const w = window.open('', '_blank'); if(!w) return;
-    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}</body></html>`);
+    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}
+<style id="sara-bulk-arrow-fix">
+#bulkReasonSelect,
+#teacherReasonSelect,
+#opType,
+.student-filters select,
+.teacher-box select,
+.field select{
+  -webkit-appearance:none !important;
+  appearance:none !important;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%23103a2e' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>") !important;
+  background-repeat:no-repeat !important;
+  background-position:left 14px center !important;
+  background-size:18px 18px !important;
+  padding-left:42px !important;
+}
+html[dir="ltr"] #bulkReasonSelect,
+html[dir="ltr"] #teacherReasonSelect,
+html[dir="ltr"] #opType,
+html[dir="ltr"] .student-filters select,
+html[dir="ltr"] .teacher-box select,
+html[dir="ltr"] .field select{
+  background-position:right 14px center !important;
+  padding-right:42px !important;
+  padding-left:14px !important;
+}
+</style>
+<script id="sara-open-class-fix">
+(function(){
+  function removeLeakedCode(){
+    try{
+      const walker=document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null);
+      const bad=[];
+      while(walker.nextNode()){
+        const n=walker.currentNode;
+        const t=(n.nodeValue||'').trim();
+        if(!t) continue;
+        if(t.includes('const w=window.open') || t.includes('document.write(html)') || t.includes('smartReportStatus') || t.includes('smart-reports-override-style')) bad.push(n);
+      }
+      bad.forEach(function(n){ n.nodeValue=''; });
+    }catch(e){}
+  }
+
+  function safeOpenClass(classId){
+    try{
+      if(typeof window.ensureSettingsState==='function'){
+        const state=window.ensureSettingsState();
+        state.classId=classId;
+      }else{
+        window.__studentSettingsState=window.__studentSettingsState||{classId:'',query:'',level:'all',status:'all'};
+        window.__studentSettingsState.classId=classId;
+      }
+      if(typeof window.renderClassDetail==='function') window.renderClassDetail();
+      const detail=document.getElementById('studentClassDetail');
+      if(detail){
+        detail.classList.remove('hidden');
+        detail.scrollIntoView({behavior:'smooth',block:'start'});
+      }
+    }catch(e){ console.error(e); }
+  }
+
+  function bindOpenButtons(){
+    document.querySelectorAll('.student-class-actions .btn, button').forEach(function(btn){
+      const txt=(btn.textContent||'').trim();
+      if(txt==='فتح الفصل'){
+        const oc=btn.getAttribute('onclick')||'';
+        const m=oc.match(/openStudentSettingsClass\('([^']+)'\)/);
+        if(m && !btn.dataset.saraBound){
+          btn.dataset.saraBound='1';
+          btn.onclick=function(ev){ ev.preventDefault(); ev.stopPropagation(); safeOpenClass(m[1]); };
+        }
+      }
+    });
+  }
+
+  const oldOpen=window.openStudentSettingsClass;
+  window.openStudentSettingsClass=function(classId){
+    if(typeof oldOpen==='function'){
+      try{ oldOpen(classId); }catch(e){}
+    }
+    safeOpenClass(classId);
+  };
+
+  const oldRenderAdv=window.renderAdvancedSlot;
+  window.renderAdvancedSlot=function(){
+    if(typeof oldRenderAdv==='function'){
+      try{ oldRenderAdv(); }catch(e){}
+    }
+    bindOpenButtons();
+  };
+
+  function boot(){
+    removeLeakedCode();
+    bindOpenButtons();
+    setTimeout(removeLeakedCode,400);
+    setTimeout(bindOpenButtons,500);
+  }
+  document.addEventListener('DOMContentLoaded',boot);
+  window.addEventListener('load',boot);
+})();
+</script>
+</body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
   window.printStudentReport = function(studentId){
@@ -6009,6 +6918,107 @@ window.addEventListener('load', function(){
 })();
 </script>
 
+
+<style id="sara-bulk-arrow-fix">
+#bulkReasonSelect,
+#teacherReasonSelect,
+#opType,
+.student-filters select,
+.teacher-box select,
+.field select{
+  -webkit-appearance:none !important;
+  appearance:none !important;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%23103a2e' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>") !important;
+  background-repeat:no-repeat !important;
+  background-position:left 14px center !important;
+  background-size:18px 18px !important;
+  padding-left:42px !important;
+}
+html[dir="ltr"] #bulkReasonSelect,
+html[dir="ltr"] #teacherReasonSelect,
+html[dir="ltr"] #opType,
+html[dir="ltr"] .student-filters select,
+html[dir="ltr"] .teacher-box select,
+html[dir="ltr"] .field select{
+  background-position:right 14px center !important;
+  padding-right:42px !important;
+  padding-left:14px !important;
+}
+</style>
+<script id="sara-open-class-fix">
+(function(){
+  function removeLeakedCode(){
+    try{
+      const walker=document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null);
+      const bad=[];
+      while(walker.nextNode()){
+        const n=walker.currentNode;
+        const t=(n.nodeValue||'').trim();
+        if(!t) continue;
+        if(t.includes('const w=window.open') || t.includes('document.write(html)') || t.includes('smartReportStatus') || t.includes('smart-reports-override-style')) bad.push(n);
+      }
+      bad.forEach(function(n){ n.nodeValue=''; });
+    }catch(e){}
+  }
+
+  function safeOpenClass(classId){
+    try{
+      if(typeof window.ensureSettingsState==='function'){
+        const state=window.ensureSettingsState();
+        state.classId=classId;
+      }else{
+        window.__studentSettingsState=window.__studentSettingsState||{classId:'',query:'',level:'all',status:'all'};
+        window.__studentSettingsState.classId=classId;
+      }
+      if(typeof window.renderClassDetail==='function') window.renderClassDetail();
+      const detail=document.getElementById('studentClassDetail');
+      if(detail){
+        detail.classList.remove('hidden');
+        detail.scrollIntoView({behavior:'smooth',block:'start'});
+      }
+    }catch(e){ console.error(e); }
+  }
+
+  function bindOpenButtons(){
+    document.querySelectorAll('.student-class-actions .btn, button').forEach(function(btn){
+      const txt=(btn.textContent||'').trim();
+      if(txt==='فتح الفصل'){
+        const oc=btn.getAttribute('onclick')||'';
+        const m=oc.match(/openStudentSettingsClass\('([^']+)'\)/);
+        if(m && !btn.dataset.saraBound){
+          btn.dataset.saraBound='1';
+          btn.onclick=function(ev){ ev.preventDefault(); ev.stopPropagation(); safeOpenClass(m[1]); };
+        }
+      }
+    });
+  }
+
+  const oldOpen=window.openStudentSettingsClass;
+  window.openStudentSettingsClass=function(classId){
+    if(typeof oldOpen==='function'){
+      try{ oldOpen(classId); }catch(e){}
+    }
+    safeOpenClass(classId);
+  };
+
+  const oldRenderAdv=window.renderAdvancedSlot;
+  window.renderAdvancedSlot=function(){
+    if(typeof oldRenderAdv==='function'){
+      try{ oldRenderAdv(); }catch(e){}
+    }
+    bindOpenButtons();
+  };
+
+  function boot(){
+    removeLeakedCode();
+    bindOpenButtons();
+    setTimeout(removeLeakedCode,400);
+    setTimeout(bindOpenButtons,500);
+  }
+  document.addEventListener('DOMContentLoaded',boot);
+  window.addEventListener('load',boot);
+})();
+</script>
 </body></html>`;
     const w=window.open('','_blank'); if(w){ w.document.write(html); w.document.close(); setTimeout(()=>w.print(),400); }
     const status=document.getElementById('smartReportStatus'); if(status){ status.classList.remove('hidden'); setTimeout(()=>status.classList.add('hidden'),2000); }
@@ -6334,7 +7344,108 @@ window.addEventListener('load', function(){
   };
   function openPrintWindow(title, bodyHtml){
     const w = window.open('', '_blank'); if(!w) return;
-    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}</body></html>`);
+    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}
+<style id="sara-bulk-arrow-fix">
+#bulkReasonSelect,
+#teacherReasonSelect,
+#opType,
+.student-filters select,
+.teacher-box select,
+.field select{
+  -webkit-appearance:none !important;
+  appearance:none !important;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%23103a2e' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>") !important;
+  background-repeat:no-repeat !important;
+  background-position:left 14px center !important;
+  background-size:18px 18px !important;
+  padding-left:42px !important;
+}
+html[dir="ltr"] #bulkReasonSelect,
+html[dir="ltr"] #teacherReasonSelect,
+html[dir="ltr"] #opType,
+html[dir="ltr"] .student-filters select,
+html[dir="ltr"] .teacher-box select,
+html[dir="ltr"] .field select{
+  background-position:right 14px center !important;
+  padding-right:42px !important;
+  padding-left:14px !important;
+}
+</style>
+<script id="sara-open-class-fix">
+(function(){
+  function removeLeakedCode(){
+    try{
+      const walker=document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null);
+      const bad=[];
+      while(walker.nextNode()){
+        const n=walker.currentNode;
+        const t=(n.nodeValue||'').trim();
+        if(!t) continue;
+        if(t.includes('const w=window.open') || t.includes('document.write(html)') || t.includes('smartReportStatus') || t.includes('smart-reports-override-style')) bad.push(n);
+      }
+      bad.forEach(function(n){ n.nodeValue=''; });
+    }catch(e){}
+  }
+
+  function safeOpenClass(classId){
+    try{
+      if(typeof window.ensureSettingsState==='function'){
+        const state=window.ensureSettingsState();
+        state.classId=classId;
+      }else{
+        window.__studentSettingsState=window.__studentSettingsState||{classId:'',query:'',level:'all',status:'all'};
+        window.__studentSettingsState.classId=classId;
+      }
+      if(typeof window.renderClassDetail==='function') window.renderClassDetail();
+      const detail=document.getElementById('studentClassDetail');
+      if(detail){
+        detail.classList.remove('hidden');
+        detail.scrollIntoView({behavior:'smooth',block:'start'});
+      }
+    }catch(e){ console.error(e); }
+  }
+
+  function bindOpenButtons(){
+    document.querySelectorAll('.student-class-actions .btn, button').forEach(function(btn){
+      const txt=(btn.textContent||'').trim();
+      if(txt==='فتح الفصل'){
+        const oc=btn.getAttribute('onclick')||'';
+        const m=oc.match(/openStudentSettingsClass\('([^']+)'\)/);
+        if(m && !btn.dataset.saraBound){
+          btn.dataset.saraBound='1';
+          btn.onclick=function(ev){ ev.preventDefault(); ev.stopPropagation(); safeOpenClass(m[1]); };
+        }
+      }
+    });
+  }
+
+  const oldOpen=window.openStudentSettingsClass;
+  window.openStudentSettingsClass=function(classId){
+    if(typeof oldOpen==='function'){
+      try{ oldOpen(classId); }catch(e){}
+    }
+    safeOpenClass(classId);
+  };
+
+  const oldRenderAdv=window.renderAdvancedSlot;
+  window.renderAdvancedSlot=function(){
+    if(typeof oldRenderAdv==='function'){
+      try{ oldRenderAdv(); }catch(e){}
+    }
+    bindOpenButtons();
+  };
+
+  function boot(){
+    removeLeakedCode();
+    bindOpenButtons();
+    setTimeout(removeLeakedCode,400);
+    setTimeout(bindOpenButtons,500);
+  }
+  document.addEventListener('DOMContentLoaded',boot);
+  window.addEventListener('load',boot);
+})();
+</script>
+</body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
   window.printStudentReport = function(studentId){
@@ -6358,6 +7469,107 @@ window.addEventListener('load', function(){
 })();
 </script>
 
+
+<style id="sara-bulk-arrow-fix">
+#bulkReasonSelect,
+#teacherReasonSelect,
+#opType,
+.student-filters select,
+.teacher-box select,
+.field select{
+  -webkit-appearance:none !important;
+  appearance:none !important;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%23103a2e' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>") !important;
+  background-repeat:no-repeat !important;
+  background-position:left 14px center !important;
+  background-size:18px 18px !important;
+  padding-left:42px !important;
+}
+html[dir="ltr"] #bulkReasonSelect,
+html[dir="ltr"] #teacherReasonSelect,
+html[dir="ltr"] #opType,
+html[dir="ltr"] .student-filters select,
+html[dir="ltr"] .teacher-box select,
+html[dir="ltr"] .field select{
+  background-position:right 14px center !important;
+  padding-right:42px !important;
+  padding-left:14px !important;
+}
+</style>
+<script id="sara-open-class-fix">
+(function(){
+  function removeLeakedCode(){
+    try{
+      const walker=document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null);
+      const bad=[];
+      while(walker.nextNode()){
+        const n=walker.currentNode;
+        const t=(n.nodeValue||'').trim();
+        if(!t) continue;
+        if(t.includes('const w=window.open') || t.includes('document.write(html)') || t.includes('smartReportStatus') || t.includes('smart-reports-override-style')) bad.push(n);
+      }
+      bad.forEach(function(n){ n.nodeValue=''; });
+    }catch(e){}
+  }
+
+  function safeOpenClass(classId){
+    try{
+      if(typeof window.ensureSettingsState==='function'){
+        const state=window.ensureSettingsState();
+        state.classId=classId;
+      }else{
+        window.__studentSettingsState=window.__studentSettingsState||{classId:'',query:'',level:'all',status:'all'};
+        window.__studentSettingsState.classId=classId;
+      }
+      if(typeof window.renderClassDetail==='function') window.renderClassDetail();
+      const detail=document.getElementById('studentClassDetail');
+      if(detail){
+        detail.classList.remove('hidden');
+        detail.scrollIntoView({behavior:'smooth',block:'start'});
+      }
+    }catch(e){ console.error(e); }
+  }
+
+  function bindOpenButtons(){
+    document.querySelectorAll('.student-class-actions .btn, button').forEach(function(btn){
+      const txt=(btn.textContent||'').trim();
+      if(txt==='فتح الفصل'){
+        const oc=btn.getAttribute('onclick')||'';
+        const m=oc.match(/openStudentSettingsClass\('([^']+)'\)/);
+        if(m && !btn.dataset.saraBound){
+          btn.dataset.saraBound='1';
+          btn.onclick=function(ev){ ev.preventDefault(); ev.stopPropagation(); safeOpenClass(m[1]); };
+        }
+      }
+    });
+  }
+
+  const oldOpen=window.openStudentSettingsClass;
+  window.openStudentSettingsClass=function(classId){
+    if(typeof oldOpen==='function'){
+      try{ oldOpen(classId); }catch(e){}
+    }
+    safeOpenClass(classId);
+  };
+
+  const oldRenderAdv=window.renderAdvancedSlot;
+  window.renderAdvancedSlot=function(){
+    if(typeof oldRenderAdv==='function'){
+      try{ oldRenderAdv(); }catch(e){}
+    }
+    bindOpenButtons();
+  };
+
+  function boot(){
+    removeLeakedCode();
+    bindOpenButtons();
+    setTimeout(removeLeakedCode,400);
+    setTimeout(bindOpenButtons,500);
+  }
+  document.addEventListener('DOMContentLoaded',boot);
+  window.addEventListener('load',boot);
+})();
+</script>
 </body></html>`;
     const w=window.open('','_blank'); if(w){ w.document.write(html); w.document.close(); setTimeout(()=>w.print(),400); }
     const status=document.getElementById('smartReportStatus'); if(status){ status.classList.remove('hidden'); setTimeout(()=>status.classList.add('hidden'),2000); }
@@ -6794,7 +8006,108 @@ window.addEventListener('load', function(){
   };
   function openPrintWindow(title, bodyHtml){
     const w = window.open('', '_blank'); if(!w) return;
-    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}</body></html>`);
+    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}
+<style id="sara-bulk-arrow-fix">
+#bulkReasonSelect,
+#teacherReasonSelect,
+#opType,
+.student-filters select,
+.teacher-box select,
+.field select{
+  -webkit-appearance:none !important;
+  appearance:none !important;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%23103a2e' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>") !important;
+  background-repeat:no-repeat !important;
+  background-position:left 14px center !important;
+  background-size:18px 18px !important;
+  padding-left:42px !important;
+}
+html[dir="ltr"] #bulkReasonSelect,
+html[dir="ltr"] #teacherReasonSelect,
+html[dir="ltr"] #opType,
+html[dir="ltr"] .student-filters select,
+html[dir="ltr"] .teacher-box select,
+html[dir="ltr"] .field select{
+  background-position:right 14px center !important;
+  padding-right:42px !important;
+  padding-left:14px !important;
+}
+</style>
+<script id="sara-open-class-fix">
+(function(){
+  function removeLeakedCode(){
+    try{
+      const walker=document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null);
+      const bad=[];
+      while(walker.nextNode()){
+        const n=walker.currentNode;
+        const t=(n.nodeValue||'').trim();
+        if(!t) continue;
+        if(t.includes('const w=window.open') || t.includes('document.write(html)') || t.includes('smartReportStatus') || t.includes('smart-reports-override-style')) bad.push(n);
+      }
+      bad.forEach(function(n){ n.nodeValue=''; });
+    }catch(e){}
+  }
+
+  function safeOpenClass(classId){
+    try{
+      if(typeof window.ensureSettingsState==='function'){
+        const state=window.ensureSettingsState();
+        state.classId=classId;
+      }else{
+        window.__studentSettingsState=window.__studentSettingsState||{classId:'',query:'',level:'all',status:'all'};
+        window.__studentSettingsState.classId=classId;
+      }
+      if(typeof window.renderClassDetail==='function') window.renderClassDetail();
+      const detail=document.getElementById('studentClassDetail');
+      if(detail){
+        detail.classList.remove('hidden');
+        detail.scrollIntoView({behavior:'smooth',block:'start'});
+      }
+    }catch(e){ console.error(e); }
+  }
+
+  function bindOpenButtons(){
+    document.querySelectorAll('.student-class-actions .btn, button').forEach(function(btn){
+      const txt=(btn.textContent||'').trim();
+      if(txt==='فتح الفصل'){
+        const oc=btn.getAttribute('onclick')||'';
+        const m=oc.match(/openStudentSettingsClass\('([^']+)'\)/);
+        if(m && !btn.dataset.saraBound){
+          btn.dataset.saraBound='1';
+          btn.onclick=function(ev){ ev.preventDefault(); ev.stopPropagation(); safeOpenClass(m[1]); };
+        }
+      }
+    });
+  }
+
+  const oldOpen=window.openStudentSettingsClass;
+  window.openStudentSettingsClass=function(classId){
+    if(typeof oldOpen==='function'){
+      try{ oldOpen(classId); }catch(e){}
+    }
+    safeOpenClass(classId);
+  };
+
+  const oldRenderAdv=window.renderAdvancedSlot;
+  window.renderAdvancedSlot=function(){
+    if(typeof oldRenderAdv==='function'){
+      try{ oldRenderAdv(); }catch(e){}
+    }
+    bindOpenButtons();
+  };
+
+  function boot(){
+    removeLeakedCode();
+    bindOpenButtons();
+    setTimeout(removeLeakedCode,400);
+    setTimeout(bindOpenButtons,500);
+  }
+  document.addEventListener('DOMContentLoaded',boot);
+  window.addEventListener('load',boot);
+})();
+</script>
+</body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
   window.printStudentReport = function(studentId){
@@ -6818,6 +8131,107 @@ window.addEventListener('load', function(){
 })();
 </script>
 
+
+<style id="sara-bulk-arrow-fix">
+#bulkReasonSelect,
+#teacherReasonSelect,
+#opType,
+.student-filters select,
+.teacher-box select,
+.field select{
+  -webkit-appearance:none !important;
+  appearance:none !important;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%23103a2e' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>") !important;
+  background-repeat:no-repeat !important;
+  background-position:left 14px center !important;
+  background-size:18px 18px !important;
+  padding-left:42px !important;
+}
+html[dir="ltr"] #bulkReasonSelect,
+html[dir="ltr"] #teacherReasonSelect,
+html[dir="ltr"] #opType,
+html[dir="ltr"] .student-filters select,
+html[dir="ltr"] .teacher-box select,
+html[dir="ltr"] .field select{
+  background-position:right 14px center !important;
+  padding-right:42px !important;
+  padding-left:14px !important;
+}
+</style>
+<script id="sara-open-class-fix">
+(function(){
+  function removeLeakedCode(){
+    try{
+      const walker=document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null);
+      const bad=[];
+      while(walker.nextNode()){
+        const n=walker.currentNode;
+        const t=(n.nodeValue||'').trim();
+        if(!t) continue;
+        if(t.includes('const w=window.open') || t.includes('document.write(html)') || t.includes('smartReportStatus') || t.includes('smart-reports-override-style')) bad.push(n);
+      }
+      bad.forEach(function(n){ n.nodeValue=''; });
+    }catch(e){}
+  }
+
+  function safeOpenClass(classId){
+    try{
+      if(typeof window.ensureSettingsState==='function'){
+        const state=window.ensureSettingsState();
+        state.classId=classId;
+      }else{
+        window.__studentSettingsState=window.__studentSettingsState||{classId:'',query:'',level:'all',status:'all'};
+        window.__studentSettingsState.classId=classId;
+      }
+      if(typeof window.renderClassDetail==='function') window.renderClassDetail();
+      const detail=document.getElementById('studentClassDetail');
+      if(detail){
+        detail.classList.remove('hidden');
+        detail.scrollIntoView({behavior:'smooth',block:'start'});
+      }
+    }catch(e){ console.error(e); }
+  }
+
+  function bindOpenButtons(){
+    document.querySelectorAll('.student-class-actions .btn, button').forEach(function(btn){
+      const txt=(btn.textContent||'').trim();
+      if(txt==='فتح الفصل'){
+        const oc=btn.getAttribute('onclick')||'';
+        const m=oc.match(/openStudentSettingsClass\('([^']+)'\)/);
+        if(m && !btn.dataset.saraBound){
+          btn.dataset.saraBound='1';
+          btn.onclick=function(ev){ ev.preventDefault(); ev.stopPropagation(); safeOpenClass(m[1]); };
+        }
+      }
+    });
+  }
+
+  const oldOpen=window.openStudentSettingsClass;
+  window.openStudentSettingsClass=function(classId){
+    if(typeof oldOpen==='function'){
+      try{ oldOpen(classId); }catch(e){}
+    }
+    safeOpenClass(classId);
+  };
+
+  const oldRenderAdv=window.renderAdvancedSlot;
+  window.renderAdvancedSlot=function(){
+    if(typeof oldRenderAdv==='function'){
+      try{ oldRenderAdv(); }catch(e){}
+    }
+    bindOpenButtons();
+  };
+
+  function boot(){
+    removeLeakedCode();
+    bindOpenButtons();
+    setTimeout(removeLeakedCode,400);
+    setTimeout(bindOpenButtons,500);
+  }
+  document.addEventListener('DOMContentLoaded',boot);
+  window.addEventListener('load',boot);
+})();
+</script>
 </body></html>`;
     const w=window.open('','_blank'); if(w){ w.document.write(html); w.document.close(); setTimeout(()=>w.print(),400); }
     const status=document.getElementById('smartReportStatus'); if(status){ status.classList.remove('hidden'); setTimeout(()=>status.classList.add('hidden'),2000); }
@@ -7143,7 +8557,108 @@ window.addEventListener('load', function(){
   };
   function openPrintWindow(title, bodyHtml){
     const w = window.open('', '_blank'); if(!w) return;
-    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}</body></html>`);
+    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}
+<style id="sara-bulk-arrow-fix">
+#bulkReasonSelect,
+#teacherReasonSelect,
+#opType,
+.student-filters select,
+.teacher-box select,
+.field select{
+  -webkit-appearance:none !important;
+  appearance:none !important;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%23103a2e' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>") !important;
+  background-repeat:no-repeat !important;
+  background-position:left 14px center !important;
+  background-size:18px 18px !important;
+  padding-left:42px !important;
+}
+html[dir="ltr"] #bulkReasonSelect,
+html[dir="ltr"] #teacherReasonSelect,
+html[dir="ltr"] #opType,
+html[dir="ltr"] .student-filters select,
+html[dir="ltr"] .teacher-box select,
+html[dir="ltr"] .field select{
+  background-position:right 14px center !important;
+  padding-right:42px !important;
+  padding-left:14px !important;
+}
+</style>
+<script id="sara-open-class-fix">
+(function(){
+  function removeLeakedCode(){
+    try{
+      const walker=document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null);
+      const bad=[];
+      while(walker.nextNode()){
+        const n=walker.currentNode;
+        const t=(n.nodeValue||'').trim();
+        if(!t) continue;
+        if(t.includes('const w=window.open') || t.includes('document.write(html)') || t.includes('smartReportStatus') || t.includes('smart-reports-override-style')) bad.push(n);
+      }
+      bad.forEach(function(n){ n.nodeValue=''; });
+    }catch(e){}
+  }
+
+  function safeOpenClass(classId){
+    try{
+      if(typeof window.ensureSettingsState==='function'){
+        const state=window.ensureSettingsState();
+        state.classId=classId;
+      }else{
+        window.__studentSettingsState=window.__studentSettingsState||{classId:'',query:'',level:'all',status:'all'};
+        window.__studentSettingsState.classId=classId;
+      }
+      if(typeof window.renderClassDetail==='function') window.renderClassDetail();
+      const detail=document.getElementById('studentClassDetail');
+      if(detail){
+        detail.classList.remove('hidden');
+        detail.scrollIntoView({behavior:'smooth',block:'start'});
+      }
+    }catch(e){ console.error(e); }
+  }
+
+  function bindOpenButtons(){
+    document.querySelectorAll('.student-class-actions .btn, button').forEach(function(btn){
+      const txt=(btn.textContent||'').trim();
+      if(txt==='فتح الفصل'){
+        const oc=btn.getAttribute('onclick')||'';
+        const m=oc.match(/openStudentSettingsClass\('([^']+)'\)/);
+        if(m && !btn.dataset.saraBound){
+          btn.dataset.saraBound='1';
+          btn.onclick=function(ev){ ev.preventDefault(); ev.stopPropagation(); safeOpenClass(m[1]); };
+        }
+      }
+    });
+  }
+
+  const oldOpen=window.openStudentSettingsClass;
+  window.openStudentSettingsClass=function(classId){
+    if(typeof oldOpen==='function'){
+      try{ oldOpen(classId); }catch(e){}
+    }
+    safeOpenClass(classId);
+  };
+
+  const oldRenderAdv=window.renderAdvancedSlot;
+  window.renderAdvancedSlot=function(){
+    if(typeof oldRenderAdv==='function'){
+      try{ oldRenderAdv(); }catch(e){}
+    }
+    bindOpenButtons();
+  };
+
+  function boot(){
+    removeLeakedCode();
+    bindOpenButtons();
+    setTimeout(removeLeakedCode,400);
+    setTimeout(bindOpenButtons,500);
+  }
+  document.addEventListener('DOMContentLoaded',boot);
+  window.addEventListener('load',boot);
+})();
+</script>
+</body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
   window.printStudentReport = function(studentId){
@@ -7325,131 +8840,104 @@ window.addEventListener('load', function(){
 })();
 </script>
 
-<style id="oai-final-fix-style">
-.bulk-op-modal{position:fixed;inset:0;background:rgba(0,0,0,.38);display:none;align-items:center;justify-content:center;z-index:10020;padding:18px}
-.bulk-op-modal.show{display:flex}
-.bulk-op-box{width:min(480px,100%);background:#fff;border-radius:28px;padding:20px;box-shadow:0 24px 60px rgba(0,0,0,.22);border:1px solid rgba(16,58,46,.08)}
-.bulk-op-box h3{margin:0 0 8px;color:var(--deep);font-size:20px}.bulk-op-box p{margin:0 0 14px;color:var(--muted);font-size:13px;line-height:1.8}
-.bulk-op-grid{display:grid;gap:12px}.bulk-op-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
-.select-arrow{appearance:none;-webkit-appearance:none;-moz-appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%23103a2e'><path d='M5.5 7.5L10 12l4.5-4.5'/></svg>");background-repeat:no-repeat;background-position:left 12px center;background-size:20px;padding-left:38px !important}
-html[dir="ltr"] .select-arrow{background-position:right 12px center;padding-left:14px !important;padding-right:38px !important}
-.bulk-op-box select,.bulk-op-box input{width:100%;border:1px solid var(--line);background:#f8fbf9;border-radius:16px;padding:14px;font-family:inherit;font-size:14px;outline:none}
+<style id="sara-bulk-arrow-fix">
+#bulkReasonSelect,
+#teacherReasonSelect,
+#opType,
+.student-filters select,
+.teacher-box select,
+.field select{
+  -webkit-appearance:none !important;
+  appearance:none !important;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%23103a2e' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>") !important;
+  background-repeat:no-repeat !important;
+  background-position:left 14px center !important;
+  background-size:18px 18px !important;
+  padding-left:42px !important;
+}
+html[dir="ltr"] #bulkReasonSelect,
+html[dir="ltr"] #teacherReasonSelect,
+html[dir="ltr"] #opType,
+html[dir="ltr"] .student-filters select,
+html[dir="ltr"] .teacher-box select,
+html[dir="ltr"] .field select{
+  background-position:right 14px center !important;
+  padding-right:42px !important;
+  padding-left:14px !important;
+}
 </style>
-<div id="bulkOpModal" class="bulk-op-modal" aria-hidden="true">
-  <div class="bulk-op-box">
-    <h3 id="bulkOpTitle">عملية جماعية</h3>
-    <p id="bulkOpDesc">اختاري السبب والمبلغ ثم نفذي العملية على الفصل كامل.</p>
-    <div class="bulk-op-grid">
-      <div class="field"><label>الفصل</label><input id="bulkOpClassName" type="text" readonly></div>
-      <div class="field"><label>المبلغ</label><input id="bulkOpAmount" type="number" min="1" placeholder="أدخلي المبلغ بالريال"></div>
-      <div class="field"><label>السبب</label><select id="bulkOpReason" class="select-arrow"></select></div>
-      <div class="field" id="bulkOpOtherWrap" style="display:none"><label>سبب آخر</label><input id="bulkOpOther" type="text" placeholder="اكتبي السبب هنا"></div>
-    </div>
-    <div class="bulk-op-actions">
-      <button class="btn btn-light" type="button" onclick="closeBulkClassModal()">إلغاء</button>
-      <button class="btn btn-green" type="button" onclick="confirmBulkClassOperation()">تنفيذ العملية</button>
-    </div>
-  </div>
-</div>
-<script id="oai-final-fix-script">
+<script id="sara-open-class-fix">
 (function(){
-  const DEPOSIT_REASONS = ['مشاركة مميزة في الحصة','حل سؤال صعب','مساعدة زميل / زميلة','إنهاء المهمة الأدائية','تسليم الواجب مبكرًا','الحصول على درجة كاملة','الفوز في تحدي الرياضيات','ترتيب الدفتر','الالتزام والهدوء في الحصة','مبادرة إيجابية','حضور كامل الأسبوع','تميز في العمل الجماعي','أخرى'];
-  const WITHDRAW_REASONS = ['عدم حل الواجب','التأخر عن الحصة','كثرة الكلام أثناء الشرح','عدم إحضار الأدوات','عدم المشاركة','مخالفة تعليمات الصف','عدم تسليم المهمة الأدائية','إزعاج الزملاء','استخدام الجوال','سحب سلوكي','أخرى'];
-  function fmt(n){ return (typeof formatMoney==='function') ? formatMoney(Number(n||0)) : String(Number(n||0)); }
-  function esc(s){ return String(s||'').replace(/[&<>\"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
-  function getState(){ if(!window.__studentSettingsState) window.__studentSettingsState={classId:'', query:'', level:'all', status:'all'}; return window.__studentSettingsState; }
-  function getStudentsByClass(classId){ return (window.bankData?.students||[]).filter(s=>s.classId===classId); }
-  function getLevel(balance){ balance=Number(balance||0); return balance>=41000?'ألماسي':balance>=31000?'بلاتيني':balance>=16000?'ذهبي':balance>=11000?'فضي':'برونزي'; }
-  function buildClassStats(c){ const students=getStudentsByClass(c.id); const total=students.reduce((a,b)=>a+Number(b.balance||0),0); const active=students.filter(s=>!s.isFrozen).length; return {students,total,active}; }
-
-  function fillBulkReasons(type){
-    const sel=document.getElementById('bulkOpReason'); if(!sel) return;
-    const reasons = type==='deposit' ? DEPOSIT_REASONS : WITHDRAW_REASONS;
-    sel.innerHTML = '<option value="">اختاري السبب</option>' + reasons.map(r=>`<option value="${esc(r)}">${esc(r)}</option>`).join('');
-    toggleBulkOther();
+  function removeLeakedCode(){
+    try{
+      const walker=document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null);
+      const bad=[];
+      while(walker.nextNode()){
+        const n=walker.currentNode;
+        const t=(n.nodeValue||'').trim();
+        if(!t) continue;
+        if(t.includes('const w=window.open') || t.includes('document.write(html)') || t.includes('smartReportStatus') || t.includes('smart-reports-override-style')) bad.push(n);
+      }
+      bad.forEach(function(n){ n.nodeValue=''; });
+    }catch(e){}
   }
-  window.toggleBulkOther = function(){
-    const val=document.getElementById('bulkOpReason')?.value||'';
-    const wrap=document.getElementById('bulkOpOtherWrap');
-    if(wrap) wrap.style.display = val==='أخرى' ? 'block' : 'none';
-  };
-  document.addEventListener('change', function(e){ if(e.target && e.target.id==='bulkOpReason') toggleBulkOther(); });
 
-  window.quickClassOperation = function(classId, type){
-    const cls=(window.bankData?.classes||[]).find(c=>c.id===classId); if(!cls) return;
-    window.__bulkOpState = {classId, type};
-    const title=document.getElementById('bulkOpTitle');
-    const desc=document.getElementById('bulkOpDesc');
-    const className=document.getElementById('bulkOpClassName');
-    const amount=document.getElementById('bulkOpAmount');
-    const other=document.getElementById('bulkOpOther');
-    if(title) title.textContent = type==='deposit' ? 'إيداع للفصل كامل' : 'سحب للفصل كامل';
-    if(desc) desc.textContent = type==='deposit' ? 'اختاري سبب الإيداع والمبلغ ثم نفذي العملية على جميع طلاب الفصل.' : 'اختاري سبب السحب والمبلغ ثم نفذي العملية على جميع طلاب الفصل.';
-    if(className) className.value = cls.name || '';
-    if(amount) amount.value = '';
-    if(other) other.value = '';
-    fillBulkReasons(type);
-    document.getElementById('bulkOpModal')?.classList.add('show');
-  };
-  window.closeBulkClassModal = function(){ document.getElementById('bulkOpModal')?.classList.remove('show'); window.__bulkOpState=null; };
-  window.confirmBulkClassOperation = function(){
-    const state=window.__bulkOpState; if(!state) return;
-    const amount=Number(document.getElementById('bulkOpAmount')?.value||0); if(!(amount>0)) return alert('أدخلي مبلغًا صحيحًا.');
-    let reason=document.getElementById('bulkOpReason')?.value||''; if(!reason) return alert('اختاري السبب.');
-    if(reason==='أخرى') reason=(document.getElementById('bulkOpOther')?.value||'').trim();
-    if(!reason) return alert('اكتبي السبب الآخر.');
-    const students=getStudentsByClass(state.classId); if(!students.length) return alert('لا يوجد طلاب في هذا الفصل.');
-    const now = new Date();
-    students.forEach(function(st){
-      st.balance = Math.max(0, Number(st.balance||0) + (state.type==='deposit'? amount : -amount));
-      if(!Array.isArray(st.history)) st.history=[];
-      st.history.unshift({id:'h'+Date.now()+Math.random().toString(16).slice(2,6), type:state.type==='deposit'?'deposit':'withdraw', amount:Number(amount), reason:reason, date: now.toLocaleDateString('en-CA')+' '+now.toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'})});
-      if(!Array.isArray(window.bankData.operations)) window.bankData.operations=[];
-      window.bankData.operations.unshift({id:'op'+Date.now()+Math.random().toString(16).slice(2,6), studentId:st.id, studentName:st.name, type:state.type==='deposit'?'deposit':'withdraw', amount:Number(amount), reason:reason, classId:state.classId, className:(window.bankData.classes||[]).find(c=>c.id===state.classId)?.name || '', date:new Date().toISOString()});
+  function safeOpenClass(classId){
+    try{
+      if(typeof window.ensureSettingsState==='function'){
+        const state=window.ensureSettingsState();
+        state.classId=classId;
+      }else{
+        window.__studentSettingsState=window.__studentSettingsState||{classId:'',query:'',level:'all',status:'all'};
+        window.__studentSettingsState.classId=classId;
+      }
+      if(typeof window.renderClassDetail==='function') window.renderClassDetail();
+      const detail=document.getElementById('studentClassDetail');
+      if(detail){
+        detail.classList.remove('hidden');
+        detail.scrollIntoView({behavior:'smooth',block:'start'});
+      }
+    }catch(e){ console.error(e); }
+  }
+
+  function bindOpenButtons(){
+    document.querySelectorAll('.student-class-actions .btn, button').forEach(function(btn){
+      const txt=(btn.textContent||'').trim();
+      if(txt==='فتح الفصل'){
+        const oc=btn.getAttribute('onclick')||'';
+        const m=oc.match(/openStudentSettingsClass\('([^']+)'\)/);
+        if(m && !btn.dataset.saraBound){
+          btn.dataset.saraBound='1';
+          btn.onclick=function(ev){ ev.preventDefault(); ev.stopPropagation(); safeOpenClass(m[1]); };
+        }
+      }
     });
-    if(typeof saveBankData==='function') saveBankData();
-    if(typeof refreshTeacherUI==='function') refreshTeacherUI();
-    if(typeof renderStudentSettingsDashboard==='function') renderStudentSettingsDashboard();
-    closeBulkClassModal();
-    alert('تم تنفيذ العملية بنجاح على الفصل كامل.');
+  }
+
+  const oldOpen=window.openStudentSettingsClass;
+  window.openStudentSettingsClass=function(classId){
+    if(typeof oldOpen==='function'){
+      try{ oldOpen(classId); }catch(e){}
+    }
+    safeOpenClass(classId);
   };
 
-  function renderClassCardsCustom(){
-    const holder = document.getElementById('studentClassCards'); if(!holder || !window.bankData) return;
-    holder.innerHTML = (window.bankData.classes||[]).map(function(c){
-      const st=buildClassStats(c);
-      return `<div class="student-class-card"><div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start"><div><h4>${esc(c.name)}</h4><div class="teacher-note">عدد الطلاب / الطالبات في الفصل: ${st.students.length}</div></div><span class="pill">${st.active} نشط</span></div><div class="student-class-meta"><div class="mini"><strong>${st.students.length}</strong><span>عدد الطلاب / الطالبات</span></div><div class="mini"><strong>${fmt(st.total)}</strong><span>إجمالي الأرصدة</span></div></div><div class="student-class-actions"><button class="btn btn-green" type="button" onclick="openStudentSettingsClass('${c.id}')">فتح الفصل</button><button class="btn btn-green" type="button" onclick="quickClassOperation('${c.id}','deposit')">إيداع للكل</button><button class="btn btn-gold" type="button" onclick="quickClassOperation('${c.id}','withdraw')">سحب للكل</button></div></div>`;
-    }).join('') || '<div class="student-empty">لا توجد فصول بعد.</div>';
-  }
-  function renderClassDetailCustom(){
-    const detail=document.getElementById('studentClassDetail'); if(!detail || !window.bankData) return;
-    const holder=document.getElementById('studentClassCards');
-    const state=getState();
-    if(!state.classId){ if(holder) holder.style.display='grid'; detail.classList.add('hidden'); detail.classList.remove('page-mode'); detail.innerHTML=''; renderClassCardsCustom(); return; }
-    const cls=(window.bankData.classes||[]).find(c=>c.id===state.classId); if(!cls){ state.classId=''; renderClassDetailCustom(); return; }
-    if(holder) holder.style.display='none';
-    const students=getStudentsByClass(cls.id);
-    const stats=buildClassStats(cls);
-    detail.classList.remove('hidden'); detail.classList.add('page-mode');
-    detail.innerHTML = `<div class="student-detail-header"><div class="student-detail-title"><h3>${esc(cls.name)}</h3><p>بطاقات الفصل مع إجراءات جماعية واضحة.</p></div><button class="ghost" type="button" onclick="closeStudentSettingsClass()">رجوع للخلف</button></div><div class="teacher-mini-kpis"><div class="teacher-mini-kpi"><strong>${stats.students.length}</strong><span>عدد الطلاب / الطالبات</span></div><div class="teacher-mini-kpi"><strong>${fmt(stats.total)}</strong><span>إجمالي الأرصدة</span></div></div><div class="student-bulk-actions"><button class="btn btn-green" type="button" onclick="quickClassOperation('${cls.id}','deposit')">إيداع للكل</button><button class="btn btn-gold" type="button" onclick="quickClassOperation('${cls.id}','withdraw')">سحب للكل</button><button class="btn btn-light" type="button" onclick="closeStudentSettingsClass()">إغلاق</button></div><div class="student-cards-grid">${students.map(s=>`<div class="student-card-pro"><div class="student-card-top"><div><div class="student-card-name">${esc(s.name||'—')}</div><div class="student-card-sub">PIN: ${esc(s.password||'—')}</div></div><div><span class="student-status-badge ${s.isFrozen?'frozen':''}">${s.isFrozen?'موقوف':'مفعل'}</span></div></div><div class="student-card-metrics"><div class="metric"><strong>${fmt(s.balance)}</strong><span>الرصيد</span></div><div class="metric"><strong>${esc(getLevel(s.balance))}</strong><span>المستوى</span></div></div></div>`).join('') || '<div class="student-empty">لا يوجد طلاب في هذا الفصل.</div>'}</div>`;
-  }
-  window.openStudentSettingsClass = function(classId){ const state=getState(); state.classId=classId; renderClassDetailCustom(); };
-  window.closeStudentSettingsClass = function(){ const state=getState(); state.classId=''; renderClassDetailCustom(); };
-  window.renderStudentSettingsDashboard = function(){
-    const pane = document.getElementById('teacherPaneStudents'); if(!pane) return;
-    pane.innerHTML = `<div class="student-settings-shell"><div class="section-head"><h3>لوحة تحكم متقدمة</h3><span class="pill">جاهزة</span></div><div class="teacher-note">اخترِي الفصل ثم نفذي إيداعًا أو سحبًا للكل مع قائمة أسباب واضحة.</div><div id="studentClassCards" class="student-class-cards"></div><div id="studentClassDetail" class="student-detail-shell hidden"></div></div>`;
-    renderClassCardsCustom();
-    renderClassDetailCustom();
+  const oldRenderAdv=window.renderAdvancedSlot;
+  window.renderAdvancedSlot=function(){
+    if(typeof oldRenderAdv==='function'){
+      try{ oldRenderAdv(); }catch(e){}
+    }
+    bindOpenButtons();
   };
-  const prevShow=window.showTeacherPane;
-  if(typeof prevShow==='function'){
-    window.showTeacherPane=function(id,btn){ prevShow(id,btn); if(id==='teacherPaneStudents') setTimeout(function(){ window.renderStudentSettingsDashboard(); }, 60); };
+
+  function boot(){
+    removeLeakedCode();
+    bindOpenButtons();
+    setTimeout(removeLeakedCode,400);
+    setTimeout(bindOpenButtons,500);
   }
-  document.addEventListener('DOMContentLoaded', function(){
-    const studentReason = document.getElementById('reasonBox');
-    if(studentReason && studentReason.tagName==='INPUT') studentReason.placeholder='أخرى';
-    setTimeout(function(){ if(document.getElementById('teacherPaneStudents')?.classList.contains('active')) window.renderStudentSettingsDashboard(); }, 400);
-  });
+  document.addEventListener('DOMContentLoaded',boot);
+  window.addEventListener('load',boot);
 })();
 </script>
 </body>
@@ -8331,5 +9819,234 @@ html[dir="ltr"] .select-arrow{background-position:right 12px center;padding-left
   };
 
   document.addEventListener('DOMContentLoaded', function(){ rerenderSettings(); });
+})();
+</script>
+
+
+<style id="sara-teacher-bulk-fix-style">
+.bulk-op-modal{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;z-index:99999;padding:18px}
+.bulk-op-modal.show{display:flex}
+.bulk-op-box{width:min(460px,100%);background:#fff;border-radius:28px;padding:18px;border:1px solid rgba(16,58,46,.08);box-shadow:0 24px 60px rgba(0,0,0,.18)}
+.bulk-op-box h3{margin:0 0 8px;color:var(--deep)}
+.bulk-op-box .teacher-note{margin-bottom:10px}
+.bulk-op-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+#teacherOpOtherWrap.hidden,#bulkReasonOtherWrap.hidden{display:none !important}
+</style>
+<script id="sara-teacher-bulk-fix-script">
+(function(){
+  const DEPOSIT_REASONS = [
+    'مشاركة مميزة في الحصة','حل سؤال صعب','مساعدة زميل / زميلة','إنهاء المهمة الأدائية','تسليم الواجب مبكرًا','الحصول على درجة كاملة','الفوز في تحدي الرياضيات','ترتيب الدفتر','الالتزام والهدوء في الحصة','مبادرة إيجابية','حضور كامل الأسبوع','تميز في العمل الجماعي','أخرى'
+  ];
+  const WITHDRAW_REASONS = [
+    'عدم حل الواجب','التأخر عن الحصة','كثرة الكلام أثناء الشرح','عدم إحضار الأدوات','عدم المشاركة','مخالفة تعليمات الصف','عدم تسليم المهمة الأدائية','إزعاج الزملاء','استخدام الجوال','سحب سلوكي','أخرى'
+  ];
+  const TRANSFER_REASONS = ['تحويل بين الطلاب / الطالبات','تحويل تحفيزي','أخرى'];
+
+  function reasonList(type){
+    if(type==='deposit') return DEPOSIT_REASONS;
+    if(type==='withdraw') return WITHDRAW_REASONS;
+    return TRANSFER_REASONS;
+  }
+  function buildOptions(arr, placeholder){
+    return ['<option value="">'+placeholder+'</option>'].concat(arr.map(function(x){ return '<option value="'+x+'">'+x+'</option>'; })).join('');
+  }
+  function ensureTeacherOpReasonUI(){
+    const reasonInput = document.getElementById('opReason');
+    if(!reasonInput || document.getElementById('opReasonSelect')) return;
+    const field = reasonInput.closest('.field');
+    if(!field) return;
+    field.innerHTML = '<label>السبب</label>'+
+      '<select id="opReasonSelect"></select>'+
+      '<div id="teacherOpOtherWrap" class="field hidden" style="margin-top:10px;margin-bottom:0"><label>سبب آخر</label><input id="opReasonOther" type="text" placeholder="اكتبي السبب هنا" /></div>'+
+      '<input id="opReason" type="hidden" />';
+    updateTeacherOpReasons();
+    const sel = document.getElementById('opReasonSelect');
+    if(sel) sel.addEventListener('change', syncTeacherReasonHidden);
+    const other = document.getElementById('opReasonOther');
+    if(other) other.addEventListener('input', syncTeacherReasonHidden);
+  }
+  function updateTeacherOpReasons(){
+    const type = document.getElementById('opType')?.value || 'deposit';
+    const sel = document.getElementById('opReasonSelect');
+    const otherWrap = document.getElementById('teacherOpOtherWrap');
+    if(!sel) return;
+    const prev = sel.value;
+    sel.innerHTML = buildOptions(reasonList(type), 'اختاري السبب');
+    if(reasonList(type).includes(prev)) sel.value = prev;
+    if(otherWrap) otherWrap.classList.toggle('hidden', sel.value !== 'أخرى');
+    syncTeacherReasonHidden();
+  }
+  function syncTeacherReasonHidden(){
+    const sel = document.getElementById('opReasonSelect');
+    const other = document.getElementById('opReasonOther');
+    const hidden = document.getElementById('opReason');
+    const otherWrap = document.getElementById('teacherOpOtherWrap');
+    if(!sel || !hidden) return;
+    if(otherWrap) otherWrap.classList.toggle('hidden', sel.value !== 'أخرى');
+    hidden.value = sel.value === 'أخرى' ? (other?.value || '').trim() : (sel.value || '');
+  }
+
+  window.toggleTransferTarget = function(){
+    const type = document.getElementById('opType');
+    const wrap = document.getElementById('transferTargetWrap');
+    if(type && wrap) wrap.classList.toggle('hidden', type.value !== 'transfer');
+    updateTeacherOpReasons();
+  };
+
+  window.executeTeacherOperation = function(){
+    syncTeacherReasonHidden();
+    const type = document.getElementById('opType')?.value;
+    const studentId = document.getElementById('opStudent')?.value;
+    const targetId = document.getElementById('transferTarget')?.value;
+    const amount = Number(document.getElementById('opAmount')?.value || 0);
+    const reason = (document.getElementById('opReason')?.value || '').trim();
+    const ok = document.getElementById('opMsg');
+    const err = document.getElementById('opErr');
+    ok?.classList.add('hidden'); err?.classList.add('hidden');
+    const student = typeof getStudent==='function' ? getStudent(studentId) : null;
+    if(!student || amount<=0 || !reason || (type==='transfer' && (!targetId || targetId===studentId))){ err?.classList.remove('hidden'); return; }
+    const now = new Date();
+    const date = now.toLocaleDateString('en-CA') + ' ' + now.toLocaleTimeString('ar-SA', {hour:'2-digit', minute:'2-digit'});
+    const op = {id:'op'+Date.now(), studentId:student.id, studentName:student.name, type, amount, reason, date};
+    if(type==='deposit') student.balance = Number(student.balance||0) + amount;
+    if(type==='withdraw') student.balance = Math.max(0, Number(student.balance||0) - amount);
+    if(type==='transfer'){
+      const target = typeof getStudent==='function' ? getStudent(targetId) : null;
+      if(!target || Number(student.balance||0) < amount){ err?.classList.remove('hidden'); return; }
+      student.balance = Number(student.balance||0) - amount;
+      target.balance = Number(target.balance||0) + amount;
+      op.targetStudentId = target.id; op.targetStudentName = target.name;
+      if(!Array.isArray(target.history)) target.history=[];
+      target.history.push({id:'h'+Date.now()+'t', type:'deposit', amount, reason:'تحويل من '+student.name, date});
+    }
+    if(!Array.isArray(student.history)) student.history=[];
+    student.history.push({id:'h'+Date.now(), type, amount, reason, date});
+    if(!Array.isArray(bankData.operations)) bankData.operations=[];
+    bankData.operations.push(op); window.lastOperation = op;
+    if(typeof saveBankData==='function') saveBankData();
+    const a=document.getElementById('opAmount'); if(a) a.value='';
+    const s=document.getElementById('opReasonSelect'); if(s) s.value='';
+    const o=document.getElementById('opReasonOther'); if(o) o.value='';
+    syncTeacherReasonHidden();
+    ok?.classList.remove('hidden');
+    if(typeof refreshTeacherUI==='function') refreshTeacherUI();
+    if(bankData?.teacher?.autoOpenWA && typeof sendOperationToGuardian==='function') sendOperationToGuardian(op, student);
+    if(sessionStorage.getItem('currentStudentId')===student.id && typeof renderStudentAccount==='function') renderStudentAccount();
+  };
+
+  function ensureBulkModal(){
+    if(document.getElementById('bulkOpModal')) return;
+    const modal = document.createElement('div');
+    modal.id = 'bulkOpModal';
+    modal.className = 'bulk-op-modal';
+    modal.innerHTML = '<div class="bulk-op-box">'+
+      '<h3 id="bulkOpTitle">تنفيذ عملية جماعية</h3>'+
+      '<div class="teacher-note" id="bulkOpDesc">اختاري السبب والمبلغ ثم نفذي العملية على الفصل كامل.</div>'+
+      '<div class="field"><label>المبلغ</label><input id="bulkOpAmount" type="number" placeholder="أدخلي المبلغ" /></div>'+
+      '<div class="field"><label>السبب</label><select id="bulkReasonSelect"></select></div>'+
+      '<div id="bulkReasonOtherWrap" class="field hidden"><label>سبب آخر</label><input id="bulkReasonOther" type="text" placeholder="اكتبي السبب هنا" /></div>'+
+      '<div class="bulk-op-actions"><button class="btn btn-green" type="button" id="bulkOpSubmit">تنفيذ</button><button class="btn btn-light" type="button" onclick="document.getElementById(\'bulkOpModal\').classList.remove(\'show\')">إلغاء</button></div>'+
+      '<div id="bulkOpMsg" class="notice ok hidden" style="margin-top:12px">تم تنفيذ العملية على الفصل كامل.</div>'+
+      '<div id="bulkOpErr" class="notice err hidden" style="margin-top:12px">أدخلي المبلغ والسبب أولًا.</div>'+
+    '</div>';
+    document.body.appendChild(modal);
+    document.getElementById('bulkReasonSelect').addEventListener('change', function(){
+      document.getElementById('bulkReasonOtherWrap').classList.toggle('hidden', this.value!=='أخرى');
+    });
+    document.getElementById('bulkOpSubmit').addEventListener('click', function(){
+      const state = window.__bulkOpState || {};
+      const amount = Number(document.getElementById('bulkOpAmount').value || 0);
+      let reason = document.getElementById('bulkReasonSelect').value || '';
+      if(reason==='أخرى') reason = (document.getElementById('bulkReasonOther').value || '').trim();
+      const ok=document.getElementById('bulkOpMsg'), err=document.getElementById('bulkOpErr');
+      ok.classList.add('hidden'); err.classList.add('hidden');
+      if(!state.classId || !state.type || !(amount>0) || !reason){ err.classList.remove('hidden'); return; }
+      const arr = (bankData.students||[]).filter(function(s){ return s.classId===state.classId; });
+      const now = new Date();
+      arr.forEach(function(st, idx){
+        const date = now.toLocaleDateString('en-CA') + ' ' + now.toLocaleTimeString('ar-SA', {hour:'2-digit', minute:'2-digit'});
+        if(!Array.isArray(st.history)) st.history=[];
+        st.history.push({id:'h'+Date.now()+idx, type:state.type, amount, reason, date});
+        if(state.type==='deposit') st.balance = Number(st.balance||0) + amount;
+        else st.balance = Math.max(0, Number(st.balance||0) - amount);
+        if(!Array.isArray(bankData.operations)) bankData.operations=[];
+        bankData.operations.push({id:'op'+Date.now()+idx, studentId:st.id, studentName:st.name, type:state.type, amount, reason, date});
+      });
+      if(typeof saveBankData==='function') saveBankData();
+      if(typeof refreshTeacherUI==='function') refreshTeacherUI();
+      ok.classList.remove('hidden');
+      setTimeout(function(){ document.getElementById('bulkOpModal').classList.remove('show'); }, 900);
+    });
+  }
+  function openBulkOpModal(classId, type){
+    ensureBulkModal();
+    window.__bulkOpState = {classId:classId, type:type};
+    const cls = (bankData.classes||[]).find(function(c){ return c.id===classId; });
+    document.getElementById('bulkOpTitle').textContent = type==='deposit' ? 'إيداع للفصل كامل' : 'سحب للفصل كامل';
+    document.getElementById('bulkOpDesc').textContent = 'الفصل: ' + (cls?.name || '—') + ' • اختاري السبب من القائمة المنسدلة.';
+    document.getElementById('bulkOpAmount').value = '';
+    document.getElementById('bulkReasonOther').value = '';
+    const sel = document.getElementById('bulkReasonSelect');
+    sel.innerHTML = buildOptions(reasonList(type), 'اختاري السبب');
+    document.getElementById('bulkReasonOtherWrap').classList.add('hidden');
+    document.getElementById('bulkOpMsg').classList.add('hidden');
+    document.getElementById('bulkOpErr').classList.add('hidden');
+    document.getElementById('bulkOpModal').classList.add('show');
+  }
+  window.quickClassOperation = openBulkOpModal;
+
+  function renderAdvancedSlot(){
+    const slot = document.getElementById('studentsRouterSlot');
+    if(!slot) return;
+    const classes = bankData?.classes || [];
+    slot.innerHTML = '<div class="student-settings-head"><div><h3>لوحة تحكم متقدمة</h3><div class="teacher-note">اختاري الفصل ثم نفذي إيداعًا أو سحبًا للفصل كامل مع سبب من قائمة منسدلة.</div></div><span class="pill">جاهزة</span></div>'+
+      '<div class="student-class-cards">'+
+      classes.map(function(c){
+        const count = (bankData.students||[]).filter(function(s){ return s.classId===c.id; }).length;
+        const total = (bankData.students||[]).filter(function(s){ return s.classId===c.id; }).reduce(function(a,b){ return a + Number(b.balance||0); },0);
+        return '<div class="student-class-card">'+
+          '<div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start"><div><h4>'+c.name+'</h4><div class="teacher-note">عدد الطلاب / الطالبات: '+count+'</div></div><span class="pill">'+count+' طالب/ة</span></div>'+
+          '<div class="student-class-meta"><div class="mini"><strong>'+count+'</strong><span>عدد الطلاب</span></div><div class="mini"><strong>'+(typeof formatMoney==='function'?formatMoney(total):total)+'</strong><span>إجمالي الأرصدة</span></div></div>'+
+          '<div class="student-class-actions">'+
+          '<button class="btn btn-green" type="button" onclick="quickClassOperation(\''+c.id+'\',\'deposit\')">إيداع للكل</button>'+
+          '<button class="btn btn-gold" type="button" onclick="quickClassOperation(\''+c.id+'\',\'withdraw\')">سحب للكل</button>'+
+          '<button class="btn btn-light" type="button" onclick="openStudentSettingsClass(\''+c.id+'\')">فتح الفصل</button>'+
+          '</div></div>';
+      }).join('') + '</div>';
+  }
+
+  const prevOpenStudentsManagerCard = window.openStudentsManagerCard;
+  window.openStudentsManagerCard = function(kind){
+    if(typeof prevOpenStudentsManagerCard==='function') prevOpenStudentsManagerCard(kind);
+    if(kind==='advanced') setTimeout(renderAdvancedSlot, 80);
+  };
+
+  const prevOpenStudentSettingsClass = window.openStudentSettingsClass;
+  window.openStudentSettingsClass = function(classId){
+    if(typeof prevOpenStudentSettingsClass==='function') prevOpenStudentSettingsClass(classId);
+    setTimeout(function(){
+      document.querySelectorAll('.student-bulk-actions .btn').forEach(function(btn){
+        if(btn.textContent.includes('خصم للفصل كامل')) btn.textContent='سحب للفصل كامل';
+      });
+    }, 40);
+  };
+
+  function fixStudentPaneButtons(){
+    document.querySelectorAll('button').forEach(function(btn){
+      if(btn.textContent && btn.textContent.trim()==='خصم للفصل كامل') btn.textContent='سحب للفصل كامل';
+    });
+  }
+
+  function initFixes(){
+    ensureTeacherOpReasonUI();
+    fixStudentPaneButtons();
+    const type=document.getElementById('opType');
+    if(type && !type.dataset.reasonBound){
+      type.dataset.reasonBound='1';
+      type.addEventListener('change', updateTeacherOpReasons);
+    }
+  }
+  document.addEventListener('DOMContentLoaded', function(){ setTimeout(initFixes, 300); });
+  window.addEventListener('load', function(){ setTimeout(initFixes, 500); });
 })();
 </script>
