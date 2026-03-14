@@ -96,6 +96,8 @@ button,input,select{font-family:inherit}
 .shortcut{border:1px solid var(--line);background:#fff;border-radius:22px;padding:14px 8px;text-align:center}
 .shortcut .icon{width:42px;height:42px;border-radius:14px;background:var(--mint);display:grid;place-items:center;margin:0 auto 8px;font-size:19px}
 .shortcut span{display:block;font-size:12px;font-weight:800;color:var(--deep);line-height:1.5}
+.shortcut{cursor:pointer;width:100%;appearance:none;-webkit-appearance:none;color:inherit;font-family:inherit}
+.menu-item{cursor:pointer;width:100%;appearance:none;-webkit-appearance:none;color:inherit;font-family:inherit;text-align:inherit}
 .list{display:flex;flex-direction:column;gap:10px}
 .row{display:flex;justify-content:space-between;align-items:center;gap:12px;border:1px solid var(--line);background:#fff;border-radius:20px;padding:14px}
 .name{font-size:14px;font-weight:800}
@@ -532,6 +534,13 @@ html[dir="ltr"] .balance-head{direction:ltr}
 @media(max-width:900px){.smart-kpis{grid-template-columns:repeat(2,1fr)}.smart-grid.two,.smart-metrics{grid-template-columns:1fr}}
 </style>
 
+
+<style id="top-gap-hard-fix">
+html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!important;}
+.app,.screen{margin-top:0!important;padding-top:0!important;}
+.screen.active{display:block!important;}
+.topbar,.card:first-child,.hero:first-child{margin-top:0!important;}
+</style>
 </head>
 <body>
 <div class="app">
@@ -594,10 +603,10 @@ html[dir="ltr"] .balance-head{direction:ltr}
   <div class="card">
     <div class="section-head"><h3 id="shortcutsTitle">اختصارات سريعة</h3><span class="pill" id="shortcutsPill">الوصول السريع</span></div>
     <div class="shortcuts">
-      <div class="shortcut"><div class="icon">🧾</div><span>كشف الحساب</span></div>
-      <div class="shortcut"><div class="icon">🔄</div><span>العمليات</span></div>
-      <div class="shortcut"><div class="icon">🎡</div><span>روليت الهدايا</span></div>
-      <div class="shortcut"><div class="icon">📑</div><span>تقرير PDF</span></div>
+      <button type="button" class="shortcut" onclick="goAccountTab('statement')"><div class="icon">🧾</div><span>كشف الحساب</span></button>
+      <button type="button" class="shortcut" onclick="goAccountTab('operations')"><div class="icon">🔄</div><span>العمليات</span></button>
+      <button type="button" class="shortcut" onclick="goAccountTab('rouletteTab')"><div class="icon">🎡</div><span>روليت الهدايا</span></button>
+      <button type="button" class="shortcut" onclick="goAccountTab('pdfTab')"><div class="icon">📑</div><span>تقرير PDF</span></button>
     </div>
   </div>
   </div>
@@ -1440,12 +1449,12 @@ html[dir="ltr"] .balance-head{direction:ltr}
   </div>
   <div class="card">
     <div class="menu-list">
-      <div class="menu-item"><div class="left"><div class="circle">👤</div><div><div class="name">من نحن</div><div class="meta">نبذة عن بنك الرياضيات</div></div></div><div>‹</div></div>
-      <div class="menu-item"><div class="left"><div class="circle">📞</div><div><div class="name">اتصل بنا</div><div class="meta">قنوات التواصل الرسمية</div></div></div><div>‹</div></div>
-      <div class="menu-item"><div class="left"><div class="circle">⚙️</div><div><div class="name">الإعدادات</div><div class="meta">إدارة الحساب والبيانات</div></div></div><div>‹</div></div>
-      <div class="menu-item"><div class="left"><div class="circle">🔒</div><div><div class="name">سياسة الخصوصية</div><div class="meta">استخدام البيانات داخل النظام</div></div></div><div>‹</div></div>
-      <div class="menu-item"><div class="left"><div class="circle">⚖️</div><div><div class="name">إخلاء المسؤولية</div><div class="meta">النظام تعليمي تحفيزي وليس ماليًا حقيقيًا</div></div></div><div>‹</div></div>
-      <div class="menu-item"><div class="left"><div class="circle">📜</div><div><div class="name">الأحكام والشروط</div><div class="meta">ضوابط استخدام بنك الرياضيات</div></div></div><div>‹</div></div>
+      <button type="button" class="menu-item" onclick="openMoreInfo('about')"><div class="left"><div class="circle">👤</div><div><div class="name">من نحن</div><div class="meta">نبذة عن بنك الرياضيات</div></div></div><div>‹</div></button>
+      <button type="button" class="menu-item" onclick="openMoreInfo('contact')"><div class="left"><div class="circle">📞</div><div><div class="name">اتصل بنا</div><div class="meta">قنوات التواصل الرسمية</div></div></div><div>‹</div></button>
+      <button type="button" class="menu-item" onclick="openMoreInfo('settings')"><div class="left"><div class="circle">⚙️</div><div><div class="name">الإعدادات</div><div class="meta">إدارة الحساب والبيانات</div></div></div><div>‹</div></button>
+      <button type="button" class="menu-item" onclick="openMoreInfo('privacy')"><div class="left"><div class="circle">🔒</div><div><div class="name">سياسة الخصوصية</div><div class="meta">استخدام البيانات داخل النظام</div></div></div><div>‹</div></button>
+      <button type="button" class="menu-item" onclick="openMoreInfo('disclaimer')"><div class="left"><div class="circle">⚖️</div><div><div class="name">إخلاء المسؤولية</div><div class="meta">النظام تعليمي تحفيزي وليس ماليًا حقيقيًا</div></div></div><div>‹</div></button>
+      <button type="button" class="menu-item" onclick="openMoreInfo('terms')"><div class="left"><div class="circle">📜</div><div><div class="name">الأحكام والشروط</div><div class="meta">ضوابط استخدام بنك الرياضيات</div></div></div><div>‹</div></button>
     </div>
   </div>
   <div class="footer">© بنك الرياضيات</div>
@@ -3729,7 +3738,14 @@ window.addEventListener('load', function(){
     if(!from || !to){ alert('اختاري من تاريخ وإلى تاريخ'); return; }
     var fromD = new Date(from), toD = new Date(to);
     var ops = (student.history||[]).filter(function(h){ var d = new Date((h.date||'').split(' ')[0]); return !isNaN(d) && d >= fromD && d <= toD; });
-    var html = '<html dir="rtl" lang="ar"><head><meta charset="utf-8"><title>تقرير بنك الرياضيات</title><style>body{font-family:Arial;padding:24px;color:#183229} h1{margin:0 0 8px} table{width:100%;border-collapse:collapse;margin-top:16px} th,td{border:1px solid #ddd;padding:8px;text-align:right} .meta{margin:6px 0;color:#555}</style></head><body>'
+    var html = '<html dir="rtl" lang="ar"><head><meta charset="utf-8"><title>تقرير بنك الرياضيات</title><style>body{font-family:Arial;padding:24px;color:#183229} h1{margin:0 0 8px} table{width:100%;border-collapse:collapse;margin-top:16px} th,td{border:1px solid #ddd;padding:8px;text-align:right} .meta{margin:6px 0;color:#555}</style>
+<style id="top-gap-hard-fix">
+html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!important;}
+.app,.screen{margin-top:0!important;padding-top:0!important;}
+.screen.active{display:block!important;}
+.topbar,.card:first-child,.hero:first-child{margin-top:0!important;}
+</style>
+</head><body>'
       + '<h1>تقرير بنك الرياضيات</h1>'
       + '<div class="meta">الطالبة: '+esc(student.name)+'</div>'
       + '<div class="meta">الفترة: من '+esc(from)+' إلى '+esc(to)+'</div>'
@@ -3836,7 +3852,14 @@ window.addEventListener('load', function(){
   }
   window.generateSmartTeacherReport = function(){
     try{ renderSmartReports(); }catch(e){}
-    const html=`<html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>تقرير شامل - بنك الرياضيات</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{color:#103a2e} .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.card{border:1px solid #dce6df;border-radius:16px;padding:14px;margin-bottom:12px}.muted{color:#6b8178;font-size:13px}</style></head><body><h1>التقرير الشامل - بنك الرياضيات</h1><div class="muted">تم إنشاؤه تلقائيًا من التقارير الذكية</div><div class="grid">${['srStudents','srClasses','srDeposits','srWithdrawals','srTransfers','srTasks','srSubmitted','srPending'].map(id=>{ const el=document.getElementById(id); const label=el&&el.nextElementSibling?el.nextElementSibling.textContent:''; return `<div class="card"><strong>${label}</strong><div style="font-size:24px;margin-top:8px">${el?el.textContent:''}</div></div>`; }).join('')}</div><div class="card"><h3>أفضل الطلاب / الطالبات</h3>${document.getElementById('smartTopStudents')?.innerHTML||''}</div><div class="card"><h3>تحليل الفصول</h3>${document.getElementById('smartClassCards')?.innerHTML||''}</div><div class="card"><h3>التنبيهات الذكية</h3>${document.getElementById('smartAlerts')?.innerHTML||''}</div>
+    const html=`<html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>تقرير شامل - بنك الرياضيات</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{color:#103a2e} .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.card{border:1px solid #dce6df;border-radius:16px;padding:14px;margin-bottom:12px}.muted{color:#6b8178;font-size:13px}</style>
+<style id="top-gap-hard-fix">
+html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!important;}
+.app,.screen{margin-top:0!important;padding-top:0!important;}
+.screen.active{display:block!important;}
+.topbar,.card:first-child,.hero:first-child{margin-top:0!important;}
+</style>
+</head><body><h1>التقرير الشامل - بنك الرياضيات</h1><div class="muted">تم إنشاؤه تلقائيًا من التقارير الذكية</div><div class="grid">${['srStudents','srClasses','srDeposits','srWithdrawals','srTransfers','srTasks','srSubmitted','srPending'].map(id=>{ const el=document.getElementById(id); const label=el&&el.nextElementSibling?el.nextElementSibling.textContent:''; return `<div class="card"><strong>${label}</strong><div style="font-size:24px;margin-top:8px">${el?el.textContent:''}</div></div>`; }).join('')}</div><div class="card"><h3>أفضل الطلاب / الطالبات</h3>${document.getElementById('smartTopStudents')?.innerHTML||''}</div><div class="card"><h3>تحليل الفصول</h3>${document.getElementById('smartClassCards')?.innerHTML||''}</div><div class="card"><h3>التنبيهات الذكية</h3>${document.getElementById('smartAlerts')?.innerHTML||''}</div>
 <script id="smart-reports-override-v7">
 (function(){
   function money(v){ return Number(v||0).toLocaleString('ar-SA'); }
@@ -3950,7 +3973,14 @@ window.addEventListener('load', function(){
   }
   window.generateSmartTeacherReport = function(){
     try{ window.renderSmartReports(); }catch(e){}
-    const html=`<html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>تقرير شامل - بنك الرياضيات</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{color:#103a2e}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.card{border:1px solid #dce6df;border-radius:16px;padding:14px;margin-bottom:12px}.muted{color:#6b8178;font-size:13px}</style></head><body><h1>التقرير الشامل - بنك الرياضيات</h1><div class="muted">تم إنشاؤه تلقائيًا من التقارير الذكية</div><div class="grid">${['srStudents','srClasses','srDeposits','srWithdrawals','srTransfers','srTasks','srSubmitted','srPending'].map(id=>{ const el=document.getElementById(id); const label=el&&el.nextElementSibling?el.nextElementSibling.textContent:''; return `<div class="card"><strong>${label}</strong><div style="font-size:24px;margin-top:8px">${el?el.textContent:''}</div></div>`; }).join('')}</div><div class="card"><h3>أفضل الطلاب / الطالبات</h3>${document.getElementById('smartTopStudents')?.innerHTML||''}</div><div class="card"><h3>مؤشر أداء الطالب / الطالبة</h3>${document.getElementById('smartPerformanceIndicators')?.innerHTML||''}</div><div class="card"><h3>تحليل الفصول</h3>${document.getElementById('smartClassCards')?.innerHTML||''}</div><div class="card"><h3>التنبيهات الذكية</h3>${document.getElementById('smartAlerts')?.innerHTML||''}</div>
+    const html=`<html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>تقرير شامل - بنك الرياضيات</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{color:#103a2e}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.card{border:1px solid #dce6df;border-radius:16px;padding:14px;margin-bottom:12px}.muted{color:#6b8178;font-size:13px}</style>
+<style id="top-gap-hard-fix">
+html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!important;}
+.app,.screen{margin-top:0!important;padding-top:0!important;}
+.screen.active{display:block!important;}
+.topbar,.card:first-child,.hero:first-child{margin-top:0!important;}
+</style>
+</head><body><h1>التقرير الشامل - بنك الرياضيات</h1><div class="muted">تم إنشاؤه تلقائيًا من التقارير الذكية</div><div class="grid">${['srStudents','srClasses','srDeposits','srWithdrawals','srTransfers','srTasks','srSubmitted','srPending'].map(id=>{ const el=document.getElementById(id); const label=el&&el.nextElementSibling?el.nextElementSibling.textContent:''; return `<div class="card"><strong>${label}</strong><div style="font-size:24px;margin-top:8px">${el?el.textContent:''}</div></div>`; }).join('')}</div><div class="card"><h3>أفضل الطلاب / الطالبات</h3>${document.getElementById('smartTopStudents')?.innerHTML||''}</div><div class="card"><h3>مؤشر أداء الطالب / الطالبة</h3>${document.getElementById('smartPerformanceIndicators')?.innerHTML||''}</div><div class="card"><h3>تحليل الفصول</h3>${document.getElementById('smartClassCards')?.innerHTML||''}</div><div class="card"><h3>التنبيهات الذكية</h3>${document.getElementById('smartAlerts')?.innerHTML||''}</div>
 <style id="student-settings-pro-style">
 .student-settings-pro{margin-top:16px;display:grid;gap:14px}
 .student-settings-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
@@ -4256,7 +4286,39 @@ window.addEventListener('load', function(){
   };
   function openPrintWindow(title, bodyHtml){
     const w = window.open('', '_blank'); if(!w) return;
-    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}</body></html>`);
+    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style>
+<style id="top-gap-hard-fix">
+html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!important;}
+.app,.screen{margin-top:0!important;padding-top:0!important;}
+.screen.active{display:block!important;}
+.topbar,.card:first-child,.hero:first-child{margin-top:0!important;}
+</style>
+</head><body><h1>${title}</h1>${bodyHtml}
+<script>
+function goAccountTab(tabId){
+  try{
+    go('account');
+    setTimeout(function(){
+      var btnMap={statement:0,operations:2,rouletteTab:6,pdfTab:5};
+      var tabs=document.querySelectorAll('#account .tabbar button');
+      var btn=(typeof btnMap[tabId]!=='undefined' && tabs[btnMap[tabId]])?tabs[btnMap[tabId]]:null;
+      if(typeof showTab==='function'){ showTab(tabId, btn); }
+    },120);
+  }catch(e){ console.log(e); }
+}
+function openMoreInfo(type){
+  var messages={
+    about:'بنك الرياضيات منصة تعليمية تحفيزية لعرض الرصيد والعمليات والجوائز ولوحة الشرف داخل واجهة بنكية تعليمية.',
+    contact:'للتواصل مع إدارة بنك الرياضيات يمكن استخدام قنوات التواصل الرسمية المعتمدة داخل المدرسة أو رقم ولي الأمر المضاف في النظام.',
+    settings:'صفحة الإعدادات مخصصة لإدارة الحسابات والبيانات، ويمكن تطويرها لاحقًا حسب احتياجك داخل النظام.',
+    privacy:'يتم استخدام البيانات داخل النظام لأغراض تعليمية وتنظيمية فقط داخل بنك الرياضيات.',
+    disclaimer:'هذا النظام تعليمي تحفيزي فقط، وليس نظامًا ماليًا حقيقيًا أو مصرفيًا فعليًا.',
+    terms:'يستخدم بنك الرياضيات داخل البيئة التعليمية لتنظيم التحفيز والعمليات والسجلات بما يتوافق مع ضوابط الصف.'
+  };
+  alert(messages[type]||'تم فتح العنصر.');
+}
+</script>
+</body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
   window.printStudentReport = function(studentId){
@@ -4280,6 +4342,31 @@ window.addEventListener('load', function(){
 })();
 </script>
 
+
+<script>
+function goAccountTab(tabId){
+  try{
+    go('account');
+    setTimeout(function(){
+      var btnMap={statement:0,operations:2,rouletteTab:6,pdfTab:5};
+      var tabs=document.querySelectorAll('#account .tabbar button');
+      var btn=(typeof btnMap[tabId]!=='undefined' && tabs[btnMap[tabId]])?tabs[btnMap[tabId]]:null;
+      if(typeof showTab==='function'){ showTab(tabId, btn); }
+    },120);
+  }catch(e){ console.log(e); }
+}
+function openMoreInfo(type){
+  var messages={
+    about:'بنك الرياضيات منصة تعليمية تحفيزية لعرض الرصيد والعمليات والجوائز ولوحة الشرف داخل واجهة بنكية تعليمية.',
+    contact:'للتواصل مع إدارة بنك الرياضيات يمكن استخدام قنوات التواصل الرسمية المعتمدة داخل المدرسة أو رقم ولي الأمر المضاف في النظام.',
+    settings:'صفحة الإعدادات مخصصة لإدارة الحسابات والبيانات، ويمكن تطويرها لاحقًا حسب احتياجك داخل النظام.',
+    privacy:'يتم استخدام البيانات داخل النظام لأغراض تعليمية وتنظيمية فقط داخل بنك الرياضيات.',
+    disclaimer:'هذا النظام تعليمي تحفيزي فقط، وليس نظامًا ماليًا حقيقيًا أو مصرفيًا فعليًا.',
+    terms:'يستخدم بنك الرياضيات داخل البيئة التعليمية لتنظيم التحفيز والعمليات والسجلات بما يتوافق مع ضوابط الصف.'
+  };
+  alert(messages[type]||'تم فتح العنصر.');
+}
+</script>
 </body></html>`;
     const w=window.open('','_blank'); if(w){ w.document.write(html); w.document.close(); setTimeout(()=>w.print(),400); }
     const status=document.getElementById('smartReportStatus'); if(status){ status.classList.remove('hidden'); setTimeout(()=>status.classList.add('hidden'),2000); }
@@ -4605,7 +4692,39 @@ window.addEventListener('load', function(){
   };
   function openPrintWindow(title, bodyHtml){
     const w = window.open('', '_blank'); if(!w) return;
-    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}</body></html>`);
+    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style>
+<style id="top-gap-hard-fix">
+html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!important;}
+.app,.screen{margin-top:0!important;padding-top:0!important;}
+.screen.active{display:block!important;}
+.topbar,.card:first-child,.hero:first-child{margin-top:0!important;}
+</style>
+</head><body><h1>${title}</h1>${bodyHtml}
+<script>
+function goAccountTab(tabId){
+  try{
+    go('account');
+    setTimeout(function(){
+      var btnMap={statement:0,operations:2,rouletteTab:6,pdfTab:5};
+      var tabs=document.querySelectorAll('#account .tabbar button');
+      var btn=(typeof btnMap[tabId]!=='undefined' && tabs[btnMap[tabId]])?tabs[btnMap[tabId]]:null;
+      if(typeof showTab==='function'){ showTab(tabId, btn); }
+    },120);
+  }catch(e){ console.log(e); }
+}
+function openMoreInfo(type){
+  var messages={
+    about:'بنك الرياضيات منصة تعليمية تحفيزية لعرض الرصيد والعمليات والجوائز ولوحة الشرف داخل واجهة بنكية تعليمية.',
+    contact:'للتواصل مع إدارة بنك الرياضيات يمكن استخدام قنوات التواصل الرسمية المعتمدة داخل المدرسة أو رقم ولي الأمر المضاف في النظام.',
+    settings:'صفحة الإعدادات مخصصة لإدارة الحسابات والبيانات، ويمكن تطويرها لاحقًا حسب احتياجك داخل النظام.',
+    privacy:'يتم استخدام البيانات داخل النظام لأغراض تعليمية وتنظيمية فقط داخل بنك الرياضيات.',
+    disclaimer:'هذا النظام تعليمي تحفيزي فقط، وليس نظامًا ماليًا حقيقيًا أو مصرفيًا فعليًا.',
+    terms:'يستخدم بنك الرياضيات داخل البيئة التعليمية لتنظيم التحفيز والعمليات والسجلات بما يتوافق مع ضوابط الصف.'
+  };
+  alert(messages[type]||'تم فتح العنصر.');
+}
+</script>
+</body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
   window.printStudentReport = function(studentId){
@@ -4629,6 +4748,31 @@ window.addEventListener('load', function(){
 })();
 </script>
 
+
+<script>
+function goAccountTab(tabId){
+  try{
+    go('account');
+    setTimeout(function(){
+      var btnMap={statement:0,operations:2,rouletteTab:6,pdfTab:5};
+      var tabs=document.querySelectorAll('#account .tabbar button');
+      var btn=(typeof btnMap[tabId]!=='undefined' && tabs[btnMap[tabId]])?tabs[btnMap[tabId]]:null;
+      if(typeof showTab==='function'){ showTab(tabId, btn); }
+    },120);
+  }catch(e){ console.log(e); }
+}
+function openMoreInfo(type){
+  var messages={
+    about:'بنك الرياضيات منصة تعليمية تحفيزية لعرض الرصيد والعمليات والجوائز ولوحة الشرف داخل واجهة بنكية تعليمية.',
+    contact:'للتواصل مع إدارة بنك الرياضيات يمكن استخدام قنوات التواصل الرسمية المعتمدة داخل المدرسة أو رقم ولي الأمر المضاف في النظام.',
+    settings:'صفحة الإعدادات مخصصة لإدارة الحسابات والبيانات، ويمكن تطويرها لاحقًا حسب احتياجك داخل النظام.',
+    privacy:'يتم استخدام البيانات داخل النظام لأغراض تعليمية وتنظيمية فقط داخل بنك الرياضيات.',
+    disclaimer:'هذا النظام تعليمي تحفيزي فقط، وليس نظامًا ماليًا حقيقيًا أو مصرفيًا فعليًا.',
+    terms:'يستخدم بنك الرياضيات داخل البيئة التعليمية لتنظيم التحفيز والعمليات والسجلات بما يتوافق مع ضوابط الصف.'
+  };
+  alert(messages[type]||'تم فتح العنصر.');
+}
+</script>
 </body></html>`;
     const w=window.open('','_blank'); if(w){ w.document.write(html); w.document.close(); setTimeout(()=>w.print(),400); }
     const status=document.getElementById('smartReportStatus'); if(status){ status.classList.remove('hidden'); setTimeout(()=>status.classList.add('hidden'),2000); }
@@ -4759,7 +4903,14 @@ window.addEventListener('load', function(){
   }
   window.generateSmartTeacherReport = function(){
     try{ window.renderSmartReports(); }catch(e){}
-    const html=`<html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>تقرير شامل - بنك الرياضيات</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{color:#103a2e}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.card{border:1px solid #dce6df;border-radius:16px;padding:14px;margin-bottom:12px}.muted{color:#6b8178;font-size:13px}</style></head><body><h1>التقرير الشامل - بنك الرياضيات</h1><div class="muted">تم إنشاؤه تلقائيًا من التقارير الذكية</div><div class="grid">${['srStudents','srClasses','srDeposits','srWithdrawals','srTransfers','srTasks','srSubmitted','srPending'].map(id=>{ const el=document.getElementById(id); const label=el&&el.nextElementSibling?el.nextElementSibling.textContent:''; return `<div class="card"><strong>${label}</strong><div style="font-size:24px;margin-top:8px">${el?el.textContent:''}</div></div>`; }).join('')}</div><div class="card"><h3>أفضل الطلاب / الطالبات</h3>${document.getElementById('smartTopStudents')?.innerHTML||''}</div><div class="card"><h3>مؤشر أداء الطالب / الطالبة</h3>${document.getElementById('smartPerformanceIndicators')?.innerHTML||''}</div><div class="card"><h3>تحليل الفصول</h3>${document.getElementById('smartClassCards')?.innerHTML||''}</div><div class="card"><h3>التنبيهات الذكية</h3>${document.getElementById('smartAlerts')?.innerHTML||''}</div>
+    const html=`<html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>تقرير شامل - بنك الرياضيات</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{color:#103a2e}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.card{border:1px solid #dce6df;border-radius:16px;padding:14px;margin-bottom:12px}.muted{color:#6b8178;font-size:13px}</style>
+<style id="top-gap-hard-fix">
+html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!important;}
+.app,.screen{margin-top:0!important;padding-top:0!important;}
+.screen.active{display:block!important;}
+.topbar,.card:first-child,.hero:first-child{margin-top:0!important;}
+</style>
+</head><body><h1>التقرير الشامل - بنك الرياضيات</h1><div class="muted">تم إنشاؤه تلقائيًا من التقارير الذكية</div><div class="grid">${['srStudents','srClasses','srDeposits','srWithdrawals','srTransfers','srTasks','srSubmitted','srPending'].map(id=>{ const el=document.getElementById(id); const label=el&&el.nextElementSibling?el.nextElementSibling.textContent:''; return `<div class="card"><strong>${label}</strong><div style="font-size:24px;margin-top:8px">${el?el.textContent:''}</div></div>`; }).join('')}</div><div class="card"><h3>أفضل الطلاب / الطالبات</h3>${document.getElementById('smartTopStudents')?.innerHTML||''}</div><div class="card"><h3>مؤشر أداء الطالب / الطالبة</h3>${document.getElementById('smartPerformanceIndicators')?.innerHTML||''}</div><div class="card"><h3>تحليل الفصول</h3>${document.getElementById('smartClassCards')?.innerHTML||''}</div><div class="card"><h3>التنبيهات الذكية</h3>${document.getElementById('smartAlerts')?.innerHTML||''}</div>
 <style id="student-settings-pro-style">
 .student-settings-pro{margin-top:16px;display:grid;gap:14px}
 .student-settings-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
@@ -5065,7 +5216,39 @@ window.addEventListener('load', function(){
   };
   function openPrintWindow(title, bodyHtml){
     const w = window.open('', '_blank'); if(!w) return;
-    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}</body></html>`);
+    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style>
+<style id="top-gap-hard-fix">
+html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!important;}
+.app,.screen{margin-top:0!important;padding-top:0!important;}
+.screen.active{display:block!important;}
+.topbar,.card:first-child,.hero:first-child{margin-top:0!important;}
+</style>
+</head><body><h1>${title}</h1>${bodyHtml}
+<script>
+function goAccountTab(tabId){
+  try{
+    go('account');
+    setTimeout(function(){
+      var btnMap={statement:0,operations:2,rouletteTab:6,pdfTab:5};
+      var tabs=document.querySelectorAll('#account .tabbar button');
+      var btn=(typeof btnMap[tabId]!=='undefined' && tabs[btnMap[tabId]])?tabs[btnMap[tabId]]:null;
+      if(typeof showTab==='function'){ showTab(tabId, btn); }
+    },120);
+  }catch(e){ console.log(e); }
+}
+function openMoreInfo(type){
+  var messages={
+    about:'بنك الرياضيات منصة تعليمية تحفيزية لعرض الرصيد والعمليات والجوائز ولوحة الشرف داخل واجهة بنكية تعليمية.',
+    contact:'للتواصل مع إدارة بنك الرياضيات يمكن استخدام قنوات التواصل الرسمية المعتمدة داخل المدرسة أو رقم ولي الأمر المضاف في النظام.',
+    settings:'صفحة الإعدادات مخصصة لإدارة الحسابات والبيانات، ويمكن تطويرها لاحقًا حسب احتياجك داخل النظام.',
+    privacy:'يتم استخدام البيانات داخل النظام لأغراض تعليمية وتنظيمية فقط داخل بنك الرياضيات.',
+    disclaimer:'هذا النظام تعليمي تحفيزي فقط، وليس نظامًا ماليًا حقيقيًا أو مصرفيًا فعليًا.',
+    terms:'يستخدم بنك الرياضيات داخل البيئة التعليمية لتنظيم التحفيز والعمليات والسجلات بما يتوافق مع ضوابط الصف.'
+  };
+  alert(messages[type]||'تم فتح العنصر.');
+}
+</script>
+</body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
   window.printStudentReport = function(studentId){
@@ -5089,6 +5272,31 @@ window.addEventListener('load', function(){
 })();
 </script>
 
+
+<script>
+function goAccountTab(tabId){
+  try{
+    go('account');
+    setTimeout(function(){
+      var btnMap={statement:0,operations:2,rouletteTab:6,pdfTab:5};
+      var tabs=document.querySelectorAll('#account .tabbar button');
+      var btn=(typeof btnMap[tabId]!=='undefined' && tabs[btnMap[tabId]])?tabs[btnMap[tabId]]:null;
+      if(typeof showTab==='function'){ showTab(tabId, btn); }
+    },120);
+  }catch(e){ console.log(e); }
+}
+function openMoreInfo(type){
+  var messages={
+    about:'بنك الرياضيات منصة تعليمية تحفيزية لعرض الرصيد والعمليات والجوائز ولوحة الشرف داخل واجهة بنكية تعليمية.',
+    contact:'للتواصل مع إدارة بنك الرياضيات يمكن استخدام قنوات التواصل الرسمية المعتمدة داخل المدرسة أو رقم ولي الأمر المضاف في النظام.',
+    settings:'صفحة الإعدادات مخصصة لإدارة الحسابات والبيانات، ويمكن تطويرها لاحقًا حسب احتياجك داخل النظام.',
+    privacy:'يتم استخدام البيانات داخل النظام لأغراض تعليمية وتنظيمية فقط داخل بنك الرياضيات.',
+    disclaimer:'هذا النظام تعليمي تحفيزي فقط، وليس نظامًا ماليًا حقيقيًا أو مصرفيًا فعليًا.',
+    terms:'يستخدم بنك الرياضيات داخل البيئة التعليمية لتنظيم التحفيز والعمليات والسجلات بما يتوافق مع ضوابط الصف.'
+  };
+  alert(messages[type]||'تم فتح العنصر.');
+}
+</script>
 </body></html>`;
     const w=window.open('','_blank'); if(w){ w.document.write(html); w.document.close(); setTimeout(()=>w.print(),400); }
     const status=document.getElementById('smartReportStatus'); if(status){ status.classList.remove('hidden'); setTimeout(()=>status.classList.add('hidden'),2000); }
@@ -5414,7 +5622,39 @@ window.addEventListener('load', function(){
   };
   function openPrintWindow(title, bodyHtml){
     const w = window.open('', '_blank'); if(!w) return;
-    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}</body></html>`);
+    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style>
+<style id="top-gap-hard-fix">
+html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!important;}
+.app,.screen{margin-top:0!important;padding-top:0!important;}
+.screen.active{display:block!important;}
+.topbar,.card:first-child,.hero:first-child{margin-top:0!important;}
+</style>
+</head><body><h1>${title}</h1>${bodyHtml}
+<script>
+function goAccountTab(tabId){
+  try{
+    go('account');
+    setTimeout(function(){
+      var btnMap={statement:0,operations:2,rouletteTab:6,pdfTab:5};
+      var tabs=document.querySelectorAll('#account .tabbar button');
+      var btn=(typeof btnMap[tabId]!=='undefined' && tabs[btnMap[tabId]])?tabs[btnMap[tabId]]:null;
+      if(typeof showTab==='function'){ showTab(tabId, btn); }
+    },120);
+  }catch(e){ console.log(e); }
+}
+function openMoreInfo(type){
+  var messages={
+    about:'بنك الرياضيات منصة تعليمية تحفيزية لعرض الرصيد والعمليات والجوائز ولوحة الشرف داخل واجهة بنكية تعليمية.',
+    contact:'للتواصل مع إدارة بنك الرياضيات يمكن استخدام قنوات التواصل الرسمية المعتمدة داخل المدرسة أو رقم ولي الأمر المضاف في النظام.',
+    settings:'صفحة الإعدادات مخصصة لإدارة الحسابات والبيانات، ويمكن تطويرها لاحقًا حسب احتياجك داخل النظام.',
+    privacy:'يتم استخدام البيانات داخل النظام لأغراض تعليمية وتنظيمية فقط داخل بنك الرياضيات.',
+    disclaimer:'هذا النظام تعليمي تحفيزي فقط، وليس نظامًا ماليًا حقيقيًا أو مصرفيًا فعليًا.',
+    terms:'يستخدم بنك الرياضيات داخل البيئة التعليمية لتنظيم التحفيز والعمليات والسجلات بما يتوافق مع ضوابط الصف.'
+  };
+  alert(messages[type]||'تم فتح العنصر.');
+}
+</script>
+</body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
   window.printStudentReport = function(studentId){
@@ -5435,33 +5675,6 @@ window.addEventListener('load', function(){
   const prevShowPane = window.showTeacherPane;
   window.showTeacherPane = function(id, btn){ if(typeof prevShowPane==='function') prevShowPane(id, btn); if(id==='teacherPaneStudents') setTimeout(function(){ try{ renderStudentSettingsDashboard(); }catch(e){} }, 60); };
   document.addEventListener('DOMContentLoaded', function(){ setTimeout(function(){ try{ renderStudentSettingsDashboard(); }catch(e){} }, 250); });
-})();
-</script>
-
-</body></html>';
-    var w = window.open('', '_blank'); if(!w) return;
-    w.document.open(); w.document.write(html); w.document.close();
-    setTimeout(function(){ try{ w.print(); }catch(e){} }, 350);
-    var msg=document.getElementById('pdfReportMsg'); if(msg){ msg.classList.remove('hidden'); }
-  };
-
-  function bindPdf(){
-    var btn=document.getElementById('generatePdfReportBtn'); if(btn) btn.onclick=function(e){ e.preventDefault(); window.generatePdfReport(); };
-    var tab=document.getElementById('pdfTab'); if(tab && !document.getElementById('pdfFromDate')){
-      var existingDates = tab.querySelectorAll('input[type="date"]');
-      if(existingDates.length>=2){ existingDates[0].id='pdfToDate'; existingDates[1].id='pdfFromDate'; }
-    }
-  }
-
-  document.addEventListener('DOMContentLoaded', function(){ setTimeout(function(){ bindCreateBtn(); bindPdf(); renderTeacher(); var st=getCurrentStudentSafe(); if(st) renderStudent(st); }, 400); });
-  var oldShowTab = window.showTab;
-  if(typeof oldShowTab==='function'){
-    window.showTab = function(id, btn){ oldShowTab(id, btn); if(id==='performanceStudentTab'){ var st=getCurrentStudentSafe(); if(st) setTimeout(function(){ renderStudent(st); }, 0); } if(id==='pdfTab'){ setTimeout(bindPdf, 0); } };
-  }
-  var oldShowTeacherPane = window.showTeacherPane;
-  if(typeof oldShowTeacherPane==='function'){
-    window.showTeacherPane = function(id, btn){ oldShowTeacherPane(id, btn); if(id==='teacherPanePerformance'){ setTimeout(function(){ bindCreateBtn(); renderTeacher(); }, 0); } };
-  }
 })();
 </script>
 
@@ -5565,7 +5778,14 @@ window.addEventListener('load', function(){
   }
   window.generateSmartTeacherReport = function(){
     try{ renderSmartReports(); }catch(e){}
-    const html=`<html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>تقرير شامل - بنك الرياضيات</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{color:#103a2e} .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.card{border:1px solid #dce6df;border-radius:16px;padding:14px;margin-bottom:12px}.muted{color:#6b8178;font-size:13px}</style></head><body><h1>التقرير الشامل - بنك الرياضيات</h1><div class="muted">تم إنشاؤه تلقائيًا من التقارير الذكية</div><div class="grid">${['srStudents','srClasses','srDeposits','srWithdrawals','srTransfers','srTasks','srSubmitted','srPending'].map(id=>{ const el=document.getElementById(id); const label=el&&el.nextElementSibling?el.nextElementSibling.textContent:''; return `<div class="card"><strong>${label}</strong><div style="font-size:24px;margin-top:8px">${el?el.textContent:''}</div></div>`; }).join('')}</div><div class="card"><h3>أفضل الطلاب / الطالبات</h3>${document.getElementById('smartTopStudents')?.innerHTML||''}</div><div class="card"><h3>تحليل الفصول</h3>${document.getElementById('smartClassCards')?.innerHTML||''}</div><div class="card"><h3>التنبيهات الذكية</h3>${document.getElementById('smartAlerts')?.innerHTML||''}</div>
+    const html=`<html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>تقرير شامل - بنك الرياضيات</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{color:#103a2e} .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.card{border:1px solid #dce6df;border-radius:16px;padding:14px;margin-bottom:12px}.muted{color:#6b8178;font-size:13px}</style>
+<style id="top-gap-hard-fix">
+html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!important;}
+.app,.screen{margin-top:0!important;padding-top:0!important;}
+.screen.active{display:block!important;}
+.topbar,.card:first-child,.hero:first-child{margin-top:0!important;}
+</style>
+</head><body><h1>التقرير الشامل - بنك الرياضيات</h1><div class="muted">تم إنشاؤه تلقائيًا من التقارير الذكية</div><div class="grid">${['srStudents','srClasses','srDeposits','srWithdrawals','srTransfers','srTasks','srSubmitted','srPending'].map(id=>{ const el=document.getElementById(id); const label=el&&el.nextElementSibling?el.nextElementSibling.textContent:''; return `<div class="card"><strong>${label}</strong><div style="font-size:24px;margin-top:8px">${el?el.textContent:''}</div></div>`; }).join('')}</div><div class="card"><h3>أفضل الطلاب / الطالبات</h3>${document.getElementById('smartTopStudents')?.innerHTML||''}</div><div class="card"><h3>تحليل الفصول</h3>${document.getElementById('smartClassCards')?.innerHTML||''}</div><div class="card"><h3>التنبيهات الذكية</h3>${document.getElementById('smartAlerts')?.innerHTML||''}</div>
 <script id="smart-reports-override-v7">
 (function(){
   function money(v){ return Number(v||0).toLocaleString('ar-SA'); }
@@ -5679,7 +5899,14 @@ window.addEventListener('load', function(){
   }
   window.generateSmartTeacherReport = function(){
     try{ window.renderSmartReports(); }catch(e){}
-    const html=`<html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>تقرير شامل - بنك الرياضيات</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{color:#103a2e}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.card{border:1px solid #dce6df;border-radius:16px;padding:14px;margin-bottom:12px}.muted{color:#6b8178;font-size:13px}</style></head><body><h1>التقرير الشامل - بنك الرياضيات</h1><div class="muted">تم إنشاؤه تلقائيًا من التقارير الذكية</div><div class="grid">${['srStudents','srClasses','srDeposits','srWithdrawals','srTransfers','srTasks','srSubmitted','srPending'].map(id=>{ const el=document.getElementById(id); const label=el&&el.nextElementSibling?el.nextElementSibling.textContent:''; return `<div class="card"><strong>${label}</strong><div style="font-size:24px;margin-top:8px">${el?el.textContent:''}</div></div>`; }).join('')}</div><div class="card"><h3>أفضل الطلاب / الطالبات</h3>${document.getElementById('smartTopStudents')?.innerHTML||''}</div><div class="card"><h3>مؤشر أداء الطالب / الطالبة</h3>${document.getElementById('smartPerformanceIndicators')?.innerHTML||''}</div><div class="card"><h3>تحليل الفصول</h3>${document.getElementById('smartClassCards')?.innerHTML||''}</div><div class="card"><h3>التنبيهات الذكية</h3>${document.getElementById('smartAlerts')?.innerHTML||''}</div>
+    const html=`<html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>تقرير شامل - بنك الرياضيات</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{color:#103a2e}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.card{border:1px solid #dce6df;border-radius:16px;padding:14px;margin-bottom:12px}.muted{color:#6b8178;font-size:13px}</style>
+<style id="top-gap-hard-fix">
+html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!important;}
+.app,.screen{margin-top:0!important;padding-top:0!important;}
+.screen.active{display:block!important;}
+.topbar,.card:first-child,.hero:first-child{margin-top:0!important;}
+</style>
+</head><body><h1>التقرير الشامل - بنك الرياضيات</h1><div class="muted">تم إنشاؤه تلقائيًا من التقارير الذكية</div><div class="grid">${['srStudents','srClasses','srDeposits','srWithdrawals','srTransfers','srTasks','srSubmitted','srPending'].map(id=>{ const el=document.getElementById(id); const label=el&&el.nextElementSibling?el.nextElementSibling.textContent:''; return `<div class="card"><strong>${label}</strong><div style="font-size:24px;margin-top:8px">${el?el.textContent:''}</div></div>`; }).join('')}</div><div class="card"><h3>أفضل الطلاب / الطالبات</h3>${document.getElementById('smartTopStudents')?.innerHTML||''}</div><div class="card"><h3>مؤشر أداء الطالب / الطالبة</h3>${document.getElementById('smartPerformanceIndicators')?.innerHTML||''}</div><div class="card"><h3>تحليل الفصول</h3>${document.getElementById('smartClassCards')?.innerHTML||''}</div><div class="card"><h3>التنبيهات الذكية</h3>${document.getElementById('smartAlerts')?.innerHTML||''}</div>
 <style id="student-settings-pro-style">
 .student-settings-pro{margin-top:16px;display:grid;gap:14px}
 .student-settings-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
@@ -5985,7 +6212,39 @@ window.addEventListener('load', function(){
   };
   function openPrintWindow(title, bodyHtml){
     const w = window.open('', '_blank'); if(!w) return;
-    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}</body></html>`);
+    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style>
+<style id="top-gap-hard-fix">
+html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!important;}
+.app,.screen{margin-top:0!important;padding-top:0!important;}
+.screen.active{display:block!important;}
+.topbar,.card:first-child,.hero:first-child{margin-top:0!important;}
+</style>
+</head><body><h1>${title}</h1>${bodyHtml}
+<script>
+function goAccountTab(tabId){
+  try{
+    go('account');
+    setTimeout(function(){
+      var btnMap={statement:0,operations:2,rouletteTab:6,pdfTab:5};
+      var tabs=document.querySelectorAll('#account .tabbar button');
+      var btn=(typeof btnMap[tabId]!=='undefined' && tabs[btnMap[tabId]])?tabs[btnMap[tabId]]:null;
+      if(typeof showTab==='function'){ showTab(tabId, btn); }
+    },120);
+  }catch(e){ console.log(e); }
+}
+function openMoreInfo(type){
+  var messages={
+    about:'بنك الرياضيات منصة تعليمية تحفيزية لعرض الرصيد والعمليات والجوائز ولوحة الشرف داخل واجهة بنكية تعليمية.',
+    contact:'للتواصل مع إدارة بنك الرياضيات يمكن استخدام قنوات التواصل الرسمية المعتمدة داخل المدرسة أو رقم ولي الأمر المضاف في النظام.',
+    settings:'صفحة الإعدادات مخصصة لإدارة الحسابات والبيانات، ويمكن تطويرها لاحقًا حسب احتياجك داخل النظام.',
+    privacy:'يتم استخدام البيانات داخل النظام لأغراض تعليمية وتنظيمية فقط داخل بنك الرياضيات.',
+    disclaimer:'هذا النظام تعليمي تحفيزي فقط، وليس نظامًا ماليًا حقيقيًا أو مصرفيًا فعليًا.',
+    terms:'يستخدم بنك الرياضيات داخل البيئة التعليمية لتنظيم التحفيز والعمليات والسجلات بما يتوافق مع ضوابط الصف.'
+  };
+  alert(messages[type]||'تم فتح العنصر.');
+}
+</script>
+</body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
   window.printStudentReport = function(studentId){
@@ -6009,6 +6268,31 @@ window.addEventListener('load', function(){
 })();
 </script>
 
+
+<script>
+function goAccountTab(tabId){
+  try{
+    go('account');
+    setTimeout(function(){
+      var btnMap={statement:0,operations:2,rouletteTab:6,pdfTab:5};
+      var tabs=document.querySelectorAll('#account .tabbar button');
+      var btn=(typeof btnMap[tabId]!=='undefined' && tabs[btnMap[tabId]])?tabs[btnMap[tabId]]:null;
+      if(typeof showTab==='function'){ showTab(tabId, btn); }
+    },120);
+  }catch(e){ console.log(e); }
+}
+function openMoreInfo(type){
+  var messages={
+    about:'بنك الرياضيات منصة تعليمية تحفيزية لعرض الرصيد والعمليات والجوائز ولوحة الشرف داخل واجهة بنكية تعليمية.',
+    contact:'للتواصل مع إدارة بنك الرياضيات يمكن استخدام قنوات التواصل الرسمية المعتمدة داخل المدرسة أو رقم ولي الأمر المضاف في النظام.',
+    settings:'صفحة الإعدادات مخصصة لإدارة الحسابات والبيانات، ويمكن تطويرها لاحقًا حسب احتياجك داخل النظام.',
+    privacy:'يتم استخدام البيانات داخل النظام لأغراض تعليمية وتنظيمية فقط داخل بنك الرياضيات.',
+    disclaimer:'هذا النظام تعليمي تحفيزي فقط، وليس نظامًا ماليًا حقيقيًا أو مصرفيًا فعليًا.',
+    terms:'يستخدم بنك الرياضيات داخل البيئة التعليمية لتنظيم التحفيز والعمليات والسجلات بما يتوافق مع ضوابط الصف.'
+  };
+  alert(messages[type]||'تم فتح العنصر.');
+}
+</script>
 </body></html>`;
     const w=window.open('','_blank'); if(w){ w.document.write(html); w.document.close(); setTimeout(()=>w.print(),400); }
     const status=document.getElementById('smartReportStatus'); if(status){ status.classList.remove('hidden'); setTimeout(()=>status.classList.add('hidden'),2000); }
@@ -6334,7 +6618,39 @@ window.addEventListener('load', function(){
   };
   function openPrintWindow(title, bodyHtml){
     const w = window.open('', '_blank'); if(!w) return;
-    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}</body></html>`);
+    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style>
+<style id="top-gap-hard-fix">
+html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!important;}
+.app,.screen{margin-top:0!important;padding-top:0!important;}
+.screen.active{display:block!important;}
+.topbar,.card:first-child,.hero:first-child{margin-top:0!important;}
+</style>
+</head><body><h1>${title}</h1>${bodyHtml}
+<script>
+function goAccountTab(tabId){
+  try{
+    go('account');
+    setTimeout(function(){
+      var btnMap={statement:0,operations:2,rouletteTab:6,pdfTab:5};
+      var tabs=document.querySelectorAll('#account .tabbar button');
+      var btn=(typeof btnMap[tabId]!=='undefined' && tabs[btnMap[tabId]])?tabs[btnMap[tabId]]:null;
+      if(typeof showTab==='function'){ showTab(tabId, btn); }
+    },120);
+  }catch(e){ console.log(e); }
+}
+function openMoreInfo(type){
+  var messages={
+    about:'بنك الرياضيات منصة تعليمية تحفيزية لعرض الرصيد والعمليات والجوائز ولوحة الشرف داخل واجهة بنكية تعليمية.',
+    contact:'للتواصل مع إدارة بنك الرياضيات يمكن استخدام قنوات التواصل الرسمية المعتمدة داخل المدرسة أو رقم ولي الأمر المضاف في النظام.',
+    settings:'صفحة الإعدادات مخصصة لإدارة الحسابات والبيانات، ويمكن تطويرها لاحقًا حسب احتياجك داخل النظام.',
+    privacy:'يتم استخدام البيانات داخل النظام لأغراض تعليمية وتنظيمية فقط داخل بنك الرياضيات.',
+    disclaimer:'هذا النظام تعليمي تحفيزي فقط، وليس نظامًا ماليًا حقيقيًا أو مصرفيًا فعليًا.',
+    terms:'يستخدم بنك الرياضيات داخل البيئة التعليمية لتنظيم التحفيز والعمليات والسجلات بما يتوافق مع ضوابط الصف.'
+  };
+  alert(messages[type]||'تم فتح العنصر.');
+}
+</script>
+</body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
   window.printStudentReport = function(studentId){
@@ -6358,6 +6674,31 @@ window.addEventListener('load', function(){
 })();
 </script>
 
+
+<script>
+function goAccountTab(tabId){
+  try{
+    go('account');
+    setTimeout(function(){
+      var btnMap={statement:0,operations:2,rouletteTab:6,pdfTab:5};
+      var tabs=document.querySelectorAll('#account .tabbar button');
+      var btn=(typeof btnMap[tabId]!=='undefined' && tabs[btnMap[tabId]])?tabs[btnMap[tabId]]:null;
+      if(typeof showTab==='function'){ showTab(tabId, btn); }
+    },120);
+  }catch(e){ console.log(e); }
+}
+function openMoreInfo(type){
+  var messages={
+    about:'بنك الرياضيات منصة تعليمية تحفيزية لعرض الرصيد والعمليات والجوائز ولوحة الشرف داخل واجهة بنكية تعليمية.',
+    contact:'للتواصل مع إدارة بنك الرياضيات يمكن استخدام قنوات التواصل الرسمية المعتمدة داخل المدرسة أو رقم ولي الأمر المضاف في النظام.',
+    settings:'صفحة الإعدادات مخصصة لإدارة الحسابات والبيانات، ويمكن تطويرها لاحقًا حسب احتياجك داخل النظام.',
+    privacy:'يتم استخدام البيانات داخل النظام لأغراض تعليمية وتنظيمية فقط داخل بنك الرياضيات.',
+    disclaimer:'هذا النظام تعليمي تحفيزي فقط، وليس نظامًا ماليًا حقيقيًا أو مصرفيًا فعليًا.',
+    terms:'يستخدم بنك الرياضيات داخل البيئة التعليمية لتنظيم التحفيز والعمليات والسجلات بما يتوافق مع ضوابط الصف.'
+  };
+  alert(messages[type]||'تم فتح العنصر.');
+}
+</script>
 </body></html>`;
     const w=window.open('','_blank'); if(w){ w.document.write(html); w.document.close(); setTimeout(()=>w.print(),400); }
     const status=document.getElementById('smartReportStatus'); if(status){ status.classList.remove('hidden'); setTimeout(()=>status.classList.add('hidden'),2000); }
@@ -6488,7 +6829,14 @@ window.addEventListener('load', function(){
   }
   window.generateSmartTeacherReport = function(){
     try{ window.renderSmartReports(); }catch(e){}
-    const html=`<html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>تقرير شامل - بنك الرياضيات</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{color:#103a2e}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.card{border:1px solid #dce6df;border-radius:16px;padding:14px;margin-bottom:12px}.muted{color:#6b8178;font-size:13px}</style></head><body><h1>التقرير الشامل - بنك الرياضيات</h1><div class="muted">تم إنشاؤه تلقائيًا من التقارير الذكية</div><div class="grid">${['srStudents','srClasses','srDeposits','srWithdrawals','srTransfers','srTasks','srSubmitted','srPending'].map(id=>{ const el=document.getElementById(id); const label=el&&el.nextElementSibling?el.nextElementSibling.textContent:''; return `<div class="card"><strong>${label}</strong><div style="font-size:24px;margin-top:8px">${el?el.textContent:''}</div></div>`; }).join('')}</div><div class="card"><h3>أفضل الطلاب / الطالبات</h3>${document.getElementById('smartTopStudents')?.innerHTML||''}</div><div class="card"><h3>مؤشر أداء الطالب / الطالبة</h3>${document.getElementById('smartPerformanceIndicators')?.innerHTML||''}</div><div class="card"><h3>تحليل الفصول</h3>${document.getElementById('smartClassCards')?.innerHTML||''}</div><div class="card"><h3>التنبيهات الذكية</h3>${document.getElementById('smartAlerts')?.innerHTML||''}</div>
+    const html=`<html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>تقرير شامل - بنك الرياضيات</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{color:#103a2e}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.card{border:1px solid #dce6df;border-radius:16px;padding:14px;margin-bottom:12px}.muted{color:#6b8178;font-size:13px}</style>
+<style id="top-gap-hard-fix">
+html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!important;}
+.app,.screen{margin-top:0!important;padding-top:0!important;}
+.screen.active{display:block!important;}
+.topbar,.card:first-child,.hero:first-child{margin-top:0!important;}
+</style>
+</head><body><h1>التقرير الشامل - بنك الرياضيات</h1><div class="muted">تم إنشاؤه تلقائيًا من التقارير الذكية</div><div class="grid">${['srStudents','srClasses','srDeposits','srWithdrawals','srTransfers','srTasks','srSubmitted','srPending'].map(id=>{ const el=document.getElementById(id); const label=el&&el.nextElementSibling?el.nextElementSibling.textContent:''; return `<div class="card"><strong>${label}</strong><div style="font-size:24px;margin-top:8px">${el?el.textContent:''}</div></div>`; }).join('')}</div><div class="card"><h3>أفضل الطلاب / الطالبات</h3>${document.getElementById('smartTopStudents')?.innerHTML||''}</div><div class="card"><h3>مؤشر أداء الطالب / الطالبة</h3>${document.getElementById('smartPerformanceIndicators')?.innerHTML||''}</div><div class="card"><h3>تحليل الفصول</h3>${document.getElementById('smartClassCards')?.innerHTML||''}</div><div class="card"><h3>التنبيهات الذكية</h3>${document.getElementById('smartAlerts')?.innerHTML||''}</div>
 <style id="student-settings-pro-style">
 .student-settings-pro{margin-top:16px;display:grid;gap:14px}
 .student-settings-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
@@ -6794,7 +7142,39 @@ window.addEventListener('load', function(){
   };
   function openPrintWindow(title, bodyHtml){
     const w = window.open('', '_blank'); if(!w) return;
-    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}</body></html>`);
+    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style>
+<style id="top-gap-hard-fix">
+html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!important;}
+.app,.screen{margin-top:0!important;padding-top:0!important;}
+.screen.active{display:block!important;}
+.topbar,.card:first-child,.hero:first-child{margin-top:0!important;}
+</style>
+</head><body><h1>${title}</h1>${bodyHtml}
+<script>
+function goAccountTab(tabId){
+  try{
+    go('account');
+    setTimeout(function(){
+      var btnMap={statement:0,operations:2,rouletteTab:6,pdfTab:5};
+      var tabs=document.querySelectorAll('#account .tabbar button');
+      var btn=(typeof btnMap[tabId]!=='undefined' && tabs[btnMap[tabId]])?tabs[btnMap[tabId]]:null;
+      if(typeof showTab==='function'){ showTab(tabId, btn); }
+    },120);
+  }catch(e){ console.log(e); }
+}
+function openMoreInfo(type){
+  var messages={
+    about:'بنك الرياضيات منصة تعليمية تحفيزية لعرض الرصيد والعمليات والجوائز ولوحة الشرف داخل واجهة بنكية تعليمية.',
+    contact:'للتواصل مع إدارة بنك الرياضيات يمكن استخدام قنوات التواصل الرسمية المعتمدة داخل المدرسة أو رقم ولي الأمر المضاف في النظام.',
+    settings:'صفحة الإعدادات مخصصة لإدارة الحسابات والبيانات، ويمكن تطويرها لاحقًا حسب احتياجك داخل النظام.',
+    privacy:'يتم استخدام البيانات داخل النظام لأغراض تعليمية وتنظيمية فقط داخل بنك الرياضيات.',
+    disclaimer:'هذا النظام تعليمي تحفيزي فقط، وليس نظامًا ماليًا حقيقيًا أو مصرفيًا فعليًا.',
+    terms:'يستخدم بنك الرياضيات داخل البيئة التعليمية لتنظيم التحفيز والعمليات والسجلات بما يتوافق مع ضوابط الصف.'
+  };
+  alert(messages[type]||'تم فتح العنصر.');
+}
+</script>
+</body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
   window.printStudentReport = function(studentId){
@@ -6818,6 +7198,31 @@ window.addEventListener('load', function(){
 })();
 </script>
 
+
+<script>
+function goAccountTab(tabId){
+  try{
+    go('account');
+    setTimeout(function(){
+      var btnMap={statement:0,operations:2,rouletteTab:6,pdfTab:5};
+      var tabs=document.querySelectorAll('#account .tabbar button');
+      var btn=(typeof btnMap[tabId]!=='undefined' && tabs[btnMap[tabId]])?tabs[btnMap[tabId]]:null;
+      if(typeof showTab==='function'){ showTab(tabId, btn); }
+    },120);
+  }catch(e){ console.log(e); }
+}
+function openMoreInfo(type){
+  var messages={
+    about:'بنك الرياضيات منصة تعليمية تحفيزية لعرض الرصيد والعمليات والجوائز ولوحة الشرف داخل واجهة بنكية تعليمية.',
+    contact:'للتواصل مع إدارة بنك الرياضيات يمكن استخدام قنوات التواصل الرسمية المعتمدة داخل المدرسة أو رقم ولي الأمر المضاف في النظام.',
+    settings:'صفحة الإعدادات مخصصة لإدارة الحسابات والبيانات، ويمكن تطويرها لاحقًا حسب احتياجك داخل النظام.',
+    privacy:'يتم استخدام البيانات داخل النظام لأغراض تعليمية وتنظيمية فقط داخل بنك الرياضيات.',
+    disclaimer:'هذا النظام تعليمي تحفيزي فقط، وليس نظامًا ماليًا حقيقيًا أو مصرفيًا فعليًا.',
+    terms:'يستخدم بنك الرياضيات داخل البيئة التعليمية لتنظيم التحفيز والعمليات والسجلات بما يتوافق مع ضوابط الصف.'
+  };
+  alert(messages[type]||'تم فتح العنصر.');
+}
+</script>
 </body></html>`;
     const w=window.open('','_blank'); if(w){ w.document.write(html); w.document.close(); setTimeout(()=>w.print(),400); }
     const status=document.getElementById('smartReportStatus'); if(status){ status.classList.remove('hidden'); setTimeout(()=>status.classList.add('hidden'),2000); }
@@ -7143,7 +7548,39 @@ window.addEventListener('load', function(){
   };
   function openPrintWindow(title, bodyHtml){
     const w = window.open('', '_blank'); if(!w) return;
-    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}</body></html>`);
+    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style>
+<style id="top-gap-hard-fix">
+html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!important;}
+.app,.screen{margin-top:0!important;padding-top:0!important;}
+.screen.active{display:block!important;}
+.topbar,.card:first-child,.hero:first-child{margin-top:0!important;}
+</style>
+</head><body><h1>${title}</h1>${bodyHtml}
+<script>
+function goAccountTab(tabId){
+  try{
+    go('account');
+    setTimeout(function(){
+      var btnMap={statement:0,operations:2,rouletteTab:6,pdfTab:5};
+      var tabs=document.querySelectorAll('#account .tabbar button');
+      var btn=(typeof btnMap[tabId]!=='undefined' && tabs[btnMap[tabId]])?tabs[btnMap[tabId]]:null;
+      if(typeof showTab==='function'){ showTab(tabId, btn); }
+    },120);
+  }catch(e){ console.log(e); }
+}
+function openMoreInfo(type){
+  var messages={
+    about:'بنك الرياضيات منصة تعليمية تحفيزية لعرض الرصيد والعمليات والجوائز ولوحة الشرف داخل واجهة بنكية تعليمية.',
+    contact:'للتواصل مع إدارة بنك الرياضيات يمكن استخدام قنوات التواصل الرسمية المعتمدة داخل المدرسة أو رقم ولي الأمر المضاف في النظام.',
+    settings:'صفحة الإعدادات مخصصة لإدارة الحسابات والبيانات، ويمكن تطويرها لاحقًا حسب احتياجك داخل النظام.',
+    privacy:'يتم استخدام البيانات داخل النظام لأغراض تعليمية وتنظيمية فقط داخل بنك الرياضيات.',
+    disclaimer:'هذا النظام تعليمي تحفيزي فقط، وليس نظامًا ماليًا حقيقيًا أو مصرفيًا فعليًا.',
+    terms:'يستخدم بنك الرياضيات داخل البيئة التعليمية لتنظيم التحفيز والعمليات والسجلات بما يتوافق مع ضوابط الصف.'
+  };
+  alert(messages[type]||'تم فتح العنصر.');
+}
+</script>
+</body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
   window.printStudentReport = function(studentId){
@@ -7325,132 +7762,29 @@ window.addEventListener('load', function(){
 })();
 </script>
 
-<style id="oai-final-fix-style">
-.bulk-op-modal{position:fixed;inset:0;background:rgba(0,0,0,.38);display:none;align-items:center;justify-content:center;z-index:10020;padding:18px}
-.bulk-op-modal.show{display:flex}
-.bulk-op-box{width:min(480px,100%);background:#fff;border-radius:28px;padding:20px;box-shadow:0 24px 60px rgba(0,0,0,.22);border:1px solid rgba(16,58,46,.08)}
-.bulk-op-box h3{margin:0 0 8px;color:var(--deep);font-size:20px}.bulk-op-box p{margin:0 0 14px;color:var(--muted);font-size:13px;line-height:1.8}
-.bulk-op-grid{display:grid;gap:12px}.bulk-op-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
-.select-arrow{appearance:none;-webkit-appearance:none;-moz-appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%23103a2e'><path d='M5.5 7.5L10 12l4.5-4.5'/></svg>");background-repeat:no-repeat;background-position:left 12px center;background-size:20px;padding-left:38px !important}
-html[dir="ltr"] .select-arrow{background-position:right 12px center;padding-left:14px !important;padding-right:38px !important}
-.bulk-op-box select,.bulk-op-box input{width:100%;border:1px solid var(--line);background:#f8fbf9;border-radius:16px;padding:14px;font-family:inherit;font-size:14px;outline:none}
-</style>
-<div id="bulkOpModal" class="bulk-op-modal" aria-hidden="true">
-  <div class="bulk-op-box">
-    <h3 id="bulkOpTitle">عملية جماعية</h3>
-    <p id="bulkOpDesc">اختاري السبب والمبلغ ثم نفذي العملية على الفصل كامل.</p>
-    <div class="bulk-op-grid">
-      <div class="field"><label>الفصل</label><input id="bulkOpClassName" type="text" readonly></div>
-      <div class="field"><label>المبلغ</label><input id="bulkOpAmount" type="number" min="1" placeholder="أدخلي المبلغ بالريال"></div>
-      <div class="field"><label>السبب</label><select id="bulkOpReason" class="select-arrow"></select></div>
-      <div class="field" id="bulkOpOtherWrap" style="display:none"><label>سبب آخر</label><input id="bulkOpOther" type="text" placeholder="اكتبي السبب هنا"></div>
-    </div>
-    <div class="bulk-op-actions">
-      <button class="btn btn-light" type="button" onclick="closeBulkClassModal()">إلغاء</button>
-      <button class="btn btn-green" type="button" onclick="confirmBulkClassOperation()">تنفيذ العملية</button>
-    </div>
-  </div>
-</div>
-<script id="oai-final-fix-script">
-(function(){
-  const DEPOSIT_REASONS = ['مشاركة مميزة في الحصة','حل سؤال صعب','مساعدة زميل / زميلة','إنهاء المهمة الأدائية','تسليم الواجب مبكرًا','الحصول على درجة كاملة','الفوز في تحدي الرياضيات','ترتيب الدفتر','الالتزام والهدوء في الحصة','مبادرة إيجابية','حضور كامل الأسبوع','تميز في العمل الجماعي','أخرى'];
-  const WITHDRAW_REASONS = ['عدم حل الواجب','التأخر عن الحصة','كثرة الكلام أثناء الشرح','عدم إحضار الأدوات','عدم المشاركة','مخالفة تعليمات الصف','عدم تسليم المهمة الأدائية','إزعاج الزملاء','استخدام الجوال','سحب سلوكي','أخرى'];
-  function fmt(n){ return (typeof formatMoney==='function') ? formatMoney(Number(n||0)) : String(Number(n||0)); }
-  function esc(s){ return String(s||'').replace(/[&<>\"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
-  function getState(){ if(!window.__studentSettingsState) window.__studentSettingsState={classId:'', query:'', level:'all', status:'all'}; return window.__studentSettingsState; }
-  function getStudentsByClass(classId){ return (window.bankData?.students||[]).filter(s=>s.classId===classId); }
-  function getLevel(balance){ balance=Number(balance||0); return balance>=41000?'ألماسي':balance>=31000?'بلاتيني':balance>=16000?'ذهبي':balance>=11000?'فضي':'برونزي'; }
-  function buildClassStats(c){ const students=getStudentsByClass(c.id); const total=students.reduce((a,b)=>a+Number(b.balance||0),0); const active=students.filter(s=>!s.isFrozen).length; return {students,total,active}; }
-
-  function fillBulkReasons(type){
-    const sel=document.getElementById('bulkOpReason'); if(!sel) return;
-    const reasons = type==='deposit' ? DEPOSIT_REASONS : WITHDRAW_REASONS;
-    sel.innerHTML = '<option value="">اختاري السبب</option>' + reasons.map(r=>`<option value="${esc(r)}">${esc(r)}</option>`).join('');
-    toggleBulkOther();
-  }
-  window.toggleBulkOther = function(){
-    const val=document.getElementById('bulkOpReason')?.value||'';
-    const wrap=document.getElementById('bulkOpOtherWrap');
-    if(wrap) wrap.style.display = val==='أخرى' ? 'block' : 'none';
+<script>
+function goAccountTab(tabId){
+  try{
+    go('account');
+    setTimeout(function(){
+      var btnMap={statement:0,operations:2,rouletteTab:6,pdfTab:5};
+      var tabs=document.querySelectorAll('#account .tabbar button');
+      var btn=(typeof btnMap[tabId]!=='undefined' && tabs[btnMap[tabId]])?tabs[btnMap[tabId]]:null;
+      if(typeof showTab==='function'){ showTab(tabId, btn); }
+    },120);
+  }catch(e){ console.log(e); }
+}
+function openMoreInfo(type){
+  var messages={
+    about:'بنك الرياضيات منصة تعليمية تحفيزية لعرض الرصيد والعمليات والجوائز ولوحة الشرف داخل واجهة بنكية تعليمية.',
+    contact:'للتواصل مع إدارة بنك الرياضيات يمكن استخدام قنوات التواصل الرسمية المعتمدة داخل المدرسة أو رقم ولي الأمر المضاف في النظام.',
+    settings:'صفحة الإعدادات مخصصة لإدارة الحسابات والبيانات، ويمكن تطويرها لاحقًا حسب احتياجك داخل النظام.',
+    privacy:'يتم استخدام البيانات داخل النظام لأغراض تعليمية وتنظيمية فقط داخل بنك الرياضيات.',
+    disclaimer:'هذا النظام تعليمي تحفيزي فقط، وليس نظامًا ماليًا حقيقيًا أو مصرفيًا فعليًا.',
+    terms:'يستخدم بنك الرياضيات داخل البيئة التعليمية لتنظيم التحفيز والعمليات والسجلات بما يتوافق مع ضوابط الصف.'
   };
-  document.addEventListener('change', function(e){ if(e.target && e.target.id==='bulkOpReason') toggleBulkOther(); });
-
-  window.quickClassOperation = function(classId, type){
-    const cls=(window.bankData?.classes||[]).find(c=>c.id===classId); if(!cls) return;
-    window.__bulkOpState = {classId, type};
-    const title=document.getElementById('bulkOpTitle');
-    const desc=document.getElementById('bulkOpDesc');
-    const className=document.getElementById('bulkOpClassName');
-    const amount=document.getElementById('bulkOpAmount');
-    const other=document.getElementById('bulkOpOther');
-    if(title) title.textContent = type==='deposit' ? 'إيداع للفصل كامل' : 'سحب للفصل كامل';
-    if(desc) desc.textContent = type==='deposit' ? 'اختاري سبب الإيداع والمبلغ ثم نفذي العملية على جميع طلاب الفصل.' : 'اختاري سبب السحب والمبلغ ثم نفذي العملية على جميع طلاب الفصل.';
-    if(className) className.value = cls.name || '';
-    if(amount) amount.value = '';
-    if(other) other.value = '';
-    fillBulkReasons(type);
-    document.getElementById('bulkOpModal')?.classList.add('show');
-  };
-  window.closeBulkClassModal = function(){ document.getElementById('bulkOpModal')?.classList.remove('show'); window.__bulkOpState=null; };
-  window.confirmBulkClassOperation = function(){
-    const state=window.__bulkOpState; if(!state) return;
-    const amount=Number(document.getElementById('bulkOpAmount')?.value||0); if(!(amount>0)) return alert('أدخلي مبلغًا صحيحًا.');
-    let reason=document.getElementById('bulkOpReason')?.value||''; if(!reason) return alert('اختاري السبب.');
-    if(reason==='أخرى') reason=(document.getElementById('bulkOpOther')?.value||'').trim();
-    if(!reason) return alert('اكتبي السبب الآخر.');
-    const students=getStudentsByClass(state.classId); if(!students.length) return alert('لا يوجد طلاب في هذا الفصل.');
-    const now = new Date();
-    students.forEach(function(st){
-      st.balance = Math.max(0, Number(st.balance||0) + (state.type==='deposit'? amount : -amount));
-      if(!Array.isArray(st.history)) st.history=[];
-      st.history.unshift({id:'h'+Date.now()+Math.random().toString(16).slice(2,6), type:state.type==='deposit'?'deposit':'withdraw', amount:Number(amount), reason:reason, date: now.toLocaleDateString('en-CA')+' '+now.toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'})});
-      if(!Array.isArray(window.bankData.operations)) window.bankData.operations=[];
-      window.bankData.operations.unshift({id:'op'+Date.now()+Math.random().toString(16).slice(2,6), studentId:st.id, studentName:st.name, type:state.type==='deposit'?'deposit':'withdraw', amount:Number(amount), reason:reason, classId:state.classId, className:(window.bankData.classes||[]).find(c=>c.id===state.classId)?.name || '', date:new Date().toISOString()});
-    });
-    if(typeof saveBankData==='function') saveBankData();
-    if(typeof refreshTeacherUI==='function') refreshTeacherUI();
-    if(typeof renderStudentSettingsDashboard==='function') renderStudentSettingsDashboard();
-    closeBulkClassModal();
-    alert('تم تنفيذ العملية بنجاح على الفصل كامل.');
-  };
-
-  function renderClassCardsCustom(){
-    const holder = document.getElementById('studentClassCards'); if(!holder || !window.bankData) return;
-    holder.innerHTML = (window.bankData.classes||[]).map(function(c){
-      const st=buildClassStats(c);
-      return `<div class="student-class-card"><div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start"><div><h4>${esc(c.name)}</h4><div class="teacher-note">عدد الطلاب / الطالبات في الفصل: ${st.students.length}</div></div><span class="pill">${st.active} نشط</span></div><div class="student-class-meta"><div class="mini"><strong>${st.students.length}</strong><span>عدد الطلاب / الطالبات</span></div><div class="mini"><strong>${fmt(st.total)}</strong><span>إجمالي الأرصدة</span></div></div><div class="student-class-actions"><button class="btn btn-green" type="button" onclick="openStudentSettingsClass('${c.id}')">فتح الفصل</button><button class="btn btn-green" type="button" onclick="quickClassOperation('${c.id}','deposit')">إيداع للكل</button><button class="btn btn-gold" type="button" onclick="quickClassOperation('${c.id}','withdraw')">سحب للكل</button></div></div>`;
-    }).join('') || '<div class="student-empty">لا توجد فصول بعد.</div>';
-  }
-  function renderClassDetailCustom(){
-    const detail=document.getElementById('studentClassDetail'); if(!detail || !window.bankData) return;
-    const holder=document.getElementById('studentClassCards');
-    const state=getState();
-    if(!state.classId){ if(holder) holder.style.display='grid'; detail.classList.add('hidden'); detail.classList.remove('page-mode'); detail.innerHTML=''; renderClassCardsCustom(); return; }
-    const cls=(window.bankData.classes||[]).find(c=>c.id===state.classId); if(!cls){ state.classId=''; renderClassDetailCustom(); return; }
-    if(holder) holder.style.display='none';
-    const students=getStudentsByClass(cls.id);
-    const stats=buildClassStats(cls);
-    detail.classList.remove('hidden'); detail.classList.add('page-mode');
-    detail.innerHTML = `<div class="student-detail-header"><div class="student-detail-title"><h3>${esc(cls.name)}</h3><p>بطاقات الفصل مع إجراءات جماعية واضحة.</p></div><button class="ghost" type="button" onclick="closeStudentSettingsClass()">رجوع للخلف</button></div><div class="teacher-mini-kpis"><div class="teacher-mini-kpi"><strong>${stats.students.length}</strong><span>عدد الطلاب / الطالبات</span></div><div class="teacher-mini-kpi"><strong>${fmt(stats.total)}</strong><span>إجمالي الأرصدة</span></div></div><div class="student-bulk-actions"><button class="btn btn-green" type="button" onclick="quickClassOperation('${cls.id}','deposit')">إيداع للكل</button><button class="btn btn-gold" type="button" onclick="quickClassOperation('${cls.id}','withdraw')">سحب للكل</button><button class="btn btn-light" type="button" onclick="closeStudentSettingsClass()">إغلاق</button></div><div class="student-cards-grid">${students.map(s=>`<div class="student-card-pro"><div class="student-card-top"><div><div class="student-card-name">${esc(s.name||'—')}</div><div class="student-card-sub">PIN: ${esc(s.password||'—')}</div></div><div><span class="student-status-badge ${s.isFrozen?'frozen':''}">${s.isFrozen?'موقوف':'مفعل'}</span></div></div><div class="student-card-metrics"><div class="metric"><strong>${fmt(s.balance)}</strong><span>الرصيد</span></div><div class="metric"><strong>${esc(getLevel(s.balance))}</strong><span>المستوى</span></div></div></div>`).join('') || '<div class="student-empty">لا يوجد طلاب في هذا الفصل.</div>'}</div>`;
-  }
-  window.openStudentSettingsClass = function(classId){ const state=getState(); state.classId=classId; renderClassDetailCustom(); };
-  window.closeStudentSettingsClass = function(){ const state=getState(); state.classId=''; renderClassDetailCustom(); };
-  window.renderStudentSettingsDashboard = function(){
-    const pane = document.getElementById('teacherPaneStudents'); if(!pane) return;
-    pane.innerHTML = `<div class="student-settings-shell"><div class="section-head"><h3>لوحة تحكم متقدمة</h3><span class="pill">جاهزة</span></div><div class="teacher-note">اخترِي الفصل ثم نفذي إيداعًا أو سحبًا للكل مع قائمة أسباب واضحة.</div><div id="studentClassCards" class="student-class-cards"></div><div id="studentClassDetail" class="student-detail-shell hidden"></div></div>`;
-    renderClassCardsCustom();
-    renderClassDetailCustom();
-  };
-  const prevShow=window.showTeacherPane;
-  if(typeof prevShow==='function'){
-    window.showTeacherPane=function(id,btn){ prevShow(id,btn); if(id==='teacherPaneStudents') setTimeout(function(){ window.renderStudentSettingsDashboard(); }, 60); };
-  }
-  document.addEventListener('DOMContentLoaded', function(){
-    const studentReason = document.getElementById('reasonBox');
-    if(studentReason && studentReason.tagName==='INPUT') studentReason.placeholder='أخرى';
-    setTimeout(function(){ if(document.getElementById('teacherPaneStudents')?.classList.contains('active')) window.renderStudentSettingsDashboard(); }, 400);
-  });
-})();
+  alert(messages[type]||'تم فتح العنصر.');
+}
 </script>
 </body>
 </html>
