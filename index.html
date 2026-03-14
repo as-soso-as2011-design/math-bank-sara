@@ -1237,9 +1237,7 @@ html[dir="ltr"] .balance-head{direction:ltr}
           <div class="field"><label>الطالب / الطالبة</label><select id="opStudent"></select></div>
           <div class="field hidden" id="transferTargetWrap"><label>التحويل إلى</label><select id="transferTarget"></select></div>
           <div class="field"><label>المبلغ</label><input id="opAmount" type="number" placeholder="أدخل المبلغ" /></div>
-          <div class="field"><label>السبب</label><select id="opReasonSelect"></select></div>
-          <div class="field hidden" id="opReasonOtherWrap"><label>سبب آخر</label><input id="opReasonOther" type="text" placeholder="اكتبي السبب هنا" /></div>
-          <input id="opReason" type="hidden" />
+          <div class="field"><label>السبب</label><input id="opReason" type="text" placeholder="اكتبي السبب هنا" /></div>
           <div class="teacher-actions">
             <button class="btn btn-green" onclick="executeTeacherOperation()">تنفيذ العملية</button>
             <button class="btn btn-gold" onclick="sendLatestOperationToGuardian()">إرسال آخر عملية واتساب</button>
@@ -4258,162 +4256,7 @@ window.addEventListener('load', function(){
   };
   function openPrintWindow(title, bodyHtml){
     const w = window.open('', '_blank'); if(!w) return;
-    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}
-<style id="teacher-reason-patch-style">
-.bulk-op-modal{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;z-index:99999;padding:18px}
-.bulk-op-modal.show{display:flex}
-.bulk-op-box{width:min(420px,100%);background:#fff;border-radius:28px;padding:18px;border:1px solid var(--line);box-shadow:0 24px 60px rgba(0,0,0,.18)}
-.bulk-op-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
-.bulk-op-head h3{margin:0;color:var(--deep);font-size:18px}
-.bulk-op-close{border:none;background:#f4f8f5;border-radius:14px;padding:10px 12px;font-weight:900;cursor:pointer}
-</style>
-<div id="bulkOpModal" class="bulk-op-modal">
-  <div class="bulk-op-box">
-    <div class="bulk-op-head"><h3 id="bulkOpTitle">عملية للفصل كامل</h3><button type="button" class="bulk-op-close" onclick="closeBulkOpModal()">✕</button></div>
-    <div class="field"><label>الفصل</label><select id="bulkClassSelect"></select></div>
-    <div class="field"><label>نوع العملية</label><select id="bulkTypeSelect" onchange="updateBulkReasonOptions()"><option value="deposit">إيداع</option><option value="withdraw">سحب</option></select></div>
-    <div class="field"><label>المبلغ</label><input id="bulkAmountInput" type="number" placeholder="أدخلي المبلغ" /></div>
-    <div class="field"><label>السبب</label><select id="bulkReasonSelect"></select></div>
-    <div class="field hidden" id="bulkReasonOtherWrap"><label>سبب آخر</label><input id="bulkReasonOther" type="text" placeholder="اكتبي السبب هنا" /></div>
-    <div class="teacher-actions">
-      <button class="btn btn-green" type="button" onclick="submitBulkOperation()">تنفيذ العملية</button>
-      <button class="btn" type="button" style="background:#eef3ef" onclick="closeBulkOpModal()">إلغاء</button>
-    </div>
-    <div id="bulkOpMsg" class="notice ok hidden">تم تنفيذ العملية للفصل كامل</div>
-    <div id="bulkOpErr" class="notice err hidden">أكملي البيانات بشكل صحيح</div>
-  </div>
-</div>
-<script>
-(function(){
-  const depositReasons = [
-    'مشاركة مميزة في الحصة','حل سؤال صعب','مساعدة زميل / زميلة','إنهاء المهمة الأدائية','تسليم الواجب مبكرًا','الحصول على درجة كاملة','الفوز في تحدي الرياضيات','ترتيب الدفتر','الالتزام والهدوء في الحصة','مبادرة إيجابية','حضور كامل الأسبوع','تميز في العمل الجماعي','أخرى'
-  ];
-  const withdrawReasons = [
-    'عدم حل الواجب','التأخر عن الحصة','كثرة الكلام أثناء الشرح','عدم إحضار الأدوات','عدم المشاركة','مخالفة تعليمات الصف','عدم تسليم المهمة الأدائية','إزعاج الزملاء','استخدام الجوال','سحب سلوكي','أخرى'
-  ];
-  function fillSelect(select, items, placeholder){
-    if(!select) return;
-    select.innerHTML = '<option value="">'+(placeholder||'اختر السبب')+'</option>' + items.map(function(item){ return '<option value="'+item+'">'+item+'</option>'; }).join('');
-  }
-  function syncTeacherReason(){
-    const type = document.getElementById('opType')?.value || 'deposit';
-    const select = document.getElementById('opReasonSelect');
-    const otherWrap = document.getElementById('opReasonOtherWrap');
-    const other = document.getElementById('opReasonOther');
-    const hidden = document.getElementById('opReason');
-    if(!select || !hidden) return;
-    const current = select.value;
-    if(type === 'withdraw') fillSelect(select, withdrawReasons, 'اختاري سبب السحب');
-    else if(type === 'deposit') fillSelect(select, depositReasons, 'اختاري سبب الإيداع');
-    else fillSelect(select, ['تحويل بين الطلاب','أخرى'], 'اختاري سبب التحويل');
-    if([...select.options].some(o=>o.value===current)) select.value = current;
-    const chosen = select.value;
-    if(chosen === 'أخرى') { otherWrap?.classList.remove('hidden'); hidden.value = (other?.value || '').trim(); }
-    else { otherWrap?.classList.add('hidden'); if(other) other.value=''; hidden.value = chosen || ''; }
-  }
-  window.updateTeacherReasonOptions = syncTeacherReason;
-  document.addEventListener('change', function(e){
-    if(e.target && e.target.id === 'opType') syncTeacherReason();
-    if(e.target && e.target.id === 'opReasonSelect') syncTeacherReason();
-    if(e.target && e.target.id === 'bulkTypeSelect') updateBulkReasonOptions();
-    if(e.target && e.target.id === 'bulkReasonSelect') updateBulkReasonOptions();
-  });
-  document.addEventListener('input', function(e){
-    if(e.target && e.target.id === 'opReasonOther'){
-      const hidden = document.getElementById('opReason');
-      if(hidden) hidden.value = (e.target.value || '').trim();
-    }
-    if(e.target && e.target.id === 'bulkReasonOther'){
-      const hidden = document.getElementById('bulkReasonHidden');
-      if(hidden) hidden.value = (e.target.value || '').trim();
-    }
-  });
-  const oldToggle = window.toggleTransferTarget;
-  if(typeof oldToggle === 'function'){
-    window.toggleTransferTarget = function(){ oldToggle(); syncTeacherReason(); };
-  }
-
-  function populateClassSelects(){
-    const classes = (window.bankData?.classes || []);
-    ['bulkClassSelect'].forEach(function(id){
-      const sel = document.getElementById(id);
-      if(!sel) return;
-      const current = sel.value;
-      sel.innerHTML = classes.map(function(c){ return '<option value="'+c.id+'">'+c.name+'</option>'; }).join('');
-      if(current && [...sel.options].some(o=>o.value===current)) sel.value = current;
-    });
-  }
-  window.updateBulkReasonOptions = function(){
-    const type = document.getElementById('bulkTypeSelect')?.value || 'deposit';
-    const select = document.getElementById('bulkReasonSelect');
-    const wrap = document.getElementById('bulkReasonOtherWrap');
-    const other = document.getElementById('bulkReasonOther');
-    if(!select) return;
-    const current = select.value;
-    fillSelect(select, type === 'withdraw' ? withdrawReasons : depositReasons, type === 'withdraw' ? 'اختاري سبب السحب' : 'اختاري سبب الإيداع');
-    if([...select.options].some(o=>o.value===current)) select.value = current;
-    if(select.value === 'أخرى') wrap?.classList.remove('hidden'); else { wrap?.classList.add('hidden'); if(other) other.value=''; }
-  };
-  window.openBulkOpModal = function(classId, type){
-    const modal = document.getElementById('bulkOpModal');
-    const classSel = document.getElementById('bulkClassSelect');
-    const typeSel = document.getElementById('bulkTypeSelect');
-    const title = document.getElementById('bulkOpTitle');
-    document.getElementById('bulkOpMsg')?.classList.add('hidden');
-    document.getElementById('bulkOpErr')?.classList.add('hidden');
-    populateClassSelects();
-    if(classSel && classId) classSel.value = classId;
-    if(typeSel && type) typeSel.value = type;
-    if(title) title.textContent = type === 'withdraw' ? 'سحب للفصل كامل' : 'إيداع للفصل كامل';
-    const amount = document.getElementById('bulkAmountInput'); if(amount) amount.value = '';
-    const other = document.getElementById('bulkReasonOther'); if(other) other.value = '';
-    updateBulkReasonOptions();
-    modal?.classList.add('show');
-  };
-  window.closeBulkOpModal = function(){ document.getElementById('bulkOpModal')?.classList.remove('show'); };
-  window.quickClassOperation = function(classId, type){ openBulkOpModal(classId, type); };
-  window.submitBulkOperation = function(){
-    const classId = document.getElementById('bulkClassSelect')?.value;
-    const type = document.getElementById('bulkTypeSelect')?.value;
-    const amount = Number(document.getElementById('bulkAmountInput')?.value || 0);
-    const reasonSel = document.getElementById('bulkReasonSelect')?.value || '';
-    const reasonOther = (document.getElementById('bulkReasonOther')?.value || '').trim();
-    const reason = reasonSel === 'أخرى' ? reasonOther : reasonSel;
-    const ok = document.getElementById('bulkOpMsg');
-    const err = document.getElementById('bulkOpErr');
-    ok?.classList.add('hidden'); err?.classList.add('hidden');
-    if(!classId || !(amount > 0) || !reason){ err?.classList.remove('hidden'); return; }
-    if(!window.bankData) return;
-    const now = new Date();
-    const date = now.toLocaleDateString('en-CA') + ' ' + now.toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'});
-    (bankData.students || []).filter(function(st){ return st.classId === classId; }).forEach(function(st){
-      st.balance = Math.max(0, Number(st.balance||0) + (type === 'deposit' ? amount : -amount));
-      if(!Array.isArray(st.history)) st.history = [];
-      st.history.push({id:'h'+Date.now()+Math.random().toString(16).slice(2,6), type:type === 'deposit' ? 'deposit' : 'withdraw', amount:Number(amount), reason:reason, date:date});
-      if(Array.isArray(bankData.operations)) bankData.operations.push({id:'op'+Date.now()+Math.random().toString(16).slice(2,6), studentId:st.id, studentName:st.name, type:type === 'deposit' ? 'deposit' : 'withdraw', amount:Number(amount), reason:reason, date:date});
-    });
-    if(typeof saveBankData === 'function') saveBankData();
-    if(typeof refreshTeacherUI === 'function') refreshTeacherUI();
-    ok?.classList.remove('hidden');
-    setTimeout(function(){ closeBulkOpModal(); }, 900);
-  };
-
-  function relabelButtons(){
-    document.querySelectorAll('button').forEach(function(btn){
-      const t = (btn.textContent || '').trim();
-      if(t === 'خصم للفصل كامل') btn.textContent = 'سحب للفصل كامل';
-    });
-  }
-  const oldRefresh = window.refreshTeacherUI;
-  if(typeof oldRefresh === 'function'){
-    window.refreshTeacherUI = function(){ oldRefresh(); populateClassSelects(); relabelButtons(); syncTeacherReason(); };
-  }
-  document.addEventListener('DOMContentLoaded', function(){ populateClassSelects(); relabelButtons(); syncTeacherReason(); });
-  window.addEventListener('load', function(){ setTimeout(function(){ populateClassSelects(); relabelButtons(); syncTeacherReason(); }, 300); });
-})();
-</script>
-
-</body></html>`);
+    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}</body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
   window.printStudentReport = function(studentId){
@@ -4434,161 +4277,6 @@ window.addEventListener('load', function(){
   const prevShowPane = window.showTeacherPane;
   window.showTeacherPane = function(id, btn){ if(typeof prevShowPane==='function') prevShowPane(id, btn); if(id==='teacherPaneStudents') setTimeout(function(){ try{ renderStudentSettingsDashboard(); }catch(e){} }, 60); };
   document.addEventListener('DOMContentLoaded', function(){ setTimeout(function(){ try{ renderStudentSettingsDashboard(); }catch(e){} }, 250); });
-})();
-</script>
-
-
-<style id="teacher-reason-patch-style">
-.bulk-op-modal{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;z-index:99999;padding:18px}
-.bulk-op-modal.show{display:flex}
-.bulk-op-box{width:min(420px,100%);background:#fff;border-radius:28px;padding:18px;border:1px solid var(--line);box-shadow:0 24px 60px rgba(0,0,0,.18)}
-.bulk-op-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
-.bulk-op-head h3{margin:0;color:var(--deep);font-size:18px}
-.bulk-op-close{border:none;background:#f4f8f5;border-radius:14px;padding:10px 12px;font-weight:900;cursor:pointer}
-</style>
-<div id="bulkOpModal" class="bulk-op-modal">
-  <div class="bulk-op-box">
-    <div class="bulk-op-head"><h3 id="bulkOpTitle">عملية للفصل كامل</h3><button type="button" class="bulk-op-close" onclick="closeBulkOpModal()">✕</button></div>
-    <div class="field"><label>الفصل</label><select id="bulkClassSelect"></select></div>
-    <div class="field"><label>نوع العملية</label><select id="bulkTypeSelect" onchange="updateBulkReasonOptions()"><option value="deposit">إيداع</option><option value="withdraw">سحب</option></select></div>
-    <div class="field"><label>المبلغ</label><input id="bulkAmountInput" type="number" placeholder="أدخلي المبلغ" /></div>
-    <div class="field"><label>السبب</label><select id="bulkReasonSelect"></select></div>
-    <div class="field hidden" id="bulkReasonOtherWrap"><label>سبب آخر</label><input id="bulkReasonOther" type="text" placeholder="اكتبي السبب هنا" /></div>
-    <div class="teacher-actions">
-      <button class="btn btn-green" type="button" onclick="submitBulkOperation()">تنفيذ العملية</button>
-      <button class="btn" type="button" style="background:#eef3ef" onclick="closeBulkOpModal()">إلغاء</button>
-    </div>
-    <div id="bulkOpMsg" class="notice ok hidden">تم تنفيذ العملية للفصل كامل</div>
-    <div id="bulkOpErr" class="notice err hidden">أكملي البيانات بشكل صحيح</div>
-  </div>
-</div>
-<script>
-(function(){
-  const depositReasons = [
-    'مشاركة مميزة في الحصة','حل سؤال صعب','مساعدة زميل / زميلة','إنهاء المهمة الأدائية','تسليم الواجب مبكرًا','الحصول على درجة كاملة','الفوز في تحدي الرياضيات','ترتيب الدفتر','الالتزام والهدوء في الحصة','مبادرة إيجابية','حضور كامل الأسبوع','تميز في العمل الجماعي','أخرى'
-  ];
-  const withdrawReasons = [
-    'عدم حل الواجب','التأخر عن الحصة','كثرة الكلام أثناء الشرح','عدم إحضار الأدوات','عدم المشاركة','مخالفة تعليمات الصف','عدم تسليم المهمة الأدائية','إزعاج الزملاء','استخدام الجوال','سحب سلوكي','أخرى'
-  ];
-  function fillSelect(select, items, placeholder){
-    if(!select) return;
-    select.innerHTML = '<option value="">'+(placeholder||'اختر السبب')+'</option>' + items.map(function(item){ return '<option value="'+item+'">'+item+'</option>'; }).join('');
-  }
-  function syncTeacherReason(){
-    const type = document.getElementById('opType')?.value || 'deposit';
-    const select = document.getElementById('opReasonSelect');
-    const otherWrap = document.getElementById('opReasonOtherWrap');
-    const other = document.getElementById('opReasonOther');
-    const hidden = document.getElementById('opReason');
-    if(!select || !hidden) return;
-    const current = select.value;
-    if(type === 'withdraw') fillSelect(select, withdrawReasons, 'اختاري سبب السحب');
-    else if(type === 'deposit') fillSelect(select, depositReasons, 'اختاري سبب الإيداع');
-    else fillSelect(select, ['تحويل بين الطلاب','أخرى'], 'اختاري سبب التحويل');
-    if([...select.options].some(o=>o.value===current)) select.value = current;
-    const chosen = select.value;
-    if(chosen === 'أخرى') { otherWrap?.classList.remove('hidden'); hidden.value = (other?.value || '').trim(); }
-    else { otherWrap?.classList.add('hidden'); if(other) other.value=''; hidden.value = chosen || ''; }
-  }
-  window.updateTeacherReasonOptions = syncTeacherReason;
-  document.addEventListener('change', function(e){
-    if(e.target && e.target.id === 'opType') syncTeacherReason();
-    if(e.target && e.target.id === 'opReasonSelect') syncTeacherReason();
-    if(e.target && e.target.id === 'bulkTypeSelect') updateBulkReasonOptions();
-    if(e.target && e.target.id === 'bulkReasonSelect') updateBulkReasonOptions();
-  });
-  document.addEventListener('input', function(e){
-    if(e.target && e.target.id === 'opReasonOther'){
-      const hidden = document.getElementById('opReason');
-      if(hidden) hidden.value = (e.target.value || '').trim();
-    }
-    if(e.target && e.target.id === 'bulkReasonOther'){
-      const hidden = document.getElementById('bulkReasonHidden');
-      if(hidden) hidden.value = (e.target.value || '').trim();
-    }
-  });
-  const oldToggle = window.toggleTransferTarget;
-  if(typeof oldToggle === 'function'){
-    window.toggleTransferTarget = function(){ oldToggle(); syncTeacherReason(); };
-  }
-
-  function populateClassSelects(){
-    const classes = (window.bankData?.classes || []);
-    ['bulkClassSelect'].forEach(function(id){
-      const sel = document.getElementById(id);
-      if(!sel) return;
-      const current = sel.value;
-      sel.innerHTML = classes.map(function(c){ return '<option value="'+c.id+'">'+c.name+'</option>'; }).join('');
-      if(current && [...sel.options].some(o=>o.value===current)) sel.value = current;
-    });
-  }
-  window.updateBulkReasonOptions = function(){
-    const type = document.getElementById('bulkTypeSelect')?.value || 'deposit';
-    const select = document.getElementById('bulkReasonSelect');
-    const wrap = document.getElementById('bulkReasonOtherWrap');
-    const other = document.getElementById('bulkReasonOther');
-    if(!select) return;
-    const current = select.value;
-    fillSelect(select, type === 'withdraw' ? withdrawReasons : depositReasons, type === 'withdraw' ? 'اختاري سبب السحب' : 'اختاري سبب الإيداع');
-    if([...select.options].some(o=>o.value===current)) select.value = current;
-    if(select.value === 'أخرى') wrap?.classList.remove('hidden'); else { wrap?.classList.add('hidden'); if(other) other.value=''; }
-  };
-  window.openBulkOpModal = function(classId, type){
-    const modal = document.getElementById('bulkOpModal');
-    const classSel = document.getElementById('bulkClassSelect');
-    const typeSel = document.getElementById('bulkTypeSelect');
-    const title = document.getElementById('bulkOpTitle');
-    document.getElementById('bulkOpMsg')?.classList.add('hidden');
-    document.getElementById('bulkOpErr')?.classList.add('hidden');
-    populateClassSelects();
-    if(classSel && classId) classSel.value = classId;
-    if(typeSel && type) typeSel.value = type;
-    if(title) title.textContent = type === 'withdraw' ? 'سحب للفصل كامل' : 'إيداع للفصل كامل';
-    const amount = document.getElementById('bulkAmountInput'); if(amount) amount.value = '';
-    const other = document.getElementById('bulkReasonOther'); if(other) other.value = '';
-    updateBulkReasonOptions();
-    modal?.classList.add('show');
-  };
-  window.closeBulkOpModal = function(){ document.getElementById('bulkOpModal')?.classList.remove('show'); };
-  window.quickClassOperation = function(classId, type){ openBulkOpModal(classId, type); };
-  window.submitBulkOperation = function(){
-    const classId = document.getElementById('bulkClassSelect')?.value;
-    const type = document.getElementById('bulkTypeSelect')?.value;
-    const amount = Number(document.getElementById('bulkAmountInput')?.value || 0);
-    const reasonSel = document.getElementById('bulkReasonSelect')?.value || '';
-    const reasonOther = (document.getElementById('bulkReasonOther')?.value || '').trim();
-    const reason = reasonSel === 'أخرى' ? reasonOther : reasonSel;
-    const ok = document.getElementById('bulkOpMsg');
-    const err = document.getElementById('bulkOpErr');
-    ok?.classList.add('hidden'); err?.classList.add('hidden');
-    if(!classId || !(amount > 0) || !reason){ err?.classList.remove('hidden'); return; }
-    if(!window.bankData) return;
-    const now = new Date();
-    const date = now.toLocaleDateString('en-CA') + ' ' + now.toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'});
-    (bankData.students || []).filter(function(st){ return st.classId === classId; }).forEach(function(st){
-      st.balance = Math.max(0, Number(st.balance||0) + (type === 'deposit' ? amount : -amount));
-      if(!Array.isArray(st.history)) st.history = [];
-      st.history.push({id:'h'+Date.now()+Math.random().toString(16).slice(2,6), type:type === 'deposit' ? 'deposit' : 'withdraw', amount:Number(amount), reason:reason, date:date});
-      if(Array.isArray(bankData.operations)) bankData.operations.push({id:'op'+Date.now()+Math.random().toString(16).slice(2,6), studentId:st.id, studentName:st.name, type:type === 'deposit' ? 'deposit' : 'withdraw', amount:Number(amount), reason:reason, date:date});
-    });
-    if(typeof saveBankData === 'function') saveBankData();
-    if(typeof refreshTeacherUI === 'function') refreshTeacherUI();
-    ok?.classList.remove('hidden');
-    setTimeout(function(){ closeBulkOpModal(); }, 900);
-  };
-
-  function relabelButtons(){
-    document.querySelectorAll('button').forEach(function(btn){
-      const t = (btn.textContent || '').trim();
-      if(t === 'خصم للفصل كامل') btn.textContent = 'سحب للفصل كامل';
-    });
-  }
-  const oldRefresh = window.refreshTeacherUI;
-  if(typeof oldRefresh === 'function'){
-    window.refreshTeacherUI = function(){ oldRefresh(); populateClassSelects(); relabelButtons(); syncTeacherReason(); };
-  }
-  document.addEventListener('DOMContentLoaded', function(){ populateClassSelects(); relabelButtons(); syncTeacherReason(); });
-  window.addEventListener('load', function(){ setTimeout(function(){ populateClassSelects(); relabelButtons(); syncTeacherReason(); }, 300); });
 })();
 </script>
 
@@ -4917,162 +4605,7 @@ window.addEventListener('load', function(){
   };
   function openPrintWindow(title, bodyHtml){
     const w = window.open('', '_blank'); if(!w) return;
-    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}
-<style id="teacher-reason-patch-style">
-.bulk-op-modal{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;z-index:99999;padding:18px}
-.bulk-op-modal.show{display:flex}
-.bulk-op-box{width:min(420px,100%);background:#fff;border-radius:28px;padding:18px;border:1px solid var(--line);box-shadow:0 24px 60px rgba(0,0,0,.18)}
-.bulk-op-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
-.bulk-op-head h3{margin:0;color:var(--deep);font-size:18px}
-.bulk-op-close{border:none;background:#f4f8f5;border-radius:14px;padding:10px 12px;font-weight:900;cursor:pointer}
-</style>
-<div id="bulkOpModal" class="bulk-op-modal">
-  <div class="bulk-op-box">
-    <div class="bulk-op-head"><h3 id="bulkOpTitle">عملية للفصل كامل</h3><button type="button" class="bulk-op-close" onclick="closeBulkOpModal()">✕</button></div>
-    <div class="field"><label>الفصل</label><select id="bulkClassSelect"></select></div>
-    <div class="field"><label>نوع العملية</label><select id="bulkTypeSelect" onchange="updateBulkReasonOptions()"><option value="deposit">إيداع</option><option value="withdraw">سحب</option></select></div>
-    <div class="field"><label>المبلغ</label><input id="bulkAmountInput" type="number" placeholder="أدخلي المبلغ" /></div>
-    <div class="field"><label>السبب</label><select id="bulkReasonSelect"></select></div>
-    <div class="field hidden" id="bulkReasonOtherWrap"><label>سبب آخر</label><input id="bulkReasonOther" type="text" placeholder="اكتبي السبب هنا" /></div>
-    <div class="teacher-actions">
-      <button class="btn btn-green" type="button" onclick="submitBulkOperation()">تنفيذ العملية</button>
-      <button class="btn" type="button" style="background:#eef3ef" onclick="closeBulkOpModal()">إلغاء</button>
-    </div>
-    <div id="bulkOpMsg" class="notice ok hidden">تم تنفيذ العملية للفصل كامل</div>
-    <div id="bulkOpErr" class="notice err hidden">أكملي البيانات بشكل صحيح</div>
-  </div>
-</div>
-<script>
-(function(){
-  const depositReasons = [
-    'مشاركة مميزة في الحصة','حل سؤال صعب','مساعدة زميل / زميلة','إنهاء المهمة الأدائية','تسليم الواجب مبكرًا','الحصول على درجة كاملة','الفوز في تحدي الرياضيات','ترتيب الدفتر','الالتزام والهدوء في الحصة','مبادرة إيجابية','حضور كامل الأسبوع','تميز في العمل الجماعي','أخرى'
-  ];
-  const withdrawReasons = [
-    'عدم حل الواجب','التأخر عن الحصة','كثرة الكلام أثناء الشرح','عدم إحضار الأدوات','عدم المشاركة','مخالفة تعليمات الصف','عدم تسليم المهمة الأدائية','إزعاج الزملاء','استخدام الجوال','سحب سلوكي','أخرى'
-  ];
-  function fillSelect(select, items, placeholder){
-    if(!select) return;
-    select.innerHTML = '<option value="">'+(placeholder||'اختر السبب')+'</option>' + items.map(function(item){ return '<option value="'+item+'">'+item+'</option>'; }).join('');
-  }
-  function syncTeacherReason(){
-    const type = document.getElementById('opType')?.value || 'deposit';
-    const select = document.getElementById('opReasonSelect');
-    const otherWrap = document.getElementById('opReasonOtherWrap');
-    const other = document.getElementById('opReasonOther');
-    const hidden = document.getElementById('opReason');
-    if(!select || !hidden) return;
-    const current = select.value;
-    if(type === 'withdraw') fillSelect(select, withdrawReasons, 'اختاري سبب السحب');
-    else if(type === 'deposit') fillSelect(select, depositReasons, 'اختاري سبب الإيداع');
-    else fillSelect(select, ['تحويل بين الطلاب','أخرى'], 'اختاري سبب التحويل');
-    if([...select.options].some(o=>o.value===current)) select.value = current;
-    const chosen = select.value;
-    if(chosen === 'أخرى') { otherWrap?.classList.remove('hidden'); hidden.value = (other?.value || '').trim(); }
-    else { otherWrap?.classList.add('hidden'); if(other) other.value=''; hidden.value = chosen || ''; }
-  }
-  window.updateTeacherReasonOptions = syncTeacherReason;
-  document.addEventListener('change', function(e){
-    if(e.target && e.target.id === 'opType') syncTeacherReason();
-    if(e.target && e.target.id === 'opReasonSelect') syncTeacherReason();
-    if(e.target && e.target.id === 'bulkTypeSelect') updateBulkReasonOptions();
-    if(e.target && e.target.id === 'bulkReasonSelect') updateBulkReasonOptions();
-  });
-  document.addEventListener('input', function(e){
-    if(e.target && e.target.id === 'opReasonOther'){
-      const hidden = document.getElementById('opReason');
-      if(hidden) hidden.value = (e.target.value || '').trim();
-    }
-    if(e.target && e.target.id === 'bulkReasonOther'){
-      const hidden = document.getElementById('bulkReasonHidden');
-      if(hidden) hidden.value = (e.target.value || '').trim();
-    }
-  });
-  const oldToggle = window.toggleTransferTarget;
-  if(typeof oldToggle === 'function'){
-    window.toggleTransferTarget = function(){ oldToggle(); syncTeacherReason(); };
-  }
-
-  function populateClassSelects(){
-    const classes = (window.bankData?.classes || []);
-    ['bulkClassSelect'].forEach(function(id){
-      const sel = document.getElementById(id);
-      if(!sel) return;
-      const current = sel.value;
-      sel.innerHTML = classes.map(function(c){ return '<option value="'+c.id+'">'+c.name+'</option>'; }).join('');
-      if(current && [...sel.options].some(o=>o.value===current)) sel.value = current;
-    });
-  }
-  window.updateBulkReasonOptions = function(){
-    const type = document.getElementById('bulkTypeSelect')?.value || 'deposit';
-    const select = document.getElementById('bulkReasonSelect');
-    const wrap = document.getElementById('bulkReasonOtherWrap');
-    const other = document.getElementById('bulkReasonOther');
-    if(!select) return;
-    const current = select.value;
-    fillSelect(select, type === 'withdraw' ? withdrawReasons : depositReasons, type === 'withdraw' ? 'اختاري سبب السحب' : 'اختاري سبب الإيداع');
-    if([...select.options].some(o=>o.value===current)) select.value = current;
-    if(select.value === 'أخرى') wrap?.classList.remove('hidden'); else { wrap?.classList.add('hidden'); if(other) other.value=''; }
-  };
-  window.openBulkOpModal = function(classId, type){
-    const modal = document.getElementById('bulkOpModal');
-    const classSel = document.getElementById('bulkClassSelect');
-    const typeSel = document.getElementById('bulkTypeSelect');
-    const title = document.getElementById('bulkOpTitle');
-    document.getElementById('bulkOpMsg')?.classList.add('hidden');
-    document.getElementById('bulkOpErr')?.classList.add('hidden');
-    populateClassSelects();
-    if(classSel && classId) classSel.value = classId;
-    if(typeSel && type) typeSel.value = type;
-    if(title) title.textContent = type === 'withdraw' ? 'سحب للفصل كامل' : 'إيداع للفصل كامل';
-    const amount = document.getElementById('bulkAmountInput'); if(amount) amount.value = '';
-    const other = document.getElementById('bulkReasonOther'); if(other) other.value = '';
-    updateBulkReasonOptions();
-    modal?.classList.add('show');
-  };
-  window.closeBulkOpModal = function(){ document.getElementById('bulkOpModal')?.classList.remove('show'); };
-  window.quickClassOperation = function(classId, type){ openBulkOpModal(classId, type); };
-  window.submitBulkOperation = function(){
-    const classId = document.getElementById('bulkClassSelect')?.value;
-    const type = document.getElementById('bulkTypeSelect')?.value;
-    const amount = Number(document.getElementById('bulkAmountInput')?.value || 0);
-    const reasonSel = document.getElementById('bulkReasonSelect')?.value || '';
-    const reasonOther = (document.getElementById('bulkReasonOther')?.value || '').trim();
-    const reason = reasonSel === 'أخرى' ? reasonOther : reasonSel;
-    const ok = document.getElementById('bulkOpMsg');
-    const err = document.getElementById('bulkOpErr');
-    ok?.classList.add('hidden'); err?.classList.add('hidden');
-    if(!classId || !(amount > 0) || !reason){ err?.classList.remove('hidden'); return; }
-    if(!window.bankData) return;
-    const now = new Date();
-    const date = now.toLocaleDateString('en-CA') + ' ' + now.toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'});
-    (bankData.students || []).filter(function(st){ return st.classId === classId; }).forEach(function(st){
-      st.balance = Math.max(0, Number(st.balance||0) + (type === 'deposit' ? amount : -amount));
-      if(!Array.isArray(st.history)) st.history = [];
-      st.history.push({id:'h'+Date.now()+Math.random().toString(16).slice(2,6), type:type === 'deposit' ? 'deposit' : 'withdraw', amount:Number(amount), reason:reason, date:date});
-      if(Array.isArray(bankData.operations)) bankData.operations.push({id:'op'+Date.now()+Math.random().toString(16).slice(2,6), studentId:st.id, studentName:st.name, type:type === 'deposit' ? 'deposit' : 'withdraw', amount:Number(amount), reason:reason, date:date});
-    });
-    if(typeof saveBankData === 'function') saveBankData();
-    if(typeof refreshTeacherUI === 'function') refreshTeacherUI();
-    ok?.classList.remove('hidden');
-    setTimeout(function(){ closeBulkOpModal(); }, 900);
-  };
-
-  function relabelButtons(){
-    document.querySelectorAll('button').forEach(function(btn){
-      const t = (btn.textContent || '').trim();
-      if(t === 'خصم للفصل كامل') btn.textContent = 'سحب للفصل كامل';
-    });
-  }
-  const oldRefresh = window.refreshTeacherUI;
-  if(typeof oldRefresh === 'function'){
-    window.refreshTeacherUI = function(){ oldRefresh(); populateClassSelects(); relabelButtons(); syncTeacherReason(); };
-  }
-  document.addEventListener('DOMContentLoaded', function(){ populateClassSelects(); relabelButtons(); syncTeacherReason(); });
-  window.addEventListener('load', function(){ setTimeout(function(){ populateClassSelects(); relabelButtons(); syncTeacherReason(); }, 300); });
-})();
-</script>
-
-</body></html>`);
+    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}</body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
   window.printStudentReport = function(studentId){
@@ -5093,161 +4626,6 @@ window.addEventListener('load', function(){
   const prevShowPane = window.showTeacherPane;
   window.showTeacherPane = function(id, btn){ if(typeof prevShowPane==='function') prevShowPane(id, btn); if(id==='teacherPaneStudents') setTimeout(function(){ try{ renderStudentSettingsDashboard(); }catch(e){} }, 60); };
   document.addEventListener('DOMContentLoaded', function(){ setTimeout(function(){ try{ renderStudentSettingsDashboard(); }catch(e){} }, 250); });
-})();
-</script>
-
-
-<style id="teacher-reason-patch-style">
-.bulk-op-modal{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;z-index:99999;padding:18px}
-.bulk-op-modal.show{display:flex}
-.bulk-op-box{width:min(420px,100%);background:#fff;border-radius:28px;padding:18px;border:1px solid var(--line);box-shadow:0 24px 60px rgba(0,0,0,.18)}
-.bulk-op-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
-.bulk-op-head h3{margin:0;color:var(--deep);font-size:18px}
-.bulk-op-close{border:none;background:#f4f8f5;border-radius:14px;padding:10px 12px;font-weight:900;cursor:pointer}
-</style>
-<div id="bulkOpModal" class="bulk-op-modal">
-  <div class="bulk-op-box">
-    <div class="bulk-op-head"><h3 id="bulkOpTitle">عملية للفصل كامل</h3><button type="button" class="bulk-op-close" onclick="closeBulkOpModal()">✕</button></div>
-    <div class="field"><label>الفصل</label><select id="bulkClassSelect"></select></div>
-    <div class="field"><label>نوع العملية</label><select id="bulkTypeSelect" onchange="updateBulkReasonOptions()"><option value="deposit">إيداع</option><option value="withdraw">سحب</option></select></div>
-    <div class="field"><label>المبلغ</label><input id="bulkAmountInput" type="number" placeholder="أدخلي المبلغ" /></div>
-    <div class="field"><label>السبب</label><select id="bulkReasonSelect"></select></div>
-    <div class="field hidden" id="bulkReasonOtherWrap"><label>سبب آخر</label><input id="bulkReasonOther" type="text" placeholder="اكتبي السبب هنا" /></div>
-    <div class="teacher-actions">
-      <button class="btn btn-green" type="button" onclick="submitBulkOperation()">تنفيذ العملية</button>
-      <button class="btn" type="button" style="background:#eef3ef" onclick="closeBulkOpModal()">إلغاء</button>
-    </div>
-    <div id="bulkOpMsg" class="notice ok hidden">تم تنفيذ العملية للفصل كامل</div>
-    <div id="bulkOpErr" class="notice err hidden">أكملي البيانات بشكل صحيح</div>
-  </div>
-</div>
-<script>
-(function(){
-  const depositReasons = [
-    'مشاركة مميزة في الحصة','حل سؤال صعب','مساعدة زميل / زميلة','إنهاء المهمة الأدائية','تسليم الواجب مبكرًا','الحصول على درجة كاملة','الفوز في تحدي الرياضيات','ترتيب الدفتر','الالتزام والهدوء في الحصة','مبادرة إيجابية','حضور كامل الأسبوع','تميز في العمل الجماعي','أخرى'
-  ];
-  const withdrawReasons = [
-    'عدم حل الواجب','التأخر عن الحصة','كثرة الكلام أثناء الشرح','عدم إحضار الأدوات','عدم المشاركة','مخالفة تعليمات الصف','عدم تسليم المهمة الأدائية','إزعاج الزملاء','استخدام الجوال','سحب سلوكي','أخرى'
-  ];
-  function fillSelect(select, items, placeholder){
-    if(!select) return;
-    select.innerHTML = '<option value="">'+(placeholder||'اختر السبب')+'</option>' + items.map(function(item){ return '<option value="'+item+'">'+item+'</option>'; }).join('');
-  }
-  function syncTeacherReason(){
-    const type = document.getElementById('opType')?.value || 'deposit';
-    const select = document.getElementById('opReasonSelect');
-    const otherWrap = document.getElementById('opReasonOtherWrap');
-    const other = document.getElementById('opReasonOther');
-    const hidden = document.getElementById('opReason');
-    if(!select || !hidden) return;
-    const current = select.value;
-    if(type === 'withdraw') fillSelect(select, withdrawReasons, 'اختاري سبب السحب');
-    else if(type === 'deposit') fillSelect(select, depositReasons, 'اختاري سبب الإيداع');
-    else fillSelect(select, ['تحويل بين الطلاب','أخرى'], 'اختاري سبب التحويل');
-    if([...select.options].some(o=>o.value===current)) select.value = current;
-    const chosen = select.value;
-    if(chosen === 'أخرى') { otherWrap?.classList.remove('hidden'); hidden.value = (other?.value || '').trim(); }
-    else { otherWrap?.classList.add('hidden'); if(other) other.value=''; hidden.value = chosen || ''; }
-  }
-  window.updateTeacherReasonOptions = syncTeacherReason;
-  document.addEventListener('change', function(e){
-    if(e.target && e.target.id === 'opType') syncTeacherReason();
-    if(e.target && e.target.id === 'opReasonSelect') syncTeacherReason();
-    if(e.target && e.target.id === 'bulkTypeSelect') updateBulkReasonOptions();
-    if(e.target && e.target.id === 'bulkReasonSelect') updateBulkReasonOptions();
-  });
-  document.addEventListener('input', function(e){
-    if(e.target && e.target.id === 'opReasonOther'){
-      const hidden = document.getElementById('opReason');
-      if(hidden) hidden.value = (e.target.value || '').trim();
-    }
-    if(e.target && e.target.id === 'bulkReasonOther'){
-      const hidden = document.getElementById('bulkReasonHidden');
-      if(hidden) hidden.value = (e.target.value || '').trim();
-    }
-  });
-  const oldToggle = window.toggleTransferTarget;
-  if(typeof oldToggle === 'function'){
-    window.toggleTransferTarget = function(){ oldToggle(); syncTeacherReason(); };
-  }
-
-  function populateClassSelects(){
-    const classes = (window.bankData?.classes || []);
-    ['bulkClassSelect'].forEach(function(id){
-      const sel = document.getElementById(id);
-      if(!sel) return;
-      const current = sel.value;
-      sel.innerHTML = classes.map(function(c){ return '<option value="'+c.id+'">'+c.name+'</option>'; }).join('');
-      if(current && [...sel.options].some(o=>o.value===current)) sel.value = current;
-    });
-  }
-  window.updateBulkReasonOptions = function(){
-    const type = document.getElementById('bulkTypeSelect')?.value || 'deposit';
-    const select = document.getElementById('bulkReasonSelect');
-    const wrap = document.getElementById('bulkReasonOtherWrap');
-    const other = document.getElementById('bulkReasonOther');
-    if(!select) return;
-    const current = select.value;
-    fillSelect(select, type === 'withdraw' ? withdrawReasons : depositReasons, type === 'withdraw' ? 'اختاري سبب السحب' : 'اختاري سبب الإيداع');
-    if([...select.options].some(o=>o.value===current)) select.value = current;
-    if(select.value === 'أخرى') wrap?.classList.remove('hidden'); else { wrap?.classList.add('hidden'); if(other) other.value=''; }
-  };
-  window.openBulkOpModal = function(classId, type){
-    const modal = document.getElementById('bulkOpModal');
-    const classSel = document.getElementById('bulkClassSelect');
-    const typeSel = document.getElementById('bulkTypeSelect');
-    const title = document.getElementById('bulkOpTitle');
-    document.getElementById('bulkOpMsg')?.classList.add('hidden');
-    document.getElementById('bulkOpErr')?.classList.add('hidden');
-    populateClassSelects();
-    if(classSel && classId) classSel.value = classId;
-    if(typeSel && type) typeSel.value = type;
-    if(title) title.textContent = type === 'withdraw' ? 'سحب للفصل كامل' : 'إيداع للفصل كامل';
-    const amount = document.getElementById('bulkAmountInput'); if(amount) amount.value = '';
-    const other = document.getElementById('bulkReasonOther'); if(other) other.value = '';
-    updateBulkReasonOptions();
-    modal?.classList.add('show');
-  };
-  window.closeBulkOpModal = function(){ document.getElementById('bulkOpModal')?.classList.remove('show'); };
-  window.quickClassOperation = function(classId, type){ openBulkOpModal(classId, type); };
-  window.submitBulkOperation = function(){
-    const classId = document.getElementById('bulkClassSelect')?.value;
-    const type = document.getElementById('bulkTypeSelect')?.value;
-    const amount = Number(document.getElementById('bulkAmountInput')?.value || 0);
-    const reasonSel = document.getElementById('bulkReasonSelect')?.value || '';
-    const reasonOther = (document.getElementById('bulkReasonOther')?.value || '').trim();
-    const reason = reasonSel === 'أخرى' ? reasonOther : reasonSel;
-    const ok = document.getElementById('bulkOpMsg');
-    const err = document.getElementById('bulkOpErr');
-    ok?.classList.add('hidden'); err?.classList.add('hidden');
-    if(!classId || !(amount > 0) || !reason){ err?.classList.remove('hidden'); return; }
-    if(!window.bankData) return;
-    const now = new Date();
-    const date = now.toLocaleDateString('en-CA') + ' ' + now.toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'});
-    (bankData.students || []).filter(function(st){ return st.classId === classId; }).forEach(function(st){
-      st.balance = Math.max(0, Number(st.balance||0) + (type === 'deposit' ? amount : -amount));
-      if(!Array.isArray(st.history)) st.history = [];
-      st.history.push({id:'h'+Date.now()+Math.random().toString(16).slice(2,6), type:type === 'deposit' ? 'deposit' : 'withdraw', amount:Number(amount), reason:reason, date:date});
-      if(Array.isArray(bankData.operations)) bankData.operations.push({id:'op'+Date.now()+Math.random().toString(16).slice(2,6), studentId:st.id, studentName:st.name, type:type === 'deposit' ? 'deposit' : 'withdraw', amount:Number(amount), reason:reason, date:date});
-    });
-    if(typeof saveBankData === 'function') saveBankData();
-    if(typeof refreshTeacherUI === 'function') refreshTeacherUI();
-    ok?.classList.remove('hidden');
-    setTimeout(function(){ closeBulkOpModal(); }, 900);
-  };
-
-  function relabelButtons(){
-    document.querySelectorAll('button').forEach(function(btn){
-      const t = (btn.textContent || '').trim();
-      if(t === 'خصم للفصل كامل') btn.textContent = 'سحب للفصل كامل';
-    });
-  }
-  const oldRefresh = window.refreshTeacherUI;
-  if(typeof oldRefresh === 'function'){
-    window.refreshTeacherUI = function(){ oldRefresh(); populateClassSelects(); relabelButtons(); syncTeacherReason(); };
-  }
-  document.addEventListener('DOMContentLoaded', function(){ populateClassSelects(); relabelButtons(); syncTeacherReason(); });
-  window.addEventListener('load', function(){ setTimeout(function(){ populateClassSelects(); relabelButtons(); syncTeacherReason(); }, 300); });
 })();
 </script>
 
@@ -5687,162 +5065,7 @@ window.addEventListener('load', function(){
   };
   function openPrintWindow(title, bodyHtml){
     const w = window.open('', '_blank'); if(!w) return;
-    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}
-<style id="teacher-reason-patch-style">
-.bulk-op-modal{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;z-index:99999;padding:18px}
-.bulk-op-modal.show{display:flex}
-.bulk-op-box{width:min(420px,100%);background:#fff;border-radius:28px;padding:18px;border:1px solid var(--line);box-shadow:0 24px 60px rgba(0,0,0,.18)}
-.bulk-op-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
-.bulk-op-head h3{margin:0;color:var(--deep);font-size:18px}
-.bulk-op-close{border:none;background:#f4f8f5;border-radius:14px;padding:10px 12px;font-weight:900;cursor:pointer}
-</style>
-<div id="bulkOpModal" class="bulk-op-modal">
-  <div class="bulk-op-box">
-    <div class="bulk-op-head"><h3 id="bulkOpTitle">عملية للفصل كامل</h3><button type="button" class="bulk-op-close" onclick="closeBulkOpModal()">✕</button></div>
-    <div class="field"><label>الفصل</label><select id="bulkClassSelect"></select></div>
-    <div class="field"><label>نوع العملية</label><select id="bulkTypeSelect" onchange="updateBulkReasonOptions()"><option value="deposit">إيداع</option><option value="withdraw">سحب</option></select></div>
-    <div class="field"><label>المبلغ</label><input id="bulkAmountInput" type="number" placeholder="أدخلي المبلغ" /></div>
-    <div class="field"><label>السبب</label><select id="bulkReasonSelect"></select></div>
-    <div class="field hidden" id="bulkReasonOtherWrap"><label>سبب آخر</label><input id="bulkReasonOther" type="text" placeholder="اكتبي السبب هنا" /></div>
-    <div class="teacher-actions">
-      <button class="btn btn-green" type="button" onclick="submitBulkOperation()">تنفيذ العملية</button>
-      <button class="btn" type="button" style="background:#eef3ef" onclick="closeBulkOpModal()">إلغاء</button>
-    </div>
-    <div id="bulkOpMsg" class="notice ok hidden">تم تنفيذ العملية للفصل كامل</div>
-    <div id="bulkOpErr" class="notice err hidden">أكملي البيانات بشكل صحيح</div>
-  </div>
-</div>
-<script>
-(function(){
-  const depositReasons = [
-    'مشاركة مميزة في الحصة','حل سؤال صعب','مساعدة زميل / زميلة','إنهاء المهمة الأدائية','تسليم الواجب مبكرًا','الحصول على درجة كاملة','الفوز في تحدي الرياضيات','ترتيب الدفتر','الالتزام والهدوء في الحصة','مبادرة إيجابية','حضور كامل الأسبوع','تميز في العمل الجماعي','أخرى'
-  ];
-  const withdrawReasons = [
-    'عدم حل الواجب','التأخر عن الحصة','كثرة الكلام أثناء الشرح','عدم إحضار الأدوات','عدم المشاركة','مخالفة تعليمات الصف','عدم تسليم المهمة الأدائية','إزعاج الزملاء','استخدام الجوال','سحب سلوكي','أخرى'
-  ];
-  function fillSelect(select, items, placeholder){
-    if(!select) return;
-    select.innerHTML = '<option value="">'+(placeholder||'اختر السبب')+'</option>' + items.map(function(item){ return '<option value="'+item+'">'+item+'</option>'; }).join('');
-  }
-  function syncTeacherReason(){
-    const type = document.getElementById('opType')?.value || 'deposit';
-    const select = document.getElementById('opReasonSelect');
-    const otherWrap = document.getElementById('opReasonOtherWrap');
-    const other = document.getElementById('opReasonOther');
-    const hidden = document.getElementById('opReason');
-    if(!select || !hidden) return;
-    const current = select.value;
-    if(type === 'withdraw') fillSelect(select, withdrawReasons, 'اختاري سبب السحب');
-    else if(type === 'deposit') fillSelect(select, depositReasons, 'اختاري سبب الإيداع');
-    else fillSelect(select, ['تحويل بين الطلاب','أخرى'], 'اختاري سبب التحويل');
-    if([...select.options].some(o=>o.value===current)) select.value = current;
-    const chosen = select.value;
-    if(chosen === 'أخرى') { otherWrap?.classList.remove('hidden'); hidden.value = (other?.value || '').trim(); }
-    else { otherWrap?.classList.add('hidden'); if(other) other.value=''; hidden.value = chosen || ''; }
-  }
-  window.updateTeacherReasonOptions = syncTeacherReason;
-  document.addEventListener('change', function(e){
-    if(e.target && e.target.id === 'opType') syncTeacherReason();
-    if(e.target && e.target.id === 'opReasonSelect') syncTeacherReason();
-    if(e.target && e.target.id === 'bulkTypeSelect') updateBulkReasonOptions();
-    if(e.target && e.target.id === 'bulkReasonSelect') updateBulkReasonOptions();
-  });
-  document.addEventListener('input', function(e){
-    if(e.target && e.target.id === 'opReasonOther'){
-      const hidden = document.getElementById('opReason');
-      if(hidden) hidden.value = (e.target.value || '').trim();
-    }
-    if(e.target && e.target.id === 'bulkReasonOther'){
-      const hidden = document.getElementById('bulkReasonHidden');
-      if(hidden) hidden.value = (e.target.value || '').trim();
-    }
-  });
-  const oldToggle = window.toggleTransferTarget;
-  if(typeof oldToggle === 'function'){
-    window.toggleTransferTarget = function(){ oldToggle(); syncTeacherReason(); };
-  }
-
-  function populateClassSelects(){
-    const classes = (window.bankData?.classes || []);
-    ['bulkClassSelect'].forEach(function(id){
-      const sel = document.getElementById(id);
-      if(!sel) return;
-      const current = sel.value;
-      sel.innerHTML = classes.map(function(c){ return '<option value="'+c.id+'">'+c.name+'</option>'; }).join('');
-      if(current && [...sel.options].some(o=>o.value===current)) sel.value = current;
-    });
-  }
-  window.updateBulkReasonOptions = function(){
-    const type = document.getElementById('bulkTypeSelect')?.value || 'deposit';
-    const select = document.getElementById('bulkReasonSelect');
-    const wrap = document.getElementById('bulkReasonOtherWrap');
-    const other = document.getElementById('bulkReasonOther');
-    if(!select) return;
-    const current = select.value;
-    fillSelect(select, type === 'withdraw' ? withdrawReasons : depositReasons, type === 'withdraw' ? 'اختاري سبب السحب' : 'اختاري سبب الإيداع');
-    if([...select.options].some(o=>o.value===current)) select.value = current;
-    if(select.value === 'أخرى') wrap?.classList.remove('hidden'); else { wrap?.classList.add('hidden'); if(other) other.value=''; }
-  };
-  window.openBulkOpModal = function(classId, type){
-    const modal = document.getElementById('bulkOpModal');
-    const classSel = document.getElementById('bulkClassSelect');
-    const typeSel = document.getElementById('bulkTypeSelect');
-    const title = document.getElementById('bulkOpTitle');
-    document.getElementById('bulkOpMsg')?.classList.add('hidden');
-    document.getElementById('bulkOpErr')?.classList.add('hidden');
-    populateClassSelects();
-    if(classSel && classId) classSel.value = classId;
-    if(typeSel && type) typeSel.value = type;
-    if(title) title.textContent = type === 'withdraw' ? 'سحب للفصل كامل' : 'إيداع للفصل كامل';
-    const amount = document.getElementById('bulkAmountInput'); if(amount) amount.value = '';
-    const other = document.getElementById('bulkReasonOther'); if(other) other.value = '';
-    updateBulkReasonOptions();
-    modal?.classList.add('show');
-  };
-  window.closeBulkOpModal = function(){ document.getElementById('bulkOpModal')?.classList.remove('show'); };
-  window.quickClassOperation = function(classId, type){ openBulkOpModal(classId, type); };
-  window.submitBulkOperation = function(){
-    const classId = document.getElementById('bulkClassSelect')?.value;
-    const type = document.getElementById('bulkTypeSelect')?.value;
-    const amount = Number(document.getElementById('bulkAmountInput')?.value || 0);
-    const reasonSel = document.getElementById('bulkReasonSelect')?.value || '';
-    const reasonOther = (document.getElementById('bulkReasonOther')?.value || '').trim();
-    const reason = reasonSel === 'أخرى' ? reasonOther : reasonSel;
-    const ok = document.getElementById('bulkOpMsg');
-    const err = document.getElementById('bulkOpErr');
-    ok?.classList.add('hidden'); err?.classList.add('hidden');
-    if(!classId || !(amount > 0) || !reason){ err?.classList.remove('hidden'); return; }
-    if(!window.bankData) return;
-    const now = new Date();
-    const date = now.toLocaleDateString('en-CA') + ' ' + now.toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'});
-    (bankData.students || []).filter(function(st){ return st.classId === classId; }).forEach(function(st){
-      st.balance = Math.max(0, Number(st.balance||0) + (type === 'deposit' ? amount : -amount));
-      if(!Array.isArray(st.history)) st.history = [];
-      st.history.push({id:'h'+Date.now()+Math.random().toString(16).slice(2,6), type:type === 'deposit' ? 'deposit' : 'withdraw', amount:Number(amount), reason:reason, date:date});
-      if(Array.isArray(bankData.operations)) bankData.operations.push({id:'op'+Date.now()+Math.random().toString(16).slice(2,6), studentId:st.id, studentName:st.name, type:type === 'deposit' ? 'deposit' : 'withdraw', amount:Number(amount), reason:reason, date:date});
-    });
-    if(typeof saveBankData === 'function') saveBankData();
-    if(typeof refreshTeacherUI === 'function') refreshTeacherUI();
-    ok?.classList.remove('hidden');
-    setTimeout(function(){ closeBulkOpModal(); }, 900);
-  };
-
-  function relabelButtons(){
-    document.querySelectorAll('button').forEach(function(btn){
-      const t = (btn.textContent || '').trim();
-      if(t === 'خصم للفصل كامل') btn.textContent = 'سحب للفصل كامل';
-    });
-  }
-  const oldRefresh = window.refreshTeacherUI;
-  if(typeof oldRefresh === 'function'){
-    window.refreshTeacherUI = function(){ oldRefresh(); populateClassSelects(); relabelButtons(); syncTeacherReason(); };
-  }
-  document.addEventListener('DOMContentLoaded', function(){ populateClassSelects(); relabelButtons(); syncTeacherReason(); });
-  window.addEventListener('load', function(){ setTimeout(function(){ populateClassSelects(); relabelButtons(); syncTeacherReason(); }, 300); });
-})();
-</script>
-
-</body></html>`);
+    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}</body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
   window.printStudentReport = function(studentId){
@@ -5863,161 +5086,6 @@ window.addEventListener('load', function(){
   const prevShowPane = window.showTeacherPane;
   window.showTeacherPane = function(id, btn){ if(typeof prevShowPane==='function') prevShowPane(id, btn); if(id==='teacherPaneStudents') setTimeout(function(){ try{ renderStudentSettingsDashboard(); }catch(e){} }, 60); };
   document.addEventListener('DOMContentLoaded', function(){ setTimeout(function(){ try{ renderStudentSettingsDashboard(); }catch(e){} }, 250); });
-})();
-</script>
-
-
-<style id="teacher-reason-patch-style">
-.bulk-op-modal{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;z-index:99999;padding:18px}
-.bulk-op-modal.show{display:flex}
-.bulk-op-box{width:min(420px,100%);background:#fff;border-radius:28px;padding:18px;border:1px solid var(--line);box-shadow:0 24px 60px rgba(0,0,0,.18)}
-.bulk-op-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
-.bulk-op-head h3{margin:0;color:var(--deep);font-size:18px}
-.bulk-op-close{border:none;background:#f4f8f5;border-radius:14px;padding:10px 12px;font-weight:900;cursor:pointer}
-</style>
-<div id="bulkOpModal" class="bulk-op-modal">
-  <div class="bulk-op-box">
-    <div class="bulk-op-head"><h3 id="bulkOpTitle">عملية للفصل كامل</h3><button type="button" class="bulk-op-close" onclick="closeBulkOpModal()">✕</button></div>
-    <div class="field"><label>الفصل</label><select id="bulkClassSelect"></select></div>
-    <div class="field"><label>نوع العملية</label><select id="bulkTypeSelect" onchange="updateBulkReasonOptions()"><option value="deposit">إيداع</option><option value="withdraw">سحب</option></select></div>
-    <div class="field"><label>المبلغ</label><input id="bulkAmountInput" type="number" placeholder="أدخلي المبلغ" /></div>
-    <div class="field"><label>السبب</label><select id="bulkReasonSelect"></select></div>
-    <div class="field hidden" id="bulkReasonOtherWrap"><label>سبب آخر</label><input id="bulkReasonOther" type="text" placeholder="اكتبي السبب هنا" /></div>
-    <div class="teacher-actions">
-      <button class="btn btn-green" type="button" onclick="submitBulkOperation()">تنفيذ العملية</button>
-      <button class="btn" type="button" style="background:#eef3ef" onclick="closeBulkOpModal()">إلغاء</button>
-    </div>
-    <div id="bulkOpMsg" class="notice ok hidden">تم تنفيذ العملية للفصل كامل</div>
-    <div id="bulkOpErr" class="notice err hidden">أكملي البيانات بشكل صحيح</div>
-  </div>
-</div>
-<script>
-(function(){
-  const depositReasons = [
-    'مشاركة مميزة في الحصة','حل سؤال صعب','مساعدة زميل / زميلة','إنهاء المهمة الأدائية','تسليم الواجب مبكرًا','الحصول على درجة كاملة','الفوز في تحدي الرياضيات','ترتيب الدفتر','الالتزام والهدوء في الحصة','مبادرة إيجابية','حضور كامل الأسبوع','تميز في العمل الجماعي','أخرى'
-  ];
-  const withdrawReasons = [
-    'عدم حل الواجب','التأخر عن الحصة','كثرة الكلام أثناء الشرح','عدم إحضار الأدوات','عدم المشاركة','مخالفة تعليمات الصف','عدم تسليم المهمة الأدائية','إزعاج الزملاء','استخدام الجوال','سحب سلوكي','أخرى'
-  ];
-  function fillSelect(select, items, placeholder){
-    if(!select) return;
-    select.innerHTML = '<option value="">'+(placeholder||'اختر السبب')+'</option>' + items.map(function(item){ return '<option value="'+item+'">'+item+'</option>'; }).join('');
-  }
-  function syncTeacherReason(){
-    const type = document.getElementById('opType')?.value || 'deposit';
-    const select = document.getElementById('opReasonSelect');
-    const otherWrap = document.getElementById('opReasonOtherWrap');
-    const other = document.getElementById('opReasonOther');
-    const hidden = document.getElementById('opReason');
-    if(!select || !hidden) return;
-    const current = select.value;
-    if(type === 'withdraw') fillSelect(select, withdrawReasons, 'اختاري سبب السحب');
-    else if(type === 'deposit') fillSelect(select, depositReasons, 'اختاري سبب الإيداع');
-    else fillSelect(select, ['تحويل بين الطلاب','أخرى'], 'اختاري سبب التحويل');
-    if([...select.options].some(o=>o.value===current)) select.value = current;
-    const chosen = select.value;
-    if(chosen === 'أخرى') { otherWrap?.classList.remove('hidden'); hidden.value = (other?.value || '').trim(); }
-    else { otherWrap?.classList.add('hidden'); if(other) other.value=''; hidden.value = chosen || ''; }
-  }
-  window.updateTeacherReasonOptions = syncTeacherReason;
-  document.addEventListener('change', function(e){
-    if(e.target && e.target.id === 'opType') syncTeacherReason();
-    if(e.target && e.target.id === 'opReasonSelect') syncTeacherReason();
-    if(e.target && e.target.id === 'bulkTypeSelect') updateBulkReasonOptions();
-    if(e.target && e.target.id === 'bulkReasonSelect') updateBulkReasonOptions();
-  });
-  document.addEventListener('input', function(e){
-    if(e.target && e.target.id === 'opReasonOther'){
-      const hidden = document.getElementById('opReason');
-      if(hidden) hidden.value = (e.target.value || '').trim();
-    }
-    if(e.target && e.target.id === 'bulkReasonOther'){
-      const hidden = document.getElementById('bulkReasonHidden');
-      if(hidden) hidden.value = (e.target.value || '').trim();
-    }
-  });
-  const oldToggle = window.toggleTransferTarget;
-  if(typeof oldToggle === 'function'){
-    window.toggleTransferTarget = function(){ oldToggle(); syncTeacherReason(); };
-  }
-
-  function populateClassSelects(){
-    const classes = (window.bankData?.classes || []);
-    ['bulkClassSelect'].forEach(function(id){
-      const sel = document.getElementById(id);
-      if(!sel) return;
-      const current = sel.value;
-      sel.innerHTML = classes.map(function(c){ return '<option value="'+c.id+'">'+c.name+'</option>'; }).join('');
-      if(current && [...sel.options].some(o=>o.value===current)) sel.value = current;
-    });
-  }
-  window.updateBulkReasonOptions = function(){
-    const type = document.getElementById('bulkTypeSelect')?.value || 'deposit';
-    const select = document.getElementById('bulkReasonSelect');
-    const wrap = document.getElementById('bulkReasonOtherWrap');
-    const other = document.getElementById('bulkReasonOther');
-    if(!select) return;
-    const current = select.value;
-    fillSelect(select, type === 'withdraw' ? withdrawReasons : depositReasons, type === 'withdraw' ? 'اختاري سبب السحب' : 'اختاري سبب الإيداع');
-    if([...select.options].some(o=>o.value===current)) select.value = current;
-    if(select.value === 'أخرى') wrap?.classList.remove('hidden'); else { wrap?.classList.add('hidden'); if(other) other.value=''; }
-  };
-  window.openBulkOpModal = function(classId, type){
-    const modal = document.getElementById('bulkOpModal');
-    const classSel = document.getElementById('bulkClassSelect');
-    const typeSel = document.getElementById('bulkTypeSelect');
-    const title = document.getElementById('bulkOpTitle');
-    document.getElementById('bulkOpMsg')?.classList.add('hidden');
-    document.getElementById('bulkOpErr')?.classList.add('hidden');
-    populateClassSelects();
-    if(classSel && classId) classSel.value = classId;
-    if(typeSel && type) typeSel.value = type;
-    if(title) title.textContent = type === 'withdraw' ? 'سحب للفصل كامل' : 'إيداع للفصل كامل';
-    const amount = document.getElementById('bulkAmountInput'); if(amount) amount.value = '';
-    const other = document.getElementById('bulkReasonOther'); if(other) other.value = '';
-    updateBulkReasonOptions();
-    modal?.classList.add('show');
-  };
-  window.closeBulkOpModal = function(){ document.getElementById('bulkOpModal')?.classList.remove('show'); };
-  window.quickClassOperation = function(classId, type){ openBulkOpModal(classId, type); };
-  window.submitBulkOperation = function(){
-    const classId = document.getElementById('bulkClassSelect')?.value;
-    const type = document.getElementById('bulkTypeSelect')?.value;
-    const amount = Number(document.getElementById('bulkAmountInput')?.value || 0);
-    const reasonSel = document.getElementById('bulkReasonSelect')?.value || '';
-    const reasonOther = (document.getElementById('bulkReasonOther')?.value || '').trim();
-    const reason = reasonSel === 'أخرى' ? reasonOther : reasonSel;
-    const ok = document.getElementById('bulkOpMsg');
-    const err = document.getElementById('bulkOpErr');
-    ok?.classList.add('hidden'); err?.classList.add('hidden');
-    if(!classId || !(amount > 0) || !reason){ err?.classList.remove('hidden'); return; }
-    if(!window.bankData) return;
-    const now = new Date();
-    const date = now.toLocaleDateString('en-CA') + ' ' + now.toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'});
-    (bankData.students || []).filter(function(st){ return st.classId === classId; }).forEach(function(st){
-      st.balance = Math.max(0, Number(st.balance||0) + (type === 'deposit' ? amount : -amount));
-      if(!Array.isArray(st.history)) st.history = [];
-      st.history.push({id:'h'+Date.now()+Math.random().toString(16).slice(2,6), type:type === 'deposit' ? 'deposit' : 'withdraw', amount:Number(amount), reason:reason, date:date});
-      if(Array.isArray(bankData.operations)) bankData.operations.push({id:'op'+Date.now()+Math.random().toString(16).slice(2,6), studentId:st.id, studentName:st.name, type:type === 'deposit' ? 'deposit' : 'withdraw', amount:Number(amount), reason:reason, date:date});
-    });
-    if(typeof saveBankData === 'function') saveBankData();
-    if(typeof refreshTeacherUI === 'function') refreshTeacherUI();
-    ok?.classList.remove('hidden');
-    setTimeout(function(){ closeBulkOpModal(); }, 900);
-  };
-
-  function relabelButtons(){
-    document.querySelectorAll('button').forEach(function(btn){
-      const t = (btn.textContent || '').trim();
-      if(t === 'خصم للفصل كامل') btn.textContent = 'سحب للفصل كامل';
-    });
-  }
-  const oldRefresh = window.refreshTeacherUI;
-  if(typeof oldRefresh === 'function'){
-    window.refreshTeacherUI = function(){ oldRefresh(); populateClassSelects(); relabelButtons(); syncTeacherReason(); };
-  }
-  document.addEventListener('DOMContentLoaded', function(){ populateClassSelects(); relabelButtons(); syncTeacherReason(); });
-  window.addEventListener('load', function(){ setTimeout(function(){ populateClassSelects(); relabelButtons(); syncTeacherReason(); }, 300); });
 })();
 </script>
 
@@ -6346,162 +5414,7 @@ window.addEventListener('load', function(){
   };
   function openPrintWindow(title, bodyHtml){
     const w = window.open('', '_blank'); if(!w) return;
-    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}
-<style id="teacher-reason-patch-style">
-.bulk-op-modal{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;z-index:99999;padding:18px}
-.bulk-op-modal.show{display:flex}
-.bulk-op-box{width:min(420px,100%);background:#fff;border-radius:28px;padding:18px;border:1px solid var(--line);box-shadow:0 24px 60px rgba(0,0,0,.18)}
-.bulk-op-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
-.bulk-op-head h3{margin:0;color:var(--deep);font-size:18px}
-.bulk-op-close{border:none;background:#f4f8f5;border-radius:14px;padding:10px 12px;font-weight:900;cursor:pointer}
-</style>
-<div id="bulkOpModal" class="bulk-op-modal">
-  <div class="bulk-op-box">
-    <div class="bulk-op-head"><h3 id="bulkOpTitle">عملية للفصل كامل</h3><button type="button" class="bulk-op-close" onclick="closeBulkOpModal()">✕</button></div>
-    <div class="field"><label>الفصل</label><select id="bulkClassSelect"></select></div>
-    <div class="field"><label>نوع العملية</label><select id="bulkTypeSelect" onchange="updateBulkReasonOptions()"><option value="deposit">إيداع</option><option value="withdraw">سحب</option></select></div>
-    <div class="field"><label>المبلغ</label><input id="bulkAmountInput" type="number" placeholder="أدخلي المبلغ" /></div>
-    <div class="field"><label>السبب</label><select id="bulkReasonSelect"></select></div>
-    <div class="field hidden" id="bulkReasonOtherWrap"><label>سبب آخر</label><input id="bulkReasonOther" type="text" placeholder="اكتبي السبب هنا" /></div>
-    <div class="teacher-actions">
-      <button class="btn btn-green" type="button" onclick="submitBulkOperation()">تنفيذ العملية</button>
-      <button class="btn" type="button" style="background:#eef3ef" onclick="closeBulkOpModal()">إلغاء</button>
-    </div>
-    <div id="bulkOpMsg" class="notice ok hidden">تم تنفيذ العملية للفصل كامل</div>
-    <div id="bulkOpErr" class="notice err hidden">أكملي البيانات بشكل صحيح</div>
-  </div>
-</div>
-<script>
-(function(){
-  const depositReasons = [
-    'مشاركة مميزة في الحصة','حل سؤال صعب','مساعدة زميل / زميلة','إنهاء المهمة الأدائية','تسليم الواجب مبكرًا','الحصول على درجة كاملة','الفوز في تحدي الرياضيات','ترتيب الدفتر','الالتزام والهدوء في الحصة','مبادرة إيجابية','حضور كامل الأسبوع','تميز في العمل الجماعي','أخرى'
-  ];
-  const withdrawReasons = [
-    'عدم حل الواجب','التأخر عن الحصة','كثرة الكلام أثناء الشرح','عدم إحضار الأدوات','عدم المشاركة','مخالفة تعليمات الصف','عدم تسليم المهمة الأدائية','إزعاج الزملاء','استخدام الجوال','سحب سلوكي','أخرى'
-  ];
-  function fillSelect(select, items, placeholder){
-    if(!select) return;
-    select.innerHTML = '<option value="">'+(placeholder||'اختر السبب')+'</option>' + items.map(function(item){ return '<option value="'+item+'">'+item+'</option>'; }).join('');
-  }
-  function syncTeacherReason(){
-    const type = document.getElementById('opType')?.value || 'deposit';
-    const select = document.getElementById('opReasonSelect');
-    const otherWrap = document.getElementById('opReasonOtherWrap');
-    const other = document.getElementById('opReasonOther');
-    const hidden = document.getElementById('opReason');
-    if(!select || !hidden) return;
-    const current = select.value;
-    if(type === 'withdraw') fillSelect(select, withdrawReasons, 'اختاري سبب السحب');
-    else if(type === 'deposit') fillSelect(select, depositReasons, 'اختاري سبب الإيداع');
-    else fillSelect(select, ['تحويل بين الطلاب','أخرى'], 'اختاري سبب التحويل');
-    if([...select.options].some(o=>o.value===current)) select.value = current;
-    const chosen = select.value;
-    if(chosen === 'أخرى') { otherWrap?.classList.remove('hidden'); hidden.value = (other?.value || '').trim(); }
-    else { otherWrap?.classList.add('hidden'); if(other) other.value=''; hidden.value = chosen || ''; }
-  }
-  window.updateTeacherReasonOptions = syncTeacherReason;
-  document.addEventListener('change', function(e){
-    if(e.target && e.target.id === 'opType') syncTeacherReason();
-    if(e.target && e.target.id === 'opReasonSelect') syncTeacherReason();
-    if(e.target && e.target.id === 'bulkTypeSelect') updateBulkReasonOptions();
-    if(e.target && e.target.id === 'bulkReasonSelect') updateBulkReasonOptions();
-  });
-  document.addEventListener('input', function(e){
-    if(e.target && e.target.id === 'opReasonOther'){
-      const hidden = document.getElementById('opReason');
-      if(hidden) hidden.value = (e.target.value || '').trim();
-    }
-    if(e.target && e.target.id === 'bulkReasonOther'){
-      const hidden = document.getElementById('bulkReasonHidden');
-      if(hidden) hidden.value = (e.target.value || '').trim();
-    }
-  });
-  const oldToggle = window.toggleTransferTarget;
-  if(typeof oldToggle === 'function'){
-    window.toggleTransferTarget = function(){ oldToggle(); syncTeacherReason(); };
-  }
-
-  function populateClassSelects(){
-    const classes = (window.bankData?.classes || []);
-    ['bulkClassSelect'].forEach(function(id){
-      const sel = document.getElementById(id);
-      if(!sel) return;
-      const current = sel.value;
-      sel.innerHTML = classes.map(function(c){ return '<option value="'+c.id+'">'+c.name+'</option>'; }).join('');
-      if(current && [...sel.options].some(o=>o.value===current)) sel.value = current;
-    });
-  }
-  window.updateBulkReasonOptions = function(){
-    const type = document.getElementById('bulkTypeSelect')?.value || 'deposit';
-    const select = document.getElementById('bulkReasonSelect');
-    const wrap = document.getElementById('bulkReasonOtherWrap');
-    const other = document.getElementById('bulkReasonOther');
-    if(!select) return;
-    const current = select.value;
-    fillSelect(select, type === 'withdraw' ? withdrawReasons : depositReasons, type === 'withdraw' ? 'اختاري سبب السحب' : 'اختاري سبب الإيداع');
-    if([...select.options].some(o=>o.value===current)) select.value = current;
-    if(select.value === 'أخرى') wrap?.classList.remove('hidden'); else { wrap?.classList.add('hidden'); if(other) other.value=''; }
-  };
-  window.openBulkOpModal = function(classId, type){
-    const modal = document.getElementById('bulkOpModal');
-    const classSel = document.getElementById('bulkClassSelect');
-    const typeSel = document.getElementById('bulkTypeSelect');
-    const title = document.getElementById('bulkOpTitle');
-    document.getElementById('bulkOpMsg')?.classList.add('hidden');
-    document.getElementById('bulkOpErr')?.classList.add('hidden');
-    populateClassSelects();
-    if(classSel && classId) classSel.value = classId;
-    if(typeSel && type) typeSel.value = type;
-    if(title) title.textContent = type === 'withdraw' ? 'سحب للفصل كامل' : 'إيداع للفصل كامل';
-    const amount = document.getElementById('bulkAmountInput'); if(amount) amount.value = '';
-    const other = document.getElementById('bulkReasonOther'); if(other) other.value = '';
-    updateBulkReasonOptions();
-    modal?.classList.add('show');
-  };
-  window.closeBulkOpModal = function(){ document.getElementById('bulkOpModal')?.classList.remove('show'); };
-  window.quickClassOperation = function(classId, type){ openBulkOpModal(classId, type); };
-  window.submitBulkOperation = function(){
-    const classId = document.getElementById('bulkClassSelect')?.value;
-    const type = document.getElementById('bulkTypeSelect')?.value;
-    const amount = Number(document.getElementById('bulkAmountInput')?.value || 0);
-    const reasonSel = document.getElementById('bulkReasonSelect')?.value || '';
-    const reasonOther = (document.getElementById('bulkReasonOther')?.value || '').trim();
-    const reason = reasonSel === 'أخرى' ? reasonOther : reasonSel;
-    const ok = document.getElementById('bulkOpMsg');
-    const err = document.getElementById('bulkOpErr');
-    ok?.classList.add('hidden'); err?.classList.add('hidden');
-    if(!classId || !(amount > 0) || !reason){ err?.classList.remove('hidden'); return; }
-    if(!window.bankData) return;
-    const now = new Date();
-    const date = now.toLocaleDateString('en-CA') + ' ' + now.toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'});
-    (bankData.students || []).filter(function(st){ return st.classId === classId; }).forEach(function(st){
-      st.balance = Math.max(0, Number(st.balance||0) + (type === 'deposit' ? amount : -amount));
-      if(!Array.isArray(st.history)) st.history = [];
-      st.history.push({id:'h'+Date.now()+Math.random().toString(16).slice(2,6), type:type === 'deposit' ? 'deposit' : 'withdraw', amount:Number(amount), reason:reason, date:date});
-      if(Array.isArray(bankData.operations)) bankData.operations.push({id:'op'+Date.now()+Math.random().toString(16).slice(2,6), studentId:st.id, studentName:st.name, type:type === 'deposit' ? 'deposit' : 'withdraw', amount:Number(amount), reason:reason, date:date});
-    });
-    if(typeof saveBankData === 'function') saveBankData();
-    if(typeof refreshTeacherUI === 'function') refreshTeacherUI();
-    ok?.classList.remove('hidden');
-    setTimeout(function(){ closeBulkOpModal(); }, 900);
-  };
-
-  function relabelButtons(){
-    document.querySelectorAll('button').forEach(function(btn){
-      const t = (btn.textContent || '').trim();
-      if(t === 'خصم للفصل كامل') btn.textContent = 'سحب للفصل كامل';
-    });
-  }
-  const oldRefresh = window.refreshTeacherUI;
-  if(typeof oldRefresh === 'function'){
-    window.refreshTeacherUI = function(){ oldRefresh(); populateClassSelects(); relabelButtons(); syncTeacherReason(); };
-  }
-  document.addEventListener('DOMContentLoaded', function(){ populateClassSelects(); relabelButtons(); syncTeacherReason(); });
-  window.addEventListener('load', function(){ setTimeout(function(){ populateClassSelects(); relabelButtons(); syncTeacherReason(); }, 300); });
-})();
-</script>
-
-</body></html>`);
+    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}</body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
   window.printStudentReport = function(studentId){
@@ -6522,161 +5435,6 @@ window.addEventListener('load', function(){
   const prevShowPane = window.showTeacherPane;
   window.showTeacherPane = function(id, btn){ if(typeof prevShowPane==='function') prevShowPane(id, btn); if(id==='teacherPaneStudents') setTimeout(function(){ try{ renderStudentSettingsDashboard(); }catch(e){} }, 60); };
   document.addEventListener('DOMContentLoaded', function(){ setTimeout(function(){ try{ renderStudentSettingsDashboard(); }catch(e){} }, 250); });
-})();
-</script>
-
-
-<style id="teacher-reason-patch-style">
-.bulk-op-modal{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;z-index:99999;padding:18px}
-.bulk-op-modal.show{display:flex}
-.bulk-op-box{width:min(420px,100%);background:#fff;border-radius:28px;padding:18px;border:1px solid var(--line);box-shadow:0 24px 60px rgba(0,0,0,.18)}
-.bulk-op-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
-.bulk-op-head h3{margin:0;color:var(--deep);font-size:18px}
-.bulk-op-close{border:none;background:#f4f8f5;border-radius:14px;padding:10px 12px;font-weight:900;cursor:pointer}
-</style>
-<div id="bulkOpModal" class="bulk-op-modal">
-  <div class="bulk-op-box">
-    <div class="bulk-op-head"><h3 id="bulkOpTitle">عملية للفصل كامل</h3><button type="button" class="bulk-op-close" onclick="closeBulkOpModal()">✕</button></div>
-    <div class="field"><label>الفصل</label><select id="bulkClassSelect"></select></div>
-    <div class="field"><label>نوع العملية</label><select id="bulkTypeSelect" onchange="updateBulkReasonOptions()"><option value="deposit">إيداع</option><option value="withdraw">سحب</option></select></div>
-    <div class="field"><label>المبلغ</label><input id="bulkAmountInput" type="number" placeholder="أدخلي المبلغ" /></div>
-    <div class="field"><label>السبب</label><select id="bulkReasonSelect"></select></div>
-    <div class="field hidden" id="bulkReasonOtherWrap"><label>سبب آخر</label><input id="bulkReasonOther" type="text" placeholder="اكتبي السبب هنا" /></div>
-    <div class="teacher-actions">
-      <button class="btn btn-green" type="button" onclick="submitBulkOperation()">تنفيذ العملية</button>
-      <button class="btn" type="button" style="background:#eef3ef" onclick="closeBulkOpModal()">إلغاء</button>
-    </div>
-    <div id="bulkOpMsg" class="notice ok hidden">تم تنفيذ العملية للفصل كامل</div>
-    <div id="bulkOpErr" class="notice err hidden">أكملي البيانات بشكل صحيح</div>
-  </div>
-</div>
-<script>
-(function(){
-  const depositReasons = [
-    'مشاركة مميزة في الحصة','حل سؤال صعب','مساعدة زميل / زميلة','إنهاء المهمة الأدائية','تسليم الواجب مبكرًا','الحصول على درجة كاملة','الفوز في تحدي الرياضيات','ترتيب الدفتر','الالتزام والهدوء في الحصة','مبادرة إيجابية','حضور كامل الأسبوع','تميز في العمل الجماعي','أخرى'
-  ];
-  const withdrawReasons = [
-    'عدم حل الواجب','التأخر عن الحصة','كثرة الكلام أثناء الشرح','عدم إحضار الأدوات','عدم المشاركة','مخالفة تعليمات الصف','عدم تسليم المهمة الأدائية','إزعاج الزملاء','استخدام الجوال','سحب سلوكي','أخرى'
-  ];
-  function fillSelect(select, items, placeholder){
-    if(!select) return;
-    select.innerHTML = '<option value="">'+(placeholder||'اختر السبب')+'</option>' + items.map(function(item){ return '<option value="'+item+'">'+item+'</option>'; }).join('');
-  }
-  function syncTeacherReason(){
-    const type = document.getElementById('opType')?.value || 'deposit';
-    const select = document.getElementById('opReasonSelect');
-    const otherWrap = document.getElementById('opReasonOtherWrap');
-    const other = document.getElementById('opReasonOther');
-    const hidden = document.getElementById('opReason');
-    if(!select || !hidden) return;
-    const current = select.value;
-    if(type === 'withdraw') fillSelect(select, withdrawReasons, 'اختاري سبب السحب');
-    else if(type === 'deposit') fillSelect(select, depositReasons, 'اختاري سبب الإيداع');
-    else fillSelect(select, ['تحويل بين الطلاب','أخرى'], 'اختاري سبب التحويل');
-    if([...select.options].some(o=>o.value===current)) select.value = current;
-    const chosen = select.value;
-    if(chosen === 'أخرى') { otherWrap?.classList.remove('hidden'); hidden.value = (other?.value || '').trim(); }
-    else { otherWrap?.classList.add('hidden'); if(other) other.value=''; hidden.value = chosen || ''; }
-  }
-  window.updateTeacherReasonOptions = syncTeacherReason;
-  document.addEventListener('change', function(e){
-    if(e.target && e.target.id === 'opType') syncTeacherReason();
-    if(e.target && e.target.id === 'opReasonSelect') syncTeacherReason();
-    if(e.target && e.target.id === 'bulkTypeSelect') updateBulkReasonOptions();
-    if(e.target && e.target.id === 'bulkReasonSelect') updateBulkReasonOptions();
-  });
-  document.addEventListener('input', function(e){
-    if(e.target && e.target.id === 'opReasonOther'){
-      const hidden = document.getElementById('opReason');
-      if(hidden) hidden.value = (e.target.value || '').trim();
-    }
-    if(e.target && e.target.id === 'bulkReasonOther'){
-      const hidden = document.getElementById('bulkReasonHidden');
-      if(hidden) hidden.value = (e.target.value || '').trim();
-    }
-  });
-  const oldToggle = window.toggleTransferTarget;
-  if(typeof oldToggle === 'function'){
-    window.toggleTransferTarget = function(){ oldToggle(); syncTeacherReason(); };
-  }
-
-  function populateClassSelects(){
-    const classes = (window.bankData?.classes || []);
-    ['bulkClassSelect'].forEach(function(id){
-      const sel = document.getElementById(id);
-      if(!sel) return;
-      const current = sel.value;
-      sel.innerHTML = classes.map(function(c){ return '<option value="'+c.id+'">'+c.name+'</option>'; }).join('');
-      if(current && [...sel.options].some(o=>o.value===current)) sel.value = current;
-    });
-  }
-  window.updateBulkReasonOptions = function(){
-    const type = document.getElementById('bulkTypeSelect')?.value || 'deposit';
-    const select = document.getElementById('bulkReasonSelect');
-    const wrap = document.getElementById('bulkReasonOtherWrap');
-    const other = document.getElementById('bulkReasonOther');
-    if(!select) return;
-    const current = select.value;
-    fillSelect(select, type === 'withdraw' ? withdrawReasons : depositReasons, type === 'withdraw' ? 'اختاري سبب السحب' : 'اختاري سبب الإيداع');
-    if([...select.options].some(o=>o.value===current)) select.value = current;
-    if(select.value === 'أخرى') wrap?.classList.remove('hidden'); else { wrap?.classList.add('hidden'); if(other) other.value=''; }
-  };
-  window.openBulkOpModal = function(classId, type){
-    const modal = document.getElementById('bulkOpModal');
-    const classSel = document.getElementById('bulkClassSelect');
-    const typeSel = document.getElementById('bulkTypeSelect');
-    const title = document.getElementById('bulkOpTitle');
-    document.getElementById('bulkOpMsg')?.classList.add('hidden');
-    document.getElementById('bulkOpErr')?.classList.add('hidden');
-    populateClassSelects();
-    if(classSel && classId) classSel.value = classId;
-    if(typeSel && type) typeSel.value = type;
-    if(title) title.textContent = type === 'withdraw' ? 'سحب للفصل كامل' : 'إيداع للفصل كامل';
-    const amount = document.getElementById('bulkAmountInput'); if(amount) amount.value = '';
-    const other = document.getElementById('bulkReasonOther'); if(other) other.value = '';
-    updateBulkReasonOptions();
-    modal?.classList.add('show');
-  };
-  window.closeBulkOpModal = function(){ document.getElementById('bulkOpModal')?.classList.remove('show'); };
-  window.quickClassOperation = function(classId, type){ openBulkOpModal(classId, type); };
-  window.submitBulkOperation = function(){
-    const classId = document.getElementById('bulkClassSelect')?.value;
-    const type = document.getElementById('bulkTypeSelect')?.value;
-    const amount = Number(document.getElementById('bulkAmountInput')?.value || 0);
-    const reasonSel = document.getElementById('bulkReasonSelect')?.value || '';
-    const reasonOther = (document.getElementById('bulkReasonOther')?.value || '').trim();
-    const reason = reasonSel === 'أخرى' ? reasonOther : reasonSel;
-    const ok = document.getElementById('bulkOpMsg');
-    const err = document.getElementById('bulkOpErr');
-    ok?.classList.add('hidden'); err?.classList.add('hidden');
-    if(!classId || !(amount > 0) || !reason){ err?.classList.remove('hidden'); return; }
-    if(!window.bankData) return;
-    const now = new Date();
-    const date = now.toLocaleDateString('en-CA') + ' ' + now.toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'});
-    (bankData.students || []).filter(function(st){ return st.classId === classId; }).forEach(function(st){
-      st.balance = Math.max(0, Number(st.balance||0) + (type === 'deposit' ? amount : -amount));
-      if(!Array.isArray(st.history)) st.history = [];
-      st.history.push({id:'h'+Date.now()+Math.random().toString(16).slice(2,6), type:type === 'deposit' ? 'deposit' : 'withdraw', amount:Number(amount), reason:reason, date:date});
-      if(Array.isArray(bankData.operations)) bankData.operations.push({id:'op'+Date.now()+Math.random().toString(16).slice(2,6), studentId:st.id, studentName:st.name, type:type === 'deposit' ? 'deposit' : 'withdraw', amount:Number(amount), reason:reason, date:date});
-    });
-    if(typeof saveBankData === 'function') saveBankData();
-    if(typeof refreshTeacherUI === 'function') refreshTeacherUI();
-    ok?.classList.remove('hidden');
-    setTimeout(function(){ closeBulkOpModal(); }, 900);
-  };
-
-  function relabelButtons(){
-    document.querySelectorAll('button').forEach(function(btn){
-      const t = (btn.textContent || '').trim();
-      if(t === 'خصم للفصل كامل') btn.textContent = 'سحب للفصل كامل';
-    });
-  }
-  const oldRefresh = window.refreshTeacherUI;
-  if(typeof oldRefresh === 'function'){
-    window.refreshTeacherUI = function(){ oldRefresh(); populateClassSelects(); relabelButtons(); syncTeacherReason(); };
-  }
-  document.addEventListener('DOMContentLoaded', function(){ populateClassSelects(); relabelButtons(); syncTeacherReason(); });
-  window.addEventListener('load', function(){ setTimeout(function(){ populateClassSelects(); relabelButtons(); syncTeacherReason(); }, 300); });
 })();
 </script>
 
@@ -7227,162 +5985,7 @@ window.addEventListener('load', function(){
   };
   function openPrintWindow(title, bodyHtml){
     const w = window.open('', '_blank'); if(!w) return;
-    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}
-<style id="teacher-reason-patch-style">
-.bulk-op-modal{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;z-index:99999;padding:18px}
-.bulk-op-modal.show{display:flex}
-.bulk-op-box{width:min(420px,100%);background:#fff;border-radius:28px;padding:18px;border:1px solid var(--line);box-shadow:0 24px 60px rgba(0,0,0,.18)}
-.bulk-op-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
-.bulk-op-head h3{margin:0;color:var(--deep);font-size:18px}
-.bulk-op-close{border:none;background:#f4f8f5;border-radius:14px;padding:10px 12px;font-weight:900;cursor:pointer}
-</style>
-<div id="bulkOpModal" class="bulk-op-modal">
-  <div class="bulk-op-box">
-    <div class="bulk-op-head"><h3 id="bulkOpTitle">عملية للفصل كامل</h3><button type="button" class="bulk-op-close" onclick="closeBulkOpModal()">✕</button></div>
-    <div class="field"><label>الفصل</label><select id="bulkClassSelect"></select></div>
-    <div class="field"><label>نوع العملية</label><select id="bulkTypeSelect" onchange="updateBulkReasonOptions()"><option value="deposit">إيداع</option><option value="withdraw">سحب</option></select></div>
-    <div class="field"><label>المبلغ</label><input id="bulkAmountInput" type="number" placeholder="أدخلي المبلغ" /></div>
-    <div class="field"><label>السبب</label><select id="bulkReasonSelect"></select></div>
-    <div class="field hidden" id="bulkReasonOtherWrap"><label>سبب آخر</label><input id="bulkReasonOther" type="text" placeholder="اكتبي السبب هنا" /></div>
-    <div class="teacher-actions">
-      <button class="btn btn-green" type="button" onclick="submitBulkOperation()">تنفيذ العملية</button>
-      <button class="btn" type="button" style="background:#eef3ef" onclick="closeBulkOpModal()">إلغاء</button>
-    </div>
-    <div id="bulkOpMsg" class="notice ok hidden">تم تنفيذ العملية للفصل كامل</div>
-    <div id="bulkOpErr" class="notice err hidden">أكملي البيانات بشكل صحيح</div>
-  </div>
-</div>
-<script>
-(function(){
-  const depositReasons = [
-    'مشاركة مميزة في الحصة','حل سؤال صعب','مساعدة زميل / زميلة','إنهاء المهمة الأدائية','تسليم الواجب مبكرًا','الحصول على درجة كاملة','الفوز في تحدي الرياضيات','ترتيب الدفتر','الالتزام والهدوء في الحصة','مبادرة إيجابية','حضور كامل الأسبوع','تميز في العمل الجماعي','أخرى'
-  ];
-  const withdrawReasons = [
-    'عدم حل الواجب','التأخر عن الحصة','كثرة الكلام أثناء الشرح','عدم إحضار الأدوات','عدم المشاركة','مخالفة تعليمات الصف','عدم تسليم المهمة الأدائية','إزعاج الزملاء','استخدام الجوال','سحب سلوكي','أخرى'
-  ];
-  function fillSelect(select, items, placeholder){
-    if(!select) return;
-    select.innerHTML = '<option value="">'+(placeholder||'اختر السبب')+'</option>' + items.map(function(item){ return '<option value="'+item+'">'+item+'</option>'; }).join('');
-  }
-  function syncTeacherReason(){
-    const type = document.getElementById('opType')?.value || 'deposit';
-    const select = document.getElementById('opReasonSelect');
-    const otherWrap = document.getElementById('opReasonOtherWrap');
-    const other = document.getElementById('opReasonOther');
-    const hidden = document.getElementById('opReason');
-    if(!select || !hidden) return;
-    const current = select.value;
-    if(type === 'withdraw') fillSelect(select, withdrawReasons, 'اختاري سبب السحب');
-    else if(type === 'deposit') fillSelect(select, depositReasons, 'اختاري سبب الإيداع');
-    else fillSelect(select, ['تحويل بين الطلاب','أخرى'], 'اختاري سبب التحويل');
-    if([...select.options].some(o=>o.value===current)) select.value = current;
-    const chosen = select.value;
-    if(chosen === 'أخرى') { otherWrap?.classList.remove('hidden'); hidden.value = (other?.value || '').trim(); }
-    else { otherWrap?.classList.add('hidden'); if(other) other.value=''; hidden.value = chosen || ''; }
-  }
-  window.updateTeacherReasonOptions = syncTeacherReason;
-  document.addEventListener('change', function(e){
-    if(e.target && e.target.id === 'opType') syncTeacherReason();
-    if(e.target && e.target.id === 'opReasonSelect') syncTeacherReason();
-    if(e.target && e.target.id === 'bulkTypeSelect') updateBulkReasonOptions();
-    if(e.target && e.target.id === 'bulkReasonSelect') updateBulkReasonOptions();
-  });
-  document.addEventListener('input', function(e){
-    if(e.target && e.target.id === 'opReasonOther'){
-      const hidden = document.getElementById('opReason');
-      if(hidden) hidden.value = (e.target.value || '').trim();
-    }
-    if(e.target && e.target.id === 'bulkReasonOther'){
-      const hidden = document.getElementById('bulkReasonHidden');
-      if(hidden) hidden.value = (e.target.value || '').trim();
-    }
-  });
-  const oldToggle = window.toggleTransferTarget;
-  if(typeof oldToggle === 'function'){
-    window.toggleTransferTarget = function(){ oldToggle(); syncTeacherReason(); };
-  }
-
-  function populateClassSelects(){
-    const classes = (window.bankData?.classes || []);
-    ['bulkClassSelect'].forEach(function(id){
-      const sel = document.getElementById(id);
-      if(!sel) return;
-      const current = sel.value;
-      sel.innerHTML = classes.map(function(c){ return '<option value="'+c.id+'">'+c.name+'</option>'; }).join('');
-      if(current && [...sel.options].some(o=>o.value===current)) sel.value = current;
-    });
-  }
-  window.updateBulkReasonOptions = function(){
-    const type = document.getElementById('bulkTypeSelect')?.value || 'deposit';
-    const select = document.getElementById('bulkReasonSelect');
-    const wrap = document.getElementById('bulkReasonOtherWrap');
-    const other = document.getElementById('bulkReasonOther');
-    if(!select) return;
-    const current = select.value;
-    fillSelect(select, type === 'withdraw' ? withdrawReasons : depositReasons, type === 'withdraw' ? 'اختاري سبب السحب' : 'اختاري سبب الإيداع');
-    if([...select.options].some(o=>o.value===current)) select.value = current;
-    if(select.value === 'أخرى') wrap?.classList.remove('hidden'); else { wrap?.classList.add('hidden'); if(other) other.value=''; }
-  };
-  window.openBulkOpModal = function(classId, type){
-    const modal = document.getElementById('bulkOpModal');
-    const classSel = document.getElementById('bulkClassSelect');
-    const typeSel = document.getElementById('bulkTypeSelect');
-    const title = document.getElementById('bulkOpTitle');
-    document.getElementById('bulkOpMsg')?.classList.add('hidden');
-    document.getElementById('bulkOpErr')?.classList.add('hidden');
-    populateClassSelects();
-    if(classSel && classId) classSel.value = classId;
-    if(typeSel && type) typeSel.value = type;
-    if(title) title.textContent = type === 'withdraw' ? 'سحب للفصل كامل' : 'إيداع للفصل كامل';
-    const amount = document.getElementById('bulkAmountInput'); if(amount) amount.value = '';
-    const other = document.getElementById('bulkReasonOther'); if(other) other.value = '';
-    updateBulkReasonOptions();
-    modal?.classList.add('show');
-  };
-  window.closeBulkOpModal = function(){ document.getElementById('bulkOpModal')?.classList.remove('show'); };
-  window.quickClassOperation = function(classId, type){ openBulkOpModal(classId, type); };
-  window.submitBulkOperation = function(){
-    const classId = document.getElementById('bulkClassSelect')?.value;
-    const type = document.getElementById('bulkTypeSelect')?.value;
-    const amount = Number(document.getElementById('bulkAmountInput')?.value || 0);
-    const reasonSel = document.getElementById('bulkReasonSelect')?.value || '';
-    const reasonOther = (document.getElementById('bulkReasonOther')?.value || '').trim();
-    const reason = reasonSel === 'أخرى' ? reasonOther : reasonSel;
-    const ok = document.getElementById('bulkOpMsg');
-    const err = document.getElementById('bulkOpErr');
-    ok?.classList.add('hidden'); err?.classList.add('hidden');
-    if(!classId || !(amount > 0) || !reason){ err?.classList.remove('hidden'); return; }
-    if(!window.bankData) return;
-    const now = new Date();
-    const date = now.toLocaleDateString('en-CA') + ' ' + now.toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'});
-    (bankData.students || []).filter(function(st){ return st.classId === classId; }).forEach(function(st){
-      st.balance = Math.max(0, Number(st.balance||0) + (type === 'deposit' ? amount : -amount));
-      if(!Array.isArray(st.history)) st.history = [];
-      st.history.push({id:'h'+Date.now()+Math.random().toString(16).slice(2,6), type:type === 'deposit' ? 'deposit' : 'withdraw', amount:Number(amount), reason:reason, date:date});
-      if(Array.isArray(bankData.operations)) bankData.operations.push({id:'op'+Date.now()+Math.random().toString(16).slice(2,6), studentId:st.id, studentName:st.name, type:type === 'deposit' ? 'deposit' : 'withdraw', amount:Number(amount), reason:reason, date:date});
-    });
-    if(typeof saveBankData === 'function') saveBankData();
-    if(typeof refreshTeacherUI === 'function') refreshTeacherUI();
-    ok?.classList.remove('hidden');
-    setTimeout(function(){ closeBulkOpModal(); }, 900);
-  };
-
-  function relabelButtons(){
-    document.querySelectorAll('button').forEach(function(btn){
-      const t = (btn.textContent || '').trim();
-      if(t === 'خصم للفصل كامل') btn.textContent = 'سحب للفصل كامل';
-    });
-  }
-  const oldRefresh = window.refreshTeacherUI;
-  if(typeof oldRefresh === 'function'){
-    window.refreshTeacherUI = function(){ oldRefresh(); populateClassSelects(); relabelButtons(); syncTeacherReason(); };
-  }
-  document.addEventListener('DOMContentLoaded', function(){ populateClassSelects(); relabelButtons(); syncTeacherReason(); });
-  window.addEventListener('load', function(){ setTimeout(function(){ populateClassSelects(); relabelButtons(); syncTeacherReason(); }, 300); });
-})();
-</script>
-
-</body></html>`);
+    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}</body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
   window.printStudentReport = function(studentId){
@@ -7403,161 +6006,6 @@ window.addEventListener('load', function(){
   const prevShowPane = window.showTeacherPane;
   window.showTeacherPane = function(id, btn){ if(typeof prevShowPane==='function') prevShowPane(id, btn); if(id==='teacherPaneStudents') setTimeout(function(){ try{ renderStudentSettingsDashboard(); }catch(e){} }, 60); };
   document.addEventListener('DOMContentLoaded', function(){ setTimeout(function(){ try{ renderStudentSettingsDashboard(); }catch(e){} }, 250); });
-})();
-</script>
-
-
-<style id="teacher-reason-patch-style">
-.bulk-op-modal{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;z-index:99999;padding:18px}
-.bulk-op-modal.show{display:flex}
-.bulk-op-box{width:min(420px,100%);background:#fff;border-radius:28px;padding:18px;border:1px solid var(--line);box-shadow:0 24px 60px rgba(0,0,0,.18)}
-.bulk-op-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
-.bulk-op-head h3{margin:0;color:var(--deep);font-size:18px}
-.bulk-op-close{border:none;background:#f4f8f5;border-radius:14px;padding:10px 12px;font-weight:900;cursor:pointer}
-</style>
-<div id="bulkOpModal" class="bulk-op-modal">
-  <div class="bulk-op-box">
-    <div class="bulk-op-head"><h3 id="bulkOpTitle">عملية للفصل كامل</h3><button type="button" class="bulk-op-close" onclick="closeBulkOpModal()">✕</button></div>
-    <div class="field"><label>الفصل</label><select id="bulkClassSelect"></select></div>
-    <div class="field"><label>نوع العملية</label><select id="bulkTypeSelect" onchange="updateBulkReasonOptions()"><option value="deposit">إيداع</option><option value="withdraw">سحب</option></select></div>
-    <div class="field"><label>المبلغ</label><input id="bulkAmountInput" type="number" placeholder="أدخلي المبلغ" /></div>
-    <div class="field"><label>السبب</label><select id="bulkReasonSelect"></select></div>
-    <div class="field hidden" id="bulkReasonOtherWrap"><label>سبب آخر</label><input id="bulkReasonOther" type="text" placeholder="اكتبي السبب هنا" /></div>
-    <div class="teacher-actions">
-      <button class="btn btn-green" type="button" onclick="submitBulkOperation()">تنفيذ العملية</button>
-      <button class="btn" type="button" style="background:#eef3ef" onclick="closeBulkOpModal()">إلغاء</button>
-    </div>
-    <div id="bulkOpMsg" class="notice ok hidden">تم تنفيذ العملية للفصل كامل</div>
-    <div id="bulkOpErr" class="notice err hidden">أكملي البيانات بشكل صحيح</div>
-  </div>
-</div>
-<script>
-(function(){
-  const depositReasons = [
-    'مشاركة مميزة في الحصة','حل سؤال صعب','مساعدة زميل / زميلة','إنهاء المهمة الأدائية','تسليم الواجب مبكرًا','الحصول على درجة كاملة','الفوز في تحدي الرياضيات','ترتيب الدفتر','الالتزام والهدوء في الحصة','مبادرة إيجابية','حضور كامل الأسبوع','تميز في العمل الجماعي','أخرى'
-  ];
-  const withdrawReasons = [
-    'عدم حل الواجب','التأخر عن الحصة','كثرة الكلام أثناء الشرح','عدم إحضار الأدوات','عدم المشاركة','مخالفة تعليمات الصف','عدم تسليم المهمة الأدائية','إزعاج الزملاء','استخدام الجوال','سحب سلوكي','أخرى'
-  ];
-  function fillSelect(select, items, placeholder){
-    if(!select) return;
-    select.innerHTML = '<option value="">'+(placeholder||'اختر السبب')+'</option>' + items.map(function(item){ return '<option value="'+item+'">'+item+'</option>'; }).join('');
-  }
-  function syncTeacherReason(){
-    const type = document.getElementById('opType')?.value || 'deposit';
-    const select = document.getElementById('opReasonSelect');
-    const otherWrap = document.getElementById('opReasonOtherWrap');
-    const other = document.getElementById('opReasonOther');
-    const hidden = document.getElementById('opReason');
-    if(!select || !hidden) return;
-    const current = select.value;
-    if(type === 'withdraw') fillSelect(select, withdrawReasons, 'اختاري سبب السحب');
-    else if(type === 'deposit') fillSelect(select, depositReasons, 'اختاري سبب الإيداع');
-    else fillSelect(select, ['تحويل بين الطلاب','أخرى'], 'اختاري سبب التحويل');
-    if([...select.options].some(o=>o.value===current)) select.value = current;
-    const chosen = select.value;
-    if(chosen === 'أخرى') { otherWrap?.classList.remove('hidden'); hidden.value = (other?.value || '').trim(); }
-    else { otherWrap?.classList.add('hidden'); if(other) other.value=''; hidden.value = chosen || ''; }
-  }
-  window.updateTeacherReasonOptions = syncTeacherReason;
-  document.addEventListener('change', function(e){
-    if(e.target && e.target.id === 'opType') syncTeacherReason();
-    if(e.target && e.target.id === 'opReasonSelect') syncTeacherReason();
-    if(e.target && e.target.id === 'bulkTypeSelect') updateBulkReasonOptions();
-    if(e.target && e.target.id === 'bulkReasonSelect') updateBulkReasonOptions();
-  });
-  document.addEventListener('input', function(e){
-    if(e.target && e.target.id === 'opReasonOther'){
-      const hidden = document.getElementById('opReason');
-      if(hidden) hidden.value = (e.target.value || '').trim();
-    }
-    if(e.target && e.target.id === 'bulkReasonOther'){
-      const hidden = document.getElementById('bulkReasonHidden');
-      if(hidden) hidden.value = (e.target.value || '').trim();
-    }
-  });
-  const oldToggle = window.toggleTransferTarget;
-  if(typeof oldToggle === 'function'){
-    window.toggleTransferTarget = function(){ oldToggle(); syncTeacherReason(); };
-  }
-
-  function populateClassSelects(){
-    const classes = (window.bankData?.classes || []);
-    ['bulkClassSelect'].forEach(function(id){
-      const sel = document.getElementById(id);
-      if(!sel) return;
-      const current = sel.value;
-      sel.innerHTML = classes.map(function(c){ return '<option value="'+c.id+'">'+c.name+'</option>'; }).join('');
-      if(current && [...sel.options].some(o=>o.value===current)) sel.value = current;
-    });
-  }
-  window.updateBulkReasonOptions = function(){
-    const type = document.getElementById('bulkTypeSelect')?.value || 'deposit';
-    const select = document.getElementById('bulkReasonSelect');
-    const wrap = document.getElementById('bulkReasonOtherWrap');
-    const other = document.getElementById('bulkReasonOther');
-    if(!select) return;
-    const current = select.value;
-    fillSelect(select, type === 'withdraw' ? withdrawReasons : depositReasons, type === 'withdraw' ? 'اختاري سبب السحب' : 'اختاري سبب الإيداع');
-    if([...select.options].some(o=>o.value===current)) select.value = current;
-    if(select.value === 'أخرى') wrap?.classList.remove('hidden'); else { wrap?.classList.add('hidden'); if(other) other.value=''; }
-  };
-  window.openBulkOpModal = function(classId, type){
-    const modal = document.getElementById('bulkOpModal');
-    const classSel = document.getElementById('bulkClassSelect');
-    const typeSel = document.getElementById('bulkTypeSelect');
-    const title = document.getElementById('bulkOpTitle');
-    document.getElementById('bulkOpMsg')?.classList.add('hidden');
-    document.getElementById('bulkOpErr')?.classList.add('hidden');
-    populateClassSelects();
-    if(classSel && classId) classSel.value = classId;
-    if(typeSel && type) typeSel.value = type;
-    if(title) title.textContent = type === 'withdraw' ? 'سحب للفصل كامل' : 'إيداع للفصل كامل';
-    const amount = document.getElementById('bulkAmountInput'); if(amount) amount.value = '';
-    const other = document.getElementById('bulkReasonOther'); if(other) other.value = '';
-    updateBulkReasonOptions();
-    modal?.classList.add('show');
-  };
-  window.closeBulkOpModal = function(){ document.getElementById('bulkOpModal')?.classList.remove('show'); };
-  window.quickClassOperation = function(classId, type){ openBulkOpModal(classId, type); };
-  window.submitBulkOperation = function(){
-    const classId = document.getElementById('bulkClassSelect')?.value;
-    const type = document.getElementById('bulkTypeSelect')?.value;
-    const amount = Number(document.getElementById('bulkAmountInput')?.value || 0);
-    const reasonSel = document.getElementById('bulkReasonSelect')?.value || '';
-    const reasonOther = (document.getElementById('bulkReasonOther')?.value || '').trim();
-    const reason = reasonSel === 'أخرى' ? reasonOther : reasonSel;
-    const ok = document.getElementById('bulkOpMsg');
-    const err = document.getElementById('bulkOpErr');
-    ok?.classList.add('hidden'); err?.classList.add('hidden');
-    if(!classId || !(amount > 0) || !reason){ err?.classList.remove('hidden'); return; }
-    if(!window.bankData) return;
-    const now = new Date();
-    const date = now.toLocaleDateString('en-CA') + ' ' + now.toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'});
-    (bankData.students || []).filter(function(st){ return st.classId === classId; }).forEach(function(st){
-      st.balance = Math.max(0, Number(st.balance||0) + (type === 'deposit' ? amount : -amount));
-      if(!Array.isArray(st.history)) st.history = [];
-      st.history.push({id:'h'+Date.now()+Math.random().toString(16).slice(2,6), type:type === 'deposit' ? 'deposit' : 'withdraw', amount:Number(amount), reason:reason, date:date});
-      if(Array.isArray(bankData.operations)) bankData.operations.push({id:'op'+Date.now()+Math.random().toString(16).slice(2,6), studentId:st.id, studentName:st.name, type:type === 'deposit' ? 'deposit' : 'withdraw', amount:Number(amount), reason:reason, date:date});
-    });
-    if(typeof saveBankData === 'function') saveBankData();
-    if(typeof refreshTeacherUI === 'function') refreshTeacherUI();
-    ok?.classList.remove('hidden');
-    setTimeout(function(){ closeBulkOpModal(); }, 900);
-  };
-
-  function relabelButtons(){
-    document.querySelectorAll('button').forEach(function(btn){
-      const t = (btn.textContent || '').trim();
-      if(t === 'خصم للفصل كامل') btn.textContent = 'سحب للفصل كامل';
-    });
-  }
-  const oldRefresh = window.refreshTeacherUI;
-  if(typeof oldRefresh === 'function'){
-    window.refreshTeacherUI = function(){ oldRefresh(); populateClassSelects(); relabelButtons(); syncTeacherReason(); };
-  }
-  document.addEventListener('DOMContentLoaded', function(){ populateClassSelects(); relabelButtons(); syncTeacherReason(); });
-  window.addEventListener('load', function(){ setTimeout(function(){ populateClassSelects(); relabelButtons(); syncTeacherReason(); }, 300); });
 })();
 </script>
 
@@ -7886,162 +6334,7 @@ window.addEventListener('load', function(){
   };
   function openPrintWindow(title, bodyHtml){
     const w = window.open('', '_blank'); if(!w) return;
-    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}
-<style id="teacher-reason-patch-style">
-.bulk-op-modal{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;z-index:99999;padding:18px}
-.bulk-op-modal.show{display:flex}
-.bulk-op-box{width:min(420px,100%);background:#fff;border-radius:28px;padding:18px;border:1px solid var(--line);box-shadow:0 24px 60px rgba(0,0,0,.18)}
-.bulk-op-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
-.bulk-op-head h3{margin:0;color:var(--deep);font-size:18px}
-.bulk-op-close{border:none;background:#f4f8f5;border-radius:14px;padding:10px 12px;font-weight:900;cursor:pointer}
-</style>
-<div id="bulkOpModal" class="bulk-op-modal">
-  <div class="bulk-op-box">
-    <div class="bulk-op-head"><h3 id="bulkOpTitle">عملية للفصل كامل</h3><button type="button" class="bulk-op-close" onclick="closeBulkOpModal()">✕</button></div>
-    <div class="field"><label>الفصل</label><select id="bulkClassSelect"></select></div>
-    <div class="field"><label>نوع العملية</label><select id="bulkTypeSelect" onchange="updateBulkReasonOptions()"><option value="deposit">إيداع</option><option value="withdraw">سحب</option></select></div>
-    <div class="field"><label>المبلغ</label><input id="bulkAmountInput" type="number" placeholder="أدخلي المبلغ" /></div>
-    <div class="field"><label>السبب</label><select id="bulkReasonSelect"></select></div>
-    <div class="field hidden" id="bulkReasonOtherWrap"><label>سبب آخر</label><input id="bulkReasonOther" type="text" placeholder="اكتبي السبب هنا" /></div>
-    <div class="teacher-actions">
-      <button class="btn btn-green" type="button" onclick="submitBulkOperation()">تنفيذ العملية</button>
-      <button class="btn" type="button" style="background:#eef3ef" onclick="closeBulkOpModal()">إلغاء</button>
-    </div>
-    <div id="bulkOpMsg" class="notice ok hidden">تم تنفيذ العملية للفصل كامل</div>
-    <div id="bulkOpErr" class="notice err hidden">أكملي البيانات بشكل صحيح</div>
-  </div>
-</div>
-<script>
-(function(){
-  const depositReasons = [
-    'مشاركة مميزة في الحصة','حل سؤال صعب','مساعدة زميل / زميلة','إنهاء المهمة الأدائية','تسليم الواجب مبكرًا','الحصول على درجة كاملة','الفوز في تحدي الرياضيات','ترتيب الدفتر','الالتزام والهدوء في الحصة','مبادرة إيجابية','حضور كامل الأسبوع','تميز في العمل الجماعي','أخرى'
-  ];
-  const withdrawReasons = [
-    'عدم حل الواجب','التأخر عن الحصة','كثرة الكلام أثناء الشرح','عدم إحضار الأدوات','عدم المشاركة','مخالفة تعليمات الصف','عدم تسليم المهمة الأدائية','إزعاج الزملاء','استخدام الجوال','سحب سلوكي','أخرى'
-  ];
-  function fillSelect(select, items, placeholder){
-    if(!select) return;
-    select.innerHTML = '<option value="">'+(placeholder||'اختر السبب')+'</option>' + items.map(function(item){ return '<option value="'+item+'">'+item+'</option>'; }).join('');
-  }
-  function syncTeacherReason(){
-    const type = document.getElementById('opType')?.value || 'deposit';
-    const select = document.getElementById('opReasonSelect');
-    const otherWrap = document.getElementById('opReasonOtherWrap');
-    const other = document.getElementById('opReasonOther');
-    const hidden = document.getElementById('opReason');
-    if(!select || !hidden) return;
-    const current = select.value;
-    if(type === 'withdraw') fillSelect(select, withdrawReasons, 'اختاري سبب السحب');
-    else if(type === 'deposit') fillSelect(select, depositReasons, 'اختاري سبب الإيداع');
-    else fillSelect(select, ['تحويل بين الطلاب','أخرى'], 'اختاري سبب التحويل');
-    if([...select.options].some(o=>o.value===current)) select.value = current;
-    const chosen = select.value;
-    if(chosen === 'أخرى') { otherWrap?.classList.remove('hidden'); hidden.value = (other?.value || '').trim(); }
-    else { otherWrap?.classList.add('hidden'); if(other) other.value=''; hidden.value = chosen || ''; }
-  }
-  window.updateTeacherReasonOptions = syncTeacherReason;
-  document.addEventListener('change', function(e){
-    if(e.target && e.target.id === 'opType') syncTeacherReason();
-    if(e.target && e.target.id === 'opReasonSelect') syncTeacherReason();
-    if(e.target && e.target.id === 'bulkTypeSelect') updateBulkReasonOptions();
-    if(e.target && e.target.id === 'bulkReasonSelect') updateBulkReasonOptions();
-  });
-  document.addEventListener('input', function(e){
-    if(e.target && e.target.id === 'opReasonOther'){
-      const hidden = document.getElementById('opReason');
-      if(hidden) hidden.value = (e.target.value || '').trim();
-    }
-    if(e.target && e.target.id === 'bulkReasonOther'){
-      const hidden = document.getElementById('bulkReasonHidden');
-      if(hidden) hidden.value = (e.target.value || '').trim();
-    }
-  });
-  const oldToggle = window.toggleTransferTarget;
-  if(typeof oldToggle === 'function'){
-    window.toggleTransferTarget = function(){ oldToggle(); syncTeacherReason(); };
-  }
-
-  function populateClassSelects(){
-    const classes = (window.bankData?.classes || []);
-    ['bulkClassSelect'].forEach(function(id){
-      const sel = document.getElementById(id);
-      if(!sel) return;
-      const current = sel.value;
-      sel.innerHTML = classes.map(function(c){ return '<option value="'+c.id+'">'+c.name+'</option>'; }).join('');
-      if(current && [...sel.options].some(o=>o.value===current)) sel.value = current;
-    });
-  }
-  window.updateBulkReasonOptions = function(){
-    const type = document.getElementById('bulkTypeSelect')?.value || 'deposit';
-    const select = document.getElementById('bulkReasonSelect');
-    const wrap = document.getElementById('bulkReasonOtherWrap');
-    const other = document.getElementById('bulkReasonOther');
-    if(!select) return;
-    const current = select.value;
-    fillSelect(select, type === 'withdraw' ? withdrawReasons : depositReasons, type === 'withdraw' ? 'اختاري سبب السحب' : 'اختاري سبب الإيداع');
-    if([...select.options].some(o=>o.value===current)) select.value = current;
-    if(select.value === 'أخرى') wrap?.classList.remove('hidden'); else { wrap?.classList.add('hidden'); if(other) other.value=''; }
-  };
-  window.openBulkOpModal = function(classId, type){
-    const modal = document.getElementById('bulkOpModal');
-    const classSel = document.getElementById('bulkClassSelect');
-    const typeSel = document.getElementById('bulkTypeSelect');
-    const title = document.getElementById('bulkOpTitle');
-    document.getElementById('bulkOpMsg')?.classList.add('hidden');
-    document.getElementById('bulkOpErr')?.classList.add('hidden');
-    populateClassSelects();
-    if(classSel && classId) classSel.value = classId;
-    if(typeSel && type) typeSel.value = type;
-    if(title) title.textContent = type === 'withdraw' ? 'سحب للفصل كامل' : 'إيداع للفصل كامل';
-    const amount = document.getElementById('bulkAmountInput'); if(amount) amount.value = '';
-    const other = document.getElementById('bulkReasonOther'); if(other) other.value = '';
-    updateBulkReasonOptions();
-    modal?.classList.add('show');
-  };
-  window.closeBulkOpModal = function(){ document.getElementById('bulkOpModal')?.classList.remove('show'); };
-  window.quickClassOperation = function(classId, type){ openBulkOpModal(classId, type); };
-  window.submitBulkOperation = function(){
-    const classId = document.getElementById('bulkClassSelect')?.value;
-    const type = document.getElementById('bulkTypeSelect')?.value;
-    const amount = Number(document.getElementById('bulkAmountInput')?.value || 0);
-    const reasonSel = document.getElementById('bulkReasonSelect')?.value || '';
-    const reasonOther = (document.getElementById('bulkReasonOther')?.value || '').trim();
-    const reason = reasonSel === 'أخرى' ? reasonOther : reasonSel;
-    const ok = document.getElementById('bulkOpMsg');
-    const err = document.getElementById('bulkOpErr');
-    ok?.classList.add('hidden'); err?.classList.add('hidden');
-    if(!classId || !(amount > 0) || !reason){ err?.classList.remove('hidden'); return; }
-    if(!window.bankData) return;
-    const now = new Date();
-    const date = now.toLocaleDateString('en-CA') + ' ' + now.toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'});
-    (bankData.students || []).filter(function(st){ return st.classId === classId; }).forEach(function(st){
-      st.balance = Math.max(0, Number(st.balance||0) + (type === 'deposit' ? amount : -amount));
-      if(!Array.isArray(st.history)) st.history = [];
-      st.history.push({id:'h'+Date.now()+Math.random().toString(16).slice(2,6), type:type === 'deposit' ? 'deposit' : 'withdraw', amount:Number(amount), reason:reason, date:date});
-      if(Array.isArray(bankData.operations)) bankData.operations.push({id:'op'+Date.now()+Math.random().toString(16).slice(2,6), studentId:st.id, studentName:st.name, type:type === 'deposit' ? 'deposit' : 'withdraw', amount:Number(amount), reason:reason, date:date});
-    });
-    if(typeof saveBankData === 'function') saveBankData();
-    if(typeof refreshTeacherUI === 'function') refreshTeacherUI();
-    ok?.classList.remove('hidden');
-    setTimeout(function(){ closeBulkOpModal(); }, 900);
-  };
-
-  function relabelButtons(){
-    document.querySelectorAll('button').forEach(function(btn){
-      const t = (btn.textContent || '').trim();
-      if(t === 'خصم للفصل كامل') btn.textContent = 'سحب للفصل كامل';
-    });
-  }
-  const oldRefresh = window.refreshTeacherUI;
-  if(typeof oldRefresh === 'function'){
-    window.refreshTeacherUI = function(){ oldRefresh(); populateClassSelects(); relabelButtons(); syncTeacherReason(); };
-  }
-  document.addEventListener('DOMContentLoaded', function(){ populateClassSelects(); relabelButtons(); syncTeacherReason(); });
-  window.addEventListener('load', function(){ setTimeout(function(){ populateClassSelects(); relabelButtons(); syncTeacherReason(); }, 300); });
-})();
-</script>
-
-</body></html>`);
+    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}</body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
   window.printStudentReport = function(studentId){
@@ -8062,161 +6355,6 @@ window.addEventListener('load', function(){
   const prevShowPane = window.showTeacherPane;
   window.showTeacherPane = function(id, btn){ if(typeof prevShowPane==='function') prevShowPane(id, btn); if(id==='teacherPaneStudents') setTimeout(function(){ try{ renderStudentSettingsDashboard(); }catch(e){} }, 60); };
   document.addEventListener('DOMContentLoaded', function(){ setTimeout(function(){ try{ renderStudentSettingsDashboard(); }catch(e){} }, 250); });
-})();
-</script>
-
-
-<style id="teacher-reason-patch-style">
-.bulk-op-modal{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;z-index:99999;padding:18px}
-.bulk-op-modal.show{display:flex}
-.bulk-op-box{width:min(420px,100%);background:#fff;border-radius:28px;padding:18px;border:1px solid var(--line);box-shadow:0 24px 60px rgba(0,0,0,.18)}
-.bulk-op-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
-.bulk-op-head h3{margin:0;color:var(--deep);font-size:18px}
-.bulk-op-close{border:none;background:#f4f8f5;border-radius:14px;padding:10px 12px;font-weight:900;cursor:pointer}
-</style>
-<div id="bulkOpModal" class="bulk-op-modal">
-  <div class="bulk-op-box">
-    <div class="bulk-op-head"><h3 id="bulkOpTitle">عملية للفصل كامل</h3><button type="button" class="bulk-op-close" onclick="closeBulkOpModal()">✕</button></div>
-    <div class="field"><label>الفصل</label><select id="bulkClassSelect"></select></div>
-    <div class="field"><label>نوع العملية</label><select id="bulkTypeSelect" onchange="updateBulkReasonOptions()"><option value="deposit">إيداع</option><option value="withdraw">سحب</option></select></div>
-    <div class="field"><label>المبلغ</label><input id="bulkAmountInput" type="number" placeholder="أدخلي المبلغ" /></div>
-    <div class="field"><label>السبب</label><select id="bulkReasonSelect"></select></div>
-    <div class="field hidden" id="bulkReasonOtherWrap"><label>سبب آخر</label><input id="bulkReasonOther" type="text" placeholder="اكتبي السبب هنا" /></div>
-    <div class="teacher-actions">
-      <button class="btn btn-green" type="button" onclick="submitBulkOperation()">تنفيذ العملية</button>
-      <button class="btn" type="button" style="background:#eef3ef" onclick="closeBulkOpModal()">إلغاء</button>
-    </div>
-    <div id="bulkOpMsg" class="notice ok hidden">تم تنفيذ العملية للفصل كامل</div>
-    <div id="bulkOpErr" class="notice err hidden">أكملي البيانات بشكل صحيح</div>
-  </div>
-</div>
-<script>
-(function(){
-  const depositReasons = [
-    'مشاركة مميزة في الحصة','حل سؤال صعب','مساعدة زميل / زميلة','إنهاء المهمة الأدائية','تسليم الواجب مبكرًا','الحصول على درجة كاملة','الفوز في تحدي الرياضيات','ترتيب الدفتر','الالتزام والهدوء في الحصة','مبادرة إيجابية','حضور كامل الأسبوع','تميز في العمل الجماعي','أخرى'
-  ];
-  const withdrawReasons = [
-    'عدم حل الواجب','التأخر عن الحصة','كثرة الكلام أثناء الشرح','عدم إحضار الأدوات','عدم المشاركة','مخالفة تعليمات الصف','عدم تسليم المهمة الأدائية','إزعاج الزملاء','استخدام الجوال','سحب سلوكي','أخرى'
-  ];
-  function fillSelect(select, items, placeholder){
-    if(!select) return;
-    select.innerHTML = '<option value="">'+(placeholder||'اختر السبب')+'</option>' + items.map(function(item){ return '<option value="'+item+'">'+item+'</option>'; }).join('');
-  }
-  function syncTeacherReason(){
-    const type = document.getElementById('opType')?.value || 'deposit';
-    const select = document.getElementById('opReasonSelect');
-    const otherWrap = document.getElementById('opReasonOtherWrap');
-    const other = document.getElementById('opReasonOther');
-    const hidden = document.getElementById('opReason');
-    if(!select || !hidden) return;
-    const current = select.value;
-    if(type === 'withdraw') fillSelect(select, withdrawReasons, 'اختاري سبب السحب');
-    else if(type === 'deposit') fillSelect(select, depositReasons, 'اختاري سبب الإيداع');
-    else fillSelect(select, ['تحويل بين الطلاب','أخرى'], 'اختاري سبب التحويل');
-    if([...select.options].some(o=>o.value===current)) select.value = current;
-    const chosen = select.value;
-    if(chosen === 'أخرى') { otherWrap?.classList.remove('hidden'); hidden.value = (other?.value || '').trim(); }
-    else { otherWrap?.classList.add('hidden'); if(other) other.value=''; hidden.value = chosen || ''; }
-  }
-  window.updateTeacherReasonOptions = syncTeacherReason;
-  document.addEventListener('change', function(e){
-    if(e.target && e.target.id === 'opType') syncTeacherReason();
-    if(e.target && e.target.id === 'opReasonSelect') syncTeacherReason();
-    if(e.target && e.target.id === 'bulkTypeSelect') updateBulkReasonOptions();
-    if(e.target && e.target.id === 'bulkReasonSelect') updateBulkReasonOptions();
-  });
-  document.addEventListener('input', function(e){
-    if(e.target && e.target.id === 'opReasonOther'){
-      const hidden = document.getElementById('opReason');
-      if(hidden) hidden.value = (e.target.value || '').trim();
-    }
-    if(e.target && e.target.id === 'bulkReasonOther'){
-      const hidden = document.getElementById('bulkReasonHidden');
-      if(hidden) hidden.value = (e.target.value || '').trim();
-    }
-  });
-  const oldToggle = window.toggleTransferTarget;
-  if(typeof oldToggle === 'function'){
-    window.toggleTransferTarget = function(){ oldToggle(); syncTeacherReason(); };
-  }
-
-  function populateClassSelects(){
-    const classes = (window.bankData?.classes || []);
-    ['bulkClassSelect'].forEach(function(id){
-      const sel = document.getElementById(id);
-      if(!sel) return;
-      const current = sel.value;
-      sel.innerHTML = classes.map(function(c){ return '<option value="'+c.id+'">'+c.name+'</option>'; }).join('');
-      if(current && [...sel.options].some(o=>o.value===current)) sel.value = current;
-    });
-  }
-  window.updateBulkReasonOptions = function(){
-    const type = document.getElementById('bulkTypeSelect')?.value || 'deposit';
-    const select = document.getElementById('bulkReasonSelect');
-    const wrap = document.getElementById('bulkReasonOtherWrap');
-    const other = document.getElementById('bulkReasonOther');
-    if(!select) return;
-    const current = select.value;
-    fillSelect(select, type === 'withdraw' ? withdrawReasons : depositReasons, type === 'withdraw' ? 'اختاري سبب السحب' : 'اختاري سبب الإيداع');
-    if([...select.options].some(o=>o.value===current)) select.value = current;
-    if(select.value === 'أخرى') wrap?.classList.remove('hidden'); else { wrap?.classList.add('hidden'); if(other) other.value=''; }
-  };
-  window.openBulkOpModal = function(classId, type){
-    const modal = document.getElementById('bulkOpModal');
-    const classSel = document.getElementById('bulkClassSelect');
-    const typeSel = document.getElementById('bulkTypeSelect');
-    const title = document.getElementById('bulkOpTitle');
-    document.getElementById('bulkOpMsg')?.classList.add('hidden');
-    document.getElementById('bulkOpErr')?.classList.add('hidden');
-    populateClassSelects();
-    if(classSel && classId) classSel.value = classId;
-    if(typeSel && type) typeSel.value = type;
-    if(title) title.textContent = type === 'withdraw' ? 'سحب للفصل كامل' : 'إيداع للفصل كامل';
-    const amount = document.getElementById('bulkAmountInput'); if(amount) amount.value = '';
-    const other = document.getElementById('bulkReasonOther'); if(other) other.value = '';
-    updateBulkReasonOptions();
-    modal?.classList.add('show');
-  };
-  window.closeBulkOpModal = function(){ document.getElementById('bulkOpModal')?.classList.remove('show'); };
-  window.quickClassOperation = function(classId, type){ openBulkOpModal(classId, type); };
-  window.submitBulkOperation = function(){
-    const classId = document.getElementById('bulkClassSelect')?.value;
-    const type = document.getElementById('bulkTypeSelect')?.value;
-    const amount = Number(document.getElementById('bulkAmountInput')?.value || 0);
-    const reasonSel = document.getElementById('bulkReasonSelect')?.value || '';
-    const reasonOther = (document.getElementById('bulkReasonOther')?.value || '').trim();
-    const reason = reasonSel === 'أخرى' ? reasonOther : reasonSel;
-    const ok = document.getElementById('bulkOpMsg');
-    const err = document.getElementById('bulkOpErr');
-    ok?.classList.add('hidden'); err?.classList.add('hidden');
-    if(!classId || !(amount > 0) || !reason){ err?.classList.remove('hidden'); return; }
-    if(!window.bankData) return;
-    const now = new Date();
-    const date = now.toLocaleDateString('en-CA') + ' ' + now.toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'});
-    (bankData.students || []).filter(function(st){ return st.classId === classId; }).forEach(function(st){
-      st.balance = Math.max(0, Number(st.balance||0) + (type === 'deposit' ? amount : -amount));
-      if(!Array.isArray(st.history)) st.history = [];
-      st.history.push({id:'h'+Date.now()+Math.random().toString(16).slice(2,6), type:type === 'deposit' ? 'deposit' : 'withdraw', amount:Number(amount), reason:reason, date:date});
-      if(Array.isArray(bankData.operations)) bankData.operations.push({id:'op'+Date.now()+Math.random().toString(16).slice(2,6), studentId:st.id, studentName:st.name, type:type === 'deposit' ? 'deposit' : 'withdraw', amount:Number(amount), reason:reason, date:date});
-    });
-    if(typeof saveBankData === 'function') saveBankData();
-    if(typeof refreshTeacherUI === 'function') refreshTeacherUI();
-    ok?.classList.remove('hidden');
-    setTimeout(function(){ closeBulkOpModal(); }, 900);
-  };
-
-  function relabelButtons(){
-    document.querySelectorAll('button').forEach(function(btn){
-      const t = (btn.textContent || '').trim();
-      if(t === 'خصم للفصل كامل') btn.textContent = 'سحب للفصل كامل';
-    });
-  }
-  const oldRefresh = window.refreshTeacherUI;
-  if(typeof oldRefresh === 'function'){
-    window.refreshTeacherUI = function(){ oldRefresh(); populateClassSelects(); relabelButtons(); syncTeacherReason(); };
-  }
-  document.addEventListener('DOMContentLoaded', function(){ populateClassSelects(); relabelButtons(); syncTeacherReason(); });
-  window.addEventListener('load', function(){ setTimeout(function(){ populateClassSelects(); relabelButtons(); syncTeacherReason(); }, 300); });
 })();
 </script>
 
@@ -8656,162 +6794,7 @@ window.addEventListener('load', function(){
   };
   function openPrintWindow(title, bodyHtml){
     const w = window.open('', '_blank'); if(!w) return;
-    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}
-<style id="teacher-reason-patch-style">
-.bulk-op-modal{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;z-index:99999;padding:18px}
-.bulk-op-modal.show{display:flex}
-.bulk-op-box{width:min(420px,100%);background:#fff;border-radius:28px;padding:18px;border:1px solid var(--line);box-shadow:0 24px 60px rgba(0,0,0,.18)}
-.bulk-op-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
-.bulk-op-head h3{margin:0;color:var(--deep);font-size:18px}
-.bulk-op-close{border:none;background:#f4f8f5;border-radius:14px;padding:10px 12px;font-weight:900;cursor:pointer}
-</style>
-<div id="bulkOpModal" class="bulk-op-modal">
-  <div class="bulk-op-box">
-    <div class="bulk-op-head"><h3 id="bulkOpTitle">عملية للفصل كامل</h3><button type="button" class="bulk-op-close" onclick="closeBulkOpModal()">✕</button></div>
-    <div class="field"><label>الفصل</label><select id="bulkClassSelect"></select></div>
-    <div class="field"><label>نوع العملية</label><select id="bulkTypeSelect" onchange="updateBulkReasonOptions()"><option value="deposit">إيداع</option><option value="withdraw">سحب</option></select></div>
-    <div class="field"><label>المبلغ</label><input id="bulkAmountInput" type="number" placeholder="أدخلي المبلغ" /></div>
-    <div class="field"><label>السبب</label><select id="bulkReasonSelect"></select></div>
-    <div class="field hidden" id="bulkReasonOtherWrap"><label>سبب آخر</label><input id="bulkReasonOther" type="text" placeholder="اكتبي السبب هنا" /></div>
-    <div class="teacher-actions">
-      <button class="btn btn-green" type="button" onclick="submitBulkOperation()">تنفيذ العملية</button>
-      <button class="btn" type="button" style="background:#eef3ef" onclick="closeBulkOpModal()">إلغاء</button>
-    </div>
-    <div id="bulkOpMsg" class="notice ok hidden">تم تنفيذ العملية للفصل كامل</div>
-    <div id="bulkOpErr" class="notice err hidden">أكملي البيانات بشكل صحيح</div>
-  </div>
-</div>
-<script>
-(function(){
-  const depositReasons = [
-    'مشاركة مميزة في الحصة','حل سؤال صعب','مساعدة زميل / زميلة','إنهاء المهمة الأدائية','تسليم الواجب مبكرًا','الحصول على درجة كاملة','الفوز في تحدي الرياضيات','ترتيب الدفتر','الالتزام والهدوء في الحصة','مبادرة إيجابية','حضور كامل الأسبوع','تميز في العمل الجماعي','أخرى'
-  ];
-  const withdrawReasons = [
-    'عدم حل الواجب','التأخر عن الحصة','كثرة الكلام أثناء الشرح','عدم إحضار الأدوات','عدم المشاركة','مخالفة تعليمات الصف','عدم تسليم المهمة الأدائية','إزعاج الزملاء','استخدام الجوال','سحب سلوكي','أخرى'
-  ];
-  function fillSelect(select, items, placeholder){
-    if(!select) return;
-    select.innerHTML = '<option value="">'+(placeholder||'اختر السبب')+'</option>' + items.map(function(item){ return '<option value="'+item+'">'+item+'</option>'; }).join('');
-  }
-  function syncTeacherReason(){
-    const type = document.getElementById('opType')?.value || 'deposit';
-    const select = document.getElementById('opReasonSelect');
-    const otherWrap = document.getElementById('opReasonOtherWrap');
-    const other = document.getElementById('opReasonOther');
-    const hidden = document.getElementById('opReason');
-    if(!select || !hidden) return;
-    const current = select.value;
-    if(type === 'withdraw') fillSelect(select, withdrawReasons, 'اختاري سبب السحب');
-    else if(type === 'deposit') fillSelect(select, depositReasons, 'اختاري سبب الإيداع');
-    else fillSelect(select, ['تحويل بين الطلاب','أخرى'], 'اختاري سبب التحويل');
-    if([...select.options].some(o=>o.value===current)) select.value = current;
-    const chosen = select.value;
-    if(chosen === 'أخرى') { otherWrap?.classList.remove('hidden'); hidden.value = (other?.value || '').trim(); }
-    else { otherWrap?.classList.add('hidden'); if(other) other.value=''; hidden.value = chosen || ''; }
-  }
-  window.updateTeacherReasonOptions = syncTeacherReason;
-  document.addEventListener('change', function(e){
-    if(e.target && e.target.id === 'opType') syncTeacherReason();
-    if(e.target && e.target.id === 'opReasonSelect') syncTeacherReason();
-    if(e.target && e.target.id === 'bulkTypeSelect') updateBulkReasonOptions();
-    if(e.target && e.target.id === 'bulkReasonSelect') updateBulkReasonOptions();
-  });
-  document.addEventListener('input', function(e){
-    if(e.target && e.target.id === 'opReasonOther'){
-      const hidden = document.getElementById('opReason');
-      if(hidden) hidden.value = (e.target.value || '').trim();
-    }
-    if(e.target && e.target.id === 'bulkReasonOther'){
-      const hidden = document.getElementById('bulkReasonHidden');
-      if(hidden) hidden.value = (e.target.value || '').trim();
-    }
-  });
-  const oldToggle = window.toggleTransferTarget;
-  if(typeof oldToggle === 'function'){
-    window.toggleTransferTarget = function(){ oldToggle(); syncTeacherReason(); };
-  }
-
-  function populateClassSelects(){
-    const classes = (window.bankData?.classes || []);
-    ['bulkClassSelect'].forEach(function(id){
-      const sel = document.getElementById(id);
-      if(!sel) return;
-      const current = sel.value;
-      sel.innerHTML = classes.map(function(c){ return '<option value="'+c.id+'">'+c.name+'</option>'; }).join('');
-      if(current && [...sel.options].some(o=>o.value===current)) sel.value = current;
-    });
-  }
-  window.updateBulkReasonOptions = function(){
-    const type = document.getElementById('bulkTypeSelect')?.value || 'deposit';
-    const select = document.getElementById('bulkReasonSelect');
-    const wrap = document.getElementById('bulkReasonOtherWrap');
-    const other = document.getElementById('bulkReasonOther');
-    if(!select) return;
-    const current = select.value;
-    fillSelect(select, type === 'withdraw' ? withdrawReasons : depositReasons, type === 'withdraw' ? 'اختاري سبب السحب' : 'اختاري سبب الإيداع');
-    if([...select.options].some(o=>o.value===current)) select.value = current;
-    if(select.value === 'أخرى') wrap?.classList.remove('hidden'); else { wrap?.classList.add('hidden'); if(other) other.value=''; }
-  };
-  window.openBulkOpModal = function(classId, type){
-    const modal = document.getElementById('bulkOpModal');
-    const classSel = document.getElementById('bulkClassSelect');
-    const typeSel = document.getElementById('bulkTypeSelect');
-    const title = document.getElementById('bulkOpTitle');
-    document.getElementById('bulkOpMsg')?.classList.add('hidden');
-    document.getElementById('bulkOpErr')?.classList.add('hidden');
-    populateClassSelects();
-    if(classSel && classId) classSel.value = classId;
-    if(typeSel && type) typeSel.value = type;
-    if(title) title.textContent = type === 'withdraw' ? 'سحب للفصل كامل' : 'إيداع للفصل كامل';
-    const amount = document.getElementById('bulkAmountInput'); if(amount) amount.value = '';
-    const other = document.getElementById('bulkReasonOther'); if(other) other.value = '';
-    updateBulkReasonOptions();
-    modal?.classList.add('show');
-  };
-  window.closeBulkOpModal = function(){ document.getElementById('bulkOpModal')?.classList.remove('show'); };
-  window.quickClassOperation = function(classId, type){ openBulkOpModal(classId, type); };
-  window.submitBulkOperation = function(){
-    const classId = document.getElementById('bulkClassSelect')?.value;
-    const type = document.getElementById('bulkTypeSelect')?.value;
-    const amount = Number(document.getElementById('bulkAmountInput')?.value || 0);
-    const reasonSel = document.getElementById('bulkReasonSelect')?.value || '';
-    const reasonOther = (document.getElementById('bulkReasonOther')?.value || '').trim();
-    const reason = reasonSel === 'أخرى' ? reasonOther : reasonSel;
-    const ok = document.getElementById('bulkOpMsg');
-    const err = document.getElementById('bulkOpErr');
-    ok?.classList.add('hidden'); err?.classList.add('hidden');
-    if(!classId || !(amount > 0) || !reason){ err?.classList.remove('hidden'); return; }
-    if(!window.bankData) return;
-    const now = new Date();
-    const date = now.toLocaleDateString('en-CA') + ' ' + now.toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'});
-    (bankData.students || []).filter(function(st){ return st.classId === classId; }).forEach(function(st){
-      st.balance = Math.max(0, Number(st.balance||0) + (type === 'deposit' ? amount : -amount));
-      if(!Array.isArray(st.history)) st.history = [];
-      st.history.push({id:'h'+Date.now()+Math.random().toString(16).slice(2,6), type:type === 'deposit' ? 'deposit' : 'withdraw', amount:Number(amount), reason:reason, date:date});
-      if(Array.isArray(bankData.operations)) bankData.operations.push({id:'op'+Date.now()+Math.random().toString(16).slice(2,6), studentId:st.id, studentName:st.name, type:type === 'deposit' ? 'deposit' : 'withdraw', amount:Number(amount), reason:reason, date:date});
-    });
-    if(typeof saveBankData === 'function') saveBankData();
-    if(typeof refreshTeacherUI === 'function') refreshTeacherUI();
-    ok?.classList.remove('hidden');
-    setTimeout(function(){ closeBulkOpModal(); }, 900);
-  };
-
-  function relabelButtons(){
-    document.querySelectorAll('button').forEach(function(btn){
-      const t = (btn.textContent || '').trim();
-      if(t === 'خصم للفصل كامل') btn.textContent = 'سحب للفصل كامل';
-    });
-  }
-  const oldRefresh = window.refreshTeacherUI;
-  if(typeof oldRefresh === 'function'){
-    window.refreshTeacherUI = function(){ oldRefresh(); populateClassSelects(); relabelButtons(); syncTeacherReason(); };
-  }
-  document.addEventListener('DOMContentLoaded', function(){ populateClassSelects(); relabelButtons(); syncTeacherReason(); });
-  window.addEventListener('load', function(){ setTimeout(function(){ populateClassSelects(); relabelButtons(); syncTeacherReason(); }, 300); });
-})();
-</script>
-
-</body></html>`);
+    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}</body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
   window.printStudentReport = function(studentId){
@@ -8832,161 +6815,6 @@ window.addEventListener('load', function(){
   const prevShowPane = window.showTeacherPane;
   window.showTeacherPane = function(id, btn){ if(typeof prevShowPane==='function') prevShowPane(id, btn); if(id==='teacherPaneStudents') setTimeout(function(){ try{ renderStudentSettingsDashboard(); }catch(e){} }, 60); };
   document.addEventListener('DOMContentLoaded', function(){ setTimeout(function(){ try{ renderStudentSettingsDashboard(); }catch(e){} }, 250); });
-})();
-</script>
-
-
-<style id="teacher-reason-patch-style">
-.bulk-op-modal{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;z-index:99999;padding:18px}
-.bulk-op-modal.show{display:flex}
-.bulk-op-box{width:min(420px,100%);background:#fff;border-radius:28px;padding:18px;border:1px solid var(--line);box-shadow:0 24px 60px rgba(0,0,0,.18)}
-.bulk-op-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
-.bulk-op-head h3{margin:0;color:var(--deep);font-size:18px}
-.bulk-op-close{border:none;background:#f4f8f5;border-radius:14px;padding:10px 12px;font-weight:900;cursor:pointer}
-</style>
-<div id="bulkOpModal" class="bulk-op-modal">
-  <div class="bulk-op-box">
-    <div class="bulk-op-head"><h3 id="bulkOpTitle">عملية للفصل كامل</h3><button type="button" class="bulk-op-close" onclick="closeBulkOpModal()">✕</button></div>
-    <div class="field"><label>الفصل</label><select id="bulkClassSelect"></select></div>
-    <div class="field"><label>نوع العملية</label><select id="bulkTypeSelect" onchange="updateBulkReasonOptions()"><option value="deposit">إيداع</option><option value="withdraw">سحب</option></select></div>
-    <div class="field"><label>المبلغ</label><input id="bulkAmountInput" type="number" placeholder="أدخلي المبلغ" /></div>
-    <div class="field"><label>السبب</label><select id="bulkReasonSelect"></select></div>
-    <div class="field hidden" id="bulkReasonOtherWrap"><label>سبب آخر</label><input id="bulkReasonOther" type="text" placeholder="اكتبي السبب هنا" /></div>
-    <div class="teacher-actions">
-      <button class="btn btn-green" type="button" onclick="submitBulkOperation()">تنفيذ العملية</button>
-      <button class="btn" type="button" style="background:#eef3ef" onclick="closeBulkOpModal()">إلغاء</button>
-    </div>
-    <div id="bulkOpMsg" class="notice ok hidden">تم تنفيذ العملية للفصل كامل</div>
-    <div id="bulkOpErr" class="notice err hidden">أكملي البيانات بشكل صحيح</div>
-  </div>
-</div>
-<script>
-(function(){
-  const depositReasons = [
-    'مشاركة مميزة في الحصة','حل سؤال صعب','مساعدة زميل / زميلة','إنهاء المهمة الأدائية','تسليم الواجب مبكرًا','الحصول على درجة كاملة','الفوز في تحدي الرياضيات','ترتيب الدفتر','الالتزام والهدوء في الحصة','مبادرة إيجابية','حضور كامل الأسبوع','تميز في العمل الجماعي','أخرى'
-  ];
-  const withdrawReasons = [
-    'عدم حل الواجب','التأخر عن الحصة','كثرة الكلام أثناء الشرح','عدم إحضار الأدوات','عدم المشاركة','مخالفة تعليمات الصف','عدم تسليم المهمة الأدائية','إزعاج الزملاء','استخدام الجوال','سحب سلوكي','أخرى'
-  ];
-  function fillSelect(select, items, placeholder){
-    if(!select) return;
-    select.innerHTML = '<option value="">'+(placeholder||'اختر السبب')+'</option>' + items.map(function(item){ return '<option value="'+item+'">'+item+'</option>'; }).join('');
-  }
-  function syncTeacherReason(){
-    const type = document.getElementById('opType')?.value || 'deposit';
-    const select = document.getElementById('opReasonSelect');
-    const otherWrap = document.getElementById('opReasonOtherWrap');
-    const other = document.getElementById('opReasonOther');
-    const hidden = document.getElementById('opReason');
-    if(!select || !hidden) return;
-    const current = select.value;
-    if(type === 'withdraw') fillSelect(select, withdrawReasons, 'اختاري سبب السحب');
-    else if(type === 'deposit') fillSelect(select, depositReasons, 'اختاري سبب الإيداع');
-    else fillSelect(select, ['تحويل بين الطلاب','أخرى'], 'اختاري سبب التحويل');
-    if([...select.options].some(o=>o.value===current)) select.value = current;
-    const chosen = select.value;
-    if(chosen === 'أخرى') { otherWrap?.classList.remove('hidden'); hidden.value = (other?.value || '').trim(); }
-    else { otherWrap?.classList.add('hidden'); if(other) other.value=''; hidden.value = chosen || ''; }
-  }
-  window.updateTeacherReasonOptions = syncTeacherReason;
-  document.addEventListener('change', function(e){
-    if(e.target && e.target.id === 'opType') syncTeacherReason();
-    if(e.target && e.target.id === 'opReasonSelect') syncTeacherReason();
-    if(e.target && e.target.id === 'bulkTypeSelect') updateBulkReasonOptions();
-    if(e.target && e.target.id === 'bulkReasonSelect') updateBulkReasonOptions();
-  });
-  document.addEventListener('input', function(e){
-    if(e.target && e.target.id === 'opReasonOther'){
-      const hidden = document.getElementById('opReason');
-      if(hidden) hidden.value = (e.target.value || '').trim();
-    }
-    if(e.target && e.target.id === 'bulkReasonOther'){
-      const hidden = document.getElementById('bulkReasonHidden');
-      if(hidden) hidden.value = (e.target.value || '').trim();
-    }
-  });
-  const oldToggle = window.toggleTransferTarget;
-  if(typeof oldToggle === 'function'){
-    window.toggleTransferTarget = function(){ oldToggle(); syncTeacherReason(); };
-  }
-
-  function populateClassSelects(){
-    const classes = (window.bankData?.classes || []);
-    ['bulkClassSelect'].forEach(function(id){
-      const sel = document.getElementById(id);
-      if(!sel) return;
-      const current = sel.value;
-      sel.innerHTML = classes.map(function(c){ return '<option value="'+c.id+'">'+c.name+'</option>'; }).join('');
-      if(current && [...sel.options].some(o=>o.value===current)) sel.value = current;
-    });
-  }
-  window.updateBulkReasonOptions = function(){
-    const type = document.getElementById('bulkTypeSelect')?.value || 'deposit';
-    const select = document.getElementById('bulkReasonSelect');
-    const wrap = document.getElementById('bulkReasonOtherWrap');
-    const other = document.getElementById('bulkReasonOther');
-    if(!select) return;
-    const current = select.value;
-    fillSelect(select, type === 'withdraw' ? withdrawReasons : depositReasons, type === 'withdraw' ? 'اختاري سبب السحب' : 'اختاري سبب الإيداع');
-    if([...select.options].some(o=>o.value===current)) select.value = current;
-    if(select.value === 'أخرى') wrap?.classList.remove('hidden'); else { wrap?.classList.add('hidden'); if(other) other.value=''; }
-  };
-  window.openBulkOpModal = function(classId, type){
-    const modal = document.getElementById('bulkOpModal');
-    const classSel = document.getElementById('bulkClassSelect');
-    const typeSel = document.getElementById('bulkTypeSelect');
-    const title = document.getElementById('bulkOpTitle');
-    document.getElementById('bulkOpMsg')?.classList.add('hidden');
-    document.getElementById('bulkOpErr')?.classList.add('hidden');
-    populateClassSelects();
-    if(classSel && classId) classSel.value = classId;
-    if(typeSel && type) typeSel.value = type;
-    if(title) title.textContent = type === 'withdraw' ? 'سحب للفصل كامل' : 'إيداع للفصل كامل';
-    const amount = document.getElementById('bulkAmountInput'); if(amount) amount.value = '';
-    const other = document.getElementById('bulkReasonOther'); if(other) other.value = '';
-    updateBulkReasonOptions();
-    modal?.classList.add('show');
-  };
-  window.closeBulkOpModal = function(){ document.getElementById('bulkOpModal')?.classList.remove('show'); };
-  window.quickClassOperation = function(classId, type){ openBulkOpModal(classId, type); };
-  window.submitBulkOperation = function(){
-    const classId = document.getElementById('bulkClassSelect')?.value;
-    const type = document.getElementById('bulkTypeSelect')?.value;
-    const amount = Number(document.getElementById('bulkAmountInput')?.value || 0);
-    const reasonSel = document.getElementById('bulkReasonSelect')?.value || '';
-    const reasonOther = (document.getElementById('bulkReasonOther')?.value || '').trim();
-    const reason = reasonSel === 'أخرى' ? reasonOther : reasonSel;
-    const ok = document.getElementById('bulkOpMsg');
-    const err = document.getElementById('bulkOpErr');
-    ok?.classList.add('hidden'); err?.classList.add('hidden');
-    if(!classId || !(amount > 0) || !reason){ err?.classList.remove('hidden'); return; }
-    if(!window.bankData) return;
-    const now = new Date();
-    const date = now.toLocaleDateString('en-CA') + ' ' + now.toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'});
-    (bankData.students || []).filter(function(st){ return st.classId === classId; }).forEach(function(st){
-      st.balance = Math.max(0, Number(st.balance||0) + (type === 'deposit' ? amount : -amount));
-      if(!Array.isArray(st.history)) st.history = [];
-      st.history.push({id:'h'+Date.now()+Math.random().toString(16).slice(2,6), type:type === 'deposit' ? 'deposit' : 'withdraw', amount:Number(amount), reason:reason, date:date});
-      if(Array.isArray(bankData.operations)) bankData.operations.push({id:'op'+Date.now()+Math.random().toString(16).slice(2,6), studentId:st.id, studentName:st.name, type:type === 'deposit' ? 'deposit' : 'withdraw', amount:Number(amount), reason:reason, date:date});
-    });
-    if(typeof saveBankData === 'function') saveBankData();
-    if(typeof refreshTeacherUI === 'function') refreshTeacherUI();
-    ok?.classList.remove('hidden');
-    setTimeout(function(){ closeBulkOpModal(); }, 900);
-  };
-
-  function relabelButtons(){
-    document.querySelectorAll('button').forEach(function(btn){
-      const t = (btn.textContent || '').trim();
-      if(t === 'خصم للفصل كامل') btn.textContent = 'سحب للفصل كامل';
-    });
-  }
-  const oldRefresh = window.refreshTeacherUI;
-  if(typeof oldRefresh === 'function'){
-    window.refreshTeacherUI = function(){ oldRefresh(); populateClassSelects(); relabelButtons(); syncTeacherReason(); };
-  }
-  document.addEventListener('DOMContentLoaded', function(){ populateClassSelects(); relabelButtons(); syncTeacherReason(); });
-  window.addEventListener('load', function(){ setTimeout(function(){ populateClassSelects(); relabelButtons(); syncTeacherReason(); }, 300); });
 })();
 </script>
 
@@ -9315,162 +7143,7 @@ window.addEventListener('load', function(){
   };
   function openPrintWindow(title, bodyHtml){
     const w = window.open('', '_blank'); if(!w) return;
-    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}
-<style id="teacher-reason-patch-style">
-.bulk-op-modal{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;z-index:99999;padding:18px}
-.bulk-op-modal.show{display:flex}
-.bulk-op-box{width:min(420px,100%);background:#fff;border-radius:28px;padding:18px;border:1px solid var(--line);box-shadow:0 24px 60px rgba(0,0,0,.18)}
-.bulk-op-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
-.bulk-op-head h3{margin:0;color:var(--deep);font-size:18px}
-.bulk-op-close{border:none;background:#f4f8f5;border-radius:14px;padding:10px 12px;font-weight:900;cursor:pointer}
-</style>
-<div id="bulkOpModal" class="bulk-op-modal">
-  <div class="bulk-op-box">
-    <div class="bulk-op-head"><h3 id="bulkOpTitle">عملية للفصل كامل</h3><button type="button" class="bulk-op-close" onclick="closeBulkOpModal()">✕</button></div>
-    <div class="field"><label>الفصل</label><select id="bulkClassSelect"></select></div>
-    <div class="field"><label>نوع العملية</label><select id="bulkTypeSelect" onchange="updateBulkReasonOptions()"><option value="deposit">إيداع</option><option value="withdraw">سحب</option></select></div>
-    <div class="field"><label>المبلغ</label><input id="bulkAmountInput" type="number" placeholder="أدخلي المبلغ" /></div>
-    <div class="field"><label>السبب</label><select id="bulkReasonSelect"></select></div>
-    <div class="field hidden" id="bulkReasonOtherWrap"><label>سبب آخر</label><input id="bulkReasonOther" type="text" placeholder="اكتبي السبب هنا" /></div>
-    <div class="teacher-actions">
-      <button class="btn btn-green" type="button" onclick="submitBulkOperation()">تنفيذ العملية</button>
-      <button class="btn" type="button" style="background:#eef3ef" onclick="closeBulkOpModal()">إلغاء</button>
-    </div>
-    <div id="bulkOpMsg" class="notice ok hidden">تم تنفيذ العملية للفصل كامل</div>
-    <div id="bulkOpErr" class="notice err hidden">أكملي البيانات بشكل صحيح</div>
-  </div>
-</div>
-<script>
-(function(){
-  const depositReasons = [
-    'مشاركة مميزة في الحصة','حل سؤال صعب','مساعدة زميل / زميلة','إنهاء المهمة الأدائية','تسليم الواجب مبكرًا','الحصول على درجة كاملة','الفوز في تحدي الرياضيات','ترتيب الدفتر','الالتزام والهدوء في الحصة','مبادرة إيجابية','حضور كامل الأسبوع','تميز في العمل الجماعي','أخرى'
-  ];
-  const withdrawReasons = [
-    'عدم حل الواجب','التأخر عن الحصة','كثرة الكلام أثناء الشرح','عدم إحضار الأدوات','عدم المشاركة','مخالفة تعليمات الصف','عدم تسليم المهمة الأدائية','إزعاج الزملاء','استخدام الجوال','سحب سلوكي','أخرى'
-  ];
-  function fillSelect(select, items, placeholder){
-    if(!select) return;
-    select.innerHTML = '<option value="">'+(placeholder||'اختر السبب')+'</option>' + items.map(function(item){ return '<option value="'+item+'">'+item+'</option>'; }).join('');
-  }
-  function syncTeacherReason(){
-    const type = document.getElementById('opType')?.value || 'deposit';
-    const select = document.getElementById('opReasonSelect');
-    const otherWrap = document.getElementById('opReasonOtherWrap');
-    const other = document.getElementById('opReasonOther');
-    const hidden = document.getElementById('opReason');
-    if(!select || !hidden) return;
-    const current = select.value;
-    if(type === 'withdraw') fillSelect(select, withdrawReasons, 'اختاري سبب السحب');
-    else if(type === 'deposit') fillSelect(select, depositReasons, 'اختاري سبب الإيداع');
-    else fillSelect(select, ['تحويل بين الطلاب','أخرى'], 'اختاري سبب التحويل');
-    if([...select.options].some(o=>o.value===current)) select.value = current;
-    const chosen = select.value;
-    if(chosen === 'أخرى') { otherWrap?.classList.remove('hidden'); hidden.value = (other?.value || '').trim(); }
-    else { otherWrap?.classList.add('hidden'); if(other) other.value=''; hidden.value = chosen || ''; }
-  }
-  window.updateTeacherReasonOptions = syncTeacherReason;
-  document.addEventListener('change', function(e){
-    if(e.target && e.target.id === 'opType') syncTeacherReason();
-    if(e.target && e.target.id === 'opReasonSelect') syncTeacherReason();
-    if(e.target && e.target.id === 'bulkTypeSelect') updateBulkReasonOptions();
-    if(e.target && e.target.id === 'bulkReasonSelect') updateBulkReasonOptions();
-  });
-  document.addEventListener('input', function(e){
-    if(e.target && e.target.id === 'opReasonOther'){
-      const hidden = document.getElementById('opReason');
-      if(hidden) hidden.value = (e.target.value || '').trim();
-    }
-    if(e.target && e.target.id === 'bulkReasonOther'){
-      const hidden = document.getElementById('bulkReasonHidden');
-      if(hidden) hidden.value = (e.target.value || '').trim();
-    }
-  });
-  const oldToggle = window.toggleTransferTarget;
-  if(typeof oldToggle === 'function'){
-    window.toggleTransferTarget = function(){ oldToggle(); syncTeacherReason(); };
-  }
-
-  function populateClassSelects(){
-    const classes = (window.bankData?.classes || []);
-    ['bulkClassSelect'].forEach(function(id){
-      const sel = document.getElementById(id);
-      if(!sel) return;
-      const current = sel.value;
-      sel.innerHTML = classes.map(function(c){ return '<option value="'+c.id+'">'+c.name+'</option>'; }).join('');
-      if(current && [...sel.options].some(o=>o.value===current)) sel.value = current;
-    });
-  }
-  window.updateBulkReasonOptions = function(){
-    const type = document.getElementById('bulkTypeSelect')?.value || 'deposit';
-    const select = document.getElementById('bulkReasonSelect');
-    const wrap = document.getElementById('bulkReasonOtherWrap');
-    const other = document.getElementById('bulkReasonOther');
-    if(!select) return;
-    const current = select.value;
-    fillSelect(select, type === 'withdraw' ? withdrawReasons : depositReasons, type === 'withdraw' ? 'اختاري سبب السحب' : 'اختاري سبب الإيداع');
-    if([...select.options].some(o=>o.value===current)) select.value = current;
-    if(select.value === 'أخرى') wrap?.classList.remove('hidden'); else { wrap?.classList.add('hidden'); if(other) other.value=''; }
-  };
-  window.openBulkOpModal = function(classId, type){
-    const modal = document.getElementById('bulkOpModal');
-    const classSel = document.getElementById('bulkClassSelect');
-    const typeSel = document.getElementById('bulkTypeSelect');
-    const title = document.getElementById('bulkOpTitle');
-    document.getElementById('bulkOpMsg')?.classList.add('hidden');
-    document.getElementById('bulkOpErr')?.classList.add('hidden');
-    populateClassSelects();
-    if(classSel && classId) classSel.value = classId;
-    if(typeSel && type) typeSel.value = type;
-    if(title) title.textContent = type === 'withdraw' ? 'سحب للفصل كامل' : 'إيداع للفصل كامل';
-    const amount = document.getElementById('bulkAmountInput'); if(amount) amount.value = '';
-    const other = document.getElementById('bulkReasonOther'); if(other) other.value = '';
-    updateBulkReasonOptions();
-    modal?.classList.add('show');
-  };
-  window.closeBulkOpModal = function(){ document.getElementById('bulkOpModal')?.classList.remove('show'); };
-  window.quickClassOperation = function(classId, type){ openBulkOpModal(classId, type); };
-  window.submitBulkOperation = function(){
-    const classId = document.getElementById('bulkClassSelect')?.value;
-    const type = document.getElementById('bulkTypeSelect')?.value;
-    const amount = Number(document.getElementById('bulkAmountInput')?.value || 0);
-    const reasonSel = document.getElementById('bulkReasonSelect')?.value || '';
-    const reasonOther = (document.getElementById('bulkReasonOther')?.value || '').trim();
-    const reason = reasonSel === 'أخرى' ? reasonOther : reasonSel;
-    const ok = document.getElementById('bulkOpMsg');
-    const err = document.getElementById('bulkOpErr');
-    ok?.classList.add('hidden'); err?.classList.add('hidden');
-    if(!classId || !(amount > 0) || !reason){ err?.classList.remove('hidden'); return; }
-    if(!window.bankData) return;
-    const now = new Date();
-    const date = now.toLocaleDateString('en-CA') + ' ' + now.toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'});
-    (bankData.students || []).filter(function(st){ return st.classId === classId; }).forEach(function(st){
-      st.balance = Math.max(0, Number(st.balance||0) + (type === 'deposit' ? amount : -amount));
-      if(!Array.isArray(st.history)) st.history = [];
-      st.history.push({id:'h'+Date.now()+Math.random().toString(16).slice(2,6), type:type === 'deposit' ? 'deposit' : 'withdraw', amount:Number(amount), reason:reason, date:date});
-      if(Array.isArray(bankData.operations)) bankData.operations.push({id:'op'+Date.now()+Math.random().toString(16).slice(2,6), studentId:st.id, studentName:st.name, type:type === 'deposit' ? 'deposit' : 'withdraw', amount:Number(amount), reason:reason, date:date});
-    });
-    if(typeof saveBankData === 'function') saveBankData();
-    if(typeof refreshTeacherUI === 'function') refreshTeacherUI();
-    ok?.classList.remove('hidden');
-    setTimeout(function(){ closeBulkOpModal(); }, 900);
-  };
-
-  function relabelButtons(){
-    document.querySelectorAll('button').forEach(function(btn){
-      const t = (btn.textContent || '').trim();
-      if(t === 'خصم للفصل كامل') btn.textContent = 'سحب للفصل كامل';
-    });
-  }
-  const oldRefresh = window.refreshTeacherUI;
-  if(typeof oldRefresh === 'function'){
-    window.refreshTeacherUI = function(){ oldRefresh(); populateClassSelects(); relabelButtons(); syncTeacherReason(); };
-  }
-  document.addEventListener('DOMContentLoaded', function(){ populateClassSelects(); relabelButtons(); syncTeacherReason(); });
-  window.addEventListener('load', function(){ setTimeout(function(){ populateClassSelects(); relabelButtons(); syncTeacherReason(); }, 300); });
-})();
-</script>
-
-</body></html>`);
+    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style></head><body><h1>${title}</h1>${bodyHtml}</body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
   window.printStudentReport = function(studentId){
@@ -9651,161 +7324,6 @@ window.addEventListener('load', function(){
   document.addEventListener('DOMContentLoaded', function(){ setTimeout(function(){ try{ initStudentsManagerRouter(); }catch(e){} }, 400); });
 })();
 </script>
-
-<style id="teacher-reason-patch-style">
-.bulk-op-modal{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;z-index:99999;padding:18px}
-.bulk-op-modal.show{display:flex}
-.bulk-op-box{width:min(420px,100%);background:#fff;border-radius:28px;padding:18px;border:1px solid var(--line);box-shadow:0 24px 60px rgba(0,0,0,.18)}
-.bulk-op-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
-.bulk-op-head h3{margin:0;color:var(--deep);font-size:18px}
-.bulk-op-close{border:none;background:#f4f8f5;border-radius:14px;padding:10px 12px;font-weight:900;cursor:pointer}
-</style>
-<div id="bulkOpModal" class="bulk-op-modal">
-  <div class="bulk-op-box">
-    <div class="bulk-op-head"><h3 id="bulkOpTitle">عملية للفصل كامل</h3><button type="button" class="bulk-op-close" onclick="closeBulkOpModal()">✕</button></div>
-    <div class="field"><label>الفصل</label><select id="bulkClassSelect"></select></div>
-    <div class="field"><label>نوع العملية</label><select id="bulkTypeSelect" onchange="updateBulkReasonOptions()"><option value="deposit">إيداع</option><option value="withdraw">سحب</option></select></div>
-    <div class="field"><label>المبلغ</label><input id="bulkAmountInput" type="number" placeholder="أدخلي المبلغ" /></div>
-    <div class="field"><label>السبب</label><select id="bulkReasonSelect"></select></div>
-    <div class="field hidden" id="bulkReasonOtherWrap"><label>سبب آخر</label><input id="bulkReasonOther" type="text" placeholder="اكتبي السبب هنا" /></div>
-    <div class="teacher-actions">
-      <button class="btn btn-green" type="button" onclick="submitBulkOperation()">تنفيذ العملية</button>
-      <button class="btn" type="button" style="background:#eef3ef" onclick="closeBulkOpModal()">إلغاء</button>
-    </div>
-    <div id="bulkOpMsg" class="notice ok hidden">تم تنفيذ العملية للفصل كامل</div>
-    <div id="bulkOpErr" class="notice err hidden">أكملي البيانات بشكل صحيح</div>
-  </div>
-</div>
-<script>
-(function(){
-  const depositReasons = [
-    'مشاركة مميزة في الحصة','حل سؤال صعب','مساعدة زميل / زميلة','إنهاء المهمة الأدائية','تسليم الواجب مبكرًا','الحصول على درجة كاملة','الفوز في تحدي الرياضيات','ترتيب الدفتر','الالتزام والهدوء في الحصة','مبادرة إيجابية','حضور كامل الأسبوع','تميز في العمل الجماعي','أخرى'
-  ];
-  const withdrawReasons = [
-    'عدم حل الواجب','التأخر عن الحصة','كثرة الكلام أثناء الشرح','عدم إحضار الأدوات','عدم المشاركة','مخالفة تعليمات الصف','عدم تسليم المهمة الأدائية','إزعاج الزملاء','استخدام الجوال','سحب سلوكي','أخرى'
-  ];
-  function fillSelect(select, items, placeholder){
-    if(!select) return;
-    select.innerHTML = '<option value="">'+(placeholder||'اختر السبب')+'</option>' + items.map(function(item){ return '<option value="'+item+'">'+item+'</option>'; }).join('');
-  }
-  function syncTeacherReason(){
-    const type = document.getElementById('opType')?.value || 'deposit';
-    const select = document.getElementById('opReasonSelect');
-    const otherWrap = document.getElementById('opReasonOtherWrap');
-    const other = document.getElementById('opReasonOther');
-    const hidden = document.getElementById('opReason');
-    if(!select || !hidden) return;
-    const current = select.value;
-    if(type === 'withdraw') fillSelect(select, withdrawReasons, 'اختاري سبب السحب');
-    else if(type === 'deposit') fillSelect(select, depositReasons, 'اختاري سبب الإيداع');
-    else fillSelect(select, ['تحويل بين الطلاب','أخرى'], 'اختاري سبب التحويل');
-    if([...select.options].some(o=>o.value===current)) select.value = current;
-    const chosen = select.value;
-    if(chosen === 'أخرى') { otherWrap?.classList.remove('hidden'); hidden.value = (other?.value || '').trim(); }
-    else { otherWrap?.classList.add('hidden'); if(other) other.value=''; hidden.value = chosen || ''; }
-  }
-  window.updateTeacherReasonOptions = syncTeacherReason;
-  document.addEventListener('change', function(e){
-    if(e.target && e.target.id === 'opType') syncTeacherReason();
-    if(e.target && e.target.id === 'opReasonSelect') syncTeacherReason();
-    if(e.target && e.target.id === 'bulkTypeSelect') updateBulkReasonOptions();
-    if(e.target && e.target.id === 'bulkReasonSelect') updateBulkReasonOptions();
-  });
-  document.addEventListener('input', function(e){
-    if(e.target && e.target.id === 'opReasonOther'){
-      const hidden = document.getElementById('opReason');
-      if(hidden) hidden.value = (e.target.value || '').trim();
-    }
-    if(e.target && e.target.id === 'bulkReasonOther'){
-      const hidden = document.getElementById('bulkReasonHidden');
-      if(hidden) hidden.value = (e.target.value || '').trim();
-    }
-  });
-  const oldToggle = window.toggleTransferTarget;
-  if(typeof oldToggle === 'function'){
-    window.toggleTransferTarget = function(){ oldToggle(); syncTeacherReason(); };
-  }
-
-  function populateClassSelects(){
-    const classes = (window.bankData?.classes || []);
-    ['bulkClassSelect'].forEach(function(id){
-      const sel = document.getElementById(id);
-      if(!sel) return;
-      const current = sel.value;
-      sel.innerHTML = classes.map(function(c){ return '<option value="'+c.id+'">'+c.name+'</option>'; }).join('');
-      if(current && [...sel.options].some(o=>o.value===current)) sel.value = current;
-    });
-  }
-  window.updateBulkReasonOptions = function(){
-    const type = document.getElementById('bulkTypeSelect')?.value || 'deposit';
-    const select = document.getElementById('bulkReasonSelect');
-    const wrap = document.getElementById('bulkReasonOtherWrap');
-    const other = document.getElementById('bulkReasonOther');
-    if(!select) return;
-    const current = select.value;
-    fillSelect(select, type === 'withdraw' ? withdrawReasons : depositReasons, type === 'withdraw' ? 'اختاري سبب السحب' : 'اختاري سبب الإيداع');
-    if([...select.options].some(o=>o.value===current)) select.value = current;
-    if(select.value === 'أخرى') wrap?.classList.remove('hidden'); else { wrap?.classList.add('hidden'); if(other) other.value=''; }
-  };
-  window.openBulkOpModal = function(classId, type){
-    const modal = document.getElementById('bulkOpModal');
-    const classSel = document.getElementById('bulkClassSelect');
-    const typeSel = document.getElementById('bulkTypeSelect');
-    const title = document.getElementById('bulkOpTitle');
-    document.getElementById('bulkOpMsg')?.classList.add('hidden');
-    document.getElementById('bulkOpErr')?.classList.add('hidden');
-    populateClassSelects();
-    if(classSel && classId) classSel.value = classId;
-    if(typeSel && type) typeSel.value = type;
-    if(title) title.textContent = type === 'withdraw' ? 'سحب للفصل كامل' : 'إيداع للفصل كامل';
-    const amount = document.getElementById('bulkAmountInput'); if(amount) amount.value = '';
-    const other = document.getElementById('bulkReasonOther'); if(other) other.value = '';
-    updateBulkReasonOptions();
-    modal?.classList.add('show');
-  };
-  window.closeBulkOpModal = function(){ document.getElementById('bulkOpModal')?.classList.remove('show'); };
-  window.quickClassOperation = function(classId, type){ openBulkOpModal(classId, type); };
-  window.submitBulkOperation = function(){
-    const classId = document.getElementById('bulkClassSelect')?.value;
-    const type = document.getElementById('bulkTypeSelect')?.value;
-    const amount = Number(document.getElementById('bulkAmountInput')?.value || 0);
-    const reasonSel = document.getElementById('bulkReasonSelect')?.value || '';
-    const reasonOther = (document.getElementById('bulkReasonOther')?.value || '').trim();
-    const reason = reasonSel === 'أخرى' ? reasonOther : reasonSel;
-    const ok = document.getElementById('bulkOpMsg');
-    const err = document.getElementById('bulkOpErr');
-    ok?.classList.add('hidden'); err?.classList.add('hidden');
-    if(!classId || !(amount > 0) || !reason){ err?.classList.remove('hidden'); return; }
-    if(!window.bankData) return;
-    const now = new Date();
-    const date = now.toLocaleDateString('en-CA') + ' ' + now.toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'});
-    (bankData.students || []).filter(function(st){ return st.classId === classId; }).forEach(function(st){
-      st.balance = Math.max(0, Number(st.balance||0) + (type === 'deposit' ? amount : -amount));
-      if(!Array.isArray(st.history)) st.history = [];
-      st.history.push({id:'h'+Date.now()+Math.random().toString(16).slice(2,6), type:type === 'deposit' ? 'deposit' : 'withdraw', amount:Number(amount), reason:reason, date:date});
-      if(Array.isArray(bankData.operations)) bankData.operations.push({id:'op'+Date.now()+Math.random().toString(16).slice(2,6), studentId:st.id, studentName:st.name, type:type === 'deposit' ? 'deposit' : 'withdraw', amount:Number(amount), reason:reason, date:date});
-    });
-    if(typeof saveBankData === 'function') saveBankData();
-    if(typeof refreshTeacherUI === 'function') refreshTeacherUI();
-    ok?.classList.remove('hidden');
-    setTimeout(function(){ closeBulkOpModal(); }, 900);
-  };
-
-  function relabelButtons(){
-    document.querySelectorAll('button').forEach(function(btn){
-      const t = (btn.textContent || '').trim();
-      if(t === 'خصم للفصل كامل') btn.textContent = 'سحب للفصل كامل';
-    });
-  }
-  const oldRefresh = window.refreshTeacherUI;
-  if(typeof oldRefresh === 'function'){
-    window.refreshTeacherUI = function(){ oldRefresh(); populateClassSelects(); relabelButtons(); syncTeacherReason(); };
-  }
-  document.addEventListener('DOMContentLoaded', function(){ populateClassSelects(); relabelButtons(); syncTeacherReason(); });
-  window.addEventListener('load', function(){ setTimeout(function(){ populateClassSelects(); relabelButtons(); syncTeacherReason(); }, 300); });
-})();
-</script>
-
 </body>
 </html>
 
@@ -10685,5 +8203,234 @@ window.addEventListener('load', function(){
   };
 
   document.addEventListener('DOMContentLoaded', function(){ rerenderSettings(); });
+})();
+</script>
+
+
+<style id="sara-teacher-bulk-fix-style">
+.bulk-op-modal{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;z-index:99999;padding:18px}
+.bulk-op-modal.show{display:flex}
+.bulk-op-box{width:min(460px,100%);background:#fff;border-radius:28px;padding:18px;border:1px solid rgba(16,58,46,.08);box-shadow:0 24px 60px rgba(0,0,0,.18)}
+.bulk-op-box h3{margin:0 0 8px;color:var(--deep)}
+.bulk-op-box .teacher-note{margin-bottom:10px}
+.bulk-op-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+#teacherOpOtherWrap.hidden,#bulkReasonOtherWrap.hidden{display:none !important}
+</style>
+<script id="sara-teacher-bulk-fix-script">
+(function(){
+  const DEPOSIT_REASONS = [
+    'مشاركة مميزة في الحصة','حل سؤال صعب','مساعدة زميل / زميلة','إنهاء المهمة الأدائية','تسليم الواجب مبكرًا','الحصول على درجة كاملة','الفوز في تحدي الرياضيات','ترتيب الدفتر','الالتزام والهدوء في الحصة','مبادرة إيجابية','حضور كامل الأسبوع','تميز في العمل الجماعي','أخرى'
+  ];
+  const WITHDRAW_REASONS = [
+    'عدم حل الواجب','التأخر عن الحصة','كثرة الكلام أثناء الشرح','عدم إحضار الأدوات','عدم المشاركة','مخالفة تعليمات الصف','عدم تسليم المهمة الأدائية','إزعاج الزملاء','استخدام الجوال','سحب سلوكي','أخرى'
+  ];
+  const TRANSFER_REASONS = ['تحويل بين الطلاب / الطالبات','تحويل تحفيزي','أخرى'];
+
+  function reasonList(type){
+    if(type==='deposit') return DEPOSIT_REASONS;
+    if(type==='withdraw') return WITHDRAW_REASONS;
+    return TRANSFER_REASONS;
+  }
+  function buildOptions(arr, placeholder){
+    return ['<option value="">'+placeholder+'</option>'].concat(arr.map(function(x){ return '<option value="'+x+'">'+x+'</option>'; })).join('');
+  }
+  function ensureTeacherOpReasonUI(){
+    const reasonInput = document.getElementById('opReason');
+    if(!reasonInput || document.getElementById('opReasonSelect')) return;
+    const field = reasonInput.closest('.field');
+    if(!field) return;
+    field.innerHTML = '<label>السبب</label>'+
+      '<select id="opReasonSelect"></select>'+
+      '<div id="teacherOpOtherWrap" class="field hidden" style="margin-top:10px;margin-bottom:0"><label>سبب آخر</label><input id="opReasonOther" type="text" placeholder="اكتبي السبب هنا" /></div>'+
+      '<input id="opReason" type="hidden" />';
+    updateTeacherOpReasons();
+    const sel = document.getElementById('opReasonSelect');
+    if(sel) sel.addEventListener('change', syncTeacherReasonHidden);
+    const other = document.getElementById('opReasonOther');
+    if(other) other.addEventListener('input', syncTeacherReasonHidden);
+  }
+  function updateTeacherOpReasons(){
+    const type = document.getElementById('opType')?.value || 'deposit';
+    const sel = document.getElementById('opReasonSelect');
+    const otherWrap = document.getElementById('teacherOpOtherWrap');
+    if(!sel) return;
+    const prev = sel.value;
+    sel.innerHTML = buildOptions(reasonList(type), 'اختاري السبب');
+    if(reasonList(type).includes(prev)) sel.value = prev;
+    if(otherWrap) otherWrap.classList.toggle('hidden', sel.value !== 'أخرى');
+    syncTeacherReasonHidden();
+  }
+  function syncTeacherReasonHidden(){
+    const sel = document.getElementById('opReasonSelect');
+    const other = document.getElementById('opReasonOther');
+    const hidden = document.getElementById('opReason');
+    const otherWrap = document.getElementById('teacherOpOtherWrap');
+    if(!sel || !hidden) return;
+    if(otherWrap) otherWrap.classList.toggle('hidden', sel.value !== 'أخرى');
+    hidden.value = sel.value === 'أخرى' ? (other?.value || '').trim() : (sel.value || '');
+  }
+
+  window.toggleTransferTarget = function(){
+    const type = document.getElementById('opType');
+    const wrap = document.getElementById('transferTargetWrap');
+    if(type && wrap) wrap.classList.toggle('hidden', type.value !== 'transfer');
+    updateTeacherOpReasons();
+  };
+
+  window.executeTeacherOperation = function(){
+    syncTeacherReasonHidden();
+    const type = document.getElementById('opType')?.value;
+    const studentId = document.getElementById('opStudent')?.value;
+    const targetId = document.getElementById('transferTarget')?.value;
+    const amount = Number(document.getElementById('opAmount')?.value || 0);
+    const reason = (document.getElementById('opReason')?.value || '').trim();
+    const ok = document.getElementById('opMsg');
+    const err = document.getElementById('opErr');
+    ok?.classList.add('hidden'); err?.classList.add('hidden');
+    const student = typeof getStudent==='function' ? getStudent(studentId) : null;
+    if(!student || amount<=0 || !reason || (type==='transfer' && (!targetId || targetId===studentId))){ err?.classList.remove('hidden'); return; }
+    const now = new Date();
+    const date = now.toLocaleDateString('en-CA') + ' ' + now.toLocaleTimeString('ar-SA', {hour:'2-digit', minute:'2-digit'});
+    const op = {id:'op'+Date.now(), studentId:student.id, studentName:student.name, type, amount, reason, date};
+    if(type==='deposit') student.balance = Number(student.balance||0) + amount;
+    if(type==='withdraw') student.balance = Math.max(0, Number(student.balance||0) - amount);
+    if(type==='transfer'){
+      const target = typeof getStudent==='function' ? getStudent(targetId) : null;
+      if(!target || Number(student.balance||0) < amount){ err?.classList.remove('hidden'); return; }
+      student.balance = Number(student.balance||0) - amount;
+      target.balance = Number(target.balance||0) + amount;
+      op.targetStudentId = target.id; op.targetStudentName = target.name;
+      if(!Array.isArray(target.history)) target.history=[];
+      target.history.push({id:'h'+Date.now()+'t', type:'deposit', amount, reason:'تحويل من '+student.name, date});
+    }
+    if(!Array.isArray(student.history)) student.history=[];
+    student.history.push({id:'h'+Date.now(), type, amount, reason, date});
+    if(!Array.isArray(bankData.operations)) bankData.operations=[];
+    bankData.operations.push(op); window.lastOperation = op;
+    if(typeof saveBankData==='function') saveBankData();
+    const a=document.getElementById('opAmount'); if(a) a.value='';
+    const s=document.getElementById('opReasonSelect'); if(s) s.value='';
+    const o=document.getElementById('opReasonOther'); if(o) o.value='';
+    syncTeacherReasonHidden();
+    ok?.classList.remove('hidden');
+    if(typeof refreshTeacherUI==='function') refreshTeacherUI();
+    if(bankData?.teacher?.autoOpenWA && typeof sendOperationToGuardian==='function') sendOperationToGuardian(op, student);
+    if(sessionStorage.getItem('currentStudentId')===student.id && typeof renderStudentAccount==='function') renderStudentAccount();
+  };
+
+  function ensureBulkModal(){
+    if(document.getElementById('bulkOpModal')) return;
+    const modal = document.createElement('div');
+    modal.id = 'bulkOpModal';
+    modal.className = 'bulk-op-modal';
+    modal.innerHTML = '<div class="bulk-op-box">'+
+      '<h3 id="bulkOpTitle">تنفيذ عملية جماعية</h3>'+
+      '<div class="teacher-note" id="bulkOpDesc">اختاري السبب والمبلغ ثم نفذي العملية على الفصل كامل.</div>'+
+      '<div class="field"><label>المبلغ</label><input id="bulkOpAmount" type="number" placeholder="أدخلي المبلغ" /></div>'+
+      '<div class="field"><label>السبب</label><select id="bulkReasonSelect"></select></div>'+
+      '<div id="bulkReasonOtherWrap" class="field hidden"><label>سبب آخر</label><input id="bulkReasonOther" type="text" placeholder="اكتبي السبب هنا" /></div>'+
+      '<div class="bulk-op-actions"><button class="btn btn-green" type="button" id="bulkOpSubmit">تنفيذ</button><button class="btn btn-light" type="button" onclick="document.getElementById(\'bulkOpModal\').classList.remove(\'show\')">إلغاء</button></div>'+
+      '<div id="bulkOpMsg" class="notice ok hidden" style="margin-top:12px">تم تنفيذ العملية على الفصل كامل.</div>'+
+      '<div id="bulkOpErr" class="notice err hidden" style="margin-top:12px">أدخلي المبلغ والسبب أولًا.</div>'+
+    '</div>';
+    document.body.appendChild(modal);
+    document.getElementById('bulkReasonSelect').addEventListener('change', function(){
+      document.getElementById('bulkReasonOtherWrap').classList.toggle('hidden', this.value!=='أخرى');
+    });
+    document.getElementById('bulkOpSubmit').addEventListener('click', function(){
+      const state = window.__bulkOpState || {};
+      const amount = Number(document.getElementById('bulkOpAmount').value || 0);
+      let reason = document.getElementById('bulkReasonSelect').value || '';
+      if(reason==='أخرى') reason = (document.getElementById('bulkReasonOther').value || '').trim();
+      const ok=document.getElementById('bulkOpMsg'), err=document.getElementById('bulkOpErr');
+      ok.classList.add('hidden'); err.classList.add('hidden');
+      if(!state.classId || !state.type || !(amount>0) || !reason){ err.classList.remove('hidden'); return; }
+      const arr = (bankData.students||[]).filter(function(s){ return s.classId===state.classId; });
+      const now = new Date();
+      arr.forEach(function(st, idx){
+        const date = now.toLocaleDateString('en-CA') + ' ' + now.toLocaleTimeString('ar-SA', {hour:'2-digit', minute:'2-digit'});
+        if(!Array.isArray(st.history)) st.history=[];
+        st.history.push({id:'h'+Date.now()+idx, type:state.type, amount, reason, date});
+        if(state.type==='deposit') st.balance = Number(st.balance||0) + amount;
+        else st.balance = Math.max(0, Number(st.balance||0) - amount);
+        if(!Array.isArray(bankData.operations)) bankData.operations=[];
+        bankData.operations.push({id:'op'+Date.now()+idx, studentId:st.id, studentName:st.name, type:state.type, amount, reason, date});
+      });
+      if(typeof saveBankData==='function') saveBankData();
+      if(typeof refreshTeacherUI==='function') refreshTeacherUI();
+      ok.classList.remove('hidden');
+      setTimeout(function(){ document.getElementById('bulkOpModal').classList.remove('show'); }, 900);
+    });
+  }
+  function openBulkOpModal(classId, type){
+    ensureBulkModal();
+    window.__bulkOpState = {classId:classId, type:type};
+    const cls = (bankData.classes||[]).find(function(c){ return c.id===classId; });
+    document.getElementById('bulkOpTitle').textContent = type==='deposit' ? 'إيداع للفصل كامل' : 'سحب للفصل كامل';
+    document.getElementById('bulkOpDesc').textContent = 'الفصل: ' + (cls?.name || '—') + ' • اختاري السبب من القائمة المنسدلة.';
+    document.getElementById('bulkOpAmount').value = '';
+    document.getElementById('bulkReasonOther').value = '';
+    const sel = document.getElementById('bulkReasonSelect');
+    sel.innerHTML = buildOptions(reasonList(type), 'اختاري السبب');
+    document.getElementById('bulkReasonOtherWrap').classList.add('hidden');
+    document.getElementById('bulkOpMsg').classList.add('hidden');
+    document.getElementById('bulkOpErr').classList.add('hidden');
+    document.getElementById('bulkOpModal').classList.add('show');
+  }
+  window.quickClassOperation = openBulkOpModal;
+
+  function renderAdvancedSlot(){
+    const slot = document.getElementById('studentsRouterSlot');
+    if(!slot) return;
+    const classes = bankData?.classes || [];
+    slot.innerHTML = '<div class="student-settings-head"><div><h3>لوحة تحكم متقدمة</h3><div class="teacher-note">اختاري الفصل ثم نفذي إيداعًا أو سحبًا للفصل كامل مع سبب من قائمة منسدلة.</div></div><span class="pill">جاهزة</span></div>'+
+      '<div class="student-class-cards">'+
+      classes.map(function(c){
+        const count = (bankData.students||[]).filter(function(s){ return s.classId===c.id; }).length;
+        const total = (bankData.students||[]).filter(function(s){ return s.classId===c.id; }).reduce(function(a,b){ return a + Number(b.balance||0); },0);
+        return '<div class="student-class-card">'+
+          '<div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start"><div><h4>'+c.name+'</h4><div class="teacher-note">عدد الطلاب / الطالبات: '+count+'</div></div><span class="pill">'+count+' طالب/ة</span></div>'+
+          '<div class="student-class-meta"><div class="mini"><strong>'+count+'</strong><span>عدد الطلاب</span></div><div class="mini"><strong>'+(typeof formatMoney==='function'?formatMoney(total):total)+'</strong><span>إجمالي الأرصدة</span></div></div>'+
+          '<div class="student-class-actions">'+
+          '<button class="btn btn-green" type="button" onclick="quickClassOperation(\''+c.id+'\',\'deposit\')">إيداع للكل</button>'+
+          '<button class="btn btn-gold" type="button" onclick="quickClassOperation(\''+c.id+'\',\'withdraw\')">سحب للكل</button>'+
+          '<button class="btn btn-light" type="button" onclick="openStudentSettingsClass(\''+c.id+'\')">فتح الفصل</button>'+
+          '</div></div>';
+      }).join('') + '</div>';
+  }
+
+  const prevOpenStudentsManagerCard = window.openStudentsManagerCard;
+  window.openStudentsManagerCard = function(kind){
+    if(typeof prevOpenStudentsManagerCard==='function') prevOpenStudentsManagerCard(kind);
+    if(kind==='advanced') setTimeout(renderAdvancedSlot, 80);
+  };
+
+  const prevOpenStudentSettingsClass = window.openStudentSettingsClass;
+  window.openStudentSettingsClass = function(classId){
+    if(typeof prevOpenStudentSettingsClass==='function') prevOpenStudentSettingsClass(classId);
+    setTimeout(function(){
+      document.querySelectorAll('.student-bulk-actions .btn').forEach(function(btn){
+        if(btn.textContent.includes('خصم للفصل كامل')) btn.textContent='سحب للفصل كامل';
+      });
+    }, 40);
+  };
+
+  function fixStudentPaneButtons(){
+    document.querySelectorAll('button').forEach(function(btn){
+      if(btn.textContent && btn.textContent.trim()==='خصم للفصل كامل') btn.textContent='سحب للفصل كامل';
+    });
+  }
+
+  function initFixes(){
+    ensureTeacherOpReasonUI();
+    fixStudentPaneButtons();
+    const type=document.getElementById('opType');
+    if(type && !type.dataset.reasonBound){
+      type.dataset.reasonBound='1';
+      type.addEventListener('change', updateTeacherOpReasons);
+    }
+  }
+  document.addEventListener('DOMContentLoaded', function(){ setTimeout(initFixes, 300); });
+  window.addEventListener('load', function(){ setTimeout(initFixes, 500); });
 })();
 </script>
