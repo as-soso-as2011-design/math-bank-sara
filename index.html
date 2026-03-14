@@ -4235,8 +4235,8 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
     detail.classList.add('page-mode');
     detail.innerHTML = `
       <div class="student-detail-header">
-        <div class="student-detail-title"><h3>${cls.name}</h3><p>صفحة مستقلة لإدارة الطلاب / الطالبات داخل الفصل مع أدوات جماعية وأزرار خاصة بكل طالب / طالبة.</p></div>
-        <button class="ghost" onclick="closeStudentSettingsClass()">رجوع إلى الفصول</button>
+        <div class="student-detail-title"><h3>${cls.name}</h3><p>صفحة خاصة بالفصل تتضمن بطاقات الطلاب / الطالبات وأزرارًا فردية وجماعية مع زر رجوع للخلف.</p></div>
+        <button class="ghost" onclick="closeStudentSettingsClass()">رجوع للخلف</button>
       </div>
       <div class="teacher-mini-kpis">
         <div class="teacher-mini-kpi"><strong>${stats.students.length}</strong><span>عدد الطلاب / الطالبات</span></div>
@@ -4245,7 +4245,7 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
       </div>
       <div class="student-bulk-actions">
         <button class="btn btn-green" onclick="quickClassOperation('${cls.id}','deposit')">إيداع للفصل كامل</button>
-        <button class="btn btn-gold" onclick="quickClassOperation('${cls.id}','withdraw')">خصم للفصل كامل</button>
+        <button class="btn btn-gold" onclick="quickClassOperation('${cls.id}','withdraw')">سحب للفصل كامل</button>
         <button class="btn btn-green" onclick="assignTaskToClassFromSettings('${cls.id}')">إرسال مهمة للفصل كامل</button>
         <button class="btn btn-gold" onclick="bulkClassMessage('${cls.id}')">رسالة لولي الأمر للفصل كامل</button>
         <button class="btn btn-light" onclick="printClassReport('${cls.id}')">تصدير تقرير الفصل</button>
@@ -4319,7 +4319,7 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
     });
   };
   window.quickClassOperation = function(classId, type){
-    const amount = Number(prompt(type==='deposit'?'مبلغ الإيداع للفصل كامل':'مبلغ الخصم للفصل كامل') || 0);
+    const amount = Number(prompt(type==='deposit'?'مبلغ الإيداع للفصل كامل':'مبلغ السحب للفصل كامل') || 0);
     if(!(amount>0)) return;
     const reason = prompt('اكتبي السبب:') || (type==='deposit'?'مكافأة جماعية':'خصم جماعي');
     (bankData.students||[]).filter(s=>s.classId===classId).forEach(function(st){
@@ -4743,14 +4743,20 @@ function openMoreInfo(type){
       const students=(bankData.students||[]).filter(function(s){return s.classId===c.id;});
       const total=students.reduce((a,b)=>a+Number(b.balance||0),0);
       const active=students.filter(function(s){return !s.isFrozen;}).length;
+      const pending=students.reduce(function(sum,s){ return sum + (((s.performanceTasks||[]).filter(function(t){ return !t.done; }).length)||0); },0);
+      const nearUpgrade=students.filter(function(s){ return Number(s.balance||0) >= 9000; }).length;
       return `
         <div class="students-advanced-card">
           <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start"><h4>${c.name||''}</h4><span class="pill">${active} نشط</span></div>
+          <div class="teacher-note">عدد الطلاب / الطالبات في الفصل: ${students.length}</div>
           <div class="students-advanced-mini">
-            <div class="mini"><strong>${students.length}</strong><span>عدد الطلاب / الطالبات</span></div>
             <div class="mini"><strong>${money(total)}</strong><span>إجمالي الأرصدة</span></div>
+            <div class="mini"><strong>${students.length}</strong><span>عدد الطلاب / الطالبات</span></div>
+            <div class="mini"><strong>${nearUpgrade}</strong><span>قريبون من الترقية</span></div>
+            <div class="mini"><strong>${pending}</strong><span>مهام غير مسلمة</span></div>
           </div>
-          <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end">
+            <button class="btn btn-gold" type="button" onclick="bulkClassMessage('${c.id}')">رسالة جماعية</button>
             <button class="btn btn-green" type="button" onclick="openStudentSettingsClass('${c.id}')">فتح الفصل</button>
           </div>
         </div>`;
