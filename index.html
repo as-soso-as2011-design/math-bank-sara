@@ -532,15 +532,6 @@ html[dir="ltr"] .balance-head{direction:ltr}
 @media(max-width:900px){.smart-kpis{grid-template-columns:repeat(2,1fr)}.smart-grid.two,.smart-metrics{grid-template-columns:1fr}}
 </style>
 
-
-<style id="top-gap-fix-final">
-html,body{margin:0 !important;padding:0 !important;}
-.app{margin:0 auto !important;padding-top:0 !important;}
-.screen{padding-top:0 !important;margin-top:0 !important;}
-#account,#teacher,#honor,#menu,#account_choice,#student_login,#teacher_login{padding-top:0 !important;margin-top:0 !important;}
-.topbar,.card,.hero,.honor-hero{margin-top:0 !important;}
-</style>
-
 </head>
 <body>
 <div class="app">
@@ -4289,6 +4280,24 @@ window.addEventListener('load', function(){
 })();
 </script>
 
+</body></html>`;
+    const w=window.open('','_blank'); if(w){ w.document.write(html); w.document.close(); setTimeout(()=>w.print(),400); }
+    const status=document.getElementById('smartReportStatus'); if(status){ status.classList.remove('hidden'); setTimeout(()=>status.classList.add('hidden'),2000); }
+  }
+  function injectStyles(){
+    if(document.getElementById('smart-reports-override-style')) return;
+    const st=document.createElement('style');
+    st.id='smart-reports-override-style';
+    st.textContent='.smart-perf.ok{color:#176242;font-weight:800}.smart-perf.warn{color:#9a7a14;font-weight:800}.smart-perf.danger{color:#b9514f;font-weight:800}.danger-pill{background:#fff0ef;color:#a63f3c}.warn-pill{background:#fff7df;color:#9a7a14}.ok-pill{background:#e9f8f0;color:#176242}.smart-alert.danger{background:#fff0ef;border:1px solid #efcfcd}.smart-alert.danger strong{color:#a63f3c}';
+    document.head.appendChild(st);
+  }
+  document.addEventListener('DOMContentLoaded', function(){ injectStyles(); setTimeout(function(){ try{ window.renderSmartReports(); }catch(e){} }, 500); });
+  const oldShow=window.showTeacherPane;
+  if(typeof oldShow==='function'){
+    window.showTeacherPane=function(id,btn){ oldShow(id,btn); if(id==='teacherPaneReportsSmart'){ injectStyles(); setTimeout(function(){ try{ window.renderSmartReports(); }catch(e){} }, 50); } }
+  }
+})();
+</script>
 
 
 <style id="student-settings-pro-style">
@@ -4620,6 +4629,7 @@ window.addEventListener('load', function(){
 })();
 </script>
 
+</body></html>`;
     const w=window.open('','_blank'); if(w){ w.document.write(html); w.document.close(); setTimeout(()=>w.print(),400); }
     const status=document.getElementById('smartReportStatus'); if(status){ status.classList.remove('hidden'); setTimeout(()=>status.classList.add('hidden'),2000); }
   }
@@ -5079,6 +5089,24 @@ window.addEventListener('load', function(){
 })();
 </script>
 
+</body></html>`;
+    const w=window.open('','_blank'); if(w){ w.document.write(html); w.document.close(); setTimeout(()=>w.print(),400); }
+    const status=document.getElementById('smartReportStatus'); if(status){ status.classList.remove('hidden'); setTimeout(()=>status.classList.add('hidden'),2000); }
+  }
+  function injectStyles(){
+    if(document.getElementById('smart-reports-override-style')) return;
+    const st=document.createElement('style');
+    st.id='smart-reports-override-style';
+    st.textContent='.smart-perf.ok{color:#176242;font-weight:800}.smart-perf.warn{color:#9a7a14;font-weight:800}.smart-perf.danger{color:#b9514f;font-weight:800}.danger-pill{background:#fff0ef;color:#a63f3c}.warn-pill{background:#fff7df;color:#9a7a14}.ok-pill{background:#e9f8f0;color:#176242}.smart-alert.danger{background:#fff0ef;border:1px solid #efcfcd}.smart-alert.danger strong{color:#a63f3c}';
+    document.head.appendChild(st);
+  }
+  document.addEventListener('DOMContentLoaded', function(){ injectStyles(); setTimeout(function(){ try{ window.renderSmartReports(); }catch(e){} }, 500); });
+  const oldShow=window.showTeacherPane;
+  if(typeof oldShow==='function'){
+    window.showTeacherPane=function(id,btn){ oldShow(id,btn); if(id==='teacherPaneReportsSmart'){ injectStyles(); setTimeout(function(){ try{ window.renderSmartReports(); }catch(e){} }, 50); } }
+  }
+})();
+</script>
 
 
 <style id="student-settings-pro-style">
@@ -5981,6 +6009,24 @@ window.addEventListener('load', function(){
 })();
 </script>
 
+</body></html>`;
+    const w=window.open('','_blank'); if(w){ w.document.write(html); w.document.close(); setTimeout(()=>w.print(),400); }
+    const status=document.getElementById('smartReportStatus'); if(status){ status.classList.remove('hidden'); setTimeout(()=>status.classList.add('hidden'),2000); }
+  }
+  function injectStyles(){
+    if(document.getElementById('smart-reports-override-style')) return;
+    const st=document.createElement('style');
+    st.id='smart-reports-override-style';
+    st.textContent='.smart-perf.ok{color:#176242;font-weight:800}.smart-perf.warn{color:#9a7a14;font-weight:800}.smart-perf.danger{color:#b9514f;font-weight:800}.danger-pill{background:#fff0ef;color:#a63f3c}.warn-pill{background:#fff7df;color:#9a7a14}.ok-pill{background:#e9f8f0;color:#176242}.smart-alert.danger{background:#fff0ef;border:1px solid #efcfcd}.smart-alert.danger strong{color:#a63f3c}';
+    document.head.appendChild(st);
+  }
+  document.addEventListener('DOMContentLoaded', function(){ injectStyles(); setTimeout(function(){ try{ window.renderSmartReports(); }catch(e){} }, 500); });
+  const oldShow=window.showTeacherPane;
+  if(typeof oldShow==='function'){
+    window.showTeacherPane=function(id,btn){ oldShow(id,btn); if(id==='teacherPaneReportsSmart'){ injectStyles(); setTimeout(function(){ try{ window.renderSmartReports(); }catch(e){} }, 50); } }
+  }
+})();
+</script>
 
 
 <style id="student-settings-pro-style">
@@ -6312,6 +6358,7 @@ window.addEventListener('load', function(){
 })();
 </script>
 
+</body></html>`;
     const w=window.open('','_blank'); if(w){ w.document.write(html); w.document.close(); setTimeout(()=>w.print(),400); }
     const status=document.getElementById('smartReportStatus'); if(status){ status.classList.remove('hidden'); setTimeout(()=>status.classList.add('hidden'),2000); }
   }
@@ -6771,6 +6818,24 @@ window.addEventListener('load', function(){
 })();
 </script>
 
+</body></html>`;
+    const w=window.open('','_blank'); if(w){ w.document.write(html); w.document.close(); setTimeout(()=>w.print(),400); }
+    const status=document.getElementById('smartReportStatus'); if(status){ status.classList.remove('hidden'); setTimeout(()=>status.classList.add('hidden'),2000); }
+  }
+  function injectStyles(){
+    if(document.getElementById('smart-reports-override-style')) return;
+    const st=document.createElement('style');
+    st.id='smart-reports-override-style';
+    st.textContent='.smart-perf.ok{color:#176242;font-weight:800}.smart-perf.warn{color:#9a7a14;font-weight:800}.smart-perf.danger{color:#b9514f;font-weight:800}.danger-pill{background:#fff0ef;color:#a63f3c}.warn-pill{background:#fff7df;color:#9a7a14}.ok-pill{background:#e9f8f0;color:#176242}.smart-alert.danger{background:#fff0ef;border:1px solid #efcfcd}.smart-alert.danger strong{color:#a63f3c}';
+    document.head.appendChild(st);
+  }
+  document.addEventListener('DOMContentLoaded', function(){ injectStyles(); setTimeout(function(){ try{ window.renderSmartReports(); }catch(e){} }, 500); });
+  const oldShow=window.showTeacherPane;
+  if(typeof oldShow==='function'){
+    window.showTeacherPane=function(id,btn){ oldShow(id,btn); if(id==='teacherPaneReportsSmart'){ injectStyles(); setTimeout(function(){ try{ window.renderSmartReports(); }catch(e){} }, 50); } }
+  }
+})();
+</script>
 
 
 <style id="student-settings-pro-style">
