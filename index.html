@@ -96,6 +96,8 @@ button,input,select{font-family:inherit}
 .shortcut{border:1px solid var(--line);background:#fff;border-radius:22px;padding:14px 8px;text-align:center}
 .shortcut .icon{width:42px;height:42px;border-radius:14px;background:var(--mint);display:grid;place-items:center;margin:0 auto 8px;font-size:19px}
 .shortcut span{display:block;font-size:12px;font-weight:800;color:var(--deep);line-height:1.5}
+.shortcut{cursor:pointer;width:100%;appearance:none;-webkit-appearance:none;color:inherit;font-family:inherit}
+.menu-item{cursor:pointer;width:100%;appearance:none;-webkit-appearance:none;color:inherit;font-family:inherit;text-align:inherit}
 .list{display:flex;flex-direction:column;gap:10px}
 .row{display:flex;justify-content:space-between;align-items:center;gap:12px;border:1px solid var(--line);background:#fff;border-radius:20px;padding:14px}
 .name{font-size:14px;font-weight:800}
@@ -601,10 +603,10 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
   <div class="card">
     <div class="section-head"><h3 id="shortcutsTitle">اختصارات سريعة</h3><span class="pill" id="shortcutsPill">الوصول السريع</span></div>
     <div class="shortcuts">
-      <div class="shortcut"><div class="icon">🧾</div><span>كشف الحساب</span></div>
-      <div class="shortcut"><div class="icon">🔄</div><span>العمليات</span></div>
-      <div class="shortcut"><div class="icon">🎡</div><span>روليت الهدايا</span></div>
-      <div class="shortcut"><div class="icon">📑</div><span>تقرير PDF</span></div>
+      <button type="button" class="shortcut" onclick="goAccountTab('statement')"><div class="icon">🧾</div><span>كشف الحساب</span></button>
+      <button type="button" class="shortcut" onclick="goAccountTab('operations')"><div class="icon">🔄</div><span>العمليات</span></button>
+      <button type="button" class="shortcut" onclick="goAccountTab('rouletteTab')"><div class="icon">🎡</div><span>روليت الهدايا</span></button>
+      <button type="button" class="shortcut" onclick="goAccountTab('pdfTab')"><div class="icon">📑</div><span>تقرير PDF</span></button>
     </div>
   </div>
   </div>
@@ -1447,15 +1449,17 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
   </div>
   <div class="card">
     <div class="menu-list">
-      <div class="menu-item"><div class="left"><div class="circle">👤</div><div><div class="name">من نحن</div><div class="meta">نبذة عن بنك الرياضيات</div></div></div><div>‹</div></div>
-      <div class="menu-item"><div class="left"><div class="circle">📞</div><div><div class="name">اتصل بنا</div><div class="meta">قنوات التواصل الرسمية</div></div></div><div>‹</div></div>
-      <div class="menu-item"><div class="left"><div class="circle">⚙️</div><div><div class="name">الإعدادات</div><div class="meta">إدارة الحساب والبيانات</div></div></div><div>‹</div></div>
-      <div class="menu-item"><div class="left"><div class="circle">🔒</div><div><div class="name">سياسة الخصوصية</div><div class="meta">استخدام البيانات داخل النظام</div></div></div><div>‹</div></div>
-      <div class="menu-item"><div class="left"><div class="circle">⚖️</div><div><div class="name">إخلاء المسؤولية</div><div class="meta">النظام تعليمي تحفيزي وليس ماليًا حقيقيًا</div></div></div><div>‹</div></div>
-      <div class="menu-item"><div class="left"><div class="circle">📜</div><div><div class="name">الأحكام والشروط</div><div class="meta">ضوابط استخدام بنك الرياضيات</div></div></div><div>‹</div></div>
+      <button type="button" class="menu-item" onclick="openMoreInfo('about')"><div class="left"><div class="circle">👤</div><div><div class="name">من نحن</div><div class="meta">نبذة عن بنك الرياضيات</div></div></div><div>‹</div></button>
+      <button type="button" class="menu-item" onclick="openMoreInfo('contact')"><div class="left"><div class="circle">📞</div><div><div class="name">اتصل بنا</div><div class="meta">قنوات التواصل الرسمية</div></div></div><div>‹</div></button>
+      <button type="button" class="menu-item" onclick="openMoreInfo('settings')"><div class="left"><div class="circle">⚙️</div><div><div class="name">الإعدادات</div><div class="meta">إدارة الحساب والبيانات</div></div></div><div>‹</div></button>
+      <button type="button" class="menu-item" onclick="openMoreInfo('privacy')"><div class="left"><div class="circle">🔒</div><div><div class="name">سياسة الخصوصية</div><div class="meta">استخدام البيانات داخل النظام</div></div></div><div>‹</div></button>
+      <button type="button" class="menu-item" onclick="openMoreInfo('disclaimer')"><div class="left"><div class="circle">⚖️</div><div><div class="name">إخلاء المسؤولية</div><div class="meta">النظام تعليمي تحفيزي وليس ماليًا حقيقيًا</div></div></div><div>‹</div></button>
+      <button type="button" class="menu-item" onclick="openMoreInfo('terms')"><div class="left"><div class="circle">📜</div><div><div class="name">الأحكام والشروط</div><div class="meta">ضوابط استخدام بنك الرياضيات</div></div></div><div>‹</div></button>
     </div>
   </div>
-  <div class="footer">© بنك الرياضيات</div>
+  <div class="footer">الرياضيات لغة الأذكياء
+نحو تعليم محفّز وعقول مفكّرة © بنك الرياضيات – إشراف الأستاذة سارة حقوي
+🏫 مدرسة رواد الشرق الأهلية</div>
 </section>
 
 <nav class="bottom-nav">
@@ -4291,7 +4295,62 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
 .screen.active{display:block!important;}
 .topbar,.card:first-child,.hero:first-child{margin-top:0!important;}
 </style>
-</head><body><h1>${title}</h1>${bodyHtml}</body></html>`);
+</head><body><h1>${title}</h1>${bodyHtml}
+<script>
+function goAccountTab(tabId){
+  try{
+    go('account');
+    setTimeout(function(){
+      var btnMap={statement:0,operations:2,rouletteTab:6,pdfTab:5};
+      var tabs=document.querySelectorAll('#account .tabbar button');
+      var btn=(typeof btnMap[tabId]!=='undefined' && tabs[btnMap[tabId]])?tabs[btnMap[tabId]]:null;
+      if(typeof showTab==='function'){ showTab(tabId, btn); }
+    },120);
+  }catch(e){ console.log(e); }
+}
+function openMoreInfo(type){
+  const data={
+    about:`<h3>من نحن</h3><p>بنك الرياضيات منصة تعليمية تحفيزية تهدف إلى تعزيز مشاركة الطلاب داخل الحصة الدراسية من خلال نظام نقاط مستوحى من الأنظمة المصرفية.</p>
+    <p>يمنح البنك الطلاب رصيدًا تحفيزيًا مقابل المشاركة والإنجاز والالتزام مما يعزز روح التنافس الإيجابي.</p>
+    <p>إشراف الأستاذة: سارة حقوي</p>`,
+    contact:`<h3>اتصل بنا</h3>
+    <p>خدمة الطلاب وأولياء الأمور: 📞 0502234335</p>
+    <p>الإدارة العامة: 📞 0556891201</p>
+    <p>البريد الإلكتروني: ✉ Saramathss@hotmail.com</p>
+    <p>🏫 مدرسة رواد الشرق الأهلية</p>`,
+    settings:`<h3>الإعدادات</h3>
+    <ul>
+    <li>تغيير كلمة المرور</li>
+    <li>تعديل بيانات الحساب</li>
+    <li>إدارة الإشعارات داخل النظام</li>
+    <li>تسجيل الخروج</li>
+    </ul>`,
+    privacy:`<h3>سياسة الخصوصية</h3>
+    <p>يحرص بنك الرياضيات على حماية خصوصية بيانات الطلاب وأولياء الأمور.</p>
+    <p>تستخدم البيانات لأغراض تعليمية فقط داخل المدرسة.</p>`,
+    disclaimer:`<h3>إخلاء المسؤولية</h3>
+    <p>بنك الرياضيات نظام تحفيزي تعليمي لتشجيع المشاركة داخل الحصة.</p>
+    <p>النقاط لا تمثل أي قيمة مالية حقيقية.</p>`,
+    terms:`<h3>الأحكام والشروط</h3>
+    <p>يستخدم النظام لتعزيز البيئة التعليمية وتحفيز الطلاب.</p>
+    <p>يتم منح النقاط وفق معايير يحددها المعلم.</p>`
+  };
+  let box=document.getElementById('moreContentBox');
+  if(!box){
+    box=document.createElement('div');
+    box.id='moreContentBox';
+    box.style.marginTop='16px';
+    box.style.padding='16px';
+    box.style.background='#fff';
+    box.style.borderRadius='14px';
+    document.querySelector('#more .card').appendChild(box);
+  }
+  box.innerHTML=data[type]||'';
+};
+  alert(messages[type]||'تم فتح العنصر.');
+}
+</script>
+</body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
   window.printStudentReport = function(studentId){
@@ -4315,6 +4374,61 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
 })();
 </script>
 
+
+<script>
+function goAccountTab(tabId){
+  try{
+    go('account');
+    setTimeout(function(){
+      var btnMap={statement:0,operations:2,rouletteTab:6,pdfTab:5};
+      var tabs=document.querySelectorAll('#account .tabbar button');
+      var btn=(typeof btnMap[tabId]!=='undefined' && tabs[btnMap[tabId]])?tabs[btnMap[tabId]]:null;
+      if(typeof showTab==='function'){ showTab(tabId, btn); }
+    },120);
+  }catch(e){ console.log(e); }
+}
+function openMoreInfo(type){
+  const data={
+    about:`<h3>من نحن</h3><p>بنك الرياضيات منصة تعليمية تحفيزية تهدف إلى تعزيز مشاركة الطلاب داخل الحصة الدراسية من خلال نظام نقاط مستوحى من الأنظمة المصرفية.</p>
+    <p>يمنح البنك الطلاب رصيدًا تحفيزيًا مقابل المشاركة والإنجاز والالتزام مما يعزز روح التنافس الإيجابي.</p>
+    <p>إشراف الأستاذة: سارة حقوي</p>`,
+    contact:`<h3>اتصل بنا</h3>
+    <p>خدمة الطلاب وأولياء الأمور: 📞 0502234335</p>
+    <p>الإدارة العامة: 📞 0556891201</p>
+    <p>البريد الإلكتروني: ✉ Saramathss@hotmail.com</p>
+    <p>🏫 مدرسة رواد الشرق الأهلية</p>`,
+    settings:`<h3>الإعدادات</h3>
+    <ul>
+    <li>تغيير كلمة المرور</li>
+    <li>تعديل بيانات الحساب</li>
+    <li>إدارة الإشعارات داخل النظام</li>
+    <li>تسجيل الخروج</li>
+    </ul>`,
+    privacy:`<h3>سياسة الخصوصية</h3>
+    <p>يحرص بنك الرياضيات على حماية خصوصية بيانات الطلاب وأولياء الأمور.</p>
+    <p>تستخدم البيانات لأغراض تعليمية فقط داخل المدرسة.</p>`,
+    disclaimer:`<h3>إخلاء المسؤولية</h3>
+    <p>بنك الرياضيات نظام تحفيزي تعليمي لتشجيع المشاركة داخل الحصة.</p>
+    <p>النقاط لا تمثل أي قيمة مالية حقيقية.</p>`,
+    terms:`<h3>الأحكام والشروط</h3>
+    <p>يستخدم النظام لتعزيز البيئة التعليمية وتحفيز الطلاب.</p>
+    <p>يتم منح النقاط وفق معايير يحددها المعلم.</p>`
+  };
+  let box=document.getElementById('moreContentBox');
+  if(!box){
+    box=document.createElement('div');
+    box.id='moreContentBox';
+    box.style.marginTop='16px';
+    box.style.padding='16px';
+    box.style.background='#fff';
+    box.style.borderRadius='14px';
+    document.querySelector('#more .card').appendChild(box);
+  }
+  box.innerHTML=data[type]||'';
+};
+  alert(messages[type]||'تم فتح العنصر.');
+}
+</script>
 </body></html>`;
     const w=window.open('','_blank'); if(w){ w.document.write(html); w.document.close(); setTimeout(()=>w.print(),400); }
     const status=document.getElementById('smartReportStatus'); if(status){ status.classList.remove('hidden'); setTimeout(()=>status.classList.add('hidden'),2000); }
@@ -4647,7 +4761,62 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
 .screen.active{display:block!important;}
 .topbar,.card:first-child,.hero:first-child{margin-top:0!important;}
 </style>
-</head><body><h1>${title}</h1>${bodyHtml}</body></html>`);
+</head><body><h1>${title}</h1>${bodyHtml}
+<script>
+function goAccountTab(tabId){
+  try{
+    go('account');
+    setTimeout(function(){
+      var btnMap={statement:0,operations:2,rouletteTab:6,pdfTab:5};
+      var tabs=document.querySelectorAll('#account .tabbar button');
+      var btn=(typeof btnMap[tabId]!=='undefined' && tabs[btnMap[tabId]])?tabs[btnMap[tabId]]:null;
+      if(typeof showTab==='function'){ showTab(tabId, btn); }
+    },120);
+  }catch(e){ console.log(e); }
+}
+function openMoreInfo(type){
+  const data={
+    about:`<h3>من نحن</h3><p>بنك الرياضيات منصة تعليمية تحفيزية تهدف إلى تعزيز مشاركة الطلاب داخل الحصة الدراسية من خلال نظام نقاط مستوحى من الأنظمة المصرفية.</p>
+    <p>يمنح البنك الطلاب رصيدًا تحفيزيًا مقابل المشاركة والإنجاز والالتزام مما يعزز روح التنافس الإيجابي.</p>
+    <p>إشراف الأستاذة: سارة حقوي</p>`,
+    contact:`<h3>اتصل بنا</h3>
+    <p>خدمة الطلاب وأولياء الأمور: 📞 0502234335</p>
+    <p>الإدارة العامة: 📞 0556891201</p>
+    <p>البريد الإلكتروني: ✉ Saramathss@hotmail.com</p>
+    <p>🏫 مدرسة رواد الشرق الأهلية</p>`,
+    settings:`<h3>الإعدادات</h3>
+    <ul>
+    <li>تغيير كلمة المرور</li>
+    <li>تعديل بيانات الحساب</li>
+    <li>إدارة الإشعارات داخل النظام</li>
+    <li>تسجيل الخروج</li>
+    </ul>`,
+    privacy:`<h3>سياسة الخصوصية</h3>
+    <p>يحرص بنك الرياضيات على حماية خصوصية بيانات الطلاب وأولياء الأمور.</p>
+    <p>تستخدم البيانات لأغراض تعليمية فقط داخل المدرسة.</p>`,
+    disclaimer:`<h3>إخلاء المسؤولية</h3>
+    <p>بنك الرياضيات نظام تحفيزي تعليمي لتشجيع المشاركة داخل الحصة.</p>
+    <p>النقاط لا تمثل أي قيمة مالية حقيقية.</p>`,
+    terms:`<h3>الأحكام والشروط</h3>
+    <p>يستخدم النظام لتعزيز البيئة التعليمية وتحفيز الطلاب.</p>
+    <p>يتم منح النقاط وفق معايير يحددها المعلم.</p>`
+  };
+  let box=document.getElementById('moreContentBox');
+  if(!box){
+    box=document.createElement('div');
+    box.id='moreContentBox';
+    box.style.marginTop='16px';
+    box.style.padding='16px';
+    box.style.background='#fff';
+    box.style.borderRadius='14px';
+    document.querySelector('#more .card').appendChild(box);
+  }
+  box.innerHTML=data[type]||'';
+};
+  alert(messages[type]||'تم فتح العنصر.');
+}
+</script>
+</body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
   window.printStudentReport = function(studentId){
@@ -4671,6 +4840,61 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
 })();
 </script>
 
+
+<script>
+function goAccountTab(tabId){
+  try{
+    go('account');
+    setTimeout(function(){
+      var btnMap={statement:0,operations:2,rouletteTab:6,pdfTab:5};
+      var tabs=document.querySelectorAll('#account .tabbar button');
+      var btn=(typeof btnMap[tabId]!=='undefined' && tabs[btnMap[tabId]])?tabs[btnMap[tabId]]:null;
+      if(typeof showTab==='function'){ showTab(tabId, btn); }
+    },120);
+  }catch(e){ console.log(e); }
+}
+function openMoreInfo(type){
+  const data={
+    about:`<h3>من نحن</h3><p>بنك الرياضيات منصة تعليمية تحفيزية تهدف إلى تعزيز مشاركة الطلاب داخل الحصة الدراسية من خلال نظام نقاط مستوحى من الأنظمة المصرفية.</p>
+    <p>يمنح البنك الطلاب رصيدًا تحفيزيًا مقابل المشاركة والإنجاز والالتزام مما يعزز روح التنافس الإيجابي.</p>
+    <p>إشراف الأستاذة: سارة حقوي</p>`,
+    contact:`<h3>اتصل بنا</h3>
+    <p>خدمة الطلاب وأولياء الأمور: 📞 0502234335</p>
+    <p>الإدارة العامة: 📞 0556891201</p>
+    <p>البريد الإلكتروني: ✉ Saramathss@hotmail.com</p>
+    <p>🏫 مدرسة رواد الشرق الأهلية</p>`,
+    settings:`<h3>الإعدادات</h3>
+    <ul>
+    <li>تغيير كلمة المرور</li>
+    <li>تعديل بيانات الحساب</li>
+    <li>إدارة الإشعارات داخل النظام</li>
+    <li>تسجيل الخروج</li>
+    </ul>`,
+    privacy:`<h3>سياسة الخصوصية</h3>
+    <p>يحرص بنك الرياضيات على حماية خصوصية بيانات الطلاب وأولياء الأمور.</p>
+    <p>تستخدم البيانات لأغراض تعليمية فقط داخل المدرسة.</p>`,
+    disclaimer:`<h3>إخلاء المسؤولية</h3>
+    <p>بنك الرياضيات نظام تحفيزي تعليمي لتشجيع المشاركة داخل الحصة.</p>
+    <p>النقاط لا تمثل أي قيمة مالية حقيقية.</p>`,
+    terms:`<h3>الأحكام والشروط</h3>
+    <p>يستخدم النظام لتعزيز البيئة التعليمية وتحفيز الطلاب.</p>
+    <p>يتم منح النقاط وفق معايير يحددها المعلم.</p>`
+  };
+  let box=document.getElementById('moreContentBox');
+  if(!box){
+    box=document.createElement('div');
+    box.id='moreContentBox';
+    box.style.marginTop='16px';
+    box.style.padding='16px';
+    box.style.background='#fff';
+    box.style.borderRadius='14px';
+    document.querySelector('#more .card').appendChild(box);
+  }
+  box.innerHTML=data[type]||'';
+};
+  alert(messages[type]||'تم فتح العنصر.');
+}
+</script>
 </body></html>`;
     const w=window.open('','_blank'); if(w){ w.document.write(html); w.document.close(); setTimeout(()=>w.print(),400); }
     const status=document.getElementById('smartReportStatus'); if(status){ status.classList.remove('hidden'); setTimeout(()=>status.classList.add('hidden'),2000); }
@@ -5121,7 +5345,62 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
 .screen.active{display:block!important;}
 .topbar,.card:first-child,.hero:first-child{margin-top:0!important;}
 </style>
-</head><body><h1>${title}</h1>${bodyHtml}</body></html>`);
+</head><body><h1>${title}</h1>${bodyHtml}
+<script>
+function goAccountTab(tabId){
+  try{
+    go('account');
+    setTimeout(function(){
+      var btnMap={statement:0,operations:2,rouletteTab:6,pdfTab:5};
+      var tabs=document.querySelectorAll('#account .tabbar button');
+      var btn=(typeof btnMap[tabId]!=='undefined' && tabs[btnMap[tabId]])?tabs[btnMap[tabId]]:null;
+      if(typeof showTab==='function'){ showTab(tabId, btn); }
+    },120);
+  }catch(e){ console.log(e); }
+}
+function openMoreInfo(type){
+  const data={
+    about:`<h3>من نحن</h3><p>بنك الرياضيات منصة تعليمية تحفيزية تهدف إلى تعزيز مشاركة الطلاب داخل الحصة الدراسية من خلال نظام نقاط مستوحى من الأنظمة المصرفية.</p>
+    <p>يمنح البنك الطلاب رصيدًا تحفيزيًا مقابل المشاركة والإنجاز والالتزام مما يعزز روح التنافس الإيجابي.</p>
+    <p>إشراف الأستاذة: سارة حقوي</p>`,
+    contact:`<h3>اتصل بنا</h3>
+    <p>خدمة الطلاب وأولياء الأمور: 📞 0502234335</p>
+    <p>الإدارة العامة: 📞 0556891201</p>
+    <p>البريد الإلكتروني: ✉ Saramathss@hotmail.com</p>
+    <p>🏫 مدرسة رواد الشرق الأهلية</p>`,
+    settings:`<h3>الإعدادات</h3>
+    <ul>
+    <li>تغيير كلمة المرور</li>
+    <li>تعديل بيانات الحساب</li>
+    <li>إدارة الإشعارات داخل النظام</li>
+    <li>تسجيل الخروج</li>
+    </ul>`,
+    privacy:`<h3>سياسة الخصوصية</h3>
+    <p>يحرص بنك الرياضيات على حماية خصوصية بيانات الطلاب وأولياء الأمور.</p>
+    <p>تستخدم البيانات لأغراض تعليمية فقط داخل المدرسة.</p>`,
+    disclaimer:`<h3>إخلاء المسؤولية</h3>
+    <p>بنك الرياضيات نظام تحفيزي تعليمي لتشجيع المشاركة داخل الحصة.</p>
+    <p>النقاط لا تمثل أي قيمة مالية حقيقية.</p>`,
+    terms:`<h3>الأحكام والشروط</h3>
+    <p>يستخدم النظام لتعزيز البيئة التعليمية وتحفيز الطلاب.</p>
+    <p>يتم منح النقاط وفق معايير يحددها المعلم.</p>`
+  };
+  let box=document.getElementById('moreContentBox');
+  if(!box){
+    box=document.createElement('div');
+    box.id='moreContentBox';
+    box.style.marginTop='16px';
+    box.style.padding='16px';
+    box.style.background='#fff';
+    box.style.borderRadius='14px';
+    document.querySelector('#more .card').appendChild(box);
+  }
+  box.innerHTML=data[type]||'';
+};
+  alert(messages[type]||'تم فتح العنصر.');
+}
+</script>
+</body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
   window.printStudentReport = function(studentId){
@@ -5145,6 +5424,61 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
 })();
 </script>
 
+
+<script>
+function goAccountTab(tabId){
+  try{
+    go('account');
+    setTimeout(function(){
+      var btnMap={statement:0,operations:2,rouletteTab:6,pdfTab:5};
+      var tabs=document.querySelectorAll('#account .tabbar button');
+      var btn=(typeof btnMap[tabId]!=='undefined' && tabs[btnMap[tabId]])?tabs[btnMap[tabId]]:null;
+      if(typeof showTab==='function'){ showTab(tabId, btn); }
+    },120);
+  }catch(e){ console.log(e); }
+}
+function openMoreInfo(type){
+  const data={
+    about:`<h3>من نحن</h3><p>بنك الرياضيات منصة تعليمية تحفيزية تهدف إلى تعزيز مشاركة الطلاب داخل الحصة الدراسية من خلال نظام نقاط مستوحى من الأنظمة المصرفية.</p>
+    <p>يمنح البنك الطلاب رصيدًا تحفيزيًا مقابل المشاركة والإنجاز والالتزام مما يعزز روح التنافس الإيجابي.</p>
+    <p>إشراف الأستاذة: سارة حقوي</p>`,
+    contact:`<h3>اتصل بنا</h3>
+    <p>خدمة الطلاب وأولياء الأمور: 📞 0502234335</p>
+    <p>الإدارة العامة: 📞 0556891201</p>
+    <p>البريد الإلكتروني: ✉ Saramathss@hotmail.com</p>
+    <p>🏫 مدرسة رواد الشرق الأهلية</p>`,
+    settings:`<h3>الإعدادات</h3>
+    <ul>
+    <li>تغيير كلمة المرور</li>
+    <li>تعديل بيانات الحساب</li>
+    <li>إدارة الإشعارات داخل النظام</li>
+    <li>تسجيل الخروج</li>
+    </ul>`,
+    privacy:`<h3>سياسة الخصوصية</h3>
+    <p>يحرص بنك الرياضيات على حماية خصوصية بيانات الطلاب وأولياء الأمور.</p>
+    <p>تستخدم البيانات لأغراض تعليمية فقط داخل المدرسة.</p>`,
+    disclaimer:`<h3>إخلاء المسؤولية</h3>
+    <p>بنك الرياضيات نظام تحفيزي تعليمي لتشجيع المشاركة داخل الحصة.</p>
+    <p>النقاط لا تمثل أي قيمة مالية حقيقية.</p>`,
+    terms:`<h3>الأحكام والشروط</h3>
+    <p>يستخدم النظام لتعزيز البيئة التعليمية وتحفيز الطلاب.</p>
+    <p>يتم منح النقاط وفق معايير يحددها المعلم.</p>`
+  };
+  let box=document.getElementById('moreContentBox');
+  if(!box){
+    box=document.createElement('div');
+    box.id='moreContentBox';
+    box.style.marginTop='16px';
+    box.style.padding='16px';
+    box.style.background='#fff';
+    box.style.borderRadius='14px';
+    document.querySelector('#more .card').appendChild(box);
+  }
+  box.innerHTML=data[type]||'';
+};
+  alert(messages[type]||'تم فتح العنصر.');
+}
+</script>
 </body></html>`;
     const w=window.open('','_blank'); if(w){ w.document.write(html); w.document.close(); setTimeout(()=>w.print(),400); }
     const status=document.getElementById('smartReportStatus'); if(status){ status.classList.remove('hidden'); setTimeout(()=>status.classList.add('hidden'),2000); }
@@ -5477,7 +5811,62 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
 .screen.active{display:block!important;}
 .topbar,.card:first-child,.hero:first-child{margin-top:0!important;}
 </style>
-</head><body><h1>${title}</h1>${bodyHtml}</body></html>`);
+</head><body><h1>${title}</h1>${bodyHtml}
+<script>
+function goAccountTab(tabId){
+  try{
+    go('account');
+    setTimeout(function(){
+      var btnMap={statement:0,operations:2,rouletteTab:6,pdfTab:5};
+      var tabs=document.querySelectorAll('#account .tabbar button');
+      var btn=(typeof btnMap[tabId]!=='undefined' && tabs[btnMap[tabId]])?tabs[btnMap[tabId]]:null;
+      if(typeof showTab==='function'){ showTab(tabId, btn); }
+    },120);
+  }catch(e){ console.log(e); }
+}
+function openMoreInfo(type){
+  const data={
+    about:`<h3>من نحن</h3><p>بنك الرياضيات منصة تعليمية تحفيزية تهدف إلى تعزيز مشاركة الطلاب داخل الحصة الدراسية من خلال نظام نقاط مستوحى من الأنظمة المصرفية.</p>
+    <p>يمنح البنك الطلاب رصيدًا تحفيزيًا مقابل المشاركة والإنجاز والالتزام مما يعزز روح التنافس الإيجابي.</p>
+    <p>إشراف الأستاذة: سارة حقوي</p>`,
+    contact:`<h3>اتصل بنا</h3>
+    <p>خدمة الطلاب وأولياء الأمور: 📞 0502234335</p>
+    <p>الإدارة العامة: 📞 0556891201</p>
+    <p>البريد الإلكتروني: ✉ Saramathss@hotmail.com</p>
+    <p>🏫 مدرسة رواد الشرق الأهلية</p>`,
+    settings:`<h3>الإعدادات</h3>
+    <ul>
+    <li>تغيير كلمة المرور</li>
+    <li>تعديل بيانات الحساب</li>
+    <li>إدارة الإشعارات داخل النظام</li>
+    <li>تسجيل الخروج</li>
+    </ul>`,
+    privacy:`<h3>سياسة الخصوصية</h3>
+    <p>يحرص بنك الرياضيات على حماية خصوصية بيانات الطلاب وأولياء الأمور.</p>
+    <p>تستخدم البيانات لأغراض تعليمية فقط داخل المدرسة.</p>`,
+    disclaimer:`<h3>إخلاء المسؤولية</h3>
+    <p>بنك الرياضيات نظام تحفيزي تعليمي لتشجيع المشاركة داخل الحصة.</p>
+    <p>النقاط لا تمثل أي قيمة مالية حقيقية.</p>`,
+    terms:`<h3>الأحكام والشروط</h3>
+    <p>يستخدم النظام لتعزيز البيئة التعليمية وتحفيز الطلاب.</p>
+    <p>يتم منح النقاط وفق معايير يحددها المعلم.</p>`
+  };
+  let box=document.getElementById('moreContentBox');
+  if(!box){
+    box=document.createElement('div');
+    box.id='moreContentBox';
+    box.style.marginTop='16px';
+    box.style.padding='16px';
+    box.style.background='#fff';
+    box.style.borderRadius='14px';
+    document.querySelector('#more .card').appendChild(box);
+  }
+  box.innerHTML=data[type]||'';
+};
+  alert(messages[type]||'تم فتح العنصر.');
+}
+</script>
+</body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
   window.printStudentReport = function(studentId){
@@ -6042,7 +6431,62 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
 .screen.active{display:block!important;}
 .topbar,.card:first-child,.hero:first-child{margin-top:0!important;}
 </style>
-</head><body><h1>${title}</h1>${bodyHtml}</body></html>`);
+</head><body><h1>${title}</h1>${bodyHtml}
+<script>
+function goAccountTab(tabId){
+  try{
+    go('account');
+    setTimeout(function(){
+      var btnMap={statement:0,operations:2,rouletteTab:6,pdfTab:5};
+      var tabs=document.querySelectorAll('#account .tabbar button');
+      var btn=(typeof btnMap[tabId]!=='undefined' && tabs[btnMap[tabId]])?tabs[btnMap[tabId]]:null;
+      if(typeof showTab==='function'){ showTab(tabId, btn); }
+    },120);
+  }catch(e){ console.log(e); }
+}
+function openMoreInfo(type){
+  const data={
+    about:`<h3>من نحن</h3><p>بنك الرياضيات منصة تعليمية تحفيزية تهدف إلى تعزيز مشاركة الطلاب داخل الحصة الدراسية من خلال نظام نقاط مستوحى من الأنظمة المصرفية.</p>
+    <p>يمنح البنك الطلاب رصيدًا تحفيزيًا مقابل المشاركة والإنجاز والالتزام مما يعزز روح التنافس الإيجابي.</p>
+    <p>إشراف الأستاذة: سارة حقوي</p>`,
+    contact:`<h3>اتصل بنا</h3>
+    <p>خدمة الطلاب وأولياء الأمور: 📞 0502234335</p>
+    <p>الإدارة العامة: 📞 0556891201</p>
+    <p>البريد الإلكتروني: ✉ Saramathss@hotmail.com</p>
+    <p>🏫 مدرسة رواد الشرق الأهلية</p>`,
+    settings:`<h3>الإعدادات</h3>
+    <ul>
+    <li>تغيير كلمة المرور</li>
+    <li>تعديل بيانات الحساب</li>
+    <li>إدارة الإشعارات داخل النظام</li>
+    <li>تسجيل الخروج</li>
+    </ul>`,
+    privacy:`<h3>سياسة الخصوصية</h3>
+    <p>يحرص بنك الرياضيات على حماية خصوصية بيانات الطلاب وأولياء الأمور.</p>
+    <p>تستخدم البيانات لأغراض تعليمية فقط داخل المدرسة.</p>`,
+    disclaimer:`<h3>إخلاء المسؤولية</h3>
+    <p>بنك الرياضيات نظام تحفيزي تعليمي لتشجيع المشاركة داخل الحصة.</p>
+    <p>النقاط لا تمثل أي قيمة مالية حقيقية.</p>`,
+    terms:`<h3>الأحكام والشروط</h3>
+    <p>يستخدم النظام لتعزيز البيئة التعليمية وتحفيز الطلاب.</p>
+    <p>يتم منح النقاط وفق معايير يحددها المعلم.</p>`
+  };
+  let box=document.getElementById('moreContentBox');
+  if(!box){
+    box=document.createElement('div');
+    box.id='moreContentBox';
+    box.style.marginTop='16px';
+    box.style.padding='16px';
+    box.style.background='#fff';
+    box.style.borderRadius='14px';
+    document.querySelector('#more .card').appendChild(box);
+  }
+  box.innerHTML=data[type]||'';
+};
+  alert(messages[type]||'تم فتح العنصر.');
+}
+</script>
+</body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
   window.printStudentReport = function(studentId){
@@ -6066,6 +6510,61 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
 })();
 </script>
 
+
+<script>
+function goAccountTab(tabId){
+  try{
+    go('account');
+    setTimeout(function(){
+      var btnMap={statement:0,operations:2,rouletteTab:6,pdfTab:5};
+      var tabs=document.querySelectorAll('#account .tabbar button');
+      var btn=(typeof btnMap[tabId]!=='undefined' && tabs[btnMap[tabId]])?tabs[btnMap[tabId]]:null;
+      if(typeof showTab==='function'){ showTab(tabId, btn); }
+    },120);
+  }catch(e){ console.log(e); }
+}
+function openMoreInfo(type){
+  const data={
+    about:`<h3>من نحن</h3><p>بنك الرياضيات منصة تعليمية تحفيزية تهدف إلى تعزيز مشاركة الطلاب داخل الحصة الدراسية من خلال نظام نقاط مستوحى من الأنظمة المصرفية.</p>
+    <p>يمنح البنك الطلاب رصيدًا تحفيزيًا مقابل المشاركة والإنجاز والالتزام مما يعزز روح التنافس الإيجابي.</p>
+    <p>إشراف الأستاذة: سارة حقوي</p>`,
+    contact:`<h3>اتصل بنا</h3>
+    <p>خدمة الطلاب وأولياء الأمور: 📞 0502234335</p>
+    <p>الإدارة العامة: 📞 0556891201</p>
+    <p>البريد الإلكتروني: ✉ Saramathss@hotmail.com</p>
+    <p>🏫 مدرسة رواد الشرق الأهلية</p>`,
+    settings:`<h3>الإعدادات</h3>
+    <ul>
+    <li>تغيير كلمة المرور</li>
+    <li>تعديل بيانات الحساب</li>
+    <li>إدارة الإشعارات داخل النظام</li>
+    <li>تسجيل الخروج</li>
+    </ul>`,
+    privacy:`<h3>سياسة الخصوصية</h3>
+    <p>يحرص بنك الرياضيات على حماية خصوصية بيانات الطلاب وأولياء الأمور.</p>
+    <p>تستخدم البيانات لأغراض تعليمية فقط داخل المدرسة.</p>`,
+    disclaimer:`<h3>إخلاء المسؤولية</h3>
+    <p>بنك الرياضيات نظام تحفيزي تعليمي لتشجيع المشاركة داخل الحصة.</p>
+    <p>النقاط لا تمثل أي قيمة مالية حقيقية.</p>`,
+    terms:`<h3>الأحكام والشروط</h3>
+    <p>يستخدم النظام لتعزيز البيئة التعليمية وتحفيز الطلاب.</p>
+    <p>يتم منح النقاط وفق معايير يحددها المعلم.</p>`
+  };
+  let box=document.getElementById('moreContentBox');
+  if(!box){
+    box=document.createElement('div');
+    box.id='moreContentBox';
+    box.style.marginTop='16px';
+    box.style.padding='16px';
+    box.style.background='#fff';
+    box.style.borderRadius='14px';
+    document.querySelector('#more .card').appendChild(box);
+  }
+  box.innerHTML=data[type]||'';
+};
+  alert(messages[type]||'تم فتح العنصر.');
+}
+</script>
 </body></html>`;
     const w=window.open('','_blank'); if(w){ w.document.write(html); w.document.close(); setTimeout(()=>w.print(),400); }
     const status=document.getElementById('smartReportStatus'); if(status){ status.classList.remove('hidden'); setTimeout(()=>status.classList.add('hidden'),2000); }
@@ -6398,7 +6897,62 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
 .screen.active{display:block!important;}
 .topbar,.card:first-child,.hero:first-child{margin-top:0!important;}
 </style>
-</head><body><h1>${title}</h1>${bodyHtml}</body></html>`);
+</head><body><h1>${title}</h1>${bodyHtml}
+<script>
+function goAccountTab(tabId){
+  try{
+    go('account');
+    setTimeout(function(){
+      var btnMap={statement:0,operations:2,rouletteTab:6,pdfTab:5};
+      var tabs=document.querySelectorAll('#account .tabbar button');
+      var btn=(typeof btnMap[tabId]!=='undefined' && tabs[btnMap[tabId]])?tabs[btnMap[tabId]]:null;
+      if(typeof showTab==='function'){ showTab(tabId, btn); }
+    },120);
+  }catch(e){ console.log(e); }
+}
+function openMoreInfo(type){
+  const data={
+    about:`<h3>من نحن</h3><p>بنك الرياضيات منصة تعليمية تحفيزية تهدف إلى تعزيز مشاركة الطلاب داخل الحصة الدراسية من خلال نظام نقاط مستوحى من الأنظمة المصرفية.</p>
+    <p>يمنح البنك الطلاب رصيدًا تحفيزيًا مقابل المشاركة والإنجاز والالتزام مما يعزز روح التنافس الإيجابي.</p>
+    <p>إشراف الأستاذة: سارة حقوي</p>`,
+    contact:`<h3>اتصل بنا</h3>
+    <p>خدمة الطلاب وأولياء الأمور: 📞 0502234335</p>
+    <p>الإدارة العامة: 📞 0556891201</p>
+    <p>البريد الإلكتروني: ✉ Saramathss@hotmail.com</p>
+    <p>🏫 مدرسة رواد الشرق الأهلية</p>`,
+    settings:`<h3>الإعدادات</h3>
+    <ul>
+    <li>تغيير كلمة المرور</li>
+    <li>تعديل بيانات الحساب</li>
+    <li>إدارة الإشعارات داخل النظام</li>
+    <li>تسجيل الخروج</li>
+    </ul>`,
+    privacy:`<h3>سياسة الخصوصية</h3>
+    <p>يحرص بنك الرياضيات على حماية خصوصية بيانات الطلاب وأولياء الأمور.</p>
+    <p>تستخدم البيانات لأغراض تعليمية فقط داخل المدرسة.</p>`,
+    disclaimer:`<h3>إخلاء المسؤولية</h3>
+    <p>بنك الرياضيات نظام تحفيزي تعليمي لتشجيع المشاركة داخل الحصة.</p>
+    <p>النقاط لا تمثل أي قيمة مالية حقيقية.</p>`,
+    terms:`<h3>الأحكام والشروط</h3>
+    <p>يستخدم النظام لتعزيز البيئة التعليمية وتحفيز الطلاب.</p>
+    <p>يتم منح النقاط وفق معايير يحددها المعلم.</p>`
+  };
+  let box=document.getElementById('moreContentBox');
+  if(!box){
+    box=document.createElement('div');
+    box.id='moreContentBox';
+    box.style.marginTop='16px';
+    box.style.padding='16px';
+    box.style.background='#fff';
+    box.style.borderRadius='14px';
+    document.querySelector('#more .card').appendChild(box);
+  }
+  box.innerHTML=data[type]||'';
+};
+  alert(messages[type]||'تم فتح العنصر.');
+}
+</script>
+</body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
   window.printStudentReport = function(studentId){
@@ -6422,6 +6976,61 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
 })();
 </script>
 
+
+<script>
+function goAccountTab(tabId){
+  try{
+    go('account');
+    setTimeout(function(){
+      var btnMap={statement:0,operations:2,rouletteTab:6,pdfTab:5};
+      var tabs=document.querySelectorAll('#account .tabbar button');
+      var btn=(typeof btnMap[tabId]!=='undefined' && tabs[btnMap[tabId]])?tabs[btnMap[tabId]]:null;
+      if(typeof showTab==='function'){ showTab(tabId, btn); }
+    },120);
+  }catch(e){ console.log(e); }
+}
+function openMoreInfo(type){
+  const data={
+    about:`<h3>من نحن</h3><p>بنك الرياضيات منصة تعليمية تحفيزية تهدف إلى تعزيز مشاركة الطلاب داخل الحصة الدراسية من خلال نظام نقاط مستوحى من الأنظمة المصرفية.</p>
+    <p>يمنح البنك الطلاب رصيدًا تحفيزيًا مقابل المشاركة والإنجاز والالتزام مما يعزز روح التنافس الإيجابي.</p>
+    <p>إشراف الأستاذة: سارة حقوي</p>`,
+    contact:`<h3>اتصل بنا</h3>
+    <p>خدمة الطلاب وأولياء الأمور: 📞 0502234335</p>
+    <p>الإدارة العامة: 📞 0556891201</p>
+    <p>البريد الإلكتروني: ✉ Saramathss@hotmail.com</p>
+    <p>🏫 مدرسة رواد الشرق الأهلية</p>`,
+    settings:`<h3>الإعدادات</h3>
+    <ul>
+    <li>تغيير كلمة المرور</li>
+    <li>تعديل بيانات الحساب</li>
+    <li>إدارة الإشعارات داخل النظام</li>
+    <li>تسجيل الخروج</li>
+    </ul>`,
+    privacy:`<h3>سياسة الخصوصية</h3>
+    <p>يحرص بنك الرياضيات على حماية خصوصية بيانات الطلاب وأولياء الأمور.</p>
+    <p>تستخدم البيانات لأغراض تعليمية فقط داخل المدرسة.</p>`,
+    disclaimer:`<h3>إخلاء المسؤولية</h3>
+    <p>بنك الرياضيات نظام تحفيزي تعليمي لتشجيع المشاركة داخل الحصة.</p>
+    <p>النقاط لا تمثل أي قيمة مالية حقيقية.</p>`,
+    terms:`<h3>الأحكام والشروط</h3>
+    <p>يستخدم النظام لتعزيز البيئة التعليمية وتحفيز الطلاب.</p>
+    <p>يتم منح النقاط وفق معايير يحددها المعلم.</p>`
+  };
+  let box=document.getElementById('moreContentBox');
+  if(!box){
+    box=document.createElement('div');
+    box.id='moreContentBox';
+    box.style.marginTop='16px';
+    box.style.padding='16px';
+    box.style.background='#fff';
+    box.style.borderRadius='14px';
+    document.querySelector('#more .card').appendChild(box);
+  }
+  box.innerHTML=data[type]||'';
+};
+  alert(messages[type]||'تم فتح العنصر.');
+}
+</script>
 </body></html>`;
     const w=window.open('','_blank'); if(w){ w.document.write(html); w.document.close(); setTimeout(()=>w.print(),400); }
     const status=document.getElementById('smartReportStatus'); if(status){ status.classList.remove('hidden'); setTimeout(()=>status.classList.add('hidden'),2000); }
@@ -6872,7 +7481,62 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
 .screen.active{display:block!important;}
 .topbar,.card:first-child,.hero:first-child{margin-top:0!important;}
 </style>
-</head><body><h1>${title}</h1>${bodyHtml}</body></html>`);
+</head><body><h1>${title}</h1>${bodyHtml}
+<script>
+function goAccountTab(tabId){
+  try{
+    go('account');
+    setTimeout(function(){
+      var btnMap={statement:0,operations:2,rouletteTab:6,pdfTab:5};
+      var tabs=document.querySelectorAll('#account .tabbar button');
+      var btn=(typeof btnMap[tabId]!=='undefined' && tabs[btnMap[tabId]])?tabs[btnMap[tabId]]:null;
+      if(typeof showTab==='function'){ showTab(tabId, btn); }
+    },120);
+  }catch(e){ console.log(e); }
+}
+function openMoreInfo(type){
+  const data={
+    about:`<h3>من نحن</h3><p>بنك الرياضيات منصة تعليمية تحفيزية تهدف إلى تعزيز مشاركة الطلاب داخل الحصة الدراسية من خلال نظام نقاط مستوحى من الأنظمة المصرفية.</p>
+    <p>يمنح البنك الطلاب رصيدًا تحفيزيًا مقابل المشاركة والإنجاز والالتزام مما يعزز روح التنافس الإيجابي.</p>
+    <p>إشراف الأستاذة: سارة حقوي</p>`,
+    contact:`<h3>اتصل بنا</h3>
+    <p>خدمة الطلاب وأولياء الأمور: 📞 0502234335</p>
+    <p>الإدارة العامة: 📞 0556891201</p>
+    <p>البريد الإلكتروني: ✉ Saramathss@hotmail.com</p>
+    <p>🏫 مدرسة رواد الشرق الأهلية</p>`,
+    settings:`<h3>الإعدادات</h3>
+    <ul>
+    <li>تغيير كلمة المرور</li>
+    <li>تعديل بيانات الحساب</li>
+    <li>إدارة الإشعارات داخل النظام</li>
+    <li>تسجيل الخروج</li>
+    </ul>`,
+    privacy:`<h3>سياسة الخصوصية</h3>
+    <p>يحرص بنك الرياضيات على حماية خصوصية بيانات الطلاب وأولياء الأمور.</p>
+    <p>تستخدم البيانات لأغراض تعليمية فقط داخل المدرسة.</p>`,
+    disclaimer:`<h3>إخلاء المسؤولية</h3>
+    <p>بنك الرياضيات نظام تحفيزي تعليمي لتشجيع المشاركة داخل الحصة.</p>
+    <p>النقاط لا تمثل أي قيمة مالية حقيقية.</p>`,
+    terms:`<h3>الأحكام والشروط</h3>
+    <p>يستخدم النظام لتعزيز البيئة التعليمية وتحفيز الطلاب.</p>
+    <p>يتم منح النقاط وفق معايير يحددها المعلم.</p>`
+  };
+  let box=document.getElementById('moreContentBox');
+  if(!box){
+    box=document.createElement('div');
+    box.id='moreContentBox';
+    box.style.marginTop='16px';
+    box.style.padding='16px';
+    box.style.background='#fff';
+    box.style.borderRadius='14px';
+    document.querySelector('#more .card').appendChild(box);
+  }
+  box.innerHTML=data[type]||'';
+};
+  alert(messages[type]||'تم فتح العنصر.');
+}
+</script>
+</body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
   window.printStudentReport = function(studentId){
@@ -6896,6 +7560,61 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
 })();
 </script>
 
+
+<script>
+function goAccountTab(tabId){
+  try{
+    go('account');
+    setTimeout(function(){
+      var btnMap={statement:0,operations:2,rouletteTab:6,pdfTab:5};
+      var tabs=document.querySelectorAll('#account .tabbar button');
+      var btn=(typeof btnMap[tabId]!=='undefined' && tabs[btnMap[tabId]])?tabs[btnMap[tabId]]:null;
+      if(typeof showTab==='function'){ showTab(tabId, btn); }
+    },120);
+  }catch(e){ console.log(e); }
+}
+function openMoreInfo(type){
+  const data={
+    about:`<h3>من نحن</h3><p>بنك الرياضيات منصة تعليمية تحفيزية تهدف إلى تعزيز مشاركة الطلاب داخل الحصة الدراسية من خلال نظام نقاط مستوحى من الأنظمة المصرفية.</p>
+    <p>يمنح البنك الطلاب رصيدًا تحفيزيًا مقابل المشاركة والإنجاز والالتزام مما يعزز روح التنافس الإيجابي.</p>
+    <p>إشراف الأستاذة: سارة حقوي</p>`,
+    contact:`<h3>اتصل بنا</h3>
+    <p>خدمة الطلاب وأولياء الأمور: 📞 0502234335</p>
+    <p>الإدارة العامة: 📞 0556891201</p>
+    <p>البريد الإلكتروني: ✉ Saramathss@hotmail.com</p>
+    <p>🏫 مدرسة رواد الشرق الأهلية</p>`,
+    settings:`<h3>الإعدادات</h3>
+    <ul>
+    <li>تغيير كلمة المرور</li>
+    <li>تعديل بيانات الحساب</li>
+    <li>إدارة الإشعارات داخل النظام</li>
+    <li>تسجيل الخروج</li>
+    </ul>`,
+    privacy:`<h3>سياسة الخصوصية</h3>
+    <p>يحرص بنك الرياضيات على حماية خصوصية بيانات الطلاب وأولياء الأمور.</p>
+    <p>تستخدم البيانات لأغراض تعليمية فقط داخل المدرسة.</p>`,
+    disclaimer:`<h3>إخلاء المسؤولية</h3>
+    <p>بنك الرياضيات نظام تحفيزي تعليمي لتشجيع المشاركة داخل الحصة.</p>
+    <p>النقاط لا تمثل أي قيمة مالية حقيقية.</p>`,
+    terms:`<h3>الأحكام والشروط</h3>
+    <p>يستخدم النظام لتعزيز البيئة التعليمية وتحفيز الطلاب.</p>
+    <p>يتم منح النقاط وفق معايير يحددها المعلم.</p>`
+  };
+  let box=document.getElementById('moreContentBox');
+  if(!box){
+    box=document.createElement('div');
+    box.id='moreContentBox';
+    box.style.marginTop='16px';
+    box.style.padding='16px';
+    box.style.background='#fff';
+    box.style.borderRadius='14px';
+    document.querySelector('#more .card').appendChild(box);
+  }
+  box.innerHTML=data[type]||'';
+};
+  alert(messages[type]||'تم فتح العنصر.');
+}
+</script>
 </body></html>`;
     const w=window.open('','_blank'); if(w){ w.document.write(html); w.document.close(); setTimeout(()=>w.print(),400); }
     const status=document.getElementById('smartReportStatus'); if(status){ status.classList.remove('hidden'); setTimeout(()=>status.classList.add('hidden'),2000); }
@@ -7228,7 +7947,62 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
 .screen.active{display:block!important;}
 .topbar,.card:first-child,.hero:first-child{margin-top:0!important;}
 </style>
-</head><body><h1>${title}</h1>${bodyHtml}</body></html>`);
+</head><body><h1>${title}</h1>${bodyHtml}
+<script>
+function goAccountTab(tabId){
+  try{
+    go('account');
+    setTimeout(function(){
+      var btnMap={statement:0,operations:2,rouletteTab:6,pdfTab:5};
+      var tabs=document.querySelectorAll('#account .tabbar button');
+      var btn=(typeof btnMap[tabId]!=='undefined' && tabs[btnMap[tabId]])?tabs[btnMap[tabId]]:null;
+      if(typeof showTab==='function'){ showTab(tabId, btn); }
+    },120);
+  }catch(e){ console.log(e); }
+}
+function openMoreInfo(type){
+  const data={
+    about:`<h3>من نحن</h3><p>بنك الرياضيات منصة تعليمية تحفيزية تهدف إلى تعزيز مشاركة الطلاب داخل الحصة الدراسية من خلال نظام نقاط مستوحى من الأنظمة المصرفية.</p>
+    <p>يمنح البنك الطلاب رصيدًا تحفيزيًا مقابل المشاركة والإنجاز والالتزام مما يعزز روح التنافس الإيجابي.</p>
+    <p>إشراف الأستاذة: سارة حقوي</p>`,
+    contact:`<h3>اتصل بنا</h3>
+    <p>خدمة الطلاب وأولياء الأمور: 📞 0502234335</p>
+    <p>الإدارة العامة: 📞 0556891201</p>
+    <p>البريد الإلكتروني: ✉ Saramathss@hotmail.com</p>
+    <p>🏫 مدرسة رواد الشرق الأهلية</p>`,
+    settings:`<h3>الإعدادات</h3>
+    <ul>
+    <li>تغيير كلمة المرور</li>
+    <li>تعديل بيانات الحساب</li>
+    <li>إدارة الإشعارات داخل النظام</li>
+    <li>تسجيل الخروج</li>
+    </ul>`,
+    privacy:`<h3>سياسة الخصوصية</h3>
+    <p>يحرص بنك الرياضيات على حماية خصوصية بيانات الطلاب وأولياء الأمور.</p>
+    <p>تستخدم البيانات لأغراض تعليمية فقط داخل المدرسة.</p>`,
+    disclaimer:`<h3>إخلاء المسؤولية</h3>
+    <p>بنك الرياضيات نظام تحفيزي تعليمي لتشجيع المشاركة داخل الحصة.</p>
+    <p>النقاط لا تمثل أي قيمة مالية حقيقية.</p>`,
+    terms:`<h3>الأحكام والشروط</h3>
+    <p>يستخدم النظام لتعزيز البيئة التعليمية وتحفيز الطلاب.</p>
+    <p>يتم منح النقاط وفق معايير يحددها المعلم.</p>`
+  };
+  let box=document.getElementById('moreContentBox');
+  if(!box){
+    box=document.createElement('div');
+    box.id='moreContentBox';
+    box.style.marginTop='16px';
+    box.style.padding='16px';
+    box.style.background='#fff';
+    box.style.borderRadius='14px';
+    document.querySelector('#more .card').appendChild(box);
+  }
+  box.innerHTML=data[type]||'';
+};
+  alert(messages[type]||'تم فتح العنصر.');
+}
+</script>
+</body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
   window.printStudentReport = function(studentId){
@@ -7408,6 +8182,61 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
   };
   document.addEventListener('DOMContentLoaded', function(){ setTimeout(function(){ try{ initStudentsManagerRouter(); }catch(e){} }, 400); });
 })();
+</script>
+
+<script>
+function goAccountTab(tabId){
+  try{
+    go('account');
+    setTimeout(function(){
+      var btnMap={statement:0,operations:2,rouletteTab:6,pdfTab:5};
+      var tabs=document.querySelectorAll('#account .tabbar button');
+      var btn=(typeof btnMap[tabId]!=='undefined' && tabs[btnMap[tabId]])?tabs[btnMap[tabId]]:null;
+      if(typeof showTab==='function'){ showTab(tabId, btn); }
+    },120);
+  }catch(e){ console.log(e); }
+}
+function openMoreInfo(type){
+  const data={
+    about:`<h3>من نحن</h3><p>بنك الرياضيات منصة تعليمية تحفيزية تهدف إلى تعزيز مشاركة الطلاب داخل الحصة الدراسية من خلال نظام نقاط مستوحى من الأنظمة المصرفية.</p>
+    <p>يمنح البنك الطلاب رصيدًا تحفيزيًا مقابل المشاركة والإنجاز والالتزام مما يعزز روح التنافس الإيجابي.</p>
+    <p>إشراف الأستاذة: سارة حقوي</p>`,
+    contact:`<h3>اتصل بنا</h3>
+    <p>خدمة الطلاب وأولياء الأمور: 📞 0502234335</p>
+    <p>الإدارة العامة: 📞 0556891201</p>
+    <p>البريد الإلكتروني: ✉ Saramathss@hotmail.com</p>
+    <p>🏫 مدرسة رواد الشرق الأهلية</p>`,
+    settings:`<h3>الإعدادات</h3>
+    <ul>
+    <li>تغيير كلمة المرور</li>
+    <li>تعديل بيانات الحساب</li>
+    <li>إدارة الإشعارات داخل النظام</li>
+    <li>تسجيل الخروج</li>
+    </ul>`,
+    privacy:`<h3>سياسة الخصوصية</h3>
+    <p>يحرص بنك الرياضيات على حماية خصوصية بيانات الطلاب وأولياء الأمور.</p>
+    <p>تستخدم البيانات لأغراض تعليمية فقط داخل المدرسة.</p>`,
+    disclaimer:`<h3>إخلاء المسؤولية</h3>
+    <p>بنك الرياضيات نظام تحفيزي تعليمي لتشجيع المشاركة داخل الحصة.</p>
+    <p>النقاط لا تمثل أي قيمة مالية حقيقية.</p>`,
+    terms:`<h3>الأحكام والشروط</h3>
+    <p>يستخدم النظام لتعزيز البيئة التعليمية وتحفيز الطلاب.</p>
+    <p>يتم منح النقاط وفق معايير يحددها المعلم.</p>`
+  };
+  let box=document.getElementById('moreContentBox');
+  if(!box){
+    box=document.createElement('div');
+    box.id='moreContentBox';
+    box.style.marginTop='16px';
+    box.style.padding='16px';
+    box.style.background='#fff';
+    box.style.borderRadius='14px';
+    document.querySelector('#more .card').appendChild(box);
+  }
+  box.innerHTML=data[type]||'';
+};
+  alert(messages[type]||'تم فتح العنصر.');
+}
 </script>
 </body>
 </html>
