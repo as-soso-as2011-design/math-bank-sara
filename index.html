@@ -809,7 +809,7 @@ html[dir="ltr"] .balance-head{direction:ltr}
         </thead>
         <tbody>
           <tr><td>الأربعاء</td><td>11 / 03 / 2026</td><td>مشاركة مميزة</td><td class="green">+500 ر.س</td><td>إيداع</td></tr>
-          <tr><td>الثلاثاء</td><td>10 / 03 / 2026</td><td>سحب تأخر</td><td class="red">-50 ر.س</td><td>سحب</td></tr>
+          <tr><td>الثلاثاء</td><td>10 / 03 / 2026</td><td>خصم تأخر</td><td class="red">-50 ر.س</td><td>سحب</td></tr>
           <tr><td>الاثنين</td><td>09 / 03 / 2026</td><td>تحويل إلى لينا</td><td class="gold">-100 ر.س</td><td>تحويل</td></tr>
         </tbody>
       </table>
@@ -823,9 +823,9 @@ html[dir="ltr"] .balance-head{direction:ltr}
     </div>
 
     <div id="operations" class="tab-content">
-      <div class="field"><label>نوع العملية</label><select id="operationType" onchange="updateReasonOptions()"><option value="deposit">إيداع</option><option value="withdraw">سحب</option><option value="transfer">تحويل</option></select></div>
+      <div class="field"><label>نوع العملية</label><select id="operationType" onchange="updateOperationReasonOptions()"><option value="deposit">إيداع</option><option value="withdraw">سحب</option><option value="transfer">تحويل</option></select></div>
 
-      <div class="field">
+      <div class="field" id="transferMethodField">
         <label>اسم المحول</label>
         <select id="transferMethod" onchange="updateTransferMode()">
           <option value="account">تحويل برقم الحساب</option>
@@ -844,13 +844,12 @@ html[dir="ltr"] .balance-head{direction:ltr}
       </div>
 
       <div class="field"><label>المبلغ</label><input id="amountBox" type="number" placeholder="أدخل المبلغ بالريال" /></div>
-      <div class="field">
-        <label>السبب</label>
+      <div class="field"><label>السبب</label>
         <select id="reasonBox" onchange="toggleCustomReason()">
           <option value="">اختر السبب</option>
         </select>
       </div>
-      <div class="field hidden" id="customReasonWrap"><label>اكتبي السبب</label><input id="customReasonBox" type="text" placeholder="اكتبي السبب هنا" /></div>
+      <div class="field hidden" id="customReasonField"><label>اكتبي السبب</label><input id="customReasonBox" type="text" placeholder="اكتبي السبب هنا" /></div>
       <div class="field"><label>خانة تنفيذ العملية</label><select><option>تنفيذ العملية</option><option>معاينة قبل التنفيذ</option></select></div>
       <button class="btn btn-green" style="width:100%" onclick="execOpEnhanced()">تنفيذ</button>
       <div id="okMsg" class="notice ok hidden">تم التنفيذ بنجاح.</div>
@@ -1486,84 +1485,84 @@ function showTab(id, btn){
   if(target) target.classList.add('active');
 }
 
+const operationReasons = {
+  deposit: [
+    'مشاركة مميزة في الحصة',
+    'حل سؤال صعب',
+    'مساعدة زميل / زميلة',
+    'إنهاء المهمة الأدائية',
+    'تسليم الواجب مبكرًا',
+    'الحصول على درجة كاملة',
+    'الفوز في تحدي الرياضيات',
+    'ترتيب الدفتر',
+    'الالتزام والهدوء في الحصة',
+    'مبادرة إيجابية',
+    'حضور كامل الأسبوع',
+    'تميز في العمل الجماعي',
+    'أخرى'
+  ],
+  withdraw: [
+    'عدم حل الواجب',
+    'التأخر عن الحصة',
+    'كثرة الكلام أثناء الشرح',
+    'عدم إحضار الأدوات',
+    'عدم المشاركة',
+    'مخالفة تعليمات الصف',
+    'عدم تسليم المهمة الأدائية',
+    'إزعاج الزملاء',
+    'استخدام الجوال',
+    'سحب سلوكي',
+    'أخرى'
+  ],
+  transfer: [
+    'تحويل بين الطلاب',
+    'تسوية رصيد',
+    'أخرى'
+  ]
+};
+
 function updateTransferMode(){
   const mode = document.getElementById('transferMethod');
   const byAcc = document.getElementById('byAccount');
   const byStu = document.getElementById('byStudent');
-  if(!mode || !byAcc || !byStu) return;
-  if(mode.value === 'account'){
-    byAcc.classList.remove('hidden');
+  const opType = document.getElementById('operationType');
+  const transferField = document.getElementById('transferMethodField');
+  const isTransfer = !opType || opType.value === 'transfer';
+  if(transferField) transferField.classList.toggle('hidden', !isTransfer);
+  if(!byAcc || !byStu) return;
+  if(!isTransfer){
+    byAcc.classList.add('hidden');
     byStu.classList.add('hidden');
-  }else{
+    return;
+  }
+  if(mode && mode.value === 'student'){
     byAcc.classList.add('hidden');
     byStu.classList.remove('hidden');
+  }else{
+    byAcc.classList.remove('hidden');
+    byStu.classList.add('hidden');
   }
 }
 
-
-const depositReasons = [
-  'مشاركة مميزة في الحصة',
-  'حل سؤال صعب',
-  'مساعدة زميل / زميلة',
-  'إنهاء المهمة الأدائية',
-  'تسليم الواجب مبكرًا',
-  'الحصول على درجة كاملة',
-  'الفوز في تحدي الرياضيات',
-  'ترتيب الدفتر',
-  'الالتزام والهدوء في الحصة',
-  'مبادرة إيجابية',
-  'حضور كامل الأسبوع',
-  'تميز في العمل الجماعي',
-  'أخرى'
-];
-
-const withdrawReasons = [
-  'عدم حل الواجب',
-  'التأخر عن الحصة',
-  'كثرة الكلام أثناء الشرح',
-  'عدم إحضار الأدوات',
-  'عدم المشاركة',
-  'مخالفة تعليمات الصف',
-  'عدم تسليم المهمة الأدائية',
-  'إزعاج الزملاء',
-  'استخدام الجوال',
-  'سحب سلوكي',
-  'أخرى'
-];
-
-const transferReasons = [
-  'تحويل بين الطلاب',
-  'تسوية رصيد',
-  'مكافأة محولة',
-  'أخرى'
-];
-
-function updateReasonOptions(){
+function updateOperationReasonOptions(){
   const opType = document.getElementById('operationType');
   const reason = document.getElementById('reasonBox');
   if(!opType || !reason) return;
-  const map = {
-    deposit: depositReasons,
-    withdraw: withdrawReasons,
-    transfer: transferReasons
-  };
-  const reasons = map[opType.value] || depositReasons;
-  reason.innerHTML = '<option value="">اختر السبب</option>' + reasons.map(r => `<option value="${r}">${r}</option>`).join('');
-  reason.value = '';
+  const list = operationReasons[opType.value] || [];
+  reason.innerHTML = '<option value="">اختر السبب</option>' + list.map(function(item){
+    return '<option value="'+item+'">'+item+'</option>';
+  }).join('');
   toggleCustomReason();
+  updateTransferMode();
 }
 
 function toggleCustomReason(){
   const reason = document.getElementById('reasonBox');
-  const wrap = document.getElementById('customReasonWrap');
-  const input = document.getElementById('customReasonBox');
-  if(!reason || !wrap || !input) return;
-  if(reason.value === 'أخرى'){
-    wrap.classList.remove('hidden');
-  }else{
-    wrap.classList.add('hidden');
-    input.value = '';
-  }
+  const customField = document.getElementById('customReasonField');
+  const customBox = document.getElementById('customReasonBox');
+  const isOther = reason && reason.value === 'أخرى';
+  if(customField) customField.classList.toggle('hidden', !isOther);
+  if(customBox && !isOther) customBox.value = '';
 }
 
 function execOpEnhanced(){
@@ -1583,6 +1582,11 @@ function execOpEnhanced(){
     if(err) err.classList.remove('hidden');
   }
 }
+
+document.addEventListener('DOMContentLoaded', function(){
+  updateOperationReasonOptions();
+  updateTransferMode();
+});
 
 function drawLineChart(){
   const canvas = document.getElementById('lineChart');
@@ -1680,7 +1684,7 @@ const rouletteItems = [
   {label:"هدية", color:"#e0c98f"},
   {label:"٣٠٠", color:"#249668"},
   {label:"١٠٠٠", color:"#b58a42"},
-  {label:"سحب", color:"#174c3b"},
+  {label:"خصم", color:"#174c3b"},
   {label:"حظ أوفر", color:"#d8bb82"}
 ];
 let rouletteRotation = 0;
@@ -4172,7 +4176,7 @@ window.addEventListener('load', function(){
       </div>
       <div class="student-bulk-actions">
         <button class="btn btn-green" onclick="quickClassOperation('${cls.id}','deposit')">إيداع للفصل كامل</button>
-        <button class="btn btn-gold" onclick="quickClassOperation('${cls.id}','withdraw')">سحب للفصل كامل</button>
+        <button class="btn btn-gold" onclick="quickClassOperation('${cls.id}','withdraw')">خصم للفصل كامل</button>
         <button class="btn btn-green" onclick="assignTaskToClassFromSettings('${cls.id}')">إرسال مهمة للفصل كامل</button>
         <button class="btn btn-gold" onclick="bulkClassMessage('${cls.id}')">رسالة لولي الأمر للفصل كامل</button>
         <button class="btn btn-light" onclick="printClassReport('${cls.id}')">تصدير تقرير الفصل</button>
@@ -4246,9 +4250,9 @@ window.addEventListener('load', function(){
     });
   };
   window.quickClassOperation = function(classId, type){
-    const amount = Number(prompt(type==='deposit'?'مبلغ الإيداع للفصل كامل':'مبلغ السحب للفصل كامل') || 0);
+    const amount = Number(prompt(type==='deposit'?'مبلغ الإيداع للفصل كامل':'مبلغ الخصم للفصل كامل') || 0);
     if(!(amount>0)) return;
-    const reason = prompt('اكتبي السبب:') || (type==='deposit'?'مكافأة جماعية':'سحب جماعي');
+    const reason = prompt('اكتبي السبب:') || (type==='deposit'?'مكافأة جماعية':'خصم جماعي');
     (bankData.students||[]).filter(s=>s.classId===classId).forEach(function(st){
       st.balance = Math.max(0, Number(st.balance||0) + (type==='deposit'? amount : -amount));
       addHistory(st, type==='deposit'?'deposit':'withdraw', amount, reason);
@@ -4283,10 +4287,10 @@ window.addEventListener('load', function(){
   };
   window.quickStudentOperation = function(studentId){
     const st = getStudent(studentId); if(!st) return;
-    const type = prompt('اكتبي نوع العملية: deposit للإيداع أو withdraw للسحب','deposit');
+    const type = prompt('اكتبي نوع العملية: deposit للإيداع أو withdraw للخصم','deposit');
     if(!type || !['deposit','withdraw'].includes(type)) return;
     const amount = Number(prompt('المبلغ') || 0); if(!(amount>0)) return;
-    const reason = prompt('السبب') || (type==='deposit'?'عملية سريعة':'سحب سريع');
+    const reason = prompt('السبب') || (type==='deposit'?'عملية سريعة':'خصم سريع');
     st.balance = Math.max(0, Number(st.balance||0) + (type==='deposit'?amount:-amount));
     addHistory(st,type,amount,reason);
     bankData.operations.push({id:'op'+Date.now(), studentId:st.id, studentName:st.name, type:type, amount:amount, reason:reason, date:new Date().toLocaleDateString('en-CA')});
@@ -4521,7 +4525,7 @@ window.addEventListener('load', function(){
       </div>
       <div class="student-bulk-actions">
         <button class="btn btn-green" onclick="quickClassOperation('${cls.id}','deposit')">إيداع للفصل كامل</button>
-        <button class="btn btn-gold" onclick="quickClassOperation('${cls.id}','withdraw')">سحب للفصل كامل</button>
+        <button class="btn btn-gold" onclick="quickClassOperation('${cls.id}','withdraw')">خصم للفصل كامل</button>
         <button class="btn btn-green" onclick="assignTaskToClassFromSettings('${cls.id}')">إرسال مهمة للفصل كامل</button>
         <button class="btn btn-gold" onclick="bulkClassMessage('${cls.id}')">رسالة لولي الأمر للفصل كامل</button>
         <button class="btn btn-light" onclick="printClassReport('${cls.id}')">تصدير تقرير الفصل</button>
@@ -4595,9 +4599,9 @@ window.addEventListener('load', function(){
     });
   };
   window.quickClassOperation = function(classId, type){
-    const amount = Number(prompt(type==='deposit'?'مبلغ الإيداع للفصل كامل':'مبلغ السحب للفصل كامل') || 0);
+    const amount = Number(prompt(type==='deposit'?'مبلغ الإيداع للفصل كامل':'مبلغ الخصم للفصل كامل') || 0);
     if(!(amount>0)) return;
-    const reason = prompt('اكتبي السبب:') || (type==='deposit'?'مكافأة جماعية':'سحب جماعي');
+    const reason = prompt('اكتبي السبب:') || (type==='deposit'?'مكافأة جماعية':'خصم جماعي');
     (bankData.students||[]).filter(s=>s.classId===classId).forEach(function(st){
       st.balance = Math.max(0, Number(st.balance||0) + (type==='deposit'? amount : -amount));
       addHistory(st, type==='deposit'?'deposit':'withdraw', amount, reason);
@@ -4632,10 +4636,10 @@ window.addEventListener('load', function(){
   };
   window.quickStudentOperation = function(studentId){
     const st = getStudent(studentId); if(!st) return;
-    const type = prompt('اكتبي نوع العملية: deposit للإيداع أو withdraw للسحب','deposit');
+    const type = prompt('اكتبي نوع العملية: deposit للإيداع أو withdraw للخصم','deposit');
     if(!type || !['deposit','withdraw'].includes(type)) return;
     const amount = Number(prompt('المبلغ') || 0); if(!(amount>0)) return;
-    const reason = prompt('السبب') || (type==='deposit'?'عملية سريعة':'سحب سريع');
+    const reason = prompt('السبب') || (type==='deposit'?'عملية سريعة':'خصم سريع');
     st.balance = Math.max(0, Number(st.balance||0) + (type==='deposit'?amount:-amount));
     addHistory(st,type,amount,reason);
     bankData.operations.push({id:'op'+Date.now(), studentId:st.id, studentName:st.name, type:type, amount:amount, reason:reason, date:new Date().toLocaleDateString('en-CA')});
@@ -4981,7 +4985,7 @@ window.addEventListener('load', function(){
       </div>
       <div class="student-bulk-actions">
         <button class="btn btn-green" onclick="quickClassOperation('${cls.id}','deposit')">إيداع للفصل كامل</button>
-        <button class="btn btn-gold" onclick="quickClassOperation('${cls.id}','withdraw')">سحب للفصل كامل</button>
+        <button class="btn btn-gold" onclick="quickClassOperation('${cls.id}','withdraw')">خصم للفصل كامل</button>
         <button class="btn btn-green" onclick="assignTaskToClassFromSettings('${cls.id}')">إرسال مهمة للفصل كامل</button>
         <button class="btn btn-gold" onclick="bulkClassMessage('${cls.id}')">رسالة لولي الأمر للفصل كامل</button>
         <button class="btn btn-light" onclick="printClassReport('${cls.id}')">تصدير تقرير الفصل</button>
@@ -5055,9 +5059,9 @@ window.addEventListener('load', function(){
     });
   };
   window.quickClassOperation = function(classId, type){
-    const amount = Number(prompt(type==='deposit'?'مبلغ الإيداع للفصل كامل':'مبلغ السحب للفصل كامل') || 0);
+    const amount = Number(prompt(type==='deposit'?'مبلغ الإيداع للفصل كامل':'مبلغ الخصم للفصل كامل') || 0);
     if(!(amount>0)) return;
-    const reason = prompt('اكتبي السبب:') || (type==='deposit'?'مكافأة جماعية':'سحب جماعي');
+    const reason = prompt('اكتبي السبب:') || (type==='deposit'?'مكافأة جماعية':'خصم جماعي');
     (bankData.students||[]).filter(s=>s.classId===classId).forEach(function(st){
       st.balance = Math.max(0, Number(st.balance||0) + (type==='deposit'? amount : -amount));
       addHistory(st, type==='deposit'?'deposit':'withdraw', amount, reason);
@@ -5092,10 +5096,10 @@ window.addEventListener('load', function(){
   };
   window.quickStudentOperation = function(studentId){
     const st = getStudent(studentId); if(!st) return;
-    const type = prompt('اكتبي نوع العملية: deposit للإيداع أو withdraw للسحب','deposit');
+    const type = prompt('اكتبي نوع العملية: deposit للإيداع أو withdraw للخصم','deposit');
     if(!type || !['deposit','withdraw'].includes(type)) return;
     const amount = Number(prompt('المبلغ') || 0); if(!(amount>0)) return;
-    const reason = prompt('السبب') || (type==='deposit'?'عملية سريعة':'سحب سريع');
+    const reason = prompt('السبب') || (type==='deposit'?'عملية سريعة':'خصم سريع');
     st.balance = Math.max(0, Number(st.balance||0) + (type==='deposit'?amount:-amount));
     addHistory(st,type,amount,reason);
     bankData.operations.push({id:'op'+Date.now(), studentId:st.id, studentName:st.name, type:type, amount:amount, reason:reason, date:new Date().toLocaleDateString('en-CA')});
@@ -5330,7 +5334,7 @@ window.addEventListener('load', function(){
       </div>
       <div class="student-bulk-actions">
         <button class="btn btn-green" onclick="quickClassOperation('${cls.id}','deposit')">إيداع للفصل كامل</button>
-        <button class="btn btn-gold" onclick="quickClassOperation('${cls.id}','withdraw')">سحب للفصل كامل</button>
+        <button class="btn btn-gold" onclick="quickClassOperation('${cls.id}','withdraw')">خصم للفصل كامل</button>
         <button class="btn btn-green" onclick="assignTaskToClassFromSettings('${cls.id}')">إرسال مهمة للفصل كامل</button>
         <button class="btn btn-gold" onclick="bulkClassMessage('${cls.id}')">رسالة لولي الأمر للفصل كامل</button>
         <button class="btn btn-light" onclick="printClassReport('${cls.id}')">تصدير تقرير الفصل</button>
@@ -5404,9 +5408,9 @@ window.addEventListener('load', function(){
     });
   };
   window.quickClassOperation = function(classId, type){
-    const amount = Number(prompt(type==='deposit'?'مبلغ الإيداع للفصل كامل':'مبلغ السحب للفصل كامل') || 0);
+    const amount = Number(prompt(type==='deposit'?'مبلغ الإيداع للفصل كامل':'مبلغ الخصم للفصل كامل') || 0);
     if(!(amount>0)) return;
-    const reason = prompt('اكتبي السبب:') || (type==='deposit'?'مكافأة جماعية':'سحب جماعي');
+    const reason = prompt('اكتبي السبب:') || (type==='deposit'?'مكافأة جماعية':'خصم جماعي');
     (bankData.students||[]).filter(s=>s.classId===classId).forEach(function(st){
       st.balance = Math.max(0, Number(st.balance||0) + (type==='deposit'? amount : -amount));
       addHistory(st, type==='deposit'?'deposit':'withdraw', amount, reason);
@@ -5441,10 +5445,10 @@ window.addEventListener('load', function(){
   };
   window.quickStudentOperation = function(studentId){
     const st = getStudent(studentId); if(!st) return;
-    const type = prompt('اكتبي نوع العملية: deposit للإيداع أو withdraw للسحب','deposit');
+    const type = prompt('اكتبي نوع العملية: deposit للإيداع أو withdraw للخصم','deposit');
     if(!type || !['deposit','withdraw'].includes(type)) return;
     const amount = Number(prompt('المبلغ') || 0); if(!(amount>0)) return;
-    const reason = prompt('السبب') || (type==='deposit'?'عملية سريعة':'سحب سريع');
+    const reason = prompt('السبب') || (type==='deposit'?'عملية سريعة':'خصم سريع');
     st.balance = Math.max(0, Number(st.balance||0) + (type==='deposit'?amount:-amount));
     addHistory(st,type,amount,reason);
     bankData.operations.push({id:'op'+Date.now(), studentId:st.id, studentName:st.name, type:type, amount:amount, reason:reason, date:new Date().toLocaleDateString('en-CA')});
@@ -5901,7 +5905,7 @@ window.addEventListener('load', function(){
       </div>
       <div class="student-bulk-actions">
         <button class="btn btn-green" onclick="quickClassOperation('${cls.id}','deposit')">إيداع للفصل كامل</button>
-        <button class="btn btn-gold" onclick="quickClassOperation('${cls.id}','withdraw')">سحب للفصل كامل</button>
+        <button class="btn btn-gold" onclick="quickClassOperation('${cls.id}','withdraw')">خصم للفصل كامل</button>
         <button class="btn btn-green" onclick="assignTaskToClassFromSettings('${cls.id}')">إرسال مهمة للفصل كامل</button>
         <button class="btn btn-gold" onclick="bulkClassMessage('${cls.id}')">رسالة لولي الأمر للفصل كامل</button>
         <button class="btn btn-light" onclick="printClassReport('${cls.id}')">تصدير تقرير الفصل</button>
@@ -5975,9 +5979,9 @@ window.addEventListener('load', function(){
     });
   };
   window.quickClassOperation = function(classId, type){
-    const amount = Number(prompt(type==='deposit'?'مبلغ الإيداع للفصل كامل':'مبلغ السحب للفصل كامل') || 0);
+    const amount = Number(prompt(type==='deposit'?'مبلغ الإيداع للفصل كامل':'مبلغ الخصم للفصل كامل') || 0);
     if(!(amount>0)) return;
-    const reason = prompt('اكتبي السبب:') || (type==='deposit'?'مكافأة جماعية':'سحب جماعي');
+    const reason = prompt('اكتبي السبب:') || (type==='deposit'?'مكافأة جماعية':'خصم جماعي');
     (bankData.students||[]).filter(s=>s.classId===classId).forEach(function(st){
       st.balance = Math.max(0, Number(st.balance||0) + (type==='deposit'? amount : -amount));
       addHistory(st, type==='deposit'?'deposit':'withdraw', amount, reason);
@@ -6012,10 +6016,10 @@ window.addEventListener('load', function(){
   };
   window.quickStudentOperation = function(studentId){
     const st = getStudent(studentId); if(!st) return;
-    const type = prompt('اكتبي نوع العملية: deposit للإيداع أو withdraw للسحب','deposit');
+    const type = prompt('اكتبي نوع العملية: deposit للإيداع أو withdraw للخصم','deposit');
     if(!type || !['deposit','withdraw'].includes(type)) return;
     const amount = Number(prompt('المبلغ') || 0); if(!(amount>0)) return;
-    const reason = prompt('السبب') || (type==='deposit'?'عملية سريعة':'سحب سريع');
+    const reason = prompt('السبب') || (type==='deposit'?'عملية سريعة':'خصم سريع');
     st.balance = Math.max(0, Number(st.balance||0) + (type==='deposit'?amount:-amount));
     addHistory(st,type,amount,reason);
     bankData.operations.push({id:'op'+Date.now(), studentId:st.id, studentName:st.name, type:type, amount:amount, reason:reason, date:new Date().toLocaleDateString('en-CA')});
@@ -6250,7 +6254,7 @@ window.addEventListener('load', function(){
       </div>
       <div class="student-bulk-actions">
         <button class="btn btn-green" onclick="quickClassOperation('${cls.id}','deposit')">إيداع للفصل كامل</button>
-        <button class="btn btn-gold" onclick="quickClassOperation('${cls.id}','withdraw')">سحب للفصل كامل</button>
+        <button class="btn btn-gold" onclick="quickClassOperation('${cls.id}','withdraw')">خصم للفصل كامل</button>
         <button class="btn btn-green" onclick="assignTaskToClassFromSettings('${cls.id}')">إرسال مهمة للفصل كامل</button>
         <button class="btn btn-gold" onclick="bulkClassMessage('${cls.id}')">رسالة لولي الأمر للفصل كامل</button>
         <button class="btn btn-light" onclick="printClassReport('${cls.id}')">تصدير تقرير الفصل</button>
@@ -6324,9 +6328,9 @@ window.addEventListener('load', function(){
     });
   };
   window.quickClassOperation = function(classId, type){
-    const amount = Number(prompt(type==='deposit'?'مبلغ الإيداع للفصل كامل':'مبلغ السحب للفصل كامل') || 0);
+    const amount = Number(prompt(type==='deposit'?'مبلغ الإيداع للفصل كامل':'مبلغ الخصم للفصل كامل') || 0);
     if(!(amount>0)) return;
-    const reason = prompt('اكتبي السبب:') || (type==='deposit'?'مكافأة جماعية':'سحب جماعي');
+    const reason = prompt('اكتبي السبب:') || (type==='deposit'?'مكافأة جماعية':'خصم جماعي');
     (bankData.students||[]).filter(s=>s.classId===classId).forEach(function(st){
       st.balance = Math.max(0, Number(st.balance||0) + (type==='deposit'? amount : -amount));
       addHistory(st, type==='deposit'?'deposit':'withdraw', amount, reason);
@@ -6361,10 +6365,10 @@ window.addEventListener('load', function(){
   };
   window.quickStudentOperation = function(studentId){
     const st = getStudent(studentId); if(!st) return;
-    const type = prompt('اكتبي نوع العملية: deposit للإيداع أو withdraw للسحب','deposit');
+    const type = prompt('اكتبي نوع العملية: deposit للإيداع أو withdraw للخصم','deposit');
     if(!type || !['deposit','withdraw'].includes(type)) return;
     const amount = Number(prompt('المبلغ') || 0); if(!(amount>0)) return;
-    const reason = prompt('السبب') || (type==='deposit'?'عملية سريعة':'سحب سريع');
+    const reason = prompt('السبب') || (type==='deposit'?'عملية سريعة':'خصم سريع');
     st.balance = Math.max(0, Number(st.balance||0) + (type==='deposit'?amount:-amount));
     addHistory(st,type,amount,reason);
     bankData.operations.push({id:'op'+Date.now(), studentId:st.id, studentName:st.name, type:type, amount:amount, reason:reason, date:new Date().toLocaleDateString('en-CA')});
@@ -6710,7 +6714,7 @@ window.addEventListener('load', function(){
       </div>
       <div class="student-bulk-actions">
         <button class="btn btn-green" onclick="quickClassOperation('${cls.id}','deposit')">إيداع للفصل كامل</button>
-        <button class="btn btn-gold" onclick="quickClassOperation('${cls.id}','withdraw')">سحب للفصل كامل</button>
+        <button class="btn btn-gold" onclick="quickClassOperation('${cls.id}','withdraw')">خصم للفصل كامل</button>
         <button class="btn btn-green" onclick="assignTaskToClassFromSettings('${cls.id}')">إرسال مهمة للفصل كامل</button>
         <button class="btn btn-gold" onclick="bulkClassMessage('${cls.id}')">رسالة لولي الأمر للفصل كامل</button>
         <button class="btn btn-light" onclick="printClassReport('${cls.id}')">تصدير تقرير الفصل</button>
@@ -6784,9 +6788,9 @@ window.addEventListener('load', function(){
     });
   };
   window.quickClassOperation = function(classId, type){
-    const amount = Number(prompt(type==='deposit'?'مبلغ الإيداع للفصل كامل':'مبلغ السحب للفصل كامل') || 0);
+    const amount = Number(prompt(type==='deposit'?'مبلغ الإيداع للفصل كامل':'مبلغ الخصم للفصل كامل') || 0);
     if(!(amount>0)) return;
-    const reason = prompt('اكتبي السبب:') || (type==='deposit'?'مكافأة جماعية':'سحب جماعي');
+    const reason = prompt('اكتبي السبب:') || (type==='deposit'?'مكافأة جماعية':'خصم جماعي');
     (bankData.students||[]).filter(s=>s.classId===classId).forEach(function(st){
       st.balance = Math.max(0, Number(st.balance||0) + (type==='deposit'? amount : -amount));
       addHistory(st, type==='deposit'?'deposit':'withdraw', amount, reason);
@@ -6821,10 +6825,10 @@ window.addEventListener('load', function(){
   };
   window.quickStudentOperation = function(studentId){
     const st = getStudent(studentId); if(!st) return;
-    const type = prompt('اكتبي نوع العملية: deposit للإيداع أو withdraw للسحب','deposit');
+    const type = prompt('اكتبي نوع العملية: deposit للإيداع أو withdraw للخصم','deposit');
     if(!type || !['deposit','withdraw'].includes(type)) return;
     const amount = Number(prompt('المبلغ') || 0); if(!(amount>0)) return;
-    const reason = prompt('السبب') || (type==='deposit'?'عملية سريعة':'سحب سريع');
+    const reason = prompt('السبب') || (type==='deposit'?'عملية سريعة':'خصم سريع');
     st.balance = Math.max(0, Number(st.balance||0) + (type==='deposit'?amount:-amount));
     addHistory(st,type,amount,reason);
     bankData.operations.push({id:'op'+Date.now(), studentId:st.id, studentName:st.name, type:type, amount:amount, reason:reason, date:new Date().toLocaleDateString('en-CA')});
@@ -7059,7 +7063,7 @@ window.addEventListener('load', function(){
       </div>
       <div class="student-bulk-actions">
         <button class="btn btn-green" onclick="quickClassOperation('${cls.id}','deposit')">إيداع للفصل كامل</button>
-        <button class="btn btn-gold" onclick="quickClassOperation('${cls.id}','withdraw')">سحب للفصل كامل</button>
+        <button class="btn btn-gold" onclick="quickClassOperation('${cls.id}','withdraw')">خصم للفصل كامل</button>
         <button class="btn btn-green" onclick="assignTaskToClassFromSettings('${cls.id}')">إرسال مهمة للفصل كامل</button>
         <button class="btn btn-gold" onclick="bulkClassMessage('${cls.id}')">رسالة لولي الأمر للفصل كامل</button>
         <button class="btn btn-light" onclick="printClassReport('${cls.id}')">تصدير تقرير الفصل</button>
@@ -7133,9 +7137,9 @@ window.addEventListener('load', function(){
     });
   };
   window.quickClassOperation = function(classId, type){
-    const amount = Number(prompt(type==='deposit'?'مبلغ الإيداع للفصل كامل':'مبلغ السحب للفصل كامل') || 0);
+    const amount = Number(prompt(type==='deposit'?'مبلغ الإيداع للفصل كامل':'مبلغ الخصم للفصل كامل') || 0);
     if(!(amount>0)) return;
-    const reason = prompt('اكتبي السبب:') || (type==='deposit'?'مكافأة جماعية':'سحب جماعي');
+    const reason = prompt('اكتبي السبب:') || (type==='deposit'?'مكافأة جماعية':'خصم جماعي');
     (bankData.students||[]).filter(s=>s.classId===classId).forEach(function(st){
       st.balance = Math.max(0, Number(st.balance||0) + (type==='deposit'? amount : -amount));
       addHistory(st, type==='deposit'?'deposit':'withdraw', amount, reason);
@@ -7170,10 +7174,10 @@ window.addEventListener('load', function(){
   };
   window.quickStudentOperation = function(studentId){
     const st = getStudent(studentId); if(!st) return;
-    const type = prompt('اكتبي نوع العملية: deposit للإيداع أو withdraw للسحب','deposit');
+    const type = prompt('اكتبي نوع العملية: deposit للإيداع أو withdraw للخصم','deposit');
     if(!type || !['deposit','withdraw'].includes(type)) return;
     const amount = Number(prompt('المبلغ') || 0); if(!(amount>0)) return;
-    const reason = prompt('السبب') || (type==='deposit'?'عملية سريعة':'سحب سريع');
+    const reason = prompt('السبب') || (type==='deposit'?'عملية سريعة':'خصم سريع');
     st.balance = Math.max(0, Number(st.balance||0) + (type==='deposit'?amount:-amount));
     addHistory(st,type,amount,reason);
     bankData.operations.push({id:'op'+Date.now(), studentId:st.id, studentName:st.name, type:type, amount:amount, reason:reason, date:new Date().toLocaleDateString('en-CA')});
@@ -8196,7 +8200,7 @@ window.addEventListener('load', function(){
       </div>
       <div class="student-bulk-actions">
         <button class="btn btn-green" onclick="quickClassOperation('${cls.id}','deposit')">إيداع للفصل كامل</button>
-        <button class="btn btn-gold" onclick="quickClassOperation('${cls.id}','withdraw')">سحب للفصل كامل</button>
+        <button class="btn btn-gold" onclick="quickClassOperation('${cls.id}','withdraw')">خصم للفصل كامل</button>
         <button class="btn btn-gold" onclick="bulkClassMessage('${cls.id}')">رسالة لولي الأمر للفصل كامل</button>
         <button class="btn btn-light" onclick="printClassReport('${cls.id}')">تصدير تقرير الفصل</button>
         <button class="btn ${cls.isDisabled?'btn-green':'btn-gold'}" onclick="toggleClassEnabled('${cls.id}')">${cls.isDisabled?'تفعيل الفصل':'إيقاف الفصل'}</button>
@@ -8279,5 +8283,3 @@ window.addEventListener('load', function(){
   document.addEventListener('DOMContentLoaded', function(){ rerenderSettings(); });
 })();
 </script>
-
-<script>updateReasonOptions();</script>
