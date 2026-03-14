@@ -541,6 +541,12 @@ html,body{margin:0 !important;padding:0 !important;}
 .topbar,.card,.hero,.honor-hero{margin-top:0 !important;}
 </style>
 
+
+<style id="oai-gap-fix">
+html,body{margin:0 !important;padding:0 !important;}
+.app,.screen,#account,#teacher,#honor,#menu,#account_choice,#student_login,#teacher_login{margin-top:0 !important;padding-top:0 !important;}
+.topbar,.hero,.card,.honor-hero,.teacher-shell,.teacher-hero{margin-top:0 !important;}
+</style>
 </head>
 <body>
 <div class="app">
@@ -1478,7 +1484,7 @@ function go(id, el){
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   const nav = el && el.classList.contains('nav-btn') ? el : document.querySelector('.nav-btn[data-screen="' + id + '"]');
   if(nav) nav.classList.add('active');
-  window.scrollTo({top:0, behavior:'smooth'});
+  window.scrollTo(0,0);
 }
 function showTab(id, btn){
   const wrap = btn.closest('.card');
@@ -4620,20 +4626,6 @@ window.addEventListener('load', function(){
 })();
 </script>
 
-    const w=window.open('','_blank'); if(w){ w.document.write(html); w.document.close(); setTimeout(()=>w.print(),400); }
-    const status=document.getElementById('smartReportStatus'); if(status){ status.classList.remove('hidden'); setTimeout(()=>status.classList.add('hidden'),2000); }
-  }
-  const oldShow=window.showTeacherPane;
-  if(typeof oldShow==='function'){
-    window.showTeacherPane=function(id, btn){ oldShow(id, btn); if(id==='teacherPaneReportsSmart') setTimeout(window.renderSmartReports,60); };
-  }
-  const oldRefresh=window.refreshTeacherUI;
-  if(typeof oldRefresh==='function'){
-    window.refreshTeacherUI=function(){ oldRefresh(); const pane=document.getElementById('teacherPaneReportsSmart'); if(pane && pane.classList.contains('active')) setTimeout(window.renderSmartReports,60); };
-  }
-  window.addEventListener('load', function(){ setTimeout(function(){ if(document.getElementById('teacherPaneReportsSmart')?.classList.contains('active')) window.renderSmartReports(); }, 300); });
-})();
-</script>
 
 
 <script id="smart-reports-override-v7">
@@ -6312,20 +6304,6 @@ window.addEventListener('load', function(){
 })();
 </script>
 
-    const w=window.open('','_blank'); if(w){ w.document.write(html); w.document.close(); setTimeout(()=>w.print(),400); }
-    const status=document.getElementById('smartReportStatus'); if(status){ status.classList.remove('hidden'); setTimeout(()=>status.classList.add('hidden'),2000); }
-  }
-  const oldShow=window.showTeacherPane;
-  if(typeof oldShow==='function'){
-    window.showTeacherPane=function(id, btn){ oldShow(id, btn); if(id==='teacherPaneReportsSmart') setTimeout(window.renderSmartReports,60); };
-  }
-  const oldRefresh=window.refreshTeacherUI;
-  if(typeof oldRefresh==='function'){
-    window.refreshTeacherUI=function(){ oldRefresh(); const pane=document.getElementById('teacherPaneReportsSmart'); if(pane && pane.classList.contains('active')) setTimeout(window.renderSmartReports,60); };
-  }
-  window.addEventListener('load', function(){ setTimeout(function(){ if(document.getElementById('teacherPaneReportsSmart')?.classList.contains('active')) window.renderSmartReports(); }, 300); });
-})();
-</script>
 
 
 <script id="smart-reports-override-v7">
