@@ -1472,6 +1472,7 @@ function go(id, el){
   window.scrollTo({top:0, behavior:'smooth'});
 }
 function showTab(id, btn){
+  scrollAppToTop();
   const wrap = btn.closest('.card');
   wrap.querySelectorAll('.tabbar button').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
@@ -2762,6 +2763,7 @@ function renderStudentPerformanceTasks(student){
 }
 
 window.addEventListener('load', function(){
+  scrollAppToTop();
   loadBankData();
   refreshTeacherUI();
   toggleTransferTarget();
@@ -2888,6 +2890,7 @@ window.addEventListener('load', function(){
 
 <script id="teacher-performance-fix-script">
 window.addEventListener('load', function(){
+  scrollAppToTop();
   try{
     const perf = document.getElementById('teacherPanePerformance');
     const teacherShell = document.querySelector('#teacher .teacher-shell');
@@ -3041,6 +3044,7 @@ window.addEventListener('load', function(){
   };
 
   window.addEventListener('load', function(){
+  scrollAppToTop();
     try{
       if(typeof getCurrentStudent === 'function'){
         const student = getCurrentStudent();
@@ -3180,6 +3184,7 @@ window.addEventListener('load', function(){
 
   const baseShowTeacherPane = window.showTeacherPane;
   window.showTeacherPane = function(id, btn){
+  scrollAppToTop();
     if(typeof baseShowTeacherPane==='function') baseShowTeacherPane(id, btn);
     if(id==='teacherPanePerformance') setTimeout(function(){ bindCreateBtn(); window.renderTeacherPerformanceTasks(); }, 0);
   };
@@ -3198,6 +3203,7 @@ window.addEventListener('load', function(){
   };
 
   window.addEventListener('load', function(){
+  scrollAppToTop();
     setTimeout(function(){ fillClassSelect(); bindCreateBtn(); window.renderTeacherPerformanceTasks(); const st=getCurrentStudentSafe(); if(st) window.renderStudentPerformanceTasks(st); }, 300);
   });
 })();
@@ -3332,6 +3338,7 @@ window.addEventListener('load', function(){
   const baseShowTeacherPane = window.showTeacherPane;
   if(typeof baseShowTeacherPane === 'function'){
     window.showTeacherPane = function(id, btn){
+  scrollAppToTop();
       const out = baseShowTeacherPane.apply(this, arguments);
       if(id === 'teacherPanePerformance'){
         ensureBank();
@@ -3344,6 +3351,7 @@ window.addEventListener('load', function(){
   }
 
   window.addEventListener('load', function(){
+  scrollAppToTop();
     ensureBank();
     if(typeof populatePerformanceClassSelect === 'function') populatePerformanceClassSelect();
     bindCreateButton();
@@ -3471,6 +3479,7 @@ window.addEventListener('load', function(){
   var oldShowTeacherPane = window.showTeacherPane;
   if(typeof oldShowTeacherPane === 'function'){
     window.showTeacherPane = function(id, btn){
+  scrollAppToTop();
       oldShowTeacherPane(id, btn);
       if(id === 'teacherPanePerformance') setTimeout(bind, 0);
     };
@@ -7188,6 +7197,7 @@ window.addEventListener('load', function(){
   };
   const prevShowPaneRouter = window.showTeacherPane;
   window.showTeacherPane = function(id, btn){
+  scrollAppToTop();
     if(typeof prevShowPaneRouter === 'function') prevShowPaneRouter(id, btn);
     if(id==='teacherPaneStudents'){
       setTimeout(function(){ try{ initStudentsManagerRouter(); backStudentsManagerHome(); }catch(e){} }, 80);
@@ -7347,6 +7357,7 @@ window.addEventListener('load', function(){
   var oldShowTeacherPane = window.showTeacherPane;
   if(typeof oldShowTeacherPane === 'function'){
     window.showTeacherPane = function(id, btn){
+  scrollAppToTop();
       var res = oldShowTeacherPane.apply(this, arguments);
       if(id === 'teacherPanePerformance'){
         setTimeout(function(){ fillClassSelectPreserve(); bindCreateBtnFinal(); if(typeof renderTeacherPerformanceTasks==='function') renderTeacherPerformanceTasks(); }, 0);
