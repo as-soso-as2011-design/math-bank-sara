@@ -4272,6 +4272,113 @@ background:linear-gradient(180deg,#014c39 0%, #0b6d52 24%, #f6fbf8 24%);
 }
 </style>
 
+
+<style id="export-bank-style-v2">
+#exportBlueBankBtn{position:fixed;left:18px;bottom:18px;z-index:99999;background:linear-gradient(135deg,#0b2a66,#0b5bb5);color:#fff;border:0;border-radius:16px;padding:14px 16px;font-weight:1000;box-shadow:0 14px 34px rgba(0,0,0,.22)}
+#exportBlueBankModal{position:fixed;inset:0;background:rgba(0,0,0,.50);display:none;align-items:center;justify-content:center;padding:18px;z-index:100000}
+#exportBlueBankModal.show{display:flex}
+#exportBlueBankModal .box{background:#fff;border-radius:18px;max-width:900px;width:100%;padding:16px;border:1px solid rgba(0,0,0,.10)}
+#exportBlueBankModal .head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}
+#exportBlueBankModal h3{margin:0;color:#0b2a66;font-weight:1000}
+#exportBlueBankInfo{font-size:13px;color:#4b5563;line-height:1.9;margin-bottom:10px}
+#exportBlueBankStatus{font-size:12px;font-weight:900;margin:8px 0 10px;color:#0b2a66}
+#exportBlueBankText{width:100%;min-height:320px;border:1px solid rgba(0,0,0,.16);border-radius:14px;padding:12px;font-size:12px;direction:ltr;text-align:left;font-family:Menlo,Consolas,monospace}
+#exportBlueBankActions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+#exportBlueBankActions button{flex:1}
+</style>
+
+<button id="exportBlueBankBtn" type="button" onclick="openBlueBankExport()">📦 تصدير بيانات البنك الأزرق</button>
+
+<div id="exportBlueBankModal">
+  <div class="box">
+    <div class="head">
+      <h3>تصدير بيانات البنك الأزرق</h3>
+      <button class="xBtn" type="button" onclick="closeBlueBankExport()">إغلاق</button>
+    </div>
+    <div id="exportBlueBankInfo">اضغطي <b>جمع البيانات</b>. إذا كانت قاعدة البيانات جاهزة سيظهر كل شيء هنا. بعدها اضغطي <b>نسخ الكل</b> وأرسلي النص لي.</div>
+    <div id="exportBlueBankStatus">الحالة: بانتظار الفحص…</div>
+    <textarea id="exportBlueBankText" placeholder="ستظهر هنا بيانات البنك الأزرق..."></textarea>
+    <div id="exportBlueBankActions">
+      <button class="btn" type="button" onclick="collectBlueBankExport()">جمع البيانات</button>
+      <button class="btn2" type="button" onclick="copyBlueBankExport()">نسخ الكل</button>
+    </div>
+  </div>
+</div>
+
+<script id="export-bank-script-v2">
+(function(){
+  function setStatus(msg){ var s=document.getElementById('exportBlueBankStatus'); if(s) s.textContent='الحالة: ' + msg; }
+  function serialize(value){
+    if(value === null || value === undefined) return value;
+    if(Array.isArray(value)) return value.map(serialize);
+    if(typeof value === 'object'){
+      if(typeof value.toDate === 'function'){ try{return value.toDate().toISOString();}catch(e){} }
+      var out = {};
+      Object.keys(value).forEach(function(k){ out[k] = serialize(value[k]); });
+      return out;
+    }
+    return value;
+  }
+  function lsDump(){
+    var out = {};
+    try{
+      for(var i=0;i<localStorage.length;i++){
+        var k = localStorage.key(i); if(!k) continue;
+        out[k] = localStorage.getItem(k);
+      }
+    }catch(e){}
+    return out;
+  }
+  async function waitForDb(ms){
+    var start = Date.now();
+    while(Date.now()-start < ms){
+      if(window.db && typeof window.db.collection === 'function') return window.db;
+      await new Promise(function(r){setTimeout(r,500);});
+    }
+    return null;
+  }
+  async function fetchCollection(name){
+    var snap = await window.db.collection(name).get();
+    var rows = [];
+    snap.forEach(function(doc){ rows.push({id:doc.id, data:serialize(doc.data())}); });
+    return rows;
+  }
+  window.openBlueBankExport = function(){
+    var m=document.getElementById('exportBlueBankModal'); if(m) m.classList.add('show');
+    setStatus(window.db ? 'تم رصد قاعدة البيانات' : 'قاعدة البيانات غير جاهزة بعد');
+  };
+  window.closeBlueBankExport = function(){
+    var m=document.getElementById('exportBlueBankModal'); if(m) m.classList.remove('show');
+  };
+  window.collectBlueBankExport = async function(){
+    var t=document.getElementById('exportBlueBankText');
+    if(!t) return;
+    t.value='جاري فحص قاعدة البيانات...';
+    setStatus('جاري الانتظار حتى تصبح قاعدة البيانات جاهزة');
+    var dbReady = await waitForDb(12000);
+    if(!dbReady){
+      setStatus('لم يتم العثور على db. أرسلي لي هذه الرسالة كما هي.');
+      t.value = JSON.stringify({exportedAt:new Date().toISOString(),source:'blue-bank',error:'DB_NOT_READY',note:'لم يتم العثور على window.db داخل الصفحة بعد 12 ثانية',localStorage: lsDump()}, null, 2);
+      return;
+    }
+    try{
+      setStatus('تم الاتصال بقاعدة البيانات، جاري تحميل البيانات');
+      var payload = {exportedAt:new Date().toISOString(),source:'blue-bank',collections:{classes: await fetchCollection('classes'),students: await fetchCollection('students'),settings: await fetchCollection('settings')},localStorage: lsDump()};
+      t.value = JSON.stringify(payload, null, 2);
+      setStatus('تم جمع البيانات بنجاح');
+    }catch(err){
+      setStatus('حدث خطأ أثناء الجمع');
+      t.value = JSON.stringify({exportedAt:new Date().toISOString(),source:'blue-bank',error:String(err && err.message || err),localStorage: lsDump()}, null, 2);
+    }
+  };
+  window.copyBlueBankExport = async function(){
+    var t=document.getElementById('exportBlueBankText'); if(!t || !t.value) return;
+    try{ await navigator.clipboard.writeText(t.value); }catch(e){ t.select(); document.execCommand('copy'); }
+    alert('تم نسخ البيانات. أرسليها لي هنا.');
+  };
+})();
+</script>
+
 </body></html>`);
       w.document.close();
     }
@@ -6413,5 +6520,112 @@ background:linear-gradient(180deg,#014c39 0%, #0b6d52 24%, #f6fbf8 24%);
   else bindStart();
 })();
 </script>
+
+<style id="export-bank-style-v2">
+#exportBlueBankBtn{position:fixed;left:18px;bottom:18px;z-index:99999;background:linear-gradient(135deg,#0b2a66,#0b5bb5);color:#fff;border:0;border-radius:16px;padding:14px 16px;font-weight:1000;box-shadow:0 14px 34px rgba(0,0,0,.22)}
+#exportBlueBankModal{position:fixed;inset:0;background:rgba(0,0,0,.50);display:none;align-items:center;justify-content:center;padding:18px;z-index:100000}
+#exportBlueBankModal.show{display:flex}
+#exportBlueBankModal .box{background:#fff;border-radius:18px;max-width:900px;width:100%;padding:16px;border:1px solid rgba(0,0,0,.10)}
+#exportBlueBankModal .head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}
+#exportBlueBankModal h3{margin:0;color:#0b2a66;font-weight:1000}
+#exportBlueBankInfo{font-size:13px;color:#4b5563;line-height:1.9;margin-bottom:10px}
+#exportBlueBankStatus{font-size:12px;font-weight:900;margin:8px 0 10px;color:#0b2a66}
+#exportBlueBankText{width:100%;min-height:320px;border:1px solid rgba(0,0,0,.16);border-radius:14px;padding:12px;font-size:12px;direction:ltr;text-align:left;font-family:Menlo,Consolas,monospace}
+#exportBlueBankActions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+#exportBlueBankActions button{flex:1}
+</style>
+
+<button id="exportBlueBankBtn" type="button" onclick="openBlueBankExport()">📦 تصدير بيانات البنك الأزرق</button>
+
+<div id="exportBlueBankModal">
+  <div class="box">
+    <div class="head">
+      <h3>تصدير بيانات البنك الأزرق</h3>
+      <button class="xBtn" type="button" onclick="closeBlueBankExport()">إغلاق</button>
+    </div>
+    <div id="exportBlueBankInfo">اضغطي <b>جمع البيانات</b>. إذا كانت قاعدة البيانات جاهزة سيظهر كل شيء هنا. بعدها اضغطي <b>نسخ الكل</b> وأرسلي النص لي.</div>
+    <div id="exportBlueBankStatus">الحالة: بانتظار الفحص…</div>
+    <textarea id="exportBlueBankText" placeholder="ستظهر هنا بيانات البنك الأزرق..."></textarea>
+    <div id="exportBlueBankActions">
+      <button class="btn" type="button" onclick="collectBlueBankExport()">جمع البيانات</button>
+      <button class="btn2" type="button" onclick="copyBlueBankExport()">نسخ الكل</button>
+    </div>
+  </div>
+</div>
+
+<script id="export-bank-script-v2">
+(function(){
+  function setStatus(msg){ var s=document.getElementById('exportBlueBankStatus'); if(s) s.textContent='الحالة: ' + msg; }
+  function serialize(value){
+    if(value === null || value === undefined) return value;
+    if(Array.isArray(value)) return value.map(serialize);
+    if(typeof value === 'object'){
+      if(typeof value.toDate === 'function'){ try{return value.toDate().toISOString();}catch(e){} }
+      var out = {};
+      Object.keys(value).forEach(function(k){ out[k] = serialize(value[k]); });
+      return out;
+    }
+    return value;
+  }
+  function lsDump(){
+    var out = {};
+    try{
+      for(var i=0;i<localStorage.length;i++){
+        var k = localStorage.key(i); if(!k) continue;
+        out[k] = localStorage.getItem(k);
+      }
+    }catch(e){}
+    return out;
+  }
+  async function waitForDb(ms){
+    var start = Date.now();
+    while(Date.now()-start < ms){
+      if(window.db && typeof window.db.collection === 'function') return window.db;
+      await new Promise(function(r){setTimeout(r,500);});
+    }
+    return null;
+  }
+  async function fetchCollection(name){
+    var snap = await window.db.collection(name).get();
+    var rows = [];
+    snap.forEach(function(doc){ rows.push({id:doc.id, data:serialize(doc.data())}); });
+    return rows;
+  }
+  window.openBlueBankExport = function(){
+    var m=document.getElementById('exportBlueBankModal'); if(m) m.classList.add('show');
+    setStatus(window.db ? 'تم رصد قاعدة البيانات' : 'قاعدة البيانات غير جاهزة بعد');
+  };
+  window.closeBlueBankExport = function(){
+    var m=document.getElementById('exportBlueBankModal'); if(m) m.classList.remove('show');
+  };
+  window.collectBlueBankExport = async function(){
+    var t=document.getElementById('exportBlueBankText');
+    if(!t) return;
+    t.value='جاري فحص قاعدة البيانات...';
+    setStatus('جاري الانتظار حتى تصبح قاعدة البيانات جاهزة');
+    var dbReady = await waitForDb(12000);
+    if(!dbReady){
+      setStatus('لم يتم العثور على db. أرسلي لي هذه الرسالة كما هي.');
+      t.value = JSON.stringify({exportedAt:new Date().toISOString(),source:'blue-bank',error:'DB_NOT_READY',note:'لم يتم العثور على window.db داخل الصفحة بعد 12 ثانية',localStorage: lsDump()}, null, 2);
+      return;
+    }
+    try{
+      setStatus('تم الاتصال بقاعدة البيانات، جاري تحميل البيانات');
+      var payload = {exportedAt:new Date().toISOString(),source:'blue-bank',collections:{classes: await fetchCollection('classes'),students: await fetchCollection('students'),settings: await fetchCollection('settings')},localStorage: lsDump()};
+      t.value = JSON.stringify(payload, null, 2);
+      setStatus('تم جمع البيانات بنجاح');
+    }catch(err){
+      setStatus('حدث خطأ أثناء الجمع');
+      t.value = JSON.stringify({exportedAt:new Date().toISOString(),source:'blue-bank',error:String(err && err.message || err),localStorage: lsDump()}, null, 2);
+    }
+  };
+  window.copyBlueBankExport = async function(){
+    var t=document.getElementById('exportBlueBankText'); if(!t || !t.value) return;
+    try{ await navigator.clipboard.writeText(t.value); }catch(e){ t.select(); document.execCommand('copy'); }
+    alert('تم نسخ البيانات. أرسليها لي هنا.');
+  };
+})();
+</script>
+
 </body>
 </html>
