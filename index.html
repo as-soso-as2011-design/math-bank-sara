@@ -4301,7 +4301,7 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
       </div>
       <div class="student-bulk-actions">
         <button class="btn btn-green" onclick="quickClassOperation('${cls.id}','deposit')">إيداع للفصل كامل</button>
-        <button class="btn btn-gold" onclick="quickClassOperation('${cls.id}','withdraw')">خصم للفصل كامل</button>
+        <button class="btn btn-gold" onclick="quickClassOperation('${cls.id}','withdraw')">سحب للفصل كامل</button>
         <button class="btn btn-green" onclick="assignTaskToClassFromSettings('${cls.id}')">إرسال مهمة للفصل كامل</button>
         <button class="btn btn-gold" onclick="bulkClassMessage('${cls.id}')">رسالة لولي الأمر للفصل كامل</button>
         <button class="btn btn-light" onclick="printClassReport('${cls.id}')">تصدير تقرير الفصل</button>
@@ -4375,9 +4375,9 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
     });
   };
   window.quickClassOperation = function(classId, type){
-    const amount = Number(prompt(type==='deposit'?'مبلغ الإيداع للفصل كامل':'مبلغ الخصم للفصل كامل') || 0);
+    const amount = Number(prompt(type==='deposit'?'مبلغ الإيداع للفصل كامل':'مبلغ السحب للفصل كامل') || 0);
     if(!(amount>0)) return;
-    const reason = prompt('اكتبي السبب:') || (type==='deposit'?'مكافأة جماعية':'خصم جماعي');
+    const reason = prompt('اكتبي السبب:') || (type==='deposit'?'مكافأة جماعية':'سحب جماعي');
     (bankData.students||[]).filter(s=>s.classId===classId).forEach(function(st){
       st.balance = Math.max(0, Number(st.balance||0) + (type==='deposit'? amount : -amount));
       addHistory(st, type==='deposit'?'deposit':'withdraw', amount, reason);
@@ -4415,7 +4415,7 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
     const type = prompt('اكتبي نوع العملية: deposit للإيداع أو withdraw للخصم','deposit');
     if(!type || !['deposit','withdraw'].includes(type)) return;
     const amount = Number(prompt('المبلغ') || 0); if(!(amount>0)) return;
-    const reason = prompt('السبب') || (type==='deposit'?'عملية سريعة':'خصم سريع');
+    const reason = prompt('السبب') || (type==='deposit'?'عملية سريعة':'سحب سريع');
     st.balance = Math.max(0, Number(st.balance||0) + (type==='deposit'?amount:-amount));
     addHistory(st,type,amount,reason);
     bankData.operations.push({id:'op'+Date.now(), studentId:st.id, studentName:st.name, type:type, amount:amount, reason:reason, date:new Date().toLocaleDateString('en-CA')});
@@ -4514,6 +4514,221 @@ function openMoreInfo(type){
   alert(messages[type]||'تم فتح العنصر.');
 }
 <\/script>
+
+<style id="bulk-reasons-enhancement">
+.bulk-op-modal{position:fixed;inset:0;background:rgba(0,0,0,.38);display:none;align-items:center;justify-content:center;z-index:99999;padding:20px}
+.bulk-op-modal.show{display:flex}
+.bulk-op-box{width:min(420px,100%);background:#fff;border:1px solid var(--line);border-radius:28px;padding:18px;box-shadow:0 24px 60px rgba(0,0,0,.22)}
+.bulk-op-box h3{margin:0 0 8px;color:var(--deep);font-size:22px}
+.bulk-op-box p{margin:0 0 14px;color:var(--muted);font-size:13px;line-height:1.9}
+.bulk-op-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.select-arrow{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23103a2e' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");background-repeat:no-repeat;background-position:left 14px center;background-size:18px;padding-left:42px!important}
+</style>
+
+<div id="bulkOpModal" class="bulk-op-modal" aria-hidden="true">
+  <div class="bulk-op-box">
+    <h3 id="bulkOpTitle">عملية جماعية</h3>
+    <p id="bulkOpDesc">تنفيذ عملية على الفصل كامل.</p>
+    <div class="field">
+      <label>المبلغ</label>
+      <input id="bulkOpAmount" type="number" placeholder="أدخلي المبلغ بالريال" />
+    </div>
+    <div class="field">
+      <label>السبب</label>
+      <select id="bulkOpReason" class="select-arrow"></select>
+    </div>
+    <div class="field" id="bulkOpOtherWrap" style="display:none">
+      <label>اكتبي السبب</label>
+      <input id="bulkOpOther" type="text" placeholder="اكتبي السبب هنا" />
+    </div>
+    <div class="bulk-op-actions">
+      <button class="btn btn-light" type="button" onclick="closeBulkOpModal()">رجوع</button>
+      <button class="btn btn-green" type="button" onclick="submitBulkOpModal()">تنفيذ العملية</button>
+    </div>
+  </div>
+</div>
+
+<script id="bulk-reasons-script">
+(function(){
+  const depositReasons = [
+    'مشاركة مميزة في الحصة',
+    'حل سؤال صعب',
+    'مساعدة زميل / زميلة',
+    'إنهاء المهمة الأدائية',
+    'تسليم الواجب مبكرًا',
+    'الحصول على درجة كاملة',
+    'الفوز في تحدي الرياضيات',
+    'ترتيب الدفتر',
+    'الالتزام والهدوء في الحصة',
+    'مبادرة إيجابية',
+    'حضور كامل الأسبوع',
+    'تميز في العمل الجماعي',
+    'أخرى'
+  ];
+  const withdrawReasons = [
+    'عدم حل الواجب',
+    'التأخر عن الحصة',
+    'كثرة الكلام أثناء الشرح',
+    'عدم إحضار الأدوات',
+    'عدم المشاركة',
+    'مخالفة تعليمات الصف',
+    'عدم تسليم المهمة الأدائية',
+    'إزعاج الزملاء',
+    'استخدام الجوال',
+    'سحب سلوكي',
+    'أخرى'
+  ];
+
+  function getStudentSafe(id){
+    if(typeof getStudent === 'function'){
+      try{ return getStudent(id); }catch(e){}
+    }
+    if(window.bankData && Array.isArray(bankData.students)){
+      return bankData.students.find(s => s.id===id);
+    }
+    return null;
+  }
+
+  function refreshAll(){
+    try{ if(typeof saveBankData==='function') saveBankData(); }catch(e){}
+    try{ if(typeof refreshTeacherUI==='function') refreshTeacherUI(); }catch(e){}
+    try{ if(typeof renderTeacher==='function') renderTeacher(); }catch(e){}
+    try{ if(typeof renderStudentSettingsDashboard==='function') renderStudentSettingsDashboard(); }catch(e){}
+    try{ if(typeof renderClassDetailCustom==='function') renderClassDetailCustom(); }catch(e){}
+    try{ if(typeof renderClassCardsCustom==='function') renderClassCardsCustom(); }catch(e){}
+  }
+
+  window.markAttendanceForStudent = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    const status = prompt('اكتبي حالة الحضور: حاضر / غياب / استئذان', st.attendanceStatus || 'حاضر');
+    if(!status) return;
+    st.attendanceStatus = String(status).trim();
+    refreshAll();
+    alert('تم حفظ حالة الحضور.');
+  };
+
+  window.messageGuardianFromSettings = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    const base = 'تنبيه من بنك الرياضيات\nالطالب / الطالبة: ' + (st.name||'');
+    const text = prompt('اكتبي رسالة ولي الأمر:', base);
+    if(!text) return;
+    if(typeof openWhatsAppNumber==='function' && st.guardian){
+      openWhatsAppNumber(st.guardian, text);
+      return;
+    }
+    alert('تم تجهيز رسالة ولي الأمر.');
+  };
+
+  window.changeStudentPasswordFromSettings = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    const pwd = prompt('اكتبي كلمة المرور الجديدة:', st.password || st.pin || '');
+    if(!pwd || !String(pwd).trim()) return;
+    st.password = String(pwd).trim();
+    if('pin' in st) st.pin = String(pwd).trim();
+    refreshAll();
+    alert('تم تغيير كلمة المرور.');
+  };
+
+  window.editStudentNameFromSettings = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    const name = prompt('اكتبي الاسم الجديد للطالب / الطالبة:', st.name || '');
+    if(!name || !String(name).trim()) return;
+    st.name = String(name).trim();
+    refreshAll();
+    alert('تم تعديل الاسم.');
+  };
+
+  window.deleteStudentFromSettings = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    if(!confirm('هل تريدين حذف الطالب / الطالبة؟')) return;
+    if(typeof deleteStudent==='function'){
+      deleteStudent(studentId);
+    }else if(window.bankData && Array.isArray(bankData.students)){
+      bankData.students = bankData.students.filter(s => s.id !== studentId);
+      if(Array.isArray(bankData.operations)){
+        bankData.operations = bankData.operations.filter(op => op.studentId !== studentId && op.targetStudentId !== studentId);
+      }
+      refreshAll();
+    }
+  };
+
+  window.__bulkOpState = {classId:'', type:'deposit'};
+
+  function fillReasons(type){
+    const sel = document.getElementById('bulkOpReason');
+    if(!sel) return;
+    const reasons = type === 'deposit' ? depositReasons : withdrawReasons;
+    sel.innerHTML = '<option value="">اختاري السبب</option>' + reasons.map(r => '<option value="'+r+'">'+r+'</option>').join('');
+    sel.onchange = function(){
+      const wrap = document.getElementById('bulkOpOtherWrap');
+      if(wrap) wrap.style.display = this.value === 'أخرى' ? 'block' : 'none';
+    };
+    sel.classList.add('select-arrow');
+  }
+
+  window.openBulkOpModal = function(classId, type){
+    window.__bulkOpState = {classId, type};
+    const modal = document.getElementById('bulkOpModal');
+    const title = document.getElementById('bulkOpTitle');
+    const desc = document.getElementById('bulkOpDesc');
+    const amount = document.getElementById('bulkOpAmount');
+    const other = document.getElementById('bulkOpOther');
+    const wrap = document.getElementById('bulkOpOtherWrap');
+    if(title) title.textContent = type === 'deposit' ? 'إيداع للفصل كامل' : 'سحب للفصل كامل';
+    if(desc) desc.textContent = type === 'deposit' ? 'اختاري سبب الإيداع للفصل كامل.' : 'اختاري سبب السحب للفصل كامل.';
+    if(amount) amount.value = '';
+    if(other) other.value = '';
+    if(wrap) wrap.style.display = 'none';
+    fillReasons(type);
+    if(modal) modal.classList.add('show');
+  };
+
+  window.closeBulkOpModal = function(){
+    const modal = document.getElementById('bulkOpModal');
+    if(modal) modal.classList.remove('show');
+  };
+
+  window.submitBulkOpModal = function(){
+    const state = window.__bulkOpState || {};
+    const amount = Number(document.getElementById('bulkOpAmount')?.value || 0);
+    let reason = document.getElementById('bulkOpReason')?.value || '';
+    if(reason === 'أخرى'){
+      reason = (document.getElementById('bulkOpOther')?.value || '').trim();
+    }
+    if(!(amount > 0)) return alert('أدخلي مبلغًا صحيحًا.');
+    if(!reason) return alert('اختاري السبب أولًا.');
+    if(!window.bankData || !Array.isArray(bankData.students)) return;
+    const students = bankData.students.filter(s => s.classId === state.classId);
+    students.forEach(function(st){
+      st.balance = Math.max(0, Number(st.balance||0) + (state.type === 'deposit' ? amount : -amount));
+      if(typeof addHistory === 'function'){
+        try{ addHistory(st, state.type === 'deposit' ? 'deposit' : 'withdraw', amount, reason); }catch(e){}
+      }else{
+        st.history = Array.isArray(st.history) ? st.history : [];
+        st.history.push({id:'h'+Date.now()+Math.random().toString(16).slice(2,6),type:(state.type==='deposit'?'deposit':'withdraw'),amount:Number(amount||0),reason:reason,date:new Date().toLocaleString('ar-SA')});
+      }
+      bankData.operations = Array.isArray(bankData.operations) ? bankData.operations : [];
+      bankData.operations.push({
+        id:'op'+Date.now()+Math.random().toString(16).slice(2,6),
+        studentId:st.id,
+        studentName:st.name,
+        type:(state.type==='deposit'?'deposit':'withdraw'),
+        amount:Number(amount||0),
+        reason:reason,
+        date:new Date().toLocaleDateString('en-CA')+' '+new Date().toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'})
+      });
+    });
+    refreshAll();
+    closeBulkOpModal();
+    alert('تم تنفيذ العملية بنجاح.');
+  };
+
+  window.quickClassOperation = function(classId, type){
+    openBulkOpModal(classId, type);
+  };
+})();
+</script>
+
 </body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
@@ -4563,6 +4778,221 @@ function openMoreInfo(type){
   alert(messages[type]||'تم فتح العنصر.');
 }
 <\/script>
+
+<style id="bulk-reasons-enhancement">
+.bulk-op-modal{position:fixed;inset:0;background:rgba(0,0,0,.38);display:none;align-items:center;justify-content:center;z-index:99999;padding:20px}
+.bulk-op-modal.show{display:flex}
+.bulk-op-box{width:min(420px,100%);background:#fff;border:1px solid var(--line);border-radius:28px;padding:18px;box-shadow:0 24px 60px rgba(0,0,0,.22)}
+.bulk-op-box h3{margin:0 0 8px;color:var(--deep);font-size:22px}
+.bulk-op-box p{margin:0 0 14px;color:var(--muted);font-size:13px;line-height:1.9}
+.bulk-op-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.select-arrow{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23103a2e' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");background-repeat:no-repeat;background-position:left 14px center;background-size:18px;padding-left:42px!important}
+</style>
+
+<div id="bulkOpModal" class="bulk-op-modal" aria-hidden="true">
+  <div class="bulk-op-box">
+    <h3 id="bulkOpTitle">عملية جماعية</h3>
+    <p id="bulkOpDesc">تنفيذ عملية على الفصل كامل.</p>
+    <div class="field">
+      <label>المبلغ</label>
+      <input id="bulkOpAmount" type="number" placeholder="أدخلي المبلغ بالريال" />
+    </div>
+    <div class="field">
+      <label>السبب</label>
+      <select id="bulkOpReason" class="select-arrow"></select>
+    </div>
+    <div class="field" id="bulkOpOtherWrap" style="display:none">
+      <label>اكتبي السبب</label>
+      <input id="bulkOpOther" type="text" placeholder="اكتبي السبب هنا" />
+    </div>
+    <div class="bulk-op-actions">
+      <button class="btn btn-light" type="button" onclick="closeBulkOpModal()">رجوع</button>
+      <button class="btn btn-green" type="button" onclick="submitBulkOpModal()">تنفيذ العملية</button>
+    </div>
+  </div>
+</div>
+
+<script id="bulk-reasons-script">
+(function(){
+  const depositReasons = [
+    'مشاركة مميزة في الحصة',
+    'حل سؤال صعب',
+    'مساعدة زميل / زميلة',
+    'إنهاء المهمة الأدائية',
+    'تسليم الواجب مبكرًا',
+    'الحصول على درجة كاملة',
+    'الفوز في تحدي الرياضيات',
+    'ترتيب الدفتر',
+    'الالتزام والهدوء في الحصة',
+    'مبادرة إيجابية',
+    'حضور كامل الأسبوع',
+    'تميز في العمل الجماعي',
+    'أخرى'
+  ];
+  const withdrawReasons = [
+    'عدم حل الواجب',
+    'التأخر عن الحصة',
+    'كثرة الكلام أثناء الشرح',
+    'عدم إحضار الأدوات',
+    'عدم المشاركة',
+    'مخالفة تعليمات الصف',
+    'عدم تسليم المهمة الأدائية',
+    'إزعاج الزملاء',
+    'استخدام الجوال',
+    'سحب سلوكي',
+    'أخرى'
+  ];
+
+  function getStudentSafe(id){
+    if(typeof getStudent === 'function'){
+      try{ return getStudent(id); }catch(e){}
+    }
+    if(window.bankData && Array.isArray(bankData.students)){
+      return bankData.students.find(s => s.id===id);
+    }
+    return null;
+  }
+
+  function refreshAll(){
+    try{ if(typeof saveBankData==='function') saveBankData(); }catch(e){}
+    try{ if(typeof refreshTeacherUI==='function') refreshTeacherUI(); }catch(e){}
+    try{ if(typeof renderTeacher==='function') renderTeacher(); }catch(e){}
+    try{ if(typeof renderStudentSettingsDashboard==='function') renderStudentSettingsDashboard(); }catch(e){}
+    try{ if(typeof renderClassDetailCustom==='function') renderClassDetailCustom(); }catch(e){}
+    try{ if(typeof renderClassCardsCustom==='function') renderClassCardsCustom(); }catch(e){}
+  }
+
+  window.markAttendanceForStudent = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    const status = prompt('اكتبي حالة الحضور: حاضر / غياب / استئذان', st.attendanceStatus || 'حاضر');
+    if(!status) return;
+    st.attendanceStatus = String(status).trim();
+    refreshAll();
+    alert('تم حفظ حالة الحضور.');
+  };
+
+  window.messageGuardianFromSettings = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    const base = 'تنبيه من بنك الرياضيات\nالطالب / الطالبة: ' + (st.name||'');
+    const text = prompt('اكتبي رسالة ولي الأمر:', base);
+    if(!text) return;
+    if(typeof openWhatsAppNumber==='function' && st.guardian){
+      openWhatsAppNumber(st.guardian, text);
+      return;
+    }
+    alert('تم تجهيز رسالة ولي الأمر.');
+  };
+
+  window.changeStudentPasswordFromSettings = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    const pwd = prompt('اكتبي كلمة المرور الجديدة:', st.password || st.pin || '');
+    if(!pwd || !String(pwd).trim()) return;
+    st.password = String(pwd).trim();
+    if('pin' in st) st.pin = String(pwd).trim();
+    refreshAll();
+    alert('تم تغيير كلمة المرور.');
+  };
+
+  window.editStudentNameFromSettings = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    const name = prompt('اكتبي الاسم الجديد للطالب / الطالبة:', st.name || '');
+    if(!name || !String(name).trim()) return;
+    st.name = String(name).trim();
+    refreshAll();
+    alert('تم تعديل الاسم.');
+  };
+
+  window.deleteStudentFromSettings = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    if(!confirm('هل تريدين حذف الطالب / الطالبة؟')) return;
+    if(typeof deleteStudent==='function'){
+      deleteStudent(studentId);
+    }else if(window.bankData && Array.isArray(bankData.students)){
+      bankData.students = bankData.students.filter(s => s.id !== studentId);
+      if(Array.isArray(bankData.operations)){
+        bankData.operations = bankData.operations.filter(op => op.studentId !== studentId && op.targetStudentId !== studentId);
+      }
+      refreshAll();
+    }
+  };
+
+  window.__bulkOpState = {classId:'', type:'deposit'};
+
+  function fillReasons(type){
+    const sel = document.getElementById('bulkOpReason');
+    if(!sel) return;
+    const reasons = type === 'deposit' ? depositReasons : withdrawReasons;
+    sel.innerHTML = '<option value="">اختاري السبب</option>' + reasons.map(r => '<option value="'+r+'">'+r+'</option>').join('');
+    sel.onchange = function(){
+      const wrap = document.getElementById('bulkOpOtherWrap');
+      if(wrap) wrap.style.display = this.value === 'أخرى' ? 'block' : 'none';
+    };
+    sel.classList.add('select-arrow');
+  }
+
+  window.openBulkOpModal = function(classId, type){
+    window.__bulkOpState = {classId, type};
+    const modal = document.getElementById('bulkOpModal');
+    const title = document.getElementById('bulkOpTitle');
+    const desc = document.getElementById('bulkOpDesc');
+    const amount = document.getElementById('bulkOpAmount');
+    const other = document.getElementById('bulkOpOther');
+    const wrap = document.getElementById('bulkOpOtherWrap');
+    if(title) title.textContent = type === 'deposit' ? 'إيداع للفصل كامل' : 'سحب للفصل كامل';
+    if(desc) desc.textContent = type === 'deposit' ? 'اختاري سبب الإيداع للفصل كامل.' : 'اختاري سبب السحب للفصل كامل.';
+    if(amount) amount.value = '';
+    if(other) other.value = '';
+    if(wrap) wrap.style.display = 'none';
+    fillReasons(type);
+    if(modal) modal.classList.add('show');
+  };
+
+  window.closeBulkOpModal = function(){
+    const modal = document.getElementById('bulkOpModal');
+    if(modal) modal.classList.remove('show');
+  };
+
+  window.submitBulkOpModal = function(){
+    const state = window.__bulkOpState || {};
+    const amount = Number(document.getElementById('bulkOpAmount')?.value || 0);
+    let reason = document.getElementById('bulkOpReason')?.value || '';
+    if(reason === 'أخرى'){
+      reason = (document.getElementById('bulkOpOther')?.value || '').trim();
+    }
+    if(!(amount > 0)) return alert('أدخلي مبلغًا صحيحًا.');
+    if(!reason) return alert('اختاري السبب أولًا.');
+    if(!window.bankData || !Array.isArray(bankData.students)) return;
+    const students = bankData.students.filter(s => s.classId === state.classId);
+    students.forEach(function(st){
+      st.balance = Math.max(0, Number(st.balance||0) + (state.type === 'deposit' ? amount : -amount));
+      if(typeof addHistory === 'function'){
+        try{ addHistory(st, state.type === 'deposit' ? 'deposit' : 'withdraw', amount, reason); }catch(e){}
+      }else{
+        st.history = Array.isArray(st.history) ? st.history : [];
+        st.history.push({id:'h'+Date.now()+Math.random().toString(16).slice(2,6),type:(state.type==='deposit'?'deposit':'withdraw'),amount:Number(amount||0),reason:reason,date:new Date().toLocaleString('ar-SA')});
+      }
+      bankData.operations = Array.isArray(bankData.operations) ? bankData.operations : [];
+      bankData.operations.push({
+        id:'op'+Date.now()+Math.random().toString(16).slice(2,6),
+        studentId:st.id,
+        studentName:st.name,
+        type:(state.type==='deposit'?'deposit':'withdraw'),
+        amount:Number(amount||0),
+        reason:reason,
+        date:new Date().toLocaleDateString('en-CA')+' '+new Date().toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'})
+      });
+    });
+    refreshAll();
+    closeBulkOpModal();
+    alert('تم تنفيذ العملية بنجاح.');
+  };
+
+  window.quickClassOperation = function(classId, type){
+    openBulkOpModal(classId, type);
+  };
+})();
+</script>
+
 </body></html>`;
     const w=window.open('','_blank'); if(w){ w.document.write(html); w.document.close(); setTimeout(()=>w.print(),400); }
     const status=document.getElementById('smartReportStatus'); if(status){ status.classList.remove('hidden'); setTimeout(()=>status.classList.add('hidden'),2000); }
@@ -4730,7 +5160,7 @@ function openMoreInfo(type){
       </div>
       <div class="student-bulk-actions">
         <button class="btn btn-green" onclick="quickClassOperation('${cls.id}','deposit')">إيداع للفصل كامل</button>
-        <button class="btn btn-gold" onclick="quickClassOperation('${cls.id}','withdraw')">خصم للفصل كامل</button>
+        <button class="btn btn-gold" onclick="quickClassOperation('${cls.id}','withdraw')">سحب للفصل كامل</button>
         <button class="btn btn-green" onclick="assignTaskToClassFromSettings('${cls.id}')">إرسال مهمة للفصل كامل</button>
         <button class="btn btn-gold" onclick="bulkClassMessage('${cls.id}')">رسالة لولي الأمر للفصل كامل</button>
         <button class="btn btn-light" onclick="printClassReport('${cls.id}')">تصدير تقرير الفصل</button>
@@ -4804,9 +5234,9 @@ function openMoreInfo(type){
     });
   };
   window.quickClassOperation = function(classId, type){
-    const amount = Number(prompt(type==='deposit'?'مبلغ الإيداع للفصل كامل':'مبلغ الخصم للفصل كامل') || 0);
+    const amount = Number(prompt(type==='deposit'?'مبلغ الإيداع للفصل كامل':'مبلغ السحب للفصل كامل') || 0);
     if(!(amount>0)) return;
-    const reason = prompt('اكتبي السبب:') || (type==='deposit'?'مكافأة جماعية':'خصم جماعي');
+    const reason = prompt('اكتبي السبب:') || (type==='deposit'?'مكافأة جماعية':'سحب جماعي');
     (bankData.students||[]).filter(s=>s.classId===classId).forEach(function(st){
       st.balance = Math.max(0, Number(st.balance||0) + (type==='deposit'? amount : -amount));
       addHistory(st, type==='deposit'?'deposit':'withdraw', amount, reason);
@@ -4844,7 +5274,7 @@ function openMoreInfo(type){
     const type = prompt('اكتبي نوع العملية: deposit للإيداع أو withdraw للخصم','deposit');
     if(!type || !['deposit','withdraw'].includes(type)) return;
     const amount = Number(prompt('المبلغ') || 0); if(!(amount>0)) return;
-    const reason = prompt('السبب') || (type==='deposit'?'عملية سريعة':'خصم سريع');
+    const reason = prompt('السبب') || (type==='deposit'?'عملية سريعة':'سحب سريع');
     st.balance = Math.max(0, Number(st.balance||0) + (type==='deposit'?amount:-amount));
     addHistory(st,type,amount,reason);
     bankData.operations.push({id:'op'+Date.now(), studentId:st.id, studentName:st.name, type:type, amount:amount, reason:reason, date:new Date().toLocaleDateString('en-CA')});
@@ -4943,6 +5373,221 @@ function openMoreInfo(type){
   alert(messages[type]||'تم فتح العنصر.');
 }
 <\/script>
+
+<style id="bulk-reasons-enhancement">
+.bulk-op-modal{position:fixed;inset:0;background:rgba(0,0,0,.38);display:none;align-items:center;justify-content:center;z-index:99999;padding:20px}
+.bulk-op-modal.show{display:flex}
+.bulk-op-box{width:min(420px,100%);background:#fff;border:1px solid var(--line);border-radius:28px;padding:18px;box-shadow:0 24px 60px rgba(0,0,0,.22)}
+.bulk-op-box h3{margin:0 0 8px;color:var(--deep);font-size:22px}
+.bulk-op-box p{margin:0 0 14px;color:var(--muted);font-size:13px;line-height:1.9}
+.bulk-op-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.select-arrow{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23103a2e' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");background-repeat:no-repeat;background-position:left 14px center;background-size:18px;padding-left:42px!important}
+</style>
+
+<div id="bulkOpModal" class="bulk-op-modal" aria-hidden="true">
+  <div class="bulk-op-box">
+    <h3 id="bulkOpTitle">عملية جماعية</h3>
+    <p id="bulkOpDesc">تنفيذ عملية على الفصل كامل.</p>
+    <div class="field">
+      <label>المبلغ</label>
+      <input id="bulkOpAmount" type="number" placeholder="أدخلي المبلغ بالريال" />
+    </div>
+    <div class="field">
+      <label>السبب</label>
+      <select id="bulkOpReason" class="select-arrow"></select>
+    </div>
+    <div class="field" id="bulkOpOtherWrap" style="display:none">
+      <label>اكتبي السبب</label>
+      <input id="bulkOpOther" type="text" placeholder="اكتبي السبب هنا" />
+    </div>
+    <div class="bulk-op-actions">
+      <button class="btn btn-light" type="button" onclick="closeBulkOpModal()">رجوع</button>
+      <button class="btn btn-green" type="button" onclick="submitBulkOpModal()">تنفيذ العملية</button>
+    </div>
+  </div>
+</div>
+
+<script id="bulk-reasons-script">
+(function(){
+  const depositReasons = [
+    'مشاركة مميزة في الحصة',
+    'حل سؤال صعب',
+    'مساعدة زميل / زميلة',
+    'إنهاء المهمة الأدائية',
+    'تسليم الواجب مبكرًا',
+    'الحصول على درجة كاملة',
+    'الفوز في تحدي الرياضيات',
+    'ترتيب الدفتر',
+    'الالتزام والهدوء في الحصة',
+    'مبادرة إيجابية',
+    'حضور كامل الأسبوع',
+    'تميز في العمل الجماعي',
+    'أخرى'
+  ];
+  const withdrawReasons = [
+    'عدم حل الواجب',
+    'التأخر عن الحصة',
+    'كثرة الكلام أثناء الشرح',
+    'عدم إحضار الأدوات',
+    'عدم المشاركة',
+    'مخالفة تعليمات الصف',
+    'عدم تسليم المهمة الأدائية',
+    'إزعاج الزملاء',
+    'استخدام الجوال',
+    'سحب سلوكي',
+    'أخرى'
+  ];
+
+  function getStudentSafe(id){
+    if(typeof getStudent === 'function'){
+      try{ return getStudent(id); }catch(e){}
+    }
+    if(window.bankData && Array.isArray(bankData.students)){
+      return bankData.students.find(s => s.id===id);
+    }
+    return null;
+  }
+
+  function refreshAll(){
+    try{ if(typeof saveBankData==='function') saveBankData(); }catch(e){}
+    try{ if(typeof refreshTeacherUI==='function') refreshTeacherUI(); }catch(e){}
+    try{ if(typeof renderTeacher==='function') renderTeacher(); }catch(e){}
+    try{ if(typeof renderStudentSettingsDashboard==='function') renderStudentSettingsDashboard(); }catch(e){}
+    try{ if(typeof renderClassDetailCustom==='function') renderClassDetailCustom(); }catch(e){}
+    try{ if(typeof renderClassCardsCustom==='function') renderClassCardsCustom(); }catch(e){}
+  }
+
+  window.markAttendanceForStudent = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    const status = prompt('اكتبي حالة الحضور: حاضر / غياب / استئذان', st.attendanceStatus || 'حاضر');
+    if(!status) return;
+    st.attendanceStatus = String(status).trim();
+    refreshAll();
+    alert('تم حفظ حالة الحضور.');
+  };
+
+  window.messageGuardianFromSettings = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    const base = 'تنبيه من بنك الرياضيات\nالطالب / الطالبة: ' + (st.name||'');
+    const text = prompt('اكتبي رسالة ولي الأمر:', base);
+    if(!text) return;
+    if(typeof openWhatsAppNumber==='function' && st.guardian){
+      openWhatsAppNumber(st.guardian, text);
+      return;
+    }
+    alert('تم تجهيز رسالة ولي الأمر.');
+  };
+
+  window.changeStudentPasswordFromSettings = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    const pwd = prompt('اكتبي كلمة المرور الجديدة:', st.password || st.pin || '');
+    if(!pwd || !String(pwd).trim()) return;
+    st.password = String(pwd).trim();
+    if('pin' in st) st.pin = String(pwd).trim();
+    refreshAll();
+    alert('تم تغيير كلمة المرور.');
+  };
+
+  window.editStudentNameFromSettings = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    const name = prompt('اكتبي الاسم الجديد للطالب / الطالبة:', st.name || '');
+    if(!name || !String(name).trim()) return;
+    st.name = String(name).trim();
+    refreshAll();
+    alert('تم تعديل الاسم.');
+  };
+
+  window.deleteStudentFromSettings = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    if(!confirm('هل تريدين حذف الطالب / الطالبة؟')) return;
+    if(typeof deleteStudent==='function'){
+      deleteStudent(studentId);
+    }else if(window.bankData && Array.isArray(bankData.students)){
+      bankData.students = bankData.students.filter(s => s.id !== studentId);
+      if(Array.isArray(bankData.operations)){
+        bankData.operations = bankData.operations.filter(op => op.studentId !== studentId && op.targetStudentId !== studentId);
+      }
+      refreshAll();
+    }
+  };
+
+  window.__bulkOpState = {classId:'', type:'deposit'};
+
+  function fillReasons(type){
+    const sel = document.getElementById('bulkOpReason');
+    if(!sel) return;
+    const reasons = type === 'deposit' ? depositReasons : withdrawReasons;
+    sel.innerHTML = '<option value="">اختاري السبب</option>' + reasons.map(r => '<option value="'+r+'">'+r+'</option>').join('');
+    sel.onchange = function(){
+      const wrap = document.getElementById('bulkOpOtherWrap');
+      if(wrap) wrap.style.display = this.value === 'أخرى' ? 'block' : 'none';
+    };
+    sel.classList.add('select-arrow');
+  }
+
+  window.openBulkOpModal = function(classId, type){
+    window.__bulkOpState = {classId, type};
+    const modal = document.getElementById('bulkOpModal');
+    const title = document.getElementById('bulkOpTitle');
+    const desc = document.getElementById('bulkOpDesc');
+    const amount = document.getElementById('bulkOpAmount');
+    const other = document.getElementById('bulkOpOther');
+    const wrap = document.getElementById('bulkOpOtherWrap');
+    if(title) title.textContent = type === 'deposit' ? 'إيداع للفصل كامل' : 'سحب للفصل كامل';
+    if(desc) desc.textContent = type === 'deposit' ? 'اختاري سبب الإيداع للفصل كامل.' : 'اختاري سبب السحب للفصل كامل.';
+    if(amount) amount.value = '';
+    if(other) other.value = '';
+    if(wrap) wrap.style.display = 'none';
+    fillReasons(type);
+    if(modal) modal.classList.add('show');
+  };
+
+  window.closeBulkOpModal = function(){
+    const modal = document.getElementById('bulkOpModal');
+    if(modal) modal.classList.remove('show');
+  };
+
+  window.submitBulkOpModal = function(){
+    const state = window.__bulkOpState || {};
+    const amount = Number(document.getElementById('bulkOpAmount')?.value || 0);
+    let reason = document.getElementById('bulkOpReason')?.value || '';
+    if(reason === 'أخرى'){
+      reason = (document.getElementById('bulkOpOther')?.value || '').trim();
+    }
+    if(!(amount > 0)) return alert('أدخلي مبلغًا صحيحًا.');
+    if(!reason) return alert('اختاري السبب أولًا.');
+    if(!window.bankData || !Array.isArray(bankData.students)) return;
+    const students = bankData.students.filter(s => s.classId === state.classId);
+    students.forEach(function(st){
+      st.balance = Math.max(0, Number(st.balance||0) + (state.type === 'deposit' ? amount : -amount));
+      if(typeof addHistory === 'function'){
+        try{ addHistory(st, state.type === 'deposit' ? 'deposit' : 'withdraw', amount, reason); }catch(e){}
+      }else{
+        st.history = Array.isArray(st.history) ? st.history : [];
+        st.history.push({id:'h'+Date.now()+Math.random().toString(16).slice(2,6),type:(state.type==='deposit'?'deposit':'withdraw'),amount:Number(amount||0),reason:reason,date:new Date().toLocaleString('ar-SA')});
+      }
+      bankData.operations = Array.isArray(bankData.operations) ? bankData.operations : [];
+      bankData.operations.push({
+        id:'op'+Date.now()+Math.random().toString(16).slice(2,6),
+        studentId:st.id,
+        studentName:st.name,
+        type:(state.type==='deposit'?'deposit':'withdraw'),
+        amount:Number(amount||0),
+        reason:reason,
+        date:new Date().toLocaleDateString('en-CA')+' '+new Date().toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'})
+      });
+    });
+    refreshAll();
+    closeBulkOpModal();
+    alert('تم تنفيذ العملية بنجاح.');
+  };
+
+  window.quickClassOperation = function(classId, type){
+    openBulkOpModal(classId, type);
+  };
+})();
+</script>
+
 </body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
@@ -4992,6 +5637,221 @@ function openMoreInfo(type){
   alert(messages[type]||'تم فتح العنصر.');
 }
 <\/script>
+
+<style id="bulk-reasons-enhancement">
+.bulk-op-modal{position:fixed;inset:0;background:rgba(0,0,0,.38);display:none;align-items:center;justify-content:center;z-index:99999;padding:20px}
+.bulk-op-modal.show{display:flex}
+.bulk-op-box{width:min(420px,100%);background:#fff;border:1px solid var(--line);border-radius:28px;padding:18px;box-shadow:0 24px 60px rgba(0,0,0,.22)}
+.bulk-op-box h3{margin:0 0 8px;color:var(--deep);font-size:22px}
+.bulk-op-box p{margin:0 0 14px;color:var(--muted);font-size:13px;line-height:1.9}
+.bulk-op-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.select-arrow{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23103a2e' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");background-repeat:no-repeat;background-position:left 14px center;background-size:18px;padding-left:42px!important}
+</style>
+
+<div id="bulkOpModal" class="bulk-op-modal" aria-hidden="true">
+  <div class="bulk-op-box">
+    <h3 id="bulkOpTitle">عملية جماعية</h3>
+    <p id="bulkOpDesc">تنفيذ عملية على الفصل كامل.</p>
+    <div class="field">
+      <label>المبلغ</label>
+      <input id="bulkOpAmount" type="number" placeholder="أدخلي المبلغ بالريال" />
+    </div>
+    <div class="field">
+      <label>السبب</label>
+      <select id="bulkOpReason" class="select-arrow"></select>
+    </div>
+    <div class="field" id="bulkOpOtherWrap" style="display:none">
+      <label>اكتبي السبب</label>
+      <input id="bulkOpOther" type="text" placeholder="اكتبي السبب هنا" />
+    </div>
+    <div class="bulk-op-actions">
+      <button class="btn btn-light" type="button" onclick="closeBulkOpModal()">رجوع</button>
+      <button class="btn btn-green" type="button" onclick="submitBulkOpModal()">تنفيذ العملية</button>
+    </div>
+  </div>
+</div>
+
+<script id="bulk-reasons-script">
+(function(){
+  const depositReasons = [
+    'مشاركة مميزة في الحصة',
+    'حل سؤال صعب',
+    'مساعدة زميل / زميلة',
+    'إنهاء المهمة الأدائية',
+    'تسليم الواجب مبكرًا',
+    'الحصول على درجة كاملة',
+    'الفوز في تحدي الرياضيات',
+    'ترتيب الدفتر',
+    'الالتزام والهدوء في الحصة',
+    'مبادرة إيجابية',
+    'حضور كامل الأسبوع',
+    'تميز في العمل الجماعي',
+    'أخرى'
+  ];
+  const withdrawReasons = [
+    'عدم حل الواجب',
+    'التأخر عن الحصة',
+    'كثرة الكلام أثناء الشرح',
+    'عدم إحضار الأدوات',
+    'عدم المشاركة',
+    'مخالفة تعليمات الصف',
+    'عدم تسليم المهمة الأدائية',
+    'إزعاج الزملاء',
+    'استخدام الجوال',
+    'سحب سلوكي',
+    'أخرى'
+  ];
+
+  function getStudentSafe(id){
+    if(typeof getStudent === 'function'){
+      try{ return getStudent(id); }catch(e){}
+    }
+    if(window.bankData && Array.isArray(bankData.students)){
+      return bankData.students.find(s => s.id===id);
+    }
+    return null;
+  }
+
+  function refreshAll(){
+    try{ if(typeof saveBankData==='function') saveBankData(); }catch(e){}
+    try{ if(typeof refreshTeacherUI==='function') refreshTeacherUI(); }catch(e){}
+    try{ if(typeof renderTeacher==='function') renderTeacher(); }catch(e){}
+    try{ if(typeof renderStudentSettingsDashboard==='function') renderStudentSettingsDashboard(); }catch(e){}
+    try{ if(typeof renderClassDetailCustom==='function') renderClassDetailCustom(); }catch(e){}
+    try{ if(typeof renderClassCardsCustom==='function') renderClassCardsCustom(); }catch(e){}
+  }
+
+  window.markAttendanceForStudent = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    const status = prompt('اكتبي حالة الحضور: حاضر / غياب / استئذان', st.attendanceStatus || 'حاضر');
+    if(!status) return;
+    st.attendanceStatus = String(status).trim();
+    refreshAll();
+    alert('تم حفظ حالة الحضور.');
+  };
+
+  window.messageGuardianFromSettings = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    const base = 'تنبيه من بنك الرياضيات\nالطالب / الطالبة: ' + (st.name||'');
+    const text = prompt('اكتبي رسالة ولي الأمر:', base);
+    if(!text) return;
+    if(typeof openWhatsAppNumber==='function' && st.guardian){
+      openWhatsAppNumber(st.guardian, text);
+      return;
+    }
+    alert('تم تجهيز رسالة ولي الأمر.');
+  };
+
+  window.changeStudentPasswordFromSettings = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    const pwd = prompt('اكتبي كلمة المرور الجديدة:', st.password || st.pin || '');
+    if(!pwd || !String(pwd).trim()) return;
+    st.password = String(pwd).trim();
+    if('pin' in st) st.pin = String(pwd).trim();
+    refreshAll();
+    alert('تم تغيير كلمة المرور.');
+  };
+
+  window.editStudentNameFromSettings = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    const name = prompt('اكتبي الاسم الجديد للطالب / الطالبة:', st.name || '');
+    if(!name || !String(name).trim()) return;
+    st.name = String(name).trim();
+    refreshAll();
+    alert('تم تعديل الاسم.');
+  };
+
+  window.deleteStudentFromSettings = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    if(!confirm('هل تريدين حذف الطالب / الطالبة؟')) return;
+    if(typeof deleteStudent==='function'){
+      deleteStudent(studentId);
+    }else if(window.bankData && Array.isArray(bankData.students)){
+      bankData.students = bankData.students.filter(s => s.id !== studentId);
+      if(Array.isArray(bankData.operations)){
+        bankData.operations = bankData.operations.filter(op => op.studentId !== studentId && op.targetStudentId !== studentId);
+      }
+      refreshAll();
+    }
+  };
+
+  window.__bulkOpState = {classId:'', type:'deposit'};
+
+  function fillReasons(type){
+    const sel = document.getElementById('bulkOpReason');
+    if(!sel) return;
+    const reasons = type === 'deposit' ? depositReasons : withdrawReasons;
+    sel.innerHTML = '<option value="">اختاري السبب</option>' + reasons.map(r => '<option value="'+r+'">'+r+'</option>').join('');
+    sel.onchange = function(){
+      const wrap = document.getElementById('bulkOpOtherWrap');
+      if(wrap) wrap.style.display = this.value === 'أخرى' ? 'block' : 'none';
+    };
+    sel.classList.add('select-arrow');
+  }
+
+  window.openBulkOpModal = function(classId, type){
+    window.__bulkOpState = {classId, type};
+    const modal = document.getElementById('bulkOpModal');
+    const title = document.getElementById('bulkOpTitle');
+    const desc = document.getElementById('bulkOpDesc');
+    const amount = document.getElementById('bulkOpAmount');
+    const other = document.getElementById('bulkOpOther');
+    const wrap = document.getElementById('bulkOpOtherWrap');
+    if(title) title.textContent = type === 'deposit' ? 'إيداع للفصل كامل' : 'سحب للفصل كامل';
+    if(desc) desc.textContent = type === 'deposit' ? 'اختاري سبب الإيداع للفصل كامل.' : 'اختاري سبب السحب للفصل كامل.';
+    if(amount) amount.value = '';
+    if(other) other.value = '';
+    if(wrap) wrap.style.display = 'none';
+    fillReasons(type);
+    if(modal) modal.classList.add('show');
+  };
+
+  window.closeBulkOpModal = function(){
+    const modal = document.getElementById('bulkOpModal');
+    if(modal) modal.classList.remove('show');
+  };
+
+  window.submitBulkOpModal = function(){
+    const state = window.__bulkOpState || {};
+    const amount = Number(document.getElementById('bulkOpAmount')?.value || 0);
+    let reason = document.getElementById('bulkOpReason')?.value || '';
+    if(reason === 'أخرى'){
+      reason = (document.getElementById('bulkOpOther')?.value || '').trim();
+    }
+    if(!(amount > 0)) return alert('أدخلي مبلغًا صحيحًا.');
+    if(!reason) return alert('اختاري السبب أولًا.');
+    if(!window.bankData || !Array.isArray(bankData.students)) return;
+    const students = bankData.students.filter(s => s.classId === state.classId);
+    students.forEach(function(st){
+      st.balance = Math.max(0, Number(st.balance||0) + (state.type === 'deposit' ? amount : -amount));
+      if(typeof addHistory === 'function'){
+        try{ addHistory(st, state.type === 'deposit' ? 'deposit' : 'withdraw', amount, reason); }catch(e){}
+      }else{
+        st.history = Array.isArray(st.history) ? st.history : [];
+        st.history.push({id:'h'+Date.now()+Math.random().toString(16).slice(2,6),type:(state.type==='deposit'?'deposit':'withdraw'),amount:Number(amount||0),reason:reason,date:new Date().toLocaleString('ar-SA')});
+      }
+      bankData.operations = Array.isArray(bankData.operations) ? bankData.operations : [];
+      bankData.operations.push({
+        id:'op'+Date.now()+Math.random().toString(16).slice(2,6),
+        studentId:st.id,
+        studentName:st.name,
+        type:(state.type==='deposit'?'deposit':'withdraw'),
+        amount:Number(amount||0),
+        reason:reason,
+        date:new Date().toLocaleDateString('en-CA')+' '+new Date().toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'})
+      });
+    });
+    refreshAll();
+    closeBulkOpModal();
+    alert('تم تنفيذ العملية بنجاح.');
+  };
+
+  window.quickClassOperation = function(classId, type){
+    openBulkOpModal(classId, type);
+  };
+})();
+</script>
+
 </body></html>`;
     const w=window.open('','_blank'); if(w){ w.document.write(html); w.document.close(); setTimeout(()=>w.print(),400); }
     const status=document.getElementById('smartReportStatus'); if(status){ status.classList.remove('hidden'); setTimeout(()=>status.classList.add('hidden'),2000); }
@@ -5300,7 +6160,7 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
       </div>
       <div class="student-bulk-actions">
         <button class="btn btn-green" onclick="quickClassOperation('${cls.id}','deposit')">إيداع للفصل كامل</button>
-        <button class="btn btn-gold" onclick="quickClassOperation('${cls.id}','withdraw')">خصم للفصل كامل</button>
+        <button class="btn btn-gold" onclick="quickClassOperation('${cls.id}','withdraw')">سحب للفصل كامل</button>
         <button class="btn btn-green" onclick="assignTaskToClassFromSettings('${cls.id}')">إرسال مهمة للفصل كامل</button>
         <button class="btn btn-gold" onclick="bulkClassMessage('${cls.id}')">رسالة لولي الأمر للفصل كامل</button>
         <button class="btn btn-light" onclick="printClassReport('${cls.id}')">تصدير تقرير الفصل</button>
@@ -5374,9 +6234,9 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
     });
   };
   window.quickClassOperation = function(classId, type){
-    const amount = Number(prompt(type==='deposit'?'مبلغ الإيداع للفصل كامل':'مبلغ الخصم للفصل كامل') || 0);
+    const amount = Number(prompt(type==='deposit'?'مبلغ الإيداع للفصل كامل':'مبلغ السحب للفصل كامل') || 0);
     if(!(amount>0)) return;
-    const reason = prompt('اكتبي السبب:') || (type==='deposit'?'مكافأة جماعية':'خصم جماعي');
+    const reason = prompt('اكتبي السبب:') || (type==='deposit'?'مكافأة جماعية':'سحب جماعي');
     (bankData.students||[]).filter(s=>s.classId===classId).forEach(function(st){
       st.balance = Math.max(0, Number(st.balance||0) + (type==='deposit'? amount : -amount));
       addHistory(st, type==='deposit'?'deposit':'withdraw', amount, reason);
@@ -5414,7 +6274,7 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
     const type = prompt('اكتبي نوع العملية: deposit للإيداع أو withdraw للخصم','deposit');
     if(!type || !['deposit','withdraw'].includes(type)) return;
     const amount = Number(prompt('المبلغ') || 0); if(!(amount>0)) return;
-    const reason = prompt('السبب') || (type==='deposit'?'عملية سريعة':'خصم سريع');
+    const reason = prompt('السبب') || (type==='deposit'?'عملية سريعة':'سحب سريع');
     st.balance = Math.max(0, Number(st.balance||0) + (type==='deposit'?amount:-amount));
     addHistory(st,type,amount,reason);
     bankData.operations.push({id:'op'+Date.now(), studentId:st.id, studentName:st.name, type:type, amount:amount, reason:reason, date:new Date().toLocaleDateString('en-CA')});
@@ -5513,6 +6373,221 @@ function openMoreInfo(type){
   alert(messages[type]||'تم فتح العنصر.');
 }
 <\/script>
+
+<style id="bulk-reasons-enhancement">
+.bulk-op-modal{position:fixed;inset:0;background:rgba(0,0,0,.38);display:none;align-items:center;justify-content:center;z-index:99999;padding:20px}
+.bulk-op-modal.show{display:flex}
+.bulk-op-box{width:min(420px,100%);background:#fff;border:1px solid var(--line);border-radius:28px;padding:18px;box-shadow:0 24px 60px rgba(0,0,0,.22)}
+.bulk-op-box h3{margin:0 0 8px;color:var(--deep);font-size:22px}
+.bulk-op-box p{margin:0 0 14px;color:var(--muted);font-size:13px;line-height:1.9}
+.bulk-op-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.select-arrow{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23103a2e' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");background-repeat:no-repeat;background-position:left 14px center;background-size:18px;padding-left:42px!important}
+</style>
+
+<div id="bulkOpModal" class="bulk-op-modal" aria-hidden="true">
+  <div class="bulk-op-box">
+    <h3 id="bulkOpTitle">عملية جماعية</h3>
+    <p id="bulkOpDesc">تنفيذ عملية على الفصل كامل.</p>
+    <div class="field">
+      <label>المبلغ</label>
+      <input id="bulkOpAmount" type="number" placeholder="أدخلي المبلغ بالريال" />
+    </div>
+    <div class="field">
+      <label>السبب</label>
+      <select id="bulkOpReason" class="select-arrow"></select>
+    </div>
+    <div class="field" id="bulkOpOtherWrap" style="display:none">
+      <label>اكتبي السبب</label>
+      <input id="bulkOpOther" type="text" placeholder="اكتبي السبب هنا" />
+    </div>
+    <div class="bulk-op-actions">
+      <button class="btn btn-light" type="button" onclick="closeBulkOpModal()">رجوع</button>
+      <button class="btn btn-green" type="button" onclick="submitBulkOpModal()">تنفيذ العملية</button>
+    </div>
+  </div>
+</div>
+
+<script id="bulk-reasons-script">
+(function(){
+  const depositReasons = [
+    'مشاركة مميزة في الحصة',
+    'حل سؤال صعب',
+    'مساعدة زميل / زميلة',
+    'إنهاء المهمة الأدائية',
+    'تسليم الواجب مبكرًا',
+    'الحصول على درجة كاملة',
+    'الفوز في تحدي الرياضيات',
+    'ترتيب الدفتر',
+    'الالتزام والهدوء في الحصة',
+    'مبادرة إيجابية',
+    'حضور كامل الأسبوع',
+    'تميز في العمل الجماعي',
+    'أخرى'
+  ];
+  const withdrawReasons = [
+    'عدم حل الواجب',
+    'التأخر عن الحصة',
+    'كثرة الكلام أثناء الشرح',
+    'عدم إحضار الأدوات',
+    'عدم المشاركة',
+    'مخالفة تعليمات الصف',
+    'عدم تسليم المهمة الأدائية',
+    'إزعاج الزملاء',
+    'استخدام الجوال',
+    'سحب سلوكي',
+    'أخرى'
+  ];
+
+  function getStudentSafe(id){
+    if(typeof getStudent === 'function'){
+      try{ return getStudent(id); }catch(e){}
+    }
+    if(window.bankData && Array.isArray(bankData.students)){
+      return bankData.students.find(s => s.id===id);
+    }
+    return null;
+  }
+
+  function refreshAll(){
+    try{ if(typeof saveBankData==='function') saveBankData(); }catch(e){}
+    try{ if(typeof refreshTeacherUI==='function') refreshTeacherUI(); }catch(e){}
+    try{ if(typeof renderTeacher==='function') renderTeacher(); }catch(e){}
+    try{ if(typeof renderStudentSettingsDashboard==='function') renderStudentSettingsDashboard(); }catch(e){}
+    try{ if(typeof renderClassDetailCustom==='function') renderClassDetailCustom(); }catch(e){}
+    try{ if(typeof renderClassCardsCustom==='function') renderClassCardsCustom(); }catch(e){}
+  }
+
+  window.markAttendanceForStudent = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    const status = prompt('اكتبي حالة الحضور: حاضر / غياب / استئذان', st.attendanceStatus || 'حاضر');
+    if(!status) return;
+    st.attendanceStatus = String(status).trim();
+    refreshAll();
+    alert('تم حفظ حالة الحضور.');
+  };
+
+  window.messageGuardianFromSettings = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    const base = 'تنبيه من بنك الرياضيات\nالطالب / الطالبة: ' + (st.name||'');
+    const text = prompt('اكتبي رسالة ولي الأمر:', base);
+    if(!text) return;
+    if(typeof openWhatsAppNumber==='function' && st.guardian){
+      openWhatsAppNumber(st.guardian, text);
+      return;
+    }
+    alert('تم تجهيز رسالة ولي الأمر.');
+  };
+
+  window.changeStudentPasswordFromSettings = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    const pwd = prompt('اكتبي كلمة المرور الجديدة:', st.password || st.pin || '');
+    if(!pwd || !String(pwd).trim()) return;
+    st.password = String(pwd).trim();
+    if('pin' in st) st.pin = String(pwd).trim();
+    refreshAll();
+    alert('تم تغيير كلمة المرور.');
+  };
+
+  window.editStudentNameFromSettings = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    const name = prompt('اكتبي الاسم الجديد للطالب / الطالبة:', st.name || '');
+    if(!name || !String(name).trim()) return;
+    st.name = String(name).trim();
+    refreshAll();
+    alert('تم تعديل الاسم.');
+  };
+
+  window.deleteStudentFromSettings = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    if(!confirm('هل تريدين حذف الطالب / الطالبة؟')) return;
+    if(typeof deleteStudent==='function'){
+      deleteStudent(studentId);
+    }else if(window.bankData && Array.isArray(bankData.students)){
+      bankData.students = bankData.students.filter(s => s.id !== studentId);
+      if(Array.isArray(bankData.operations)){
+        bankData.operations = bankData.operations.filter(op => op.studentId !== studentId && op.targetStudentId !== studentId);
+      }
+      refreshAll();
+    }
+  };
+
+  window.__bulkOpState = {classId:'', type:'deposit'};
+
+  function fillReasons(type){
+    const sel = document.getElementById('bulkOpReason');
+    if(!sel) return;
+    const reasons = type === 'deposit' ? depositReasons : withdrawReasons;
+    sel.innerHTML = '<option value="">اختاري السبب</option>' + reasons.map(r => '<option value="'+r+'">'+r+'</option>').join('');
+    sel.onchange = function(){
+      const wrap = document.getElementById('bulkOpOtherWrap');
+      if(wrap) wrap.style.display = this.value === 'أخرى' ? 'block' : 'none';
+    };
+    sel.classList.add('select-arrow');
+  }
+
+  window.openBulkOpModal = function(classId, type){
+    window.__bulkOpState = {classId, type};
+    const modal = document.getElementById('bulkOpModal');
+    const title = document.getElementById('bulkOpTitle');
+    const desc = document.getElementById('bulkOpDesc');
+    const amount = document.getElementById('bulkOpAmount');
+    const other = document.getElementById('bulkOpOther');
+    const wrap = document.getElementById('bulkOpOtherWrap');
+    if(title) title.textContent = type === 'deposit' ? 'إيداع للفصل كامل' : 'سحب للفصل كامل';
+    if(desc) desc.textContent = type === 'deposit' ? 'اختاري سبب الإيداع للفصل كامل.' : 'اختاري سبب السحب للفصل كامل.';
+    if(amount) amount.value = '';
+    if(other) other.value = '';
+    if(wrap) wrap.style.display = 'none';
+    fillReasons(type);
+    if(modal) modal.classList.add('show');
+  };
+
+  window.closeBulkOpModal = function(){
+    const modal = document.getElementById('bulkOpModal');
+    if(modal) modal.classList.remove('show');
+  };
+
+  window.submitBulkOpModal = function(){
+    const state = window.__bulkOpState || {};
+    const amount = Number(document.getElementById('bulkOpAmount')?.value || 0);
+    let reason = document.getElementById('bulkOpReason')?.value || '';
+    if(reason === 'أخرى'){
+      reason = (document.getElementById('bulkOpOther')?.value || '').trim();
+    }
+    if(!(amount > 0)) return alert('أدخلي مبلغًا صحيحًا.');
+    if(!reason) return alert('اختاري السبب أولًا.');
+    if(!window.bankData || !Array.isArray(bankData.students)) return;
+    const students = bankData.students.filter(s => s.classId === state.classId);
+    students.forEach(function(st){
+      st.balance = Math.max(0, Number(st.balance||0) + (state.type === 'deposit' ? amount : -amount));
+      if(typeof addHistory === 'function'){
+        try{ addHistory(st, state.type === 'deposit' ? 'deposit' : 'withdraw', amount, reason); }catch(e){}
+      }else{
+        st.history = Array.isArray(st.history) ? st.history : [];
+        st.history.push({id:'h'+Date.now()+Math.random().toString(16).slice(2,6),type:(state.type==='deposit'?'deposit':'withdraw'),amount:Number(amount||0),reason:reason,date:new Date().toLocaleString('ar-SA')});
+      }
+      bankData.operations = Array.isArray(bankData.operations) ? bankData.operations : [];
+      bankData.operations.push({
+        id:'op'+Date.now()+Math.random().toString(16).slice(2,6),
+        studentId:st.id,
+        studentName:st.name,
+        type:(state.type==='deposit'?'deposit':'withdraw'),
+        amount:Number(amount||0),
+        reason:reason,
+        date:new Date().toLocaleDateString('en-CA')+' '+new Date().toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'})
+      });
+    });
+    refreshAll();
+    closeBulkOpModal();
+    alert('تم تنفيذ العملية بنجاح.');
+  };
+
+  window.quickClassOperation = function(classId, type){
+    openBulkOpModal(classId, type);
+  };
+})();
+</script>
+
 </body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
@@ -5562,6 +6637,221 @@ function openMoreInfo(type){
   alert(messages[type]||'تم فتح العنصر.');
 }
 <\/script>
+
+<style id="bulk-reasons-enhancement">
+.bulk-op-modal{position:fixed;inset:0;background:rgba(0,0,0,.38);display:none;align-items:center;justify-content:center;z-index:99999;padding:20px}
+.bulk-op-modal.show{display:flex}
+.bulk-op-box{width:min(420px,100%);background:#fff;border:1px solid var(--line);border-radius:28px;padding:18px;box-shadow:0 24px 60px rgba(0,0,0,.22)}
+.bulk-op-box h3{margin:0 0 8px;color:var(--deep);font-size:22px}
+.bulk-op-box p{margin:0 0 14px;color:var(--muted);font-size:13px;line-height:1.9}
+.bulk-op-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.select-arrow{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23103a2e' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");background-repeat:no-repeat;background-position:left 14px center;background-size:18px;padding-left:42px!important}
+</style>
+
+<div id="bulkOpModal" class="bulk-op-modal" aria-hidden="true">
+  <div class="bulk-op-box">
+    <h3 id="bulkOpTitle">عملية جماعية</h3>
+    <p id="bulkOpDesc">تنفيذ عملية على الفصل كامل.</p>
+    <div class="field">
+      <label>المبلغ</label>
+      <input id="bulkOpAmount" type="number" placeholder="أدخلي المبلغ بالريال" />
+    </div>
+    <div class="field">
+      <label>السبب</label>
+      <select id="bulkOpReason" class="select-arrow"></select>
+    </div>
+    <div class="field" id="bulkOpOtherWrap" style="display:none">
+      <label>اكتبي السبب</label>
+      <input id="bulkOpOther" type="text" placeholder="اكتبي السبب هنا" />
+    </div>
+    <div class="bulk-op-actions">
+      <button class="btn btn-light" type="button" onclick="closeBulkOpModal()">رجوع</button>
+      <button class="btn btn-green" type="button" onclick="submitBulkOpModal()">تنفيذ العملية</button>
+    </div>
+  </div>
+</div>
+
+<script id="bulk-reasons-script">
+(function(){
+  const depositReasons = [
+    'مشاركة مميزة في الحصة',
+    'حل سؤال صعب',
+    'مساعدة زميل / زميلة',
+    'إنهاء المهمة الأدائية',
+    'تسليم الواجب مبكرًا',
+    'الحصول على درجة كاملة',
+    'الفوز في تحدي الرياضيات',
+    'ترتيب الدفتر',
+    'الالتزام والهدوء في الحصة',
+    'مبادرة إيجابية',
+    'حضور كامل الأسبوع',
+    'تميز في العمل الجماعي',
+    'أخرى'
+  ];
+  const withdrawReasons = [
+    'عدم حل الواجب',
+    'التأخر عن الحصة',
+    'كثرة الكلام أثناء الشرح',
+    'عدم إحضار الأدوات',
+    'عدم المشاركة',
+    'مخالفة تعليمات الصف',
+    'عدم تسليم المهمة الأدائية',
+    'إزعاج الزملاء',
+    'استخدام الجوال',
+    'سحب سلوكي',
+    'أخرى'
+  ];
+
+  function getStudentSafe(id){
+    if(typeof getStudent === 'function'){
+      try{ return getStudent(id); }catch(e){}
+    }
+    if(window.bankData && Array.isArray(bankData.students)){
+      return bankData.students.find(s => s.id===id);
+    }
+    return null;
+  }
+
+  function refreshAll(){
+    try{ if(typeof saveBankData==='function') saveBankData(); }catch(e){}
+    try{ if(typeof refreshTeacherUI==='function') refreshTeacherUI(); }catch(e){}
+    try{ if(typeof renderTeacher==='function') renderTeacher(); }catch(e){}
+    try{ if(typeof renderStudentSettingsDashboard==='function') renderStudentSettingsDashboard(); }catch(e){}
+    try{ if(typeof renderClassDetailCustom==='function') renderClassDetailCustom(); }catch(e){}
+    try{ if(typeof renderClassCardsCustom==='function') renderClassCardsCustom(); }catch(e){}
+  }
+
+  window.markAttendanceForStudent = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    const status = prompt('اكتبي حالة الحضور: حاضر / غياب / استئذان', st.attendanceStatus || 'حاضر');
+    if(!status) return;
+    st.attendanceStatus = String(status).trim();
+    refreshAll();
+    alert('تم حفظ حالة الحضور.');
+  };
+
+  window.messageGuardianFromSettings = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    const base = 'تنبيه من بنك الرياضيات\nالطالب / الطالبة: ' + (st.name||'');
+    const text = prompt('اكتبي رسالة ولي الأمر:', base);
+    if(!text) return;
+    if(typeof openWhatsAppNumber==='function' && st.guardian){
+      openWhatsAppNumber(st.guardian, text);
+      return;
+    }
+    alert('تم تجهيز رسالة ولي الأمر.');
+  };
+
+  window.changeStudentPasswordFromSettings = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    const pwd = prompt('اكتبي كلمة المرور الجديدة:', st.password || st.pin || '');
+    if(!pwd || !String(pwd).trim()) return;
+    st.password = String(pwd).trim();
+    if('pin' in st) st.pin = String(pwd).trim();
+    refreshAll();
+    alert('تم تغيير كلمة المرور.');
+  };
+
+  window.editStudentNameFromSettings = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    const name = prompt('اكتبي الاسم الجديد للطالب / الطالبة:', st.name || '');
+    if(!name || !String(name).trim()) return;
+    st.name = String(name).trim();
+    refreshAll();
+    alert('تم تعديل الاسم.');
+  };
+
+  window.deleteStudentFromSettings = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    if(!confirm('هل تريدين حذف الطالب / الطالبة؟')) return;
+    if(typeof deleteStudent==='function'){
+      deleteStudent(studentId);
+    }else if(window.bankData && Array.isArray(bankData.students)){
+      bankData.students = bankData.students.filter(s => s.id !== studentId);
+      if(Array.isArray(bankData.operations)){
+        bankData.operations = bankData.operations.filter(op => op.studentId !== studentId && op.targetStudentId !== studentId);
+      }
+      refreshAll();
+    }
+  };
+
+  window.__bulkOpState = {classId:'', type:'deposit'};
+
+  function fillReasons(type){
+    const sel = document.getElementById('bulkOpReason');
+    if(!sel) return;
+    const reasons = type === 'deposit' ? depositReasons : withdrawReasons;
+    sel.innerHTML = '<option value="">اختاري السبب</option>' + reasons.map(r => '<option value="'+r+'">'+r+'</option>').join('');
+    sel.onchange = function(){
+      const wrap = document.getElementById('bulkOpOtherWrap');
+      if(wrap) wrap.style.display = this.value === 'أخرى' ? 'block' : 'none';
+    };
+    sel.classList.add('select-arrow');
+  }
+
+  window.openBulkOpModal = function(classId, type){
+    window.__bulkOpState = {classId, type};
+    const modal = document.getElementById('bulkOpModal');
+    const title = document.getElementById('bulkOpTitle');
+    const desc = document.getElementById('bulkOpDesc');
+    const amount = document.getElementById('bulkOpAmount');
+    const other = document.getElementById('bulkOpOther');
+    const wrap = document.getElementById('bulkOpOtherWrap');
+    if(title) title.textContent = type === 'deposit' ? 'إيداع للفصل كامل' : 'سحب للفصل كامل';
+    if(desc) desc.textContent = type === 'deposit' ? 'اختاري سبب الإيداع للفصل كامل.' : 'اختاري سبب السحب للفصل كامل.';
+    if(amount) amount.value = '';
+    if(other) other.value = '';
+    if(wrap) wrap.style.display = 'none';
+    fillReasons(type);
+    if(modal) modal.classList.add('show');
+  };
+
+  window.closeBulkOpModal = function(){
+    const modal = document.getElementById('bulkOpModal');
+    if(modal) modal.classList.remove('show');
+  };
+
+  window.submitBulkOpModal = function(){
+    const state = window.__bulkOpState || {};
+    const amount = Number(document.getElementById('bulkOpAmount')?.value || 0);
+    let reason = document.getElementById('bulkOpReason')?.value || '';
+    if(reason === 'أخرى'){
+      reason = (document.getElementById('bulkOpOther')?.value || '').trim();
+    }
+    if(!(amount > 0)) return alert('أدخلي مبلغًا صحيحًا.');
+    if(!reason) return alert('اختاري السبب أولًا.');
+    if(!window.bankData || !Array.isArray(bankData.students)) return;
+    const students = bankData.students.filter(s => s.classId === state.classId);
+    students.forEach(function(st){
+      st.balance = Math.max(0, Number(st.balance||0) + (state.type === 'deposit' ? amount : -amount));
+      if(typeof addHistory === 'function'){
+        try{ addHistory(st, state.type === 'deposit' ? 'deposit' : 'withdraw', amount, reason); }catch(e){}
+      }else{
+        st.history = Array.isArray(st.history) ? st.history : [];
+        st.history.push({id:'h'+Date.now()+Math.random().toString(16).slice(2,6),type:(state.type==='deposit'?'deposit':'withdraw'),amount:Number(amount||0),reason:reason,date:new Date().toLocaleString('ar-SA')});
+      }
+      bankData.operations = Array.isArray(bankData.operations) ? bankData.operations : [];
+      bankData.operations.push({
+        id:'op'+Date.now()+Math.random().toString(16).slice(2,6),
+        studentId:st.id,
+        studentName:st.name,
+        type:(state.type==='deposit'?'deposit':'withdraw'),
+        amount:Number(amount||0),
+        reason:reason,
+        date:new Date().toLocaleDateString('en-CA')+' '+new Date().toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'})
+      });
+    });
+    refreshAll();
+    closeBulkOpModal();
+    alert('تم تنفيذ العملية بنجاح.');
+  };
+
+  window.quickClassOperation = function(classId, type){
+    openBulkOpModal(classId, type);
+  };
+})();
+</script>
+
 </body></html>`;
     const w=window.open('','_blank'); if(w){ w.document.write(html); w.document.close(); setTimeout(()=>w.print(),400); }
     const status=document.getElementById('smartReportStatus'); if(status){ status.classList.remove('hidden'); setTimeout(()=>status.classList.add('hidden'),2000); }
@@ -5729,7 +7019,7 @@ function openMoreInfo(type){
       </div>
       <div class="student-bulk-actions">
         <button class="btn btn-green" onclick="quickClassOperation('${cls.id}','deposit')">إيداع للفصل كامل</button>
-        <button class="btn btn-gold" onclick="quickClassOperation('${cls.id}','withdraw')">خصم للفصل كامل</button>
+        <button class="btn btn-gold" onclick="quickClassOperation('${cls.id}','withdraw')">سحب للفصل كامل</button>
         <button class="btn btn-green" onclick="assignTaskToClassFromSettings('${cls.id}')">إرسال مهمة للفصل كامل</button>
         <button class="btn btn-gold" onclick="bulkClassMessage('${cls.id}')">رسالة لولي الأمر للفصل كامل</button>
         <button class="btn btn-light" onclick="printClassReport('${cls.id}')">تصدير تقرير الفصل</button>
@@ -5803,9 +7093,9 @@ function openMoreInfo(type){
     });
   };
   window.quickClassOperation = function(classId, type){
-    const amount = Number(prompt(type==='deposit'?'مبلغ الإيداع للفصل كامل':'مبلغ الخصم للفصل كامل') || 0);
+    const amount = Number(prompt(type==='deposit'?'مبلغ الإيداع للفصل كامل':'مبلغ السحب للفصل كامل') || 0);
     if(!(amount>0)) return;
-    const reason = prompt('اكتبي السبب:') || (type==='deposit'?'مكافأة جماعية':'خصم جماعي');
+    const reason = prompt('اكتبي السبب:') || (type==='deposit'?'مكافأة جماعية':'سحب جماعي');
     (bankData.students||[]).filter(s=>s.classId===classId).forEach(function(st){
       st.balance = Math.max(0, Number(st.balance||0) + (type==='deposit'? amount : -amount));
       addHistory(st, type==='deposit'?'deposit':'withdraw', amount, reason);
@@ -5843,7 +7133,7 @@ function openMoreInfo(type){
     const type = prompt('اكتبي نوع العملية: deposit للإيداع أو withdraw للخصم','deposit');
     if(!type || !['deposit','withdraw'].includes(type)) return;
     const amount = Number(prompt('المبلغ') || 0); if(!(amount>0)) return;
-    const reason = prompt('السبب') || (type==='deposit'?'عملية سريعة':'خصم سريع');
+    const reason = prompt('السبب') || (type==='deposit'?'عملية سريعة':'سحب سريع');
     st.balance = Math.max(0, Number(st.balance||0) + (type==='deposit'?amount:-amount));
     addHistory(st,type,amount,reason);
     bankData.operations.push({id:'op'+Date.now(), studentId:st.id, studentName:st.name, type:type, amount:amount, reason:reason, date:new Date().toLocaleDateString('en-CA')});
@@ -5942,6 +7232,221 @@ function openMoreInfo(type){
   alert(messages[type]||'تم فتح العنصر.');
 }
 <\/script>
+
+<style id="bulk-reasons-enhancement">
+.bulk-op-modal{position:fixed;inset:0;background:rgba(0,0,0,.38);display:none;align-items:center;justify-content:center;z-index:99999;padding:20px}
+.bulk-op-modal.show{display:flex}
+.bulk-op-box{width:min(420px,100%);background:#fff;border:1px solid var(--line);border-radius:28px;padding:18px;box-shadow:0 24px 60px rgba(0,0,0,.22)}
+.bulk-op-box h3{margin:0 0 8px;color:var(--deep);font-size:22px}
+.bulk-op-box p{margin:0 0 14px;color:var(--muted);font-size:13px;line-height:1.9}
+.bulk-op-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.select-arrow{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23103a2e' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");background-repeat:no-repeat;background-position:left 14px center;background-size:18px;padding-left:42px!important}
+</style>
+
+<div id="bulkOpModal" class="bulk-op-modal" aria-hidden="true">
+  <div class="bulk-op-box">
+    <h3 id="bulkOpTitle">عملية جماعية</h3>
+    <p id="bulkOpDesc">تنفيذ عملية على الفصل كامل.</p>
+    <div class="field">
+      <label>المبلغ</label>
+      <input id="bulkOpAmount" type="number" placeholder="أدخلي المبلغ بالريال" />
+    </div>
+    <div class="field">
+      <label>السبب</label>
+      <select id="bulkOpReason" class="select-arrow"></select>
+    </div>
+    <div class="field" id="bulkOpOtherWrap" style="display:none">
+      <label>اكتبي السبب</label>
+      <input id="bulkOpOther" type="text" placeholder="اكتبي السبب هنا" />
+    </div>
+    <div class="bulk-op-actions">
+      <button class="btn btn-light" type="button" onclick="closeBulkOpModal()">رجوع</button>
+      <button class="btn btn-green" type="button" onclick="submitBulkOpModal()">تنفيذ العملية</button>
+    </div>
+  </div>
+</div>
+
+<script id="bulk-reasons-script">
+(function(){
+  const depositReasons = [
+    'مشاركة مميزة في الحصة',
+    'حل سؤال صعب',
+    'مساعدة زميل / زميلة',
+    'إنهاء المهمة الأدائية',
+    'تسليم الواجب مبكرًا',
+    'الحصول على درجة كاملة',
+    'الفوز في تحدي الرياضيات',
+    'ترتيب الدفتر',
+    'الالتزام والهدوء في الحصة',
+    'مبادرة إيجابية',
+    'حضور كامل الأسبوع',
+    'تميز في العمل الجماعي',
+    'أخرى'
+  ];
+  const withdrawReasons = [
+    'عدم حل الواجب',
+    'التأخر عن الحصة',
+    'كثرة الكلام أثناء الشرح',
+    'عدم إحضار الأدوات',
+    'عدم المشاركة',
+    'مخالفة تعليمات الصف',
+    'عدم تسليم المهمة الأدائية',
+    'إزعاج الزملاء',
+    'استخدام الجوال',
+    'سحب سلوكي',
+    'أخرى'
+  ];
+
+  function getStudentSafe(id){
+    if(typeof getStudent === 'function'){
+      try{ return getStudent(id); }catch(e){}
+    }
+    if(window.bankData && Array.isArray(bankData.students)){
+      return bankData.students.find(s => s.id===id);
+    }
+    return null;
+  }
+
+  function refreshAll(){
+    try{ if(typeof saveBankData==='function') saveBankData(); }catch(e){}
+    try{ if(typeof refreshTeacherUI==='function') refreshTeacherUI(); }catch(e){}
+    try{ if(typeof renderTeacher==='function') renderTeacher(); }catch(e){}
+    try{ if(typeof renderStudentSettingsDashboard==='function') renderStudentSettingsDashboard(); }catch(e){}
+    try{ if(typeof renderClassDetailCustom==='function') renderClassDetailCustom(); }catch(e){}
+    try{ if(typeof renderClassCardsCustom==='function') renderClassCardsCustom(); }catch(e){}
+  }
+
+  window.markAttendanceForStudent = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    const status = prompt('اكتبي حالة الحضور: حاضر / غياب / استئذان', st.attendanceStatus || 'حاضر');
+    if(!status) return;
+    st.attendanceStatus = String(status).trim();
+    refreshAll();
+    alert('تم حفظ حالة الحضور.');
+  };
+
+  window.messageGuardianFromSettings = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    const base = 'تنبيه من بنك الرياضيات\nالطالب / الطالبة: ' + (st.name||'');
+    const text = prompt('اكتبي رسالة ولي الأمر:', base);
+    if(!text) return;
+    if(typeof openWhatsAppNumber==='function' && st.guardian){
+      openWhatsAppNumber(st.guardian, text);
+      return;
+    }
+    alert('تم تجهيز رسالة ولي الأمر.');
+  };
+
+  window.changeStudentPasswordFromSettings = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    const pwd = prompt('اكتبي كلمة المرور الجديدة:', st.password || st.pin || '');
+    if(!pwd || !String(pwd).trim()) return;
+    st.password = String(pwd).trim();
+    if('pin' in st) st.pin = String(pwd).trim();
+    refreshAll();
+    alert('تم تغيير كلمة المرور.');
+  };
+
+  window.editStudentNameFromSettings = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    const name = prompt('اكتبي الاسم الجديد للطالب / الطالبة:', st.name || '');
+    if(!name || !String(name).trim()) return;
+    st.name = String(name).trim();
+    refreshAll();
+    alert('تم تعديل الاسم.');
+  };
+
+  window.deleteStudentFromSettings = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    if(!confirm('هل تريدين حذف الطالب / الطالبة؟')) return;
+    if(typeof deleteStudent==='function'){
+      deleteStudent(studentId);
+    }else if(window.bankData && Array.isArray(bankData.students)){
+      bankData.students = bankData.students.filter(s => s.id !== studentId);
+      if(Array.isArray(bankData.operations)){
+        bankData.operations = bankData.operations.filter(op => op.studentId !== studentId && op.targetStudentId !== studentId);
+      }
+      refreshAll();
+    }
+  };
+
+  window.__bulkOpState = {classId:'', type:'deposit'};
+
+  function fillReasons(type){
+    const sel = document.getElementById('bulkOpReason');
+    if(!sel) return;
+    const reasons = type === 'deposit' ? depositReasons : withdrawReasons;
+    sel.innerHTML = '<option value="">اختاري السبب</option>' + reasons.map(r => '<option value="'+r+'">'+r+'</option>').join('');
+    sel.onchange = function(){
+      const wrap = document.getElementById('bulkOpOtherWrap');
+      if(wrap) wrap.style.display = this.value === 'أخرى' ? 'block' : 'none';
+    };
+    sel.classList.add('select-arrow');
+  }
+
+  window.openBulkOpModal = function(classId, type){
+    window.__bulkOpState = {classId, type};
+    const modal = document.getElementById('bulkOpModal');
+    const title = document.getElementById('bulkOpTitle');
+    const desc = document.getElementById('bulkOpDesc');
+    const amount = document.getElementById('bulkOpAmount');
+    const other = document.getElementById('bulkOpOther');
+    const wrap = document.getElementById('bulkOpOtherWrap');
+    if(title) title.textContent = type === 'deposit' ? 'إيداع للفصل كامل' : 'سحب للفصل كامل';
+    if(desc) desc.textContent = type === 'deposit' ? 'اختاري سبب الإيداع للفصل كامل.' : 'اختاري سبب السحب للفصل كامل.';
+    if(amount) amount.value = '';
+    if(other) other.value = '';
+    if(wrap) wrap.style.display = 'none';
+    fillReasons(type);
+    if(modal) modal.classList.add('show');
+  };
+
+  window.closeBulkOpModal = function(){
+    const modal = document.getElementById('bulkOpModal');
+    if(modal) modal.classList.remove('show');
+  };
+
+  window.submitBulkOpModal = function(){
+    const state = window.__bulkOpState || {};
+    const amount = Number(document.getElementById('bulkOpAmount')?.value || 0);
+    let reason = document.getElementById('bulkOpReason')?.value || '';
+    if(reason === 'أخرى'){
+      reason = (document.getElementById('bulkOpOther')?.value || '').trim();
+    }
+    if(!(amount > 0)) return alert('أدخلي مبلغًا صحيحًا.');
+    if(!reason) return alert('اختاري السبب أولًا.');
+    if(!window.bankData || !Array.isArray(bankData.students)) return;
+    const students = bankData.students.filter(s => s.classId === state.classId);
+    students.forEach(function(st){
+      st.balance = Math.max(0, Number(st.balance||0) + (state.type === 'deposit' ? amount : -amount));
+      if(typeof addHistory === 'function'){
+        try{ addHistory(st, state.type === 'deposit' ? 'deposit' : 'withdraw', amount, reason); }catch(e){}
+      }else{
+        st.history = Array.isArray(st.history) ? st.history : [];
+        st.history.push({id:'h'+Date.now()+Math.random().toString(16).slice(2,6),type:(state.type==='deposit'?'deposit':'withdraw'),amount:Number(amount||0),reason:reason,date:new Date().toLocaleString('ar-SA')});
+      }
+      bankData.operations = Array.isArray(bankData.operations) ? bankData.operations : [];
+      bankData.operations.push({
+        id:'op'+Date.now()+Math.random().toString(16).slice(2,6),
+        studentId:st.id,
+        studentName:st.name,
+        type:(state.type==='deposit'?'deposit':'withdraw'),
+        amount:Number(amount||0),
+        reason:reason,
+        date:new Date().toLocaleDateString('en-CA')+' '+new Date().toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'})
+      });
+    });
+    refreshAll();
+    closeBulkOpModal();
+    alert('تم تنفيذ العملية بنجاح.');
+  };
+
+  window.quickClassOperation = function(classId, type){
+    openBulkOpModal(classId, type);
+  };
+})();
+</script>
+
 </body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
@@ -6388,7 +7893,7 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
       </div>
       <div class="student-bulk-actions">
         <button class="btn btn-green" onclick="quickClassOperation('${cls.id}','deposit')">إيداع للفصل كامل</button>
-        <button class="btn btn-gold" onclick="quickClassOperation('${cls.id}','withdraw')">خصم للفصل كامل</button>
+        <button class="btn btn-gold" onclick="quickClassOperation('${cls.id}','withdraw')">سحب للفصل كامل</button>
         <button class="btn btn-green" onclick="assignTaskToClassFromSettings('${cls.id}')">إرسال مهمة للفصل كامل</button>
         <button class="btn btn-gold" onclick="bulkClassMessage('${cls.id}')">رسالة لولي الأمر للفصل كامل</button>
         <button class="btn btn-light" onclick="printClassReport('${cls.id}')">تصدير تقرير الفصل</button>
@@ -6462,9 +7967,9 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
     });
   };
   window.quickClassOperation = function(classId, type){
-    const amount = Number(prompt(type==='deposit'?'مبلغ الإيداع للفصل كامل':'مبلغ الخصم للفصل كامل') || 0);
+    const amount = Number(prompt(type==='deposit'?'مبلغ الإيداع للفصل كامل':'مبلغ السحب للفصل كامل') || 0);
     if(!(amount>0)) return;
-    const reason = prompt('اكتبي السبب:') || (type==='deposit'?'مكافأة جماعية':'خصم جماعي');
+    const reason = prompt('اكتبي السبب:') || (type==='deposit'?'مكافأة جماعية':'سحب جماعي');
     (bankData.students||[]).filter(s=>s.classId===classId).forEach(function(st){
       st.balance = Math.max(0, Number(st.balance||0) + (type==='deposit'? amount : -amount));
       addHistory(st, type==='deposit'?'deposit':'withdraw', amount, reason);
@@ -6502,7 +8007,7 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
     const type = prompt('اكتبي نوع العملية: deposit للإيداع أو withdraw للخصم','deposit');
     if(!type || !['deposit','withdraw'].includes(type)) return;
     const amount = Number(prompt('المبلغ') || 0); if(!(amount>0)) return;
-    const reason = prompt('السبب') || (type==='deposit'?'عملية سريعة':'خصم سريع');
+    const reason = prompt('السبب') || (type==='deposit'?'عملية سريعة':'سحب سريع');
     st.balance = Math.max(0, Number(st.balance||0) + (type==='deposit'?amount:-amount));
     addHistory(st,type,amount,reason);
     bankData.operations.push({id:'op'+Date.now(), studentId:st.id, studentName:st.name, type:type, amount:amount, reason:reason, date:new Date().toLocaleDateString('en-CA')});
@@ -6601,6 +8106,221 @@ function openMoreInfo(type){
   alert(messages[type]||'تم فتح العنصر.');
 }
 <\/script>
+
+<style id="bulk-reasons-enhancement">
+.bulk-op-modal{position:fixed;inset:0;background:rgba(0,0,0,.38);display:none;align-items:center;justify-content:center;z-index:99999;padding:20px}
+.bulk-op-modal.show{display:flex}
+.bulk-op-box{width:min(420px,100%);background:#fff;border:1px solid var(--line);border-radius:28px;padding:18px;box-shadow:0 24px 60px rgba(0,0,0,.22)}
+.bulk-op-box h3{margin:0 0 8px;color:var(--deep);font-size:22px}
+.bulk-op-box p{margin:0 0 14px;color:var(--muted);font-size:13px;line-height:1.9}
+.bulk-op-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.select-arrow{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23103a2e' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");background-repeat:no-repeat;background-position:left 14px center;background-size:18px;padding-left:42px!important}
+</style>
+
+<div id="bulkOpModal" class="bulk-op-modal" aria-hidden="true">
+  <div class="bulk-op-box">
+    <h3 id="bulkOpTitle">عملية جماعية</h3>
+    <p id="bulkOpDesc">تنفيذ عملية على الفصل كامل.</p>
+    <div class="field">
+      <label>المبلغ</label>
+      <input id="bulkOpAmount" type="number" placeholder="أدخلي المبلغ بالريال" />
+    </div>
+    <div class="field">
+      <label>السبب</label>
+      <select id="bulkOpReason" class="select-arrow"></select>
+    </div>
+    <div class="field" id="bulkOpOtherWrap" style="display:none">
+      <label>اكتبي السبب</label>
+      <input id="bulkOpOther" type="text" placeholder="اكتبي السبب هنا" />
+    </div>
+    <div class="bulk-op-actions">
+      <button class="btn btn-light" type="button" onclick="closeBulkOpModal()">رجوع</button>
+      <button class="btn btn-green" type="button" onclick="submitBulkOpModal()">تنفيذ العملية</button>
+    </div>
+  </div>
+</div>
+
+<script id="bulk-reasons-script">
+(function(){
+  const depositReasons = [
+    'مشاركة مميزة في الحصة',
+    'حل سؤال صعب',
+    'مساعدة زميل / زميلة',
+    'إنهاء المهمة الأدائية',
+    'تسليم الواجب مبكرًا',
+    'الحصول على درجة كاملة',
+    'الفوز في تحدي الرياضيات',
+    'ترتيب الدفتر',
+    'الالتزام والهدوء في الحصة',
+    'مبادرة إيجابية',
+    'حضور كامل الأسبوع',
+    'تميز في العمل الجماعي',
+    'أخرى'
+  ];
+  const withdrawReasons = [
+    'عدم حل الواجب',
+    'التأخر عن الحصة',
+    'كثرة الكلام أثناء الشرح',
+    'عدم إحضار الأدوات',
+    'عدم المشاركة',
+    'مخالفة تعليمات الصف',
+    'عدم تسليم المهمة الأدائية',
+    'إزعاج الزملاء',
+    'استخدام الجوال',
+    'سحب سلوكي',
+    'أخرى'
+  ];
+
+  function getStudentSafe(id){
+    if(typeof getStudent === 'function'){
+      try{ return getStudent(id); }catch(e){}
+    }
+    if(window.bankData && Array.isArray(bankData.students)){
+      return bankData.students.find(s => s.id===id);
+    }
+    return null;
+  }
+
+  function refreshAll(){
+    try{ if(typeof saveBankData==='function') saveBankData(); }catch(e){}
+    try{ if(typeof refreshTeacherUI==='function') refreshTeacherUI(); }catch(e){}
+    try{ if(typeof renderTeacher==='function') renderTeacher(); }catch(e){}
+    try{ if(typeof renderStudentSettingsDashboard==='function') renderStudentSettingsDashboard(); }catch(e){}
+    try{ if(typeof renderClassDetailCustom==='function') renderClassDetailCustom(); }catch(e){}
+    try{ if(typeof renderClassCardsCustom==='function') renderClassCardsCustom(); }catch(e){}
+  }
+
+  window.markAttendanceForStudent = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    const status = prompt('اكتبي حالة الحضور: حاضر / غياب / استئذان', st.attendanceStatus || 'حاضر');
+    if(!status) return;
+    st.attendanceStatus = String(status).trim();
+    refreshAll();
+    alert('تم حفظ حالة الحضور.');
+  };
+
+  window.messageGuardianFromSettings = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    const base = 'تنبيه من بنك الرياضيات\nالطالب / الطالبة: ' + (st.name||'');
+    const text = prompt('اكتبي رسالة ولي الأمر:', base);
+    if(!text) return;
+    if(typeof openWhatsAppNumber==='function' && st.guardian){
+      openWhatsAppNumber(st.guardian, text);
+      return;
+    }
+    alert('تم تجهيز رسالة ولي الأمر.');
+  };
+
+  window.changeStudentPasswordFromSettings = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    const pwd = prompt('اكتبي كلمة المرور الجديدة:', st.password || st.pin || '');
+    if(!pwd || !String(pwd).trim()) return;
+    st.password = String(pwd).trim();
+    if('pin' in st) st.pin = String(pwd).trim();
+    refreshAll();
+    alert('تم تغيير كلمة المرور.');
+  };
+
+  window.editStudentNameFromSettings = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    const name = prompt('اكتبي الاسم الجديد للطالب / الطالبة:', st.name || '');
+    if(!name || !String(name).trim()) return;
+    st.name = String(name).trim();
+    refreshAll();
+    alert('تم تعديل الاسم.');
+  };
+
+  window.deleteStudentFromSettings = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    if(!confirm('هل تريدين حذف الطالب / الطالبة؟')) return;
+    if(typeof deleteStudent==='function'){
+      deleteStudent(studentId);
+    }else if(window.bankData && Array.isArray(bankData.students)){
+      bankData.students = bankData.students.filter(s => s.id !== studentId);
+      if(Array.isArray(bankData.operations)){
+        bankData.operations = bankData.operations.filter(op => op.studentId !== studentId && op.targetStudentId !== studentId);
+      }
+      refreshAll();
+    }
+  };
+
+  window.__bulkOpState = {classId:'', type:'deposit'};
+
+  function fillReasons(type){
+    const sel = document.getElementById('bulkOpReason');
+    if(!sel) return;
+    const reasons = type === 'deposit' ? depositReasons : withdrawReasons;
+    sel.innerHTML = '<option value="">اختاري السبب</option>' + reasons.map(r => '<option value="'+r+'">'+r+'</option>').join('');
+    sel.onchange = function(){
+      const wrap = document.getElementById('bulkOpOtherWrap');
+      if(wrap) wrap.style.display = this.value === 'أخرى' ? 'block' : 'none';
+    };
+    sel.classList.add('select-arrow');
+  }
+
+  window.openBulkOpModal = function(classId, type){
+    window.__bulkOpState = {classId, type};
+    const modal = document.getElementById('bulkOpModal');
+    const title = document.getElementById('bulkOpTitle');
+    const desc = document.getElementById('bulkOpDesc');
+    const amount = document.getElementById('bulkOpAmount');
+    const other = document.getElementById('bulkOpOther');
+    const wrap = document.getElementById('bulkOpOtherWrap');
+    if(title) title.textContent = type === 'deposit' ? 'إيداع للفصل كامل' : 'سحب للفصل كامل';
+    if(desc) desc.textContent = type === 'deposit' ? 'اختاري سبب الإيداع للفصل كامل.' : 'اختاري سبب السحب للفصل كامل.';
+    if(amount) amount.value = '';
+    if(other) other.value = '';
+    if(wrap) wrap.style.display = 'none';
+    fillReasons(type);
+    if(modal) modal.classList.add('show');
+  };
+
+  window.closeBulkOpModal = function(){
+    const modal = document.getElementById('bulkOpModal');
+    if(modal) modal.classList.remove('show');
+  };
+
+  window.submitBulkOpModal = function(){
+    const state = window.__bulkOpState || {};
+    const amount = Number(document.getElementById('bulkOpAmount')?.value || 0);
+    let reason = document.getElementById('bulkOpReason')?.value || '';
+    if(reason === 'أخرى'){
+      reason = (document.getElementById('bulkOpOther')?.value || '').trim();
+    }
+    if(!(amount > 0)) return alert('أدخلي مبلغًا صحيحًا.');
+    if(!reason) return alert('اختاري السبب أولًا.');
+    if(!window.bankData || !Array.isArray(bankData.students)) return;
+    const students = bankData.students.filter(s => s.classId === state.classId);
+    students.forEach(function(st){
+      st.balance = Math.max(0, Number(st.balance||0) + (state.type === 'deposit' ? amount : -amount));
+      if(typeof addHistory === 'function'){
+        try{ addHistory(st, state.type === 'deposit' ? 'deposit' : 'withdraw', amount, reason); }catch(e){}
+      }else{
+        st.history = Array.isArray(st.history) ? st.history : [];
+        st.history.push({id:'h'+Date.now()+Math.random().toString(16).slice(2,6),type:(state.type==='deposit'?'deposit':'withdraw'),amount:Number(amount||0),reason:reason,date:new Date().toLocaleString('ar-SA')});
+      }
+      bankData.operations = Array.isArray(bankData.operations) ? bankData.operations : [];
+      bankData.operations.push({
+        id:'op'+Date.now()+Math.random().toString(16).slice(2,6),
+        studentId:st.id,
+        studentName:st.name,
+        type:(state.type==='deposit'?'deposit':'withdraw'),
+        amount:Number(amount||0),
+        reason:reason,
+        date:new Date().toLocaleDateString('en-CA')+' '+new Date().toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'})
+      });
+    });
+    refreshAll();
+    closeBulkOpModal();
+    alert('تم تنفيذ العملية بنجاح.');
+  };
+
+  window.quickClassOperation = function(classId, type){
+    openBulkOpModal(classId, type);
+  };
+})();
+</script>
+
 </body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
@@ -6650,6 +8370,221 @@ function openMoreInfo(type){
   alert(messages[type]||'تم فتح العنصر.');
 }
 <\/script>
+
+<style id="bulk-reasons-enhancement">
+.bulk-op-modal{position:fixed;inset:0;background:rgba(0,0,0,.38);display:none;align-items:center;justify-content:center;z-index:99999;padding:20px}
+.bulk-op-modal.show{display:flex}
+.bulk-op-box{width:min(420px,100%);background:#fff;border:1px solid var(--line);border-radius:28px;padding:18px;box-shadow:0 24px 60px rgba(0,0,0,.22)}
+.bulk-op-box h3{margin:0 0 8px;color:var(--deep);font-size:22px}
+.bulk-op-box p{margin:0 0 14px;color:var(--muted);font-size:13px;line-height:1.9}
+.bulk-op-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.select-arrow{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23103a2e' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");background-repeat:no-repeat;background-position:left 14px center;background-size:18px;padding-left:42px!important}
+</style>
+
+<div id="bulkOpModal" class="bulk-op-modal" aria-hidden="true">
+  <div class="bulk-op-box">
+    <h3 id="bulkOpTitle">عملية جماعية</h3>
+    <p id="bulkOpDesc">تنفيذ عملية على الفصل كامل.</p>
+    <div class="field">
+      <label>المبلغ</label>
+      <input id="bulkOpAmount" type="number" placeholder="أدخلي المبلغ بالريال" />
+    </div>
+    <div class="field">
+      <label>السبب</label>
+      <select id="bulkOpReason" class="select-arrow"></select>
+    </div>
+    <div class="field" id="bulkOpOtherWrap" style="display:none">
+      <label>اكتبي السبب</label>
+      <input id="bulkOpOther" type="text" placeholder="اكتبي السبب هنا" />
+    </div>
+    <div class="bulk-op-actions">
+      <button class="btn btn-light" type="button" onclick="closeBulkOpModal()">رجوع</button>
+      <button class="btn btn-green" type="button" onclick="submitBulkOpModal()">تنفيذ العملية</button>
+    </div>
+  </div>
+</div>
+
+<script id="bulk-reasons-script">
+(function(){
+  const depositReasons = [
+    'مشاركة مميزة في الحصة',
+    'حل سؤال صعب',
+    'مساعدة زميل / زميلة',
+    'إنهاء المهمة الأدائية',
+    'تسليم الواجب مبكرًا',
+    'الحصول على درجة كاملة',
+    'الفوز في تحدي الرياضيات',
+    'ترتيب الدفتر',
+    'الالتزام والهدوء في الحصة',
+    'مبادرة إيجابية',
+    'حضور كامل الأسبوع',
+    'تميز في العمل الجماعي',
+    'أخرى'
+  ];
+  const withdrawReasons = [
+    'عدم حل الواجب',
+    'التأخر عن الحصة',
+    'كثرة الكلام أثناء الشرح',
+    'عدم إحضار الأدوات',
+    'عدم المشاركة',
+    'مخالفة تعليمات الصف',
+    'عدم تسليم المهمة الأدائية',
+    'إزعاج الزملاء',
+    'استخدام الجوال',
+    'سحب سلوكي',
+    'أخرى'
+  ];
+
+  function getStudentSafe(id){
+    if(typeof getStudent === 'function'){
+      try{ return getStudent(id); }catch(e){}
+    }
+    if(window.bankData && Array.isArray(bankData.students)){
+      return bankData.students.find(s => s.id===id);
+    }
+    return null;
+  }
+
+  function refreshAll(){
+    try{ if(typeof saveBankData==='function') saveBankData(); }catch(e){}
+    try{ if(typeof refreshTeacherUI==='function') refreshTeacherUI(); }catch(e){}
+    try{ if(typeof renderTeacher==='function') renderTeacher(); }catch(e){}
+    try{ if(typeof renderStudentSettingsDashboard==='function') renderStudentSettingsDashboard(); }catch(e){}
+    try{ if(typeof renderClassDetailCustom==='function') renderClassDetailCustom(); }catch(e){}
+    try{ if(typeof renderClassCardsCustom==='function') renderClassCardsCustom(); }catch(e){}
+  }
+
+  window.markAttendanceForStudent = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    const status = prompt('اكتبي حالة الحضور: حاضر / غياب / استئذان', st.attendanceStatus || 'حاضر');
+    if(!status) return;
+    st.attendanceStatus = String(status).trim();
+    refreshAll();
+    alert('تم حفظ حالة الحضور.');
+  };
+
+  window.messageGuardianFromSettings = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    const base = 'تنبيه من بنك الرياضيات\nالطالب / الطالبة: ' + (st.name||'');
+    const text = prompt('اكتبي رسالة ولي الأمر:', base);
+    if(!text) return;
+    if(typeof openWhatsAppNumber==='function' && st.guardian){
+      openWhatsAppNumber(st.guardian, text);
+      return;
+    }
+    alert('تم تجهيز رسالة ولي الأمر.');
+  };
+
+  window.changeStudentPasswordFromSettings = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    const pwd = prompt('اكتبي كلمة المرور الجديدة:', st.password || st.pin || '');
+    if(!pwd || !String(pwd).trim()) return;
+    st.password = String(pwd).trim();
+    if('pin' in st) st.pin = String(pwd).trim();
+    refreshAll();
+    alert('تم تغيير كلمة المرور.');
+  };
+
+  window.editStudentNameFromSettings = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    const name = prompt('اكتبي الاسم الجديد للطالب / الطالبة:', st.name || '');
+    if(!name || !String(name).trim()) return;
+    st.name = String(name).trim();
+    refreshAll();
+    alert('تم تعديل الاسم.');
+  };
+
+  window.deleteStudentFromSettings = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    if(!confirm('هل تريدين حذف الطالب / الطالبة؟')) return;
+    if(typeof deleteStudent==='function'){
+      deleteStudent(studentId);
+    }else if(window.bankData && Array.isArray(bankData.students)){
+      bankData.students = bankData.students.filter(s => s.id !== studentId);
+      if(Array.isArray(bankData.operations)){
+        bankData.operations = bankData.operations.filter(op => op.studentId !== studentId && op.targetStudentId !== studentId);
+      }
+      refreshAll();
+    }
+  };
+
+  window.__bulkOpState = {classId:'', type:'deposit'};
+
+  function fillReasons(type){
+    const sel = document.getElementById('bulkOpReason');
+    if(!sel) return;
+    const reasons = type === 'deposit' ? depositReasons : withdrawReasons;
+    sel.innerHTML = '<option value="">اختاري السبب</option>' + reasons.map(r => '<option value="'+r+'">'+r+'</option>').join('');
+    sel.onchange = function(){
+      const wrap = document.getElementById('bulkOpOtherWrap');
+      if(wrap) wrap.style.display = this.value === 'أخرى' ? 'block' : 'none';
+    };
+    sel.classList.add('select-arrow');
+  }
+
+  window.openBulkOpModal = function(classId, type){
+    window.__bulkOpState = {classId, type};
+    const modal = document.getElementById('bulkOpModal');
+    const title = document.getElementById('bulkOpTitle');
+    const desc = document.getElementById('bulkOpDesc');
+    const amount = document.getElementById('bulkOpAmount');
+    const other = document.getElementById('bulkOpOther');
+    const wrap = document.getElementById('bulkOpOtherWrap');
+    if(title) title.textContent = type === 'deposit' ? 'إيداع للفصل كامل' : 'سحب للفصل كامل';
+    if(desc) desc.textContent = type === 'deposit' ? 'اختاري سبب الإيداع للفصل كامل.' : 'اختاري سبب السحب للفصل كامل.';
+    if(amount) amount.value = '';
+    if(other) other.value = '';
+    if(wrap) wrap.style.display = 'none';
+    fillReasons(type);
+    if(modal) modal.classList.add('show');
+  };
+
+  window.closeBulkOpModal = function(){
+    const modal = document.getElementById('bulkOpModal');
+    if(modal) modal.classList.remove('show');
+  };
+
+  window.submitBulkOpModal = function(){
+    const state = window.__bulkOpState || {};
+    const amount = Number(document.getElementById('bulkOpAmount')?.value || 0);
+    let reason = document.getElementById('bulkOpReason')?.value || '';
+    if(reason === 'أخرى'){
+      reason = (document.getElementById('bulkOpOther')?.value || '').trim();
+    }
+    if(!(amount > 0)) return alert('أدخلي مبلغًا صحيحًا.');
+    if(!reason) return alert('اختاري السبب أولًا.');
+    if(!window.bankData || !Array.isArray(bankData.students)) return;
+    const students = bankData.students.filter(s => s.classId === state.classId);
+    students.forEach(function(st){
+      st.balance = Math.max(0, Number(st.balance||0) + (state.type === 'deposit' ? amount : -amount));
+      if(typeof addHistory === 'function'){
+        try{ addHistory(st, state.type === 'deposit' ? 'deposit' : 'withdraw', amount, reason); }catch(e){}
+      }else{
+        st.history = Array.isArray(st.history) ? st.history : [];
+        st.history.push({id:'h'+Date.now()+Math.random().toString(16).slice(2,6),type:(state.type==='deposit'?'deposit':'withdraw'),amount:Number(amount||0),reason:reason,date:new Date().toLocaleString('ar-SA')});
+      }
+      bankData.operations = Array.isArray(bankData.operations) ? bankData.operations : [];
+      bankData.operations.push({
+        id:'op'+Date.now()+Math.random().toString(16).slice(2,6),
+        studentId:st.id,
+        studentName:st.name,
+        type:(state.type==='deposit'?'deposit':'withdraw'),
+        amount:Number(amount||0),
+        reason:reason,
+        date:new Date().toLocaleDateString('en-CA')+' '+new Date().toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'})
+      });
+    });
+    refreshAll();
+    closeBulkOpModal();
+    alert('تم تنفيذ العملية بنجاح.');
+  };
+
+  window.quickClassOperation = function(classId, type){
+    openBulkOpModal(classId, type);
+  };
+})();
+</script>
+
 </body></html>`;
     const w=window.open('','_blank'); if(w){ w.document.write(html); w.document.close(); setTimeout(()=>w.print(),400); }
     const status=document.getElementById('smartReportStatus'); if(status){ status.classList.remove('hidden'); setTimeout(()=>status.classList.add('hidden'),2000); }
@@ -6817,7 +8752,7 @@ function openMoreInfo(type){
       </div>
       <div class="student-bulk-actions">
         <button class="btn btn-green" onclick="quickClassOperation('${cls.id}','deposit')">إيداع للفصل كامل</button>
-        <button class="btn btn-gold" onclick="quickClassOperation('${cls.id}','withdraw')">خصم للفصل كامل</button>
+        <button class="btn btn-gold" onclick="quickClassOperation('${cls.id}','withdraw')">سحب للفصل كامل</button>
         <button class="btn btn-green" onclick="assignTaskToClassFromSettings('${cls.id}')">إرسال مهمة للفصل كامل</button>
         <button class="btn btn-gold" onclick="bulkClassMessage('${cls.id}')">رسالة لولي الأمر للفصل كامل</button>
         <button class="btn btn-light" onclick="printClassReport('${cls.id}')">تصدير تقرير الفصل</button>
@@ -6891,9 +8826,9 @@ function openMoreInfo(type){
     });
   };
   window.quickClassOperation = function(classId, type){
-    const amount = Number(prompt(type==='deposit'?'مبلغ الإيداع للفصل كامل':'مبلغ الخصم للفصل كامل') || 0);
+    const amount = Number(prompt(type==='deposit'?'مبلغ الإيداع للفصل كامل':'مبلغ السحب للفصل كامل') || 0);
     if(!(amount>0)) return;
-    const reason = prompt('اكتبي السبب:') || (type==='deposit'?'مكافأة جماعية':'خصم جماعي');
+    const reason = prompt('اكتبي السبب:') || (type==='deposit'?'مكافأة جماعية':'سحب جماعي');
     (bankData.students||[]).filter(s=>s.classId===classId).forEach(function(st){
       st.balance = Math.max(0, Number(st.balance||0) + (type==='deposit'? amount : -amount));
       addHistory(st, type==='deposit'?'deposit':'withdraw', amount, reason);
@@ -6931,7 +8866,7 @@ function openMoreInfo(type){
     const type = prompt('اكتبي نوع العملية: deposit للإيداع أو withdraw للخصم','deposit');
     if(!type || !['deposit','withdraw'].includes(type)) return;
     const amount = Number(prompt('المبلغ') || 0); if(!(amount>0)) return;
-    const reason = prompt('السبب') || (type==='deposit'?'عملية سريعة':'خصم سريع');
+    const reason = prompt('السبب') || (type==='deposit'?'عملية سريعة':'سحب سريع');
     st.balance = Math.max(0, Number(st.balance||0) + (type==='deposit'?amount:-amount));
     addHistory(st,type,amount,reason);
     bankData.operations.push({id:'op'+Date.now(), studentId:st.id, studentName:st.name, type:type, amount:amount, reason:reason, date:new Date().toLocaleDateString('en-CA')});
@@ -7030,6 +8965,221 @@ function openMoreInfo(type){
   alert(messages[type]||'تم فتح العنصر.');
 }
 <\/script>
+
+<style id="bulk-reasons-enhancement">
+.bulk-op-modal{position:fixed;inset:0;background:rgba(0,0,0,.38);display:none;align-items:center;justify-content:center;z-index:99999;padding:20px}
+.bulk-op-modal.show{display:flex}
+.bulk-op-box{width:min(420px,100%);background:#fff;border:1px solid var(--line);border-radius:28px;padding:18px;box-shadow:0 24px 60px rgba(0,0,0,.22)}
+.bulk-op-box h3{margin:0 0 8px;color:var(--deep);font-size:22px}
+.bulk-op-box p{margin:0 0 14px;color:var(--muted);font-size:13px;line-height:1.9}
+.bulk-op-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.select-arrow{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23103a2e' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");background-repeat:no-repeat;background-position:left 14px center;background-size:18px;padding-left:42px!important}
+</style>
+
+<div id="bulkOpModal" class="bulk-op-modal" aria-hidden="true">
+  <div class="bulk-op-box">
+    <h3 id="bulkOpTitle">عملية جماعية</h3>
+    <p id="bulkOpDesc">تنفيذ عملية على الفصل كامل.</p>
+    <div class="field">
+      <label>المبلغ</label>
+      <input id="bulkOpAmount" type="number" placeholder="أدخلي المبلغ بالريال" />
+    </div>
+    <div class="field">
+      <label>السبب</label>
+      <select id="bulkOpReason" class="select-arrow"></select>
+    </div>
+    <div class="field" id="bulkOpOtherWrap" style="display:none">
+      <label>اكتبي السبب</label>
+      <input id="bulkOpOther" type="text" placeholder="اكتبي السبب هنا" />
+    </div>
+    <div class="bulk-op-actions">
+      <button class="btn btn-light" type="button" onclick="closeBulkOpModal()">رجوع</button>
+      <button class="btn btn-green" type="button" onclick="submitBulkOpModal()">تنفيذ العملية</button>
+    </div>
+  </div>
+</div>
+
+<script id="bulk-reasons-script">
+(function(){
+  const depositReasons = [
+    'مشاركة مميزة في الحصة',
+    'حل سؤال صعب',
+    'مساعدة زميل / زميلة',
+    'إنهاء المهمة الأدائية',
+    'تسليم الواجب مبكرًا',
+    'الحصول على درجة كاملة',
+    'الفوز في تحدي الرياضيات',
+    'ترتيب الدفتر',
+    'الالتزام والهدوء في الحصة',
+    'مبادرة إيجابية',
+    'حضور كامل الأسبوع',
+    'تميز في العمل الجماعي',
+    'أخرى'
+  ];
+  const withdrawReasons = [
+    'عدم حل الواجب',
+    'التأخر عن الحصة',
+    'كثرة الكلام أثناء الشرح',
+    'عدم إحضار الأدوات',
+    'عدم المشاركة',
+    'مخالفة تعليمات الصف',
+    'عدم تسليم المهمة الأدائية',
+    'إزعاج الزملاء',
+    'استخدام الجوال',
+    'سحب سلوكي',
+    'أخرى'
+  ];
+
+  function getStudentSafe(id){
+    if(typeof getStudent === 'function'){
+      try{ return getStudent(id); }catch(e){}
+    }
+    if(window.bankData && Array.isArray(bankData.students)){
+      return bankData.students.find(s => s.id===id);
+    }
+    return null;
+  }
+
+  function refreshAll(){
+    try{ if(typeof saveBankData==='function') saveBankData(); }catch(e){}
+    try{ if(typeof refreshTeacherUI==='function') refreshTeacherUI(); }catch(e){}
+    try{ if(typeof renderTeacher==='function') renderTeacher(); }catch(e){}
+    try{ if(typeof renderStudentSettingsDashboard==='function') renderStudentSettingsDashboard(); }catch(e){}
+    try{ if(typeof renderClassDetailCustom==='function') renderClassDetailCustom(); }catch(e){}
+    try{ if(typeof renderClassCardsCustom==='function') renderClassCardsCustom(); }catch(e){}
+  }
+
+  window.markAttendanceForStudent = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    const status = prompt('اكتبي حالة الحضور: حاضر / غياب / استئذان', st.attendanceStatus || 'حاضر');
+    if(!status) return;
+    st.attendanceStatus = String(status).trim();
+    refreshAll();
+    alert('تم حفظ حالة الحضور.');
+  };
+
+  window.messageGuardianFromSettings = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    const base = 'تنبيه من بنك الرياضيات\nالطالب / الطالبة: ' + (st.name||'');
+    const text = prompt('اكتبي رسالة ولي الأمر:', base);
+    if(!text) return;
+    if(typeof openWhatsAppNumber==='function' && st.guardian){
+      openWhatsAppNumber(st.guardian, text);
+      return;
+    }
+    alert('تم تجهيز رسالة ولي الأمر.');
+  };
+
+  window.changeStudentPasswordFromSettings = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    const pwd = prompt('اكتبي كلمة المرور الجديدة:', st.password || st.pin || '');
+    if(!pwd || !String(pwd).trim()) return;
+    st.password = String(pwd).trim();
+    if('pin' in st) st.pin = String(pwd).trim();
+    refreshAll();
+    alert('تم تغيير كلمة المرور.');
+  };
+
+  window.editStudentNameFromSettings = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    const name = prompt('اكتبي الاسم الجديد للطالب / الطالبة:', st.name || '');
+    if(!name || !String(name).trim()) return;
+    st.name = String(name).trim();
+    refreshAll();
+    alert('تم تعديل الاسم.');
+  };
+
+  window.deleteStudentFromSettings = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    if(!confirm('هل تريدين حذف الطالب / الطالبة؟')) return;
+    if(typeof deleteStudent==='function'){
+      deleteStudent(studentId);
+    }else if(window.bankData && Array.isArray(bankData.students)){
+      bankData.students = bankData.students.filter(s => s.id !== studentId);
+      if(Array.isArray(bankData.operations)){
+        bankData.operations = bankData.operations.filter(op => op.studentId !== studentId && op.targetStudentId !== studentId);
+      }
+      refreshAll();
+    }
+  };
+
+  window.__bulkOpState = {classId:'', type:'deposit'};
+
+  function fillReasons(type){
+    const sel = document.getElementById('bulkOpReason');
+    if(!sel) return;
+    const reasons = type === 'deposit' ? depositReasons : withdrawReasons;
+    sel.innerHTML = '<option value="">اختاري السبب</option>' + reasons.map(r => '<option value="'+r+'">'+r+'</option>').join('');
+    sel.onchange = function(){
+      const wrap = document.getElementById('bulkOpOtherWrap');
+      if(wrap) wrap.style.display = this.value === 'أخرى' ? 'block' : 'none';
+    };
+    sel.classList.add('select-arrow');
+  }
+
+  window.openBulkOpModal = function(classId, type){
+    window.__bulkOpState = {classId, type};
+    const modal = document.getElementById('bulkOpModal');
+    const title = document.getElementById('bulkOpTitle');
+    const desc = document.getElementById('bulkOpDesc');
+    const amount = document.getElementById('bulkOpAmount');
+    const other = document.getElementById('bulkOpOther');
+    const wrap = document.getElementById('bulkOpOtherWrap');
+    if(title) title.textContent = type === 'deposit' ? 'إيداع للفصل كامل' : 'سحب للفصل كامل';
+    if(desc) desc.textContent = type === 'deposit' ? 'اختاري سبب الإيداع للفصل كامل.' : 'اختاري سبب السحب للفصل كامل.';
+    if(amount) amount.value = '';
+    if(other) other.value = '';
+    if(wrap) wrap.style.display = 'none';
+    fillReasons(type);
+    if(modal) modal.classList.add('show');
+  };
+
+  window.closeBulkOpModal = function(){
+    const modal = document.getElementById('bulkOpModal');
+    if(modal) modal.classList.remove('show');
+  };
+
+  window.submitBulkOpModal = function(){
+    const state = window.__bulkOpState || {};
+    const amount = Number(document.getElementById('bulkOpAmount')?.value || 0);
+    let reason = document.getElementById('bulkOpReason')?.value || '';
+    if(reason === 'أخرى'){
+      reason = (document.getElementById('bulkOpOther')?.value || '').trim();
+    }
+    if(!(amount > 0)) return alert('أدخلي مبلغًا صحيحًا.');
+    if(!reason) return alert('اختاري السبب أولًا.');
+    if(!window.bankData || !Array.isArray(bankData.students)) return;
+    const students = bankData.students.filter(s => s.classId === state.classId);
+    students.forEach(function(st){
+      st.balance = Math.max(0, Number(st.balance||0) + (state.type === 'deposit' ? amount : -amount));
+      if(typeof addHistory === 'function'){
+        try{ addHistory(st, state.type === 'deposit' ? 'deposit' : 'withdraw', amount, reason); }catch(e){}
+      }else{
+        st.history = Array.isArray(st.history) ? st.history : [];
+        st.history.push({id:'h'+Date.now()+Math.random().toString(16).slice(2,6),type:(state.type==='deposit'?'deposit':'withdraw'),amount:Number(amount||0),reason:reason,date:new Date().toLocaleString('ar-SA')});
+      }
+      bankData.operations = Array.isArray(bankData.operations) ? bankData.operations : [];
+      bankData.operations.push({
+        id:'op'+Date.now()+Math.random().toString(16).slice(2,6),
+        studentId:st.id,
+        studentName:st.name,
+        type:(state.type==='deposit'?'deposit':'withdraw'),
+        amount:Number(amount||0),
+        reason:reason,
+        date:new Date().toLocaleDateString('en-CA')+' '+new Date().toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'})
+      });
+    });
+    refreshAll();
+    closeBulkOpModal();
+    alert('تم تنفيذ العملية بنجاح.');
+  };
+
+  window.quickClassOperation = function(classId, type){
+    openBulkOpModal(classId, type);
+  };
+})();
+</script>
+
 </body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
@@ -7079,6 +9229,221 @@ function openMoreInfo(type){
   alert(messages[type]||'تم فتح العنصر.');
 }
 <\/script>
+
+<style id="bulk-reasons-enhancement">
+.bulk-op-modal{position:fixed;inset:0;background:rgba(0,0,0,.38);display:none;align-items:center;justify-content:center;z-index:99999;padding:20px}
+.bulk-op-modal.show{display:flex}
+.bulk-op-box{width:min(420px,100%);background:#fff;border:1px solid var(--line);border-radius:28px;padding:18px;box-shadow:0 24px 60px rgba(0,0,0,.22)}
+.bulk-op-box h3{margin:0 0 8px;color:var(--deep);font-size:22px}
+.bulk-op-box p{margin:0 0 14px;color:var(--muted);font-size:13px;line-height:1.9}
+.bulk-op-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.select-arrow{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23103a2e' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");background-repeat:no-repeat;background-position:left 14px center;background-size:18px;padding-left:42px!important}
+</style>
+
+<div id="bulkOpModal" class="bulk-op-modal" aria-hidden="true">
+  <div class="bulk-op-box">
+    <h3 id="bulkOpTitle">عملية جماعية</h3>
+    <p id="bulkOpDesc">تنفيذ عملية على الفصل كامل.</p>
+    <div class="field">
+      <label>المبلغ</label>
+      <input id="bulkOpAmount" type="number" placeholder="أدخلي المبلغ بالريال" />
+    </div>
+    <div class="field">
+      <label>السبب</label>
+      <select id="bulkOpReason" class="select-arrow"></select>
+    </div>
+    <div class="field" id="bulkOpOtherWrap" style="display:none">
+      <label>اكتبي السبب</label>
+      <input id="bulkOpOther" type="text" placeholder="اكتبي السبب هنا" />
+    </div>
+    <div class="bulk-op-actions">
+      <button class="btn btn-light" type="button" onclick="closeBulkOpModal()">رجوع</button>
+      <button class="btn btn-green" type="button" onclick="submitBulkOpModal()">تنفيذ العملية</button>
+    </div>
+  </div>
+</div>
+
+<script id="bulk-reasons-script">
+(function(){
+  const depositReasons = [
+    'مشاركة مميزة في الحصة',
+    'حل سؤال صعب',
+    'مساعدة زميل / زميلة',
+    'إنهاء المهمة الأدائية',
+    'تسليم الواجب مبكرًا',
+    'الحصول على درجة كاملة',
+    'الفوز في تحدي الرياضيات',
+    'ترتيب الدفتر',
+    'الالتزام والهدوء في الحصة',
+    'مبادرة إيجابية',
+    'حضور كامل الأسبوع',
+    'تميز في العمل الجماعي',
+    'أخرى'
+  ];
+  const withdrawReasons = [
+    'عدم حل الواجب',
+    'التأخر عن الحصة',
+    'كثرة الكلام أثناء الشرح',
+    'عدم إحضار الأدوات',
+    'عدم المشاركة',
+    'مخالفة تعليمات الصف',
+    'عدم تسليم المهمة الأدائية',
+    'إزعاج الزملاء',
+    'استخدام الجوال',
+    'سحب سلوكي',
+    'أخرى'
+  ];
+
+  function getStudentSafe(id){
+    if(typeof getStudent === 'function'){
+      try{ return getStudent(id); }catch(e){}
+    }
+    if(window.bankData && Array.isArray(bankData.students)){
+      return bankData.students.find(s => s.id===id);
+    }
+    return null;
+  }
+
+  function refreshAll(){
+    try{ if(typeof saveBankData==='function') saveBankData(); }catch(e){}
+    try{ if(typeof refreshTeacherUI==='function') refreshTeacherUI(); }catch(e){}
+    try{ if(typeof renderTeacher==='function') renderTeacher(); }catch(e){}
+    try{ if(typeof renderStudentSettingsDashboard==='function') renderStudentSettingsDashboard(); }catch(e){}
+    try{ if(typeof renderClassDetailCustom==='function') renderClassDetailCustom(); }catch(e){}
+    try{ if(typeof renderClassCardsCustom==='function') renderClassCardsCustom(); }catch(e){}
+  }
+
+  window.markAttendanceForStudent = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    const status = prompt('اكتبي حالة الحضور: حاضر / غياب / استئذان', st.attendanceStatus || 'حاضر');
+    if(!status) return;
+    st.attendanceStatus = String(status).trim();
+    refreshAll();
+    alert('تم حفظ حالة الحضور.');
+  };
+
+  window.messageGuardianFromSettings = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    const base = 'تنبيه من بنك الرياضيات\nالطالب / الطالبة: ' + (st.name||'');
+    const text = prompt('اكتبي رسالة ولي الأمر:', base);
+    if(!text) return;
+    if(typeof openWhatsAppNumber==='function' && st.guardian){
+      openWhatsAppNumber(st.guardian, text);
+      return;
+    }
+    alert('تم تجهيز رسالة ولي الأمر.');
+  };
+
+  window.changeStudentPasswordFromSettings = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    const pwd = prompt('اكتبي كلمة المرور الجديدة:', st.password || st.pin || '');
+    if(!pwd || !String(pwd).trim()) return;
+    st.password = String(pwd).trim();
+    if('pin' in st) st.pin = String(pwd).trim();
+    refreshAll();
+    alert('تم تغيير كلمة المرور.');
+  };
+
+  window.editStudentNameFromSettings = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    const name = prompt('اكتبي الاسم الجديد للطالب / الطالبة:', st.name || '');
+    if(!name || !String(name).trim()) return;
+    st.name = String(name).trim();
+    refreshAll();
+    alert('تم تعديل الاسم.');
+  };
+
+  window.deleteStudentFromSettings = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    if(!confirm('هل تريدين حذف الطالب / الطالبة؟')) return;
+    if(typeof deleteStudent==='function'){
+      deleteStudent(studentId);
+    }else if(window.bankData && Array.isArray(bankData.students)){
+      bankData.students = bankData.students.filter(s => s.id !== studentId);
+      if(Array.isArray(bankData.operations)){
+        bankData.operations = bankData.operations.filter(op => op.studentId !== studentId && op.targetStudentId !== studentId);
+      }
+      refreshAll();
+    }
+  };
+
+  window.__bulkOpState = {classId:'', type:'deposit'};
+
+  function fillReasons(type){
+    const sel = document.getElementById('bulkOpReason');
+    if(!sel) return;
+    const reasons = type === 'deposit' ? depositReasons : withdrawReasons;
+    sel.innerHTML = '<option value="">اختاري السبب</option>' + reasons.map(r => '<option value="'+r+'">'+r+'</option>').join('');
+    sel.onchange = function(){
+      const wrap = document.getElementById('bulkOpOtherWrap');
+      if(wrap) wrap.style.display = this.value === 'أخرى' ? 'block' : 'none';
+    };
+    sel.classList.add('select-arrow');
+  }
+
+  window.openBulkOpModal = function(classId, type){
+    window.__bulkOpState = {classId, type};
+    const modal = document.getElementById('bulkOpModal');
+    const title = document.getElementById('bulkOpTitle');
+    const desc = document.getElementById('bulkOpDesc');
+    const amount = document.getElementById('bulkOpAmount');
+    const other = document.getElementById('bulkOpOther');
+    const wrap = document.getElementById('bulkOpOtherWrap');
+    if(title) title.textContent = type === 'deposit' ? 'إيداع للفصل كامل' : 'سحب للفصل كامل';
+    if(desc) desc.textContent = type === 'deposit' ? 'اختاري سبب الإيداع للفصل كامل.' : 'اختاري سبب السحب للفصل كامل.';
+    if(amount) amount.value = '';
+    if(other) other.value = '';
+    if(wrap) wrap.style.display = 'none';
+    fillReasons(type);
+    if(modal) modal.classList.add('show');
+  };
+
+  window.closeBulkOpModal = function(){
+    const modal = document.getElementById('bulkOpModal');
+    if(modal) modal.classList.remove('show');
+  };
+
+  window.submitBulkOpModal = function(){
+    const state = window.__bulkOpState || {};
+    const amount = Number(document.getElementById('bulkOpAmount')?.value || 0);
+    let reason = document.getElementById('bulkOpReason')?.value || '';
+    if(reason === 'أخرى'){
+      reason = (document.getElementById('bulkOpOther')?.value || '').trim();
+    }
+    if(!(amount > 0)) return alert('أدخلي مبلغًا صحيحًا.');
+    if(!reason) return alert('اختاري السبب أولًا.');
+    if(!window.bankData || !Array.isArray(bankData.students)) return;
+    const students = bankData.students.filter(s => s.classId === state.classId);
+    students.forEach(function(st){
+      st.balance = Math.max(0, Number(st.balance||0) + (state.type === 'deposit' ? amount : -amount));
+      if(typeof addHistory === 'function'){
+        try{ addHistory(st, state.type === 'deposit' ? 'deposit' : 'withdraw', amount, reason); }catch(e){}
+      }else{
+        st.history = Array.isArray(st.history) ? st.history : [];
+        st.history.push({id:'h'+Date.now()+Math.random().toString(16).slice(2,6),type:(state.type==='deposit'?'deposit':'withdraw'),amount:Number(amount||0),reason:reason,date:new Date().toLocaleString('ar-SA')});
+      }
+      bankData.operations = Array.isArray(bankData.operations) ? bankData.operations : [];
+      bankData.operations.push({
+        id:'op'+Date.now()+Math.random().toString(16).slice(2,6),
+        studentId:st.id,
+        studentName:st.name,
+        type:(state.type==='deposit'?'deposit':'withdraw'),
+        amount:Number(amount||0),
+        reason:reason,
+        date:new Date().toLocaleDateString('en-CA')+' '+new Date().toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'})
+      });
+    });
+    refreshAll();
+    closeBulkOpModal();
+    alert('تم تنفيذ العملية بنجاح.');
+  };
+
+  window.quickClassOperation = function(classId, type){
+    openBulkOpModal(classId, type);
+  };
+})();
+</script>
+
 </body></html>`;
     const w=window.open('','_blank'); if(w){ w.document.write(html); w.document.close(); setTimeout(()=>w.print(),400); }
     const status=document.getElementById('smartReportStatus'); if(status){ status.classList.remove('hidden'); setTimeout(()=>status.classList.add('hidden'),2000); }
@@ -7387,7 +9752,7 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
       </div>
       <div class="student-bulk-actions">
         <button class="btn btn-green" onclick="quickClassOperation('${cls.id}','deposit')">إيداع للفصل كامل</button>
-        <button class="btn btn-gold" onclick="quickClassOperation('${cls.id}','withdraw')">خصم للفصل كامل</button>
+        <button class="btn btn-gold" onclick="quickClassOperation('${cls.id}','withdraw')">سحب للفصل كامل</button>
         <button class="btn btn-green" onclick="assignTaskToClassFromSettings('${cls.id}')">إرسال مهمة للفصل كامل</button>
         <button class="btn btn-gold" onclick="bulkClassMessage('${cls.id}')">رسالة لولي الأمر للفصل كامل</button>
         <button class="btn btn-light" onclick="printClassReport('${cls.id}')">تصدير تقرير الفصل</button>
@@ -7461,9 +9826,9 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
     });
   };
   window.quickClassOperation = function(classId, type){
-    const amount = Number(prompt(type==='deposit'?'مبلغ الإيداع للفصل كامل':'مبلغ الخصم للفصل كامل') || 0);
+    const amount = Number(prompt(type==='deposit'?'مبلغ الإيداع للفصل كامل':'مبلغ السحب للفصل كامل') || 0);
     if(!(amount>0)) return;
-    const reason = prompt('اكتبي السبب:') || (type==='deposit'?'مكافأة جماعية':'خصم جماعي');
+    const reason = prompt('اكتبي السبب:') || (type==='deposit'?'مكافأة جماعية':'سحب جماعي');
     (bankData.students||[]).filter(s=>s.classId===classId).forEach(function(st){
       st.balance = Math.max(0, Number(st.balance||0) + (type==='deposit'? amount : -amount));
       addHistory(st, type==='deposit'?'deposit':'withdraw', amount, reason);
@@ -7501,7 +9866,7 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
     const type = prompt('اكتبي نوع العملية: deposit للإيداع أو withdraw للخصم','deposit');
     if(!type || !['deposit','withdraw'].includes(type)) return;
     const amount = Number(prompt('المبلغ') || 0); if(!(amount>0)) return;
-    const reason = prompt('السبب') || (type==='deposit'?'عملية سريعة':'خصم سريع');
+    const reason = prompt('السبب') || (type==='deposit'?'عملية سريعة':'سحب سريع');
     st.balance = Math.max(0, Number(st.balance||0) + (type==='deposit'?amount:-amount));
     addHistory(st,type,amount,reason);
     bankData.operations.push({id:'op'+Date.now(), studentId:st.id, studentName:st.name, type:type, amount:amount, reason:reason, date:new Date().toLocaleDateString('en-CA')});
@@ -7600,6 +9965,221 @@ function openMoreInfo(type){
   alert(messages[type]||'تم فتح العنصر.');
 }
 <\/script>
+
+<style id="bulk-reasons-enhancement">
+.bulk-op-modal{position:fixed;inset:0;background:rgba(0,0,0,.38);display:none;align-items:center;justify-content:center;z-index:99999;padding:20px}
+.bulk-op-modal.show{display:flex}
+.bulk-op-box{width:min(420px,100%);background:#fff;border:1px solid var(--line);border-radius:28px;padding:18px;box-shadow:0 24px 60px rgba(0,0,0,.22)}
+.bulk-op-box h3{margin:0 0 8px;color:var(--deep);font-size:22px}
+.bulk-op-box p{margin:0 0 14px;color:var(--muted);font-size:13px;line-height:1.9}
+.bulk-op-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.select-arrow{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23103a2e' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");background-repeat:no-repeat;background-position:left 14px center;background-size:18px;padding-left:42px!important}
+</style>
+
+<div id="bulkOpModal" class="bulk-op-modal" aria-hidden="true">
+  <div class="bulk-op-box">
+    <h3 id="bulkOpTitle">عملية جماعية</h3>
+    <p id="bulkOpDesc">تنفيذ عملية على الفصل كامل.</p>
+    <div class="field">
+      <label>المبلغ</label>
+      <input id="bulkOpAmount" type="number" placeholder="أدخلي المبلغ بالريال" />
+    </div>
+    <div class="field">
+      <label>السبب</label>
+      <select id="bulkOpReason" class="select-arrow"></select>
+    </div>
+    <div class="field" id="bulkOpOtherWrap" style="display:none">
+      <label>اكتبي السبب</label>
+      <input id="bulkOpOther" type="text" placeholder="اكتبي السبب هنا" />
+    </div>
+    <div class="bulk-op-actions">
+      <button class="btn btn-light" type="button" onclick="closeBulkOpModal()">رجوع</button>
+      <button class="btn btn-green" type="button" onclick="submitBulkOpModal()">تنفيذ العملية</button>
+    </div>
+  </div>
+</div>
+
+<script id="bulk-reasons-script">
+(function(){
+  const depositReasons = [
+    'مشاركة مميزة في الحصة',
+    'حل سؤال صعب',
+    'مساعدة زميل / زميلة',
+    'إنهاء المهمة الأدائية',
+    'تسليم الواجب مبكرًا',
+    'الحصول على درجة كاملة',
+    'الفوز في تحدي الرياضيات',
+    'ترتيب الدفتر',
+    'الالتزام والهدوء في الحصة',
+    'مبادرة إيجابية',
+    'حضور كامل الأسبوع',
+    'تميز في العمل الجماعي',
+    'أخرى'
+  ];
+  const withdrawReasons = [
+    'عدم حل الواجب',
+    'التأخر عن الحصة',
+    'كثرة الكلام أثناء الشرح',
+    'عدم إحضار الأدوات',
+    'عدم المشاركة',
+    'مخالفة تعليمات الصف',
+    'عدم تسليم المهمة الأدائية',
+    'إزعاج الزملاء',
+    'استخدام الجوال',
+    'سحب سلوكي',
+    'أخرى'
+  ];
+
+  function getStudentSafe(id){
+    if(typeof getStudent === 'function'){
+      try{ return getStudent(id); }catch(e){}
+    }
+    if(window.bankData && Array.isArray(bankData.students)){
+      return bankData.students.find(s => s.id===id);
+    }
+    return null;
+  }
+
+  function refreshAll(){
+    try{ if(typeof saveBankData==='function') saveBankData(); }catch(e){}
+    try{ if(typeof refreshTeacherUI==='function') refreshTeacherUI(); }catch(e){}
+    try{ if(typeof renderTeacher==='function') renderTeacher(); }catch(e){}
+    try{ if(typeof renderStudentSettingsDashboard==='function') renderStudentSettingsDashboard(); }catch(e){}
+    try{ if(typeof renderClassDetailCustom==='function') renderClassDetailCustom(); }catch(e){}
+    try{ if(typeof renderClassCardsCustom==='function') renderClassCardsCustom(); }catch(e){}
+  }
+
+  window.markAttendanceForStudent = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    const status = prompt('اكتبي حالة الحضور: حاضر / غياب / استئذان', st.attendanceStatus || 'حاضر');
+    if(!status) return;
+    st.attendanceStatus = String(status).trim();
+    refreshAll();
+    alert('تم حفظ حالة الحضور.');
+  };
+
+  window.messageGuardianFromSettings = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    const base = 'تنبيه من بنك الرياضيات\nالطالب / الطالبة: ' + (st.name||'');
+    const text = prompt('اكتبي رسالة ولي الأمر:', base);
+    if(!text) return;
+    if(typeof openWhatsAppNumber==='function' && st.guardian){
+      openWhatsAppNumber(st.guardian, text);
+      return;
+    }
+    alert('تم تجهيز رسالة ولي الأمر.');
+  };
+
+  window.changeStudentPasswordFromSettings = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    const pwd = prompt('اكتبي كلمة المرور الجديدة:', st.password || st.pin || '');
+    if(!pwd || !String(pwd).trim()) return;
+    st.password = String(pwd).trim();
+    if('pin' in st) st.pin = String(pwd).trim();
+    refreshAll();
+    alert('تم تغيير كلمة المرور.');
+  };
+
+  window.editStudentNameFromSettings = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    const name = prompt('اكتبي الاسم الجديد للطالب / الطالبة:', st.name || '');
+    if(!name || !String(name).trim()) return;
+    st.name = String(name).trim();
+    refreshAll();
+    alert('تم تعديل الاسم.');
+  };
+
+  window.deleteStudentFromSettings = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    if(!confirm('هل تريدين حذف الطالب / الطالبة؟')) return;
+    if(typeof deleteStudent==='function'){
+      deleteStudent(studentId);
+    }else if(window.bankData && Array.isArray(bankData.students)){
+      bankData.students = bankData.students.filter(s => s.id !== studentId);
+      if(Array.isArray(bankData.operations)){
+        bankData.operations = bankData.operations.filter(op => op.studentId !== studentId && op.targetStudentId !== studentId);
+      }
+      refreshAll();
+    }
+  };
+
+  window.__bulkOpState = {classId:'', type:'deposit'};
+
+  function fillReasons(type){
+    const sel = document.getElementById('bulkOpReason');
+    if(!sel) return;
+    const reasons = type === 'deposit' ? depositReasons : withdrawReasons;
+    sel.innerHTML = '<option value="">اختاري السبب</option>' + reasons.map(r => '<option value="'+r+'">'+r+'</option>').join('');
+    sel.onchange = function(){
+      const wrap = document.getElementById('bulkOpOtherWrap');
+      if(wrap) wrap.style.display = this.value === 'أخرى' ? 'block' : 'none';
+    };
+    sel.classList.add('select-arrow');
+  }
+
+  window.openBulkOpModal = function(classId, type){
+    window.__bulkOpState = {classId, type};
+    const modal = document.getElementById('bulkOpModal');
+    const title = document.getElementById('bulkOpTitle');
+    const desc = document.getElementById('bulkOpDesc');
+    const amount = document.getElementById('bulkOpAmount');
+    const other = document.getElementById('bulkOpOther');
+    const wrap = document.getElementById('bulkOpOtherWrap');
+    if(title) title.textContent = type === 'deposit' ? 'إيداع للفصل كامل' : 'سحب للفصل كامل';
+    if(desc) desc.textContent = type === 'deposit' ? 'اختاري سبب الإيداع للفصل كامل.' : 'اختاري سبب السحب للفصل كامل.';
+    if(amount) amount.value = '';
+    if(other) other.value = '';
+    if(wrap) wrap.style.display = 'none';
+    fillReasons(type);
+    if(modal) modal.classList.add('show');
+  };
+
+  window.closeBulkOpModal = function(){
+    const modal = document.getElementById('bulkOpModal');
+    if(modal) modal.classList.remove('show');
+  };
+
+  window.submitBulkOpModal = function(){
+    const state = window.__bulkOpState || {};
+    const amount = Number(document.getElementById('bulkOpAmount')?.value || 0);
+    let reason = document.getElementById('bulkOpReason')?.value || '';
+    if(reason === 'أخرى'){
+      reason = (document.getElementById('bulkOpOther')?.value || '').trim();
+    }
+    if(!(amount > 0)) return alert('أدخلي مبلغًا صحيحًا.');
+    if(!reason) return alert('اختاري السبب أولًا.');
+    if(!window.bankData || !Array.isArray(bankData.students)) return;
+    const students = bankData.students.filter(s => s.classId === state.classId);
+    students.forEach(function(st){
+      st.balance = Math.max(0, Number(st.balance||0) + (state.type === 'deposit' ? amount : -amount));
+      if(typeof addHistory === 'function'){
+        try{ addHistory(st, state.type === 'deposit' ? 'deposit' : 'withdraw', amount, reason); }catch(e){}
+      }else{
+        st.history = Array.isArray(st.history) ? st.history : [];
+        st.history.push({id:'h'+Date.now()+Math.random().toString(16).slice(2,6),type:(state.type==='deposit'?'deposit':'withdraw'),amount:Number(amount||0),reason:reason,date:new Date().toLocaleString('ar-SA')});
+      }
+      bankData.operations = Array.isArray(bankData.operations) ? bankData.operations : [];
+      bankData.operations.push({
+        id:'op'+Date.now()+Math.random().toString(16).slice(2,6),
+        studentId:st.id,
+        studentName:st.name,
+        type:(state.type==='deposit'?'deposit':'withdraw'),
+        amount:Number(amount||0),
+        reason:reason,
+        date:new Date().toLocaleDateString('en-CA')+' '+new Date().toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'})
+      });
+    });
+    refreshAll();
+    closeBulkOpModal();
+    alert('تم تنفيذ العملية بنجاح.');
+  };
+
+  window.quickClassOperation = function(classId, type){
+    openBulkOpModal(classId, type);
+  };
+})();
+</script>
+
 </body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
@@ -7649,6 +10229,221 @@ function openMoreInfo(type){
   alert(messages[type]||'تم فتح العنصر.');
 }
 <\/script>
+
+<style id="bulk-reasons-enhancement">
+.bulk-op-modal{position:fixed;inset:0;background:rgba(0,0,0,.38);display:none;align-items:center;justify-content:center;z-index:99999;padding:20px}
+.bulk-op-modal.show{display:flex}
+.bulk-op-box{width:min(420px,100%);background:#fff;border:1px solid var(--line);border-radius:28px;padding:18px;box-shadow:0 24px 60px rgba(0,0,0,.22)}
+.bulk-op-box h3{margin:0 0 8px;color:var(--deep);font-size:22px}
+.bulk-op-box p{margin:0 0 14px;color:var(--muted);font-size:13px;line-height:1.9}
+.bulk-op-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.select-arrow{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23103a2e' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");background-repeat:no-repeat;background-position:left 14px center;background-size:18px;padding-left:42px!important}
+</style>
+
+<div id="bulkOpModal" class="bulk-op-modal" aria-hidden="true">
+  <div class="bulk-op-box">
+    <h3 id="bulkOpTitle">عملية جماعية</h3>
+    <p id="bulkOpDesc">تنفيذ عملية على الفصل كامل.</p>
+    <div class="field">
+      <label>المبلغ</label>
+      <input id="bulkOpAmount" type="number" placeholder="أدخلي المبلغ بالريال" />
+    </div>
+    <div class="field">
+      <label>السبب</label>
+      <select id="bulkOpReason" class="select-arrow"></select>
+    </div>
+    <div class="field" id="bulkOpOtherWrap" style="display:none">
+      <label>اكتبي السبب</label>
+      <input id="bulkOpOther" type="text" placeholder="اكتبي السبب هنا" />
+    </div>
+    <div class="bulk-op-actions">
+      <button class="btn btn-light" type="button" onclick="closeBulkOpModal()">رجوع</button>
+      <button class="btn btn-green" type="button" onclick="submitBulkOpModal()">تنفيذ العملية</button>
+    </div>
+  </div>
+</div>
+
+<script id="bulk-reasons-script">
+(function(){
+  const depositReasons = [
+    'مشاركة مميزة في الحصة',
+    'حل سؤال صعب',
+    'مساعدة زميل / زميلة',
+    'إنهاء المهمة الأدائية',
+    'تسليم الواجب مبكرًا',
+    'الحصول على درجة كاملة',
+    'الفوز في تحدي الرياضيات',
+    'ترتيب الدفتر',
+    'الالتزام والهدوء في الحصة',
+    'مبادرة إيجابية',
+    'حضور كامل الأسبوع',
+    'تميز في العمل الجماعي',
+    'أخرى'
+  ];
+  const withdrawReasons = [
+    'عدم حل الواجب',
+    'التأخر عن الحصة',
+    'كثرة الكلام أثناء الشرح',
+    'عدم إحضار الأدوات',
+    'عدم المشاركة',
+    'مخالفة تعليمات الصف',
+    'عدم تسليم المهمة الأدائية',
+    'إزعاج الزملاء',
+    'استخدام الجوال',
+    'سحب سلوكي',
+    'أخرى'
+  ];
+
+  function getStudentSafe(id){
+    if(typeof getStudent === 'function'){
+      try{ return getStudent(id); }catch(e){}
+    }
+    if(window.bankData && Array.isArray(bankData.students)){
+      return bankData.students.find(s => s.id===id);
+    }
+    return null;
+  }
+
+  function refreshAll(){
+    try{ if(typeof saveBankData==='function') saveBankData(); }catch(e){}
+    try{ if(typeof refreshTeacherUI==='function') refreshTeacherUI(); }catch(e){}
+    try{ if(typeof renderTeacher==='function') renderTeacher(); }catch(e){}
+    try{ if(typeof renderStudentSettingsDashboard==='function') renderStudentSettingsDashboard(); }catch(e){}
+    try{ if(typeof renderClassDetailCustom==='function') renderClassDetailCustom(); }catch(e){}
+    try{ if(typeof renderClassCardsCustom==='function') renderClassCardsCustom(); }catch(e){}
+  }
+
+  window.markAttendanceForStudent = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    const status = prompt('اكتبي حالة الحضور: حاضر / غياب / استئذان', st.attendanceStatus || 'حاضر');
+    if(!status) return;
+    st.attendanceStatus = String(status).trim();
+    refreshAll();
+    alert('تم حفظ حالة الحضور.');
+  };
+
+  window.messageGuardianFromSettings = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    const base = 'تنبيه من بنك الرياضيات\nالطالب / الطالبة: ' + (st.name||'');
+    const text = prompt('اكتبي رسالة ولي الأمر:', base);
+    if(!text) return;
+    if(typeof openWhatsAppNumber==='function' && st.guardian){
+      openWhatsAppNumber(st.guardian, text);
+      return;
+    }
+    alert('تم تجهيز رسالة ولي الأمر.');
+  };
+
+  window.changeStudentPasswordFromSettings = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    const pwd = prompt('اكتبي كلمة المرور الجديدة:', st.password || st.pin || '');
+    if(!pwd || !String(pwd).trim()) return;
+    st.password = String(pwd).trim();
+    if('pin' in st) st.pin = String(pwd).trim();
+    refreshAll();
+    alert('تم تغيير كلمة المرور.');
+  };
+
+  window.editStudentNameFromSettings = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    const name = prompt('اكتبي الاسم الجديد للطالب / الطالبة:', st.name || '');
+    if(!name || !String(name).trim()) return;
+    st.name = String(name).trim();
+    refreshAll();
+    alert('تم تعديل الاسم.');
+  };
+
+  window.deleteStudentFromSettings = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    if(!confirm('هل تريدين حذف الطالب / الطالبة؟')) return;
+    if(typeof deleteStudent==='function'){
+      deleteStudent(studentId);
+    }else if(window.bankData && Array.isArray(bankData.students)){
+      bankData.students = bankData.students.filter(s => s.id !== studentId);
+      if(Array.isArray(bankData.operations)){
+        bankData.operations = bankData.operations.filter(op => op.studentId !== studentId && op.targetStudentId !== studentId);
+      }
+      refreshAll();
+    }
+  };
+
+  window.__bulkOpState = {classId:'', type:'deposit'};
+
+  function fillReasons(type){
+    const sel = document.getElementById('bulkOpReason');
+    if(!sel) return;
+    const reasons = type === 'deposit' ? depositReasons : withdrawReasons;
+    sel.innerHTML = '<option value="">اختاري السبب</option>' + reasons.map(r => '<option value="'+r+'">'+r+'</option>').join('');
+    sel.onchange = function(){
+      const wrap = document.getElementById('bulkOpOtherWrap');
+      if(wrap) wrap.style.display = this.value === 'أخرى' ? 'block' : 'none';
+    };
+    sel.classList.add('select-arrow');
+  }
+
+  window.openBulkOpModal = function(classId, type){
+    window.__bulkOpState = {classId, type};
+    const modal = document.getElementById('bulkOpModal');
+    const title = document.getElementById('bulkOpTitle');
+    const desc = document.getElementById('bulkOpDesc');
+    const amount = document.getElementById('bulkOpAmount');
+    const other = document.getElementById('bulkOpOther');
+    const wrap = document.getElementById('bulkOpOtherWrap');
+    if(title) title.textContent = type === 'deposit' ? 'إيداع للفصل كامل' : 'سحب للفصل كامل';
+    if(desc) desc.textContent = type === 'deposit' ? 'اختاري سبب الإيداع للفصل كامل.' : 'اختاري سبب السحب للفصل كامل.';
+    if(amount) amount.value = '';
+    if(other) other.value = '';
+    if(wrap) wrap.style.display = 'none';
+    fillReasons(type);
+    if(modal) modal.classList.add('show');
+  };
+
+  window.closeBulkOpModal = function(){
+    const modal = document.getElementById('bulkOpModal');
+    if(modal) modal.classList.remove('show');
+  };
+
+  window.submitBulkOpModal = function(){
+    const state = window.__bulkOpState || {};
+    const amount = Number(document.getElementById('bulkOpAmount')?.value || 0);
+    let reason = document.getElementById('bulkOpReason')?.value || '';
+    if(reason === 'أخرى'){
+      reason = (document.getElementById('bulkOpOther')?.value || '').trim();
+    }
+    if(!(amount > 0)) return alert('أدخلي مبلغًا صحيحًا.');
+    if(!reason) return alert('اختاري السبب أولًا.');
+    if(!window.bankData || !Array.isArray(bankData.students)) return;
+    const students = bankData.students.filter(s => s.classId === state.classId);
+    students.forEach(function(st){
+      st.balance = Math.max(0, Number(st.balance||0) + (state.type === 'deposit' ? amount : -amount));
+      if(typeof addHistory === 'function'){
+        try{ addHistory(st, state.type === 'deposit' ? 'deposit' : 'withdraw', amount, reason); }catch(e){}
+      }else{
+        st.history = Array.isArray(st.history) ? st.history : [];
+        st.history.push({id:'h'+Date.now()+Math.random().toString(16).slice(2,6),type:(state.type==='deposit'?'deposit':'withdraw'),amount:Number(amount||0),reason:reason,date:new Date().toLocaleString('ar-SA')});
+      }
+      bankData.operations = Array.isArray(bankData.operations) ? bankData.operations : [];
+      bankData.operations.push({
+        id:'op'+Date.now()+Math.random().toString(16).slice(2,6),
+        studentId:st.id,
+        studentName:st.name,
+        type:(state.type==='deposit'?'deposit':'withdraw'),
+        amount:Number(amount||0),
+        reason:reason,
+        date:new Date().toLocaleDateString('en-CA')+' '+new Date().toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'})
+      });
+    });
+    refreshAll();
+    closeBulkOpModal();
+    alert('تم تنفيذ العملية بنجاح.');
+  };
+
+  window.quickClassOperation = function(classId, type){
+    openBulkOpModal(classId, type);
+  };
+})();
+</script>
+
 </body></html>`;
     const w=window.open('','_blank'); if(w){ w.document.write(html); w.document.close(); setTimeout(()=>w.print(),400); }
     const status=document.getElementById('smartReportStatus'); if(status){ status.classList.remove('hidden'); setTimeout(()=>status.classList.add('hidden'),2000); }
@@ -7816,7 +10611,7 @@ function openMoreInfo(type){
       </div>
       <div class="student-bulk-actions">
         <button class="btn btn-green" onclick="quickClassOperation('${cls.id}','deposit')">إيداع للفصل كامل</button>
-        <button class="btn btn-gold" onclick="quickClassOperation('${cls.id}','withdraw')">خصم للفصل كامل</button>
+        <button class="btn btn-gold" onclick="quickClassOperation('${cls.id}','withdraw')">سحب للفصل كامل</button>
         <button class="btn btn-green" onclick="assignTaskToClassFromSettings('${cls.id}')">إرسال مهمة للفصل كامل</button>
         <button class="btn btn-gold" onclick="bulkClassMessage('${cls.id}')">رسالة لولي الأمر للفصل كامل</button>
         <button class="btn btn-light" onclick="printClassReport('${cls.id}')">تصدير تقرير الفصل</button>
@@ -7890,9 +10685,9 @@ function openMoreInfo(type){
     });
   };
   window.quickClassOperation = function(classId, type){
-    const amount = Number(prompt(type==='deposit'?'مبلغ الإيداع للفصل كامل':'مبلغ الخصم للفصل كامل') || 0);
+    const amount = Number(prompt(type==='deposit'?'مبلغ الإيداع للفصل كامل':'مبلغ السحب للفصل كامل') || 0);
     if(!(amount>0)) return;
-    const reason = prompt('اكتبي السبب:') || (type==='deposit'?'مكافأة جماعية':'خصم جماعي');
+    const reason = prompt('اكتبي السبب:') || (type==='deposit'?'مكافأة جماعية':'سحب جماعي');
     (bankData.students||[]).filter(s=>s.classId===classId).forEach(function(st){
       st.balance = Math.max(0, Number(st.balance||0) + (type==='deposit'? amount : -amount));
       addHistory(st, type==='deposit'?'deposit':'withdraw', amount, reason);
@@ -7930,7 +10725,7 @@ function openMoreInfo(type){
     const type = prompt('اكتبي نوع العملية: deposit للإيداع أو withdraw للخصم','deposit');
     if(!type || !['deposit','withdraw'].includes(type)) return;
     const amount = Number(prompt('المبلغ') || 0); if(!(amount>0)) return;
-    const reason = prompt('السبب') || (type==='deposit'?'عملية سريعة':'خصم سريع');
+    const reason = prompt('السبب') || (type==='deposit'?'عملية سريعة':'سحب سريع');
     st.balance = Math.max(0, Number(st.balance||0) + (type==='deposit'?amount:-amount));
     addHistory(st,type,amount,reason);
     bankData.operations.push({id:'op'+Date.now(), studentId:st.id, studentName:st.name, type:type, amount:amount, reason:reason, date:new Date().toLocaleDateString('en-CA')});
@@ -8029,6 +10824,221 @@ function openMoreInfo(type){
   alert(messages[type]||'تم فتح العنصر.');
 }
 <\/script>
+
+<style id="bulk-reasons-enhancement">
+.bulk-op-modal{position:fixed;inset:0;background:rgba(0,0,0,.38);display:none;align-items:center;justify-content:center;z-index:99999;padding:20px}
+.bulk-op-modal.show{display:flex}
+.bulk-op-box{width:min(420px,100%);background:#fff;border:1px solid var(--line);border-radius:28px;padding:18px;box-shadow:0 24px 60px rgba(0,0,0,.22)}
+.bulk-op-box h3{margin:0 0 8px;color:var(--deep);font-size:22px}
+.bulk-op-box p{margin:0 0 14px;color:var(--muted);font-size:13px;line-height:1.9}
+.bulk-op-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.select-arrow{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23103a2e' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");background-repeat:no-repeat;background-position:left 14px center;background-size:18px;padding-left:42px!important}
+</style>
+
+<div id="bulkOpModal" class="bulk-op-modal" aria-hidden="true">
+  <div class="bulk-op-box">
+    <h3 id="bulkOpTitle">عملية جماعية</h3>
+    <p id="bulkOpDesc">تنفيذ عملية على الفصل كامل.</p>
+    <div class="field">
+      <label>المبلغ</label>
+      <input id="bulkOpAmount" type="number" placeholder="أدخلي المبلغ بالريال" />
+    </div>
+    <div class="field">
+      <label>السبب</label>
+      <select id="bulkOpReason" class="select-arrow"></select>
+    </div>
+    <div class="field" id="bulkOpOtherWrap" style="display:none">
+      <label>اكتبي السبب</label>
+      <input id="bulkOpOther" type="text" placeholder="اكتبي السبب هنا" />
+    </div>
+    <div class="bulk-op-actions">
+      <button class="btn btn-light" type="button" onclick="closeBulkOpModal()">رجوع</button>
+      <button class="btn btn-green" type="button" onclick="submitBulkOpModal()">تنفيذ العملية</button>
+    </div>
+  </div>
+</div>
+
+<script id="bulk-reasons-script">
+(function(){
+  const depositReasons = [
+    'مشاركة مميزة في الحصة',
+    'حل سؤال صعب',
+    'مساعدة زميل / زميلة',
+    'إنهاء المهمة الأدائية',
+    'تسليم الواجب مبكرًا',
+    'الحصول على درجة كاملة',
+    'الفوز في تحدي الرياضيات',
+    'ترتيب الدفتر',
+    'الالتزام والهدوء في الحصة',
+    'مبادرة إيجابية',
+    'حضور كامل الأسبوع',
+    'تميز في العمل الجماعي',
+    'أخرى'
+  ];
+  const withdrawReasons = [
+    'عدم حل الواجب',
+    'التأخر عن الحصة',
+    'كثرة الكلام أثناء الشرح',
+    'عدم إحضار الأدوات',
+    'عدم المشاركة',
+    'مخالفة تعليمات الصف',
+    'عدم تسليم المهمة الأدائية',
+    'إزعاج الزملاء',
+    'استخدام الجوال',
+    'سحب سلوكي',
+    'أخرى'
+  ];
+
+  function getStudentSafe(id){
+    if(typeof getStudent === 'function'){
+      try{ return getStudent(id); }catch(e){}
+    }
+    if(window.bankData && Array.isArray(bankData.students)){
+      return bankData.students.find(s => s.id===id);
+    }
+    return null;
+  }
+
+  function refreshAll(){
+    try{ if(typeof saveBankData==='function') saveBankData(); }catch(e){}
+    try{ if(typeof refreshTeacherUI==='function') refreshTeacherUI(); }catch(e){}
+    try{ if(typeof renderTeacher==='function') renderTeacher(); }catch(e){}
+    try{ if(typeof renderStudentSettingsDashboard==='function') renderStudentSettingsDashboard(); }catch(e){}
+    try{ if(typeof renderClassDetailCustom==='function') renderClassDetailCustom(); }catch(e){}
+    try{ if(typeof renderClassCardsCustom==='function') renderClassCardsCustom(); }catch(e){}
+  }
+
+  window.markAttendanceForStudent = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    const status = prompt('اكتبي حالة الحضور: حاضر / غياب / استئذان', st.attendanceStatus || 'حاضر');
+    if(!status) return;
+    st.attendanceStatus = String(status).trim();
+    refreshAll();
+    alert('تم حفظ حالة الحضور.');
+  };
+
+  window.messageGuardianFromSettings = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    const base = 'تنبيه من بنك الرياضيات\nالطالب / الطالبة: ' + (st.name||'');
+    const text = prompt('اكتبي رسالة ولي الأمر:', base);
+    if(!text) return;
+    if(typeof openWhatsAppNumber==='function' && st.guardian){
+      openWhatsAppNumber(st.guardian, text);
+      return;
+    }
+    alert('تم تجهيز رسالة ولي الأمر.');
+  };
+
+  window.changeStudentPasswordFromSettings = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    const pwd = prompt('اكتبي كلمة المرور الجديدة:', st.password || st.pin || '');
+    if(!pwd || !String(pwd).trim()) return;
+    st.password = String(pwd).trim();
+    if('pin' in st) st.pin = String(pwd).trim();
+    refreshAll();
+    alert('تم تغيير كلمة المرور.');
+  };
+
+  window.editStudentNameFromSettings = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    const name = prompt('اكتبي الاسم الجديد للطالب / الطالبة:', st.name || '');
+    if(!name || !String(name).trim()) return;
+    st.name = String(name).trim();
+    refreshAll();
+    alert('تم تعديل الاسم.');
+  };
+
+  window.deleteStudentFromSettings = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    if(!confirm('هل تريدين حذف الطالب / الطالبة؟')) return;
+    if(typeof deleteStudent==='function'){
+      deleteStudent(studentId);
+    }else if(window.bankData && Array.isArray(bankData.students)){
+      bankData.students = bankData.students.filter(s => s.id !== studentId);
+      if(Array.isArray(bankData.operations)){
+        bankData.operations = bankData.operations.filter(op => op.studentId !== studentId && op.targetStudentId !== studentId);
+      }
+      refreshAll();
+    }
+  };
+
+  window.__bulkOpState = {classId:'', type:'deposit'};
+
+  function fillReasons(type){
+    const sel = document.getElementById('bulkOpReason');
+    if(!sel) return;
+    const reasons = type === 'deposit' ? depositReasons : withdrawReasons;
+    sel.innerHTML = '<option value="">اختاري السبب</option>' + reasons.map(r => '<option value="'+r+'">'+r+'</option>').join('');
+    sel.onchange = function(){
+      const wrap = document.getElementById('bulkOpOtherWrap');
+      if(wrap) wrap.style.display = this.value === 'أخرى' ? 'block' : 'none';
+    };
+    sel.classList.add('select-arrow');
+  }
+
+  window.openBulkOpModal = function(classId, type){
+    window.__bulkOpState = {classId, type};
+    const modal = document.getElementById('bulkOpModal');
+    const title = document.getElementById('bulkOpTitle');
+    const desc = document.getElementById('bulkOpDesc');
+    const amount = document.getElementById('bulkOpAmount');
+    const other = document.getElementById('bulkOpOther');
+    const wrap = document.getElementById('bulkOpOtherWrap');
+    if(title) title.textContent = type === 'deposit' ? 'إيداع للفصل كامل' : 'سحب للفصل كامل';
+    if(desc) desc.textContent = type === 'deposit' ? 'اختاري سبب الإيداع للفصل كامل.' : 'اختاري سبب السحب للفصل كامل.';
+    if(amount) amount.value = '';
+    if(other) other.value = '';
+    if(wrap) wrap.style.display = 'none';
+    fillReasons(type);
+    if(modal) modal.classList.add('show');
+  };
+
+  window.closeBulkOpModal = function(){
+    const modal = document.getElementById('bulkOpModal');
+    if(modal) modal.classList.remove('show');
+  };
+
+  window.submitBulkOpModal = function(){
+    const state = window.__bulkOpState || {};
+    const amount = Number(document.getElementById('bulkOpAmount')?.value || 0);
+    let reason = document.getElementById('bulkOpReason')?.value || '';
+    if(reason === 'أخرى'){
+      reason = (document.getElementById('bulkOpOther')?.value || '').trim();
+    }
+    if(!(amount > 0)) return alert('أدخلي مبلغًا صحيحًا.');
+    if(!reason) return alert('اختاري السبب أولًا.');
+    if(!window.bankData || !Array.isArray(bankData.students)) return;
+    const students = bankData.students.filter(s => s.classId === state.classId);
+    students.forEach(function(st){
+      st.balance = Math.max(0, Number(st.balance||0) + (state.type === 'deposit' ? amount : -amount));
+      if(typeof addHistory === 'function'){
+        try{ addHistory(st, state.type === 'deposit' ? 'deposit' : 'withdraw', amount, reason); }catch(e){}
+      }else{
+        st.history = Array.isArray(st.history) ? st.history : [];
+        st.history.push({id:'h'+Date.now()+Math.random().toString(16).slice(2,6),type:(state.type==='deposit'?'deposit':'withdraw'),amount:Number(amount||0),reason:reason,date:new Date().toLocaleString('ar-SA')});
+      }
+      bankData.operations = Array.isArray(bankData.operations) ? bankData.operations : [];
+      bankData.operations.push({
+        id:'op'+Date.now()+Math.random().toString(16).slice(2,6),
+        studentId:st.id,
+        studentName:st.name,
+        type:(state.type==='deposit'?'deposit':'withdraw'),
+        amount:Number(amount||0),
+        reason:reason,
+        date:new Date().toLocaleDateString('en-CA')+' '+new Date().toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'})
+      });
+    });
+    refreshAll();
+    closeBulkOpModal();
+    alert('تم تنفيذ العملية بنجاح.');
+  };
+
+  window.quickClassOperation = function(classId, type){
+    openBulkOpModal(classId, type);
+  };
+})();
+</script>
+
 </body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
@@ -8235,6 +11245,221 @@ function openMoreInfo(type){
   alert(messages[type]||'تم فتح العنصر.');
 }
 </script>
+
+<style id="bulk-reasons-enhancement">
+.bulk-op-modal{position:fixed;inset:0;background:rgba(0,0,0,.38);display:none;align-items:center;justify-content:center;z-index:99999;padding:20px}
+.bulk-op-modal.show{display:flex}
+.bulk-op-box{width:min(420px,100%);background:#fff;border:1px solid var(--line);border-radius:28px;padding:18px;box-shadow:0 24px 60px rgba(0,0,0,.22)}
+.bulk-op-box h3{margin:0 0 8px;color:var(--deep);font-size:22px}
+.bulk-op-box p{margin:0 0 14px;color:var(--muted);font-size:13px;line-height:1.9}
+.bulk-op-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.select-arrow{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23103a2e' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");background-repeat:no-repeat;background-position:left 14px center;background-size:18px;padding-left:42px!important}
+</style>
+
+<div id="bulkOpModal" class="bulk-op-modal" aria-hidden="true">
+  <div class="bulk-op-box">
+    <h3 id="bulkOpTitle">عملية جماعية</h3>
+    <p id="bulkOpDesc">تنفيذ عملية على الفصل كامل.</p>
+    <div class="field">
+      <label>المبلغ</label>
+      <input id="bulkOpAmount" type="number" placeholder="أدخلي المبلغ بالريال" />
+    </div>
+    <div class="field">
+      <label>السبب</label>
+      <select id="bulkOpReason" class="select-arrow"></select>
+    </div>
+    <div class="field" id="bulkOpOtherWrap" style="display:none">
+      <label>اكتبي السبب</label>
+      <input id="bulkOpOther" type="text" placeholder="اكتبي السبب هنا" />
+    </div>
+    <div class="bulk-op-actions">
+      <button class="btn btn-light" type="button" onclick="closeBulkOpModal()">رجوع</button>
+      <button class="btn btn-green" type="button" onclick="submitBulkOpModal()">تنفيذ العملية</button>
+    </div>
+  </div>
+</div>
+
+<script id="bulk-reasons-script">
+(function(){
+  const depositReasons = [
+    'مشاركة مميزة في الحصة',
+    'حل سؤال صعب',
+    'مساعدة زميل / زميلة',
+    'إنهاء المهمة الأدائية',
+    'تسليم الواجب مبكرًا',
+    'الحصول على درجة كاملة',
+    'الفوز في تحدي الرياضيات',
+    'ترتيب الدفتر',
+    'الالتزام والهدوء في الحصة',
+    'مبادرة إيجابية',
+    'حضور كامل الأسبوع',
+    'تميز في العمل الجماعي',
+    'أخرى'
+  ];
+  const withdrawReasons = [
+    'عدم حل الواجب',
+    'التأخر عن الحصة',
+    'كثرة الكلام أثناء الشرح',
+    'عدم إحضار الأدوات',
+    'عدم المشاركة',
+    'مخالفة تعليمات الصف',
+    'عدم تسليم المهمة الأدائية',
+    'إزعاج الزملاء',
+    'استخدام الجوال',
+    'سحب سلوكي',
+    'أخرى'
+  ];
+
+  function getStudentSafe(id){
+    if(typeof getStudent === 'function'){
+      try{ return getStudent(id); }catch(e){}
+    }
+    if(window.bankData && Array.isArray(bankData.students)){
+      return bankData.students.find(s => s.id===id);
+    }
+    return null;
+  }
+
+  function refreshAll(){
+    try{ if(typeof saveBankData==='function') saveBankData(); }catch(e){}
+    try{ if(typeof refreshTeacherUI==='function') refreshTeacherUI(); }catch(e){}
+    try{ if(typeof renderTeacher==='function') renderTeacher(); }catch(e){}
+    try{ if(typeof renderStudentSettingsDashboard==='function') renderStudentSettingsDashboard(); }catch(e){}
+    try{ if(typeof renderClassDetailCustom==='function') renderClassDetailCustom(); }catch(e){}
+    try{ if(typeof renderClassCardsCustom==='function') renderClassCardsCustom(); }catch(e){}
+  }
+
+  window.markAttendanceForStudent = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    const status = prompt('اكتبي حالة الحضور: حاضر / غياب / استئذان', st.attendanceStatus || 'حاضر');
+    if(!status) return;
+    st.attendanceStatus = String(status).trim();
+    refreshAll();
+    alert('تم حفظ حالة الحضور.');
+  };
+
+  window.messageGuardianFromSettings = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    const base = 'تنبيه من بنك الرياضيات\nالطالب / الطالبة: ' + (st.name||'');
+    const text = prompt('اكتبي رسالة ولي الأمر:', base);
+    if(!text) return;
+    if(typeof openWhatsAppNumber==='function' && st.guardian){
+      openWhatsAppNumber(st.guardian, text);
+      return;
+    }
+    alert('تم تجهيز رسالة ولي الأمر.');
+  };
+
+  window.changeStudentPasswordFromSettings = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    const pwd = prompt('اكتبي كلمة المرور الجديدة:', st.password || st.pin || '');
+    if(!pwd || !String(pwd).trim()) return;
+    st.password = String(pwd).trim();
+    if('pin' in st) st.pin = String(pwd).trim();
+    refreshAll();
+    alert('تم تغيير كلمة المرور.');
+  };
+
+  window.editStudentNameFromSettings = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    const name = prompt('اكتبي الاسم الجديد للطالب / الطالبة:', st.name || '');
+    if(!name || !String(name).trim()) return;
+    st.name = String(name).trim();
+    refreshAll();
+    alert('تم تعديل الاسم.');
+  };
+
+  window.deleteStudentFromSettings = function(studentId){
+    const st = getStudentSafe(studentId); if(!st) return;
+    if(!confirm('هل تريدين حذف الطالب / الطالبة؟')) return;
+    if(typeof deleteStudent==='function'){
+      deleteStudent(studentId);
+    }else if(window.bankData && Array.isArray(bankData.students)){
+      bankData.students = bankData.students.filter(s => s.id !== studentId);
+      if(Array.isArray(bankData.operations)){
+        bankData.operations = bankData.operations.filter(op => op.studentId !== studentId && op.targetStudentId !== studentId);
+      }
+      refreshAll();
+    }
+  };
+
+  window.__bulkOpState = {classId:'', type:'deposit'};
+
+  function fillReasons(type){
+    const sel = document.getElementById('bulkOpReason');
+    if(!sel) return;
+    const reasons = type === 'deposit' ? depositReasons : withdrawReasons;
+    sel.innerHTML = '<option value="">اختاري السبب</option>' + reasons.map(r => '<option value="'+r+'">'+r+'</option>').join('');
+    sel.onchange = function(){
+      const wrap = document.getElementById('bulkOpOtherWrap');
+      if(wrap) wrap.style.display = this.value === 'أخرى' ? 'block' : 'none';
+    };
+    sel.classList.add('select-arrow');
+  }
+
+  window.openBulkOpModal = function(classId, type){
+    window.__bulkOpState = {classId, type};
+    const modal = document.getElementById('bulkOpModal');
+    const title = document.getElementById('bulkOpTitle');
+    const desc = document.getElementById('bulkOpDesc');
+    const amount = document.getElementById('bulkOpAmount');
+    const other = document.getElementById('bulkOpOther');
+    const wrap = document.getElementById('bulkOpOtherWrap');
+    if(title) title.textContent = type === 'deposit' ? 'إيداع للفصل كامل' : 'سحب للفصل كامل';
+    if(desc) desc.textContent = type === 'deposit' ? 'اختاري سبب الإيداع للفصل كامل.' : 'اختاري سبب السحب للفصل كامل.';
+    if(amount) amount.value = '';
+    if(other) other.value = '';
+    if(wrap) wrap.style.display = 'none';
+    fillReasons(type);
+    if(modal) modal.classList.add('show');
+  };
+
+  window.closeBulkOpModal = function(){
+    const modal = document.getElementById('bulkOpModal');
+    if(modal) modal.classList.remove('show');
+  };
+
+  window.submitBulkOpModal = function(){
+    const state = window.__bulkOpState || {};
+    const amount = Number(document.getElementById('bulkOpAmount')?.value || 0);
+    let reason = document.getElementById('bulkOpReason')?.value || '';
+    if(reason === 'أخرى'){
+      reason = (document.getElementById('bulkOpOther')?.value || '').trim();
+    }
+    if(!(amount > 0)) return alert('أدخلي مبلغًا صحيحًا.');
+    if(!reason) return alert('اختاري السبب أولًا.');
+    if(!window.bankData || !Array.isArray(bankData.students)) return;
+    const students = bankData.students.filter(s => s.classId === state.classId);
+    students.forEach(function(st){
+      st.balance = Math.max(0, Number(st.balance||0) + (state.type === 'deposit' ? amount : -amount));
+      if(typeof addHistory === 'function'){
+        try{ addHistory(st, state.type === 'deposit' ? 'deposit' : 'withdraw', amount, reason); }catch(e){}
+      }else{
+        st.history = Array.isArray(st.history) ? st.history : [];
+        st.history.push({id:'h'+Date.now()+Math.random().toString(16).slice(2,6),type:(state.type==='deposit'?'deposit':'withdraw'),amount:Number(amount||0),reason:reason,date:new Date().toLocaleString('ar-SA')});
+      }
+      bankData.operations = Array.isArray(bankData.operations) ? bankData.operations : [];
+      bankData.operations.push({
+        id:'op'+Date.now()+Math.random().toString(16).slice(2,6),
+        studentId:st.id,
+        studentName:st.name,
+        type:(state.type==='deposit'?'deposit':'withdraw'),
+        amount:Number(amount||0),
+        reason:reason,
+        date:new Date().toLocaleDateString('en-CA')+' '+new Date().toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'})
+      });
+    });
+    refreshAll();
+    closeBulkOpModal();
+    alert('تم تنفيذ العملية بنجاح.');
+  };
+
+  window.quickClassOperation = function(classId, type){
+    openBulkOpModal(classId, type);
+  };
+})();
+</script>
+
 </body>
 </html>
 
@@ -9033,7 +12258,7 @@ function openMoreInfo(type){
       </div>
       <div class="student-bulk-actions">
         <button class="btn btn-green" onclick="quickClassOperation('${cls.id}','deposit')">إيداع للفصل كامل</button>
-        <button class="btn btn-gold" onclick="quickClassOperation('${cls.id}','withdraw')">خصم للفصل كامل</button>
+        <button class="btn btn-gold" onclick="quickClassOperation('${cls.id}','withdraw')">سحب للفصل كامل</button>
         <button class="btn btn-gold" onclick="bulkClassMessage('${cls.id}')">رسالة لولي الأمر للفصل كامل</button>
         <button class="btn btn-light" onclick="printClassReport('${cls.id}')">تصدير تقرير الفصل</button>
         <button class="btn ${cls.isDisabled?'btn-green':'btn-gold'}" onclick="toggleClassEnabled('${cls.id}')">${cls.isDisabled?'تفعيل الفصل':'إيقاف الفصل'}</button>
