@@ -4791,4 +4791,413 @@ function openMoreInfo(type){
   document.addEventListener('DOMContentLoaded', function(){ setTimeout(function(){ try{ initStudentsManagerRouter(); }catch(e){} }, 400); });
 })();
 </script>
+<style id="student-settings-final-v10-style">
+.account-type-badge{display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border-radius:999px;background:linear-gradient(135deg,var(--deep),var(--green));color:#fff;font-size:12px;font-weight:900;box-shadow:0 8px 18px rgba(16,58,46,.12)}
+.account-type-badge small{opacity:.88;font-size:11px;font-weight:700}
+.student-note-modal{position:fixed;inset:0;background:rgba(0,0,0,.38);display:none;align-items:center;justify-content:center;z-index:10001;padding:18px}
+.student-note-modal.show{display:flex}
+.student-note-box{width:min(430px,100%);background:#fff;border-radius:28px;padding:20px;box-shadow:0 24px 60px rgba(0,0,0,.22);border:1px solid rgba(16,58,46,.08)}
+.student-note-box h3{margin:0 0 8px;color:var(--deep);font-size:20px}
+.student-note-box p{margin:0 0 14px;color:var(--muted);font-size:13px;line-height:1.8}
+.student-note-grid{display:grid;gap:10px}
+.student-note-grid select,.student-note-grid textarea{width:100%;border:1px solid var(--line);background:#f8fbf9;border-radius:16px;padding:14px;font-family:inherit;font-size:14px;outline:none}
+.student-note-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.student-absence-wrap{margin-top:10px;padding:12px;border-radius:18px;background:#f8fbf9;border:1px solid var(--line)}
+.student-absence-bar{height:12px;border-radius:999px;background:#eaf0ec;overflow:hidden;margin-top:8px}
+.student-absence-fill{height:100%;border-radius:999px;background:linear-gradient(135deg,#c7a465,#e0c98f)}
+.student-absence-meta{display:flex;justify-content:space-between;gap:10px;font-size:12px;color:var(--muted);font-weight:800}
+.student-note-summary{margin-top:10px;font-size:12px;color:var(--muted);line-height:1.8}
+.student-card-actions .btn.btn-muted{background:#f4f8f5;color:var(--deep)}
+.student-detail-shell.page-mode{display:block !important;background:#fff;border:1px solid var(--line);border-radius:28px;padding:18px;box-shadow:0 12px 28px rgba(16,58,46,.06);margin-top:6px}
+</style>
+<div id="studentNoteModal" class="student-note-modal" aria-hidden="true">
+  <div class="student-note-box">
+    <h3>إضافة ملاحظة</h3>
+    <p id="studentNoteModalLabel">حددي نوع الملاحظة للطالب / الطالبة، ويمكن اختيار "أخرى" لكتابة نص مخصص.</p>
+    <div class="student-note-grid">
+      <div class="field"><label>نوع الملاحظة</label>
+        <select id="studentNoteType" onchange="toggleOtherStudentNote()">
+          <option value="">اختاري الملاحظة</option>
+          <option value="غائب عن الحصة">غائب عن الحصة</option>
+          <option value="غائبة عن الحصة">غائبة عن الحصة</option>
+          <option value="استئذن قبل الحصة">استئذن قبل الحصة</option>
+          <option value="استئذن أثناء الحصة">استئذن أثناء الحصة</option>
+          <option value="استئذنت قبل الحصة">استئذنت قبل الحصة</option>
+          <option value="استئذنت أثناء الحصة">استئذنت أثناء الحصة</option>
+          <option value="أخرى">أخرى</option>
+        </select>
+      </div>
+      <div class="field" id="studentNoteOtherWrap" style="display:none"><label>ملاحظة أخرى</label><textarea id="studentNoteOther" rows="4" placeholder="اكتبي الملاحظة هنا"></textarea></div>
+    </div>
+    <div class="student-note-actions">
+      <button class="btn btn-light" type="button" onclick="closeStudentNoteModal()">إلغاء</button>
+      <button class="btn btn-green" type="button" onclick="saveStudentNoteModal()">حفظ الملاحظة</button>
+    </div>
+  </div>
+</div>
+<script id="student-settings-final-v10-script">
+(function(){
+  const MAX_ABSENCE = 10;
+  function esc(s){ return String(s||'').replace(/[&<>\"]/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]; }); }
+  function fmt(n){ return (typeof formatMoney==='function') ? formatMoney(Number(n||0)) : String(Number(n||0)); }
+  function getLevel(balance){ balance=Number(balance||0); return balance>=41000?'ألماسي':balance>=31000?'بلاتيني':balance>=16000?'ذهبي':balance>=11000?'فضي':'برونزي'; }
+  function levelEmoji(level){ return {برونزي:'🥉',فضي:'🥈',ذهبي:'🥇',بلاتيني:'💠',ألماسي:'💎'}[level] || '💳'; }
+  function getState(){ if(!window.__studentSettingsState) window.__studentSettingsState={classId:'', query:'', level:'all', status:'all'}; return window.__studentSettingsState; }
+  function getStudentsByClass(classId){ return (window.bankData?.students||[]).filter(s=>s.classId===classId); }
+  function getStudentObj(studentId){ return typeof getStudent==='function' ? getStudent(studentId) : (window.bankData?.students||[]).find(s=>s.id===studentId); }
+  function getSubmittedCount(student){ return (window.bankData?.performanceTasks||[]).filter(task=> task.classId===student.classId && task.entries && task.entries[student.id] && (task.entries[student.id].status==='submitted' || task.entries[student.id].status==='graded')).length; }
+  function getDeductionCount(student){ return (student.history||[]).filter(h=>h.type==='withdraw').length; }
+  function getPerformanceInfo(student){
+    const submitted = getSubmittedCount(student); const deductions = getDeductionCount(student); const balance = Number(student.balance||0);
+    if(balance>=8000 && submitted>=1 && deductions<=1) return {label:'ممتاز 🟢', cls:'good'};
+    if(balance>=3000 && deductions<=3) return {label:'جيد 🟡', cls:'mid'};
+    return {label:'يحتاج متابعة 🔴', cls:'low'};
+  }
+  function getAbsenceCount(student){ return Number(student.absenceCount || 0); }
+  function getNearUpgrade(student){
+    const b = Number(student.balance||0);
+    const next = b<11000?11000:b<16000?16000:b<31000?31000:b<41000?41000:null;
+    return next ? Math.max(0, next-b) : 0;
+  }
+  function buildClassStats(c){
+    const students = getStudentsByClass(c.id);
+    const total = students.reduce((a,b)=>a+Number(b.balance||0),0);
+    const active = students.filter(s=>!s.isFrozen).length;
+    const pending = students.filter(st => (bankData.performanceTasks||[]).some(task => task.classId===c.id && (!task.entries?.[st.id] || !['submitted','graded'].includes(task.entries?.[st.id]?.status)))).length;
+    return {students,total,active,pending};
+  }
+  function renderClassCardsCustom(){
+    const holder = document.getElementById('studentClassCards'); if(!holder || !window.bankData) return;
+    holder.innerHTML = (bankData.classes||[]).map(function(c){
+      const st = buildClassStats(c);
+      return `<div class="student-class-card">
+        <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start"><div><h4>${esc(c.name)}</h4><div class="teacher-note">عدد الطلاب / الطالبات في الفصل: ${st.students.length}</div></div><span class="pill">${st.active} نشط</span></div>
+        <div class="student-class-meta">
+          <div class="mini"><strong>${st.students.length}</strong><span>عدد الطلاب / الطالبات</span></div>
+          <div class="mini"><strong>${fmt(st.total)}</strong><span>إجمالي الأرصدة</span></div>
+          <div class="mini"><strong>${st.pending}</strong><span>مهام غير مسلّمة</span></div>
+          <div class="mini"><strong>${st.students.filter(s=>getNearUpgrade(s)>0 && getNearUpgrade(s)<=3000).length}</strong><span>قريبون من الترقية</span></div>
+        </div>
+        <div class="student-class-actions">
+          <button class="btn btn-green" onclick="openStudentSettingsClass('${c.id}')">فتح الفصل</button>
+          <button class="btn btn-gold" onclick="bulkClassMessage('${c.id}')">رسالة جماعية</button>
+        </div>
+      </div>`;
+    }).join('') || '<div class="student-empty">لا توجد فصول بعد. أضيفي فصلًا جديدًا أولًا.</div>';
+  }
+  function renderStudentCardCustom(student){
+    const level = getLevel(student.balance);
+    const perf = getPerformanceInfo(student);
+    const submitted = getSubmittedCount(student);
+    const deductions = getDeductionCount(student);
+    const status = student.isFrozen ? 'موقوف' : 'مفعل';
+    const absenceCount = getAbsenceCount(student);
+    const absenceWidth = Math.min(100, (absenceCount / MAX_ABSENCE) * 100);
+    return `<div class="student-card-pro">
+      <div class="student-card-top">
+        <div>
+          <div class="student-card-name">${esc(student.name||'—')}</div>
+          <div class="student-card-sub">PIN: ${esc(student.password||'—')}<br>ولي الأمر: ${esc(student.guardian||'—')}</div>
+          <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+            <span class="account-type-badge">💳 <span>نوع الحساب: ${level}</span> <small>${levelEmoji(level)}</small></span>
+          </div>
+        </div>
+        <div style="display:grid;gap:8px;justify-items:end">
+          <span class="student-status-badge ${student.isFrozen?'frozen':''}">${status}</span>
+          <span class="student-performance-pill ${perf.cls}">${perf.label}</span>
+        </div>
+      </div>
+      <div class="student-card-metrics">
+        <div class="metric"><strong>${fmt(student.balance)}</strong><span>الرصيد</span></div>
+        <div class="metric"><strong>${submitted}</strong><span>المهام المسلّمة</span></div>
+        <div class="metric"><strong>${deductions}</strong><span>عدد الخصومات</span></div>
+      </div>
+      <div class="student-absence-wrap">
+        <div class="student-absence-meta"><span>شريط الغياب</span><span>${absenceCount} غياب</span></div>
+        <div class="student-absence-bar"><div class="student-absence-fill" style="width:${absenceWidth}%"></div></div>
+        <div class="student-note-summary">كل مرة يتم فيها اختيار "غائب عن الحصة" أو "غائبة عن الحصة" يُحتسب الغياب تلقائيًا لهذا الطالب / لهذه الطالبة.</div>
+      </div>
+      <div class="student-card-actions">
+        <button class="btn btn-green" onclick="openStudentFromSettings('${student.id}')">دخول الطالب / الطالبة</button>
+        <button class="btn btn-light" onclick="openStudentStatement('${student.id}')">كشف الحساب</button>
+        <button class="btn btn-gold" onclick="quickStudentOperation('${student.id}')">عملية سريعة</button>
+        <button class="btn btn-light" onclick="addStudentNote('${student.id}')">ملاحظة</button>
+        <button class="btn btn-light" onclick="showStudentTasksSummary('${student.id}')">المهام</button>
+        <button class="btn btn-light" onclick="markAttendanceForStudent('${student.id}')">الحضور</button>
+        <button class="btn btn-green" onclick="sendRewardToStudent('${student.id}')">مكافأة</button>
+        <button class="btn btn-gold" onclick="messageGuardianFromSettings('${student.id}')">رسالة ولي الأمر</button>
+        <button class="btn btn-light" onclick="changeStudentPasswordFromSettings('${student.id}')">تغيير كلمة المرور</button>
+        <button class="btn btn-muted" onclick="editStudentNameFromSettings('${student.id}')">تعديل الاسم</button>
+        <button class="btn btn-light" onclick="printStudentReport('${student.id}')">تقرير PDF</button>
+        <button class="btn ${student.isFrozen?'btn-green':'btn-gold'}" onclick="toggleStudentFreeze('${student.id}')">${student.isFrozen?'تفعيل الحساب':'تجميد الحساب'}</button>
+        <button class="btn" style="background:#c4002f;color:#fff" onclick="deleteStudentFromSettings('${student.id}')">حذف الطالب / الطالبة</button>
+      </div>
+    </div>`;
+  }
+  function renderClassDetailCustom(){
+    const detail = document.getElementById('studentClassDetail'); if(!detail || !window.bankData) return;
+    const holder = document.getElementById('studentClassCards');
+    const state = getState();
+    if(!state.classId){
+      if(holder) holder.style.display='grid';
+      detail.classList.remove('page-mode'); detail.classList.add('hidden'); detail.innerHTML=''; renderClassCardsCustom(); return;
+    }
+    const cls = (bankData.classes||[]).find(c=>c.id===state.classId);
+    if(!cls){
+      if(holder) holder.style.display='grid';
+      detail.classList.remove('page-mode'); detail.classList.add('hidden'); detail.innerHTML=''; renderClassCardsCustom(); return;
+    }
+    if(holder) holder.style.display='none';
+    const students = getStudentsByClass(cls.id).filter(function(s){
+      const q=(state.query||'').trim();
+      const levelOk = state.level==='all' || getLevel(s.balance)===state.level;
+      const statusOk = state.status==='all' || (state.status==='active' ? !s.isFrozen : s.isFrozen);
+      const queryOk = !q || (s.name||'').includes(q) || (s.username||'').includes(q) || (s.account||'').includes(q);
+      return levelOk && statusOk && queryOk;
+    });
+    const stats = buildClassStats(cls);
+    detail.classList.remove('hidden');
+    detail.classList.add('page-mode');
+    detail.innerHTML = `
+      <div class="student-detail-header">
+        <div class="student-detail-title"><h3>${esc(cls.name)}</h3><p>صفحة خاصة بالفصل تتضمن بطاقات الطلاب / الطالبات مع أدوات فردية واضحة وزر رجوع للخلف.</p></div>
+        <button class="ghost" onclick="closeStudentSettingsClass()">رجوع للخلف</button>
+      </div>
+      <div class="teacher-mini-kpis">
+        <div class="teacher-mini-kpi"><strong>${stats.students.length}</strong><span>عدد الطلاب / الطالبات</span></div>
+        <div class="teacher-mini-kpi"><strong>${fmt(stats.total)}</strong><span>إجمالي الأرصدة</span></div>
+        <div class="teacher-mini-kpi"><strong>${stats.pending}</strong><span>غير مسلّمين المهمة</span></div>
+      </div>
+      <div class="student-bulk-actions">
+        <button class="btn btn-green" onclick="quickClassOperation('${cls.id}','deposit')">إيداع للفصل كامل</button>
+        <button class="btn btn-gold" onclick="quickClassOperation('${cls.id}','withdraw')">خصم للفصل كامل</button>
+        <button class="btn btn-gold" onclick="bulkClassMessage('${cls.id}')">رسالة لولي الأمر للفصل كامل</button>
+        <button class="btn btn-light" onclick="printClassReport('${cls.id}')">تصدير تقرير الفصل</button>
+        <button class="btn ${cls.isDisabled?'btn-green':'btn-gold'}" onclick="toggleClassEnabled('${cls.id}')">${cls.isDisabled?'تفعيل الفصل':'إيقاف الفصل'}</button>
+      </div>
+      <div class="student-filters">
+        <input id="studentSettingsSearch" type="text" value="${esc(state.query||'')}" placeholder="بحث باسم الطالب / الطالبة أو اسم المستخدم" oninput="updateStudentSettingsFilters()">
+        <select id="studentSettingsLevel" onchange="updateStudentSettingsFilters()"><option value="all">كل المستويات</option><option value="برونزي" ${state.level==='برونزي'?'selected':''}>برونزي</option><option value="فضي" ${state.level==='فضي'?'selected':''}>فضي</option><option value="ذهبي" ${state.level==='ذهبي'?'selected':''}>ذهبي</option><option value="بلاتيني" ${state.level==='بلاتيني'?'selected':''}>بلاتيني</option><option value="ألماسي" ${state.level==='ألماسي'?'selected':''}>ألماسي</option></select>
+        <select id="studentSettingsStatus" onchange="updateStudentSettingsFilters()"><option value="all">كل الحالات</option><option value="active" ${state.status==='active'?'selected':''}>الحسابات المفعلة</option><option value="frozen" ${state.status==='frozen'?'selected':''}>الحسابات الموقوفة</option></select>
+        <div class="student-status-badge">الأزرار أدناه خاصة بكل طالب / طالبة</div>
+      </div>
+      <div id="studentCardsGrid" class="student-cards-grid">${students.map(renderStudentCardCustom).join('') || '<div class="student-empty">لا توجد نتائج مطابقة داخل هذا الفصل.</div>'}</div>`;
+  }
+  function rerenderSettings(){ setTimeout(function(){ try{ renderClassCardsCustom(); renderClassDetailCustom(); }catch(e){ console.error(e); } }, 50); }
+
+  window.openStudentSettingsClass = function(classId){ const state=getState(); state.classId=classId; renderClassDetailCustom(); };
+  window.closeStudentSettingsClass = function(){ const state=getState(); state.classId=''; state.query=''; state.level='all'; state.status='all'; renderClassDetailCustom(); };
+  window.updateStudentSettingsFilters = function(){ const state=getState(); state.query=document.getElementById('studentSettingsSearch')?.value||''; state.level=document.getElementById('studentSettingsLevel')?.value||'all'; state.status=document.getElementById('studentSettingsStatus')?.value||'all'; renderClassDetailCustom(); };
+
+  window.editStudentNameFromSettings = function(studentId){
+    const st = getStudentObj(studentId); if(!st) return;
+    const name = prompt('اكتبي الاسم الجديد للطالب / الطالبة:', st.name||'');
+    if(!name || !name.trim()) return;
+    st.name = name.trim();
+    saveBankData();
+    if(typeof refreshTeacherUI==='function') refreshTeacherUI();
+    rerenderSettings();
+  };
+
+  window.addStudentNote = function(studentId){
+    const st = getStudentObj(studentId); if(!st) return;
+    window.__currentStudentNoteId = studentId;
+    const modal = document.getElementById('studentNoteModal');
+    const label = document.getElementById('studentNoteModalLabel');
+    const type = document.getElementById('studentNoteType');
+    const other = document.getElementById('studentNoteOther');
+    const wrap = document.getElementById('studentNoteOtherWrap');
+    if(label) label.textContent = 'حددي نوع الملاحظة للطالب / للطالبة: ' + (st.name||'');
+    if(type) type.value='';
+    if(other) other.value='';
+    if(wrap) wrap.style.display='none';
+    if(modal) modal.classList.add('show');
+  };
+  window.toggleOtherStudentNote = function(){
+    const val = document.getElementById('studentNoteType')?.value;
+    const wrap = document.getElementById('studentNoteOtherWrap');
+    if(wrap) wrap.style.display = val==='أخرى' ? 'block' : 'none';
+  };
+  window.closeStudentNoteModal = function(){
+    const modal = document.getElementById('studentNoteModal'); if(modal) modal.classList.remove('show');
+    window.__currentStudentNoteId = '';
+  };
+  window.saveStudentNoteModal = function(){
+    const studentId = window.__currentStudentNoteId;
+    const st = getStudentObj(studentId); if(!st) return;
+    let type = document.getElementById('studentNoteType')?.value || '';
+    if(!type) return alert('اختاري نوع الملاحظة أولًا.');
+    if(type==='أخرى') type = (document.getElementById('studentNoteOther')?.value || '').trim();
+    if(!type) return alert('اكتبي الملاحظة الأخرى أولًا.');
+    if(!Array.isArray(st.notes)) st.notes = [];
+    st.notes.unshift({id:'n'+Date.now(), text:type, date:new Date().toLocaleDateString('ar-SA')});
+    if(/غائب عن الحصة|غائبة عن الحصة/.test(type)) st.absenceCount = Number(st.absenceCount||0) + 1;
+    saveBankData();
+    closeStudentNoteModal();
+    rerenderSettings();
+    alert('تم حفظ الملاحظة.');
+  };
+
+  const oldRenderDash = window.renderStudentSettingsDashboard;
+  window.renderStudentSettingsDashboard = function(){
+    if(typeof oldRenderDash==='function') oldRenderDash();
+    rerenderSettings();
+  };
+
+  const oldRefreshTeacherUI = window.refreshTeacherUI;
+  window.refreshTeacherUI = function(){
+    if(typeof oldRefreshTeacherUI==='function') oldRefreshTeacherUI();
+    rerenderSettings();
+  };
+
+  document.addEventListener('DOMContentLoaded', function(){ rerenderSettings(); });
+})();
+</script>
+
+<script id="teacher-students-more-shortcuts-fix">
+(function(){
+  function safeGo(screen){
+    try{
+      if(typeof go === 'function'){ go(screen); return true; }
+    }catch(e){}
+    return false;
+  }
+
+  window.goAccountTab = function(tabId){
+    try{
+      safeGo('account');
+      setTimeout(function(){
+        var btnMap={statement:0, details:1, operations:2, upgradeTab:3, performanceStudentTab:4, pdfTab:5, rouletteTab:6};
+        var tabs=document.querySelectorAll('#account .tabbar button');
+        var btn=(typeof btnMap[tabId]!=='undefined' && tabs[btnMap[tabId]]) ? tabs[btnMap[tabId]] : null;
+        if(typeof showTab==='function'){ showTab(tabId, btn); }
+      }, 140);
+    }catch(e){ console.log(e); }
+  };
+
+  window.openMoreInfo = function(type){
+    var pane = document.getElementById('moreInlineContent');
+    if(!pane){
+      var card = document.querySelector('#more .card');
+      if(!card) return;
+      pane = document.createElement('div');
+      pane.id = 'moreInlineContent';
+      pane.className = 'card more-detail-card';
+      pane.style.marginTop = '16px';
+      card.insertAdjacentElement('afterend', pane);
+    }
+
+    var data = {
+      about:{
+        title:'من نحن',
+        sub:'نبذة عن بنك الرياضيات',
+        html:`
+          <div class="more-detail-content">
+            <h2 class="more-detail-title">من نحن</h2>
+            <p class="more-detail-lead">بنك الرياضيات منصة تعليمية تحفيزية تهدف إلى تعزيز مشاركة الطلاب داخل الحصة الدراسية من خلال نظام نقاط مستوحى من الأنظمة المصرفية.</p>
+            <div class="more-detail-block"><p>يمنح البنك الطلاب رصيدًا تحفيزيًا مقابل المشاركة والإنجاز والالتزام، مما يسهم في تنمية روح التنافس الإيجابي وتحفيز التعلم بطريقة ممتعة ومبتكرة.</p></div>
+            <div class="more-detail-block"><h3>الإشراف</h3><p>يشرف على بنك الرياضيات <strong>الأستاذة: سارة حقوي</strong>.</p></div>
+          </div>`
+      },
+      contact:{
+        title:'اتصل بنا',
+        sub:'قنوات التواصل الرسمية',
+        html:`
+          <div class="more-detail-content">
+            <h2 class="more-detail-title">اتصل بنا</h2>
+            <p class="more-detail-lead">للاستفسارات أو الملاحظات يمكنكم التواصل مع إدارة بنك الرياضيات عبر الوسائل التالية:</p>
+            <div class="more-detail-list">
+              <div class="more-detail-item"><div class="icon">📞</div><div><strong>خدمة الطلاب وأولياء الأمور</strong><span>0502234335</span></div></div>
+              <div class="more-detail-item"><div class="icon">☎️</div><div><strong>الإدارة العامة</strong><span>0556891201</span></div></div>
+              <div class="more-detail-item"><div class="icon">✉️</div><div><strong>البريد الإلكتروني</strong><span>Saramathss@hotmail.com</span></div></div>
+              <div class="more-detail-item"><div class="icon">🏫</div><div><strong>الموقع</strong><span>مدرسة رواد الشرق الأهلية</span></div></div>
+            </div>
+          </div>`
+      },
+      settings:{
+        title:'الإعدادات',
+        sub:'إدارة الحساب والبيانات',
+        html:`
+          <div class="more-detail-content">
+            <h2 class="more-detail-title">الإعدادات</h2>
+            <p class="more-detail-lead">تتيح هذه الصفحة إدارة إعدادات الحساب داخل نظام بنك الرياضيات.</p>
+            <div class="more-detail-list">
+              <div class="more-detail-item"><div class="icon">🔑</div><div><strong>تغيير كلمة المرور</strong><span>إدارة بيانات الدخول بسهولة.</span></div></div>
+              <div class="more-detail-item"><div class="icon">🪪</div><div><strong>تعديل بيانات الحساب</strong><span>تنظيم اسم الحساب وبياناته الأساسية.</span></div></div>
+              <div class="more-detail-item"><div class="icon">🔔</div><div><strong>إدارة الإشعارات</strong><span>التحكم في الإشعارات داخل النظام.</span></div></div>
+              <div class="more-detail-item"><div class="icon">🚪</div><div><strong>تسجيل الخروج</strong><span>الخروج الآمن من الحساب عند الحاجة.</span></div></div>
+            </div>
+          </div>`
+      },
+      privacy:{
+        title:'سياسة الخصوصية',
+        sub:'استخدام البيانات داخل النظام',
+        html:`
+          <div class="more-detail-content">
+            <h2 class="more-detail-title">سياسة الخصوصية</h2>
+            <div class="more-detail-block"><p>يحرص بنك الرياضيات على حماية خصوصية بيانات الطلاب وأولياء الأمور.</p></div>
+            <div class="more-detail-block"><p>يتم استخدام المعلومات داخل النظام لأغراض تعليمية فقط، ولا يتم مشاركة أي بيانات خارج إطار المدرسة أو الجهات التعليمية المعنية.</p></div>
+          </div>`
+      },
+      disclaimer:{
+        title:'إخلاء المسؤولية',
+        sub:'النظام تعليمي تحفيزي',
+        html:`
+          <div class="more-detail-content">
+            <h2 class="more-detail-title">إخلاء المسؤولية</h2>
+            <div class="more-detail-block"><p>بنك الرياضيات نظام تحفيزي تعليمي يهدف إلى تشجيع الطلاب على المشاركة والتفاعل داخل الحصة الدراسية.</p></div>
+            <div class="more-detail-block"><p>النقاط والأرصدة المستخدمة داخل النظام هي لأغراض تعليمية وتحفيزية فقط، ولا تمثل أي قيمة مالية حقيقية.</p></div>
+          </div>`
+      },
+      terms:{
+        title:'الأحكام والشروط',
+        sub:'ضوابط استخدام بنك الرياضيات',
+        html:`
+          <div class="more-detail-content">
+            <h2 class="more-detail-title">الأحكام والشروط</h2>
+            <div class="more-detail-block"><p>يهدف بنك الرياضيات إلى تعزيز بيئة تعليمية محفزة داخل الفصل الدراسي.</p></div>
+            <div class="more-detail-block"><p>يتم منح النقاط للطلاب وفق معايير تعليمية يحددها المعلم، ويُستخدم النظام كوسيلة تعليمية لتحفيز المشاركة والانضباط وتحقيق التميز.</p></div>
+          </div>`
+      }
+    };
+
+    var item = data[type];
+    if(!item) return;
+    pane.innerHTML = `
+      <div class="section-head"><h3>${item.title}</h3><span class="pill">داخل الصفحة</span></div>
+      ${item.html}
+    `;
+    pane.scrollIntoView({behavior:'smooth', block:'start'});
+  };
+
+  function ensureAdvancedReady(){
+    try{
+      if(typeof window.renderStudentSettingsDashboard === 'function'){
+        window.renderStudentSettingsDashboard();
+      }
+    }catch(e){ console.log(e); }
+  }
+
+  // Rebind teacher students pane so advanced content is rendered when opening it
+  var oldShowTeacherPane = window.showTeacherPane;
+  window.showTeacherPane = function(id, btn){
+    if(typeof oldShowTeacherPane === 'function'){ oldShowTeacherPane(id, btn); }
+    if(id === 'teacherPaneStudents'){
+      setTimeout(function(){
+        try{
+          ensureAdvancedReady();
+          if(typeof window.backStudentsManagerHome === 'function'){ window.backStudentsManagerHome(); }
+        }catch(e){ console.log(e); }
+      }, 120);
+    }
+  };
+
+  document.addEventListener('DOMContentLoaded', function(){
+    setTimeout(function(){
+      try{ ensureAdvancedReady(); }catch(e){}
+    }, 500);
+  });
+})();
+</script>
+
 </body></html>
