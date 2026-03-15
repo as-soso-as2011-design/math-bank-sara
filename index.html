@@ -5200,4 +5200,70 @@ function openMoreInfo(type){
 })();
 </script>
 
+
+<style id="advanced-top-gap-fix-style">
+/* إزالة الفراغ الكبير أعلى صفحات لوحة التحكم المتقدمة */
+#studentsRouterSlot #studentSettingsProWrap{
+  margin-top:0 !important;
+  gap:10px !important;
+}
+#studentsRouterSlot #studentSettingsProWrap .student-settings-head{
+  margin:0 !important;
+}
+#studentsRouterSlot #studentSettingsProWrap.detail-open .student-settings-head,
+#studentsRouterSlot #studentSettingsProWrap.detail-open #studentClassCards{
+  display:none !important;
+}
+#studentsRouterSlot #studentSettingsProWrap.detail-open #studentClassDetail{
+  margin-top:0 !important;
+}
+#studentsRouterSlot #studentSettingsProWrap #studentClassDetail.hidden{
+  display:none !important;
+}
+</style>
+<script id="advanced-top-gap-fix-script">
+(function(){
+  function syncAdvancedGapState(){
+    var wrap = document.getElementById('studentSettingsProWrap');
+    var detail = document.getElementById('studentClassDetail');
+    if(!wrap || !detail) return;
+    if(detail.classList.contains('hidden') || !detail.innerHTML.trim()){
+      wrap.classList.remove('detail-open');
+    }else{
+      wrap.classList.add('detail-open');
+    }
+  }
+
+  var oldOpenStudentSettingsClass = window.openStudentSettingsClass;
+  window.openStudentSettingsClass = function(classId){
+    if(typeof oldOpenStudentSettingsClass === 'function'){ oldOpenStudentSettingsClass(classId); }
+    setTimeout(syncAdvancedGapState, 20);
+  };
+
+  var oldCloseStudentSettingsClass = window.closeStudentSettingsClass;
+  window.closeStudentSettingsClass = function(){
+    if(typeof oldCloseStudentSettingsClass === 'function'){ oldCloseStudentSettingsClass(); }
+    setTimeout(syncAdvancedGapState, 20);
+  };
+
+  var oldBackStudentsManagerHome = window.backStudentsManagerHome;
+  window.backStudentsManagerHome = function(){
+    if(typeof oldBackStudentsManagerHome === 'function'){ oldBackStudentsManagerHome(); }
+    setTimeout(syncAdvancedGapState, 20);
+  };
+
+  var oldShowTeacherPane2 = window.showTeacherPane;
+  window.showTeacherPane = function(id, btn){
+    if(typeof oldShowTeacherPane2 === 'function'){ oldShowTeacherPane2(id, btn); }
+    if(id === 'teacherPaneStudents'){
+      setTimeout(syncAdvancedGapState, 120);
+    }
+  };
+
+  document.addEventListener('DOMContentLoaded', function(){
+    setTimeout(syncAdvancedGapState, 500);
+  });
+})();
+</script>
+
 </body></html>
