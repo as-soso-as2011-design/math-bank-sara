@@ -5431,4 +5431,186 @@ function openMoreInfo(type){
 })();
 </script>
 
+
+<style id="advanced-buttons-reasons-fancy-style">
+.account-tier-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:10px 14px;border-radius:999px;
+  background:linear-gradient(135deg,#0f5f43,#1e8a63);
+  color:#fff;font-weight:900;font-size:14px;margin-top:10px;
+  box-shadow:0 10px 24px rgba(16,58,46,.18)
+}
+.account-tier-badge .mini-card{
+  width:18px;height:14px;border-radius:4px;
+  background:linear-gradient(135deg,#f0d58a,#b78a2a);
+  display:inline-block
+}
+.bulk-op-modal{position:fixed;inset:0;background:rgba(8,16,14,.45);display:none;align-items:center;justify-content:center;padding:18px;z-index:999999}
+.bulk-op-modal.show{display:flex}
+.bulk-op-box{background:#fff;width:min(560px,100%);border-radius:28px;padding:20px;border:1px solid rgba(16,58,46,.1);box-shadow:0 24px 50px rgba(16,58,46,.15)}
+.bulk-op-box h3{margin:0 0 8px;color:var(--deep);font-size:28px}
+.bulk-op-grid{display:grid;grid-template-columns:1fr;gap:12px;margin-top:14px}
+.bulk-op-grid label{font-size:14px;font-weight:800;color:var(--deep)}
+.bulk-op-grid input,.bulk-op-grid select,.bulk-op-grid textarea{
+  width:100%;border:1px solid var(--line);border-radius:16px;padding:14px;background:#fff;font:inherit
+}
+.bulk-op-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+</style>
+
+<div id="bulkOpModal" class="bulk-op-modal">
+  <div class="bulk-op-box">
+    <h3 id="bulkOpTitle">عملية جماعية</h3>
+    <div class="teacher-note" id="bulkOpClassName">الفصل</div>
+    <div class="bulk-op-grid">
+      <div>
+        <label>المبلغ</label>
+        <input id="bulkOpAmount" type="number" min="1" placeholder="أدخلي المبلغ">
+      </div>
+      <div>
+        <label>السبب</label>
+        <select id="bulkOpReason"></select>
+      </div>
+      <div id="bulkOpOtherWrap" style="display:none">
+        <label>سبب آخر</label>
+        <textarea id="bulkOpOther" rows="3" placeholder="اكتبي السبب"></textarea>
+      </div>
+    </div>
+    <div class="bulk-op-actions">
+      <button class="btn btn-light" onclick="closeBulkOperationModal()">إلغاء</button>
+      <button class="btn btn-green" onclick="confirmBulkOperation()">تنفيذ العملية</button>
+    </div>
+  </div>
+</div>
+
+<script id="advanced-buttons-reasons-fancy-script">
+(function(){
+  window.__bulkOperationState = {classId:null,type:null};
+
+  function getDepositReasons(){
+    return ['مشاركة مميزة في الحصة','حل سؤال صعب','مساعدة زميل / زميلة','إنهاء المهمة الأدائية','تسليم الواجب مبكرًا','الحصول على درجة كاملة','الفوز في تحدي الرياضيات','ترتيب الدفتر','الالتزام والهدوء في الحصة','مبادرة إيجابية','حضور كامل الأسبوع','تميز في العمل الجماعي','أخرى'];
+  }
+  function getWithdrawReasons(){
+    return ['عدم حل الواجب','التأخر عن الحصة','كثرة الكلام أثناء الشرح','عدم إحضار الأدوات','عدم المشاركة','مخالفة تعليمات الصف','عدم تسليم المهمة الأدائية','إزعاج الزملاء','استخدام الجوال','خصم سلوكي','أخرى'];
+  }
+
+  function levelBadge(label){
+    return `<span class="account-tier-badge"><span class="mini-card"></span> نوع الحساب: ${label}</span>`;
+  }
+
+  // Make fancy account type in advanced cards
+  var oldOpenAdvancedClass = window.__openAdvancedClass;
+  window.__openAdvancedClass = function(classId){
+    if(typeof oldOpenAdvancedClass === 'function'){ oldOpenAdvancedClass(classId); }
+    setTimeout(function(){
+      document.querySelectorAll('.adv-student-card').forEach(function(card){
+        var meta = card.querySelector('.adv-student-meta');
+        if(!meta) return;
+        var txt = meta.innerHTML;
+        var m = txt.match(/نوع الحساب:\s*([^<]+)/);
+        if(!m) return;
+        var tier = (m[1]||'').trim();
+        meta.innerHTML = txt.replace(/نوع الحساب:\s*([^<]+)/, '');
+        if(!card.querySelector('.account-tier-badge')){
+          meta.insertAdjacentHTML('beforeend', levelBadge(tier));
+        }
+      });
+    }, 30);
+  };
+
+  // Button aliases so all buttons work
+  window.teacherLoginAsStudent = function(studentId){
+    if(typeof window.openStudentFromSettings === 'function') return window.openStudentFromSettings(studentId);
+    if(typeof window.openStudentAccount === 'function') return window.openStudentAccount(studentId);
+    alert('تعذر فتح حساب الطالب حالياً');
+  };
+
+  if(typeof window.deleteStudentFromSettings !== 'function'){
+    window.deleteStudentFromSettings = function(studentId){
+      if(!confirm('هل تريدين حذف الطالب / الطالبة؟')) return;
+      if(typeof window.deleteStudent === 'function') return window.deleteStudent(studentId);
+      const list = (window.bankData?.students||[]);
+      window.bankData.students = list.filter(function(s){ return s.id !== studentId; });
+      if(typeof saveBankData === 'function') saveBankData();
+      if(typeof refreshTeacherUI === 'function') refreshTeacherUI();
+      if(typeof renderAdvancedHome === 'function') renderAdvancedHome();
+    };
+  }
+
+  if(typeof window.editStudentNameFromSettings !== 'function'){
+    window.editStudentNameFromSettings = function(studentId){
+      const st = (window.bankData?.students||[]).find(s=>s.id===studentId); if(!st) return;
+      const name = prompt('اكتبي الاسم الجديد للطالب / الطالبة:', st.name||'');
+      if(!name || !name.trim()) return;
+      st.name = name.trim();
+      if(typeof saveBankData === 'function') saveBankData();
+      if(typeof refreshTeacherUI === 'function') refreshTeacherUI();
+      if(typeof renderAdvancedHome === 'function'){ const cls=st.classId; window.__openAdvancedClass(cls); }
+    };
+  }
+
+  window.openBulkOperationModal = function(classId, type){
+    window.__bulkOperationState = {classId:classId, type:type};
+    var modal = document.getElementById('bulkOpModal');
+    var title = document.getElementById('bulkOpTitle');
+    var className = document.getElementById('bulkOpClassName');
+    var amount = document.getElementById('bulkOpAmount');
+    var reason = document.getElementById('bulkOpReason');
+    var otherWrap = document.getElementById('bulkOpOtherWrap');
+    var other = document.getElementById('bulkOpOther');
+    const cls = (window.bankData?.classes||[]).find(c=>c.id===classId);
+    title.textContent = type === 'deposit' ? 'إيداع للفصل كامل' : 'سحب للفصل كامل';
+    className.textContent = cls ? cls.name : '';
+    amount.value = '';
+    other.value = '';
+    otherWrap.style.display = 'none';
+    const reasons = type === 'deposit' ? getDepositReasons() : getWithdrawReasons();
+    reason.innerHTML = reasons.map(function(r){ return `<option value="${r}">${r}</option>`; }).join('');
+    reason.onchange = function(){ otherWrap.style.display = reason.value === 'أخرى' ? 'block' : 'none'; };
+    modal.classList.add('show');
+  };
+
+  window.closeBulkOperationModal = function(){
+    document.getElementById('bulkOpModal').classList.remove('show');
+  };
+
+  window.confirmBulkOperation = function(){
+    const st = window.__bulkOperationState || {};
+    const amount = Number(document.getElementById('bulkOpAmount').value || 0);
+    const reasonSel = document.getElementById('bulkOpReason').value;
+    const other = (document.getElementById('bulkOpOther').value || '').trim();
+    const reason = reasonSel === 'أخرى' ? other : reasonSel;
+    if(!(amount > 0)) return alert('أدخلي مبلغًا صحيحًا');
+    if(!reason) return alert('اختاري السبب أو اكتبيه');
+    const type = st.type === 'deposit' ? 'deposit' : 'withdraw';
+    (window.bankData?.students||[]).filter(s=>s.classId===st.classId).forEach(function(student){
+      student.balance = Math.max(0, Number(student.balance||0) + (type === 'deposit' ? amount : -amount));
+      if(typeof addHistory === 'function') addHistory(student, type, amount, reason);
+      if(window.bankData.operations){
+        window.bankData.operations.push({
+          id:'op'+Date.now()+Math.random().toString(16).slice(2,6),
+          studentId:student.id,
+          studentName:student.name,
+          type:type,
+          amount:amount,
+          reason:reason,
+          classId:student.classId,
+          className:((window.bankData.classes||[]).find(c=>c.id===student.classId)||{}).name || '',
+          date:new Date().toISOString()
+        });
+      }
+    });
+    if(typeof saveBankData === 'function') saveBankData();
+    if(typeof refreshTeacherUI === 'function') refreshTeacherUI();
+    if(typeof window.__openAdvancedClass === 'function') window.__openAdvancedClass(st.classId);
+    closeBulkOperationModal();
+    alert('تم تنفيذ العملية بنجاح');
+  };
+
+  // Replace old prompt-based bulk actions
+  window.quickClassOperation = function(classId, type){
+    window.openBulkOperationModal(classId, type);
+  };
+})();
+</script>
+
 </body></html>
