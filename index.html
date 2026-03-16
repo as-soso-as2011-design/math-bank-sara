@@ -647,36 +647,6 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
         <div class="selector-left"><div class="icon-box">👩🏻‍🏫</div><div><div class="selector-title">حساب المعلم / المعلمة</div><div class="selector-sub">دخول إداري لإدارة العمليات والحسابات</div></div></div>
         <div style="font-size:22px;color:var(--green)">‹</div>
       </div>
-    <div id="teacherPaneReports" class="teacher-pane card">
-      <div class="teacher-mini-kpis">
-        <div class="teacher-mini-kpi"><strong id="reportDeposits">0</strong><span>إجمالي الإيداع</span></div>
-        <div class="teacher-mini-kpi"><strong id="reportWithdrawals">0</strong><span>إجمالي السحب</span></div>
-        <div class="teacher-mini-kpi"><strong id="reportTransfers">0</strong><span>إجمالي التحويل</span></div>
-      </div>
-      <div class="teacher-grid">
-        <div class="teacher-chart-card">
-          <h4>تحليل العمليات حسب النوع</h4>
-          <canvas id="teacherOpsChart" width="320" height="220" style="width:100%;height:220px"></canvas>
-          <div class="teacher-note">يظهر هذا الرسم توزيع الإيداع والسحب والتحويل داخل النظام الحالي.</div>
-        </div>
-        <div class="teacher-chart-card">
-          <h4>لوحة الشرف التلقائية</h4>
-          <div class="teacher-top-list" id="teacherHonorList"></div>
-        </div>
-      </div>
-      <div class="teacher-grid" style="margin-top:12px">
-        <div class="teacher-chart-card">
-          <h4>ملخص الفصول</h4>
-          <div class="teacher-top-list" id="teacherClassBalances"></div>
-        </div>
-        <div class="teacher-chart-card">
-          <h4>روليت الجوائز — إعداد سريع</h4>
-          <div class="field"><label>جوائز الروليت</label><input id="roulettePrizesInput" type="text" placeholder="مثال: 100, 200, 500, هدية, حظ أوفر" /></div>
-          <button class="btn btn-gold" style="width:100%" onclick="saveRoulettePrizes()">حفظ جوائز الروليت</button>
-          <div id="rouletteMsg" class="notice ok hidden">تم حفظ جوائز الروليت</div>
-          <div class="teacher-note">هذه الإعدادات تُستخدم كمرجع سريع داخل النظام ويمكن تطويرها لاحقًا للروليت التفاعلي.</div>
-        </div>
-      </div>
     </div>
   </div>
 </section>
@@ -1506,12 +1476,12 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
   <div class="card">
     <div class="section-head"><h3>خدمات متابعة ولي الأمر</h3><span class="pill">واجهة احترافية</span></div>
     <div class="menu-list">
-      <button type="button" class="menu-item"><div class="left"><div class="circle">📘</div><div><div class="name">متابعة أكاديمية</div><div class="meta">طلب متابعة التحصيل والمستوى الدراسي</div></div></div><div>‹</div></button>
-      <button type="button" class="menu-item"><div class="left"><div class="circle">🗓️</div><div><div class="name">متابعة الحضور والانضباط</div><div class="meta">معرفة حالة الغياب والتأخر والانضباط</div></div></div><div>‹</div></button>
-      <button type="button" class="menu-item"><div class="left"><div class="circle">📄</div><div><div class="name">طلب تقرير مختصر</div><div class="meta">ملخص عن الرصيد والحضور والإنجازات</div></div></div><div>‹</div></button>
-      <button type="button" class="menu-item" onclick="go('faq_center')"><div class="left"><div class="circle">❓</div><div><div class="name">الدعم والأسئلة</div><div class="meta">الأسئلة المتكررة والاستبيان وإرسال الملاحظات</div></div></div><div>‹</div></button>
+      <button type="button" class="menu-item" id="pfAcademicBtn"><div class="left"><div class="circle">📘</div><div><div class="name">متابعة أكاديمية</div><div class="meta">طلب متابعة التحصيل والمستوى الدراسي</div></div></div><div>‹</div></button>
+      <button type="button" class="menu-item" id="pfAttendanceBtn"><div class="left"><div class="circle">🗓️</div><div><div class="name">متابعة الحضور والانضباط</div><div class="meta">معرفة حالة الغياب والتأخر والانضباط</div></div></div><div>‹</div></button>
+      <button type="button" class="menu-item" id="pfReportBtn"><div class="left"><div class="circle">📄</div><div><div class="name">طلب تقرير مختصر</div><div class="meta">ملخص عن الرصيد والحضور والإنجازات</div></div></div><div>‹</div></button>
+      <button type="button" class="menu-item" id="pfSupportBtn"><div class="left"><div class="circle">❓</div><div><div class="name">الدعم والأسئلة</div><div class="meta">الأسئلة المتكررة والاستبيان وإرسال الملاحظات</div></div></div><div>‹</div></button>
     </div>
-    <div class="notice ok" style="margin-top:14px">هذه الصفحة مخصصة لخدمات ولي الأمر التعليمية والتنظيمية داخل بنك الرياضيات.</div>
+    <div id="parentFollowNotice" class="notice ok" style="margin-top:14px">هذه الصفحة مخصصة لخدمات ولي الأمر التعليمية والتنظيمية داخل بنك الرياضيات.</div>
   </div>
 </section>
 
@@ -6104,86 +6074,157 @@ document.addEventListener('DOMContentLoaded', function(){
 </script>
 
 
-<script id="oai-parent-faq-login-patch">
+<script id="oai-realdata-home-honor-parent-patch">
 (function(){
-  function getRealBankData(){
+  function readRealBankData(){
     try{
-      const raw = localStorage.getItem('greenBankTeacherData_v1') || localStorage.getItem('bankData_v10');
-      if(!raw) return null;
-      return JSON.parse(raw);
-    }catch(e){ return null; }
+      const raw = localStorage.getItem('greenBankTeacherData_v1');
+      if(raw) return JSON.parse(raw);
+    }catch(e){}
+    try{
+      if(typeof bankData !== 'undefined' && bankData) return bankData;
+    }catch(e){}
+    return null;
   }
 
-  window.studentLogin = function(){
-    const user = document.getElementById('studentUser');
-    const pass = document.getElementById('studentPassword');
-    const err = document.getElementById('studentLoginError');
-    const userVal = (user && user.value || '').trim();
-    const passVal = (pass && pass.value || '').trim();
-    if(err) err.textContent = '';
-
-    const data = getRealBankData();
-    const students = data && Array.isArray(data.students) ? data.students : [];
-
-    const st = students.find(function(s){
-      const username = String(s.username || '').trim();
-      const name = String(s.name || '').trim();
-      const pin = String(s.pin || '').trim();
-      const password = String(s.password || '').trim();
-      const userMatch = userVal === username || userVal === name || (pin && userVal === pin);
-      const passMatch = passVal === password || (pin && passVal === pin);
-      return userMatch && passMatch;
-    });
-
-    if(!st){
-      if(err) err.textContent = 'بيانات الدخول غير صحيحة';
-      return;
-    }
-
+  function assignRealData(){
+    const data = readRealBankData();
+    if(!data) return null;
     try{
       if(typeof bankData !== 'undefined'){ bankData = data; }
       window.bankData = data;
     }catch(e){}
+    return data;
+  }
 
-    sessionStorage.setItem('studentLogged', '1');
-    sessionStorage.setItem('currentStudentId', st.id);
-    localStorage.setItem('selectedStudentId', st.id);
+  function getLevel(balance){
+    balance = Number(balance||0);
+    if(balance >= 41000) return 'ألماسي';
+    if(balance >= 31000) return 'بلاتيني';
+    if(balance >= 16000) return 'ذهبي';
+    if(balance >= 11000) return 'فضي';
+    return 'برونزي';
+  }
 
-    if(typeof go === 'function') go('account');
-    setTimeout(function(){
-      try{
-        if(typeof renderStudentAccount === 'function') renderStudentAccount();
-        const btn = Array.from(document.querySelectorAll('#account .tabbar button'))[0] || null;
-        if(typeof showTab === 'function') showTab('statement', btn);
-      }catch(e){}
-    }, 120);
-  };
+  function formatNum(v){
+    try{ return new Intl.NumberFormat('ar-SA').format(Number(v||0)); }
+    catch(e){ return String(v||0); }
+  }
+
+  function topStudents(data){
+    const list = (data && Array.isArray(data.students)) ? data.students.slice() : [];
+    return list.sort(function(a,b){ return Number(b.balance||0) - Number(a.balance||0); });
+  }
+
+  function updateHomeCard(){
+    const data = assignRealData();
+    if(!data) return;
+    const top = topStudents(data);
+    if(!top.length) return;
+    const best = top[0];
+    const nextThreshold = Number(best.balance||0) < 11000 ? 11000 :
+      Number(best.balance||0) < 16000 ? 16000 :
+      Number(best.balance||0) < 31000 ? 31000 :
+      Number(best.balance||0) < 41000 ? 41000 : Number(best.balance||0);
+    const remain = Math.max(0, nextThreshold - Number(best.balance||0));
+    const level = getLevel(best.balance);
+    const opsCount = Array.isArray(data.operations) ? data.operations.length : 0;
+    const activeCount = Array.isArray(data.students) ? data.students.filter(function(s){ return !s.isFrozen; }).length : 0;
+
+    const card = document.querySelector('#home .beige-balance-card');
+    if(card){
+      card.innerHTML = `
+        <div class="beige-pill">الحساب التحفيزي</div>
+        <div style="margin-top:14px;font-size:16px;font-weight:800">رصيد الطالب / الطالبة الأكثر انضباطًا</div>
+        <div style="font-size:15px;font-weight:800;margin-top:6px">${best.name || ''}</div>
+        <div class="beige-balance-big">${formatNum(best.balance)} <span style="font-size:26px;font-weight:900">ر.س</span></div>
+        <div class="beige-boxes">
+          <div class="beige-box"><span class="label">المستوى الحالي</span><span class="num">${level}</span></div>
+          <div class="beige-box"><span class="label">المتبقي للحساب التالي</span><span class="num">${formatNum(remain)} ر.س</span></div>
+          <div class="beige-box"><span class="label">بداية المستوى التالي</span><span class="num">${formatNum(nextThreshold)} ر.س</span></div>
+        </div>
+      `;
+    }
+    const stats = document.querySelectorAll('#home .lux-stat strong');
+    if(stats.length >= 2){
+      stats[0].textContent = formatNum(opsCount);
+      stats[1].textContent = formatNum(activeCount);
+    }
+  }
+
+  function updateHonorBoard(){
+    const data = assignRealData();
+    if(!data) return;
+    const top = topStudents(data).slice(0,5);
+    if(!top.length) return;
+
+    const podium = document.querySelector('#honor .podium');
+    if(podium && top.length >= 3){
+      const second = top[1] || top[0];
+      const first = top[0];
+      const third = top[2] || top[0];
+      podium.innerHTML = `
+        <div class="podium-card"><div class="avatar">🥈</div><div style="font-weight:800">${second.name || ''}</div><div style="font-size:12px;color:rgba(255,255,255,.78);margin-top:4px">${formatNum(second.balance)} نقطة</div></div>
+        <div class="podium-card center"><div class="avatar">👑</div><div style="font-weight:900;font-size:18px">${first.name || ''}</div><div style="font-size:12px;color:rgba(255,255,255,.85);margin-top:4px">${formatNum(first.balance)} نقطة</div><div style="margin-top:10px;font-size:12px;background:rgba(255,255,255,.12);display:inline-block;padding:8px 12px;border-radius:999px">بطلة الأسبوع</div></div>
+        <div class="podium-card"><div class="avatar">🥉</div><div style="font-weight:800">${third.name || ''}</div><div style="font-size:12px;color:rgba(255,255,255,.78);margin-top:4px">${formatNum(third.balance)} نقطة</div></div>
+      `;
+    }
+
+    const rowsWrap = document.querySelector('#honor .rank-list');
+    if(rowsWrap){
+      rowsWrap.innerHTML = top.map(function(st, i){
+        const badges = ['وسام التميز','وسام الإنجاز','وسام التفوق','وسام الالتزام','وسام الحضور'];
+        const icons = ['👑','🌟','✨','🪄','⭐'];
+        return `
+          <div class="rank-row">
+            <div class="right">
+              <div class="rank-icon">${icons[i] || '⭐'}</div>
+              <div>
+                <div class="rank-name">${st.name || ''}</div>
+                <div class="rank-meta">${formatNum(st.balance)} نقطة • ${badges[i] || 'وسام'} </div>
+              </div>
+            </div>
+            <div class="rank-num">${i+1}</div>
+          </div>
+        `;
+      }).join('');
+    }
+  }
 
   window.teacherLogin = function(){
     const user = document.getElementById('teacherUser');
     const pass = document.getElementById('teacherPassword');
     const err = document.getElementById('teacherLoginError');
+    const data = assignRealData();
+    const teacher = data && data.teacher ? data.teacher : null;
     const userVal = (user && user.value || '').trim();
     const passVal = (pass && pass.value || '').trim();
     if(err) err.textContent = '';
-
-    const data = getRealBankData();
-    const teacher = data && data.teacher ? data.teacher : null;
-    const ok = teacher && userVal === String(teacher.username || '').trim() && passVal === String(teacher.password || '').trim();
-
-    if(!ok){
+    if(!teacher || userVal !== String(teacher.username || '').trim() || passVal !== String(teacher.password || '').trim()){
       if(err) err.textContent = 'بيانات الدخول غير صحيحة';
       return;
     }
-
-    try{
-      if(typeof bankData !== 'undefined'){ bankData = data; }
-      window.bankData = data;
-    }catch(e){}
-
-    sessionStorage.setItem('teacherLogged', '1');
+    sessionStorage.setItem('teacherLogged','1');
     if(typeof go === 'function') go('teacher');
   };
+
+  function bindParentButtons(){
+    const academic = document.getElementById('pfAcademicBtn');
+    const attendance = document.getElementById('pfAttendanceBtn');
+    const report = document.getElementById('pfReportBtn');
+    const support = document.getElementById('pfSupportBtn');
+    const notice = document.getElementById('parentFollowNotice');
+    if(academic) academic.onclick = function(){
+      if(notice){ notice.textContent = 'تم فتح خدمة المتابعة الأكاديمية. يمكن متابعة التحصيل والمستوى الدراسي من خلال المعلمة.'; notice.classList.remove('hidden'); }
+    };
+    if(attendance) attendance.onclick = function(){
+      if(notice){ notice.textContent = 'تم فتح خدمة متابعة الحضور والانضباط. يمكن مراجعة الغياب والتأخر والتنبيهات التعليمية.'; notice.classList.remove('hidden'); }
+    };
+    if(report) report.onclick = function(){
+      if(notice){ notice.textContent = 'تم تجهيز طلب تقرير مختصر لولي الأمر داخل النظام.'; notice.classList.remove('hidden'); }
+    };
+    if(support) support.onclick = function(){ if(typeof go === 'function') go('faq_center'); };
+  }
 
   window.showFaqTab = function(id, btn){
     document.querySelectorAll('#faq_center .tabbar button').forEach(function(b){ b.classList.remove('active'); });
@@ -6205,6 +6246,22 @@ document.addEventListener('DOMContentLoaded', function(){
     if(msg){ msg.classList.remove('hidden'); setTimeout(function(){ msg.classList.add('hidden'); }, 1800); }
     box.value = '';
   };
+
+  const oldSave = typeof saveBankData === 'function' ? saveBankData : null;
+  if(oldSave){
+    window.saveBankData = function(){
+      oldSave();
+      setTimeout(function(){ updateHomeCard(); updateHonorBoard(); bindParentButtons(); }, 10);
+    };
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    setTimeout(function(){
+      updateHomeCard();
+      updateHonorBoard();
+      bindParentButtons();
+    }, 250);
+  });
 })();
 </script>
 
