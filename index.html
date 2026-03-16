@@ -640,7 +640,6 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
     <div class="brand"><div class="logo">BN</div><div><h1>الدخول للحساب</h1><p>اختيار نوع الحساب</p></div></div>
     <button class="ghost" onclick="go('home')">⌂</button>
   </div>
-
   <div class="card">
     <div class="section-head"><h3>اختر نوع الحساب</h3><span class="pill">الخطوة الأولى</span></div>
     <div class="selector-grid">
@@ -1999,14 +1998,18 @@ function studentLogin(){
   const pass = document.getElementById('studentPassword');
   const err = document.getElementById('studentLoginError');
   if(!user || !pass) return;
+
   const userVal = (user.value || '').trim();
   const passVal = (pass.value || '').trim();
+
   if(err) err.textContent = '';
   if(!userVal || !passVal){
     if(err) err.textContent = 'أدخلي اسم المستخدم وكلمة المرور';
     return;
   }
+
   try{ if(typeof loadBankData === 'function') loadBankData(); }catch(e){}
+
   const students = (typeof bankData !== 'undefined' && bankData && Array.isArray(bankData.students)) ? bankData.students : [];
   const st = students.find(function(s){
     const username = String(s.username || '').trim();
@@ -2016,14 +2019,18 @@ function studentLogin(){
     return ((userVal === username) || (userVal === name) || (pin && userVal === pin)) &&
            ((passVal === password) || (pin && passVal === pin));
   });
+
   if(!st){
     if(err) err.textContent = 'بيانات الدخول غير صحيحة';
     return;
   }
+
   sessionStorage.setItem('studentLogged', '1');
   sessionStorage.setItem('currentStudentId', st.id);
   localStorage.setItem('selectedStudentId', st.id);
+
   if(typeof go === 'function') go('account');
+
   setTimeout(function(){
     try{
       if(typeof renderStudentAccount === 'function') renderStudentAccount();
@@ -2038,20 +2045,28 @@ function teacherLogin(){
   const pass = document.getElementById('teacherPassword');
   const err = document.getElementById('teacherLoginError');
   if(!user || !pass) return;
+
   const userVal = (user.value || '').trim();
   const passVal = (pass.value || '').trim();
+
   if(err) err.textContent = '';
   if(!userVal || !passVal){
     if(err) err.textContent = 'أدخلي اسم المستخدم وكلمة المرور';
     return;
   }
+
   try{ if(typeof loadBankData === 'function') loadBankData(); }catch(e){}
+
   const teacher = (typeof bankData !== 'undefined' && bankData && bankData.teacher) ? bankData.teacher : null;
-  const ok = teacher && userVal === String(teacher.username || '').trim() && passVal === String(teacher.password || '').trim();
+  const ok = !!teacher &&
+             userVal === String(teacher.username || '').trim() &&
+             passVal === String(teacher.password || '').trim();
+
   if(!ok){
     if(err) err.textContent = 'بيانات الدخول غير صحيحة';
     return;
   }
+
   sessionStorage.setItem('teacherLogged', '1');
   if(typeof go === 'function') go('teacher');
 }
@@ -4463,6 +4478,8 @@ function openMoreInfo(type){
   alert(messages[type]||'تم فتح العنصر.');
 }
 </script>
+
+<script id="real-login-bootstrap-sync">document.addEventListener('DOMContentLoaded', function(){ try{ if(typeof loadBankData === 'function') loadBankData(); }catch(e){} });</script>
 </body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
@@ -4512,6 +4529,8 @@ function openMoreInfo(type){
   alert(messages[type]||'تم فتح العنصر.');
 }
 </script>
+
+<script id="real-login-bootstrap-sync">document.addEventListener('DOMContentLoaded', function(){ try{ if(typeof loadBankData === 'function') loadBankData(); }catch(e){} });</script>
 </body></html>`;
     const w=window.open('','_blank'); if(w){ w.document.write(html); w.document.close(); setTimeout(()=>w.print(),400); }
     const status=document.getElementById('smartReportStatus'); if(status){ status.classList.remove('hidden'); setTimeout(()=>status.classList.add('hidden'),2000); }
@@ -4892,6 +4911,8 @@ function openMoreInfo(type){
   alert(messages[type]||'تم فتح العنصر.');
 }
 </script>
+
+<script id="real-login-bootstrap-sync">document.addEventListener('DOMContentLoaded', function(){ try{ if(typeof loadBankData === 'function') loadBankData(); }catch(e){} });</script>
 </body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
@@ -4941,6 +4962,8 @@ function openMoreInfo(type){
   alert(messages[type]||'تم فتح العنصر.');
 }
 </script>
+
+<script id="real-login-bootstrap-sync">document.addEventListener('DOMContentLoaded', function(){ try{ if(typeof loadBankData === 'function') loadBankData(); }catch(e){} });</script>
 </body></html>`;
     const w=window.open('','_blank'); if(w){ w.document.write(html); w.document.close(); setTimeout(()=>w.print(),400); }
     const status=document.getElementById('smartReportStatus'); if(status){ status.classList.remove('hidden'); setTimeout(()=>status.classList.add('hidden'),2000); }
@@ -5462,6 +5485,8 @@ function openMoreInfo(type){
   alert(messages[type]||'تم فتح العنصر.');
 }
 </script>
+
+<script id="real-login-bootstrap-sync">document.addEventListener('DOMContentLoaded', function(){ try{ if(typeof loadBankData === 'function') loadBankData(); }catch(e){} });</script>
 </body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
@@ -5511,6 +5536,8 @@ function openMoreInfo(type){
   alert(messages[type]||'تم فتح العنصر.');
 }
 </script>
+
+<script id="real-login-bootstrap-sync">document.addEventListener('DOMContentLoaded', function(){ try{ if(typeof loadBankData === 'function') loadBankData(); }catch(e){} });</script>
 </body></html>`;
     const w=window.open('','_blank'); if(w){ w.document.write(html); w.document.close(); setTimeout(()=>w.print(),400); }
     const status=document.getElementById('smartReportStatus'); if(status){ status.classList.remove('hidden'); setTimeout(()=>status.classList.add('hidden'),2000); }
@@ -5891,6 +5918,8 @@ function openMoreInfo(type){
   alert(messages[type]||'تم فتح العنصر.');
 }
 </script>
+
+<script id="real-login-bootstrap-sync">document.addEventListener('DOMContentLoaded', function(){ try{ if(typeof loadBankData === 'function') loadBankData(); }catch(e){} });</script>
 </body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
@@ -6550,6 +6579,8 @@ function openMoreInfo(type){
   alert(messages[type]||'تم فتح العنصر.');
 }
 </script>
+
+<script id="real-login-bootstrap-sync">document.addEventListener('DOMContentLoaded', function(){ try{ if(typeof loadBankData === 'function') loadBankData(); }catch(e){} });</script>
 </body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
@@ -6599,6 +6630,8 @@ function openMoreInfo(type){
   alert(messages[type]||'تم فتح العنصر.');
 }
 </script>
+
+<script id="real-login-bootstrap-sync">document.addEventListener('DOMContentLoaded', function(){ try{ if(typeof loadBankData === 'function') loadBankData(); }catch(e){} });</script>
 </body></html>`;
     const w=window.open('','_blank'); if(w){ w.document.write(html); w.document.close(); setTimeout(()=>w.print(),400); }
     const status=document.getElementById('smartReportStatus'); if(status){ status.classList.remove('hidden'); setTimeout(()=>status.classList.add('hidden'),2000); }
@@ -6979,6 +7012,8 @@ function openMoreInfo(type){
   alert(messages[type]||'تم فتح العنصر.');
 }
 </script>
+
+<script id="real-login-bootstrap-sync">document.addEventListener('DOMContentLoaded', function(){ try{ if(typeof loadBankData === 'function') loadBankData(); }catch(e){} });</script>
 </body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
@@ -7028,6 +7063,8 @@ function openMoreInfo(type){
   alert(messages[type]||'تم فتح العنصر.');
 }
 </script>
+
+<script id="real-login-bootstrap-sync">document.addEventListener('DOMContentLoaded', function(){ try{ if(typeof loadBankData === 'function') loadBankData(); }catch(e){} });</script>
 </body></html>`;
     const w=window.open('','_blank'); if(w){ w.document.write(html); w.document.close(); setTimeout(()=>w.print(),400); }
     const status=document.getElementById('smartReportStatus'); if(status){ status.classList.remove('hidden'); setTimeout(()=>status.classList.add('hidden'),2000); }
@@ -7549,6 +7586,8 @@ function openMoreInfo(type){
   alert(messages[type]||'تم فتح العنصر.');
 }
 </script>
+
+<script id="real-login-bootstrap-sync">document.addEventListener('DOMContentLoaded', function(){ try{ if(typeof loadBankData === 'function') loadBankData(); }catch(e){} });</script>
 </body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
@@ -7598,6 +7637,8 @@ function openMoreInfo(type){
   alert(messages[type]||'تم فتح العنصر.');
 }
 </script>
+
+<script id="real-login-bootstrap-sync">document.addEventListener('DOMContentLoaded', function(){ try{ if(typeof loadBankData === 'function') loadBankData(); }catch(e){} });</script>
 </body></html>`;
     const w=window.open('','_blank'); if(w){ w.document.write(html); w.document.close(); setTimeout(()=>w.print(),400); }
     const status=document.getElementById('smartReportStatus'); if(status){ status.classList.remove('hidden'); setTimeout(()=>status.classList.add('hidden'),2000); }
@@ -7978,6 +8019,8 @@ function openMoreInfo(type){
   alert(messages[type]||'تم فتح العنصر.');
 }
 </script>
+
+<script id="real-login-bootstrap-sync">document.addEventListener('DOMContentLoaded', function(){ try{ if(typeof loadBankData === 'function') loadBankData(); }catch(e){} });</script>
 </body></html>`);
     w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
   }
@@ -8184,6 +8227,8 @@ function openMoreInfo(type){
   alert(messages[type]||'تم فتح العنصر.');
 }
 </script>
+
+<script id="real-login-bootstrap-sync">document.addEventListener('DOMContentLoaded', function(){ try{ if(typeof loadBankData === 'function') loadBankData(); }catch(e){} });</script>
 </body>
 </html>
 
