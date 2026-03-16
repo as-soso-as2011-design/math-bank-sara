@@ -1536,14 +1536,14 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
       <div>
         <div class="badge">دخول ولي الأمر</div>
         <h3>دخول آمن لمتابعة الطالب / الطالبة</h3>
-        <p>للوصول إلى لوحة المتابعة، أدخلي الرقم السري وكلمة المرور الخاصة بالطالب / الطالبة.</p>
+        <p>للوصول إلى لوحة المتابعة، أدخلي اسم المستخدم أو الرقم السري مع كلمة المرور الخاصة بالطالب / الطالبة.</p>
       </div>
       <div class="parent-hero-icon">🔐</div>
     </div>
     <div class="parent-login-grid">
       <div class="field">
-        <label>الرقم السري</label>
-        <input id="pfLoginPin" type="text" placeholder="أدخلي الرقم السري">
+        <label>اسم المستخدم أو الرقم السري</label>
+        <input id="pfLoginPin" type="text" placeholder="أدخلي اسم المستخدم أو الرقم السري">
       </div>
       <div class="field">
         <label>كلمة المرور</label>
@@ -6861,17 +6861,36 @@ document.addEventListener('DOMContentLoaded', function(){
     const pass = (document.getElementById('pfLoginPassword')?.value || '').trim();
     const err = document.getElementById('pfLoginError');
     if(err) err.classList.add('hidden');
+
+    if(!pin || !pass){
+      if(err){
+        err.textContent = 'أدخلي اسم المستخدم أو الرقم السري مع كلمة المرور';
+        err.classList.remove('hidden');
+      }
+      return;
+    }
+
     const data = pfReadData2();
     const list = data && Array.isArray(data.students) ? data.students : [];
     const st = list.find(function(s){
-      const sPin = String(s.pin || s.password || '').trim();
+      const sPin = String(s.pin || '').trim();
+      const sUser = String(s.username || '').trim();
+      const sName = String(s.name || '').trim();
       const sPass = String(s.password || '').trim();
-      return pin === sPin && pass === sPass;
+
+      const loginMatch = (pin === sPin) || (pin === sUser) || (pin === sName);
+      const passMatch = (pass === sPass) || (sPin && pass === sPin);
+      return loginMatch && passMatch;
     });
+
     if(!st){
-      if(err) err.classList.remove('hidden');
+      if(err){
+        err.textContent = 'بيانات الدخول غير صحيحة';
+        err.classList.remove('hidden');
+      }
       return;
     }
+
     sessionStorage.setItem('parentFollowStudentId', st.id);
     pfToggleDashboard(true);
     if(typeof updateParentFollowup === 'function') updateParentFollowup();
