@@ -5613,4 +5613,368 @@ function openMoreInfo(type){
 })();
 </script>
 
+
+<style id="advanced-students-v6-style">
+.adv-toolbar{display:grid;grid-template-columns:2fr 1fr 1fr;gap:12px;margin:14px 0 18px}
+.adv-toolbar input,.adv-toolbar select,.student-op-box input,.student-op-box select,.student-op-box textarea{
+  width:100%;border:1px solid var(--line);border-radius:16px;padding:14px;background:#fff;font:inherit
+}
+.adv-student-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.adv-badges{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 4px}
+.pill-live{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;font-size:13px;font-weight:900}
+.pill-live.good{background:#fff7df;color:#9a7a14}
+.pill-live.excellent{background:#e9f8f0;color:#176242}
+.pill-live.follow{background:#fff0ef;color:#a63f3c}
+.pill-live.active{background:#e9f8f0;color:#176242}
+.pill-live.inactive{background:#f1f2f4;color:#6b7280}
+.account-tier-fancy{display:inline-flex;align-items:center;justify-content:space-between;gap:10px;width:100%;padding:12px 14px;border-radius:999px;background:linear-gradient(135deg,#0f5f43,#1f8e66);color:#fff;font-weight:900;margin-top:8px;box-shadow:0 10px 24px rgba(16,58,46,.18)}
+.account-tier-fancy .card-mini{width:18px;height:14px;border-radius:4px;background:linear-gradient(135deg,#f0d58a,#b78a2a);display:inline-block}
+.absence-box{background:#f8fbf9;border:1px solid var(--line);border-radius:22px;padding:14px;margin:12px 0}
+.absence-box-head{display:flex;justify-content:space-between;align-items:center;font-weight:900;color:var(--deep)}
+.absence-track{height:12px;background:#edf2ef;border-radius:999px;overflow:hidden;margin-top:10px}
+.absence-fill{height:100%;background:linear-gradient(90deg,#d5b467,#c6a14d);border-radius:999px}
+.adv-student-actions{grid-template-columns:1fr 1fr !important}
+.student-op-modal{position:fixed;inset:0;background:rgba(8,16,14,.45);display:none;align-items:center;justify-content:center;padding:18px;z-index:1000000}
+.student-op-modal.show{display:flex}
+.student-op-box{background:#fff;width:min(680px,100%);border-radius:28px;padding:20px;border:1px solid rgba(16,58,46,.1);box-shadow:0 24px 50px rgba(16,58,46,.15)}
+.student-op-box h3{margin:0 0 8px;color:var(--deep);font-size:28px}
+.student-op-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.student-op-full{grid-column:1/-1}
+.student-op-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.class-extra-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:8px 0 12px}
+@media (max-width:700px){
+  .adv-toolbar,.student-op-grid,.student-op-actions,.class-extra-actions{grid-template-columns:1fr !important}
+}
+</style>
+
+<div id="studentOpModal" class="student-op-modal">
+  <div class="student-op-box">
+    <h3 id="studentOpTitle">عملية الطالب / الطالبة</h3>
+    <div class="teacher-note" id="studentOpName"></div>
+    <div class="student-op-grid">
+      <div>
+        <label>نوع العملية</label>
+        <select id="studentOpType">
+          <option value="deposit">إيداع</option>
+          <option value="withdraw">سحب</option>
+          <option value="transfer">تحويل</option>
+        </select>
+      </div>
+      <div>
+        <label>المبلغ</label>
+        <input id="studentOpAmount" type="number" min="1" placeholder="أدخلي المبلغ">
+      </div>
+      <div id="studentOpTargetWrap" style="display:none" class="student-op-full">
+        <label>التحويل إلى</label>
+        <select id="studentOpTarget"></select>
+      </div>
+      <div class="student-op-full">
+        <label>السبب</label>
+        <select id="studentOpReason"></select>
+      </div>
+      <div id="studentOpOtherWrap" class="student-op-full" style="display:none">
+        <label>سبب آخر</label>
+        <textarea id="studentOpOther" rows="3" placeholder="اكتبي السبب"></textarea>
+      </div>
+    </div>
+    <div class="student-op-actions">
+      <button class="btn btn-light" onclick="closeStudentOperationModal()">إلغاء</button>
+      <button class="btn btn-green" onclick="confirmStudentOperation()">تنفيذ العملية</button>
+    </div>
+  </div>
+</div>
+
+<script id="advanced-students-v6-script">
+(function(){
+  const DEPOSIT_REASONS = ['مشاركة مميزة في الحصة','حل سؤال صعب','مساعدة زميل / زميلة','إنهاء المهمة الأدائية','تسليم الواجب مبكرًا','الحصول على درجة كاملة','الفوز في تحدي الرياضيات','ترتيب الدفتر','الالتزام والهدوء في الحصة','مبادرة إيجابية','حضور كامل الأسبوع','تميز في العمل الجماعي','أخرى'];
+  const WITHDRAW_REASONS = ['عدم حل الواجب','التأخر عن الحصة','كثرة الكلام أثناء الشرح','عدم إحضار الأدوات','عدم المشاركة','مخالفة تعليمات الصف','عدم تسليم المهمة الأدائية','إزعاج الزملاء','استخدام الجوال','خصم سلوكي','أخرى'];
+  window.__studentOpState = {studentId:null};
+
+  function fmtMoneySafe(n){ try{return typeof formatMoney==='function'?formatMoney(Number(n||0)):Number(n||0).toLocaleString('ar-SA');}catch(e){return String(Number(n||0));}}
+  function getClassByIdSafe(id){ return (window.bankData?.classes||[]).find(c=>c.id===id); }
+  function getStudentsByClassSafe(id){ return (window.bankData?.students||[]).filter(s=>s.classId===id); }
+  function getStudentSafe(id){ return (window.bankData?.students||[]).find(s=>s.id===id); }
+  function getLevelSafe(balance){
+    balance=Number(balance||0);
+    if(balance>=41000) return 'ألماسي';
+    if(balance>=31000) return 'بلاتيني';
+    if(balance>=16000) return 'ذهبي';
+    if(balance>=11000) return 'فضي';
+    return 'برونزي';
+  }
+  function getAlertSafe(st){
+    const bal=Number(st.balance||0), abs=Number(st.absenceCount||0);
+    if(st.isFrozen) return {label:'غير مفعل', cls:'inactive'};
+    if(bal>=20000 && abs<=1) return {label:'ممتاز', cls:'excellent'};
+    if(bal>=12000 && abs<=2) return {label:'جيد', cls:'good'};
+    return {label:'يحتاج متابعة', cls:'follow'};
+  }
+  function activeSafe(st){ return st.isFrozen ? {label:'غير مفعل', cls:'inactive'} : {label:'مفعل', cls:'active'}; }
+  function escapeHtml(v){ return String(v??'').replace(/[&<>"]/g, s=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[s])); }
+
+  function ensureOps(){
+    if(!Array.isArray(window.bankData.operations)) window.bankData.operations=[];
+  }
+  function addHistorySafe(st, type, amount, reason){
+    if(typeof addHistory === 'function') return addHistory(st, type, amount, reason);
+    if(!Array.isArray(st.history)) st.history=[];
+    const now=new Date();
+    st.history.push({id:'h'+Date.now()+Math.random().toString(16).slice(2,6), type, amount:Number(amount||0), reason:reason||'', date: now.toLocaleDateString('en-CA')+' '+now.toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'})});
+  }
+  function addOperationSafe(st, type, amount, reason){
+    ensureOps();
+    window.bankData.operations.push({
+      id:'op'+Date.now()+Math.random().toString(16).slice(2,6),
+      studentId:st.id,
+      studentName:st.name,
+      type, amount:Number(amount||0), reason:reason||'',
+      classId:st.classId, className:(getClassByIdSafe(st.classId)||{}).name||'',
+      date:new Date().toISOString()
+    });
+  }
+
+  window.teacherLoginAsStudent = function(studentId){
+    if(typeof openStudentFromSettings === 'function') return openStudentFromSettings(studentId);
+    const st=getStudentSafe(studentId); if(!st) return;
+    try{
+      localStorage.setItem('selectedStudentId', studentId);
+      if(typeof openStudentAccount==='function') return openStudentAccount(studentId);
+      if(typeof safeGo==='function') safeGo('account');
+    }catch(e){ alert('تعذر فتح حساب الطالب'); }
+  };
+  window.openStudentStatement = function(studentId){
+    if(typeof printStudentReport==='function') return printStudentReport(studentId);
+  };
+  window.changeStudentPasswordFromSettings = function(studentId){
+    const st=getStudentSafe(studentId); if(!st) return;
+    const val=prompt('اكتبي كلمة المرور الجديدة:', st.password||st.pin||'');
+    if(!val || !val.trim()) return;
+    st.password=val.trim(); st.pin=val.trim();
+    if(typeof saveBankData==='function') saveBankData();
+    if(typeof __openAdvancedClass==='function') __openAdvancedClass(st.classId);
+  };
+  window.markAttendanceForStudent = function(studentId){
+    const st=getStudentSafe(studentId); if(!st) return;
+    const val=prompt('الحضور: اكتبي حاضر أو غائب أو غياب بعذر', st.attendanceStatus||'حاضر');
+    if(!val) return;
+    st.attendanceStatus=val.trim();
+    if(/غائب/.test(val)) st.absenceCount=Number(st.absenceCount||0)+1;
+    if(typeof saveBankData==='function') saveBankData();
+    if(typeof __openAdvancedClass==='function') __openAdvancedClass(st.classId);
+  };
+  window.messageGuardianFromSettings = function(studentId){
+    const st=getStudentSafe(studentId); if(!st) return;
+    const msg=prompt('اكتبي رسالة ولي الأمر:', 'نحيطكم علمًا بمتابعة حالة الطالب/الطالبة '+(st.name||''));
+    if(!msg) return;
+    if(typeof openWhatsAppNumber==='function' && (st.guardian||st.guardianWhats)) return openWhatsAppNumber(st.guardian||st.guardianWhats, msg);
+    alert('تم تجهيز الرسالة لولي الأمر');
+  };
+  window.editStudentNameFromSettings = function(studentId){
+    const st=getStudentSafe(studentId); if(!st) return;
+    const name=prompt('اكتبي الاسم الجديد:', st.name||''); if(!name||!name.trim()) return;
+    st.name=name.trim();
+    if(typeof saveBankData==='function') saveBankData();
+    if(typeof __openAdvancedClass==='function') __openAdvancedClass(st.classId);
+  };
+  window.deleteStudentFromSettings = function(studentId){
+    const st=getStudentSafe(studentId); if(!st) return;
+    if(!confirm('هل تريدين حذف الطالب / الطالبة؟')) return;
+    window.bankData.students=(window.bankData.students||[]).filter(s=>s.id!==studentId);
+    if(typeof saveBankData==='function') saveBankData();
+    if(typeof __openAdvancedClass==='function') __openAdvancedClass(st.classId);
+  };
+
+  function buildStudentCardV6(st){
+    const alertInfo=getAlertSafe(st);
+    const activeInfo=activeSafe(st);
+    const abs=Math.min(100, (Number(st.absenceCount||0)/5)*100);
+    const tier=getLevelSafe(st.balance);
+    return `
+      <div class="adv-student-card">
+        <div class="adv-student-top">
+          <div>
+            <h4>${escapeHtml(st.name||'')}</h4>
+            <div class="adv-student-meta">PIN: ${escapeHtml(st.password||st.pin||'')}<br>ولي الأمر: ${escapeHtml(st.guardian||st.guardianWhats||'')}</div>
+          </div>
+        </div>
+        <div class="adv-badges">
+          <span class="pill-live ${activeInfo.cls}">${activeInfo.label}</span>
+          <span class="pill-live ${alertInfo.cls}">${alertInfo.label}</span>
+        </div>
+        <div class="account-tier-fancy"><span class="card-mini"></span><span>نوع الحساب: ${tier}</span><span>💳</span></div>
+        <div class="adv-student-balance">
+          <div class="adv-class-kpi"><strong>${fmtMoneySafe(st.balance)}</strong><span>الرصيد</span></div>
+          <div class="adv-class-kpi"><strong>${Array.isArray(st.history)?st.history.length:0}</strong><span>عدد العمليات</span></div>
+          <div class="adv-class-kpi"><strong>${Number(st.absenceCount||0)}</strong><span>عدد الغياب</span></div>
+        </div>
+        <div class="absence-box">
+          <div class="absence-box-head"><span>شريط الغياب</span><span>${Number(st.absenceCount||0)} غياب</span></div>
+          <div class="absence-track"><div class="absence-fill" style="width:${abs}%"></div></div>
+        </div>
+        <div class="adv-student-actions">
+          <button class="btn btn-green" onclick="teacherLoginAsStudent('${st.id}')">دخول الطالب / الطالبة</button>
+          <button class="btn btn-light" onclick="openStudentStatement('${st.id}')">تصدير تقرير لطالب /ة</button>
+          <button class="btn btn-green" onclick="openStudentOperationModal('${st.id}','deposit')">إيداع لطالب/ة</button>
+          <button class="btn btn-gold" onclick="openStudentOperationModal('${st.id}','withdraw')">سحب من طالب /ة</button>
+          <button class="btn btn-light" onclick="openStudentOperationModal('${st.id}','quick')">عملية سريعة</button>
+          <button class="btn btn-gold" onclick="messageGuardianFromSettings('${st.id}')">رسالة ولي الأمر</button>
+          <button class="btn btn-light" onclick="changeStudentPasswordFromSettings('${st.id}')">تغيير كلمة المرور</button>
+          <button class="btn btn-light" onclick="editStudentNameFromSettings('${st.id}')">تعديل الاسم</button>
+          <button class="btn btn-light" onclick="markAttendanceForStudent('${st.id}')">الحضور</button>
+          <button class="btn ${st.isFrozen?'btn-green':'btn-gold'}" onclick="toggleStudentFreeze('${st.id}')">${st.isFrozen?'تفعيل الحساب':'تجميد الحساب'}</button>
+          <button class="btn" style="background:#c4002f;color:#fff" onclick="deleteStudentFromSettings('${st.id}')">حذف الطالب / الطالبة</button>
+        </div>
+      </div>`;
+  }
+
+  function applyStudentFilters(students){
+    const q=(document.getElementById('advSearchInput')?.value||'').trim();
+    const lvl=document.getElementById('advLevelFilter')?.value||'all';
+    const status=document.getElementById('advStatusFilter')?.value||'all';
+    return students.filter(function(st){
+      const level=getLevelSafe(st.balance);
+      const active=activeSafe(st).label;
+      if(q && !(String(st.name||'').includes(q))) return false;
+      if(lvl!=='all' && level!==lvl) return false;
+      if(status!=='all' && active!==status && getAlertSafe(st).label!==status) return false;
+      return true;
+    });
+  }
+
+  var oldOpenAdvancedClassV6 = window.__openAdvancedClass;
+  window.__openAdvancedClass = function(classId){
+    const cls=getClassByIdSafe(classId);
+    const slot=document.getElementById('studentsRouterSlot');
+    if(!cls || !slot){
+      if(typeof oldOpenAdvancedClassV6==='function') oldOpenAdvancedClassV6(classId);
+      return;
+    }
+    const render = function(){
+      const allStudents=getStudentsByClassSafe(classId);
+      const students=applyStudentFilters(allStudents);
+      const total=allStudents.reduce((a,s)=>a+Number(s.balance||0),0);
+      slot.innerHTML = `
+        <div class="adv-student-shell">
+          <div class="adv-student-header">
+            <div><h3 style="margin:0;color:var(--deep);font-size:34px">${escapeHtml(cls.name||'')}</h3><p class="teacher-note">صفحة خاصة بالفصل مع أدوات جماعية وفردية وبحث وفلترة.</p></div>
+            <button class="ghost" onclick="renderAdvancedHome()">رجوع إلى الفصول</button>
+          </div>
+          <div class="adv-student-kpis">
+            <div class="adv-class-kpi"><strong>${allStudents.length}</strong><span>عدد الطلاب / الطالبات</span></div>
+            <div class="adv-class-kpi"><strong>${fmtMoneySafe(total)}</strong><span>إجمالي الأرصدة</span></div>
+            <div class="adv-class-kpi"><strong>${allStudents.filter(s=>s.isFrozen).length}</strong><span>الحسابات المجمدة</span></div>
+          </div>
+          <div class="class-extra-actions">
+            <button class="btn btn-green" onclick="quickClassOperation('${cls.id}','deposit')">إيداع للفصل كامل</button>
+            <button class="btn btn-gold" onclick="quickClassOperation('${cls.id}','withdraw')">سحب للفصل كامل</button>
+            <button class="btn btn-light" onclick="printClassReport('${cls.id}')">تصدير تقرير للفصل</button>
+            <button class="btn btn-light" onclick="__sendClassMessage('${cls.id}')">رسالة ولي الأمر للفصل كامل</button>
+          </div>
+          <div class="adv-toolbar">
+            <input id="advSearchInput" placeholder="بحث بالاسم" value="${escapeHtml(document.getElementById('advSearchInput')?.value||'')}">
+            <select id="advLevelFilter">
+              <option value="all">كل المستويات</option>
+              <option value="برونزي">برونزي</option>
+              <option value="فضي">فضي</option>
+              <option value="ذهبي">ذهبي</option>
+              <option value="بلاتيني">بلاتيني</option>
+              <option value="ألماسي">ألماسي</option>
+            </select>
+            <select id="advStatusFilter">
+              <option value="all">كل الحالات</option>
+              <option value="مفعل">مفعل</option>
+              <option value="غير مفعل">غير مفعل</option>
+              <option value="جيد">جيد</option>
+              <option value="ممتاز">ممتاز</option>
+              <option value="يحتاج متابعة">يحتاج متابعة</option>
+            </select>
+          </div>
+          <div class="adv-student-grid">${students.map(buildStudentCardV6).join('') || '<div class="teacher-note">لا توجد نتائج مطابقة.</div>'}</div>
+        </div>`;
+      const lvl=document.getElementById('advLevelFilter'); if(lvl) lvl.value=(window.__advFilterState?.lvl)||'all';
+      const stt=document.getElementById('advStatusFilter'); if(stt) stt.value=(window.__advFilterState?.status)||'all';
+      const bind=()=>{
+        window.__advFilterState={q:document.getElementById('advSearchInput')?.value||'', lvl:document.getElementById('advLevelFilter')?.value||'all', status:document.getElementById('advStatusFilter')?.value||'all'};
+        render();
+      };
+      document.getElementById('advSearchInput')?.addEventListener('input', bind);
+      document.getElementById('advLevelFilter')?.addEventListener('change', bind);
+      document.getElementById('advStatusFilter')?.addEventListener('change', bind);
+    };
+    render();
+  };
+
+  window.openStudentOperationModal = function(studentId, preset){
+    const st=getStudentSafe(studentId); if(!st) return;
+    window.__studentOpState={studentId};
+    document.getElementById('studentOpModal').classList.add('show');
+    document.getElementById('studentOpTitle').textContent='عملية الطالب / الطالبة';
+    document.getElementById('studentOpName').textContent=st.name||'';
+    const typeEl=document.getElementById('studentOpType');
+    const reasonEl=document.getElementById('studentOpReason');
+    const targetWrap=document.getElementById('studentOpTargetWrap');
+    const targetEl=document.getElementById('studentOpTarget');
+    const otherWrap=document.getElementById('studentOpOtherWrap');
+    document.getElementById('studentOpAmount').value='';
+    document.getElementById('studentOpOther').value='';
+    function fillReasons(type){
+      const arr=(type==='withdraw')?WITHDRAW_REASONS:DEPOSIT_REASONS;
+      reasonEl.innerHTML=arr.map(r=>`<option value="${r}">${r}</option>`).join('');
+      otherWrap.style.display='none';
+    }
+    function fillTargets(){
+      const others=(window.bankData?.students||[]).filter(s=>s.id!==studentId);
+      targetEl.innerHTML=others.map(s=>`<option value="${s.id}">${s.name} — ${(getClassByIdSafe(s.classId)||{}).name||''}</option>`).join('');
+    }
+    typeEl.onchange=function(){
+      const t=typeEl.value;
+      fillReasons(t);
+      targetWrap.style.display = t==='transfer' ? 'block' : 'none';
+    };
+    reasonEl.onchange=function(){ otherWrap.style.display = reasonEl.value==='أخرى' ? 'block' : 'none'; };
+    if(preset==='deposit'){ typeEl.value='deposit'; }
+    else if(preset==='withdraw'){ typeEl.value='withdraw'; }
+    else { typeEl.value='deposit'; }
+    fillReasons(typeEl.value);
+    fillTargets();
+    targetWrap.style.display = typeEl.value==='transfer' ? 'block' : 'none';
+  };
+
+  window.closeStudentOperationModal = function(){
+    document.getElementById('studentOpModal').classList.remove('show');
+  };
+
+  window.confirmStudentOperation = function(){
+    const src=getStudentSafe(window.__studentOpState.studentId); if(!src) return;
+    const type=document.getElementById('studentOpType').value;
+    const amount=Number(document.getElementById('studentOpAmount').value||0);
+    const reasonSel=document.getElementById('studentOpReason').value;
+    const other=(document.getElementById('studentOpOther').value||'').trim();
+    const reason=reasonSel==='أخرى'?other:reasonSel;
+    if(!(amount>0)) return alert('أدخلي مبلغًا صحيحًا');
+    if(!reason) return alert('اختاري السبب أو اكتبيه');
+    if(type==='deposit'){
+      src.balance=Number(src.balance||0)+amount;
+      addHistorySafe(src,'deposit',amount,reason); addOperationSafe(src,'deposit',amount,reason);
+    }else if(type==='withdraw'){
+      src.balance=Math.max(0, Number(src.balance||0)-amount);
+      addHistorySafe(src,'withdraw',amount,reason); addOperationSafe(src,'withdraw',amount,reason);
+    }else{
+      const targetId=document.getElementById('studentOpTarget').value;
+      const dest=getStudentSafe(targetId); if(!dest) return alert('اختاري الطالب / الطالبة المحول إليه');
+      src.balance=Math.max(0, Number(src.balance||0)-amount);
+      dest.balance=Number(dest.balance||0)+amount;
+      addHistorySafe(src,'transfer',amount,'تحويل إلى '+dest.name+' — '+reason);
+      addHistorySafe(dest,'deposit',amount,'تحويل من '+src.name+' — '+reason);
+      addOperationSafe(src,'transfer',amount,'تحويل إلى '+dest.name+' — '+reason);
+      addOperationSafe(dest,'deposit',amount,'تحويل من '+src.name+' — '+reason);
+    }
+    if(typeof saveBankData==='function') saveBankData();
+    closeStudentOperationModal();
+    window.__openAdvancedClass(src.classId);
+    alert('تم تنفيذ العملية بنجاح');
+  };
+})();
+</script>
+
 </body></html>
