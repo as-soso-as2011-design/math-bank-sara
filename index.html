@@ -812,11 +812,11 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
 
   <div class="card">
     <div class="tabbar">
-      <button class="active" onclick="showTab('statement', this)">كشف الأسئلة المتكررة</button>
+      <button class="active" onclick="showTab('statement', this)">كشف الحساب</button>
       <button onclick="showTab('latest', this)">آخر العمليات</button>
       <button onclick="showTab('operations', this)">العمليات</button>
-      <button onclick="showTab('detailsTab', this)">تفاصيل الأسئلة المتكررة</button>
-      <button onclick="showTab('upgradeTab', this)">ترقية الأسئلة المتكررة</button>
+      <button onclick="showTab('detailsTab', this)">تفاصيل الحساب</button>
+      <button onclick="showTab('upgradeTab', this)">ترقية الحساب</button>
       <button onclick="showTab('pdfTab', this)">تقرير PDF</button>
       <button onclick="showTab('rouletteTab', this)">روليت الهدايا</button>
       <button onclick="showTab('analysisTab', this)">تحليل بياناتي</button>
@@ -1497,12 +1497,66 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
   </div>
 </section>
 
+
+<section id="parent_followup" class="screen">
+  <div class="topbar">
+    <div class="brand"><div class="logo">BN</div><div><h1>متابعة ولي الأمر</h1><p>خدمات المتابعة والتواصل</p></div></div>
+    <button class="ghost" onclick="go('home')">⌂</button>
+  </div>
+  <div class="card">
+    <div class="section-head"><h3>متابعة ولي الأمر</h3><span class="pill">خدمة تعليمية</span></div>
+    <div style="display:grid;gap:12px">
+      <div class="notice">طلب متابعة مستوى الطالب / الطالبة والتواصل مع المعلمة بشكل منظم وواضح.</div>
+      <div class="menu-list">
+        <button type="button" class="menu-item"><div class="left"><div class="circle">📘</div><div><div class="name">طلب متابعة أكاديمية</div><div class="meta">متابعة المستوى والتحصيل</div></div></div><div>‹</div></button>
+        <button type="button" class="menu-item"><div class="left"><div class="circle">🗓️</div><div><div class="name">متابعة الحضور</div><div class="meta">الغياب والتأخر والانضباط</div></div></div><div>‹</div></button>
+        <button type="button" class="menu-item" onclick="go('faq_center')"><div class="left"><div class="circle">❓</div><div><div class="name">الأسئلة المتكررة وخدمات الدعم</div><div class="meta">استبيان وملاحظات وأسئلة</div></div></div><div>‹</div></button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="faq_center" class="screen">
+  <div class="topbar">
+    <div class="brand"><div class="logo">BN</div><div><h1>الأسئلة المتكررة</h1><p>الاستبيان والدعم والملاحظات</p></div></div>
+    <button class="ghost" onclick="go('home')">⌂</button>
+  </div>
+  <div class="card">
+    <div class="tabbar">
+      <button class="active" onclick="showFaqTab('faqPaneFaq', this)">الأسئلة المتكررة</button>
+      <button onclick="showFaqTab('faqPaneSurvey', this)">استبيان</button>
+      <button onclick="showFaqTab('faqPaneNote', this)">إرسال ملاحظة للمعلمة</button>
+    </div>
+
+    <div id="faqPaneFaq" class="tab-content active">
+      <div class="menu-list">
+        <div class="menu-item"><div class="left"><div class="circle">❓</div><div><div class="name">كيف أسجل الدخول؟</div><div class="meta">من تبويب الدخول للحساب في أعلى الصفحة ثم اختيار نوع الحساب.</div></div></div></div>
+        <div class="menu-item"><div class="left"><div class="circle">💳</div><div><div class="name">كيف أعرف رصيد الطالب؟</div><div class="meta">بعد الدخول يظهر الرصيد وكشف الحساب داخل صفحة الحساب.</div></div></div></div>
+        <div class="menu-item"><div class="left"><div class="circle">🏫</div><div><div class="name">كيف أتابع الحضور؟</div><div class="meta">من خلال متابعة ولي الأمر أو الرسائل المنظمة داخل النظام.</div></div></div></div>
+      </div>
+    </div>
+
+    <div id="faqPaneSurvey" class="tab-content">
+      <div class="field"><label>تقييمك العام</label><select><option>ممتاز</option><option>جيد جدًا</option><option>جيد</option><option>يحتاج تحسين</option></select></div>
+      <div class="field"><label>ما أكثر شيء أعجبك؟</label><input type="text" placeholder="اكتب / اكتبي رأيك" /></div>
+      <div class="field"><label>مقترحات للتحسين</label><input type="text" placeholder="اكتب / اكتبي المقترح" /></div>
+      <button class="btn btn-green" style="width:100%" onclick="alert('تم إرسال الاستبيان بنجاح')">إرسال الاستبيان</button>
+    </div>
+
+    <div id="faqPaneNote" class="tab-content">
+      <div class="field"><label>إرسال ملاحظة للمعلمة</label><textarea id="teacherNoteText" style="width:100%;min-height:120px;border:1px solid var(--line);border-radius:16px;padding:14px;background:#fff;font:inherit" placeholder="اكتب / اكتبي الملاحظة هنا"></textarea></div>
+      <button class="btn btn-gold" style="width:100%" onclick="sendTeacherNote()">إرسال الملاحظة</button>
+      <div id="teacherNoteMsg" class="notice ok hidden">تم إرسال الملاحظة بنجاح.</div>
+    </div>
+  </div>
+</section>
+
 <nav class="bottom-nav">
   <button class="nav-btn active" data-screen="home" onclick="go('home', this)"><span class="emoji">🏠</span><span id="navHome">الرئيسية</span></button>
-  <button class="nav-btn" data-screen="account" onclick="go('account', this)"><span class="emoji">💳</span><span id="navAccount">الحساب</span></button>
+  <button class="nav-btn" data-screen="faq_center" onclick="go('faq_center', this)"><span class="emoji">❓</span><span id="navFaq">الأسئلة المتكررة</span></button>
   <button class="nav-btn" data-screen="honor" onclick="go('honor', this)"><span class="emoji">🏆</span><span id="navHonor">الشرف</span></button>
   <button class="nav-btn" data-screen="more" onclick="go('more', this)"><span class="emoji">⚙️</span><span id="navMore">المزيد</span></button>
-  <button class="nav-btn" data-screen="account_choice" onclick="go('account_choice', this)"><span class="emoji">🔐</span><span>الدخول</span></button>
+  <button class="nav-btn" data-screen="parent_followup" onclick="go('parent_followup', this)"><span class="emoji">👨‍👩‍👧</span><span id="navParent">متابعة ولي الأمر</span></button>
 </nav>
 
 </div>
@@ -2058,7 +2112,7 @@ function studentLogin(){
   sessionStorage.setItem('currentStudentId', st.id);
   localStorage.setItem('selectedStudentId', st.id);
 
-  if(typeof go === 'function') go('faq');
+  if(typeof go === 'function') go('account');
 
   setTimeout(function(){
     try{
@@ -2431,7 +2485,7 @@ function studentLogin(){
     sessionStorage.setItem('studentLogged','1');
     sessionStorage.setItem('currentStudentId', found.id);
     if(err) err.textContent='';
-    go('faq');
+    go('account');
     setTimeout(renderStudentAccount, 50);
   }else if(err){ err.textContent='بيانات الدخول غير صحيحة'; }
 }
@@ -4263,7 +4317,7 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
       </div>
       <div class="student-card-actions">
         <button class="btn btn-green" onclick="openStudentFromSettings('${student.id}')">دخول الطالب / الطالبة</button>
-        <button class="btn btn-light" onclick="openStudentStatement('${student.id}')">كشف الأسئلة المتكررة</button>
+        <button class="btn btn-light" onclick="openStudentStatement('${student.id}')">كشف الحساب</button>
         <button class="btn btn-gold" onclick="quickStudentOperation('${student.id}')">عملية سريعة</button>
         <button class="btn btn-light" onclick="addStudentNote('${student.id}')">ملاحظة</button>
         <button class="btn btn-light" onclick="showStudentTasksSummary('${student.id}')">المهام</button>
@@ -4324,7 +4378,7 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
     if(!window.getStudent) return;
     const st = getStudent(studentId); if(!st) return;
     sessionStorage.setItem('currentStudentId', st.id); sessionStorage.setItem('studentLogged','1');
-    if(typeof go==='function') go('faq');
+    if(typeof go==='function') go('account');
     setTimeout(function(){ if(typeof renderStudentAccount==='function') renderStudentAccount(); }, 80);
   };
   window.openStudentStatement = function(studentId){
@@ -4394,7 +4448,7 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
 <script>
 function goAccountTab(tabId){
   try{
-    go('faq');
+    go('account');
     setTimeout(function(){
       var btnMap={statement:0,operations:2,rouletteTab:6,pdfTab:5};
       var tabs=document.querySelectorAll('#account .tabbar button');
@@ -4979,7 +5033,7 @@ function openMoreInfo(type){
       </div>
       <div class="student-card-actions">
         <button class="btn btn-green" onclick="openStudentFromSettings('${student.id}')">دخول الطالب / الطالبة</button>
-        <button class="btn btn-light" onclick="openStudentStatement('${student.id}')">كشف الأسئلة المتكررة</button>
+        <button class="btn btn-light" onclick="openStudentStatement('${student.id}')">كشف الحساب</button>
         <button class="btn btn-gold" onclick="quickStudentOperation('${student.id}')">عملية سريعة</button>
         <button class="btn btn-light" onclick="addStudentNote('${student.id}')">ملاحظة</button>
         <button class="btn btn-light" onclick="showStudentTasksSummary('${student.id}')">المهام</button>
@@ -5415,7 +5469,7 @@ function openMoreInfo(type){
         </div>
         <div class="adv-student-actions">
           <button class="btn btn-green" onclick="teacherLoginAsStudent('${s.id}')">دخول الطالب / الطالبة</button>
-          <button class="btn btn-light" onclick="printStudentReport('${s.id}')">كشف الأسئلة المتكررة</button>
+          <button class="btn btn-light" onclick="printStudentReport('${s.id}')">كشف الحساب</button>
           <button class="btn btn-gold" onclick="messageGuardianFromSettings('${s.id}')">رسالة ولي الأمر</button>
           <button class="btn btn-light" onclick="changeStudentPasswordFromSettings('${s.id}')">تغيير كلمة المرور</button>
           <button class="btn btn-light" onclick="editStudentNameFromSettings('${s.id}')">تعديل الاسم</button>
@@ -6042,6 +6096,24 @@ function openMoreInfo(type){
 document.addEventListener('DOMContentLoaded', function(){
   try{ if(typeof loadBankData === 'function') loadBankData(); }catch(e){}
 });
+</script>
+
+
+<script id="faq-parent-nav-script">
+function showFaqTab(id, btn){
+  document.querySelectorAll('#faq_center .tabbar button').forEach(function(b){ b.classList.remove('active'); });
+  document.querySelectorAll('#faq_center .tab-content').forEach(function(p){ p.classList.remove('active'); });
+  var pane = document.getElementById(id);
+  if(pane) pane.classList.add('active');
+  if(btn) btn.classList.add('active');
+}
+function sendTeacherNote(){
+  var box = document.getElementById('teacherNoteText');
+  var msg = document.getElementById('teacherNoteMsg');
+  if(!box || !box.value.trim()){ alert('اكتبي الملاحظة أولاً'); return; }
+  if(msg){ msg.classList.remove('hidden'); setTimeout(function(){ msg.classList.add('hidden'); }, 1800); }
+  box.value = '';
+}
 </script>
 
 </body></html>
