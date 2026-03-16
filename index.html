@@ -603,6 +603,17 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
 }
 </style>
 
+
+<style id="parent-followup-login-fix-style">
+.parent-login-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.parent-login-grid input{width:100%;border:1px solid var(--line);border-radius:16px;padding:14px;background:#fff;font:inherit}
+.parent-login-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.parent-actions-grid-strong .btn{min-height:58px;font-size:15px;font-weight:900}
+@media (max-width:900px){
+  .parent-login-grid,.parent-login-actions{grid-template-columns:1fr !important}
+}
+</style>
+
 </head>
 <body>
 <div class="app">
@@ -1513,105 +1524,124 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
 
 
 
+
 <section id="parent_followup" class="screen">
   <div class="topbar">
     <div class="brand"><div class="logo">BN</div><div><h1>متابعة ولي الأمر</h1><p>لوحة متابعة تحليلية واحترافية</p></div></div>
     <button class="ghost" onclick="go('home')">⌂</button>
   </div>
 
-  <div class="card parent-hero-card">
+  <div id="parentFollowLoginCard" class="card parent-hero-card">
     <div class="parent-hero-head">
       <div>
-        <div class="badge">لوحة متابعة متقدمة</div>
-        <h3>نظرة شاملة على تقدم الطالب / الطالبة</h3>
-        <p>واجهة مخصصة لولي الأمر تعرض التقدم الدراسي، مستوى الحساب، الترتيب، والتنبيهات المهمة بطريقة أوضح وأقوى.</p>
+        <div class="badge">دخول ولي الأمر</div>
+        <h3>دخول آمن لمتابعة الطالب / الطالبة</h3>
+        <p>للوصول إلى لوحة المتابعة، أدخلي الرقم السري وكلمة المرور الخاصة بالطالب / الطالبة.</p>
       </div>
-      <div class="parent-hero-icon">👨‍👩‍👧</div>
+      <div class="parent-hero-icon">🔐</div>
     </div>
+    <div class="parent-login-grid">
+      <div class="field">
+        <label>الرقم السري</label>
+        <input id="pfLoginPin" type="text" placeholder="أدخلي الرقم السري">
+      </div>
+      <div class="field">
+        <label>كلمة المرور</label>
+        <input id="pfLoginPassword" type="password" placeholder="أدخلي كلمة المرور">
+      </div>
+    </div>
+    <div class="parent-login-actions">
+      <button class="btn btn-green" onclick="parentFollowLogin()">دخول ولي الأمر</button>
+      <button class="btn btn-light" onclick="parentFollowLogout()">مسح الدخول</button>
+    </div>
+    <div id="pfLoginError" class="notice hidden" style="margin-top:12px;background:#fff0ef;color:#a63f3c;border:1px solid #efcfcd">بيانات الدخول غير صحيحة.</div>
   </div>
 
-  <div class="parent-overview-grid">
-    <div class="parent-metric-card">
-      <span class="label">الرصيد الحالي</span>
-      <strong id="pfCurrentBalance">0</strong>
-      <small>الرصيد التحفيزي الحالي</small>
+  <div id="parentFollowDashboard" class="hidden">
+    <div class="parent-overview-grid">
+      <div class="parent-metric-card">
+        <span class="label">الرصيد الحالي</span>
+        <strong id="pfCurrentBalance">0</strong>
+        <small>الرصيد التحفيزي الحالي</small>
+      </div>
+      <div class="parent-metric-card">
+        <span class="label">المستوى الحالي</span>
+        <strong id="pfCurrentLevel">برونزي</strong>
+        <small>تصنيف الحساب البنكي</small>
+      </div>
+      <div class="parent-metric-card">
+        <span class="label">المتبقي للترقية</span>
+        <strong id="pfRemainToNext">0</strong>
+        <small>حتى المستوى التالي</small>
+      </div>
     </div>
-    <div class="parent-metric-card">
-      <span class="label">المستوى الحالي</span>
-      <strong id="pfCurrentLevel">برونزي</strong>
-      <small>تصنيف الحساب البنكي</small>
-    </div>
-    <div class="parent-metric-card">
-      <span class="label">المتبقي للترقية</span>
-      <strong id="pfRemainToNext">0</strong>
-      <small>حتى المستوى التالي</small>
-    </div>
-  </div>
 
-  <div class="card parent-student-summary">
-    <div class="section-head"><h3>بطاقة الطالب / الطالبة</h3><span class="pill">محدث تلقائيًا</span></div>
-    <div class="parent-student-shell">
-      <div class="parent-student-main">
-        <div class="parent-student-avatar">🎓</div>
-        <div>
-          <h4 id="pfStudentName">—</h4>
-          <div class="muted" id="pfStudentClass">الفصل: —</div>
-          <div class="parent-level-pill" id="pfLevelPill">نوع الحساب: —</div>
+    <div class="card parent-student-summary">
+      <div class="section-head"><h3>بطاقة الطالب / الطالبة</h3><span class="pill">محدث تلقائيًا</span></div>
+      <div class="parent-student-shell">
+        <div class="parent-student-main">
+          <div class="parent-student-avatar">🎓</div>
+          <div>
+            <h4 id="pfStudentName">—</h4>
+            <div class="muted" id="pfStudentClass">الفصل: —</div>
+            <div class="parent-level-pill" id="pfLevelPill">نوع الحساب: —</div>
+          </div>
+        </div>
+        <div class="parent-rank-box">
+          <span>الترتيب في الفصل</span>
+          <strong id="pfRankInClass">—</strong>
         </div>
       </div>
-      <div class="parent-rank-box">
-        <span>الترتيب في الفصل</span>
-        <strong id="pfRankInClass">—</strong>
+    </div>
+
+    <div class="parent-analysis-grid">
+      <div class="card">
+        <div class="section-head"><h3>تحليل هذا الأسبوع</h3><span class="pill">ملخص سريع</span></div>
+        <div class="parent-week-grid">
+          <div class="parent-week-box"><strong id="pfOpsCount">0</strong><span>عدد العمليات</span></div>
+          <div class="parent-week-box"><strong id="pfDepositsCount">0</strong><span>الإيداعات</span></div>
+          <div class="parent-week-box"><strong id="pfWithdrawsCount">0</strong><span>السحوبات</span></div>
+          <div class="parent-week-box"><strong id="pfAbsenceCount">0</strong><span>الغياب</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-head"><h3>مؤشر التقدم</h3><span class="pill">حتى الترقية</span></div>
+        <div class="progress-wrap">
+          <div class="progress-labels">
+            <span id="pfProgressLabel">التقدم نحو المستوى التالي</span>
+            <strong id="pfProgressPercent">0%</strong>
+          </div>
+          <div class="progress-track"><div class="progress-fill" id="pfProgressFill" style="width:0%"></div></div>
+          <div class="muted" id="pfProgressHint">سيظهر مقدار التقدم هنا.</div>
+        </div>
       </div>
     </div>
-  </div>
 
-  <div class="parent-analysis-grid">
     <div class="card">
-      <div class="section-head"><h3>تحليل هذا الأسبوع</h3><span class="pill">ملخص سريع</span></div>
-      <div class="parent-week-grid">
-        <div class="parent-week-box"><strong id="pfOpsCount">0</strong><span>عدد العمليات</span></div>
-        <div class="parent-week-box"><strong id="pfDepositsCount">0</strong><span>الإيداعات</span></div>
-        <div class="parent-week-box"><strong id="pfWithdrawsCount">0</strong><span>السحوبات</span></div>
-        <div class="parent-week-box"><strong id="pfAbsenceCount">0</strong><span>الغياب</span></div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="section-head"><h3>مؤشر التقدم</h3><span class="pill">حتى الترقية</span></div>
-      <div class="progress-wrap">
-        <div class="progress-labels">
-          <span id="pfProgressLabel">التقدم نحو المستوى التالي</span>
-          <strong id="pfProgressPercent">0%</strong>
-        </div>
-        <div class="progress-track"><div class="progress-fill" id="pfProgressFill" style="width:0%"></div></div>
-        <div class="muted" id="pfProgressHint">سيظهر مقدار التقدم هنا.</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="section-head"><h3>تنبيهات المعلمة</h3><span class="pill">آخر التحديثات</span></div>
-    <div id="pfTeacherAlerts" class="parent-alerts">
-      <div class="parent-alert-item">
-        <div class="icon">🔔</div>
-        <div>
-          <strong>لا توجد تنبيهات بعد</strong>
-          <span>سيتم عرض آخر الملاحظات والعمليات المهمة هنا.</span>
+      <div class="section-head"><h3>تنبيهات المعلمة</h3><span class="pill">آخر التحديثات</span></div>
+      <div id="pfTeacherAlerts" class="parent-alerts">
+        <div class="parent-alert-item">
+          <div class="icon">🔔</div>
+          <div>
+            <strong>لا توجد تنبيهات بعد</strong>
+            <span>سيتم عرض آخر الملاحظات والعمليات المهمة هنا.</span>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <div class="parent-actions-grid">
-    <button class="btn btn-green" onclick="parentFollowOpenFaq()">الأسئلة المتكررة والدعم</button>
-    <button class="btn btn-gold" onclick="parentFollowRequestReport()">طلب تقرير مختصر</button>
-    <button class="btn btn-light" onclick="parentFollowAcademic()">متابعة أكاديمية</button>
-    <button class="btn btn-light" onclick="parentFollowAttendance()">متابعة الحضور والانضباط</button>
-  </div>
+    <div class="parent-actions-grid parent-actions-grid-strong">
+      <button class="btn btn-green" onclick="parentFollowOpenFaq()">الأسئلة المتكررة والدعم</button>
+      <button class="btn btn-gold" onclick="parentFollowRequestReport()">طلب تقرير مختصر</button>
+      <button class="btn btn-light" onclick="parentFollowAcademic()">متابعة أكاديمية</button>
+      <button class="btn btn-light" onclick="parentFollowAttendance()">متابعة الحضور والانضباط</button>
+    </div>
 
-  <div id="parentFollowNotice" class="notice ok hidden" style="margin-top:14px"></div>
+    <div id="parentFollowNotice" class="notice ok hidden" style="margin-top:14px"></div>
+  </div>
 </section>
+
 
 
 <section id="faq_center" class="screen">
@@ -4044,6 +4074,17 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
 }
 </style>
 
+
+<style id="parent-followup-login-fix-style">
+.parent-login-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.parent-login-grid input{width:100%;border:1px solid var(--line);border-radius:16px;padding:14px;background:#fff;font:inherit}
+.parent-login-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.parent-actions-grid-strong .btn{min-height:58px;font-size:15px;font-weight:900}
+@media (max-width:900px){
+  .parent-login-grid,.parent-login-actions{grid-template-columns:1fr !important}
+}
+</style>
+
 </head><body>'
       + '<h1>تقرير بنك الرياضيات</h1>'
       + '<div class="meta">الطالبة: '+esc(student.name)+'</div>'
@@ -4199,6 +4240,17 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
 @media (max-width:900px){
   .parent-overview-grid,.parent-analysis-grid,.parent-actions-grid,.parent-week-grid{grid-template-columns:1fr !important}
   .parent-hero-head{flex-direction:column}
+}
+</style>
+
+
+<style id="parent-followup-login-fix-style">
+.parent-login-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.parent-login-grid input{width:100%;border:1px solid var(--line);border-radius:16px;padding:14px;background:#fff;font:inherit}
+.parent-login-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.parent-actions-grid-strong .btn{min-height:58px;font-size:15px;font-weight:900}
+@media (max-width:900px){
+  .parent-login-grid,.parent-login-actions{grid-template-columns:1fr !important}
 }
 </style>
 
@@ -4364,6 +4416,17 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
 @media (max-width:900px){
   .parent-overview-grid,.parent-analysis-grid,.parent-actions-grid,.parent-week-grid{grid-template-columns:1fr !important}
   .parent-hero-head{flex-direction:column}
+}
+</style>
+
+
+<style id="parent-followup-login-fix-style">
+.parent-login-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.parent-login-grid input{width:100%;border:1px solid var(--line);border-radius:16px;padding:14px;background:#fff;font:inherit}
+.parent-login-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.parent-actions-grid-strong .btn{min-height:58px;font-size:15px;font-weight:900}
+@media (max-width:900px){
+  .parent-login-grid,.parent-login-actions{grid-template-columns:1fr !important}
 }
 </style>
 
@@ -4721,6 +4784,17 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
 @media (max-width:900px){
   .parent-overview-grid,.parent-analysis-grid,.parent-actions-grid,.parent-week-grid{grid-template-columns:1fr !important}
   .parent-hero-head{flex-direction:column}
+}
+</style>
+
+
+<style id="parent-followup-login-fix-style">
+.parent-login-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.parent-login-grid input{width:100%;border:1px solid var(--line);border-radius:16px;padding:14px;background:#fff;font:inherit}
+.parent-login-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.parent-actions-grid-strong .btn{min-height:58px;font-size:15px;font-weight:900}
+@media (max-width:900px){
+  .parent-login-grid,.parent-login-actions{grid-template-columns:1fr !important}
 }
 </style>
 
@@ -6753,6 +6827,103 @@ document.addEventListener('DOMContentLoaded', function(){
       setTimeout(updateParentFollowup, 10);
     };
   }
+})();
+</script>
+
+
+<script id="parent-followup-login-fix-script">
+(function(){
+  function pfReadData2(){
+    try{
+      const raw = localStorage.getItem('greenBankTeacherData_v1');
+      if(raw) return JSON.parse(raw);
+    }catch(e){}
+    try{
+      if(typeof bankData !== 'undefined' && bankData) return bankData;
+    }catch(e){}
+    return null;
+  }
+  function pfFindStudentForParent(){
+    const data = pfReadData2();
+    if(!data || !Array.isArray(data.students)) return null;
+    const id = sessionStorage.getItem('parentFollowStudentId');
+    if(!id) return null;
+    return data.students.find(s => String(s.id) === String(id)) || null;
+  }
+  function pfToggleDashboard(show){
+    const login = document.getElementById('parentFollowLoginCard');
+    const dash = document.getElementById('parentFollowDashboard');
+    if(login) login.classList.toggle('hidden', !!show);
+    if(dash) dash.classList.toggle('hidden', !show);
+  }
+  window.parentFollowLogin = function(){
+    const pin = (document.getElementById('pfLoginPin')?.value || '').trim();
+    const pass = (document.getElementById('pfLoginPassword')?.value || '').trim();
+    const err = document.getElementById('pfLoginError');
+    if(err) err.classList.add('hidden');
+    const data = pfReadData2();
+    const list = data && Array.isArray(data.students) ? data.students : [];
+    const st = list.find(function(s){
+      const sPin = String(s.pin || s.password || '').trim();
+      const sPass = String(s.password || '').trim();
+      return pin === sPin && pass === sPass;
+    });
+    if(!st){
+      if(err) err.classList.remove('hidden');
+      return;
+    }
+    sessionStorage.setItem('parentFollowStudentId', st.id);
+    pfToggleDashboard(true);
+    if(typeof updateParentFollowup === 'function') updateParentFollowup();
+  };
+  window.parentFollowLogout = function(){
+    sessionStorage.removeItem('parentFollowStudentId');
+    const pin = document.getElementById('pfLoginPin');
+    const pass = document.getElementById('pfLoginPassword');
+    if(pin) pin.value = '';
+    if(pass) pass.value = '';
+    pfToggleDashboard(false);
+  };
+
+  const oldUpdatePF = window.updateParentFollowup;
+  window.updateParentFollowup = function(){
+    if(typeof oldUpdatePF === 'function') oldUpdatePF();
+    const data = pfReadData2();
+    const st = pfFindStudentForParent();
+    if(!data || !st) return;
+    const cls = (data.classes||[]).find(c => c.id === st.classId);
+    const levelName = document.getElementById('pfLevelPill');
+    const studentName = document.getElementById('pfStudentName');
+    const studentClass = document.getElementById('pfStudentClass');
+    if(studentName) studentName.textContent = st.name || '—';
+    if(studentClass) studentClass.textContent = 'الفصل: ' + ((cls && cls.name) || '—');
+    if(levelName && !levelName.textContent.includes('نوع الحساب')) levelName.textContent = 'نوع الحساب: ' + levelName.textContent;
+
+    const inClass = (data.students||[]).filter(s => s.classId === st.classId).sort((a,b)=>Number(b.balance||0)-Number(a.balance||0));
+    const idx = inClass.findIndex(s => String(s.id) === String(st.id));
+    const rank = document.getElementById('pfRankInClass');
+    if(rank) rank.textContent = (idx >= 0 ? (idx+1) : 1) + ' / ' + (inClass.length || 1);
+
+    const hist = Array.isArray(st.history) ? st.history : [];
+    const dep = hist.filter(h => h.type === 'deposit').length;
+    const wit = hist.filter(h => h.type === 'withdraw').length;
+    const ops = document.getElementById('pfOpsCount');
+    const deps = document.getElementById('pfDepositsCount');
+    const wits = document.getElementById('pfWithdrawsCount');
+    const abs = document.getElementById('pfAbsenceCount');
+    if(ops) ops.textContent = hist.length;
+    if(deps) deps.textContent = dep;
+    if(wits) wits.textContent = wit;
+    if(abs) abs.textContent = Number(st.absenceCount||0);
+  };
+
+  document.addEventListener('DOMContentLoaded', function(){
+    setTimeout(function(){
+      const has = !!sessionStorage.getItem('parentFollowStudentId');
+      pfToggleDashboard(has);
+      if(has && typeof updateParentFollowup === 'function') updateParentFollowup();
+    }, 250);
+  });
 })();
 </script>
 
