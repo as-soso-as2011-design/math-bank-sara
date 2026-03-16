@@ -6265,4 +6265,64 @@ document.addEventListener('DOMContentLoaded', function(){
 })();
 </script>
 
+
+<script id="oai-honor-top5-real-fix">
+(function(){
+  function readRealBankDataFix(){
+    try{
+      const raw = localStorage.getItem('greenBankTeacherData_v1');
+      if(raw) return JSON.parse(raw);
+    }catch(e){}
+    try{
+      if(typeof bankData !== 'undefined' && bankData) return bankData;
+    }catch(e){}
+    return null;
+  }
+  function topStudentsFix(data){
+    const list = (data && Array.isArray(data.students)) ? data.students.slice() : [];
+    return list.sort(function(a,b){ return Number(b.balance||0) - Number(a.balance||0); });
+  }
+  function formatNumFix(v){
+    try{ return new Intl.NumberFormat('ar-SA').format(Number(v||0)); }
+    catch(e){ return String(v||0); }
+  }
+  function updateHonorTop5Only(){
+    const data = readRealBankDataFix();
+    if(!data) return;
+    const top = topStudentsFix(data).slice(0,5);
+    if(!top.length) return;
+
+    const listWrap = document.querySelector('#honor .list');
+    if(listWrap){
+      const badges = ['وسام التميز','وسام الإنجاز','وسام التفوق','وسام الالتزام','وسام الحضور'];
+      const icons = ['👑','🌟','✨','💫','⭐'];
+      listWrap.innerHTML = top.map(function(st, i){
+        return `
+          <div class="rank">
+            <div class="rank-num">${i+1}</div>
+            <div class="rank-info">
+              <strong>${st.name || ''}</strong>
+              <span>${formatNumFix(st.balance)} نقطة • ${badges[i] || 'وسام'}</span>
+            </div>
+            <div>${icons[i] || '⭐'}</div>
+          </div>
+        `;
+      }).join('');
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    setTimeout(updateHonorTop5Only, 300);
+  });
+
+  const oldSaveHonorFix = window.saveBankData;
+  if(typeof oldSaveHonorFix === 'function'){
+    window.saveBankData = function(){
+      oldSaveHonorFix.apply(this, arguments);
+      setTimeout(updateHonorTop5Only, 10);
+    };
+  }
+})();
+</script>
+
 </body></html>
