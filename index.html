@@ -6927,4 +6927,124 @@ document.addEventListener('DOMContentLoaded', function(){
 })();
 </script>
 
+
+<script id="oai-login-realdata-hardfix">
+(function(){
+  function readSystemData(){
+    try{
+      const rawGreen = localStorage.getItem('greenBankTeacherData_v1');
+      if(rawGreen) return JSON.parse(rawGreen);
+    }catch(e){}
+    try{
+      const rawV10 = localStorage.getItem('bankData_v10');
+      if(rawV10) return JSON.parse(rawV10);
+    }catch(e){}
+    try{
+      if(typeof bankData !== 'undefined' && bankData) return bankData;
+    }catch(e){}
+    return null;
+  }
+
+  function syncSystemData(){
+    const data = readSystemData();
+    if(!data) return null;
+    try{
+      if(typeof bankData !== 'undefined'){ bankData = data; }
+      window.bankData = data;
+    }catch(e){}
+    return data;
+  }
+
+  window.studentLogin = function(){
+    const user = document.getElementById('studentUser');
+    const pass = document.getElementById('studentPassword');
+    const err = document.getElementById('studentLoginError');
+
+    const userVal = (user && user.value || '').trim();
+    const passVal = (pass && pass.value || '').trim();
+
+    if(err) err.textContent = '';
+
+    if(!userVal || !passVal){
+      if(err) err.textContent = 'أدخلي اسم المستخدم وكلمة المرور';
+      return;
+    }
+
+    const data = syncSystemData();
+    const students = data && Array.isArray(data.students) ? data.students : [];
+
+    const student = students.find(function(s){
+      const username = String(s.username || '').trim();
+      const name = String(s.name || '').trim();
+      const pin = String(s.pin || '').trim();
+      const password = String(s.password || '').trim();
+
+      const userMatch = userVal === username || userVal === name || (pin && userVal === pin);
+      const passMatch = passVal === password || (pin && passVal === pin);
+
+      return userMatch && passMatch;
+    });
+
+    if(!student){
+      if(err) err.textContent = 'بيانات الدخول غير صحيحة';
+      return;
+    }
+
+    sessionStorage.setItem('studentLogged', '1');
+    sessionStorage.setItem('currentStudentId', String(student.id || ''));
+    localStorage.setItem('selectedStudentId', String(student.id || ''));
+
+    if(typeof go === 'function') go('account');
+
+    setTimeout(function(){
+      try{
+        syncSystemData();
+        if(typeof renderStudentAccount === 'function') renderStudentAccount();
+        const firstBtn = Array.from(document.querySelectorAll('#account .tabbar button'))[0] || null;
+        if(typeof showTab === 'function') showTab('statement', firstBtn);
+      }catch(e){}
+    }, 150);
+  };
+
+  window.teacherLogin = function(){
+    const user = document.getElementById('teacherUser');
+    const pass = document.getElementById('teacherPassword');
+    const err = document.getElementById('teacherLoginError');
+
+    const userVal = (user && user.value || '').trim();
+    const passVal = (pass && pass.value || '').trim();
+
+    if(err) err.textContent = '';
+
+    if(!userVal || !passVal){
+      if(err) err.textContent = 'أدخلي اسم المستخدم وكلمة المرور';
+      return;
+    }
+
+    const data = syncSystemData();
+    const teacher = data && data.teacher ? data.teacher : null;
+
+    const ok = teacher &&
+      userVal === String(teacher.username || '').trim() &&
+      passVal === String(teacher.password || '').trim();
+
+    if(!ok){
+      if(err) err.textContent = 'بيانات الدخول غير صحيحة';
+      return;
+    }
+
+    sessionStorage.setItem('teacherLogged', '1');
+
+    if(typeof go === 'function') go('teacher');
+
+    setTimeout(function(){
+      try{
+        syncSystemData();
+        if(typeof refreshTeacherUI === 'function') refreshTeacherUI();
+      }catch(e){}
+    }, 150);
+  };
+})();
+</script>
+
 </body></html>
