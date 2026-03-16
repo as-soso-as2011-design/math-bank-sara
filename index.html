@@ -559,6 +559,50 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
 .screen.active{display:block!important;}
 .topbar,.card:first-child,.hero:first-child{margin-top:0!important;}
 </style>
+
+<style id="parent-followup-pro-style">
+.parent-hero-card{background:linear-gradient(135deg,#0f3529,#1d6b4a);color:#fff;overflow:hidden;position:relative}
+.parent-hero-head{display:flex;justify-content:space-between;align-items:flex-start;gap:18px}
+.parent-hero-head h3{margin:10px 0 8px;font-size:28px}
+.parent-hero-head p{margin:0;color:rgba(255,255,255,.88);line-height:1.9;font-size:14px;max-width:760px}
+.parent-hero-icon{width:74px;height:74px;border-radius:24px;background:rgba(255,255,255,.14);display:grid;place-items:center;font-size:34px;flex:none}
+.parent-overview-grid,.parent-analysis-grid,.parent-actions-grid{display:grid;gap:14px;margin-top:14px}
+.parent-overview-grid{grid-template-columns:repeat(3,1fr)}
+.parent-analysis-grid{grid-template-columns:1.25fr 1fr}
+.parent-actions-grid{grid-template-columns:repeat(4,1fr)}
+.parent-metric-card{background:#fff;border:1px solid var(--line);border-radius:24px;padding:18px;box-shadow:0 12px 24px rgba(16,58,46,.06)}
+.parent-metric-card .label{display:block;color:var(--muted);font-size:13px;margin-bottom:8px}
+.parent-metric-card strong{display:block;font-size:30px;color:var(--deep)}
+.parent-metric-card small{display:block;color:var(--muted);margin-top:6px}
+.parent-student-summary{margin-top:14px}
+.parent-student-shell{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
+.parent-student-main{display:flex;align-items:center;gap:14px}
+.parent-student-avatar{width:70px;height:70px;border-radius:22px;background:linear-gradient(135deg,#0f5f43,#1f8e66);display:grid;place-items:center;font-size:30px;color:#fff}
+.parent-student-main h4{margin:0 0 6px;font-size:24px;color:var(--deep)}
+.parent-level-pill{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:999px;background:linear-gradient(135deg,#cfae6d,#ddc186);color:#fff;font-weight:900;margin-top:10px}
+.parent-rank-box{min-width:180px;background:#f7faf8;border:1px solid var(--line);border-radius:22px;padding:16px;text-align:center}
+.parent-rank-box span{display:block;color:var(--muted);font-size:13px}
+.parent-rank-box strong{display:block;color:var(--deep);font-size:32px;margin-top:6px}
+.parent-week-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.parent-week-box{background:#f7faf8;border:1px solid var(--line);border-radius:20px;padding:16px;text-align:center}
+.parent-week-box strong{display:block;color:var(--deep);font-size:28px}
+.parent-week-box span{display:block;color:var(--muted);font-size:12px;margin-top:6px}
+.progress-wrap{padding-top:6px}
+.progress-labels{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:10px}
+.progress-labels strong{color:var(--deep);font-size:24px}
+.progress-track{height:14px;background:#edf2ef;border-radius:999px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,#0f5f43,#1f8e66);border-radius:999px}
+.parent-alerts{display:grid;gap:10px}
+.parent-alert-item{display:flex;gap:12px;align-items:flex-start;background:#fff;border:1px solid var(--line);border-radius:20px;padding:14px}
+.parent-alert-item .icon{width:42px;height:42px;border-radius:14px;background:#f4f8f5;display:grid;place-items:center;flex:none}
+.parent-alert-item strong{display:block;color:var(--deep);margin-bottom:4px}
+.parent-alert-item span{display:block;color:var(--muted);line-height:1.8}
+@media (max-width:900px){
+  .parent-overview-grid,.parent-analysis-grid,.parent-actions-grid,.parent-week-grid{grid-template-columns:1fr !important}
+  .parent-hero-head{flex-direction:column}
+}
+</style>
+
 </head>
 <body>
 <div class="app">
@@ -1468,22 +1512,107 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
 </section>
 
 
+
 <section id="parent_followup" class="screen">
   <div class="topbar">
-    <div class="brand"><div class="logo">BN</div><div><h1>متابعة ولي الأمر</h1><p>متابعة احترافية ودعم منظم</p></div></div>
+    <div class="brand"><div class="logo">BN</div><div><h1>متابعة ولي الأمر</h1><p>لوحة متابعة تحليلية واحترافية</p></div></div>
     <button class="ghost" onclick="go('home')">⌂</button>
   </div>
-  <div class="card">
-    <div class="section-head"><h3>خدمات متابعة ولي الأمر</h3><span class="pill">واجهة احترافية</span></div>
-    <div class="menu-list">
-      <button type="button" class="menu-item" id="pfAcademicBtn"><div class="left"><div class="circle">📘</div><div><div class="name">متابعة أكاديمية</div><div class="meta">طلب متابعة التحصيل والمستوى الدراسي</div></div></div><div>‹</div></button>
-      <button type="button" class="menu-item" id="pfAttendanceBtn"><div class="left"><div class="circle">🗓️</div><div><div class="name">متابعة الحضور والانضباط</div><div class="meta">معرفة حالة الغياب والتأخر والانضباط</div></div></div><div>‹</div></button>
-      <button type="button" class="menu-item" id="pfReportBtn"><div class="left"><div class="circle">📄</div><div><div class="name">طلب تقرير مختصر</div><div class="meta">ملخص عن الرصيد والحضور والإنجازات</div></div></div><div>‹</div></button>
-      <button type="button" class="menu-item" id="pfSupportBtn"><div class="left"><div class="circle">❓</div><div><div class="name">الدعم والأسئلة</div><div class="meta">الأسئلة المتكررة والاستبيان وإرسال الملاحظات</div></div></div><div>‹</div></button>
+
+  <div class="card parent-hero-card">
+    <div class="parent-hero-head">
+      <div>
+        <div class="badge">لوحة متابعة متقدمة</div>
+        <h3>نظرة شاملة على تقدم الطالب / الطالبة</h3>
+        <p>واجهة مخصصة لولي الأمر تعرض التقدم الدراسي، مستوى الحساب، الترتيب، والتنبيهات المهمة بطريقة أوضح وأقوى.</p>
+      </div>
+      <div class="parent-hero-icon">👨‍👩‍👧</div>
     </div>
-    <div id="parentFollowNotice" class="notice ok" style="margin-top:14px">هذه الصفحة مخصصة لخدمات ولي الأمر التعليمية والتنظيمية داخل بنك الرياضيات.</div>
   </div>
+
+  <div class="parent-overview-grid">
+    <div class="parent-metric-card">
+      <span class="label">الرصيد الحالي</span>
+      <strong id="pfCurrentBalance">0</strong>
+      <small>الرصيد التحفيزي الحالي</small>
+    </div>
+    <div class="parent-metric-card">
+      <span class="label">المستوى الحالي</span>
+      <strong id="pfCurrentLevel">برونزي</strong>
+      <small>تصنيف الحساب البنكي</small>
+    </div>
+    <div class="parent-metric-card">
+      <span class="label">المتبقي للترقية</span>
+      <strong id="pfRemainToNext">0</strong>
+      <small>حتى المستوى التالي</small>
+    </div>
+  </div>
+
+  <div class="card parent-student-summary">
+    <div class="section-head"><h3>بطاقة الطالب / الطالبة</h3><span class="pill">محدث تلقائيًا</span></div>
+    <div class="parent-student-shell">
+      <div class="parent-student-main">
+        <div class="parent-student-avatar">🎓</div>
+        <div>
+          <h4 id="pfStudentName">—</h4>
+          <div class="muted" id="pfStudentClass">الفصل: —</div>
+          <div class="parent-level-pill" id="pfLevelPill">نوع الحساب: —</div>
+        </div>
+      </div>
+      <div class="parent-rank-box">
+        <span>الترتيب في الفصل</span>
+        <strong id="pfRankInClass">—</strong>
+      </div>
+    </div>
+  </div>
+
+  <div class="parent-analysis-grid">
+    <div class="card">
+      <div class="section-head"><h3>تحليل هذا الأسبوع</h3><span class="pill">ملخص سريع</span></div>
+      <div class="parent-week-grid">
+        <div class="parent-week-box"><strong id="pfOpsCount">0</strong><span>عدد العمليات</span></div>
+        <div class="parent-week-box"><strong id="pfDepositsCount">0</strong><span>الإيداعات</span></div>
+        <div class="parent-week-box"><strong id="pfWithdrawsCount">0</strong><span>السحوبات</span></div>
+        <div class="parent-week-box"><strong id="pfAbsenceCount">0</strong><span>الغياب</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-head"><h3>مؤشر التقدم</h3><span class="pill">حتى الترقية</span></div>
+      <div class="progress-wrap">
+        <div class="progress-labels">
+          <span id="pfProgressLabel">التقدم نحو المستوى التالي</span>
+          <strong id="pfProgressPercent">0%</strong>
+        </div>
+        <div class="progress-track"><div class="progress-fill" id="pfProgressFill" style="width:0%"></div></div>
+        <div class="muted" id="pfProgressHint">سيظهر مقدار التقدم هنا.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-head"><h3>تنبيهات المعلمة</h3><span class="pill">آخر التحديثات</span></div>
+    <div id="pfTeacherAlerts" class="parent-alerts">
+      <div class="parent-alert-item">
+        <div class="icon">🔔</div>
+        <div>
+          <strong>لا توجد تنبيهات بعد</strong>
+          <span>سيتم عرض آخر الملاحظات والعمليات المهمة هنا.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="parent-actions-grid">
+    <button class="btn btn-green" onclick="parentFollowOpenFaq()">الأسئلة المتكررة والدعم</button>
+    <button class="btn btn-gold" onclick="parentFollowRequestReport()">طلب تقرير مختصر</button>
+    <button class="btn btn-light" onclick="parentFollowAcademic()">متابعة أكاديمية</button>
+    <button class="btn btn-light" onclick="parentFollowAttendance()">متابعة الحضور والانضباط</button>
+  </div>
+
+  <div id="parentFollowNotice" class="notice ok hidden" style="margin-top:14px"></div>
 </section>
+
 
 <section id="faq_center" class="screen">
   <div class="topbar">
@@ -3871,6 +4000,50 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
 .screen.active{display:block!important;}
 .topbar,.card:first-child,.hero:first-child{margin-top:0!important;}
 </style>
+
+<style id="parent-followup-pro-style">
+.parent-hero-card{background:linear-gradient(135deg,#0f3529,#1d6b4a);color:#fff;overflow:hidden;position:relative}
+.parent-hero-head{display:flex;justify-content:space-between;align-items:flex-start;gap:18px}
+.parent-hero-head h3{margin:10px 0 8px;font-size:28px}
+.parent-hero-head p{margin:0;color:rgba(255,255,255,.88);line-height:1.9;font-size:14px;max-width:760px}
+.parent-hero-icon{width:74px;height:74px;border-radius:24px;background:rgba(255,255,255,.14);display:grid;place-items:center;font-size:34px;flex:none}
+.parent-overview-grid,.parent-analysis-grid,.parent-actions-grid{display:grid;gap:14px;margin-top:14px}
+.parent-overview-grid{grid-template-columns:repeat(3,1fr)}
+.parent-analysis-grid{grid-template-columns:1.25fr 1fr}
+.parent-actions-grid{grid-template-columns:repeat(4,1fr)}
+.parent-metric-card{background:#fff;border:1px solid var(--line);border-radius:24px;padding:18px;box-shadow:0 12px 24px rgba(16,58,46,.06)}
+.parent-metric-card .label{display:block;color:var(--muted);font-size:13px;margin-bottom:8px}
+.parent-metric-card strong{display:block;font-size:30px;color:var(--deep)}
+.parent-metric-card small{display:block;color:var(--muted);margin-top:6px}
+.parent-student-summary{margin-top:14px}
+.parent-student-shell{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
+.parent-student-main{display:flex;align-items:center;gap:14px}
+.parent-student-avatar{width:70px;height:70px;border-radius:22px;background:linear-gradient(135deg,#0f5f43,#1f8e66);display:grid;place-items:center;font-size:30px;color:#fff}
+.parent-student-main h4{margin:0 0 6px;font-size:24px;color:var(--deep)}
+.parent-level-pill{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:999px;background:linear-gradient(135deg,#cfae6d,#ddc186);color:#fff;font-weight:900;margin-top:10px}
+.parent-rank-box{min-width:180px;background:#f7faf8;border:1px solid var(--line);border-radius:22px;padding:16px;text-align:center}
+.parent-rank-box span{display:block;color:var(--muted);font-size:13px}
+.parent-rank-box strong{display:block;color:var(--deep);font-size:32px;margin-top:6px}
+.parent-week-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.parent-week-box{background:#f7faf8;border:1px solid var(--line);border-radius:20px;padding:16px;text-align:center}
+.parent-week-box strong{display:block;color:var(--deep);font-size:28px}
+.parent-week-box span{display:block;color:var(--muted);font-size:12px;margin-top:6px}
+.progress-wrap{padding-top:6px}
+.progress-labels{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:10px}
+.progress-labels strong{color:var(--deep);font-size:24px}
+.progress-track{height:14px;background:#edf2ef;border-radius:999px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,#0f5f43,#1f8e66);border-radius:999px}
+.parent-alerts{display:grid;gap:10px}
+.parent-alert-item{display:flex;gap:12px;align-items:flex-start;background:#fff;border:1px solid var(--line);border-radius:20px;padding:14px}
+.parent-alert-item .icon{width:42px;height:42px;border-radius:14px;background:#f4f8f5;display:grid;place-items:center;flex:none}
+.parent-alert-item strong{display:block;color:var(--deep);margin-bottom:4px}
+.parent-alert-item span{display:block;color:var(--muted);line-height:1.8}
+@media (max-width:900px){
+  .parent-overview-grid,.parent-analysis-grid,.parent-actions-grid,.parent-week-grid{grid-template-columns:1fr !important}
+  .parent-hero-head{flex-direction:column}
+}
+</style>
+
 </head><body>'
       + '<h1>تقرير بنك الرياضيات</h1>'
       + '<div class="meta">الطالبة: '+esc(student.name)+'</div>'
@@ -3985,6 +4158,50 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
 .screen.active{display:block!important;}
 .topbar,.card:first-child,.hero:first-child{margin-top:0!important;}
 </style>
+
+<style id="parent-followup-pro-style">
+.parent-hero-card{background:linear-gradient(135deg,#0f3529,#1d6b4a);color:#fff;overflow:hidden;position:relative}
+.parent-hero-head{display:flex;justify-content:space-between;align-items:flex-start;gap:18px}
+.parent-hero-head h3{margin:10px 0 8px;font-size:28px}
+.parent-hero-head p{margin:0;color:rgba(255,255,255,.88);line-height:1.9;font-size:14px;max-width:760px}
+.parent-hero-icon{width:74px;height:74px;border-radius:24px;background:rgba(255,255,255,.14);display:grid;place-items:center;font-size:34px;flex:none}
+.parent-overview-grid,.parent-analysis-grid,.parent-actions-grid{display:grid;gap:14px;margin-top:14px}
+.parent-overview-grid{grid-template-columns:repeat(3,1fr)}
+.parent-analysis-grid{grid-template-columns:1.25fr 1fr}
+.parent-actions-grid{grid-template-columns:repeat(4,1fr)}
+.parent-metric-card{background:#fff;border:1px solid var(--line);border-radius:24px;padding:18px;box-shadow:0 12px 24px rgba(16,58,46,.06)}
+.parent-metric-card .label{display:block;color:var(--muted);font-size:13px;margin-bottom:8px}
+.parent-metric-card strong{display:block;font-size:30px;color:var(--deep)}
+.parent-metric-card small{display:block;color:var(--muted);margin-top:6px}
+.parent-student-summary{margin-top:14px}
+.parent-student-shell{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
+.parent-student-main{display:flex;align-items:center;gap:14px}
+.parent-student-avatar{width:70px;height:70px;border-radius:22px;background:linear-gradient(135deg,#0f5f43,#1f8e66);display:grid;place-items:center;font-size:30px;color:#fff}
+.parent-student-main h4{margin:0 0 6px;font-size:24px;color:var(--deep)}
+.parent-level-pill{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:999px;background:linear-gradient(135deg,#cfae6d,#ddc186);color:#fff;font-weight:900;margin-top:10px}
+.parent-rank-box{min-width:180px;background:#f7faf8;border:1px solid var(--line);border-radius:22px;padding:16px;text-align:center}
+.parent-rank-box span{display:block;color:var(--muted);font-size:13px}
+.parent-rank-box strong{display:block;color:var(--deep);font-size:32px;margin-top:6px}
+.parent-week-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.parent-week-box{background:#f7faf8;border:1px solid var(--line);border-radius:20px;padding:16px;text-align:center}
+.parent-week-box strong{display:block;color:var(--deep);font-size:28px}
+.parent-week-box span{display:block;color:var(--muted);font-size:12px;margin-top:6px}
+.progress-wrap{padding-top:6px}
+.progress-labels{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:10px}
+.progress-labels strong{color:var(--deep);font-size:24px}
+.progress-track{height:14px;background:#edf2ef;border-radius:999px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,#0f5f43,#1f8e66);border-radius:999px}
+.parent-alerts{display:grid;gap:10px}
+.parent-alert-item{display:flex;gap:12px;align-items:flex-start;background:#fff;border:1px solid var(--line);border-radius:20px;padding:14px}
+.parent-alert-item .icon{width:42px;height:42px;border-radius:14px;background:#f4f8f5;display:grid;place-items:center;flex:none}
+.parent-alert-item strong{display:block;color:var(--deep);margin-bottom:4px}
+.parent-alert-item span{display:block;color:var(--muted);line-height:1.8}
+@media (max-width:900px){
+  .parent-overview-grid,.parent-analysis-grid,.parent-actions-grid,.parent-week-grid{grid-template-columns:1fr !important}
+  .parent-hero-head{flex-direction:column}
+}
+</style>
+
 </head><body><h1>التقرير الشامل - بنك الرياضيات</h1><div class="muted">تم إنشاؤه تلقائيًا من التقارير الذكية</div><div class="grid">${['srStudents','srClasses','srDeposits','srWithdrawals','srTransfers','srTasks','srSubmitted','srPending'].map(id=>{ const el=document.getElementById(id); const label=el&&el.nextElementSibling?el.nextElementSibling.textContent:''; return `<div class="card"><strong>${label}</strong><div style="font-size:24px;margin-top:8px">${el?el.textContent:''}</div></div>`; }).join('')}</div><div class="card"><h3>أفضل الطلاب / الطالبات</h3>${document.getElementById('smartTopStudents')?.innerHTML||''}</div><div class="card"><h3>تحليل الفصول</h3>${document.getElementById('smartClassCards')?.innerHTML||''}</div><div class="card"><h3>التنبيهات الذكية</h3>${document.getElementById('smartAlerts')?.innerHTML||''}</div>
 <script id="smart-reports-override-v7">
 (function(){
@@ -4106,6 +4323,50 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
 .screen.active{display:block!important;}
 .topbar,.card:first-child,.hero:first-child{margin-top:0!important;}
 </style>
+
+<style id="parent-followup-pro-style">
+.parent-hero-card{background:linear-gradient(135deg,#0f3529,#1d6b4a);color:#fff;overflow:hidden;position:relative}
+.parent-hero-head{display:flex;justify-content:space-between;align-items:flex-start;gap:18px}
+.parent-hero-head h3{margin:10px 0 8px;font-size:28px}
+.parent-hero-head p{margin:0;color:rgba(255,255,255,.88);line-height:1.9;font-size:14px;max-width:760px}
+.parent-hero-icon{width:74px;height:74px;border-radius:24px;background:rgba(255,255,255,.14);display:grid;place-items:center;font-size:34px;flex:none}
+.parent-overview-grid,.parent-analysis-grid,.parent-actions-grid{display:grid;gap:14px;margin-top:14px}
+.parent-overview-grid{grid-template-columns:repeat(3,1fr)}
+.parent-analysis-grid{grid-template-columns:1.25fr 1fr}
+.parent-actions-grid{grid-template-columns:repeat(4,1fr)}
+.parent-metric-card{background:#fff;border:1px solid var(--line);border-radius:24px;padding:18px;box-shadow:0 12px 24px rgba(16,58,46,.06)}
+.parent-metric-card .label{display:block;color:var(--muted);font-size:13px;margin-bottom:8px}
+.parent-metric-card strong{display:block;font-size:30px;color:var(--deep)}
+.parent-metric-card small{display:block;color:var(--muted);margin-top:6px}
+.parent-student-summary{margin-top:14px}
+.parent-student-shell{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
+.parent-student-main{display:flex;align-items:center;gap:14px}
+.parent-student-avatar{width:70px;height:70px;border-radius:22px;background:linear-gradient(135deg,#0f5f43,#1f8e66);display:grid;place-items:center;font-size:30px;color:#fff}
+.parent-student-main h4{margin:0 0 6px;font-size:24px;color:var(--deep)}
+.parent-level-pill{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:999px;background:linear-gradient(135deg,#cfae6d,#ddc186);color:#fff;font-weight:900;margin-top:10px}
+.parent-rank-box{min-width:180px;background:#f7faf8;border:1px solid var(--line);border-radius:22px;padding:16px;text-align:center}
+.parent-rank-box span{display:block;color:var(--muted);font-size:13px}
+.parent-rank-box strong{display:block;color:var(--deep);font-size:32px;margin-top:6px}
+.parent-week-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.parent-week-box{background:#f7faf8;border:1px solid var(--line);border-radius:20px;padding:16px;text-align:center}
+.parent-week-box strong{display:block;color:var(--deep);font-size:28px}
+.parent-week-box span{display:block;color:var(--muted);font-size:12px;margin-top:6px}
+.progress-wrap{padding-top:6px}
+.progress-labels{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:10px}
+.progress-labels strong{color:var(--deep);font-size:24px}
+.progress-track{height:14px;background:#edf2ef;border-radius:999px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,#0f5f43,#1f8e66);border-radius:999px}
+.parent-alerts{display:grid;gap:10px}
+.parent-alert-item{display:flex;gap:12px;align-items:flex-start;background:#fff;border:1px solid var(--line);border-radius:20px;padding:14px}
+.parent-alert-item .icon{width:42px;height:42px;border-radius:14px;background:#f4f8f5;display:grid;place-items:center;flex:none}
+.parent-alert-item strong{display:block;color:var(--deep);margin-bottom:4px}
+.parent-alert-item span{display:block;color:var(--muted);line-height:1.8}
+@media (max-width:900px){
+  .parent-overview-grid,.parent-analysis-grid,.parent-actions-grid,.parent-week-grid{grid-template-columns:1fr !important}
+  .parent-hero-head{flex-direction:column}
+}
+</style>
+
 </head><body><h1>التقرير الشامل - بنك الرياضيات</h1><div class="muted">تم إنشاؤه تلقائيًا من التقارير الذكية</div><div class="grid">${['srStudents','srClasses','srDeposits','srWithdrawals','srTransfers','srTasks','srSubmitted','srPending'].map(id=>{ const el=document.getElementById(id); const label=el&&el.nextElementSibling?el.nextElementSibling.textContent:''; return `<div class="card"><strong>${label}</strong><div style="font-size:24px;margin-top:8px">${el?el.textContent:''}</div></div>`; }).join('')}</div><div class="card"><h3>أفضل الطلاب / الطالبات</h3>${document.getElementById('smartTopStudents')?.innerHTML||''}</div><div class="card"><h3>مؤشر أداء الطالب / الطالبة</h3>${document.getElementById('smartPerformanceIndicators')?.innerHTML||''}</div><div class="card"><h3>تحليل الفصول</h3>${document.getElementById('smartClassCards')?.innerHTML||''}</div><div class="card"><h3>التنبيهات الذكية</h3>${document.getElementById('smartAlerts')?.innerHTML||''}</div>
 <style id="student-settings-pro-style">
 .student-settings-pro{margin-top:16px;display:grid;gap:14px}
@@ -4419,6 +4680,50 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
 .screen.active{display:block!important;}
 .topbar,.card:first-child,.hero:first-child{margin-top:0!important;}
 </style>
+
+<style id="parent-followup-pro-style">
+.parent-hero-card{background:linear-gradient(135deg,#0f3529,#1d6b4a);color:#fff;overflow:hidden;position:relative}
+.parent-hero-head{display:flex;justify-content:space-between;align-items:flex-start;gap:18px}
+.parent-hero-head h3{margin:10px 0 8px;font-size:28px}
+.parent-hero-head p{margin:0;color:rgba(255,255,255,.88);line-height:1.9;font-size:14px;max-width:760px}
+.parent-hero-icon{width:74px;height:74px;border-radius:24px;background:rgba(255,255,255,.14);display:grid;place-items:center;font-size:34px;flex:none}
+.parent-overview-grid,.parent-analysis-grid,.parent-actions-grid{display:grid;gap:14px;margin-top:14px}
+.parent-overview-grid{grid-template-columns:repeat(3,1fr)}
+.parent-analysis-grid{grid-template-columns:1.25fr 1fr}
+.parent-actions-grid{grid-template-columns:repeat(4,1fr)}
+.parent-metric-card{background:#fff;border:1px solid var(--line);border-radius:24px;padding:18px;box-shadow:0 12px 24px rgba(16,58,46,.06)}
+.parent-metric-card .label{display:block;color:var(--muted);font-size:13px;margin-bottom:8px}
+.parent-metric-card strong{display:block;font-size:30px;color:var(--deep)}
+.parent-metric-card small{display:block;color:var(--muted);margin-top:6px}
+.parent-student-summary{margin-top:14px}
+.parent-student-shell{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
+.parent-student-main{display:flex;align-items:center;gap:14px}
+.parent-student-avatar{width:70px;height:70px;border-radius:22px;background:linear-gradient(135deg,#0f5f43,#1f8e66);display:grid;place-items:center;font-size:30px;color:#fff}
+.parent-student-main h4{margin:0 0 6px;font-size:24px;color:var(--deep)}
+.parent-level-pill{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:999px;background:linear-gradient(135deg,#cfae6d,#ddc186);color:#fff;font-weight:900;margin-top:10px}
+.parent-rank-box{min-width:180px;background:#f7faf8;border:1px solid var(--line);border-radius:22px;padding:16px;text-align:center}
+.parent-rank-box span{display:block;color:var(--muted);font-size:13px}
+.parent-rank-box strong{display:block;color:var(--deep);font-size:32px;margin-top:6px}
+.parent-week-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.parent-week-box{background:#f7faf8;border:1px solid var(--line);border-radius:20px;padding:16px;text-align:center}
+.parent-week-box strong{display:block;color:var(--deep);font-size:28px}
+.parent-week-box span{display:block;color:var(--muted);font-size:12px;margin-top:6px}
+.progress-wrap{padding-top:6px}
+.progress-labels{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:10px}
+.progress-labels strong{color:var(--deep);font-size:24px}
+.progress-track{height:14px;background:#edf2ef;border-radius:999px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,#0f5f43,#1f8e66);border-radius:999px}
+.parent-alerts{display:grid;gap:10px}
+.parent-alert-item{display:flex;gap:12px;align-items:flex-start;background:#fff;border:1px solid var(--line);border-radius:20px;padding:14px}
+.parent-alert-item .icon{width:42px;height:42px;border-radius:14px;background:#f4f8f5;display:grid;place-items:center;flex:none}
+.parent-alert-item strong{display:block;color:var(--deep);margin-bottom:4px}
+.parent-alert-item span{display:block;color:var(--muted);line-height:1.8}
+@media (max-width:900px){
+  .parent-overview-grid,.parent-analysis-grid,.parent-actions-grid,.parent-week-grid{grid-template-columns:1fr !important}
+  .parent-hero-head{flex-direction:column}
+}
+</style>
+
 </head><body><h1>${title}</h1>${bodyHtml}
 <script>
 function goAccountTab(tabId){
@@ -6320,6 +6625,132 @@ document.addEventListener('DOMContentLoaded', function(){
     window.saveBankData = function(){
       oldSaveHonorFix.apply(this, arguments);
       setTimeout(updateHonorTop5Only, 10);
+    };
+  }
+})();
+</script>
+
+
+<script id="parent-followup-pro-script">
+(function(){
+  function pfReadData(){
+    try{
+      const raw = localStorage.getItem('greenBankTeacherData_v1');
+      if(raw) return JSON.parse(raw);
+    }catch(e){}
+    try{
+      if(typeof bankData !== 'undefined' && bankData) return bankData;
+    }catch(e){}
+    return null;
+  }
+  function pfFormat(v){
+    try{return new Intl.NumberFormat('ar-SA').format(Number(v||0));}
+    catch(e){return String(v||0);}
+  }
+  function pfLevel(balance){
+    balance = Number(balance||0);
+    if(balance >= 41000) return {name:'ألماسي', start:41000, next:41000};
+    if(balance >= 31000) return {name:'بلاتيني', start:31000, next:41000};
+    if(balance >= 16000) return {name:'ذهبي', start:16000, next:31000};
+    if(balance >= 11000) return {name:'فضي', start:11000, next:16000};
+    return {name:'برونزي', start:0, next:11000};
+  }
+  function pfCurrentStudent(data){
+    if(!data || !Array.isArray(data.students) || !data.students.length) return null;
+    const id = sessionStorage.getItem('currentStudentId') || localStorage.getItem('selectedStudentId');
+    if(id){
+      const found = data.students.find(s => String(s.id) === String(id));
+      if(found) return found;
+    }
+    return data.students.slice().sort((a,b)=>Number(b.balance||0)-Number(a.balance||0))[0];
+  }
+  function pfClassRank(data, student){
+    const inClass = (data.students||[]).filter(s => s.classId === student.classId)
+      .sort((a,b)=>Number(b.balance||0)-Number(a.balance||0));
+    const idx = inClass.findIndex(s => String(s.id) === String(student.id));
+    return idx >= 0 ? `${idx+1} / ${inClass.length}` : `1 / ${inClass.length||1}`;
+  }
+  function pfAlerts(student){
+    const hist = Array.isArray(student.history) ? student.history.slice().reverse().slice(0,3) : [];
+    if(!hist.length){
+      return [{
+        icon:'🔔',
+        title:'لا توجد تنبيهات بعد',
+        text:'سيتم عرض آخر الملاحظات والعمليات المهمة هنا.'
+      }];
+    }
+    return hist.map(function(h){
+      const map = {deposit:'💰', withdraw:'⚠️', transfer:'🔁'};
+      return {
+        icon: map[h.type] || '🔔',
+        title: (h.type === 'deposit' ? 'إيداع جديد' : h.type === 'withdraw' ? 'سحب جديد' : 'عملية جديدة'),
+        text: `${h.reason || 'تحديث جديد'} • ${pfFormat(h.amount)}`
+      };
+    });
+  }
+  function updateParentFollowup(){
+    const data = pfReadData();
+    if(!data) return;
+    const st = pfCurrentStudent(data);
+    if(!st) return;
+    const cls = (data.classes||[]).find(c => c.id === st.classId);
+    const level = pfLevel(st.balance);
+    const remain = Math.max(0, Number(level.next||0) - Number(st.balance||0));
+    const progress = level.next > level.start ? Math.min(100, Math.round(((Number(st.balance||0)-level.start)/(level.next-level.start))*100)) : 100;
+    const history = Array.isArray(st.history) ? st.history : [];
+    const deposits = history.filter(h => h.type === 'deposit').length;
+    const withdraws = history.filter(h => h.type === 'withdraw').length;
+
+    const set = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = val; };
+    set('pfCurrentBalance', pfFormat(st.balance));
+    set('pfCurrentLevel', level.name);
+    set('pfRemainToNext', pfFormat(remain));
+    set('pfStudentName', st.name || '—');
+    set('pfStudentClass', 'الفصل: ' + ((cls && cls.name) || '—'));
+    set('pfLevelPill', 'نوع الحساب: ' + level.name);
+    set('pfRankInClass', pfClassRank(data, st));
+    set('pfOpsCount', history.length);
+    set('pfDepositsCount', deposits);
+    set('pfWithdrawsCount', withdraws);
+    set('pfAbsenceCount', Number(st.absenceCount||0));
+    set('pfProgressPercent', progress + '%');
+    const fill = document.getElementById('pfProgressFill');
+    if(fill) fill.style.width = progress + '%';
+    const hint = document.getElementById('pfProgressHint');
+    if(hint) hint.textContent = `المتبقي للترقية التالية: ${pfFormat(remain)} ر.س`;
+    const label = document.getElementById('pfProgressLabel');
+    if(label) label.textContent = 'التقدم نحو المستوى التالي';
+
+    const alertsWrap = document.getElementById('pfTeacherAlerts');
+    if(alertsWrap){
+      alertsWrap.innerHTML = pfAlerts(st).map(function(a){
+        return `<div class="parent-alert-item"><div class="icon">${a.icon}</div><div><strong>${a.title}</strong><span>${a.text}</span></div></div>`;
+      }).join('');
+    }
+  }
+
+  function showParentNotice(text){
+    const note = document.getElementById('parentFollowNotice');
+    if(note){
+      note.textContent = text;
+      note.classList.remove('hidden');
+    }
+  }
+
+  window.parentFollowOpenFaq = function(){ if(typeof go === 'function') go('faq_center'); };
+  window.parentFollowRequestReport = function(){ showParentNotice('تم تجهيز طلب تقرير مختصر لولي الأمر داخل النظام.'); };
+  window.parentFollowAcademic = function(){ showParentNotice('تظهر هنا قراءة تحليلية لمستوى الطالب وتقدمه الدراسي داخل بنك الرياضيات.'); };
+  window.parentFollowAttendance = function(){ showParentNotice('تظهر هنا متابعة الحضور والانضباط والتنبيهات المرتبطة بالغياب والتأخر.'); };
+
+  document.addEventListener('DOMContentLoaded', function(){
+    setTimeout(updateParentFollowup, 250);
+  });
+
+  const oldSavePf = window.saveBankData;
+  if(typeof oldSavePf === 'function'){
+    window.saveBankData = function(){
+      oldSavePf.apply(this, arguments);
+      setTimeout(updateParentFollowup, 10);
     };
   }
 })();
