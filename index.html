@@ -614,20 +614,6 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
 }
 </style>
 
-
-<style id="oai-reset-system-style">
-.reset-system-btn{
-  background:#b42318;
-  color:#fff;
-  border:none;
-  padding:10px 18px;
-  border-radius:12px;
-  font-weight:800;
-  cursor:pointer;
-  box-shadow:0 8px 18px rgba(180,35,24,.18);
-}
-</style>
-
 </head>
 <body>
 <div class="app">
@@ -1591,7 +1577,7 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
     </div>
 
     <div class="card parent-student-summary">
-      <div class="section-head"><h3>بطاقة الطالب / الطالبة</h3><button class="reset-system-btn" onclick="resetSystem()">🔄 إعادة تهيئة النظام</button><span class="pill">محدث تلقائيًا</span></div>
+      <div class="section-head"><h3>بطاقة الطالب / الطالبة</h3><span class="pill">محدث تلقائيًا</span></div>
       <div class="parent-student-shell">
         <div class="parent-student-main">
           <div class="parent-student-avatar">🎓</div>
@@ -4099,20 +4085,6 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
 }
 </style>
 
-
-<style id="oai-reset-system-style">
-.reset-system-btn{
-  background:#b42318;
-  color:#fff;
-  border:none;
-  padding:10px 18px;
-  border-radius:12px;
-  font-weight:800;
-  cursor:pointer;
-  box-shadow:0 8px 18px rgba(180,35,24,.18);
-}
-</style>
-
 </head><body>'
       + '<h1>تقرير بنك الرياضيات</h1>'
       + '<div class="meta">الطالبة: '+esc(student.name)+'</div>'
@@ -4279,20 +4251,6 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
 .parent-actions-grid-strong .btn{min-height:58px;font-size:15px;font-weight:900}
 @media (max-width:900px){
   .parent-login-grid,.parent-login-actions{grid-template-columns:1fr !important}
-}
-</style>
-
-
-<style id="oai-reset-system-style">
-.reset-system-btn{
-  background:#b42318;
-  color:#fff;
-  border:none;
-  padding:10px 18px;
-  border-radius:12px;
-  font-weight:800;
-  cursor:pointer;
-  box-shadow:0 8px 18px rgba(180,35,24,.18);
 }
 </style>
 
@@ -4469,20 +4427,6 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
 .parent-actions-grid-strong .btn{min-height:58px;font-size:15px;font-weight:900}
 @media (max-width:900px){
   .parent-login-grid,.parent-login-actions{grid-template-columns:1fr !important}
-}
-</style>
-
-
-<style id="oai-reset-system-style">
-.reset-system-btn{
-  background:#b42318;
-  color:#fff;
-  border:none;
-  padding:10px 18px;
-  border-radius:12px;
-  font-weight:800;
-  cursor:pointer;
-  box-shadow:0 8px 18px rgba(180,35,24,.18);
 }
 </style>
 
@@ -4851,20 +4795,6 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
 .parent-actions-grid-strong .btn{min-height:58px;font-size:15px;font-weight:900}
 @media (max-width:900px){
   .parent-login-grid,.parent-login-actions{grid-template-columns:1fr !important}
-}
-</style>
-
-
-<style id="oai-reset-system-style">
-.reset-system-btn{
-  background:#b42318;
-  color:#fff;
-  border:none;
-  padding:10px 18px;
-  border-radius:12px;
-  font-weight:800;
-  cursor:pointer;
-  box-shadow:0 8px 18px rgba(180,35,24,.18);
 }
 </style>
 
@@ -7139,14 +7069,56 @@ document.addEventListener('DOMContentLoaded', function(){
 
 <script id="oai-reset-system-script">
 function resetSystem(){
-  if(!confirm("سيتم إعادة تهيئة النظام ومسح البيانات المؤقتة من هذا الجهاز فقط. هل تريدين المتابعة؟")){
+  if(!confirm("سيتم إعادة تهيئة النظام على هذا الجهاز فقط مع الاحتفاظ ببيانات البنك الحقيقية. هل تريدين المتابعة؟")){
     return;
   }
   try{
+    let latestData = null;
+
+    try{
+      if(typeof bankData !== 'undefined' && bankData && Array.isArray(bankData.students)){
+        latestData = JSON.stringify(bankData);
+      }
+    }catch(e){}
+
+    if(!latestData){
+      latestData = localStorage.getItem('greenBankTeacherData_v1') || localStorage.getItem('bankData_v10');
+    }
+
+    const preserved = {
+      green: latestData || '',
+      blue: localStorage.getItem('bankData_v10') || ''
+    };
+
     localStorage.clear();
     sessionStorage.clear();
-    alert("تمت إعادة تهيئة النظام بنجاح");
-    location.reload();
+
+    if(preserved.green){
+      localStorage.setItem('greenBankTeacherData_v1', preserved.green);
+    }
+    if(preserved.blue){
+      localStorage.setItem('bankData_v10', preserved.blue);
+    }
+
+    // حذف المفاتيح المؤقتة والمشتقة فقط
+    Object.keys(localStorage).forEach(function(k){
+      if(
+        k.startsWith('HB_STU_TOP5_') ||
+        k.startsWith('awardState_') ||
+        k.startsWith('roulette_') ||
+        k.startsWith('mb_roulette_') ||
+        k === 'selectedStudentId' ||
+        k === 'MB_LAST_MODE' ||
+        k === 'MB_LAYOUT_PREF' ||
+        k === 'mathbank_onboarded_v1' ||
+        k === 'mb_onboarded_v1'
+      ){
+        localStorage.removeItem(k);
+      }
+    });
+
+    alert("تمت إعادة تهيئة النظام بنجاح مع الحفاظ على بيانات البنك الحقيقية.");
+    location.href = location.pathname + '?refresh=' + Date.now();
   }catch(e){
     alert("حدث خطأ أثناء إعادة التهيئة");
   }
