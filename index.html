@@ -647,7 +647,37 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
         <div class="selector-left"><div class="icon-box">👩🏻‍🏫</div><div><div class="selector-title">حساب المعلم / المعلمة</div><div class="selector-sub">دخول إداري لإدارة العمليات والحسابات</div></div></div>
         <div style="font-size:22px;color:var(--green)">‹</div>
       </div>
-    
+    <div id="teacherPaneReports" class="teacher-pane card">
+      <div class="teacher-mini-kpis">
+        <div class="teacher-mini-kpi"><strong id="reportDeposits">0</strong><span>إجمالي الإيداع</span></div>
+        <div class="teacher-mini-kpi"><strong id="reportWithdrawals">0</strong><span>إجمالي السحب</span></div>
+        <div class="teacher-mini-kpi"><strong id="reportTransfers">0</strong><span>إجمالي التحويل</span></div>
+      </div>
+      <div class="teacher-grid">
+        <div class="teacher-chart-card">
+          <h4>تحليل العمليات حسب النوع</h4>
+          <canvas id="teacherOpsChart" width="320" height="220" style="width:100%;height:220px"></canvas>
+          <div class="teacher-note">يظهر هذا الرسم توزيع الإيداع والسحب والتحويل داخل النظام الحالي.</div>
+        </div>
+        <div class="teacher-chart-card">
+          <h4>لوحة الشرف التلقائية</h4>
+          <div class="teacher-top-list" id="teacherHonorList"></div>
+        </div>
+      </div>
+      <div class="teacher-grid" style="margin-top:12px">
+        <div class="teacher-chart-card">
+          <h4>ملخص الفصول</h4>
+          <div class="teacher-top-list" id="teacherClassBalances"></div>
+        </div>
+        <div class="teacher-chart-card">
+          <h4>روليت الجوائز — إعداد سريع</h4>
+          <div class="field"><label>جوائز الروليت</label><input id="roulettePrizesInput" type="text" placeholder="مثال: 100, 200, 500, هدية, حظ أوفر" /></div>
+          <button class="btn btn-gold" style="width:100%" onclick="saveRoulettePrizes()">حفظ جوائز الروليت</button>
+          <div id="rouletteMsg" class="notice ok hidden">تم حفظ جوائز الروليت</div>
+          <div class="teacher-note">هذه الإعدادات تُستخدم كمرجع سريع داخل النظام ويمكن تطويرها لاحقًا للروليت التفاعلي.</div>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -677,7 +707,37 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
       </div>
       <div class="login-links"><a href="#">تغيير كلمة المرور</a><a href="#">استرجاع كلمة المرور</a></div>
       <button class="btn btn-green" style="width:100%" onclick="studentLogin()">دخول الطالب / الطالبة</button><div id="studentLoginError" class="muted" style="color:#b9514f;margin-top:10px"></div>
-    
+    <div id="teacherPaneReports" class="teacher-pane card">
+      <div class="teacher-mini-kpis">
+        <div class="teacher-mini-kpi"><strong id="reportDeposits">0</strong><span>إجمالي الإيداع</span></div>
+        <div class="teacher-mini-kpi"><strong id="reportWithdrawals">0</strong><span>إجمالي السحب</span></div>
+        <div class="teacher-mini-kpi"><strong id="reportTransfers">0</strong><span>إجمالي التحويل</span></div>
+      </div>
+      <div class="teacher-grid">
+        <div class="teacher-chart-card">
+          <h4>تحليل العمليات حسب النوع</h4>
+          <canvas id="teacherOpsChart" width="320" height="220" style="width:100%;height:220px"></canvas>
+          <div class="teacher-note">يظهر هذا الرسم توزيع الإيداع والسحب والتحويل داخل النظام الحالي.</div>
+        </div>
+        <div class="teacher-chart-card">
+          <h4>لوحة الشرف التلقائية</h4>
+          <div class="teacher-top-list" id="teacherHonorList"></div>
+        </div>
+      </div>
+      <div class="teacher-grid" style="margin-top:12px">
+        <div class="teacher-chart-card">
+          <h4>ملخص الفصول</h4>
+          <div class="teacher-top-list" id="teacherClassBalances"></div>
+        </div>
+        <div class="teacher-chart-card">
+          <h4>روليت الجوائز — إعداد سريع</h4>
+          <div class="field"><label>جوائز الروليت</label><input id="roulettePrizesInput" type="text" placeholder="مثال: 100, 200, 500, هدية, حظ أوفر" /></div>
+          <button class="btn btn-gold" style="width:100%" onclick="saveRoulettePrizes()">حفظ جوائز الروليت</button>
+          <div id="rouletteMsg" class="notice ok hidden">تم حفظ جوائز الروليت</div>
+          <div class="teacher-note">هذه الإعدادات تُستخدم كمرجع سريع داخل النظام ويمكن تطويرها لاحقًا للروليت التفاعلي.</div>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -709,7 +769,37 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
       <div class="login-links"><a href="#">تغيير كلمة المرور</a><a href="#">استرجاع كلمة المرور</a></div>
       <button class="btn btn-gold" style="width:100%" onclick="teacherLogin()">دخول المعلم / المعلمة</button>
       <div id="teacherLoginError" class="muted" style="color:#b9514f;margin-top:10px"></div>
-    
+    <div id="teacherPaneReports" class="teacher-pane card">
+      <div class="teacher-mini-kpis">
+        <div class="teacher-mini-kpi"><strong id="reportDeposits">0</strong><span>إجمالي الإيداع</span></div>
+        <div class="teacher-mini-kpi"><strong id="reportWithdrawals">0</strong><span>إجمالي السحب</span></div>
+        <div class="teacher-mini-kpi"><strong id="reportTransfers">0</strong><span>إجمالي التحويل</span></div>
+      </div>
+      <div class="teacher-grid">
+        <div class="teacher-chart-card">
+          <h4>تحليل العمليات حسب النوع</h4>
+          <canvas id="teacherOpsChart" width="320" height="220" style="width:100%;height:220px"></canvas>
+          <div class="teacher-note">يظهر هذا الرسم توزيع الإيداع والسحب والتحويل داخل النظام الحالي.</div>
+        </div>
+        <div class="teacher-chart-card">
+          <h4>لوحة الشرف التلقائية</h4>
+          <div class="teacher-top-list" id="teacherHonorList"></div>
+        </div>
+      </div>
+      <div class="teacher-grid" style="margin-top:12px">
+        <div class="teacher-chart-card">
+          <h4>ملخص الفصول</h4>
+          <div class="teacher-top-list" id="teacherClassBalances"></div>
+        </div>
+        <div class="teacher-chart-card">
+          <h4>روليت الجوائز — إعداد سريع</h4>
+          <div class="field"><label>جوائز الروليت</label><input id="roulettePrizesInput" type="text" placeholder="مثال: 100, 200, 500, هدية, حظ أوفر" /></div>
+          <button class="btn btn-gold" style="width:100%" onclick="saveRoulettePrizes()">حفظ جوائز الروليت</button>
+          <div id="rouletteMsg" class="notice ok hidden">تم حفظ جوائز الروليت</div>
+          <div class="teacher-note">هذه الإعدادات تُستخدم كمرجع سريع داخل النظام ويمكن تطويرها لاحقًا للروليت التفاعلي.</div>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -912,7 +1002,37 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
       <div class="level"><div><div class="name">ذهبي</div><div class="meta">من 16,000 إلى 30,000 ر.س</div></div><div class="badge-tier gold-tier">Gold</div></div>
       <div class="level"><div><div class="name">بلاتيني</div><div class="meta">من 31,000 إلى 40,000 ر.س</div></div><div class="badge-tier platinum">Platinum</div></div>
       <div class="level"><div><div class="name">ألماسي</div><div class="meta">41,000 ر.س فأكثر</div></div><div class="badge-tier diamond">Diamond</div></div>
-    
+    <div id="teacherPaneReports" class="teacher-pane card">
+      <div class="teacher-mini-kpis">
+        <div class="teacher-mini-kpi"><strong id="reportDeposits">0</strong><span>إجمالي الإيداع</span></div>
+        <div class="teacher-mini-kpi"><strong id="reportWithdrawals">0</strong><span>إجمالي السحب</span></div>
+        <div class="teacher-mini-kpi"><strong id="reportTransfers">0</strong><span>إجمالي التحويل</span></div>
+      </div>
+      <div class="teacher-grid">
+        <div class="teacher-chart-card">
+          <h4>تحليل العمليات حسب النوع</h4>
+          <canvas id="teacherOpsChart" width="320" height="220" style="width:100%;height:220px"></canvas>
+          <div class="teacher-note">يظهر هذا الرسم توزيع الإيداع والسحب والتحويل داخل النظام الحالي.</div>
+        </div>
+        <div class="teacher-chart-card">
+          <h4>لوحة الشرف التلقائية</h4>
+          <div class="teacher-top-list" id="teacherHonorList"></div>
+        </div>
+      </div>
+      <div class="teacher-grid" style="margin-top:12px">
+        <div class="teacher-chart-card">
+          <h4>ملخص الفصول</h4>
+          <div class="teacher-top-list" id="teacherClassBalances"></div>
+        </div>
+        <div class="teacher-chart-card">
+          <h4>روليت الجوائز — إعداد سريع</h4>
+          <div class="field"><label>جوائز الروليت</label><input id="roulettePrizesInput" type="text" placeholder="مثال: 100, 200, 500, هدية, حظ أوفر" /></div>
+          <button class="btn btn-gold" style="width:100%" onclick="saveRoulettePrizes()">حفظ جوائز الروليت</button>
+          <div id="rouletteMsg" class="notice ok hidden">تم حفظ جوائز الروليت</div>
+          <div class="teacher-note">هذه الإعدادات تُستخدم كمرجع سريع داخل النظام ويمكن تطويرها لاحقًا للروليت التفاعلي.</div>
+        </div>
+      </div>
+    </div>
   </div>
 
     
@@ -943,7 +1063,37 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
       <div class="rank"><div class="rank-num">3</div><div class="rank-info"><strong>جود</strong><span>9010 نقطة • وسام التفوق</span></div><div>✨</div></div>
       <div class="rank"><div class="rank-num">4</div><div class="rank-info"><strong>ريم</strong><span>8740 نقطة • وسام الالتزام</span></div><div>💫</div></div>
       <div class="rank"><div class="rank-num">5</div><div class="rank-info"><strong>تالا</strong><span>8600 نقطة • وسام الحضور</span></div><div>⭐</div></div>
-    
+    <div id="teacherPaneReports" class="teacher-pane card">
+      <div class="teacher-mini-kpis">
+        <div class="teacher-mini-kpi"><strong id="reportDeposits">0</strong><span>إجمالي الإيداع</span></div>
+        <div class="teacher-mini-kpi"><strong id="reportWithdrawals">0</strong><span>إجمالي السحب</span></div>
+        <div class="teacher-mini-kpi"><strong id="reportTransfers">0</strong><span>إجمالي التحويل</span></div>
+      </div>
+      <div class="teacher-grid">
+        <div class="teacher-chart-card">
+          <h4>تحليل العمليات حسب النوع</h4>
+          <canvas id="teacherOpsChart" width="320" height="220" style="width:100%;height:220px"></canvas>
+          <div class="teacher-note">يظهر هذا الرسم توزيع الإيداع والسحب والتحويل داخل النظام الحالي.</div>
+        </div>
+        <div class="teacher-chart-card">
+          <h4>لوحة الشرف التلقائية</h4>
+          <div class="teacher-top-list" id="teacherHonorList"></div>
+        </div>
+      </div>
+      <div class="teacher-grid" style="margin-top:12px">
+        <div class="teacher-chart-card">
+          <h4>ملخص الفصول</h4>
+          <div class="teacher-top-list" id="teacherClassBalances"></div>
+        </div>
+        <div class="teacher-chart-card">
+          <h4>روليت الجوائز — إعداد سريع</h4>
+          <div class="field"><label>جوائز الروليت</label><input id="roulettePrizesInput" type="text" placeholder="مثال: 100, 200, 500, هدية, حظ أوفر" /></div>
+          <button class="btn btn-gold" style="width:100%" onclick="saveRoulettePrizes()">حفظ جوائز الروليت</button>
+          <div id="rouletteMsg" class="notice ok hidden">تم حفظ جوائز الروليت</div>
+          <div class="teacher-note">هذه الإعدادات تُستخدم كمرجع سريع داخل النظام ويمكن تطويرها لاحقًا للروليت التفاعلي.</div>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -1953,7 +2103,7 @@ function teacherLogin(){
 
 
 <script id="teacher-dashboard-script">
-const BANK_KEY = 'greenBankTeacherData_v2_stable';
+const BANK_KEY = 'greenBankTeacherData_v1';
 let bankData = null;
 let lastOperation = null;
 
@@ -1981,13 +2131,7 @@ function defaultBankData(){
 function saveBankData(){ window.bankData = bankData; localStorage.setItem(BANK_KEY, JSON.stringify(bankData)); }
 function loadBankData(){
   try{ bankData = JSON.parse(localStorage.getItem(BANK_KEY) || 'null'); }catch(e){ bankData = null; }
-  const invalid = !bankData || typeof bankData !== 'object'
-    || !bankData.teacher || !Array.isArray(bankData.classes)
-    || !Array.isArray(bankData.students) || !Array.isArray(bankData.operations);
-  if(invalid){ bankData = defaultBankData(); }
-  bankData.teacher = bankData.teacher || defaultBankData().teacher;
-  if(!Array.isArray(bankData.performanceTasks)) bankData.performanceTasks = [];
-  if(!Array.isArray(bankData.roulettePrizes)) bankData.roulettePrizes = ['100','200','500','هدية','حظ أوفر'];
+  if(!bankData){ bankData = defaultBankData(); }
   window.bankData = bankData;
   saveBankData();
 }
@@ -2279,33 +2423,26 @@ function renderTeacherReports(){
 }
 
 function studentLogin(){
-  if(!bankData || !Array.isArray(bankData.students)) loadBankData();
   const user = document.getElementById('studentUser');
   const pass = document.getElementById('studentPassword');
   const err = document.getElementById('studentLoginError');
-  const userVal = String(user?.value || '').trim();
-  const passVal = String(pass?.value || '').trim();
-  const found = (bankData.students||[]).find(s=>String(s.username||'').trim()===userVal && String(s.password||'').trim()===passVal);
+  const found = bankData.students.find(s=>s.username===user?.value.trim() && s.password===pass?.value.trim());
   if(found){
     sessionStorage.setItem('studentLogged','1');
     sessionStorage.setItem('currentStudentId', found.id);
     if(err) err.textContent='';
     go('account');
-    setTimeout(function(){ if(typeof renderStudentAccount==='function') renderStudentAccount(); }, 50);
+    setTimeout(renderStudentAccount, 50);
   }else if(err){ err.textContent='بيانات الدخول غير صحيحة'; }
 }
 function teacherLogin(){
-  if(!bankData || !bankData.teacher) loadBankData();
   const user = document.getElementById('teacherUser');
   const pass = document.getElementById('teacherPassword');
   const err = document.getElementById('teacherLoginError');
-  const userVal = String(user?.value || '').trim();
-  const passVal = String(pass?.value || '').trim();
-  const t = bankData.teacher || {};
-  if(userVal===String(t.username||'').trim() && passVal===String(t.password||'').trim()){
+  if(user?.value.trim()===bankData.teacher.username && pass?.value.trim()===bankData.teacher.password){
     sessionStorage.setItem('teacherLogged','1');
     if(err) err.textContent='';
-    if(typeof refreshTeacherUI==='function') refreshTeacherUI();
+    refreshTeacherUI();
     go('teacher');
   }else if(err){ err.textContent='بيانات الدخول غير صحيحة'; }
 }
