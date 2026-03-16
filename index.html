@@ -615,16 +615,50 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
 </style>
 
 
-<style id="oai-reset-system-style">
-.reset-system-btn{
-  background:#b42318;
-  color:#fff;
-  border:none;
-  padding:10px 18px;
-  border-radius:12px;
-  font-weight:800;
-  cursor:pointer;
-  box-shadow:0 8px 18px rgba(180,35,24,.18);
+<style id="oai-parent-auto-device-style">
+.parent-parent-top-actions{margin-top:14px}
+.parent-actions-top{margin-top:4px}
+.parent-logout-btn{min-width:130px}
+.parent-login-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.parent-login-grid input{width:100%;border:1px solid var(--line);border-radius:16px;padding:14px;background:#fff;font:inherit}
+.parent-login-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+
+body.device-desktop .app{max-width:1280px}
+body.device-desktop .screen{padding:22px 22px 118px}
+body.device-desktop .teacher-grid,
+body.device-desktop .tracking-grid,
+body.device-desktop .parent-analysis-grid,
+body.device-desktop .parent-overview-grid{grid-template-columns:repeat(2,1fr)}
+body.device-desktop .parent-actions-grid{grid-template-columns:repeat(4,1fr)}
+body.device-desktop .bottom-nav{width:min(880px,calc(100% - 28px))}
+body.device-desktop .nav-btn{font-size:13px}
+body.device-desktop .hero,
+body.device-desktop .card,
+body.device-desktop .honor-hero{border-radius:34px}
+body.device-desktop .shortcuts{grid-template-columns:repeat(4,1fr)}
+
+body.device-ipad .app{max-width:900px}
+body.device-ipad .screen{padding:20px 18px 116px}
+body.device-ipad .parent-overview-grid{grid-template-columns:repeat(3,1fr)}
+body.device-ipad .parent-analysis-grid{grid-template-columns:1.2fr 1fr}
+body.device-ipad .bottom-nav{width:min(760px,calc(100% - 22px))}
+
+body.device-mobile .app{max-width:460px}
+body.device-mobile .screen{padding:18px 16px 108px}
+body.device-mobile .parent-overview-grid,
+body.device-mobile .parent-analysis-grid,
+body.device-mobile .parent-week-grid,
+body.device-mobile .parent-actions-grid,
+body.device-mobile .teacher-grid,
+body.device-mobile .tracking-grid{grid-template-columns:1fr !important}
+body.device-mobile .bottom-nav{width:min(430px,calc(100% - 18px))}
+
+@media (max-width:900px){
+  .parent-actions-top{grid-template-columns:1fr 1fr !important}
+  .parent-login-grid,.parent-login-actions{grid-template-columns:1fr !important}
+}
+@media (max-width:600px){
+  .parent-actions-top{grid-template-columns:1fr !important}
 }
 </style>
 
@@ -703,7 +737,6 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
   <div class="topbar">
     <div class="brand"><div class="logo">BN</div><div><h1>الدخول للحساب</h1><p>اختيار نوع الحساب</p></div></div>
     <button class="ghost" onclick="go('home')">⌂</button>
-    <button class="ghost" onclick="parentLogout()">🔓 تسجيل خروج ولي الأمر</button>
   </div>
 
   <div class="card">
@@ -848,7 +881,6 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
   <div class="topbar">
     <div class="brand"><div class="logo">BN</div><div><h1>الحساب</h1><p>الرصيد والبطاقة والعمليات</p></div></div>
     <button class="ghost" onclick="go('home')">⌂</button>
-    <button class="ghost" onclick="parentLogout()">🔓 تسجيل خروج ولي الأمر</button>
   </div>
 
   <div class="card">
@@ -1084,7 +1116,6 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
   <div class="topbar">
     <div class="brand"><div class="logo">BN</div><div><h1>لوحة الشرف</h1><p>واجهة أفخم للمراكز الأولى</p></div></div>
     <button class="ghost" onclick="go('home')">⌂</button>
-    <button class="ghost" onclick="parentLogout()">🔓 تسجيل خروج ولي الأمر</button>
   </div>
   <div class="honor-hero">
     <div class="badge">🏆 نخبة بنك الرياضيات</div>
@@ -1506,7 +1537,6 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
   <div class="topbar">
     <div class="brand"><div class="logo">BN</div><div><h1>المزيد</h1><p>روابط وخدمات إضافية</p></div></div>
     <button class="ghost" onclick="go('home')">⌂</button>
-    <button class="ghost" onclick="parentLogout()">🔓 تسجيل خروج ولي الأمر</button>
   </div>
   <div class="card">
     <div class="menu-list">
@@ -1543,11 +1573,11 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
 
 
 
+
 <section id="parent_followup" class="screen">
   <div class="topbar">
     <div class="brand"><div class="logo">BN</div><div><h1>متابعة ولي الأمر</h1><p>لوحة متابعة تحليلية واحترافية</p></div></div>
     <button class="ghost" onclick="go('home')">⌂</button>
-    <button class="ghost" onclick="parentLogout()">🔓 تسجيل خروج ولي الأمر</button>
   </div>
 
   <div id="parentFollowLoginCard" class="card parent-hero-card">
@@ -1571,12 +1601,25 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
     </div>
     <div class="parent-login-actions">
       <button class="btn btn-green" onclick="parentFollowLogin()">دخول ولي الأمر</button>
-      <button class="btn btn-light" onclick="parentFollowLogout()">مسح الدخول</button>
+      <button class="btn btn-light" onclick="parentFollowClearLogin()">مسح الدخول</button>
     </div>
     <div id="pfLoginError" class="notice hidden" style="margin-top:12px;background:#fff0ef;color:#a63f3c;border:1px solid #efcfcd">بيانات الدخول غير صحيحة.</div>
   </div>
 
   <div id="parentFollowDashboard" class="hidden">
+    <div class="card parent-parent-top-actions">
+      <div class="section-head">
+        <h3>خدمات ولي الأمر</h3>
+        <button class="btn btn-light parent-logout-btn" onclick="parentFollowLogout()">تسجيل خروج</button>
+      </div>
+      <div class="parent-actions-grid parent-actions-grid-strong parent-actions-top">
+        <button class="btn btn-green" onclick="parentFollowOpenFaq()">الأسئلة المتكررة والدعم</button>
+        <button class="btn btn-gold" onclick="parentFollowRequestReport()">طلب تقرير مختصر</button>
+        <button class="btn btn-light" onclick="parentFollowAcademic()">متابعة أكاديمية</button>
+        <button class="btn btn-light" onclick="parentFollowAttendance()">متابعة الحضور والانضباط</button>
+      </div>
+    </div>
+
     <div class="parent-overview-grid">
       <div class="parent-metric-card">
         <span class="label">الرصيد الحالي</span>
@@ -1596,7 +1639,7 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
     </div>
 
     <div class="card parent-student-summary">
-      <div class="section-head"><h3>بطاقة الطالب / الطالبة</h3><button class="reset-system-btn" onclick="resetSystem()">🔄 إعادة تهيئة النظام</button><span class="pill">محدث تلقائيًا</span></div>
+      <div class="section-head"><h3>بطاقة الطالب / الطالبة</h3><span class="pill">محدث تلقائيًا</span></div>
       <div class="parent-student-shell">
         <div class="parent-student-main">
           <div class="parent-student-avatar">🎓</div>
@@ -1650,16 +1693,10 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
       </div>
     </div>
 
-    <div class="parent-actions-grid parent-actions-grid-strong">
-      <button class="btn btn-green" onclick="parentFollowOpenFaq()">الأسئلة المتكررة والدعم</button>
-      <button class="btn btn-gold" onclick="parentFollowRequestReport()">طلب تقرير مختصر</button>
-      <button class="btn btn-light" onclick="parentFollowAcademic()">متابعة أكاديمية</button>
-      <button class="btn btn-light" onclick="parentFollowAttendance()">متابعة الحضور والانضباط</button>
-    </div>
-
     <div id="parentFollowNotice" class="notice ok hidden" style="margin-top:14px"></div>
   </div>
 </section>
+
 
 
 
@@ -1667,7 +1704,6 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
   <div class="topbar">
     <div class="brand"><div class="logo">BN</div><div><h1>الأسئلة المتكررة</h1><p>الاستبيان والدعم والملاحظات</p></div></div>
     <button class="ghost" onclick="go('home')">⌂</button>
-    <button class="ghost" onclick="parentLogout()">🔓 تسجيل خروج ولي الأمر</button>
   </div>
   <div class="card">
     <div class="tabbar" id="faqTabs">
@@ -1970,7 +2006,6 @@ function closeRouletteModal(){
   if(modal) modal.classList.remove("show");
 }
 
-function parentLogout(){ try{sessionStorage.removeItem("parentStudentId");sessionStorage.removeItem("parentLogin");}catch(e){} go("home"); }
 </script>
 
 <script>
@@ -1999,12 +2034,10 @@ function toggleLanguage(){
     location.reload();
   }
 }
-function parentLogout(){ try{sessionStorage.removeItem("parentStudentId");sessionStorage.removeItem("parentLogin");}catch(e){} go("home"); }
 </script>
 
 
-<script>window.addEventListener("load", function(){ var rw=document.getElementById("rouletteWheel"); if(rw) rw.onclick=spinRoulette; });function parentLogout(){ try{sessionStorage.removeItem("parentStudentId");sessionStorage.removeItem("parentLogin");}catch(e){} go("home"); }
-</script>
+<script>window.addEventListener("load", function(){ var rw=document.getElementById("rouletteWheel"); if(rw) rw.onclick=spinRoulette; });</script>
 <div id="rouletteModal" class="roulette-modal">
   <div class="roulette-modal-box">
     <div class="roulette-modal-title">🎉 تهانينا</div>
@@ -2078,7 +2111,6 @@ document.addEventListener("DOMContentLoaded", function(){
     });
   }
 });
-function parentLogout(){ try{sessionStorage.removeItem("parentStudentId");sessionStorage.removeItem("parentLogin");}catch(e){} go("home"); }
 </script>
 
 
@@ -2093,7 +2125,6 @@ function togglePass(el){
    el.textContent="🙈";
  }
 }
-function parentLogout(){ try{sessionStorage.removeItem("parentStudentId");sessionStorage.removeItem("parentLogin");}catch(e){} go("home"); }
 </script>
 
 
@@ -2135,7 +2166,6 @@ function login(){
  }
  alert("بيانات الدخول غير صحيحة");
 }
-function parentLogout(){ try{sessionStorage.removeItem("parentStudentId");sessionStorage.removeItem("parentLogin");}catch(e){} go("home"); }
 </script>
 
 
@@ -2313,7 +2343,6 @@ function teacherLogin(){
   sessionStorage.setItem('teacherLogged', '1');
   if(typeof go === 'function') go('teacher');
 }
-function parentLogout(){ try{sessionStorage.removeItem("parentStudentId");sessionStorage.removeItem("parentLogin");}catch(e){} go("home"); }
 </script>
 
 
@@ -3088,7 +3117,6 @@ window.addEventListener('load', function(){
   toggleTransferTarget();
   if(sessionStorage.getItem('studentLogged')==='1') setTimeout(renderStudentAccount, 80);
 });
-function parentLogout(){ try{sessionStorage.removeItem("parentStudentId");sessionStorage.removeItem("parentLogin");}catch(e){} go("home"); }
 </script>
 
 
@@ -3205,7 +3233,6 @@ function parentLogout(){ try{sessionStorage.removeItem("parentStudentId");sessio
   document.addEventListener('DOMContentLoaded', function(){ installPerformanceForm(); setTimeout(()=>{ try{ if(typeof populatePerformanceClassSelect==='function') populatePerformanceClassSelect(); if(typeof renderTeacherPerformanceTasks==='function') renderTeacherPerformanceTasks(); if(typeof sessionStorage!=='undefined' && sessionStorage.getItem('currentStudentId') && typeof renderStudentAccount==='function') renderStudentAccount(); }catch(e){} }, 50); });
   window.addEventListener('load', installPerformanceForm);
 })();
-function parentLogout(){ try{sessionStorage.removeItem("parentStudentId");sessionStorage.removeItem("parentLogin");}catch(e){} go("home"); }
 </script>
 
 
@@ -3226,7 +3253,6 @@ window.addEventListener('load', function(){
     }
   }catch(e){ console.warn('teacher performance fix failed', e); }
 });
-function parentLogout(){ try{sessionStorage.removeItem("parentStudentId");sessionStorage.removeItem("parentLogin");}catch(e){} go("home"); }
 </script>
 
 <script id="performance-final-repair">
@@ -3373,7 +3399,6 @@ function parentLogout(){ try{sessionStorage.removeItem("parentStudentId");sessio
     }catch(e){ console.warn(e); }
   });
 })();
-function parentLogout(){ try{sessionStorage.removeItem("parentStudentId");sessionStorage.removeItem("parentLogin");}catch(e){} go("home"); }
 </script>
 
 <script id="performance-hard-fix">
@@ -3526,7 +3551,6 @@ function parentLogout(){ try{sessionStorage.removeItem("parentStudentId");sessio
     setTimeout(function(){ fillClassSelect(); bindCreateBtn(); window.renderTeacherPerformanceTasks(); const st=getCurrentStudentSafe(); if(st) window.renderStudentPerformanceTasks(st); }, 300);
   });
 })();
-function parentLogout(){ try{sessionStorage.removeItem("parentStudentId");sessionStorage.removeItem("parentLogin");}catch(e){} go("home"); }
 </script>
 
 <script id="performance-task-final-fix">
@@ -3675,7 +3699,6 @@ function parentLogout(){ try{sessionStorage.removeItem("parentStudentId");sessio
     bindCreateButton();
   });
 })();
-function parentLogout(){ try{sessionStorage.removeItem("parentStudentId");sessionStorage.removeItem("parentLogin");}catch(e){} go("home"); }
 </script>
 
 
@@ -3805,7 +3828,6 @@ function parentLogout(){ try{sessionStorage.removeItem("parentStudentId");sessio
 
   window.addEventListener('load', function(){ setTimeout(bind, 300); });
 })();
-function parentLogout(){ try{sessionStorage.removeItem("parentStudentId");sessionStorage.removeItem("parentLogin");}catch(e){} go("home"); }
 </script>
 
 
@@ -4120,16 +4142,50 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
 </style>
 
 
-<style id="oai-reset-system-style">
-.reset-system-btn{
-  background:#b42318;
-  color:#fff;
-  border:none;
-  padding:10px 18px;
-  border-radius:12px;
-  font-weight:800;
-  cursor:pointer;
-  box-shadow:0 8px 18px rgba(180,35,24,.18);
+<style id="oai-parent-auto-device-style">
+.parent-parent-top-actions{margin-top:14px}
+.parent-actions-top{margin-top:4px}
+.parent-logout-btn{min-width:130px}
+.parent-login-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.parent-login-grid input{width:100%;border:1px solid var(--line);border-radius:16px;padding:14px;background:#fff;font:inherit}
+.parent-login-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+
+body.device-desktop .app{max-width:1280px}
+body.device-desktop .screen{padding:22px 22px 118px}
+body.device-desktop .teacher-grid,
+body.device-desktop .tracking-grid,
+body.device-desktop .parent-analysis-grid,
+body.device-desktop .parent-overview-grid{grid-template-columns:repeat(2,1fr)}
+body.device-desktop .parent-actions-grid{grid-template-columns:repeat(4,1fr)}
+body.device-desktop .bottom-nav{width:min(880px,calc(100% - 28px))}
+body.device-desktop .nav-btn{font-size:13px}
+body.device-desktop .hero,
+body.device-desktop .card,
+body.device-desktop .honor-hero{border-radius:34px}
+body.device-desktop .shortcuts{grid-template-columns:repeat(4,1fr)}
+
+body.device-ipad .app{max-width:900px}
+body.device-ipad .screen{padding:20px 18px 116px}
+body.device-ipad .parent-overview-grid{grid-template-columns:repeat(3,1fr)}
+body.device-ipad .parent-analysis-grid{grid-template-columns:1.2fr 1fr}
+body.device-ipad .bottom-nav{width:min(760px,calc(100% - 22px))}
+
+body.device-mobile .app{max-width:460px}
+body.device-mobile .screen{padding:18px 16px 108px}
+body.device-mobile .parent-overview-grid,
+body.device-mobile .parent-analysis-grid,
+body.device-mobile .parent-week-grid,
+body.device-mobile .parent-actions-grid,
+body.device-mobile .teacher-grid,
+body.device-mobile .tracking-grid{grid-template-columns:1fr !important}
+body.device-mobile .bottom-nav{width:min(430px,calc(100% - 18px))}
+
+@media (max-width:900px){
+  .parent-actions-top{grid-template-columns:1fr 1fr !important}
+  .parent-login-grid,.parent-login-actions{grid-template-columns:1fr !important}
+}
+@media (max-width:600px){
+  .parent-actions-top{grid-template-columns:1fr !important}
 }
 </style>
 
@@ -4303,16 +4359,50 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
 </style>
 
 
-<style id="oai-reset-system-style">
-.reset-system-btn{
-  background:#b42318;
-  color:#fff;
-  border:none;
-  padding:10px 18px;
-  border-radius:12px;
-  font-weight:800;
-  cursor:pointer;
-  box-shadow:0 8px 18px rgba(180,35,24,.18);
+<style id="oai-parent-auto-device-style">
+.parent-parent-top-actions{margin-top:14px}
+.parent-actions-top{margin-top:4px}
+.parent-logout-btn{min-width:130px}
+.parent-login-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.parent-login-grid input{width:100%;border:1px solid var(--line);border-radius:16px;padding:14px;background:#fff;font:inherit}
+.parent-login-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+
+body.device-desktop .app{max-width:1280px}
+body.device-desktop .screen{padding:22px 22px 118px}
+body.device-desktop .teacher-grid,
+body.device-desktop .tracking-grid,
+body.device-desktop .parent-analysis-grid,
+body.device-desktop .parent-overview-grid{grid-template-columns:repeat(2,1fr)}
+body.device-desktop .parent-actions-grid{grid-template-columns:repeat(4,1fr)}
+body.device-desktop .bottom-nav{width:min(880px,calc(100% - 28px))}
+body.device-desktop .nav-btn{font-size:13px}
+body.device-desktop .hero,
+body.device-desktop .card,
+body.device-desktop .honor-hero{border-radius:34px}
+body.device-desktop .shortcuts{grid-template-columns:repeat(4,1fr)}
+
+body.device-ipad .app{max-width:900px}
+body.device-ipad .screen{padding:20px 18px 116px}
+body.device-ipad .parent-overview-grid{grid-template-columns:repeat(3,1fr)}
+body.device-ipad .parent-analysis-grid{grid-template-columns:1.2fr 1fr}
+body.device-ipad .bottom-nav{width:min(760px,calc(100% - 22px))}
+
+body.device-mobile .app{max-width:460px}
+body.device-mobile .screen{padding:18px 16px 108px}
+body.device-mobile .parent-overview-grid,
+body.device-mobile .parent-analysis-grid,
+body.device-mobile .parent-week-grid,
+body.device-mobile .parent-actions-grid,
+body.device-mobile .teacher-grid,
+body.device-mobile .tracking-grid{grid-template-columns:1fr !important}
+body.device-mobile .bottom-nav{width:min(430px,calc(100% - 18px))}
+
+@media (max-width:900px){
+  .parent-actions-top{grid-template-columns:1fr 1fr !important}
+  .parent-login-grid,.parent-login-actions{grid-template-columns:1fr !important}
+}
+@media (max-width:600px){
+  .parent-actions-top{grid-template-columns:1fr !important}
 }
 </style>
 
@@ -4493,16 +4583,50 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
 </style>
 
 
-<style id="oai-reset-system-style">
-.reset-system-btn{
-  background:#b42318;
-  color:#fff;
-  border:none;
-  padding:10px 18px;
-  border-radius:12px;
-  font-weight:800;
-  cursor:pointer;
-  box-shadow:0 8px 18px rgba(180,35,24,.18);
+<style id="oai-parent-auto-device-style">
+.parent-parent-top-actions{margin-top:14px}
+.parent-actions-top{margin-top:4px}
+.parent-logout-btn{min-width:130px}
+.parent-login-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.parent-login-grid input{width:100%;border:1px solid var(--line);border-radius:16px;padding:14px;background:#fff;font:inherit}
+.parent-login-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+
+body.device-desktop .app{max-width:1280px}
+body.device-desktop .screen{padding:22px 22px 118px}
+body.device-desktop .teacher-grid,
+body.device-desktop .tracking-grid,
+body.device-desktop .parent-analysis-grid,
+body.device-desktop .parent-overview-grid{grid-template-columns:repeat(2,1fr)}
+body.device-desktop .parent-actions-grid{grid-template-columns:repeat(4,1fr)}
+body.device-desktop .bottom-nav{width:min(880px,calc(100% - 28px))}
+body.device-desktop .nav-btn{font-size:13px}
+body.device-desktop .hero,
+body.device-desktop .card,
+body.device-desktop .honor-hero{border-radius:34px}
+body.device-desktop .shortcuts{grid-template-columns:repeat(4,1fr)}
+
+body.device-ipad .app{max-width:900px}
+body.device-ipad .screen{padding:20px 18px 116px}
+body.device-ipad .parent-overview-grid{grid-template-columns:repeat(3,1fr)}
+body.device-ipad .parent-analysis-grid{grid-template-columns:1.2fr 1fr}
+body.device-ipad .bottom-nav{width:min(760px,calc(100% - 22px))}
+
+body.device-mobile .app{max-width:460px}
+body.device-mobile .screen{padding:18px 16px 108px}
+body.device-mobile .parent-overview-grid,
+body.device-mobile .parent-analysis-grid,
+body.device-mobile .parent-week-grid,
+body.device-mobile .parent-actions-grid,
+body.device-mobile .teacher-grid,
+body.device-mobile .tracking-grid{grid-template-columns:1fr !important}
+body.device-mobile .bottom-nav{width:min(430px,calc(100% - 18px))}
+
+@media (max-width:900px){
+  .parent-actions-top{grid-template-columns:1fr 1fr !important}
+  .parent-login-grid,.parent-login-actions{grid-template-columns:1fr !important}
+}
+@media (max-width:600px){
+  .parent-actions-top{grid-template-columns:1fr !important}
 }
 </style>
 
@@ -4875,16 +4999,50 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
 </style>
 
 
-<style id="oai-reset-system-style">
-.reset-system-btn{
-  background:#b42318;
-  color:#fff;
-  border:none;
-  padding:10px 18px;
-  border-radius:12px;
-  font-weight:800;
-  cursor:pointer;
-  box-shadow:0 8px 18px rgba(180,35,24,.18);
+<style id="oai-parent-auto-device-style">
+.parent-parent-top-actions{margin-top:14px}
+.parent-actions-top{margin-top:4px}
+.parent-logout-btn{min-width:130px}
+.parent-login-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.parent-login-grid input{width:100%;border:1px solid var(--line);border-radius:16px;padding:14px;background:#fff;font:inherit}
+.parent-login-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+
+body.device-desktop .app{max-width:1280px}
+body.device-desktop .screen{padding:22px 22px 118px}
+body.device-desktop .teacher-grid,
+body.device-desktop .tracking-grid,
+body.device-desktop .parent-analysis-grid,
+body.device-desktop .parent-overview-grid{grid-template-columns:repeat(2,1fr)}
+body.device-desktop .parent-actions-grid{grid-template-columns:repeat(4,1fr)}
+body.device-desktop .bottom-nav{width:min(880px,calc(100% - 28px))}
+body.device-desktop .nav-btn{font-size:13px}
+body.device-desktop .hero,
+body.device-desktop .card,
+body.device-desktop .honor-hero{border-radius:34px}
+body.device-desktop .shortcuts{grid-template-columns:repeat(4,1fr)}
+
+body.device-ipad .app{max-width:900px}
+body.device-ipad .screen{padding:20px 18px 116px}
+body.device-ipad .parent-overview-grid{grid-template-columns:repeat(3,1fr)}
+body.device-ipad .parent-analysis-grid{grid-template-columns:1.2fr 1fr}
+body.device-ipad .bottom-nav{width:min(760px,calc(100% - 22px))}
+
+body.device-mobile .app{max-width:460px}
+body.device-mobile .screen{padding:18px 16px 108px}
+body.device-mobile .parent-overview-grid,
+body.device-mobile .parent-analysis-grid,
+body.device-mobile .parent-week-grid,
+body.device-mobile .parent-actions-grid,
+body.device-mobile .teacher-grid,
+body.device-mobile .tracking-grid{grid-template-columns:1fr !important}
+body.device-mobile .bottom-nav{width:min(430px,calc(100% - 18px))}
+
+@media (max-width:900px){
+  .parent-actions-top{grid-template-columns:1fr 1fr !important}
+  .parent-login-grid,.parent-login-actions{grid-template-columns:1fr !important}
+}
+@media (max-width:600px){
+  .parent-actions-top{grid-template-columns:1fr !important}
 }
 </style>
 
@@ -4979,7 +5137,6 @@ function openMoreInfo(type){
   if(content) content.innerHTML=item.html;
   go('more_detail');
 }
-function parentLogout(){ try{sessionStorage.removeItem("parentStudentId");sessionStorage.removeItem("parentLogin");}catch(e){} go("home"); }
 </script>
 
 <script id="students-router-home-reset-fix">
@@ -5011,7 +5168,6 @@ function parentLogout(){ try{sessionStorage.removeItem("parentStudentId");sessio
     setTimeout(resetStudentsAdvancedHome, 600);
   });
 })();
-function parentLogout(){ try{sessionStorage.removeItem("parentStudentId");sessionStorage.removeItem("parentLogin");}catch(e){} go("home"); }
 </script>
 
 
@@ -5185,7 +5341,6 @@ function parentLogout(){ try{sessionStorage.removeItem("parentStudentId");sessio
   document.addEventListener('DOMContentLoaded', function(){ setTimeout(ensureBlueImportButton, 400); });
   window.addEventListener('load', function(){ setTimeout(ensureBlueImportButton, 500); });
 })();
-function parentLogout(){ try{sessionStorage.removeItem("parentStudentId");sessionStorage.removeItem("parentLogin");}catch(e){} go("home"); }
 </script>
 
 <style id="students-manager-router-v9-style">
@@ -5351,7 +5506,6 @@ function parentLogout(){ try{sessionStorage.removeItem("parentStudentId");sessio
   };
   document.addEventListener('DOMContentLoaded', function(){ setTimeout(function(){ try{ initStudentsManagerRouter(); }catch(e){} }, 400); });
 })();
-function parentLogout(){ try{sessionStorage.removeItem("parentStudentId");sessionStorage.removeItem("parentLogin");}catch(e){} go("home"); }
 </script>
 <style id="student-settings-final-v10-style">
 .account-type-badge{display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border-radius:999px;background:linear-gradient(135deg,var(--deep),var(--green));color:#fff;font-size:12px;font-weight:900;box-shadow:0 8px 18px rgba(16,58,46,.12)}
@@ -5614,7 +5768,6 @@ function parentLogout(){ try{sessionStorage.removeItem("parentStudentId");sessio
 
   document.addEventListener('DOMContentLoaded', function(){ rerenderSettings(); });
 })();
-function parentLogout(){ try{sessionStorage.removeItem("parentStudentId");sessionStorage.removeItem("parentLogin");}catch(e){} go("home"); }
 </script>
 
 <script id="teacher-students-more-shortcuts-fix">
@@ -5761,7 +5914,6 @@ function parentLogout(){ try{sessionStorage.removeItem("parentStudentId");sessio
     }, 500);
   });
 })();
-function parentLogout(){ try{sessionStorage.removeItem("parentStudentId");sessionStorage.removeItem("parentLogin");}catch(e){} go("home"); }
 </script>
 
 
@@ -5828,7 +5980,6 @@ function parentLogout(){ try{sessionStorage.removeItem("parentStudentId");sessio
     setTimeout(syncAdvancedGapState, 500);
   });
 })();
-function parentLogout(){ try{sessionStorage.removeItem("parentStudentId");sessionStorage.removeItem("parentLogin");}catch(e){} go("home"); }
 </script>
 
 
@@ -5994,7 +6145,6 @@ function parentLogout(){ try{sessionStorage.removeItem("parentStudentId");sessio
     },20);
   };
 })();
-function parentLogout(){ try{sessionStorage.removeItem("parentStudentId");sessionStorage.removeItem("parentLogin");}catch(e){} go("home"); }
 </script>
 
 
@@ -6177,7 +6327,6 @@ function parentLogout(){ try{sessionStorage.removeItem("parentStudentId");sessio
     window.openBulkOperationModal(classId, type);
   };
 })();
-function parentLogout(){ try{sessionStorage.removeItem("parentStudentId");sessionStorage.removeItem("parentLogin");}catch(e){} go("home"); }
 </script>
 
 
@@ -6542,7 +6691,6 @@ function parentLogout(){ try{sessionStorage.removeItem("parentStudentId");sessio
     alert('تم تنفيذ العملية بنجاح');
   };
 })();
-function parentLogout(){ try{sessionStorage.removeItem("parentStudentId");sessionStorage.removeItem("parentLogin");}catch(e){} go("home"); }
 </script>
 
 
@@ -6550,7 +6698,6 @@ function parentLogout(){ try{sessionStorage.removeItem("parentStudentId");sessio
 document.addEventListener('DOMContentLoaded', function(){
   try{ if(typeof loadBankData === 'function') loadBankData(); }catch(e){}
 });
-function parentLogout(){ try{sessionStorage.removeItem("parentStudentId");sessionStorage.removeItem("parentLogin");}catch(e){} go("home"); }
 </script>
 
 
@@ -6743,7 +6890,6 @@ function parentLogout(){ try{sessionStorage.removeItem("parentStudentId");sessio
     }, 250);
   });
 })();
-function parentLogout(){ try{sessionStorage.removeItem("parentStudentId");sessionStorage.removeItem("parentLogin");}catch(e){} go("home"); }
 </script>
 
 
@@ -6804,7 +6950,6 @@ function parentLogout(){ try{sessionStorage.removeItem("parentStudentId");sessio
     };
   }
 })();
-function parentLogout(){ try{sessionStorage.removeItem("parentStudentId");sessionStorage.removeItem("parentLogin");}catch(e){} go("home"); }
 </script>
 
 
@@ -6931,7 +7076,6 @@ function parentLogout(){ try{sessionStorage.removeItem("parentStudentId");sessio
     };
   }
 })();
-function parentLogout(){ try{sessionStorage.removeItem("parentStudentId");sessionStorage.removeItem("parentLogin");}catch(e){} go("home"); }
 </script>
 
 
@@ -7048,7 +7192,6 @@ function parentLogout(){ try{sessionStorage.removeItem("parentStudentId");sessio
     }, 250);
   });
 })();
-function parentLogout(){ try{sessionStorage.removeItem("parentStudentId");sessionStorage.removeItem("parentLogin");}catch(e){} go("home"); }
 </script>
 
 
@@ -7169,25 +7312,200 @@ function parentLogout(){ try{sessionStorage.removeItem("parentStudentId");sessio
     }, 150);
   };
 })();
-function parentLogout(){ try{sessionStorage.removeItem("parentStudentId");sessionStorage.removeItem("parentLogin");}catch(e){} go("home"); }
 </script>
 
 
-<script id="oai-reset-system-script">
-function resetSystem(){
-  if(!confirm("سيتم إعادة تهيئة النظام ومسح البيانات المؤقتة من هذا الجهاز فقط. هل تريدين المتابعة؟")){
-    return;
+<script id="oai-parent-auto-device-script">
+(function(){
+  function applyDeviceMode(){
+    var ua = navigator.userAgent || '';
+    var width = Math.max(window.innerWidth || 0, screen.width || 0);
+    var isIpad = /iPad/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    document.body.classList.remove('device-mobile','device-ipad','device-desktop');
+    if(isIpad || (width >= 700 && width <= 1100 && 'ontouchstart' in window)){
+      document.body.classList.add('device-ipad');
+    }else if(width >= 1100){
+      document.body.classList.add('device-desktop');
+    }else{
+      document.body.classList.add('device-mobile');
+    }
   }
-  try{
-    localStorage.clear();
-    sessionStorage.clear();
-    alert("تمت إعادة تهيئة النظام بنجاح");
-    location.reload();
-  }catch(e){
-    alert("حدث خطأ أثناء إعادة التهيئة");
+
+  function pfReadData(){
+    try{
+      var raw = localStorage.getItem('greenBankTeacherData_v1');
+      if(raw) return JSON.parse(raw);
+    }catch(e){}
+    try{
+      var raw2 = localStorage.getItem('bankData_v10');
+      if(raw2) return JSON.parse(raw2);
+    }catch(e){}
+    try{
+      if(typeof bankData !== 'undefined' && bankData) return bankData;
+    }catch(e){}
+    return null;
   }
-}
-function parentLogout(){ try{sessionStorage.removeItem("parentStudentId");sessionStorage.removeItem("parentLogin");}catch(e){} go("home"); }
+
+  function pfLevel(balance){
+    balance = Number(balance || 0);
+    if(balance >= 41000) return {name:'ألماسي', start:41000, next:41000};
+    if(balance >= 31000) return {name:'بلاتيني', start:31000, next:41000};
+    if(balance >= 16000) return {name:'ذهبي', start:16000, next:31000};
+    if(balance >= 11000) return {name:'فضي', start:11000, next:16000};
+    return {name:'برونزي', start:0, next:11000};
+  }
+
+  function pfFormat(v){
+    try{return new Intl.NumberFormat('ar-SA').format(Number(v || 0));}
+    catch(e){return String(v || 0);}
+  }
+
+  function pfToggleDashboard(show){
+    var login = document.getElementById('parentFollowLoginCard');
+    var dash = document.getElementById('parentFollowDashboard');
+    if(login) login.classList.toggle('hidden', !!show);
+    if(dash) dash.classList.toggle('hidden', !show);
+  }
+
+  function pfCurrentStudent(data){
+    if(!data || !Array.isArray(data.students)) return null;
+    var id = sessionStorage.getItem('parentFollowStudentId');
+    if(!id) return null;
+    return data.students.find(function(s){ return String(s.id) === String(id); }) || null;
+  }
+
+  function pfShowNotice(text){
+    var box = document.getElementById('parentFollowNotice');
+    if(box){
+      box.textContent = text;
+      box.classList.remove('hidden');
+    }
+  }
+
+  window.parentFollowLogin = function(){
+    var loginValue = (document.getElementById('pfLoginPin')?.value || '').trim();
+    var pass = (document.getElementById('pfLoginPassword')?.value || '').trim();
+    var err = document.getElementById('pfLoginError');
+    if(err) err.classList.add('hidden');
+
+    if(!loginValue || !pass){
+      if(err){
+        err.textContent = 'أدخلي اسم المستخدم أو الرقم السري مع كلمة المرور';
+        err.classList.remove('hidden');
+      }
+      return;
+    }
+
+    var data = pfReadData();
+    var list = data && Array.isArray(data.students) ? data.students : [];
+    var st = list.find(function(s){
+      var sPin = String(s.pin || '').trim();
+      var sUser = String(s.username || '').trim();
+      var sName = String(s.name || '').trim();
+      var sPass = String(s.password || '').trim();
+      var loginMatch = loginValue === sPin || loginValue === sUser || loginValue === sName;
+      var passMatch = pass === sPass || (sPin && pass === sPin);
+      return loginMatch && passMatch;
+    });
+
+    if(!st){
+      if(err){
+        err.textContent = 'بيانات الدخول غير صحيحة';
+        err.classList.remove('hidden');
+      }
+      return;
+    }
+
+    sessionStorage.setItem('parentFollowStudentId', String(st.id || ''));
+    pfToggleDashboard(true);
+    window.updateParentFollowup();
+  };
+
+  window.parentFollowClearLogin = function(){
+    var a = document.getElementById('pfLoginPin');
+    var b = document.getElementById('pfLoginPassword');
+    var e = document.getElementById('pfLoginError');
+    if(a) a.value = '';
+    if(b) b.value = '';
+    if(e) e.classList.add('hidden');
+  };
+
+  window.parentFollowLogout = function(){
+    sessionStorage.removeItem('parentFollowStudentId');
+    window.parentFollowClearLogin();
+    pfToggleDashboard(false);
+  };
+
+  window.updateParentFollowup = function(){
+    var data = pfReadData();
+    var st = pfCurrentStudent(data);
+    if(!data || !st) return;
+
+    var cls = (data.classes || []).find(function(c){ return c.id === st.classId; });
+    var level = pfLevel(st.balance);
+    var remain = Math.max(0, Number(level.next || 0) - Number(st.balance || 0));
+    var progress = level.next > level.start ? Math.min(100, Math.round(((Number(st.balance || 0) - level.start) / (level.next - level.start)) * 100)) : 100;
+    var hist = Array.isArray(st.history) ? st.history : [];
+    var dep = hist.filter(function(h){ return h.type === 'deposit'; }).length;
+    var wit = hist.filter(function(h){ return h.type === 'withdraw'; }).length;
+
+    var inClass = (data.students || []).filter(function(s){ return s.classId === st.classId; }).sort(function(a,b){ return Number(b.balance||0) - Number(a.balance||0); });
+    var idx = inClass.findIndex(function(s){ return String(s.id) === String(st.id); });
+
+    function setText(id, v){
+      var el = document.getElementById(id);
+      if(el) el.textContent = v;
+    }
+
+    setText('pfCurrentBalance', pfFormat(st.balance));
+    setText('pfCurrentLevel', level.name);
+    setText('pfRemainToNext', pfFormat(remain));
+    setText('pfStudentName', st.name || '—');
+    setText('pfStudentClass', 'الفصل: ' + ((cls && cls.name) || '—'));
+    setText('pfLevelPill', 'نوع الحساب: ' + level.name);
+    setText('pfRankInClass', (idx >= 0 ? (idx + 1) : 1) + ' / ' + (inClass.length || 1));
+    setText('pfOpsCount', hist.length);
+    setText('pfDepositsCount', dep);
+    setText('pfWithdrawsCount', wit);
+    setText('pfAbsenceCount', Number(st.absenceCount || 0));
+    setText('pfProgressPercent', progress + '%');
+    setText('pfProgressHint', 'المتبقي للترقية التالية: ' + pfFormat(remain) + ' ر.س');
+
+    var fill = document.getElementById('pfProgressFill');
+    if(fill) fill.style.width = progress + '%';
+
+    var alerts = document.getElementById('pfTeacherAlerts');
+    if(alerts){
+      var last = hist.slice().reverse().slice(0,3);
+      if(!last.length){
+        alerts.innerHTML = '<div class="parent-alert-item"><div class="icon">🔔</div><div><strong>لا توجد تنبيهات بعد</strong><span>سيتم عرض آخر الملاحظات والعمليات المهمة هنا.</span></div></div>';
+      }else{
+        alerts.innerHTML = last.map(function(h){
+          var icon = h.type === 'deposit' ? '💰' : (h.type === 'withdraw' ? '⚠️' : '🔁');
+          var title = h.type === 'deposit' ? 'إيداع جديد' : (h.type === 'withdraw' ? 'سحب جديد' : 'عملية جديدة');
+          return '<div class="parent-alert-item"><div class="icon">' + icon + '</div><div><strong>' + title + '</strong><span>' + (h.reason || 'تحديث جديد') + ' • ' + pfFormat(h.amount) + '</span></div></div>';
+        }).join('');
+      }
+    }
+  };
+
+  window.parentFollowOpenFaq = function(){ if(typeof go === 'function') go('faq_center'); };
+  window.parentFollowRequestReport = function(){ pfShowNotice('تم تجهيز طلب تقرير مختصر لولي الأمر داخل النظام.'); };
+  window.parentFollowAcademic = function(){ pfShowNotice('تظهر هنا قراءة تحليلية لمستوى الطالب وتقدمه الدراسي داخل بنك الرياضيات.'); };
+  window.parentFollowAttendance = function(){ pfShowNotice('تظهر هنا متابعة الحضور والانضباط والتنبيهات المرتبطة بالغياب والتأخر.'); };
+
+  document.addEventListener('DOMContentLoaded', function(){
+    applyDeviceMode();
+    setTimeout(function(){
+      var has = !!sessionStorage.getItem('parentFollowStudentId');
+      pfToggleDashboard(has);
+      if(has) window.updateParentFollowup();
+    }, 250);
+  });
+
+  window.addEventListener('resize', applyDeviceMode);
+  window.addEventListener('orientationchange', applyDeviceMode);
+})();
 </script>
 
 </body></html>
