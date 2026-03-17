@@ -615,95 +615,115 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
 </style>
 
 
-<style id="oai-parent-auto-device-style">
-.parent-parent-top-actions{margin-top:14px}
-.parent-actions-top{margin-top:4px}
-.parent-logout-btn{min-width:130px}
-.parent-login-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
-.parent-login-grid input{width:100%;border:1px solid var(--line);border-radius:16px;padding:14px;background:#fff;font:inherit}
-.parent-login-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
-
-body.device-desktop .app{max-width:1280px}
-body.device-desktop .screen{padding:22px 22px 118px}
-body.device-desktop .teacher-grid,
-body.device-desktop .tracking-grid,
-body.device-desktop .parent-analysis-grid,
-body.device-desktop .parent-overview-grid{grid-template-columns:repeat(2,1fr)}
-body.device-desktop .parent-actions-grid{grid-template-columns:repeat(4,1fr)}
-body.device-desktop .bottom-nav{width:min(880px,calc(100% - 28px))}
-body.device-desktop .nav-btn{font-size:13px}
-body.device-desktop .hero,
-body.device-desktop .card,
-body.device-desktop .honor-hero{border-radius:34px}
-body.device-desktop .shortcuts{grid-template-columns:repeat(4,1fr)}
-
-body.device-ipad .app{max-width:900px}
-body.device-ipad .screen{padding:20px 18px 116px}
-body.device-ipad .parent-overview-grid{grid-template-columns:repeat(3,1fr)}
-body.device-ipad .parent-analysis-grid{grid-template-columns:1.2fr 1fr}
-body.device-ipad .bottom-nav{width:min(760px,calc(100% - 22px))}
-
+<style id="oai-device-responsive-fix">
+/* auto device layout */
 body.device-mobile .app{max-width:460px}
-body.device-mobile .screen{padding:18px 16px 108px}
-body.device-mobile .parent-overview-grid,
-body.device-mobile .parent-analysis-grid,
-body.device-mobile .parent-week-grid,
-body.device-mobile .parent-actions-grid,
-body.device-mobile .teacher-grid,
-body.device-mobile .tracking-grid{grid-template-columns:1fr !important}
+body.device-ipad .app{max-width:900px}
+body.device-desktop .app{max-width:1280px}
+
+body.device-mobile .screen{padding:0 14px 108px !important}
+body.device-ipad .screen{padding:0 18px 118px !important}
+body.device-desktop .screen{padding:0 22px 124px !important}
+
+/* remove top gap hard */
+html,body,.app{padding-top:0 !important;margin-top:0 !important}
+.screen,.screen.active{padding-top:0 !important;margin-top:0 !important}
+.topbar{margin-top:0 !important;padding-top:0 !important}
+.hero,.card,.teacher-shell,.teacher-hero{margin-top:0 !important}
+body::before{display:none !important}
+
+/* tab bars more visible + slide on mobile */
+.tabbar,.teacher-tabs{
+  scrollbar-width:thin;
+  scrollbar-color: rgba(16,58,46,.28) transparent;
+}
+.tabbar::-webkit-scrollbar,.teacher-tabs::-webkit-scrollbar{height:7px}
+.tabbar::-webkit-scrollbar-thumb,.teacher-tabs::-webkit-scrollbar-thumb{
+  background:rgba(16,58,46,.28);border-radius:999px
+}
+body.device-mobile .tabbar,
+body.device-mobile .teacher-tabs{
+  display:flex !important;
+  flex-wrap:nowrap !important;
+  overflow-x:auto !important;
+  overflow-y:hidden !important;
+  -webkit-overflow-scrolling:touch;
+  scroll-behavior:smooth;
+  gap:10px !important;
+  padding:4px 2px 10px !important;
+  margin-bottom:14px !important;
+  border-bottom:1px solid rgba(16,58,46,.08);
+}
+body.device-mobile .tabbar button,
+body.device-mobile .teacher-tabs button{
+  flex:0 0 auto !important;
+  white-space:nowrap !important;
+  border:1px solid rgba(16,58,46,.08) !important;
+  background:#fff !important;
+  color:var(--deep) !important;
+  box-shadow:0 8px 16px rgba(16,58,46,.06);
+}
+body.device-mobile .tabbar button.active,
+body.device-mobile .teacher-tabs button.active{
+  background:linear-gradient(135deg,var(--deep),var(--green)) !important;
+  color:#fff !important;
+  border-color:transparent !important;
+  box-shadow:0 10px 22px rgba(16,58,46,.16);
+}
+
+/* better layouts on ipad/desktop */
+body.device-ipad .teacher-grid,
+body.device-desktop .teacher-grid{grid-template-columns:repeat(2,1fr)}
+body.device-ipad .teacher-kpis{grid-template-columns:repeat(4,1fr)}
+body.device-desktop .teacher-kpis{grid-template-columns:repeat(4,1fr)}
+body.device-ipad .shortcuts{grid-template-columns:repeat(4,1fr)}
+body.device-desktop .shortcuts{grid-template-columns:repeat(4,1fr)}
+body.device-ipad .bottom-nav{width:min(760px,calc(100% - 28px))}
+body.device-desktop .bottom-nav{width:min(920px,calc(100% - 34px))}
 body.device-mobile .bottom-nav{width:min(430px,calc(100% - 18px))}
 
-@media (max-width:900px){
-  .parent-actions-top{grid-template-columns:1fr 1fr !important}
-  .parent-login-grid,.parent-login-actions{grid-template-columns:1fr !important}
-}
-@media (max-width:600px){
-  .parent-actions-top{grid-template-columns:1fr !important}
+/* keep sections close to top on home */
+#home .hero, #teacher_dashboard .teacher-hero, #account_choice .card:first-child,
+#student_login .card:first-child, #teacher_login .card:first-child{
+  margin-top:0 !important;
 }
 </style>
 
 
-<style id="oai-mobile-sliding-tabs-fix">
-/* تبويبات منزلقة للجوال في صفحة الطالب والمعلمة */
-@media (max-width: 900px){
-  .tabbar,
-  .teacher-tabs{
-    display:flex !important;
-    flex-wrap:nowrap !important;
-    overflow-x:auto !important;
-    overflow-y:hidden !important;
-    -webkit-overflow-scrolling:touch;
-    scroll-behavior:smooth;
-    gap:8px !important;
-    padding-bottom:6px !important;
-    white-space:nowrap !important;
-  }
+<style id="oai-more-detail-patch-style">
+.more-detail-pro-card{padding:20px;border-radius:28px}
+.more-detail-title{margin:0 0 10px;color:var(--deep);font-size:28px}
+.more-detail-lead{margin:0 0 14px;color:var(--muted);line-height:2;font-size:15px}
+.more-detail-block{background:#fff;border:1px solid var(--line);border-radius:20px;padding:16px;margin:12px 0;box-shadow:0 8px 18px rgba(16,58,46,.05)}
+.more-detail-block h3{margin:0 0 8px;color:var(--deep);font-size:18px}
+.more-detail-block p{margin:0;line-height:2;color:var(--text)}
+.more-detail-list{display:grid;gap:12px}
+.more-detail-item{display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid var(--line);background:#fff;border-radius:20px;padding:16px;box-shadow:0 8px 18px rgba(16,58,46,.05)}
+.more-detail-item .icon{width:42px;height:42px;border-radius:14px;background:var(--mint);display:grid;place-items:center;font-size:20px}
+.more-detail-item strong{display:block;color:var(--deep);margin-bottom:4px}
+.more-detail-item span{display:block;color:var(--muted);line-height:1.8}
+</style>
 
-  .tabbar button,
-  .teacher-tabs button{
-    flex:0 0 auto !important;
-    white-space:nowrap !important;
-  }
 
-  .tabbar::-webkit-scrollbar,
-  .teacher-tabs::-webkit-scrollbar{
-    height:6px;
-  }
-
-  .tabbar::-webkit-scrollbar-thumb,
-  .teacher-tabs::-webkit-scrollbar-thumb{
-    background:rgba(16,58,46,.22);
-    border-radius:999px;
-  }
-}
+<style id="oai-more-fullpage-style">
+.more-detail-card{animation:slideInPanel .28s ease}
+.more-detail-content{display:grid;gap:14px;line-height:2}
+.more-detail-title{margin:0;color:var(--deep);font-size:22px}
+.more-detail-lead{margin:0;color:var(--muted);font-size:14px}
+.more-detail-block{background:#fff;border:1px solid var(--line);border-radius:22px;padding:16px;box-shadow:0 8px 18px rgba(16,58,46,.05)}
+.more-detail-block h3{margin:0 0 10px;color:var(--deep);font-size:16px}
+.more-detail-block p{margin:0;color:var(--text);font-size:14px;line-height:2}
+.more-detail-list{display:grid;gap:10px}
+.more-detail-item{display:flex;align-items:flex-start;gap:10px;background:#f9fbfa;border:1px solid var(--line);border-radius:18px;padding:12px 14px}
+.more-detail-item .icon{width:34px;height:34px;border-radius:12px;background:var(--mint);display:grid;place-items:center;flex:none}
+.more-detail-item strong{display:block;color:var(--deep);font-size:14px;margin-bottom:2px}
+.more-detail-item span{display:block;color:var(--muted);font-size:13px;line-height:1.9}
 </style>
 
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-
-
-<script id="oai-firebase-live-config">
+<script id="math-bank-firebase-config">
 window.MATH_BANK_CLOUD_CONFIG = {
   enabled: true,
   firebaseConfig: {
@@ -718,6 +738,14 @@ window.MATH_BANK_CLOUD_CONFIG = {
   docId: "shared_bank"
 };
 </script>
+<style id="math-bank-sync-style">
+.sync-status-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:8px 12px;border-radius:999px;
+  background:#edf6f0;color:#176242;font-size:12px;font-weight:800;
+  border:1px solid #cfe9db
+}
+</style>
 
 </head>
 <body>
@@ -1331,17 +1359,6 @@ window.MATH_BANK_CLOUD_CONFIG = {
     </div>
 
     <div id="teacherPaneHome" class="teacher-pane active card">
-
-<div class="cloud-sync-card" id="cloudSyncCard">
-  <h3>المزامنة السحابية بين الأجهزة</h3>
-  <p>تم تفعيل Firebase لهذا الملف. أي حفظ أو نقل من البنك الأزرق سيحاول المزامنة مع جميع الأجهزة.</p>
-  <div class="cloud-sync-grid">
-    <button class="btn btn-green" type="button" onclick="cloudPushNow()">رفع البيانات للسحابة</button>
-    <button class="btn btn-light" type="button" onclick="cloudRefreshFromServer()">جلب آخر بيانات من السحابة</button>
-  </div>
-  <div class="cloud-sync-status" id="cloudSyncStatus">الحالة: جارٍ تفعيل المزامنة...</div>
-</div>
-
       <div class="teacher-grid">
         <div class="teacher-box">
           <h3>ملخص سريع</h3>
@@ -1625,19 +1642,19 @@ window.MATH_BANK_CLOUD_CONFIG = {
 
 <section id="more_detail" class="screen">
   <div class="topbar">
-    <div class="brand"><div class="logo">BN</div><div><h1 id="moreDetailTitle">التفاصيل</h1><p id="moreDetailSub">صفحة معلومات إضافية</p></div></div>
-    <button class="ghost" type="button" onclick="go('more')">←</button>
+    <div class="brand">
+      <div class="logo">BN</div>
+      <div>
+        <h1 id="moreDetailTitle">التفاصيل</h1>
+        <p id="moreDetailSub">صفحة مستقلة لعرض محتوى المزيد</p>
+      </div>
+    </div>
+    <button class="ghost" type="button" onclick="goBackFromMoreDetail()">رجوع للخلف</button>
   </div>
   <div class="card more-detail-card">
     <div id="moreDetailContent" class="more-detail-content"></div>
   </div>
-  <div class="footer footer-custom">
-    <div class="footer-line footer-line-1">الرياضيات لغة الأذكياء</div>
-    <div class="footer-line footer-line-2">نحو تعليم محفّز وعقول مفكّرة © بنك الرياضيات – إشراف الأستاذة سارة حقوي</div>
-    <div class="footer-line footer-line-3">🏫 مدرسة رواد الشرق الأهلية</div>
-  </div>
 </section>
-
 
 
 
@@ -1669,25 +1686,12 @@ window.MATH_BANK_CLOUD_CONFIG = {
     </div>
     <div class="parent-login-actions">
       <button class="btn btn-green" onclick="parentFollowLogin()">دخول ولي الأمر</button>
-      <button class="btn btn-light" onclick="parentFollowClearLogin()">مسح الدخول</button>
+      <button class="btn btn-light" onclick="parentFollowLogout()">مسح الدخول</button>
     </div>
     <div id="pfLoginError" class="notice hidden" style="margin-top:12px;background:#fff0ef;color:#a63f3c;border:1px solid #efcfcd">بيانات الدخول غير صحيحة.</div>
   </div>
 
   <div id="parentFollowDashboard" class="hidden">
-    <div class="card parent-parent-top-actions">
-      <div class="section-head">
-        <h3>خدمات ولي الأمر</h3>
-        <button class="btn btn-light parent-logout-btn" onclick="parentFollowLogout()">تسجيل خروج</button>
-      </div>
-      <div class="parent-actions-grid parent-actions-grid-strong parent-actions-top">
-        <button class="btn btn-green" onclick="parentFollowOpenFaq()">الأسئلة المتكررة والدعم</button>
-        <button class="btn btn-gold" onclick="parentFollowRequestReport()">طلب تقرير مختصر</button>
-        <button class="btn btn-light" onclick="parentFollowAcademic()">متابعة أكاديمية</button>
-        <button class="btn btn-light" onclick="parentFollowAttendance()">متابعة الحضور والانضباط</button>
-      </div>
-    </div>
-
     <div class="parent-overview-grid">
       <div class="parent-metric-card">
         <span class="label">الرصيد الحالي</span>
@@ -1761,10 +1765,16 @@ window.MATH_BANK_CLOUD_CONFIG = {
       </div>
     </div>
 
+    <div class="parent-actions-grid parent-actions-grid-strong">
+      <button class="btn btn-green" onclick="parentFollowOpenFaq()">الأسئلة المتكررة والدعم</button>
+      <button class="btn btn-gold" onclick="parentFollowRequestReport()">طلب تقرير مختصر</button>
+      <button class="btn btn-light" onclick="parentFollowAcademic()">متابعة أكاديمية</button>
+      <button class="btn btn-light" onclick="parentFollowAttendance()">متابعة الحضور والانضباط</button>
+    </div>
+
     <div id="parentFollowNotice" class="notice ok hidden" style="margin-top:14px"></div>
   </div>
 </section>
-
 
 
 
@@ -4210,95 +4220,115 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
 </style>
 
 
-<style id="oai-parent-auto-device-style">
-.parent-parent-top-actions{margin-top:14px}
-.parent-actions-top{margin-top:4px}
-.parent-logout-btn{min-width:130px}
-.parent-login-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
-.parent-login-grid input{width:100%;border:1px solid var(--line);border-radius:16px;padding:14px;background:#fff;font:inherit}
-.parent-login-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
-
-body.device-desktop .app{max-width:1280px}
-body.device-desktop .screen{padding:22px 22px 118px}
-body.device-desktop .teacher-grid,
-body.device-desktop .tracking-grid,
-body.device-desktop .parent-analysis-grid,
-body.device-desktop .parent-overview-grid{grid-template-columns:repeat(2,1fr)}
-body.device-desktop .parent-actions-grid{grid-template-columns:repeat(4,1fr)}
-body.device-desktop .bottom-nav{width:min(880px,calc(100% - 28px))}
-body.device-desktop .nav-btn{font-size:13px}
-body.device-desktop .hero,
-body.device-desktop .card,
-body.device-desktop .honor-hero{border-radius:34px}
-body.device-desktop .shortcuts{grid-template-columns:repeat(4,1fr)}
-
-body.device-ipad .app{max-width:900px}
-body.device-ipad .screen{padding:20px 18px 116px}
-body.device-ipad .parent-overview-grid{grid-template-columns:repeat(3,1fr)}
-body.device-ipad .parent-analysis-grid{grid-template-columns:1.2fr 1fr}
-body.device-ipad .bottom-nav{width:min(760px,calc(100% - 22px))}
-
+<style id="oai-device-responsive-fix">
+/* auto device layout */
 body.device-mobile .app{max-width:460px}
-body.device-mobile .screen{padding:18px 16px 108px}
-body.device-mobile .parent-overview-grid,
-body.device-mobile .parent-analysis-grid,
-body.device-mobile .parent-week-grid,
-body.device-mobile .parent-actions-grid,
-body.device-mobile .teacher-grid,
-body.device-mobile .tracking-grid{grid-template-columns:1fr !important}
+body.device-ipad .app{max-width:900px}
+body.device-desktop .app{max-width:1280px}
+
+body.device-mobile .screen{padding:0 14px 108px !important}
+body.device-ipad .screen{padding:0 18px 118px !important}
+body.device-desktop .screen{padding:0 22px 124px !important}
+
+/* remove top gap hard */
+html,body,.app{padding-top:0 !important;margin-top:0 !important}
+.screen,.screen.active{padding-top:0 !important;margin-top:0 !important}
+.topbar{margin-top:0 !important;padding-top:0 !important}
+.hero,.card,.teacher-shell,.teacher-hero{margin-top:0 !important}
+body::before{display:none !important}
+
+/* tab bars more visible + slide on mobile */
+.tabbar,.teacher-tabs{
+  scrollbar-width:thin;
+  scrollbar-color: rgba(16,58,46,.28) transparent;
+}
+.tabbar::-webkit-scrollbar,.teacher-tabs::-webkit-scrollbar{height:7px}
+.tabbar::-webkit-scrollbar-thumb,.teacher-tabs::-webkit-scrollbar-thumb{
+  background:rgba(16,58,46,.28);border-radius:999px
+}
+body.device-mobile .tabbar,
+body.device-mobile .teacher-tabs{
+  display:flex !important;
+  flex-wrap:nowrap !important;
+  overflow-x:auto !important;
+  overflow-y:hidden !important;
+  -webkit-overflow-scrolling:touch;
+  scroll-behavior:smooth;
+  gap:10px !important;
+  padding:4px 2px 10px !important;
+  margin-bottom:14px !important;
+  border-bottom:1px solid rgba(16,58,46,.08);
+}
+body.device-mobile .tabbar button,
+body.device-mobile .teacher-tabs button{
+  flex:0 0 auto !important;
+  white-space:nowrap !important;
+  border:1px solid rgba(16,58,46,.08) !important;
+  background:#fff !important;
+  color:var(--deep) !important;
+  box-shadow:0 8px 16px rgba(16,58,46,.06);
+}
+body.device-mobile .tabbar button.active,
+body.device-mobile .teacher-tabs button.active{
+  background:linear-gradient(135deg,var(--deep),var(--green)) !important;
+  color:#fff !important;
+  border-color:transparent !important;
+  box-shadow:0 10px 22px rgba(16,58,46,.16);
+}
+
+/* better layouts on ipad/desktop */
+body.device-ipad .teacher-grid,
+body.device-desktop .teacher-grid{grid-template-columns:repeat(2,1fr)}
+body.device-ipad .teacher-kpis{grid-template-columns:repeat(4,1fr)}
+body.device-desktop .teacher-kpis{grid-template-columns:repeat(4,1fr)}
+body.device-ipad .shortcuts{grid-template-columns:repeat(4,1fr)}
+body.device-desktop .shortcuts{grid-template-columns:repeat(4,1fr)}
+body.device-ipad .bottom-nav{width:min(760px,calc(100% - 28px))}
+body.device-desktop .bottom-nav{width:min(920px,calc(100% - 34px))}
 body.device-mobile .bottom-nav{width:min(430px,calc(100% - 18px))}
 
-@media (max-width:900px){
-  .parent-actions-top{grid-template-columns:1fr 1fr !important}
-  .parent-login-grid,.parent-login-actions{grid-template-columns:1fr !important}
-}
-@media (max-width:600px){
-  .parent-actions-top{grid-template-columns:1fr !important}
+/* keep sections close to top on home */
+#home .hero, #teacher_dashboard .teacher-hero, #account_choice .card:first-child,
+#student_login .card:first-child, #teacher_login .card:first-child{
+  margin-top:0 !important;
 }
 </style>
 
 
-<style id="oai-mobile-sliding-tabs-fix">
-/* تبويبات منزلقة للجوال في صفحة الطالب والمعلمة */
-@media (max-width: 900px){
-  .tabbar,
-  .teacher-tabs{
-    display:flex !important;
-    flex-wrap:nowrap !important;
-    overflow-x:auto !important;
-    overflow-y:hidden !important;
-    -webkit-overflow-scrolling:touch;
-    scroll-behavior:smooth;
-    gap:8px !important;
-    padding-bottom:6px !important;
-    white-space:nowrap !important;
-  }
+<style id="oai-more-detail-patch-style">
+.more-detail-pro-card{padding:20px;border-radius:28px}
+.more-detail-title{margin:0 0 10px;color:var(--deep);font-size:28px}
+.more-detail-lead{margin:0 0 14px;color:var(--muted);line-height:2;font-size:15px}
+.more-detail-block{background:#fff;border:1px solid var(--line);border-radius:20px;padding:16px;margin:12px 0;box-shadow:0 8px 18px rgba(16,58,46,.05)}
+.more-detail-block h3{margin:0 0 8px;color:var(--deep);font-size:18px}
+.more-detail-block p{margin:0;line-height:2;color:var(--text)}
+.more-detail-list{display:grid;gap:12px}
+.more-detail-item{display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid var(--line);background:#fff;border-radius:20px;padding:16px;box-shadow:0 8px 18px rgba(16,58,46,.05)}
+.more-detail-item .icon{width:42px;height:42px;border-radius:14px;background:var(--mint);display:grid;place-items:center;font-size:20px}
+.more-detail-item strong{display:block;color:var(--deep);margin-bottom:4px}
+.more-detail-item span{display:block;color:var(--muted);line-height:1.8}
+</style>
 
-  .tabbar button,
-  .teacher-tabs button{
-    flex:0 0 auto !important;
-    white-space:nowrap !important;
-  }
 
-  .tabbar::-webkit-scrollbar,
-  .teacher-tabs::-webkit-scrollbar{
-    height:6px;
-  }
-
-  .tabbar::-webkit-scrollbar-thumb,
-  .teacher-tabs::-webkit-scrollbar-thumb{
-    background:rgba(16,58,46,.22);
-    border-radius:999px;
-  }
-}
+<style id="oai-more-fullpage-style">
+.more-detail-card{animation:slideInPanel .28s ease}
+.more-detail-content{display:grid;gap:14px;line-height:2}
+.more-detail-title{margin:0;color:var(--deep);font-size:22px}
+.more-detail-lead{margin:0;color:var(--muted);font-size:14px}
+.more-detail-block{background:#fff;border:1px solid var(--line);border-radius:22px;padding:16px;box-shadow:0 8px 18px rgba(16,58,46,.05)}
+.more-detail-block h3{margin:0 0 10px;color:var(--deep);font-size:16px}
+.more-detail-block p{margin:0;color:var(--text);font-size:14px;line-height:2}
+.more-detail-list{display:grid;gap:10px}
+.more-detail-item{display:flex;align-items:flex-start;gap:10px;background:#f9fbfa;border:1px solid var(--line);border-radius:18px;padding:12px 14px}
+.more-detail-item .icon{width:34px;height:34px;border-radius:12px;background:var(--mint);display:grid;place-items:center;flex:none}
+.more-detail-item strong{display:block;color:var(--deep);font-size:14px;margin-bottom:2px}
+.more-detail-item span{display:block;color:var(--muted);font-size:13px;line-height:1.9}
 </style>
 
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-
-
-<script id="oai-firebase-live-config">
+<script id="math-bank-firebase-config">
 window.MATH_BANK_CLOUD_CONFIG = {
   enabled: true,
   firebaseConfig: {
@@ -4313,6 +4343,14 @@ window.MATH_BANK_CLOUD_CONFIG = {
   docId: "shared_bank"
 };
 </script>
+<style id="math-bank-sync-style">
+.sync-status-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:8px 12px;border-radius:999px;
+  background:#edf6f0;color:#176242;font-size:12px;font-weight:800;
+  border:1px solid #cfe9db
+}
+</style>
 
 </head><body>'
       + '<h1>تقرير بنك الرياضيات</h1>'
@@ -4483,112 +4521,6 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
 }
 </style>
 
-
-<style id="oai-parent-auto-device-style">
-.parent-parent-top-actions{margin-top:14px}
-.parent-actions-top{margin-top:4px}
-.parent-logout-btn{min-width:130px}
-.parent-login-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
-.parent-login-grid input{width:100%;border:1px solid var(--line);border-radius:16px;padding:14px;background:#fff;font:inherit}
-.parent-login-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
-
-body.device-desktop .app{max-width:1280px}
-body.device-desktop .screen{padding:22px 22px 118px}
-body.device-desktop .teacher-grid,
-body.device-desktop .tracking-grid,
-body.device-desktop .parent-analysis-grid,
-body.device-desktop .parent-overview-grid{grid-template-columns:repeat(2,1fr)}
-body.device-desktop .parent-actions-grid{grid-template-columns:repeat(4,1fr)}
-body.device-desktop .bottom-nav{width:min(880px,calc(100% - 28px))}
-body.device-desktop .nav-btn{font-size:13px}
-body.device-desktop .hero,
-body.device-desktop .card,
-body.device-desktop .honor-hero{border-radius:34px}
-body.device-desktop .shortcuts{grid-template-columns:repeat(4,1fr)}
-
-body.device-ipad .app{max-width:900px}
-body.device-ipad .screen{padding:20px 18px 116px}
-body.device-ipad .parent-overview-grid{grid-template-columns:repeat(3,1fr)}
-body.device-ipad .parent-analysis-grid{grid-template-columns:1.2fr 1fr}
-body.device-ipad .bottom-nav{width:min(760px,calc(100% - 22px))}
-
-body.device-mobile .app{max-width:460px}
-body.device-mobile .screen{padding:18px 16px 108px}
-body.device-mobile .parent-overview-grid,
-body.device-mobile .parent-analysis-grid,
-body.device-mobile .parent-week-grid,
-body.device-mobile .parent-actions-grid,
-body.device-mobile .teacher-grid,
-body.device-mobile .tracking-grid{grid-template-columns:1fr !important}
-body.device-mobile .bottom-nav{width:min(430px,calc(100% - 18px))}
-
-@media (max-width:900px){
-  .parent-actions-top{grid-template-columns:1fr 1fr !important}
-  .parent-login-grid,.parent-login-actions{grid-template-columns:1fr !important}
-}
-@media (max-width:600px){
-  .parent-actions-top{grid-template-columns:1fr !important}
-}
-</style>
-
-
-<style id="oai-mobile-sliding-tabs-fix">
-/* تبويبات منزلقة للجوال في صفحة الطالب والمعلمة */
-@media (max-width: 900px){
-  .tabbar,
-  .teacher-tabs{
-    display:flex !important;
-    flex-wrap:nowrap !important;
-    overflow-x:auto !important;
-    overflow-y:hidden !important;
-    -webkit-overflow-scrolling:touch;
-    scroll-behavior:smooth;
-    gap:8px !important;
-    padding-bottom:6px !important;
-    white-space:nowrap !important;
-  }
-
-  .tabbar button,
-  .teacher-tabs button{
-    flex:0 0 auto !important;
-    white-space:nowrap !important;
-  }
-
-  .tabbar::-webkit-scrollbar,
-  .teacher-tabs::-webkit-scrollbar{
-    height:6px;
-  }
-
-  .tabbar::-webkit-scrollbar-thumb,
-  .teacher-tabs::-webkit-scrollbar-thumb{
-    background:rgba(16,58,46,.22);
-    border-radius:999px;
-  }
-}
-</style>
-
-
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-
-
-<script id="oai-firebase-live-config">
-window.MATH_BANK_CLOUD_CONFIG = {
-  enabled: true,
-  firebaseConfig: {
-    apiKey: "AIzaSyDP-pi0tbF09bNRihrLz_kUs-JBoa9Cw4Y",
-    authDomain: "sara-haywire.firebaseapp.com",
-    projectId: "sara-haywire",
-    storageBucket: "sara-haywire.firebasestorage.app",
-    messagingSenderId: "333467940977",
-    appId: "1:333467940977:web:97d056d5dbff2debbf43d0"
-  },
-  collection: "math_bank",
-  docId: "shared_bank"
-};
-</script>
-
-</head><body><h1>التقرير الشامل - بنك الرياضيات</h1><div class="muted">تم إنشاؤه تلقائيًا من التقارير الذكية</div><div class="grid">${['srStudents','srClasses','srDeposits','srWithdrawals','srTransfers','srTasks','srSubmitted','srPending'].map(id=>{ const el=document.getElementById(id); const label=el&&el.nextElementSibling?el.nextElementSibling.textContent:''; return `<div class="card"><strong>${label}</strong><div style="font-size:24px;margin-top:8px">${el?el.textContent:''}</div></div>`; }).join('')}</div><div class="card"><h3>أفضل الطلاب / الطالبات</h3>${document.getElementById('smartTopStudents')?.innerHTML||''}</div><div class="card"><h3>تحليل الفصول</h3>${document.getElementById('smartClassCards')?.innerHTML||''}</div><div class="card"><h3>التنبيهات الذكية</h3>${document.getElementById('smartAlerts')?.innerHTML||''}</div>
 <script id="smart-reports-override-v7">
 (function(){
   function money(v){ return Number(v||0).toLocaleString('ar-SA'); }
@@ -4765,95 +4697,115 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
 </style>
 
 
-<style id="oai-parent-auto-device-style">
-.parent-parent-top-actions{margin-top:14px}
-.parent-actions-top{margin-top:4px}
-.parent-logout-btn{min-width:130px}
-.parent-login-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
-.parent-login-grid input{width:100%;border:1px solid var(--line);border-radius:16px;padding:14px;background:#fff;font:inherit}
-.parent-login-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
-
-body.device-desktop .app{max-width:1280px}
-body.device-desktop .screen{padding:22px 22px 118px}
-body.device-desktop .teacher-grid,
-body.device-desktop .tracking-grid,
-body.device-desktop .parent-analysis-grid,
-body.device-desktop .parent-overview-grid{grid-template-columns:repeat(2,1fr)}
-body.device-desktop .parent-actions-grid{grid-template-columns:repeat(4,1fr)}
-body.device-desktop .bottom-nav{width:min(880px,calc(100% - 28px))}
-body.device-desktop .nav-btn{font-size:13px}
-body.device-desktop .hero,
-body.device-desktop .card,
-body.device-desktop .honor-hero{border-radius:34px}
-body.device-desktop .shortcuts{grid-template-columns:repeat(4,1fr)}
-
-body.device-ipad .app{max-width:900px}
-body.device-ipad .screen{padding:20px 18px 116px}
-body.device-ipad .parent-overview-grid{grid-template-columns:repeat(3,1fr)}
-body.device-ipad .parent-analysis-grid{grid-template-columns:1.2fr 1fr}
-body.device-ipad .bottom-nav{width:min(760px,calc(100% - 22px))}
-
+<style id="oai-device-responsive-fix">
+/* auto device layout */
 body.device-mobile .app{max-width:460px}
-body.device-mobile .screen{padding:18px 16px 108px}
-body.device-mobile .parent-overview-grid,
-body.device-mobile .parent-analysis-grid,
-body.device-mobile .parent-week-grid,
-body.device-mobile .parent-actions-grid,
-body.device-mobile .teacher-grid,
-body.device-mobile .tracking-grid{grid-template-columns:1fr !important}
+body.device-ipad .app{max-width:900px}
+body.device-desktop .app{max-width:1280px}
+
+body.device-mobile .screen{padding:0 14px 108px !important}
+body.device-ipad .screen{padding:0 18px 118px !important}
+body.device-desktop .screen{padding:0 22px 124px !important}
+
+/* remove top gap hard */
+html,body,.app{padding-top:0 !important;margin-top:0 !important}
+.screen,.screen.active{padding-top:0 !important;margin-top:0 !important}
+.topbar{margin-top:0 !important;padding-top:0 !important}
+.hero,.card,.teacher-shell,.teacher-hero{margin-top:0 !important}
+body::before{display:none !important}
+
+/* tab bars more visible + slide on mobile */
+.tabbar,.teacher-tabs{
+  scrollbar-width:thin;
+  scrollbar-color: rgba(16,58,46,.28) transparent;
+}
+.tabbar::-webkit-scrollbar,.teacher-tabs::-webkit-scrollbar{height:7px}
+.tabbar::-webkit-scrollbar-thumb,.teacher-tabs::-webkit-scrollbar-thumb{
+  background:rgba(16,58,46,.28);border-radius:999px
+}
+body.device-mobile .tabbar,
+body.device-mobile .teacher-tabs{
+  display:flex !important;
+  flex-wrap:nowrap !important;
+  overflow-x:auto !important;
+  overflow-y:hidden !important;
+  -webkit-overflow-scrolling:touch;
+  scroll-behavior:smooth;
+  gap:10px !important;
+  padding:4px 2px 10px !important;
+  margin-bottom:14px !important;
+  border-bottom:1px solid rgba(16,58,46,.08);
+}
+body.device-mobile .tabbar button,
+body.device-mobile .teacher-tabs button{
+  flex:0 0 auto !important;
+  white-space:nowrap !important;
+  border:1px solid rgba(16,58,46,.08) !important;
+  background:#fff !important;
+  color:var(--deep) !important;
+  box-shadow:0 8px 16px rgba(16,58,46,.06);
+}
+body.device-mobile .tabbar button.active,
+body.device-mobile .teacher-tabs button.active{
+  background:linear-gradient(135deg,var(--deep),var(--green)) !important;
+  color:#fff !important;
+  border-color:transparent !important;
+  box-shadow:0 10px 22px rgba(16,58,46,.16);
+}
+
+/* better layouts on ipad/desktop */
+body.device-ipad .teacher-grid,
+body.device-desktop .teacher-grid{grid-template-columns:repeat(2,1fr)}
+body.device-ipad .teacher-kpis{grid-template-columns:repeat(4,1fr)}
+body.device-desktop .teacher-kpis{grid-template-columns:repeat(4,1fr)}
+body.device-ipad .shortcuts{grid-template-columns:repeat(4,1fr)}
+body.device-desktop .shortcuts{grid-template-columns:repeat(4,1fr)}
+body.device-ipad .bottom-nav{width:min(760px,calc(100% - 28px))}
+body.device-desktop .bottom-nav{width:min(920px,calc(100% - 34px))}
 body.device-mobile .bottom-nav{width:min(430px,calc(100% - 18px))}
 
-@media (max-width:900px){
-  .parent-actions-top{grid-template-columns:1fr 1fr !important}
-  .parent-login-grid,.parent-login-actions{grid-template-columns:1fr !important}
-}
-@media (max-width:600px){
-  .parent-actions-top{grid-template-columns:1fr !important}
+/* keep sections close to top on home */
+#home .hero, #teacher_dashboard .teacher-hero, #account_choice .card:first-child,
+#student_login .card:first-child, #teacher_login .card:first-child{
+  margin-top:0 !important;
 }
 </style>
 
 
-<style id="oai-mobile-sliding-tabs-fix">
-/* تبويبات منزلقة للجوال في صفحة الطالب والمعلمة */
-@media (max-width: 900px){
-  .tabbar,
-  .teacher-tabs{
-    display:flex !important;
-    flex-wrap:nowrap !important;
-    overflow-x:auto !important;
-    overflow-y:hidden !important;
-    -webkit-overflow-scrolling:touch;
-    scroll-behavior:smooth;
-    gap:8px !important;
-    padding-bottom:6px !important;
-    white-space:nowrap !important;
-  }
+<style id="oai-more-detail-patch-style">
+.more-detail-pro-card{padding:20px;border-radius:28px}
+.more-detail-title{margin:0 0 10px;color:var(--deep);font-size:28px}
+.more-detail-lead{margin:0 0 14px;color:var(--muted);line-height:2;font-size:15px}
+.more-detail-block{background:#fff;border:1px solid var(--line);border-radius:20px;padding:16px;margin:12px 0;box-shadow:0 8px 18px rgba(16,58,46,.05)}
+.more-detail-block h3{margin:0 0 8px;color:var(--deep);font-size:18px}
+.more-detail-block p{margin:0;line-height:2;color:var(--text)}
+.more-detail-list{display:grid;gap:12px}
+.more-detail-item{display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid var(--line);background:#fff;border-radius:20px;padding:16px;box-shadow:0 8px 18px rgba(16,58,46,.05)}
+.more-detail-item .icon{width:42px;height:42px;border-radius:14px;background:var(--mint);display:grid;place-items:center;font-size:20px}
+.more-detail-item strong{display:block;color:var(--deep);margin-bottom:4px}
+.more-detail-item span{display:block;color:var(--muted);line-height:1.8}
+</style>
 
-  .tabbar button,
-  .teacher-tabs button{
-    flex:0 0 auto !important;
-    white-space:nowrap !important;
-  }
 
-  .tabbar::-webkit-scrollbar,
-  .teacher-tabs::-webkit-scrollbar{
-    height:6px;
-  }
-
-  .tabbar::-webkit-scrollbar-thumb,
-  .teacher-tabs::-webkit-scrollbar-thumb{
-    background:rgba(16,58,46,.22);
-    border-radius:999px;
-  }
-}
+<style id="oai-more-fullpage-style">
+.more-detail-card{animation:slideInPanel .28s ease}
+.more-detail-content{display:grid;gap:14px;line-height:2}
+.more-detail-title{margin:0;color:var(--deep);font-size:22px}
+.more-detail-lead{margin:0;color:var(--muted);font-size:14px}
+.more-detail-block{background:#fff;border:1px solid var(--line);border-radius:22px;padding:16px;box-shadow:0 8px 18px rgba(16,58,46,.05)}
+.more-detail-block h3{margin:0 0 10px;color:var(--deep);font-size:16px}
+.more-detail-block p{margin:0;color:var(--text);font-size:14px;line-height:2}
+.more-detail-list{display:grid;gap:10px}
+.more-detail-item{display:flex;align-items:flex-start;gap:10px;background:#f9fbfa;border:1px solid var(--line);border-radius:18px;padding:12px 14px}
+.more-detail-item .icon{width:34px;height:34px;border-radius:12px;background:var(--mint);display:grid;place-items:center;flex:none}
+.more-detail-item strong{display:block;color:var(--deep);font-size:14px;margin-bottom:2px}
+.more-detail-item span{display:block;color:var(--muted);font-size:13px;line-height:1.9}
 </style>
 
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-
-
-<script id="oai-firebase-live-config">
+<script id="math-bank-firebase-config">
 window.MATH_BANK_CLOUD_CONFIG = {
   enabled: true,
   firebaseConfig: {
@@ -4868,6 +4820,14 @@ window.MATH_BANK_CLOUD_CONFIG = {
   docId: "shared_bank"
 };
 </script>
+<style id="math-bank-sync-style">
+.sync-status-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:8px 12px;border-radius:999px;
+  background:#edf6f0;color:#176242;font-size:12px;font-weight:800;
+  border:1px solid #cfe9db
+}
+</style>
 
 </head><body><h1>التقرير الشامل - بنك الرياضيات</h1><div class="muted">تم إنشاؤه تلقائيًا من التقارير الذكية</div><div class="grid">${['srStudents','srClasses','srDeposits','srWithdrawals','srTransfers','srTasks','srSubmitted','srPending'].map(id=>{ const el=document.getElementById(id); const label=el&&el.nextElementSibling?el.nextElementSibling.textContent:''; return `<div class="card"><strong>${label}</strong><div style="font-size:24px;margin-top:8px">${el?el.textContent:''}</div></div>`; }).join('')}</div><div class="card"><h3>أفضل الطلاب / الطالبات</h3>${document.getElementById('smartTopStudents')?.innerHTML||''}</div><div class="card"><h3>مؤشر أداء الطالب / الطالبة</h3>${document.getElementById('smartPerformanceIndicators')?.innerHTML||''}</div><div class="card"><h3>تحليل الفصول</h3>${document.getElementById('smartClassCards')?.innerHTML||''}</div><div class="card"><h3>التنبيهات الذكية</h3>${document.getElementById('smartAlerts')?.innerHTML||''}</div>
 <style id="student-settings-pro-style">
@@ -5173,160 +5133,43 @@ window.MATH_BANK_CLOUD_CONFIG = {
     const pass = prompt('كلمة المرور الجديدة:', st.password || ''); if(!pass) return;
     st.password = pass; saveBankData(); refreshTeacherUI();
   };
-  function openPrintWindow(title, bodyHtml){
-    const w = window.open('', '_blank'); if(!w) return;
-    w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ddd;padding:8px;text-align:right} .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}</style>
-<style id="top-gap-hard-fix">
-html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!important;}
-.app,.screen{margin-top:0!important;padding-top:0!important;}
-.screen.active{display:block!important;}
-.topbar,.card:first-child,.hero:first-child{margin-top:0!important;}
+  
+
+function openPrintWindow(title, bodyHtml){
+  const w = window.open('', '_blank');
+  if(!w) return;
+  const printHtml = `<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title></title>
+<style>
+  body{font-family:Arial,sans-serif;padding:24px;color:#183229}
+  h1{margin-top:0}
+  table{width:100%;border-collapse:collapse;margin-top:16px}
+  td,th{border:1px solid #ddd;padding:8px;text-align:right}
+  .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}
 </style>
 
-<style id="parent-followup-pro-style">
-.parent-hero-card{background:linear-gradient(135deg,#0f3529,#1d6b4a);color:#fff;overflow:hidden;position:relative}
-.parent-hero-head{display:flex;justify-content:space-between;align-items:flex-start;gap:18px}
-.parent-hero-head h3{margin:10px 0 8px;font-size:28px}
-.parent-hero-head p{margin:0;color:rgba(255,255,255,.88);line-height:1.9;font-size:14px;max-width:760px}
-.parent-hero-icon{width:74px;height:74px;border-radius:24px;background:rgba(255,255,255,.14);display:grid;place-items:center;font-size:34px;flex:none}
-.parent-overview-grid,.parent-analysis-grid,.parent-actions-grid{display:grid;gap:14px;margin-top:14px}
-.parent-overview-grid{grid-template-columns:repeat(3,1fr)}
-.parent-analysis-grid{grid-template-columns:1.25fr 1fr}
-.parent-actions-grid{grid-template-columns:repeat(4,1fr)}
-.parent-metric-card{background:#fff;border:1px solid var(--line);border-radius:24px;padding:18px;box-shadow:0 12px 24px rgba(16,58,46,.06)}
-.parent-metric-card .label{display:block;color:var(--muted);font-size:13px;margin-bottom:8px}
-.parent-metric-card strong{display:block;font-size:30px;color:var(--deep)}
-.parent-metric-card small{display:block;color:var(--muted);margin-top:6px}
-.parent-student-summary{margin-top:14px}
-.parent-student-shell{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
-.parent-student-main{display:flex;align-items:center;gap:14px}
-.parent-student-avatar{width:70px;height:70px;border-radius:22px;background:linear-gradient(135deg,#0f5f43,#1f8e66);display:grid;place-items:center;font-size:30px;color:#fff}
-.parent-student-main h4{margin:0 0 6px;font-size:24px;color:var(--deep)}
-.parent-level-pill{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:999px;background:linear-gradient(135deg,#cfae6d,#ddc186);color:#fff;font-weight:900;margin-top:10px}
-.parent-rank-box{min-width:180px;background:#f7faf8;border:1px solid var(--line);border-radius:22px;padding:16px;text-align:center}
-.parent-rank-box span{display:block;color:var(--muted);font-size:13px}
-.parent-rank-box strong{display:block;color:var(--deep);font-size:32px;margin-top:6px}
-.parent-week-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-.parent-week-box{background:#f7faf8;border:1px solid var(--line);border-radius:20px;padding:16px;text-align:center}
-.parent-week-box strong{display:block;color:var(--deep);font-size:28px}
-.parent-week-box span{display:block;color:var(--muted);font-size:12px;margin-top:6px}
-.progress-wrap{padding-top:6px}
-.progress-labels{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:10px}
-.progress-labels strong{color:var(--deep);font-size:24px}
-.progress-track{height:14px;background:#edf2ef;border-radius:999px;overflow:hidden}
-.progress-fill{height:100%;background:linear-gradient(90deg,#0f5f43,#1f8e66);border-radius:999px}
-.parent-alerts{display:grid;gap:10px}
-.parent-alert-item{display:flex;gap:12px;align-items:flex-start;background:#fff;border:1px solid var(--line);border-radius:20px;padding:14px}
-.parent-alert-item .icon{width:42px;height:42px;border-radius:14px;background:#f4f8f5;display:grid;place-items:center;flex:none}
-.parent-alert-item strong{display:block;color:var(--deep);margin-bottom:4px}
-.parent-alert-item span{display:block;color:var(--muted);line-height:1.8}
-@media (max-width:900px){
-  .parent-overview-grid,.parent-analysis-grid,.parent-actions-grid,.parent-week-grid{grid-template-columns:1fr !important}
-  .parent-hero-head{flex-direction:column}
-}
-</style>
-
-
-<style id="parent-followup-login-fix-style">
-.parent-login-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
-.parent-login-grid input{width:100%;border:1px solid var(--line);border-radius:16px;padding:14px;background:#fff;font:inherit}
-.parent-login-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
-.parent-actions-grid-strong .btn{min-height:58px;font-size:15px;font-weight:900}
-@media (max-width:900px){
-  .parent-login-grid,.parent-login-actions{grid-template-columns:1fr !important}
-}
-</style>
-
-
-<style id="oai-parent-auto-device-style">
-.parent-parent-top-actions{margin-top:14px}
-.parent-actions-top{margin-top:4px}
-.parent-logout-btn{min-width:130px}
-.parent-login-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
-.parent-login-grid input{width:100%;border:1px solid var(--line);border-radius:16px;padding:14px;background:#fff;font:inherit}
-.parent-login-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
-
-body.device-desktop .app{max-width:1280px}
-body.device-desktop .screen{padding:22px 22px 118px}
-body.device-desktop .teacher-grid,
-body.device-desktop .tracking-grid,
-body.device-desktop .parent-analysis-grid,
-body.device-desktop .parent-overview-grid{grid-template-columns:repeat(2,1fr)}
-body.device-desktop .parent-actions-grid{grid-template-columns:repeat(4,1fr)}
-body.device-desktop .bottom-nav{width:min(880px,calc(100% - 28px))}
-body.device-desktop .nav-btn{font-size:13px}
-body.device-desktop .hero,
-body.device-desktop .card,
-body.device-desktop .honor-hero{border-radius:34px}
-body.device-desktop .shortcuts{grid-template-columns:repeat(4,1fr)}
-
-body.device-ipad .app{max-width:900px}
-body.device-ipad .screen{padding:20px 18px 116px}
-body.device-ipad .parent-overview-grid{grid-template-columns:repeat(3,1fr)}
-body.device-ipad .parent-analysis-grid{grid-template-columns:1.2fr 1fr}
-body.device-ipad .bottom-nav{width:min(760px,calc(100% - 22px))}
-
-body.device-mobile .app{max-width:460px}
-body.device-mobile .screen{padding:18px 16px 108px}
-body.device-mobile .parent-overview-grid,
-body.device-mobile .parent-analysis-grid,
-body.device-mobile .parent-week-grid,
-body.device-mobile .parent-actions-grid,
-body.device-mobile .teacher-grid,
-body.device-mobile .tracking-grid{grid-template-columns:1fr !important}
-body.device-mobile .bottom-nav{width:min(430px,calc(100% - 18px))}
-
-@media (max-width:900px){
-  .parent-actions-top{grid-template-columns:1fr 1fr !important}
-  .parent-login-grid,.parent-login-actions{grid-template-columns:1fr !important}
-}
-@media (max-width:600px){
-  .parent-actions-top{grid-template-columns:1fr !important}
-}
-</style>
-
-
-<style id="oai-mobile-sliding-tabs-fix">
-/* تبويبات منزلقة للجوال في صفحة الطالب والمعلمة */
-@media (max-width: 900px){
-  .tabbar,
-  .teacher-tabs{
-    display:flex !important;
-    flex-wrap:nowrap !important;
-    overflow-x:auto !important;
-    overflow-y:hidden !important;
-    -webkit-overflow-scrolling:touch;
-    scroll-behavior:smooth;
-    gap:8px !important;
-    padding-bottom:6px !important;
-    white-space:nowrap !important;
-  }
-
-  .tabbar button,
-  .teacher-tabs button{
-    flex:0 0 auto !important;
-    white-space:nowrap !important;
-  }
-
-  .tabbar::-webkit-scrollbar,
-  .teacher-tabs::-webkit-scrollbar{
-    height:6px;
-  }
-
-  .tabbar::-webkit-scrollbar-thumb,
-  .teacher-tabs::-webkit-scrollbar-thumb{
-    background:rgba(16,58,46,.22);
-    border-radius:999px;
-  }
-}
+<style id="oai-more-fullpage-style">
+.more-detail-card{animation:slideInPanel .28s ease}
+.more-detail-content{display:grid;gap:14px;line-height:2}
+.more-detail-title{margin:0;color:var(--deep);font-size:22px}
+.more-detail-lead{margin:0;color:var(--muted);font-size:14px}
+.more-detail-block{background:#fff;border:1px solid var(--line);border-radius:22px;padding:16px;box-shadow:0 8px 18px rgba(16,58,46,.05)}
+.more-detail-block h3{margin:0 0 10px;color:var(--deep);font-size:16px}
+.more-detail-block p{margin:0;color:var(--text);font-size:14px;line-height:2}
+.more-detail-list{display:grid;gap:10px}
+.more-detail-item{display:flex;align-items:flex-start;gap:10px;background:#f9fbfa;border:1px solid var(--line);border-radius:18px;padding:12px 14px}
+.more-detail-item .icon{width:34px;height:34px;border-radius:12px;background:var(--mint);display:grid;place-items:center;flex:none}
+.more-detail-item strong{display:block;color:var(--deep);font-size:14px;margin-bottom:2px}
+.more-detail-item span{display:block;color:var(--muted);font-size:13px;line-height:1.9}
 </style>
 
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-
-
-<script id="oai-firebase-live-config">
+<script id="math-bank-firebase-config">
 window.MATH_BANK_CLOUD_CONFIG = {
   enabled: true,
   firebaseConfig: {
@@ -5341,21 +5184,311 @@ window.MATH_BANK_CLOUD_CONFIG = {
   docId: "shared_bank"
 };
 </script>
-
-</head><body><h1>${title}</h1>${bodyHtml}
-<script>
-function goAccountTab(tabId){
-  try{
-    go('account');
-    setTimeout(function(){
-      var btnMap={statement:0,operations:2,rouletteTab:6,pdfTab:5};
-      var tabs=document.querySelectorAll('#account .tabbar button');
-      var btn=(typeof btnMap[tabId]!=='undefined' && tabs[btnMap[tabId]])?tabs[btnMap[tabId]]:null;
-      if(typeof showTab==='function'){ showTab(tabId, btn); }
-    },120);
-  }catch(e){ console.log(e); }
+<style id="math-bank-sync-style">
+.sync-status-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:8px 12px;border-radius:999px;
+  background:#edf6f0;color:#176242;font-size:12px;font-weight:800;
+  border:1px solid #cfe9db
 }
+</style>
+
+</head>
+<body>
+  <h1></h1>
+  
+
+<script id="oai-more-fullpage-script">
+function goBackFromMoreDetail(){
+  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+  var listScreen = document.getElementById('more');
+  if(listScreen) listScreen.classList.add('active');
+  window.scrollTo({top:0, behavior:'auto'});
+}
+
 function openMoreInfo(type){
+  var data = {
+    about:{
+      title:'من نحن',
+      sub:'نبذة عن بنك الرياضيات',
+      html:`
+        <h2 class="more-detail-title">من نحن</h2>
+        <p class="more-detail-lead">بنك الرياضيات منصة تعليمية تحفيزية تهدف إلى تعزيز مشاركة الطلاب داخل الحصة الدراسية من خلال نظام نقاط مستوحى من الأنظمة المصرفية.</p>
+        <div class="more-detail-block"><p>يمنح البنك الطلاب رصيدًا تحفيزيًا مقابل المشاركة والإنجاز والالتزام، مما يسهم في تنمية روح التنافس الإيجابي وتحفيز التعلم بطريقة ممتعة ومبتكرة.</p></div>
+        <div class="more-detail-block"><h3>الإشراف</h3><p>يشرف على بنك الرياضيات الأستاذة سارة حقوي.</p></div>
+      `
+    },
+    contact:{
+      title:'اتصل بنا',
+      sub:'قنوات التواصل الرسمية',
+      html:`
+        <h2 class="more-detail-title">اتصل بنا</h2>
+        <p class="more-detail-lead">للاستفسارات أو الملاحظات يمكنكم التواصل مع إدارة بنك الرياضيات عبر الوسائل التالية:</p>
+        <div class="more-detail-list">
+          <div class="more-detail-item"><div class="icon">📞</div><div><strong>خدمة الطلاب وأولياء الأمور</strong><span>0502234335</span></div></div>
+          <div class="more-detail-item"><div class="icon">☎️</div><div><strong>الإدارة العامة</strong><span>0556891201</span></div></div>
+          <div class="more-detail-item"><div class="icon">✉️</div><div><strong>البريد الإلكتروني</strong><span>Saramathss@hotmail.com</span></div></div>
+          <div class="more-detail-item"><div class="icon">🏫</div><div><strong>الموقع</strong><span>مدرسة رواد الشرق الأهلية</span></div></div>
+        </div>
+      `
+    },
+    settings:{
+      title:'الإعدادات',
+      sub:'إدارة الحساب والبيانات',
+      html:`
+        <h2 class="more-detail-title">الإعدادات</h2>
+        <p class="more-detail-lead">تتيح هذه الصفحة إدارة إعدادات الحساب داخل نظام بنك الرياضيات.</p>
+        <div class="more-detail-list">
+          <div class="more-detail-item"><div class="icon">🔐</div><div><strong>تغيير كلمة المرور</strong><span>تحديث كلمة المرور لحماية الحساب.</span></div></div>
+          <div class="more-detail-item"><div class="icon">👤</div><div><strong>تعديل بيانات الحساب</strong><span>مراجعة اسم المستخدم والبيانات الأساسية.</span></div></div>
+          <div class="more-detail-item"><div class="icon">🔔</div><div><strong>إدارة الإشعارات</strong><span>التحكم في التنبيهات داخل النظام.</span></div></div>
+          <div class="more-detail-item"><div class="icon">🚪</div><div><strong>تسجيل الخروج</strong><span>إنهاء الجلسة الحالية بأمان.</span></div></div>
+        </div>
+      `
+    },
+    privacy:{
+      title:'سياسة الخصوصية',
+      sub:'استخدام البيانات داخل النظام',
+      html:`
+        <h2 class="more-detail-title">سياسة الخصوصية</h2>
+        <div class="more-detail-block"><p>يحرص بنك الرياضيات على حماية خصوصية بيانات الطلاب وأولياء الأمور.</p></div>
+        <div class="more-detail-block"><p>يتم استخدام المعلومات داخل النظام لأغراض تعليمية فقط، ولا يتم مشاركة أي بيانات خارج إطار المدرسة أو الجهات التعليمية المعنية.</p></div>
+      `
+    },
+    disclaimer:{
+      title:'إخلاء المسؤولية',
+      sub:'تنويه حول طبيعة النظام',
+      html:`
+        <h2 class="more-detail-title">إخلاء المسؤولية</h2>
+        <div class="more-detail-block"><p>بنك الرياضيات نظام تحفيزي تعليمي يهدف إلى تشجيع الطلاب على المشاركة والتفاعل داخل الحصة الدراسية.</p></div>
+        <div class="more-detail-block"><p>النقاط والأرصدة المستخدمة داخل النظام هي لأغراض تعليمية وتحفيزية فقط، ولا تمثل أي قيمة مالية حقيقية.</p></div>
+      `
+    },
+    terms:{
+      title:'الأحكام والشروط',
+      sub:'ضوابط استخدام بنك الرياضيات',
+      html:`
+        <h2 class="more-detail-title">الأحكام والشروط</h2>
+        <div class="more-detail-block"><p>يهدف بنك الرياضيات إلى تعزيز بيئة تعليمية محفزة داخل الفصل الدراسي.</p></div>
+        <div class="more-detail-block"><p>يتم منح النقاط للطلاب وفق معايير تعليمية يحددها المعلم، ويُستخدم النظام كوسيلة تعليمية لتحفيز المشاركة والانضباط وتحقيق التميز.</p></div>
+      `
+    }
+  };
+
+  var item = data[type];
+  if(!item) return;
+
+  var title = document.getElementById('moreDetailTitle');
+  var sub = document.getElementById('moreDetailSub');
+  var content = document.getElementById('moreDetailContent');
+
+  if(title) title.textContent = item.title;
+  if(sub) sub.textContent = item.sub;
+  if(content) content.innerHTML = item.html;
+
+  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+  var detailScreen = document.getElementById('more_detail');
+  if(detailScreen) detailScreen.classList.add('active');
+  window.scrollTo({top:0, behavior:'auto'});
+}
+</script>
+
+
+<script id="oai-more-override-final">
+function openMoreInfo(type){
+  var data = {
+    about:{title:'من نحن',sub:'نبذة عن بنك الرياضيات',html:`<h2 class="more-detail-title">من نحن</h2><p class="more-detail-lead">بنك الرياضيات منصة تعليمية تحفيزية تهدف إلى تعزيز مشاركة الطلاب داخل الحصة الدراسية من خلال نظام نقاط مستوحى من الأنظمة المصرفية.</p><div class="more-detail-block"><p>يمنح البنك الطلاب رصيدًا تحفيزيًا مقابل المشاركة والإنجاز والالتزام، مما يسهم في تنمية روح التنافس الإيجابي وتحفيز التعلم بطريقة ممتعة ومبتكرة.</p></div><div class="more-detail-block"><h3>الإشراف</h3><p>يشرف على بنك الرياضيات الأستاذة سارة حقوي.</p></div>`},
+    contact:{title:'اتصل بنا',sub:'قنوات التواصل الرسمية',html:`<h2 class="more-detail-title">اتصل بنا</h2><p class="more-detail-lead">للاستفسارات أو الملاحظات يمكنكم التواصل مع إدارة بنك الرياضيات عبر الوسائل التالية:</p><div class="more-detail-list"><div class="more-detail-item"><div class="icon">📞</div><div><strong>خدمة الطلاب وأولياء الأمور</strong><span>0502234335</span></div></div><div class="more-detail-item"><div class="icon">☎️</div><div><strong>الإدارة العامة</strong><span>0556891201</span></div></div><div class="more-detail-item"><div class="icon">✉️</div><div><strong>البريد الإلكتروني</strong><span>Saramathss@hotmail.com</span></div></div><div class="more-detail-item"><div class="icon">🏫</div><div><strong>الموقع</strong><span>مدرسة رواد الشرق الأهلية</span></div></div></div>`},
+    settings:{title:'الإعدادات',sub:'إدارة الحساب والبيانات',html:`<h2 class="more-detail-title">الإعدادات</h2><p class="more-detail-lead">تتيح هذه الصفحة إدارة إعدادات الحساب داخل نظام بنك الرياضيات.</p><div class="more-detail-list"><div class="more-detail-item"><div class="icon">🔐</div><div><strong>تغيير كلمة المرور</strong><span>تحديث كلمة المرور لحماية الحساب.</span></div></div><div class="more-detail-item"><div class="icon">👤</div><div><strong>تعديل بيانات الحساب</strong><span>مراجعة اسم المستخدم والبيانات الأساسية.</span></div></div><div class="more-detail-item"><div class="icon">🔔</div><div><strong>إدارة الإشعارات</strong><span>التحكم في التنبيهات داخل النظام.</span></div></div><div class="more-detail-item"><div class="icon">🚪</div><div><strong>تسجيل الخروج</strong><span>إنهاء الجلسة الحالية بأمان.</span></div></div></div>`},
+    privacy:{title:'سياسة الخصوصية',sub:'استخدام البيانات داخل النظام',html:`<h2 class="more-detail-title">سياسة الخصوصية</h2><div class="more-detail-block"><p>يحرص بنك الرياضيات على حماية خصوصية بيانات الطلاب وأولياء الأمور.</p></div><div class="more-detail-block"><p>يتم استخدام المعلومات داخل النظام لأغراض تعليمية فقط، ولا يتم مشاركة أي بيانات خارج إطار المدرسة أو الجهات التعليمية المعنية.</p></div>`},
+    disclaimer:{title:'إخلاء المسؤولية',sub:'تنويه حول طبيعة النظام',html:`<h2 class="more-detail-title">إخلاء المسؤولية</h2><div class="more-detail-block"><p>بنك الرياضيات نظام تحفيزي تعليمي يهدف إلى تشجيع الطلاب على المشاركة والتفاعل داخل الحصة الدراسية.</p></div><div class="more-detail-block"><p>النقاط والأرصدة المستخدمة داخل النظام هي لأغراض تعليمية وتحفيزية فقط، ولا تمثل أي قيمة مالية حقيقية.</p></div>`},
+    terms:{title:'الأحكام والشروط',sub:'ضوابط استخدام بنك الرياضيات',html:`<h2 class="more-detail-title">الأحكام والشروط</h2><div class="more-detail-block"><p>يهدف بنك الرياضيات إلى تعزيز بيئة تعليمية محفزة داخل الفصل الدراسي.</p></div><div class="more-detail-block"><p>يتم منح النقاط للطلاب وفق معايير تعليمية يحددها المعلم، ويُستخدم النظام كوسيلة تعليمية لتحفيز المشاركة والانضباط وتحقيق التميز.</p></div>`}
+  };
+  var item = data[type];
+  if(!item) return;
+  var title = document.getElementById('moreDetailTitle');
+  var sub = document.getElementById('moreDetailSub');
+  var content = document.getElementById('moreDetailContent');
+  if(title) title.textContent = item.title;
+  if(sub) sub.textContent = item.sub;
+  if(content) content.innerHTML = item.html;
+  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+  var detailScreen = document.getElementById('more_detail');
+  if(detailScreen) detailScreen.classList.add('active');
+  window.scrollTo({top:0, behavior:'auto'});
+}
+</script>
+
+
+<script id="math-bank-live-sync-script">
+(function(){
+  let db = null;
+  let ready = false;
+  let applyingRemote = false;
+  let listenerStarted = false;
+
+  function cfg(){ return window.MATH_BANK_CLOUD_CONFIG || {}; }
+
+  function setStatus(text, ok){
+    const el = document.getElementById('syncStatusBadge');
+    if(!el) return;
+    el.textContent = text;
+    el.style.background = ok ? '#edf6f0' : '#fff7e8';
+    el.style.color = ok ? '#176242' : '#9a6a15';
+    el.style.borderColor = ok ? '#cfe9db' : '#f1dfb5';
+  }
+
+  function getLocalData(){
+    try{
+      if(typeof bankData !== 'undefined' && bankData) return JSON.parse(JSON.stringify(bankData));
+    }catch(e){}
+    try{
+      const raw = localStorage.getItem('greenBankTeacherData_v1') || localStorage.getItem('bankData_v10');
+      if(raw) return JSON.parse(raw);
+    }catch(e){}
+    return null;
+  }
+
+  function saveLocalData(data){
+    if(!data) return;
+    try{
+      window.bankData = data;
+      if(typeof bankData !== 'undefined'){ bankData = data; }
+    }catch(e){}
+    try{ localStorage.setItem('greenBankTeacherData_v1', JSON.stringify(data)); }catch(e){}
+    try{ localStorage.setItem('bankData_v10', JSON.stringify(data)); }catch(e){}
+  }
+
+  function refreshUI(){
+    try{ if(typeof refreshTeacherUI === 'function') refreshTeacherUI(); }catch(e){}
+    try{ if(typeof renderStudentAccount === 'function') renderStudentAccount(); }catch(e){}
+    try{ if(typeof updateParentFollowup === 'function') updateParentFollowup(); }catch(e){}
+    try{ if(typeof updateHonorBoard === 'function') updateHonorBoard(); }catch(e){}
+    try{ if(typeof renderLeaderboard === 'function') renderLeaderboard(); }catch(e){}
+    try{ if(typeof renderHomeData === 'function') renderHomeData(); }catch(e){}
+  }
+
+  async function initFirebase(){
+    if(ready) return true;
+    try{
+      const c = cfg();
+      if(!c.enabled) return false;
+      if(!firebase.apps.length){
+        firebase.initializeApp(c.firebaseConfig);
+      }
+      db = firebase.firestore();
+      ready = true;
+      setStatus('☁️ المزامنة مفعلة', true);
+      return true;
+    }catch(err){
+      console.warn(err);
+      setStatus('⚠️ تعذر تفعيل المزامنة', false);
+      return false;
+    }
+  }
+
+  async function pushToCloud(data){
+    if(applyingRemote) return false;
+    if(!await initFirebase()) return false;
+    try{
+      const c = cfg();
+      await db.collection(c.collection).doc(c.docId).set({
+        bankData: data,
+        updatedAt: Date.now()
+      }, {merge:true});
+      setStatus('☁️ تم تحديث جميع الأجهزة', true);
+      return true;
+    }catch(err){
+      console.warn(err);
+      setStatus('⚠️ فشل رفع التحديث', false);
+      return false;
+    }
+  }
+
+  async function pullFromCloud(){
+    if(!await initFirebase()) return null;
+    try{
+      const c = cfg();
+      const snap = await db.collection(c.collection).doc(c.docId).get();
+      if(!snap.exists) return null;
+      const data = snap.data() || {};
+      return data.bankData || null;
+    }catch(err){
+      console.warn(err);
+      return null;
+    }
+  }
+
+  async function startRealtime(){
+    if(listenerStarted) return;
+    if(!await initFirebase()) return;
+    listenerStarted = true;
+    const c = cfg();
+    db.collection(c.collection).doc(c.docId).onSnapshot(function(snap){
+      if(!snap.exists) return;
+      const data = snap.data() || {};
+      if(!data.bankData) return;
+      applyingRemote = true;
+      saveLocalData(data.bankData);
+      refreshUI();
+      applyingRemote = false;
+      setStatus('☁️ تم جلب آخر تحديث', true);
+    }, function(err){
+      console.warn(err);
+    });
+  }
+
+  // wrap saveBankData
+  const oldSaveBankData = window.saveBankData;
+  window.saveBankData = function(){
+    let res;
+    if(typeof oldSaveBankData === 'function'){
+      res = oldSaveBankData.apply(this, arguments);
+    }
+    const data = getLocalData();
+    if(data) pushToCloud(data);
+    return res;
+  };
+
+  // expose manual actions
+  window.cloudPushNow = async function(){
+    const data = getLocalData();
+    if(data) await pushToCloud(data);
+  };
+  window.cloudRefreshNow = async function(){
+    const remote = await pullFromCloud();
+    if(remote){
+      applyingRemote = true;
+      saveLocalData(remote);
+      refreshUI();
+      applyingRemote = false;
+      setStatus('☁️ تم جلب آخر تحديث', true);
+    }
+  };
+
+  // first load
+  document.addEventListener('DOMContentLoaded', async function(){
+    const ok = await initFirebase();
+    if(!ok) return;
+    const remote = await pullFromCloud();
+    if(remote){
+      applyingRemote = true;
+      saveLocalData(remote);
+      refreshUI();
+      applyingRemote = false;
+      setStatus('☁️ تم جلب آخر تحديث', true);
+    }else{
+      const local = getLocalData();
+      if(local) await pushToCloud(local);
+    }
+    startRealtime();
+  });
+})();
+</script>
+
+</body>
+</html>`;
+  function openMoreInfo(type){
   var data={
     about:{
       title:'من نحن',
@@ -7611,219 +7744,194 @@ document.addEventListener('DOMContentLoaded', function(){
 </script>
 
 
-<script id="oai-parent-auto-device-script">
+<script id="oai-device-responsive-script">
 (function(){
   function applyDeviceMode(){
-    var ua = navigator.userAgent || '';
-    var width = Math.max(window.innerWidth || 0, screen.width || 0);
-    var isIpad = /iPad/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    const ua = navigator.userAgent || '';
+    const w = Math.max(window.innerWidth || 0, screen.width || 0);
+    const isIpad = /iPad/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
     document.body.classList.remove('device-mobile','device-ipad','device-desktop');
-    if(isIpad || (width >= 700 && width <= 1100 && 'ontouchstart' in window)){
+    if(isIpad || (w > 700 && w <= 1100 && 'ontouchstart' in window)){
       document.body.classList.add('device-ipad');
-    }else if(width >= 1100){
+    }else if(w > 1100){
       document.body.classList.add('device-desktop');
     }else{
       document.body.classList.add('device-mobile');
     }
   }
 
-  function pfReadData(){
+  function trimTopGaps(){
     try{
-      var raw = localStorage.getItem('greenBankTeacherData_v1');
-      if(raw) return JSON.parse(raw);
+      document.documentElement.style.marginTop = '0';
+      document.documentElement.style.paddingTop = '0';
+      document.body.style.marginTop = '0';
+      document.body.style.paddingTop = '0';
+      const firsts = document.querySelectorAll('.screen, .topbar, .hero, .card');
+      firsts.forEach(el => {
+        if(el && el.style){
+          if(getComputedStyle(el).marginTop !== '0px') el.style.marginTop = '0';
+          if(getComputedStyle(el).paddingTop !== '0px' && el.classList.contains('screen')) el.style.paddingTop = '0';
+        }
+      });
+      window.scrollTo(0,0);
     }catch(e){}
-    try{
-      var raw2 = localStorage.getItem('bankData_v10');
-      if(raw2) return JSON.parse(raw2);
-    }catch(e){}
-    try{
-      if(typeof bankData !== 'undefined' && bankData) return bankData;
-    }catch(e){}
-    return null;
   }
-
-  function pfLevel(balance){
-    balance = Number(balance || 0);
-    if(balance >= 41000) return {name:'ألماسي', start:41000, next:41000};
-    if(balance >= 31000) return {name:'بلاتيني', start:31000, next:41000};
-    if(balance >= 16000) return {name:'ذهبي', start:16000, next:31000};
-    if(balance >= 11000) return {name:'فضي', start:11000, next:16000};
-    return {name:'برونزي', start:0, next:11000};
-  }
-
-  function pfFormat(v){
-    try{return new Intl.NumberFormat('ar-SA').format(Number(v || 0));}
-    catch(e){return String(v || 0);}
-  }
-
-  function pfToggleDashboard(show){
-    var login = document.getElementById('parentFollowLoginCard');
-    var dash = document.getElementById('parentFollowDashboard');
-    if(login) login.classList.toggle('hidden', !!show);
-    if(dash) dash.classList.toggle('hidden', !show);
-  }
-
-  function pfCurrentStudent(data){
-    if(!data || !Array.isArray(data.students)) return null;
-    var id = sessionStorage.getItem('parentFollowStudentId');
-    if(!id) return null;
-    return data.students.find(function(s){ return String(s.id) === String(id); }) || null;
-  }
-
-  function pfShowNotice(text){
-    var box = document.getElementById('parentFollowNotice');
-    if(box){
-      box.textContent = text;
-      box.classList.remove('hidden');
-    }
-  }
-
-  window.parentFollowLogin = function(){
-    var loginValue = (document.getElementById('pfLoginPin')?.value || '').trim();
-    var pass = (document.getElementById('pfLoginPassword')?.value || '').trim();
-    var err = document.getElementById('pfLoginError');
-    if(err) err.classList.add('hidden');
-
-    if(!loginValue || !pass){
-      if(err){
-        err.textContent = 'أدخلي اسم المستخدم أو الرقم السري مع كلمة المرور';
-        err.classList.remove('hidden');
-      }
-      return;
-    }
-
-    var data = pfReadData();
-    var list = data && Array.isArray(data.students) ? data.students : [];
-    var st = list.find(function(s){
-      var sPin = String(s.pin || '').trim();
-      var sUser = String(s.username || '').trim();
-      var sName = String(s.name || '').trim();
-      var sPass = String(s.password || '').trim();
-      var loginMatch = loginValue === sPin || loginValue === sUser || loginValue === sName;
-      var passMatch = pass === sPass || (sPin && pass === sPin);
-      return loginMatch && passMatch;
-    });
-
-    if(!st){
-      if(err){
-        err.textContent = 'بيانات الدخول غير صحيحة';
-        err.classList.remove('hidden');
-      }
-      return;
-    }
-
-    sessionStorage.setItem('parentFollowStudentId', String(st.id || ''));
-    pfToggleDashboard(true);
-    window.updateParentFollowup();
-  };
-
-  window.parentFollowClearLogin = function(){
-    var a = document.getElementById('pfLoginPin');
-    var b = document.getElementById('pfLoginPassword');
-    var e = document.getElementById('pfLoginError');
-    if(a) a.value = '';
-    if(b) b.value = '';
-    if(e) e.classList.add('hidden');
-  };
-
-  window.parentFollowLogout = function(){
-    sessionStorage.removeItem('parentFollowStudentId');
-    window.parentFollowClearLogin();
-    pfToggleDashboard(false);
-  };
-
-  window.updateParentFollowup = function(){
-    var data = pfReadData();
-    var st = pfCurrentStudent(data);
-    if(!data || !st) return;
-
-    var cls = (data.classes || []).find(function(c){ return c.id === st.classId; });
-    var level = pfLevel(st.balance);
-    var remain = Math.max(0, Number(level.next || 0) - Number(st.balance || 0));
-    var progress = level.next > level.start ? Math.min(100, Math.round(((Number(st.balance || 0) - level.start) / (level.next - level.start)) * 100)) : 100;
-    var hist = Array.isArray(st.history) ? st.history : [];
-    var dep = hist.filter(function(h){ return h.type === 'deposit'; }).length;
-    var wit = hist.filter(function(h){ return h.type === 'withdraw'; }).length;
-
-    var inClass = (data.students || []).filter(function(s){ return s.classId === st.classId; }).sort(function(a,b){ return Number(b.balance||0) - Number(a.balance||0); });
-    var idx = inClass.findIndex(function(s){ return String(s.id) === String(st.id); });
-
-    function setText(id, v){
-      var el = document.getElementById(id);
-      if(el) el.textContent = v;
-    }
-
-    setText('pfCurrentBalance', pfFormat(st.balance));
-    setText('pfCurrentLevel', level.name);
-    setText('pfRemainToNext', pfFormat(remain));
-    setText('pfStudentName', st.name || '—');
-    setText('pfStudentClass', 'الفصل: ' + ((cls && cls.name) || '—'));
-    setText('pfLevelPill', 'نوع الحساب: ' + level.name);
-    setText('pfRankInClass', (idx >= 0 ? (idx + 1) : 1) + ' / ' + (inClass.length || 1));
-    setText('pfOpsCount', hist.length);
-    setText('pfDepositsCount', dep);
-    setText('pfWithdrawsCount', wit);
-    setText('pfAbsenceCount', Number(st.absenceCount || 0));
-    setText('pfProgressPercent', progress + '%');
-    setText('pfProgressHint', 'المتبقي للترقية التالية: ' + pfFormat(remain) + ' ر.س');
-
-    var fill = document.getElementById('pfProgressFill');
-    if(fill) fill.style.width = progress + '%';
-
-    var alerts = document.getElementById('pfTeacherAlerts');
-    if(alerts){
-      var last = hist.slice().reverse().slice(0,3);
-      if(!last.length){
-        alerts.innerHTML = '<div class="parent-alert-item"><div class="icon">🔔</div><div><strong>لا توجد تنبيهات بعد</strong><span>سيتم عرض آخر الملاحظات والعمليات المهمة هنا.</span></div></div>';
-      }else{
-        alerts.innerHTML = last.map(function(h){
-          var icon = h.type === 'deposit' ? '💰' : (h.type === 'withdraw' ? '⚠️' : '🔁');
-          var title = h.type === 'deposit' ? 'إيداع جديد' : (h.type === 'withdraw' ? 'سحب جديد' : 'عملية جديدة');
-          return '<div class="parent-alert-item"><div class="icon">' + icon + '</div><div><strong>' + title + '</strong><span>' + (h.reason || 'تحديث جديد') + ' • ' + pfFormat(h.amount) + '</span></div></div>';
-        }).join('');
-      }
-    }
-  };
-
-  window.parentFollowOpenFaq = function(){ if(typeof go === 'function') go('faq_center'); };
-  window.parentFollowRequestReport = function(){ pfShowNotice('تم تجهيز طلب تقرير مختصر لولي الأمر داخل النظام.'); };
-  window.parentFollowAcademic = function(){ pfShowNotice('تظهر هنا قراءة تحليلية لمستوى الطالب وتقدمه الدراسي داخل بنك الرياضيات.'); };
-  window.parentFollowAttendance = function(){ pfShowNotice('تظهر هنا متابعة الحضور والانضباط والتنبيهات المرتبطة بالغياب والتأخر.'); };
 
   document.addEventListener('DOMContentLoaded', function(){
     applyDeviceMode();
-    setTimeout(function(){
-      var has = !!sessionStorage.getItem('parentFollowStudentId');
-      pfToggleDashboard(has);
-      if(has) window.updateParentFollowup();
-    }, 250);
+    setTimeout(trimTopGaps, 60);
+    setTimeout(trimTopGaps, 400);
   });
-
   window.addEventListener('resize', applyDeviceMode);
-  window.addEventListener('orientationchange', applyDeviceMode);
+  window.addEventListener('orientationchange', function(){
+    applyDeviceMode();
+    setTimeout(trimTopGaps, 120);
+  });
 })();
 </script>
 
 
-<script id="oai-cloud-sync-live-script">
+<script id="oai-more-fullpage-script">
+function goBackFromMoreDetail(){
+  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+  var listScreen = document.getElementById('more');
+  if(listScreen) listScreen.classList.add('active');
+  window.scrollTo({top:0, behavior:'auto'});
+}
+
+function openMoreInfo(type){
+  var data = {
+    about:{
+      title:'من نحن',
+      sub:'نبذة عن بنك الرياضيات',
+      html:`
+        <h2 class="more-detail-title">من نحن</h2>
+        <p class="more-detail-lead">بنك الرياضيات منصة تعليمية تحفيزية تهدف إلى تعزيز مشاركة الطلاب داخل الحصة الدراسية من خلال نظام نقاط مستوحى من الأنظمة المصرفية.</p>
+        <div class="more-detail-block"><p>يمنح البنك الطلاب رصيدًا تحفيزيًا مقابل المشاركة والإنجاز والالتزام، مما يسهم في تنمية روح التنافس الإيجابي وتحفيز التعلم بطريقة ممتعة ومبتكرة.</p></div>
+        <div class="more-detail-block"><h3>الإشراف</h3><p>يشرف على بنك الرياضيات الأستاذة سارة حقوي.</p></div>
+      `
+    },
+    contact:{
+      title:'اتصل بنا',
+      sub:'قنوات التواصل الرسمية',
+      html:`
+        <h2 class="more-detail-title">اتصل بنا</h2>
+        <p class="more-detail-lead">للاستفسارات أو الملاحظات يمكنكم التواصل مع إدارة بنك الرياضيات عبر الوسائل التالية:</p>
+        <div class="more-detail-list">
+          <div class="more-detail-item"><div class="icon">📞</div><div><strong>خدمة الطلاب وأولياء الأمور</strong><span>0502234335</span></div></div>
+          <div class="more-detail-item"><div class="icon">☎️</div><div><strong>الإدارة العامة</strong><span>0556891201</span></div></div>
+          <div class="more-detail-item"><div class="icon">✉️</div><div><strong>البريد الإلكتروني</strong><span>Saramathss@hotmail.com</span></div></div>
+          <div class="more-detail-item"><div class="icon">🏫</div><div><strong>الموقع</strong><span>مدرسة رواد الشرق الأهلية</span></div></div>
+        </div>
+      `
+    },
+    settings:{
+      title:'الإعدادات',
+      sub:'إدارة الحساب والبيانات',
+      html:`
+        <h2 class="more-detail-title">الإعدادات</h2>
+        <p class="more-detail-lead">تتيح هذه الصفحة إدارة إعدادات الحساب داخل نظام بنك الرياضيات.</p>
+        <div class="more-detail-list">
+          <div class="more-detail-item"><div class="icon">🔐</div><div><strong>تغيير كلمة المرور</strong><span>تحديث كلمة المرور لحماية الحساب.</span></div></div>
+          <div class="more-detail-item"><div class="icon">👤</div><div><strong>تعديل بيانات الحساب</strong><span>مراجعة اسم المستخدم والبيانات الأساسية.</span></div></div>
+          <div class="more-detail-item"><div class="icon">🔔</div><div><strong>إدارة الإشعارات</strong><span>التحكم في التنبيهات داخل النظام.</span></div></div>
+          <div class="more-detail-item"><div class="icon">🚪</div><div><strong>تسجيل الخروج</strong><span>إنهاء الجلسة الحالية بأمان.</span></div></div>
+        </div>
+      `
+    },
+    privacy:{
+      title:'سياسة الخصوصية',
+      sub:'استخدام البيانات داخل النظام',
+      html:`
+        <h2 class="more-detail-title">سياسة الخصوصية</h2>
+        <div class="more-detail-block"><p>يحرص بنك الرياضيات على حماية خصوصية بيانات الطلاب وأولياء الأمور.</p></div>
+        <div class="more-detail-block"><p>يتم استخدام المعلومات داخل النظام لأغراض تعليمية فقط، ولا يتم مشاركة أي بيانات خارج إطار المدرسة أو الجهات التعليمية المعنية.</p></div>
+      `
+    },
+    disclaimer:{
+      title:'إخلاء المسؤولية',
+      sub:'تنويه حول طبيعة النظام',
+      html:`
+        <h2 class="more-detail-title">إخلاء المسؤولية</h2>
+        <div class="more-detail-block"><p>بنك الرياضيات نظام تحفيزي تعليمي يهدف إلى تشجيع الطلاب على المشاركة والتفاعل داخل الحصة الدراسية.</p></div>
+        <div class="more-detail-block"><p>النقاط والأرصدة المستخدمة داخل النظام هي لأغراض تعليمية وتحفيزية فقط، ولا تمثل أي قيمة مالية حقيقية.</p></div>
+      `
+    },
+    terms:{
+      title:'الأحكام والشروط',
+      sub:'ضوابط استخدام بنك الرياضيات',
+      html:`
+        <h2 class="more-detail-title">الأحكام والشروط</h2>
+        <div class="more-detail-block"><p>يهدف بنك الرياضيات إلى تعزيز بيئة تعليمية محفزة داخل الفصل الدراسي.</p></div>
+        <div class="more-detail-block"><p>يتم منح النقاط للطلاب وفق معايير تعليمية يحددها المعلم، ويُستخدم النظام كوسيلة تعليمية لتحفيز المشاركة والانضباط وتحقيق التميز.</p></div>
+      `
+    }
+  };
+
+  var item = data[type];
+  if(!item) return;
+
+  var title = document.getElementById('moreDetailTitle');
+  var sub = document.getElementById('moreDetailSub');
+  var content = document.getElementById('moreDetailContent');
+
+  if(title) title.textContent = item.title;
+  if(sub) sub.textContent = item.sub;
+  if(content) content.innerHTML = item.html;
+
+  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+  var detailScreen = document.getElementById('more_detail');
+  if(detailScreen) detailScreen.classList.add('active');
+  window.scrollTo({top:0, behavior:'auto'});
+}
+</script>
+
+
+<script id="oai-more-override-final">
+function openMoreInfo(type){
+  var data = {
+    about:{title:'من نحن',sub:'نبذة عن بنك الرياضيات',html:`<h2 class="more-detail-title">من نحن</h2><p class="more-detail-lead">بنك الرياضيات منصة تعليمية تحفيزية تهدف إلى تعزيز مشاركة الطلاب داخل الحصة الدراسية من خلال نظام نقاط مستوحى من الأنظمة المصرفية.</p><div class="more-detail-block"><p>يمنح البنك الطلاب رصيدًا تحفيزيًا مقابل المشاركة والإنجاز والالتزام، مما يسهم في تنمية روح التنافس الإيجابي وتحفيز التعلم بطريقة ممتعة ومبتكرة.</p></div><div class="more-detail-block"><h3>الإشراف</h3><p>يشرف على بنك الرياضيات الأستاذة سارة حقوي.</p></div>`},
+    contact:{title:'اتصل بنا',sub:'قنوات التواصل الرسمية',html:`<h2 class="more-detail-title">اتصل بنا</h2><p class="more-detail-lead">للاستفسارات أو الملاحظات يمكنكم التواصل مع إدارة بنك الرياضيات عبر الوسائل التالية:</p><div class="more-detail-list"><div class="more-detail-item"><div class="icon">📞</div><div><strong>خدمة الطلاب وأولياء الأمور</strong><span>0502234335</span></div></div><div class="more-detail-item"><div class="icon">☎️</div><div><strong>الإدارة العامة</strong><span>0556891201</span></div></div><div class="more-detail-item"><div class="icon">✉️</div><div><strong>البريد الإلكتروني</strong><span>Saramathss@hotmail.com</span></div></div><div class="more-detail-item"><div class="icon">🏫</div><div><strong>الموقع</strong><span>مدرسة رواد الشرق الأهلية</span></div></div></div>`},
+    settings:{title:'الإعدادات',sub:'إدارة الحساب والبيانات',html:`<h2 class="more-detail-title">الإعدادات</h2><p class="more-detail-lead">تتيح هذه الصفحة إدارة إعدادات الحساب داخل نظام بنك الرياضيات.</p><div class="more-detail-list"><div class="more-detail-item"><div class="icon">🔐</div><div><strong>تغيير كلمة المرور</strong><span>تحديث كلمة المرور لحماية الحساب.</span></div></div><div class="more-detail-item"><div class="icon">👤</div><div><strong>تعديل بيانات الحساب</strong><span>مراجعة اسم المستخدم والبيانات الأساسية.</span></div></div><div class="more-detail-item"><div class="icon">🔔</div><div><strong>إدارة الإشعارات</strong><span>التحكم في التنبيهات داخل النظام.</span></div></div><div class="more-detail-item"><div class="icon">🚪</div><div><strong>تسجيل الخروج</strong><span>إنهاء الجلسة الحالية بأمان.</span></div></div></div>`},
+    privacy:{title:'سياسة الخصوصية',sub:'استخدام البيانات داخل النظام',html:`<h2 class="more-detail-title">سياسة الخصوصية</h2><div class="more-detail-block"><p>يحرص بنك الرياضيات على حماية خصوصية بيانات الطلاب وأولياء الأمور.</p></div><div class="more-detail-block"><p>يتم استخدام المعلومات داخل النظام لأغراض تعليمية فقط، ولا يتم مشاركة أي بيانات خارج إطار المدرسة أو الجهات التعليمية المعنية.</p></div>`},
+    disclaimer:{title:'إخلاء المسؤولية',sub:'تنويه حول طبيعة النظام',html:`<h2 class="more-detail-title">إخلاء المسؤولية</h2><div class="more-detail-block"><p>بنك الرياضيات نظام تحفيزي تعليمي يهدف إلى تشجيع الطلاب على المشاركة والتفاعل داخل الحصة الدراسية.</p></div><div class="more-detail-block"><p>النقاط والأرصدة المستخدمة داخل النظام هي لأغراض تعليمية وتحفيزية فقط، ولا تمثل أي قيمة مالية حقيقية.</p></div>`},
+    terms:{title:'الأحكام والشروط',sub:'ضوابط استخدام بنك الرياضيات',html:`<h2 class="more-detail-title">الأحكام والشروط</h2><div class="more-detail-block"><p>يهدف بنك الرياضيات إلى تعزيز بيئة تعليمية محفزة داخل الفصل الدراسي.</p></div><div class="more-detail-block"><p>يتم منح النقاط للطلاب وفق معايير تعليمية يحددها المعلم، ويُستخدم النظام كوسيلة تعليمية لتحفيز المشاركة والانضباط وتحقيق التميز.</p></div>`}
+  };
+  var item = data[type];
+  if(!item) return;
+  var title = document.getElementById('moreDetailTitle');
+  var sub = document.getElementById('moreDetailSub');
+  var content = document.getElementById('moreDetailContent');
+  if(title) title.textContent = item.title;
+  if(sub) sub.textContent = item.sub;
+  if(content) content.innerHTML = item.html;
+  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+  var detailScreen = document.getElementById('more_detail');
+  if(detailScreen) detailScreen.classList.add('active');
+  window.scrollTo({top:0, behavior:'auto'});
+}
+</script>
+
+
+<script id="math-bank-live-sync-script">
 (function(){
-  let cloudDb = null;
-  let cloudReady = false;
+  let db = null;
+  let ready = false;
+  let applyingRemote = false;
   let listenerStarted = false;
 
-  function cfg(){
-    return window.MATH_BANK_CLOUD_CONFIG || {};
-  }
+  function cfg(){ return window.MATH_BANK_CLOUD_CONFIG || {}; }
 
-  function updateCloudStatus(msg, ok){
-    const el = document.getElementById('cloudSyncStatus');
+  function setStatus(text, ok){
+    const el = document.getElementById('syncStatusBadge');
     if(!el) return;
-    el.textContent = msg;
+    el.textContent = text;
     el.style.background = ok ? '#edf6f0' : '#fff7e8';
     el.style.color = ok ? '#176242' : '#9a6a15';
+    el.style.borderColor = ok ? '#cfe9db' : '#f1dfb5';
   }
 
-  function getLocalBankData(){
+  function getLocalData(){
     try{
       if(typeof bankData !== 'undefined' && bankData) return JSON.parse(JSON.stringify(bankData));
     }catch(e){}
@@ -7834,172 +7942,139 @@ document.addEventListener('DOMContentLoaded', function(){
     return null;
   }
 
-  function saveLocalBankData(data){
+  function saveLocalData(data){
+    if(!data) return;
     try{
-      if(typeof bankData !== 'undefined'){
-        bankData = data;
-        window.bankData = data;
-      } else {
-        window.bankData = data;
-      }
+      window.bankData = data;
+      if(typeof bankData !== 'undefined'){ bankData = data; }
     }catch(e){}
     try{ localStorage.setItem('greenBankTeacherData_v1', JSON.stringify(data)); }catch(e){}
     try{ localStorage.setItem('bankData_v10', JSON.stringify(data)); }catch(e){}
   }
 
-  function refreshAllUI(){
+  function refreshUI(){
     try{ if(typeof refreshTeacherUI === 'function') refreshTeacherUI(); }catch(e){}
     try{ if(typeof renderStudentAccount === 'function') renderStudentAccount(); }catch(e){}
     try{ if(typeof updateParentFollowup === 'function') updateParentFollowup(); }catch(e){}
     try{ if(typeof updateHonorBoard === 'function') updateHonorBoard(); }catch(e){}
-    try{ if(typeof updateHomeCard === 'function') updateHomeCard(); }catch(e){}
     try{ if(typeof renderLeaderboard === 'function') renderLeaderboard(); }catch(e){}
+    try{ if(typeof renderHomeData === 'function') renderHomeData(); }catch(e){}
   }
 
-  async function initCloud(){
-    if(cloudReady) return true;
-    const c = cfg();
-    const f = c.firebaseConfig || {};
-    if(!(c.enabled && f.apiKey && f.projectId && f.appId)){
-      updateCloudStatus('الحالة: إعدادات Firebase غير مكتملة', false);
-      return false;
-    }
-    try{
-      if(!firebase.apps.length){
-        firebase.initializeApp(f);
-      }
-      cloudDb = firebase.firestore();
-      cloudReady = true;
-      updateCloudStatus('الحالة: المزامنة السحابية مفعلة', true);
-      if(!listenerStarted) startRealtimeListener();
-      return true;
-    }catch(err){
-      console.warn('firebase init error', err);
-      updateCloudStatus('الحالة: تعذر تشغيل Firebase', false);
-      return false;
-    }
-  }
-
-  async function pushCloudData(data){
-    if(!await initCloud()) return false;
+  async function initFirebase(){
+    if(ready) return true;
     try{
       const c = cfg();
-      await cloudDb.collection(c.collection).doc(c.docId).set({
+      if(!c.enabled) return false;
+      if(!firebase.apps.length){
+        firebase.initializeApp(c.firebaseConfig);
+      }
+      db = firebase.firestore();
+      ready = true;
+      setStatus('☁️ المزامنة مفعلة', true);
+      return true;
+    }catch(err){
+      console.warn(err);
+      setStatus('⚠️ تعذر تفعيل المزامنة', false);
+      return false;
+    }
+  }
+
+  async function pushToCloud(data){
+    if(applyingRemote) return false;
+    if(!await initFirebase()) return false;
+    try{
+      const c = cfg();
+      await db.collection(c.collection).doc(c.docId).set({
         bankData: data,
         updatedAt: Date.now()
       }, {merge:true});
-      updateCloudStatus('الحالة: تم رفع البيانات إلى السحابة', true);
+      setStatus('☁️ تم تحديث جميع الأجهزة', true);
       return true;
     }catch(err){
-      console.warn('pushCloudData error', err);
-      updateCloudStatus('الحالة: تعذر رفع البيانات إلى السحابة', false);
+      console.warn(err);
+      setStatus('⚠️ فشل رفع التحديث', false);
       return false;
     }
   }
 
-  async function pullCloudData(){
-    if(!await initCloud()) return null;
+  async function pullFromCloud(){
+    if(!await initFirebase()) return null;
     try{
       const c = cfg();
-      const snap = await cloudDb.collection(c.collection).doc(c.docId).get();
+      const snap = await db.collection(c.collection).doc(c.docId).get();
       if(!snap.exists) return null;
       const data = snap.data() || {};
       return data.bankData || null;
     }catch(err){
-      console.warn('pullCloudData error', err);
+      console.warn(err);
       return null;
     }
   }
 
-  function startRealtimeListener(){
-    if(listenerStarted || !cloudDb) return;
+  async function startRealtime(){
+    if(listenerStarted) return;
+    if(!await initFirebase()) return;
     listenerStarted = true;
     const c = cfg();
-    cloudDb.collection(c.collection).doc(c.docId).onSnapshot(function(snap){
+    db.collection(c.collection).doc(c.docId).onSnapshot(function(snap){
       if(!snap.exists) return;
       const data = snap.data() || {};
       if(!data.bankData) return;
-      saveLocalBankData(data.bankData);
-      refreshAllUI();
-      updateCloudStatus('الحالة: تم تحديث البيانات من السحابة', true);
+      applyingRemote = true;
+      saveLocalData(data.bankData);
+      refreshUI();
+      applyingRemote = false;
+      setStatus('☁️ تم جلب آخر تحديث', true);
     }, function(err){
-      console.warn('onSnapshot error', err);
+      console.warn(err);
     });
   }
 
-  window.cloudPushNow = async function(){
-    const data = getLocalBankData();
-    if(!data){
-      alert('لا توجد بيانات بنك لرفعها.');
-      return;
-    }
-    const ok = await pushCloudData(data);
-    if(ok) alert('تم رفع بيانات البنك إلى السحابة.');
-  };
-
-  window.cloudRefreshFromServer = async function(){
-    const data = await pullCloudData();
-    if(!data){
-      alert('لا توجد بيانات سحابية حالياً.');
-      return;
-    }
-    saveLocalBankData(data);
-    refreshAllUI();
-    alert('تم جلب آخر بيانات البنك من السحابة.');
-  };
-
-  window.pushCloudData = pushCloudData;
-  window.pullCloudData = pullCloudData;
-  window.syncBankToCloud = async function(){
-    const data = getLocalBankData();
-    if(data) return await pushCloudData(data);
-    return false;
-  };
-
-  // wrap saveBankData to push automatically
+  // wrap saveBankData
   const oldSaveBankData = window.saveBankData;
   window.saveBankData = function(){
-    let result;
-    try{
-      if(typeof oldSaveBankData === 'function'){
-        result = oldSaveBankData.apply(this, arguments);
-      }
-    }catch(e){ console.warn(e); }
-    const data = getLocalBankData();
-    if(data) pushCloudData(data);
-    return result;
+    let res;
+    if(typeof oldSaveBankData === 'function'){
+      res = oldSaveBankData.apply(this, arguments);
+    }
+    const data = getLocalData();
+    if(data) pushToCloud(data);
+    return res;
   };
 
-  // improve blue import button to sync cloud after local import
-  const oldRunBlueImportTeacher = window.runBlueImportTeacher;
-  if(typeof oldRunBlueImportTeacher === 'function'){
-    window.runBlueImportTeacher = async function(){
-      const result = oldRunBlueImportTeacher.apply(this, arguments);
-      setTimeout(async function(){
-        const data = getLocalBankData();
-        if(data){
-          const synced = await pushCloudData(data);
-          if(synced){
-            try{ alert('تم نقل بيانات البنك الأزرق ومزامنتها مع جميع الأجهزة.'); }catch(e){}
-          }
-        }
-      }, 300);
-      return result;
-    };
-  }
+  // expose manual actions
+  window.cloudPushNow = async function(){
+    const data = getLocalData();
+    if(data) await pushToCloud(data);
+  };
+  window.cloudRefreshNow = async function(){
+    const remote = await pullFromCloud();
+    if(remote){
+      applyingRemote = true;
+      saveLocalData(remote);
+      refreshUI();
+      applyingRemote = false;
+      setStatus('☁️ تم جلب آخر تحديث', true);
+    }
+  };
 
-  document.addEventListener('DOMContentLoaded', function(){
-    initCloud().then(async function(ok){
-      if(!ok) return;
-      const remote = await pullCloudData();
-      if(remote){
-        saveLocalBankData(remote);
-        refreshAllUI();
-      } else {
-        const local = getLocalBankData();
-        if(local) pushCloudData(local);
-      }
-    });
+  // first load
+  document.addEventListener('DOMContentLoaded', async function(){
+    const ok = await initFirebase();
+    if(!ok) return;
+    const remote = await pullFromCloud();
+    if(remote){
+      applyingRemote = true;
+      saveLocalData(remote);
+      refreshUI();
+      applyingRemote = false;
+      setStatus('☁️ تم جلب آخر تحديث', true);
+    }else{
+      const local = getLocalData();
+      if(local) await pushToCloud(local);
+    }
+    startRealtime();
   });
 })();
 </script>
