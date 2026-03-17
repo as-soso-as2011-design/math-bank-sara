@@ -3214,7 +3214,7 @@ window.addEventListener('load', function(){
 <script id="performance-upgrade-v2-script">
 (function(){
   function fmtDate(v){ if(!v) return '—'; try{ return new Date(v).toLocaleDateString('ar-SA'); }catch(e){ return v; } }
-  function esc(s){ return String(s||'').replace(/[&<>"]/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]; }); }
+  function { return String(s||'').replace(/[&<>"]/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]; }); }
   function installPerformanceForm(){
     const titleEl=document.getElementById('perfTaskTitle');
     if(!titleEl || document.getElementById('perfTaskStart')) return;
@@ -3262,14 +3262,14 @@ window.addEventListener('load', function(){
         const rows=students.length ? students.map(st=>{
           const entry = (typeof ensurePerformanceEntry==='function') ? ensurePerformanceEntry(task, st.id) : (task.entries[st.id]||(task.entries[st.id]={score:0,status:'pending',noteInternal:'',showToStudent:!!task.visibleDefault,attachmentName:'',attachmentData:'',attachmentMime:'',videoLink:'',awardedPoints:0}));
           return `<div class="performance-student-row">
-            <div class="performance-student-head"><div><div class="performance-student-name">${esc(st.name)}</div><div class="teacher-note">${esc(className)} • الرصيد الحالي ${typeof formatMoney==='function'?formatMoney(st.balance):st.balance} ر.س</div></div><div class="performance-private">${entry.attachmentName ? 'مرفق محفوظ 🔒' : 'بدون مرفق'}</div></div>
+            <div class="performance-student-head"><div><div class="performance-student-name">${}</div><div class="teacher-note">${} • الرصيد الحالي ${typeof formatMoney==='function'?formatMoney(st.balance):st.balance} ر.س</div></div><div class="performance-private">${entry.attachmentName ? 'مرفق محفوظ 🔒' : 'بدون مرفق'}</div></div>
             <div class="teacher-subgrid">
               <div class="field"><label>الدرجة</label><input id="perfScore_${task.id}_${st.id}" type="number" min="0" max="${Number(task.maxScore||0)}" value="${Number(entry.score||0)}"></div>
               <div class="field"><label>الحالة</label><select id="perfStatus_${task.id}_${st.id}"><option value="pending" ${entry.status==='pending'?'selected':''}>بانتظار الاستلام</option><option value="received" ${entry.status==='received'?'selected':''}>تم الاستلام</option><option value="rated" ${entry.status==='rated'?'selected':''}>تم التقييم</option><option value="closed" ${entry.status==='closed'?'selected':''}>مغلق</option></select></div>
             </div>
             <div class="teacher-subgrid">
-              <div class="field"><label>ملاحظة داخلية</label><input id="perfNote_${task.id}_${st.id}" type="text" value="${esc(entry.noteInternal||'')}" placeholder="خاصة بالمعلمة"></div>
-              <div class="field"><label>رابط فيديو/درايف</label><input id="perfVideo_${task.id}_${st.id}" type="text" value="${esc(entry.videoLink||'')}" placeholder="اختياري"></div>
+              <div class="field"><label>ملاحظة داخلية</label><input id="perfNote_${task.id}_${st.id}" type="text" value="${}" placeholder="خاصة بالمعلمة"></div>
+              <div class="field"><label>رابط فيديو/درايف</label><input id="perfVideo_${task.id}_${st.id}" type="text" value="${}" placeholder="اختياري"></div>
             </div>
             <div class="performance-attach">
               <label class="ghost" style="cursor:pointer">إرفاق العمل الآن<input type="file" accept="image/*,.pdf,video/*" style="display:none" onchange="cacheTaskAttachment('${task.id}','${st.id}',this)"></label>
@@ -3279,7 +3279,7 @@ window.addEventListener('load', function(){
             <div class="teacher-actions" style="margin-top:10px"><button class="btn btn-green" type="button" onclick="savePerformanceAssessment('${task.id}','${st.id}')">حفظ تقييم الطالبة</button><div class="performance-private">النقاط الحالية: ${new Intl.NumberFormat('ar-SA').format(Number(entry.awardedPoints||0))}</div></div>
           </div>`;
         }).join('') : '<div class="performance-empty">لا يوجد طلاب في هذا الفصل بعد.</div>';
-        return `<div class="performance-card"><div class="perf-highlight"><strong>${esc(task.title)}</strong><div>${esc(className)}</div></div><div class="perf-meta-grid"><div class="perf-meta-box"><span class="label">تاريخ الإضافة</span><span class="value">${fmtDate(task.createdAt)}</span></div><div class="perf-meta-box"><span class="label">تاريخ بدء المهمة</span><span class="value">${fmtDate(task.startDate)}</span></div><div class="perf-meta-box"><span class="label">آخر موعد للتسليم</span><span class="value">${fmtDate(task.dueDate)}</span></div></div><div class="performance-meta"><span class="pill">${esc(task.skill||'بدون مهارة محددة')}</span><span class="pill">الدرجة ${Number(task.maxScore||0)}</span><span class="pill">النقاط ${Number(task.pointRate||0)}</span></div>${rows}</div>`;
+        return `<div class="performance-card"><div class="perf-highlight"><strong>${}</strong><div>${}</div></div><div class="perf-meta-grid"><div class="perf-meta-box"><span class="label">تاريخ الإضافة</span><span class="value">${fmtDate(task.createdAt)}</span></div><div class="perf-meta-box"><span class="label">تاريخ بدء المهمة</span><span class="value">${fmtDate(task.startDate)}</span></div><div class="perf-meta-box"><span class="label">آخر موعد للتسليم</span><span class="value">${fmtDate(task.dueDate)}</span></div></div><div class="performance-meta"><span class="pill">${}</span><span class="pill">الدرجة ${Number(task.maxScore||0)}</span><span class="pill">النقاط ${Number(task.pointRate||0)}</span></div>${rows}</div>`;
       }).join('');
     }
     let attachCount=0, rated=0;
@@ -3302,7 +3302,7 @@ window.addEventListener('load', function(){
         points += Number(entry.awardedPoints||0);
         const statusMap={pending:'بانتظار الاستلام',received:'تم الاستلام',rated:'تم التقييم',closed:'مغلق'};
         const canShow=entry.showToStudent;
-        return `<div class="performance-student-row"><div class="perf-highlight"><strong>${esc(task.title)}</strong><div>${statusMap[entry.status]||'بانتظار الاستلام'}</div></div><div class="perf-meta-grid"><div class="perf-meta-box"><span class="label">تاريخ الإضافة</span><span class="value">${fmtDate(task.createdAt)}</span></div><div class="perf-meta-box"><span class="label">تاريخ بدء المهمة</span><span class="value">${fmtDate(task.startDate)}</span></div><div class="perf-meta-box"><span class="label">آخر موعد للتسليم</span><span class="value">${fmtDate(task.dueDate)}</span></div></div><div class="teacher-subgrid"><div class="field"><label>الدرجة</label><input type="text" readonly value="${Number(entry.score||0)} / ${Number(task.maxScore||0)}"></div><div class="field"><label>النقاط المضافة</label><input type="text" readonly value="${new Intl.NumberFormat('ar-SA').format(Number(entry.awardedPoints||0))}"></div></div><div class="student-attach-hero"><div><div class="tag">📎 مرفق العمل</div><div class="sub">المرفق ظاهر بشكل واضح داخل المهمة إذا سمحت المعلمة بإظهاره.</div></div><div>${canShow && (entry.attachmentData||entry.videoLink) ? 'مرفق خاص 🔒' : 'لا يوجد مرفق ظاهر'}</div></div><div class="performance-attach">${canShow && entry.attachmentData ? `<button class="ghost" type="button" onclick="openTaskAttachment('${task.id}','${student.id}')">فتح المرفق</button>` : ''}${canShow && entry.videoLink ? `<a class="performance-link" href="${entry.videoLink}" target="_blank" rel="noopener">فتح الرابط</a>` : ''}</div></div>`;
+        return `<div class="performance-student-row"><div class="perf-highlight"><strong>${}</strong><div>${statusMap[entry.status]||'بانتظار الاستلام'}</div></div><div class="perf-meta-grid"><div class="perf-meta-box"><span class="label">تاريخ الإضافة</span><span class="value">${fmtDate(task.createdAt)}</span></div><div class="perf-meta-box"><span class="label">تاريخ بدء المهمة</span><span class="value">${fmtDate(task.startDate)}</span></div><div class="perf-meta-box"><span class="label">آخر موعد للتسليم</span><span class="value">${fmtDate(task.dueDate)}</span></div></div><div class="teacher-subgrid"><div class="field"><label>الدرجة</label><input type="text" readonly value="${Number(entry.score||0)} / ${Number(task.maxScore||0)}"></div><div class="field"><label>النقاط المضافة</label><input type="text" readonly value="${new Intl.NumberFormat('ar-SA').format(Number(entry.awardedPoints||0))}"></div></div><div class="student-attach-hero"><div><div class="tag">📎 مرفق العمل</div><div class="sub">المرفق ظاهر بشكل واضح داخل المهمة إذا سمحت المعلمة بإظهاره.</div></div><div>${canShow && (entry.attachmentData||entry.videoLink) ? 'مرفق خاص 🔒' : 'لا يوجد مرفق ظاهر'}</div></div><div class="performance-attach">${canShow && entry.attachmentData ? `<button class="ghost" type="button" onclick="openTaskAttachment('${task.id}','${student.id}')">فتح المرفق</button>` : ''}${canShow && entry.videoLink ? `<a class="performance-link" href="${entry.videoLink}" target="_blank" rel="noopener">فتح الرابط</a>` : ''}</div></div>`;
       }).join('');
     }
     const c=document.getElementById('studentPerfCount'); if(c) c.textContent=new Intl.NumberFormat('ar-SA').format(tasks.length);
@@ -3340,7 +3340,7 @@ window.addEventListener('load', function(){
     if(!v) return '—';
     try{ return new Date(v).toLocaleDateString('ar-SA'); }catch(e){ return v; }
   }
-  function esc(s){ return String(s||'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+  function { return String(s||'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
   function perfNotice(msg, ok){
     const box = document.getElementById('performanceTaskMsg');
     if(!box) return;
@@ -3429,11 +3429,11 @@ window.addEventListener('load', function(){
         return `
           <div class="performance-card">
             <div class="perf-highlight">
-              <strong>${esc(task.title)}</strong>
+              <strong>${}</strong>
               <div>${statusMap[entry.status] || 'بانتظار الاستلام'}</div>
             </div>
             <div class="perf-meta-grid">
-              <div class="perf-meta-box"><span class="label">عنوان المهمة</span><span class="value">${esc(task.title)}</span></div>
+              <div class="perf-meta-box"><span class="label">عنوان المهمة</span><span class="value">${}</span></div>
               <div class="perf-meta-box"><span class="label">تاريخ البداية</span><span class="value">${fmtDate(task.startDate)}</span></div>
               <div class="perf-meta-box"><span class="label">آخر موعد للتسليم</span><span class="value">${fmtDate(task.dueDate)}</span></div>
             </div>
@@ -3483,7 +3483,7 @@ window.addEventListener('load', function(){
 <script id="performance-hard-fix">
 (function(){
   function fmtDate(v){ if(!v) return '—'; try{ return new Date(v).toLocaleDateString('ar-SA'); }catch(e){ return v; } }
-  function esc(s){ return String(s||'').replace(/[&<>"]/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]; }); }
+  function { return String(s||'').replace(/[&<>"]/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]; }); }
   function ensurePerf(){
     if(!window.bankData) return [];
     if(!Array.isArray(bankData.performanceTasks)) bankData.performanceTasks=[];
@@ -3504,7 +3504,7 @@ window.addEventListener('load', function(){
     const el=document.getElementById('perfTaskClassSelect');
     if(!el || !window.bankData) return;
     const current=el.value;
-    el.innerHTML='<option value="">اختر الفصل</option>' + (bankData.classes||[]).map(function(c){ return '<option value="'+c.id+'">'+esc(c.name)+'</option>'; }).join('');
+    el.innerHTML='<option value="">اختر الفصل</option>' + (bankData.classes||[]).map(function(c){ return '<option value="'+c.id+'">'++'</option>'; }).join('');
     if(current) el.value=current;
   }
   function showMsg(id){ const msg=document.getElementById(id); if(msg){ msg.classList.remove('hidden'); setTimeout(function(){ msg.classList.add('hidden'); }, 1800); } }
@@ -3539,9 +3539,9 @@ window.addEventListener('load', function(){
       const rows = students.length ? students.map(function(st){
         const entry=ensureEntry(task, st.id);
         const statusMap={pending:'بانتظار الاستلام',received:'تم الاستلام',rated:'تم التقييم',closed:'مغلق'};
-        return '<div class="performance-student-row"><div class="performance-student-head"><div><div class="performance-student-name">'+esc(st.name)+'</div><div class="teacher-note">'+esc(className)+' • الرصيد الحالي '+(typeof formatMoney==='function' ? formatMoney(st.balance) : st.balance)+' ر.س</div></div><div class="performance-private">'+(statusMap[entry.status]||'بانتظار الاستلام')+'</div></div></div>';
+        return '<div class="performance-student-row"><div class="performance-student-head"><div><div class="performance-student-name">'++'</div><div class="teacher-note">'++' • الرصيد الحالي '+(typeof formatMoney==='function' ? formatMoney(st.balance) : st.balance)+' ر.س</div></div><div class="performance-private">'+(statusMap[entry.status]||'بانتظار الاستلام')+'</div></div></div>';
       }).join('') : '<div class="performance-empty">لا يوجد طالبات داخل هذا الفصل حاليًا.</div>';
-      return '<div class="performance-card"><h4>'+esc(task.title)+'</h4><div class="performance-meta"><span class="pill">'+esc(className)+'</span><span class="pill">بدء: '+fmtDate(task.startDate)+'</span><span class="pill">التسليم: '+fmtDate(task.dueDate)+'</span></div>'+rows+'</div>';
+      return '<div class="performance-card"><h4>'++'</h4><div class="performance-meta"><span class="pill">'++'</span><span class="pill">بدء: '+fmtDate(task.startDate)+'</span><span class="pill">التسليم: '+fmtDate(task.dueDate)+'</span></div>'+rows+'</div>';
     }).join('');
   };
 
@@ -3564,7 +3564,7 @@ window.addEventListener('load', function(){
         points += Number(entry.awardedPoints||0);
         const statusMap={pending:'بانتظار الاستلام',received:'تم الاستلام',rated:'تم التقييم',closed:'مغلق'};
         const canShow=entry.showToStudent;
-        return '<div class="performance-student-row"><div class="perf-highlight"><strong>'+esc(task.title)+'</strong><div>'+(statusMap[entry.status]||'بانتظار الاستلام')+'</div></div><div class="perf-meta-grid"><div class="perf-meta-box"><span class="label">عنوان المهمة</span><span class="value">'+esc(task.title)+'</span></div><div class="perf-meta-box"><span class="label">تاريخ البداية</span><span class="value">'+fmtDate(task.startDate)+'</span></div><div class="perf-meta-box"><span class="label">آخر موعد للتسليم</span><span class="value">'+fmtDate(task.dueDate)+'</span></div></div><div class="teacher-subgrid"><div class="field"><label>الدرجة</label><input type="text" readonly value="'+Number(entry.score||0)+' / '+Number(task.maxScore||0)+'"></div><div class="field"><label>الحالة</label><input type="text" readonly value="'+(statusMap[entry.status]||'بانتظار الاستلام')+'"></div></div><div class="student-attach-hero"><div><div class="tag">📎 مرفق العمل</div><div class="sub">المرفق يظهر إذا سمحت المعلمة بإظهاره.</div></div><div>'+(canShow && (entry.attachmentData||entry.videoLink) ? 'مرفق خاص 🔒' : 'لا يوجد مرفق ظاهر')+'</div></div></div>';
+        return '<div class="performance-student-row"><div class="perf-highlight"><strong>'++'</strong><div>'+(statusMap[entry.status]||'بانتظار الاستلام')+'</div></div><div class="perf-meta-grid"><div class="perf-meta-box"><span class="label">عنوان المهمة</span><span class="value">'++'</span></div><div class="perf-meta-box"><span class="label">تاريخ البداية</span><span class="value">'+fmtDate(task.startDate)+'</span></div><div class="perf-meta-box"><span class="label">آخر موعد للتسليم</span><span class="value">'+fmtDate(task.dueDate)+'</span></div></div><div class="teacher-subgrid"><div class="field"><label>الدرجة</label><input type="text" readonly value="'+Number(entry.score||0)+' / '+Number(task.maxScore||0)+'"></div><div class="field"><label>الحالة</label><input type="text" readonly value="'+(statusMap[entry.status]||'بانتظار الاستلام')+'"></div></div><div class="student-attach-hero"><div><div class="tag">📎 مرفق العمل</div><div class="sub">المرفق يظهر إذا سمحت المعلمة بإظهاره.</div></div><div>'+(canShow && (entry.attachmentData||entry.videoLink) ? 'مرفق خاص 🔒' : 'لا يوجد مرفق ظاهر')+'</div></div></div>';
       }).join('');
     }
     if(c) c.textContent=String(tasks.length);
@@ -3915,7 +3915,7 @@ window.addEventListener('load', function(){
   function getCurrentStudentSafe(){
     try{ return (typeof getCurrentStudent==='function') ? getCurrentStudent() : null; }catch(e){ return null; }
   }
-  function esc(s){ return String(s||'').replace(/[&<>\"]/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]; }); }
+  function { return String(s||'').replace(/[&<>\"]/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]; }); }
   function fmtDate(v){ if(!v) return '—'; try{ return new Date(v).toLocaleDateString('ar-SA'); }catch(e){ return v; } }
   function ensureTasks(){ if(!window.bankData) return []; if(!Array.isArray(bankData.performanceTasks)) bankData.performanceTasks=[]; return bankData.performanceTasks; }
   function ensureEntry(task, studentId){
@@ -4049,18 +4049,18 @@ window.addEventListener('load', function(){
         var students = (bankData.students||[]).filter(function(s){ return s.classId===task.classId; });
         var taskAttach = getTeacherAttachmentFromTask(task);
         return '<div class="performance-card">'
-          + '<div class="performance-student-head"><div><h4 style="margin:0 0 6px">'+esc(task.title)+'</h4><div class="teacher-note">'+esc(task.skill||'مهمة أدائية')+' • يبدأ '+fmtDate(task.startDate)+' • التسليم '+fmtDate(task.dueDate)+'</div></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="ghost" type="button" onclick="deletePerformanceTask(\''+task.id+'\')">حذف المهمة</button>'+(taskAttach.data||taskAttach.link?'<button class="ghost" type="button" onclick="openTeacherTaskAttachment(\''+task.id+'\')">فتح مرفق المهمة</button>':'')+'</div></div>'
-          + '<div class="performance-meta"><span class="pill">'+esc(typeof getClassName==='function'?getClassName(task.classId):task.classId)+'</span><span class="pill">الدرجة '+Number(task.maxScore||0)+'</span><span class="pill">النقاط '+Number(task.pointRate||0)+'</span><span class="pill">'+(taskAttach.name?('مرفق: '+esc(taskAttach.name)):(taskAttach.link?'رابط مرفق':'بدون مرفق'))+'</span></div>'
+          + '<div class="performance-student-head"><div><h4 style="margin:0 0 6px">'++'</h4><div class="teacher-note">'++' • يبدأ '+fmtDate(task.startDate)+' • التسليم '+fmtDate(task.dueDate)+'</div></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="ghost" type="button" onclick="deletePerformanceTask(\''+task.id+'\')">حذف المهمة</button>'+(taskAttach.data||taskAttach.link?'<button class="ghost" type="button" onclick="openTeacherTaskAttachment(\''+task.id+'\')">فتح مرفق المهمة</button>':'')+'</div></div>'
+          + '<div class="performance-meta"><span class="pill">'+:task.classId)+'</span><span class="pill">الدرجة '+Number(task.maxScore||0)+'</span><span class="pill">النقاط '+Number(task.pointRate||0)+'</span><span class="pill">'+(taskAttach.name?('مرفق: '+):(taskAttach.link?'رابط مرفق':'بدون مرفق'))+'</span></div>'
           + (students.length ? students.map(function(st){
             var entry = ensureEntry(task, st.id);
             return '<div class="performance-student-row">'
-              + '<div class="performance-student-head"><div><div class="performance-student-name">'+esc(st.name)+'</div><div class="teacher-note">'+esc(typeof getClassName==='function'?getClassName(st.classId):st.classId)+' • الرصيد الحالي '+(typeof formatMoney==='function'?formatMoney(st.balance):st.balance)+' ر.س</div></div><div class="performance-private">'+(entry.submittedAt ? ('تم التسليم '+fmtDate(entry.submittedAt)) : 'بانتظار تسليم الطالبة')+'</div></div>'
+              + '<div class="performance-student-head"><div><div class="performance-student-name">'++'</div><div class="teacher-note">'+:st.classId)+' • الرصيد الحالي '+(typeof formatMoney==='function'?formatMoney(st.balance):st.balance)+' ر.س</div></div><div class="performance-private">'+(entry.submittedAt ? ('تم التسليم '+fmtDate(entry.submittedAt)) : 'بانتظار تسليم الطالبة')+'</div></div>'
               + '<div class="teacher-subgrid">'
-              + '<div class="field"><label>مرفق الطالبة المرسل</label><div class="performance-private">'+(entry.studentAttachmentName?esc(entry.studentAttachmentName):(entry.studentVideoLink?'رابط مرفق':'لا يوجد'))+'</div>'+(entry.studentAttachmentData||entry.studentVideoLink?'<div style="margin-top:8px"><button class="ghost" type="button" onclick="openStudentSubmissionAttachment(\''+task.id+'\',\''+st.id+'\')">فتح مرفق الطالبة</button></div>':'')+'</div>'
+              + '<div class="field"><label>مرفق الطالبة المرسل</label><div class="performance-private">'+(entry.studentAttachmentName?:(entry.studentVideoLink?'رابط مرفق':'لا يوجد'))+'</div>'+(entry.studentAttachmentData||entry.studentVideoLink?'<div style="margin-top:8px"><button class="ghost" type="button" onclick="openStudentSubmissionAttachment(\''+task.id+'\',\''+st.id+'\')">فتح مرفق الطالبة</button></div>':'')+'</div>'
               + '<div class="field"><label>خانة إدخال الدرجة</label><input id="perfScore_'+task.id+'_'+st.id+'" type="number" min="0" max="'+Number(task.maxScore||0)+'" value="'+Number(entry.score||0)+'" /></div>'
               + '</div>'
               + '<div class="teacher-subgrid">'
-              + '<div class="field"><label>رسالة قصيرة للطالبة</label><input id="perfTeacherMsg_'+task.id+'_'+st.id+'" type="text" value="'+esc(entry.reviewMessage||'')+'" placeholder="اختياري" /></div>'
+              + '<div class="field"><label>رسالة قصيرة للطالبة</label><input id="perfTeacherMsg_'+task.id+'_'+st.id+'" type="text" value="'++'" placeholder="اختياري" /></div>'
               + '<div class="field"><label>إظهار المرفق للطالبة</label><label class="chip-pill"><input id="perfShow_'+task.id+'_'+st.id+'" type="checkbox" style="width:auto" '+(entry.showToStudent?'checked':'')+'> نعم</label></div>'
               + '</div>'
               + '<div class="teacher-actions" style="margin-top:10px"><button class="btn btn-green" type="button" onclick="approvePerformanceAssessment(\''+task.id+'\',\''+st.id+'\')">اعتماد التقييم</button><div class="performance-private">النقاط الحالية: '+Number(entry.awardedPoints||0)+'</div></div>'
@@ -4088,9 +4088,9 @@ window.addEventListener('load', function(){
         var taskAttach = getTeacherAttachmentFromTask(task);
         var teacherVisible = !!entry.showToStudent;
         return '<div class="performance-student-row">'
-          + '<div class="perf-highlight"><strong>'+esc(task.title)+'</strong><div>'+((entry.status==='rated')?'تم التقييم':(entry.status==='received'?'بانتظار التقييم':'بانتظار الاستلام'))+'</div></div>'
+          + '<div class="perf-highlight"><strong>'++'</strong><div>'+((entry.status==='rated')?'تم التقييم':(entry.status==='received'?'بانتظار التقييم':'بانتظار الاستلام'))+'</div></div>'
           + '<div class="perf-meta-grid">'
-          + '<div class="perf-meta-box"><span class="label">عنوان المهمة</span><span class="value">'+esc(task.title)+'</span></div>'
+          + '<div class="perf-meta-box"><span class="label">عنوان المهمة</span><span class="value">'++'</span></div>'
           + '<div class="perf-meta-box"><span class="label">تاريخ البداية</span><span class="value">'+fmtDate(task.startDate)+'</span></div>'
           + '<div class="perf-meta-box"><span class="label">آخر موعد للتسليم</span><span class="value">'+fmtDate(task.dueDate)+'</span></div>'
           + '<div class="perf-meta-box"><span class="label">الدرجة</span><span class="value">'+Number(entry.score||0)+' / '+Number(task.maxScore||0)+'</span></div>'
@@ -4100,11 +4100,11 @@ window.addEventListener('load', function(){
           + '<div class="student-attach-hero"><div><div class="tag">📎 مرفق العمل</div><div class="sub">'+(teacherVisible && (taskAttach.name||taskAttach.link) ? 'المرفق ظاهر لك' : 'المرفق يظهر إذا سمحت المعلمة بإظهاره')+'</div></div>' + (teacherVisible && (taskAttach.data||taskAttach.link) ? '<div><button class="ghost" type="button" onclick="openTeacherTaskAttachment(\''+task.id+'\')">فتح مرفق المهمة</button></div>' : '<div class="performance-private">لا يوجد مرفق ظاهر</div>') + '</div>'
           + '<div class="teacher-subgrid" style="margin-top:12px">'
           + '<div class="field"><label>رفع تسليمك (صورة أو PDF)</label><input id="studentSubmitFile_'+task.id+'" type="file" accept="image/*,.pdf,video/*" /></div>'
-          + '<div class="field"><label>رابط تسليم (اختياري)</label><input id="studentSubmitLink_'+task.id+'" type="text" placeholder="رابط درايف أو فيديو" value="'+esc(entry.studentVideoLink||'')+'" /></div>'
+          + '<div class="field"><label>رابط تسليم (اختياري)</label><input id="studentSubmitLink_'+task.id+'" type="text" placeholder="رابط درايف أو فيديو" value="'++'" /></div>'
           + '</div>'
           + '<button class="btn btn-green" type="button" onclick="submitStudentTask(\''+task.id+'\')">تسليم المهمة</button>'
           + '<div id="studentSubmitMsg_'+task.id+'" class="notice ok hidden">تم التسليم</div>'
-          + (entry.reviewMessage ? '<div class="performance-note" style="margin-top:10px">ملاحظة المعلمة: '+esc(entry.reviewMessage)+'</div>' : '')
+          + (entry.reviewMessage ? '<div class="performance-note" style="margin-top:10px">ملاحظة المعلمة: '++'</div>' : '')
           + '</div>';
       }).join('');
     }
@@ -4151,1425 +4151,319 @@ window.addEventListener('load', function(){
     var btn=document.getElementById('createPerformanceTaskBtn') || document.querySelector('#teacherPanePerformance button.btn.btn-green');
     if(!btn) return; btn.onclick=function(e){ e.preventDefault(); e.stopPropagation(); createTaskFinal(); }; }
 
-  window.generatePdfReport = function(){
-    var student = getCurrentStudentSafe(); if(!student){ alert('سجلي دخول الطالبة أولًا'); return; }
-    var from = document.getElementById('pdfFromDate')?.value || document.querySelector('#pdfTab input[type="date"]')?.value || '';
-    var to = document.getElementById('pdfToDate')?.value || '';
-    if(!from || !to){ alert('اختاري من تاريخ وإلى تاريخ'); return; }
-    var fromD = new Date(from), toD = new Date(to);
-    var ops = (student.history||[]).filter(function(h){ var d = new Date((h.date||'').split(' ')[0]); return !isNaN(d) && d >= fromD && d <= toD; });
-    var html = '<html dir="rtl" lang="ar"><head><meta charset="utf-8"><title>تقرير بنك الرياضيات</title><style>body{font-family:Arial;padding:24px;color:#183229} h1{margin:0 0 8px} table{width:100%;border-collapse:collapse;margin-top:16px} th,td{border:1px solid #ddd;padding:8px;text-align:right} .meta{margin:6px 0;color:#555}</style>
-<style id="top-gap-hard-fix">
-html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!important;}
-.app,.screen{margin-top:0!important;padding-top:0!important;}
-.screen.active{display:block!important;}
-.topbar,.card:first-child,.hero:first-child{margin-top:0!important;}
-</style>
+  
+window.generatePdfReport = function(){
+  var student = (typeof getCurrentStudentSafe === 'function') ? getCurrentStudentSafe() : null;
+  if(!student){ alert('سجلي دخول الطالبة أولًا'); return; }
 
-<style id="parent-followup-pro-style">
-.parent-hero-card{background:linear-gradient(135deg,#0f3529,#1d6b4a);color:#fff;overflow:hidden;position:relative}
-.parent-hero-head{display:flex;justify-content:space-between;align-items:flex-start;gap:18px}
-.parent-hero-head h3{margin:10px 0 8px;font-size:28px}
-.parent-hero-head p{margin:0;color:rgba(255,255,255,.88);line-height:1.9;font-size:14px;max-width:760px}
-.parent-hero-icon{width:74px;height:74px;border-radius:24px;background:rgba(255,255,255,.14);display:grid;place-items:center;font-size:34px;flex:none}
-.parent-overview-grid,.parent-analysis-grid,.parent-actions-grid{display:grid;gap:14px;margin-top:14px}
-.parent-overview-grid{grid-template-columns:repeat(3,1fr)}
-.parent-analysis-grid{grid-template-columns:1.25fr 1fr}
-.parent-actions-grid{grid-template-columns:repeat(4,1fr)}
-.parent-metric-card{background:#fff;border:1px solid var(--line);border-radius:24px;padding:18px;box-shadow:0 12px 24px rgba(16,58,46,.06)}
-.parent-metric-card .label{display:block;color:var(--muted);font-size:13px;margin-bottom:8px}
-.parent-metric-card strong{display:block;font-size:30px;color:var(--deep)}
-.parent-metric-card small{display:block;color:var(--muted);margin-top:6px}
-.parent-student-summary{margin-top:14px}
-.parent-student-shell{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
-.parent-student-main{display:flex;align-items:center;gap:14px}
-.parent-student-avatar{width:70px;height:70px;border-radius:22px;background:linear-gradient(135deg,#0f5f43,#1f8e66);display:grid;place-items:center;font-size:30px;color:#fff}
-.parent-student-main h4{margin:0 0 6px;font-size:24px;color:var(--deep)}
-.parent-level-pill{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:999px;background:linear-gradient(135deg,#cfae6d,#ddc186);color:#fff;font-weight:900;margin-top:10px}
-.parent-rank-box{min-width:180px;background:#f7faf8;border:1px solid var(--line);border-radius:22px;padding:16px;text-align:center}
-.parent-rank-box span{display:block;color:var(--muted);font-size:13px}
-.parent-rank-box strong{display:block;color:var(--deep);font-size:32px;margin-top:6px}
-.parent-week-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-.parent-week-box{background:#f7faf8;border:1px solid var(--line);border-radius:20px;padding:16px;text-align:center}
-.parent-week-box strong{display:block;color:var(--deep);font-size:28px}
-.parent-week-box span{display:block;color:var(--muted);font-size:12px;margin-top:6px}
-.progress-wrap{padding-top:6px}
-.progress-labels{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:10px}
-.progress-labels strong{color:var(--deep);font-size:24px}
-.progress-track{height:14px;background:#edf2ef;border-radius:999px;overflow:hidden}
-.progress-fill{height:100%;background:linear-gradient(90deg,#0f5f43,#1f8e66);border-radius:999px}
-.parent-alerts{display:grid;gap:10px}
-.parent-alert-item{display:flex;gap:12px;align-items:flex-start;background:#fff;border:1px solid var(--line);border-radius:20px;padding:14px}
-.parent-alert-item .icon{width:42px;height:42px;border-radius:14px;background:#f4f8f5;display:grid;place-items:center;flex:none}
-.parent-alert-item strong{display:block;color:var(--deep);margin-bottom:4px}
-.parent-alert-item span{display:block;color:var(--muted);line-height:1.8}
-@media (max-width:900px){
-  .parent-overview-grid,.parent-analysis-grid,.parent-actions-grid,.parent-week-grid{grid-template-columns:1fr !important}
-  .parent-hero-head{flex-direction:column}
-}
-</style>
+  var from = document.getElementById('pdfFromDate')?.value || document.querySelector('#pdfTab input[type="date"]')?.value || '';
+  var to = document.getElementById('pdfToDate')?.value || '';
+  if(!from || !to){ alert('اختاري من تاريخ وإلى تاريخ'); return; }
 
+  var fromD = new Date(from), toD = new Date(to);
+  var esc = function(s){
+    return String(s || '').replace(/[&<>"]/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c] || c;
+    });
+  };
 
-<style id="parent-followup-login-fix-style">
-.parent-login-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
-.parent-login-grid input{width:100%;border:1px solid var(--line);border-radius:16px;padding:14px;background:#fff;font:inherit}
-.parent-login-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
-.parent-actions-grid-strong .btn{min-height:58px;font-size:15px;font-weight:900}
-@media (max-width:900px){
-  .parent-login-grid,.parent-login-actions{grid-template-columns:1fr !important}
-}
-</style>
+  var ops = (student.history || []).filter(function(h){
+    var raw = (h.date || '').split(' ')[0];
+    var d = new Date(raw);
+    return !isNaN(d) && d >= fromD && d <= toD;
+  });
 
+  var rows = ops.length ? ops.map(function(h){
+    var amount = (typeof formatMoney === 'function') ? formatMoney(h.amount) : (h.amount || 0);
+    var sign = (h.type === 'withdraw') ? '-' : '+';
+    var typeText = (typeof opLabel === 'function') ? opLabel(h.type) : (h.type || '');
+    return '<tr>'
+      + '<td>' + esc(h.date || '—') + '</td>'
+      + '<td>' + esc(typeText) + '</td>'
+      + '<td>' + esc(h.reason || '—') + '</td>'
+      + '<td>' + esc(sign + amount) + '</td>'
+      + '</tr>';
+  }).join('') : '<tr><td colspan="4">لا توجد عمليات في هذه الفترة</td></tr>';
 
-<style id="oai-device-responsive-fix">
-/* auto device layout */
-body.device-mobile .app{max-width:460px}
-body.device-ipad .app{max-width:900px}
-body.device-desktop .app{max-width:1280px}
+  var reportHtml = '<html dir="rtl" lang="ar"><head><meta charset="utf-8"><title>تقرير بنك الرياضيات</title>'
+    + '<style>'
+    + 'body{font-family:Arial;padding:24px;color:#183229}'
+    + 'h1{margin:0 0 8px}'
+    + 'table{width:100%;border-collapse:collapse;margin-top:16px}'
+    + 'th,td{border:1px solid #ddd;padding:8px;text-align:right}'
+    + '.meta{margin:6px 0;color:#555}'
+    + '</style></head><body>'
+    + '<h1>تقرير بنك الرياضيات</h1>'
+    + '<div class="meta">الطالبة: ' + esc(student.name || '') + '</div>'
+    + '<div class="meta">الفترة: من ' + esc(from) + ' إلى ' + esc(to) + '</div>'
+    + '<div class="meta">الرصيد الحالي: ' + esc((typeof formatMoney==='function' ? formatMoney(student.balance) : (student.balance || 0))) + ' ر.س</div>'
+    + '<table><thead><tr><th>التاريخ</th><th>النوع</th><th>السبب</th><th>القيمة</th></tr></thead><tbody>'
+    + rows
+    + '</tbody></table></body></html>';
 
-body.device-mobile .screen{padding:0 14px 108px !important}
-body.device-ipad .screen{padding:0 18px 118px !important}
-body.device-desktop .screen{padding:0 22px 124px !important}
-
-/* remove top gap hard */
-html,body,.app{padding-top:0 !important;margin-top:0 !important}
-.screen,.screen.active{padding-top:0 !important;margin-top:0 !important}
-.topbar{margin-top:0 !important;padding-top:0 !important}
-.hero,.card,.teacher-shell,.teacher-hero{margin-top:0 !important}
-body::before{display:none !important}
-
-/* tab bars more visible + slide on mobile */
-.tabbar,.teacher-tabs{
-  scrollbar-width:thin;
-  scrollbar-color: rgba(16,58,46,.28) transparent;
-}
-.tabbar::-webkit-scrollbar,.teacher-tabs::-webkit-scrollbar{height:7px}
-.tabbar::-webkit-scrollbar-thumb,.teacher-tabs::-webkit-scrollbar-thumb{
-  background:rgba(16,58,46,.28);border-radius:999px
-}
-body.device-mobile .tabbar,
-body.device-mobile .teacher-tabs{
-  display:flex !important;
-  flex-wrap:nowrap !important;
-  overflow-x:auto !important;
-  overflow-y:hidden !important;
-  -webkit-overflow-scrolling:touch;
-  scroll-behavior:smooth;
-  gap:10px !important;
-  padding:4px 2px 10px !important;
-  margin-bottom:14px !important;
-  border-bottom:1px solid rgba(16,58,46,.08);
-}
-body.device-mobile .tabbar button,
-body.device-mobile .teacher-tabs button{
-  flex:0 0 auto !important;
-  white-space:nowrap !important;
-  border:1px solid rgba(16,58,46,.08) !important;
-  background:#fff !important;
-  color:var(--deep) !important;
-  box-shadow:0 8px 16px rgba(16,58,46,.06);
-}
-body.device-mobile .tabbar button.active,
-body.device-mobile .teacher-tabs button.active{
-  background:linear-gradient(135deg,var(--deep),var(--green)) !important;
-  color:#fff !important;
-  border-color:transparent !important;
-  box-shadow:0 10px 22px rgba(16,58,46,.16);
-}
-
-/* better layouts on ipad/desktop */
-body.device-ipad .teacher-grid,
-body.device-desktop .teacher-grid{grid-template-columns:repeat(2,1fr)}
-body.device-ipad .teacher-kpis{grid-template-columns:repeat(4,1fr)}
-body.device-desktop .teacher-kpis{grid-template-columns:repeat(4,1fr)}
-body.device-ipad .shortcuts{grid-template-columns:repeat(4,1fr)}
-body.device-desktop .shortcuts{grid-template-columns:repeat(4,1fr)}
-body.device-ipad .bottom-nav{width:min(760px,calc(100% - 28px))}
-body.device-desktop .bottom-nav{width:min(920px,calc(100% - 34px))}
-body.device-mobile .bottom-nav{width:min(430px,calc(100% - 18px))}
-
-/* keep sections close to top on home */
-#home .hero, #teacher_dashboard .teacher-hero, #account_choice .card:first-child,
-#student_login .card:first-child, #teacher_login .card:first-child{
-  margin-top:0 !important;
-}
-</style>
-
-
-<style id="oai-more-detail-patch-style">
-.more-detail-pro-card{padding:20px;border-radius:28px}
-.more-detail-title{margin:0 0 10px;color:var(--deep);font-size:28px}
-.more-detail-lead{margin:0 0 14px;color:var(--muted);line-height:2;font-size:15px}
-.more-detail-block{background:#fff;border:1px solid var(--line);border-radius:20px;padding:16px;margin:12px 0;box-shadow:0 8px 18px rgba(16,58,46,.05)}
-.more-detail-block h3{margin:0 0 8px;color:var(--deep);font-size:18px}
-.more-detail-block p{margin:0;line-height:2;color:var(--text)}
-.more-detail-list{display:grid;gap:12px}
-.more-detail-item{display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid var(--line);background:#fff;border-radius:20px;padding:16px;box-shadow:0 8px 18px rgba(16,58,46,.05)}
-.more-detail-item .icon{width:42px;height:42px;border-radius:14px;background:var(--mint);display:grid;place-items:center;font-size:20px}
-.more-detail-item strong{display:block;color:var(--deep);margin-bottom:4px}
-.more-detail-item span{display:block;color:var(--muted);line-height:1.8}
-</style>
-
-
-<style id="oai-more-fullpage-style">
-.more-detail-card{animation:slideInPanel .28s ease}
-.more-detail-content{display:grid;gap:14px;line-height:2}
-.more-detail-title{margin:0;color:var(--deep);font-size:22px}
-.more-detail-lead{margin:0;color:var(--muted);font-size:14px}
-.more-detail-block{background:#fff;border:1px solid var(--line);border-radius:22px;padding:16px;box-shadow:0 8px 18px rgba(16,58,46,.05)}
-.more-detail-block h3{margin:0 0 10px;color:var(--deep);font-size:16px}
-.more-detail-block p{margin:0;color:var(--text);font-size:14px;line-height:2}
-.more-detail-list{display:grid;gap:10px}
-.more-detail-item{display:flex;align-items:flex-start;gap:10px;background:#f9fbfa;border:1px solid var(--line);border-radius:18px;padding:12px 14px}
-.more-detail-item .icon{width:34px;height:34px;border-radius:12px;background:var(--mint);display:grid;place-items:center;flex:none}
-.more-detail-item strong{display:block;color:var(--deep);font-size:14px;margin-bottom:2px}
-.more-detail-item span{display:block;color:var(--muted);font-size:13px;line-height:1.9}
-</style>
-
-
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script id="math-bank-firebase-config">
-window.MATH_BANK_CLOUD_CONFIG = {
-  enabled: true,
-  firebaseConfig: {
-    apiKey: "AIzaSyDP-pi0tbF09bNRihrLz_kUs-JBoa9Cw4Y",
-    authDomain: "sara-haywire.firebaseapp.com",
-    projectId: "sara-haywire",
-    storageBucket: "sara-haywire.firebasestorage.app",
-    messagingSenderId: "333467940977",
-    appId: "1:333467940977:web:97d056d5dbff2debbf43d0"
-  },
-  collection: "math_bank",
-  docId: "shared_bank"
+  var w = window.open('', '_blank');
+  if(!w) return;
+  w.document.write(reportHtml);
+  w.document.close();
+  w.focus();
+  setTimeout(function(){ try{ w.print(); }catch(e){} }, 300);
 };
-</script>
-<style id="math-bank-sync-badge-style">
-.sync-status-badge{
-  display:inline-flex;align-items:center;gap:8px;
-  padding:8px 12px;border-radius:999px;
-  background:#edf6f0;color:#176242;font-size:12px;font-weight:800;
-  border:1px solid #cfe9db;box-shadow:0 6px 14px rgba(16,58,46,.06)
-}
-.blue-import-btn{touch-action:manipulation}
-</style>
 
-</head><body>'
-      + '<h1>تقرير بنك الرياضيات</h1>'
-      + '<div class="meta">الطالبة: '+esc(student.name)+'</div>'
-      + '<div class="meta">الفترة: من '+esc(from)+' إلى '+esc(to)+'</div>'
-      + '<div class="meta">الرصيد الحالي: '+(typeof formatMoney==='function'?formatMoney(student.balance):student.balance)+' ر.س</div>'
-      + '<table><thead><tr><th>التاريخ</th><th>النوع</th><th>السبب</th><th>القيمة</th></tr></thead><tbody>'
-      + (ops.length ? ops.map(function(h){ return '<tr><td>'+esc(h.date||'—')+'</td><td>'+esc(typeof opLabel==='function'?opLabel(h.type):h.type)+'</td><td>'+esc(h.reason||'—')+'</td><td>'+((h.type==='withdraw'?'-':'+')+esc(typeof formatMoney==='function'?formatMoney(h.amount):h.amount))+'</td></tr>'; }).join('') : '<tr><td colspan="4">لا توجد عمليات في هذه الفترة</td></tr>')
-      + '</tbody></table>
+
 <script id="smart-reports-script">
 (function(){
-  function money(v){ return Number(v||0).toLocaleString('ar-SA'); }
-  function esc(s){ return String(s||'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]||c)); }
+  function money(v){ return Number(v || 0).toLocaleString('ar-SA'); }
+  function esc(s){
+    return String(s || '').replace(/[&<>"]/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c] || c;
+    });
+  }
   function getClassNameSafe(id){
     try{
-      if(typeof getClassName==='function') return getClassName(id);
-      const cls=(window.bankData?.classes||[]).find(c=>c.id===id);
-      return cls?cls.name:id;
-    }catch(e){ return id||'—'; }
+      if(typeof getClassName === 'function') return getClassName(id);
+      var cls = (window.bankData?.classes || []).find(function(c){ return c.id === id; });
+      return cls ? cls.name : (id || '—');
+    }catch(e){ return id || '—'; }
   }
   function getTaskStats(task){
-    const students=(window.bankData?.students||[]).filter(s=>s.classId===task.classId);
-    const total=students.length;
-    let submitted=0, scored=0, scoreSum=0;
-    students.forEach(st=>{
-      const entry=(task.entries&&task.entries[st.id])||{};
-      const status = task.submissionStatus && task.submissionStatus[st.id];
-      if(status===true || entry.submittedAt || entry.attachmentData || entry.attachmentName || entry.videoLink){ submitted++; }
-      if(Number(entry.score||0)>0){ scored++; scoreSum += Number(entry.score||0); }
+    var students = (window.bankData?.students || []).filter(function(s){ return s.classId === task.classId; });
+    var total = students.length, submitted = 0, scored = 0, scoreSum = 0;
+    students.forEach(function(st){
+      var entry = (task.entries && task.entries[st.id]) || {};
+      var status = task.submissionStatus && task.submissionStatus[st.id];
+      if(status === true || entry.submittedAt || entry.attachmentData || entry.attachmentName || entry.videoLink){ submitted++; }
+      if(Number(entry.score || 0) > 0){ scored++; scoreSum += Number(entry.score || 0); }
     });
-    return {total, submitted, pending: Math.max(0,total-submitted), avg: scored? Math.round((scoreSum / (scored * Number(task.maxScore||20))) * 100) : 0};
-  }
-  window.renderSmartReports = function(){
-    const data=window.bankData;
-    if(!data) return;
-    const students=data.students||[];
-    const classes=data.classes||[];
-    const ops=data.operations||[];
-    const tasks=data.performanceTasks||[];
-    let dep=0, wd=0, tr=0;
-    ops.forEach(op=>{ const a=Number(op.amount||0); if(op.type==='deposit') dep+=a; else if(op.type==='withdraw') wd+=a; else if(op.type==='transfer') tr+=a; });
-    let submitted=0, pending=0, avgSum=0, avgCount=0;
-    let bestTaskName='—', bestRate=-1;
-    tasks.forEach(t=>{ const s=getTaskStats(t); submitted += s.submitted; pending += s.pending; if(s.avg>0){ avgSum+=s.avg; avgCount++; } const rate=s.total? (s.submitted/s.total)*100:0; if(rate>bestRate){ bestRate=rate; bestTaskName=t.title||'—'; } });
-    const setText=(id,val)=>{ const el=document.getElementById(id); if(el) el.textContent=val; };
-    setText('srStudents', students.length);
-    setText('srClasses', classes.length);
-    setText('srDeposits', money(dep));
-    setText('srWithdrawals', money(wd));
-    setText('srTransfers', money(tr));
-    setText('srTasks', tasks.length);
-    setText('srSubmitted', submitted);
-    setText('srPending', pending);
-    setText('srAvgScore', (avgCount? Math.round(avgSum/avgCount):0) + '%');
-    setText('srBestTask', bestTaskName);
-    const classWrap=document.getElementById('smartClassCards');
-    if(classWrap){
-      if(!classes.length) classWrap.innerHTML='<div class="performance-empty">لا توجد فصول مضافة بعد.</div>';
-      else classWrap.innerHTML=classes.map(cls=>{
-        const clsStudents=students.filter(s=>s.classId===cls.id);
-        const avgBal=clsStudents.length? Math.round(clsStudents.reduce((a,s)=>a+Number(s.balance||0),0)/clsStudents.length):0;
-        const top=clsStudents.slice().sort((a,b)=>Number(b.balance||0)-Number(a.balance||0))[0];
-        const clsTasks=tasks.filter(t=>t.classId===cls.id);
-        let clsSub=0, clsPend=0; clsTasks.forEach(t=>{ const st=getTaskStats(t); clsSub+=st.submitted; clsPend+=st.pending; });
-        return `<div class="smart-class-card"><div class="top"><strong>${esc(cls.name)}</strong><span class="pill">${clsStudents.length} طالبة</span></div><div class="meta">متوسط الرصيد: ${money(avgBal)} ر.س<br>أعلى طالب / طالبة: ${esc(top?top.name:'—')}<br>تم التسليم: ${clsSub} • لم يتم: ${clsPend}</div></div>`;
-      }).join('');
-    }
-    const topWrap=document.getElementById('smartTopStudents');
-    if(topWrap){
-      const ranked=students.slice().sort((a,b)=>Number(b.balance||0)-Number(a.balance||0)).slice(0,5);
-      topWrap.innerHTML = ranked.length? ranked.map((st,i)=>`<div class="smart-top-item"><div style="display:flex;align-items:center;gap:10px"><div class="smart-rank">${i+1}</div><div><strong>${esc(st.name)}</strong><div class="meta">${esc(getClassNameSafe(st.classId))}</div></div></div><strong>${money(st.balance)} ر.س</strong></div>`).join('') : '<div class="performance-empty">لا يوجد طلاب / طالبات للعرض.</div>';
-    }
-    const taskWrap=document.getElementById('smartTaskList');
-    if(taskWrap){
-      taskWrap.innerHTML = tasks.length? tasks.map(t=>{ const s=getTaskStats(t); return `<div class="smart-task-item"><div><strong>${esc(t.title||'مهمة أدائية')}</strong><div class="meta">${esc(getClassNameSafe(t.classId))} • تم التسليم ${s.submitted}/${s.total} • متوسط الدرجات ${s.avg}%</div></div><span class="pill">${s.pending} لم يتم</span></div>`; }).join('') : '<div class="performance-empty">لا توجد مهام أدائية بعد.</div>';
-    }
-    const alerts=document.getElementById('smartAlerts');
-    if(alerts){
-      const low=students.filter(s=>Number(s.balance||0)<1000).slice(0,3);
-      const near=students.filter(s=>{ const b=Number(s.balance||0); return b>=9000 && b<11000; }).slice(0,3);
-      const late=[];
-      tasks.forEach(t=>{ const tStudents=students.filter(s=>s.classId===t.classId); tStudents.forEach(st=>{ const entry=(t.entries&&t.entries[st.id])||{}; const status=t.submissionStatus&&t.submissionStatus[st.id]; if(!(status===true || entry.submittedAt || entry.attachmentData || entry.attachmentName || entry.videoLink)){ late.push({name:st.name, task:t.title}); } });
-      });
-      let items=[];
-      late.slice(0,3).forEach(x=>items.push(`<div class="smart-alert warn"><strong>لم يتم تسليم مهمة</strong><span>${esc(x.name)} • ${esc(x.task)}</span></div>`));
-      low.forEach(x=>items.push(`<div class="smart-alert"><strong>رصيد منخفض</strong><span>${esc(x.name)} • ${money(x.balance)} ر.س</span></div>`));
-      near.forEach(x=>items.push(`<div class="smart-alert ok"><strong>قريبة من الترقية</strong><span>${esc(x.name)} • ${money(x.balance)} ر.س</span></div>`));
-      alerts.innerHTML = items.length? items.join('') : '<div class="performance-empty">لا توجد تنبيهات حالية.</div>';
-    }
-    drawSmartOpsChart(dep, wd, tr);
-  }
-  window.drawSmartOpsChart = function(dep, wd, tr){
-    const canvas=document.getElementById('smartOpsChart');
-    if(!canvas || !canvas.getContext) return;
-    const ctx=canvas.getContext('2d');
-    const total=Math.max(1, dep+wd+tr);
-    const values=[dep, wd, tr];
-    const colors=['#1f7f57','#c7a465','#103a2e'];
-    const labels=['إيداع','سحب','تحويل'];
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    let start=-Math.PI/2;
-    values.forEach((v,i)=>{ const angle=(v/total)*Math.PI*2; ctx.beginPath(); ctx.moveTo(110,110); ctx.arc(110,110,80,start,start+angle); ctx.closePath(); ctx.fillStyle=colors[i]; ctx.fill(); start += angle; });
-    ctx.beginPath(); ctx.fillStyle='#fff'; ctx.arc(110,110,36,0,Math.PI*2); ctx.fill();
-    ctx.fillStyle='#103a2e'; ctx.font='bold 14px Arial'; ctx.textAlign='center'; ctx.fillText('BN',110,116);
-    labels.forEach((lab,i)=>{ ctx.fillStyle=colors[i]; ctx.fillRect(210,35 + i*34,14,14); ctx.fillStyle='#183229'; ctx.textAlign='right'; ctx.font='12px Arial'; ctx.fillText(`${lab}: ${money(values[i])}`,270,47 + i*34); });
-  }
-  window.generateSmartTeacherReport = function(){
-    try{ renderSmartReports(); }catch(e){}
-    const html=`<html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>تقرير شامل - بنك الرياضيات</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{color:#103a2e} .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.card{border:1px solid #dce6df;border-radius:16px;padding:14px;margin-bottom:12px}.muted{color:#6b8178;font-size:13px}</style>
-<style id="top-gap-hard-fix">
-html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!important;}
-.app,.screen{margin-top:0!important;padding-top:0!important;}
-.screen.active{display:block!important;}
-.topbar,.card:first-child,.hero:first-child{margin-top:0!important;}
-</style>
-
-<style id="parent-followup-pro-style">
-.parent-hero-card{background:linear-gradient(135deg,#0f3529,#1d6b4a);color:#fff;overflow:hidden;position:relative}
-.parent-hero-head{display:flex;justify-content:space-between;align-items:flex-start;gap:18px}
-.parent-hero-head h3{margin:10px 0 8px;font-size:28px}
-.parent-hero-head p{margin:0;color:rgba(255,255,255,.88);line-height:1.9;font-size:14px;max-width:760px}
-.parent-hero-icon{width:74px;height:74px;border-radius:24px;background:rgba(255,255,255,.14);display:grid;place-items:center;font-size:34px;flex:none}
-.parent-overview-grid,.parent-analysis-grid,.parent-actions-grid{display:grid;gap:14px;margin-top:14px}
-.parent-overview-grid{grid-template-columns:repeat(3,1fr)}
-.parent-analysis-grid{grid-template-columns:1.25fr 1fr}
-.parent-actions-grid{grid-template-columns:repeat(4,1fr)}
-.parent-metric-card{background:#fff;border:1px solid var(--line);border-radius:24px;padding:18px;box-shadow:0 12px 24px rgba(16,58,46,.06)}
-.parent-metric-card .label{display:block;color:var(--muted);font-size:13px;margin-bottom:8px}
-.parent-metric-card strong{display:block;font-size:30px;color:var(--deep)}
-.parent-metric-card small{display:block;color:var(--muted);margin-top:6px}
-.parent-student-summary{margin-top:14px}
-.parent-student-shell{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
-.parent-student-main{display:flex;align-items:center;gap:14px}
-.parent-student-avatar{width:70px;height:70px;border-radius:22px;background:linear-gradient(135deg,#0f5f43,#1f8e66);display:grid;place-items:center;font-size:30px;color:#fff}
-.parent-student-main h4{margin:0 0 6px;font-size:24px;color:var(--deep)}
-.parent-level-pill{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:999px;background:linear-gradient(135deg,#cfae6d,#ddc186);color:#fff;font-weight:900;margin-top:10px}
-.parent-rank-box{min-width:180px;background:#f7faf8;border:1px solid var(--line);border-radius:22px;padding:16px;text-align:center}
-.parent-rank-box span{display:block;color:var(--muted);font-size:13px}
-.parent-rank-box strong{display:block;color:var(--deep);font-size:32px;margin-top:6px}
-.parent-week-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-.parent-week-box{background:#f7faf8;border:1px solid var(--line);border-radius:20px;padding:16px;text-align:center}
-.parent-week-box strong{display:block;color:var(--deep);font-size:28px}
-.parent-week-box span{display:block;color:var(--muted);font-size:12px;margin-top:6px}
-.progress-wrap{padding-top:6px}
-.progress-labels{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:10px}
-.progress-labels strong{color:var(--deep);font-size:24px}
-.progress-track{height:14px;background:#edf2ef;border-radius:999px;overflow:hidden}
-.progress-fill{height:100%;background:linear-gradient(90deg,#0f5f43,#1f8e66);border-radius:999px}
-.parent-alerts{display:grid;gap:10px}
-.parent-alert-item{display:flex;gap:12px;align-items:flex-start;background:#fff;border:1px solid var(--line);border-radius:20px;padding:14px}
-.parent-alert-item .icon{width:42px;height:42px;border-radius:14px;background:#f4f8f5;display:grid;place-items:center;flex:none}
-.parent-alert-item strong{display:block;color:var(--deep);margin-bottom:4px}
-.parent-alert-item span{display:block;color:var(--muted);line-height:1.8}
-@media (max-width:900px){
-  .parent-overview-grid,.parent-analysis-grid,.parent-actions-grid,.parent-week-grid{grid-template-columns:1fr !important}
-  .parent-hero-head{flex-direction:column}
-}
-</style>
-
-
-<style id="parent-followup-login-fix-style">
-.parent-login-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
-.parent-login-grid input{width:100%;border:1px solid var(--line);border-radius:16px;padding:14px;background:#fff;font:inherit}
-.parent-login-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
-.parent-actions-grid-strong .btn{min-height:58px;font-size:15px;font-weight:900}
-@media (max-width:900px){
-  .parent-login-grid,.parent-login-actions{grid-template-columns:1fr !important}
-}
-</style>
-
-<script id="smart-reports-override-v7">
-(function(){
-  function money(v){ return Number(v||0).toLocaleString('ar-SA'); }
-  function esc(s){ return String(s||'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]||c)); }
-  function getClassNameSafe(id){
-    try{
-      if(typeof getClassName==='function') return getClassName(id);
-      const cls=(window.bankData?.classes||[]).find(c=>c.id===id);
-      return cls?cls.name:id;
-    }catch(e){ return id||'—'; }
-  }
-  function getTaskStats(task){
-    const students=(window.bankData?.students||[]).filter(s=>s.classId===task.classId);
-    const total=students.length;
-    let submitted=0, scored=0, scoreSum=0;
-    students.forEach(st=>{
-      const entry=(task.entries&&task.entries[st.id])||{};
-      const status = task.submissionStatus && task.submissionStatus[st.id];
-      if(status===true || entry.submittedAt || entry.attachmentData || entry.attachmentName || entry.videoLink){ submitted++; }
-      if(Number(entry.score||0)>0){ scored++; scoreSum += Number(entry.score||0); }
-    });
-    return {total, submitted, pending: Math.max(0,total-submitted), avg: scored? Math.round((scoreSum / (scored * Number(task.maxScore||20))) * 100) : 0};
-  }
-  function getWithdrawCount(studentId){
-    return (window.bankData?.operations||[]).filter(op=>op.studentId===studentId && op.type==='withdraw').length;
-  }
-  function getStudentPendingCount(student){
-    const tasks=(window.bankData?.performanceTasks||[]).filter(t=>t.classId===student.classId);
-    let pending=0;
-    tasks.forEach(t=>{
-      const entry=(t.entries&&t.entries[student.id])||{};
-      const status=t.submissionStatus&&t.submissionStatus[student.id];
-      if(!(status===true || entry.submittedAt || entry.attachmentData || entry.attachmentName || entry.videoLink)) pending++;
-    });
-    return pending;
-  }
-  function performanceLabel(student){
-    const balance=Number(student.balance||0);
-    const pending=getStudentPendingCount(student);
-    const withdraws=getWithdrawCount(student.id);
-    if(balance>=1500 && pending===0 && withdraws<=1) return {text:'ممتاز 🟢', cls:'ok'};
-    if(balance>=1000 && pending<=1 && withdraws<=2) return {text:'جيد 🟡', cls:'warn'};
-    return {text:'يحتاج متابعة 🔴', cls:'danger'};
-  }
-  window.renderSmartReports = function(){
-    const data=window.bankData;
-    if(!data) return;
-    const students=data.students||[];
-    const classes=data.classes||[];
-    const ops=data.operations||[];
-    const tasks=data.performanceTasks||[];
-    let dep=0, wd=0, tr=0;
-    ops.forEach(op=>{ const a=Number(op.amount||0); if(op.type==='deposit') dep+=a; else if(op.type==='withdraw') wd+=a; else if(op.type==='transfer') tr+=a; });
-    let submitted=0, pending=0, avgSum=0, avgCount=0;
-    let bestTaskName='—', bestRate=-1;
-    tasks.forEach(t=>{ const s=getTaskStats(t); submitted += s.submitted; pending += s.pending; if(s.avg>0){ avgSum+=s.avg; avgCount++; } const rate=s.total? (s.submitted/s.total)*100:0; if(rate>bestRate){ bestRate=rate; bestTaskName=t.title||'—'; } });
-    const setText=(id,val)=>{ const el=document.getElementById(id); if(el) el.textContent=val; };
-    setText('srStudents', students.length);
-    setText('srClasses', classes.length);
-    setText('srDeposits', money(dep));
-    setText('srWithdrawals', money(wd));
-    setText('srTransfers', money(tr));
-    setText('srTasks', tasks.length);
-    setText('srSubmitted', submitted);
-    setText('srPending', pending);
-    setText('srAvgScore', (avgCount? Math.round(avgSum/avgCount):0) + '%');
-    setText('srBestTask', bestTaskName);
-    const classWrap=document.getElementById('smartClassCards');
-    if(classWrap){
-      if(!classes.length) classWrap.innerHTML='<div class="performance-empty">لا توجد فصول مضافة بعد.</div>';
-      else classWrap.innerHTML=classes.map(cls=>{
-        const clsStudents=students.filter(s=>s.classId===cls.id);
-        const avgBal=clsStudents.length? Math.round(clsStudents.reduce((a,s)=>a+Number(s.balance||0),0)/clsStudents.length):0;
-        const top=clsStudents.slice().sort((a,b)=>Number(b.balance||0)-Number(a.balance||0))[0];
-        const clsTasks=tasks.filter(t=>t.classId===cls.id);
-        let clsSub=0, clsPend=0; clsTasks.forEach(t=>{ const st=getTaskStats(t); clsSub+=st.submitted; clsPend+=st.pending; });
-        return `<div class="smart-class-card"><div class="top"><strong>${esc(cls.name)}</strong><span class="pill">${clsStudents.length} طالب / طالبة</span></div><div class="meta">متوسط الرصيد: ${money(avgBal)} ر.س<br>أعلى طالب / طالبة: ${esc(top?top.name:'—')}<br>تم التسليم: ${clsSub} • لم يتم التسليم: ${clsPend}</div></div>`;
-      }).join('');
-    }
-    const topWrap=document.getElementById('smartTopStudents');
-    if(topWrap){
-      const ranked=students.slice().sort((a,b)=>Number(b.balance||0)-Number(a.balance||0)).slice(0,5);
-      topWrap.innerHTML = ranked.length? ranked.map((st,i)=>{ const perf=performanceLabel(st); return `<div class="smart-top-item"><div style="display:flex;align-items:center;gap:10px"><div class="smart-rank">${i+1}</div><div><strong>${esc(st.name)}</strong><div class="meta">${esc(getClassNameSafe(st.classId))} • <span class="smart-perf ${perf.cls}">${perf.text}</span></div></div></div><strong>${money(st.balance)} ر.س</strong></div>`; }).join('') : '<div class="performance-empty">لا يوجد طلاب / طالبات للعرض.</div>';
-    }
-    const taskWrap=document.getElementById('smartTaskList');
-    if(taskWrap){
-      taskWrap.innerHTML = tasks.length? tasks.map(t=>{ const s=getTaskStats(t); return `<div class="smart-task-item"><div><strong>${esc(t.title||'مهمة أدائية')}</strong><div class="meta">${esc(getClassNameSafe(t.classId))} • تم التسليم ${s.submitted}/${s.total} • متوسط الدرجات ${s.avg}%</div></div><span class="pill">${s.pending} لم يتم التسليم</span></div>`; }).join('') : '<div class="performance-empty">لا توجد مهام أدائية بعد.</div>';
-    }
-    const performanceWrap=document.getElementById('smartPerformanceIndicators');
-    if(performanceWrap){
-      const ranked=students.slice().sort((a,b)=>Number(b.balance||0)-Number(a.balance||0)).slice(0,6);
-      performanceWrap.innerHTML = ranked.length ? ranked.map(st=>{ const perf=performanceLabel(st); return `<div class="smart-top-item"><div><div><strong>${esc(st.name)}</strong><div class="meta">${esc(getClassNameSafe(st.classId))}</div></div></div><span class="pill ${perf.cls==='ok'?'ok-pill':perf.cls==='warn'?'warn-pill':'danger-pill'}">${perf.text}</span></div>`; }).join('') : '<div class="performance-empty">لا يوجد طلاب / طالبات للعرض.</div>';
-    }
-    const alerts=document.getElementById('smartAlerts');
-    const critical=document.getElementById('smartCriticalAlerts');
-    if(alerts || critical){
-      const low=students.filter(s=>Number(s.balance||0)<1000).slice(0,5);
-      const near=students.filter(s=>{ const b=Number(s.balance||0); return b>=9000 && b<11000; }).slice(0,5);
-      const manyWithdrawals=students.filter(s=>getWithdrawCount(s.id)>=3).slice(0,5);
-      const late=[];
-      tasks.forEach(t=>{ const tStudents=students.filter(s=>s.classId===t.classId); tStudents.forEach(st=>{ const entry=(t.entries&&t.entries[st.id])||{}; const status=t.submissionStatus&&t.submissionStatus[st.id]; if(!(status===true || entry.submittedAt || entry.attachmentData || entry.attachmentName || entry.videoLink)){ late.push({name:st.name, task:t.title, className:getClassNameSafe(st.classId)}); } }); });
-      let items=[];
-      late.slice(0,5).forEach(x=>items.push(`<div class="smart-alert warn"><strong>⚠ الطلاب / الطالبات الذين لم يسلموا المهمة</strong><span>${esc(x.name)} • ${esc(x.task)} • ${esc(x.className)}</span></div>`));
-      low.forEach(x=>items.push(`<div class="smart-alert"><strong>⚠ الطلاب / الطالبات ذوو الرصيد المنخفض</strong><span>${esc(x.name)} • ${money(x.balance)} ر.س</span></div>`));
-      near.forEach(x=>items.push(`<div class="smart-alert ok"><strong>⚠ الطلاب / الطالبات القريبون من الترقية</strong><span>${esc(x.name)} • ${money(x.balance)} ر.س</span></div>`));
-      manyWithdrawals.forEach(x=>items.push(`<div class="smart-alert danger"><strong>⚠ الطلاب / الطالبات الذين لديهم خصومات كثيرة</strong><span>${esc(x.name)} • ${getWithdrawCount(x.id)} خصومات</span></div>`));
-      if(alerts) alerts.innerHTML = items.length? items.join('') : '<div class="performance-empty">لا توجد تنبيهات حالية.</div>';
-      if(critical) critical.innerHTML = items.length? items.slice(0,6).join('') : '<div class="performance-empty">لا توجد تنبيهات حرجة حاليًا.</div>';
-    }
-    if(typeof window.drawSmartOpsChart==='function') window.drawSmartOpsChart(dep, wd, tr);
-  }
-  window.generateSmartTeacherReport = function(){
-    try{ window.renderSmartReports(); }catch(e){}
-    const html=`<html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>تقرير شامل - بنك الرياضيات</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{color:#103a2e}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.card{border:1px solid #dce6df;border-radius:16px;padding:14px;margin-bottom:12px}.muted{color:#6b8178;font-size:13px}</style>
-<style id="top-gap-hard-fix">
-html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!important;}
-.app,.screen{margin-top:0!important;padding-top:0!important;}
-.screen.active{display:block!important;}
-.topbar,.card:first-child,.hero:first-child{margin-top:0!important;}
-</style>
-
-<style id="parent-followup-pro-style">
-.parent-hero-card{background:linear-gradient(135deg,#0f3529,#1d6b4a);color:#fff;overflow:hidden;position:relative}
-.parent-hero-head{display:flex;justify-content:space-between;align-items:flex-start;gap:18px}
-.parent-hero-head h3{margin:10px 0 8px;font-size:28px}
-.parent-hero-head p{margin:0;color:rgba(255,255,255,.88);line-height:1.9;font-size:14px;max-width:760px}
-.parent-hero-icon{width:74px;height:74px;border-radius:24px;background:rgba(255,255,255,.14);display:grid;place-items:center;font-size:34px;flex:none}
-.parent-overview-grid,.parent-analysis-grid,.parent-actions-grid{display:grid;gap:14px;margin-top:14px}
-.parent-overview-grid{grid-template-columns:repeat(3,1fr)}
-.parent-analysis-grid{grid-template-columns:1.25fr 1fr}
-.parent-actions-grid{grid-template-columns:repeat(4,1fr)}
-.parent-metric-card{background:#fff;border:1px solid var(--line);border-radius:24px;padding:18px;box-shadow:0 12px 24px rgba(16,58,46,.06)}
-.parent-metric-card .label{display:block;color:var(--muted);font-size:13px;margin-bottom:8px}
-.parent-metric-card strong{display:block;font-size:30px;color:var(--deep)}
-.parent-metric-card small{display:block;color:var(--muted);margin-top:6px}
-.parent-student-summary{margin-top:14px}
-.parent-student-shell{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
-.parent-student-main{display:flex;align-items:center;gap:14px}
-.parent-student-avatar{width:70px;height:70px;border-radius:22px;background:linear-gradient(135deg,#0f5f43,#1f8e66);display:grid;place-items:center;font-size:30px;color:#fff}
-.parent-student-main h4{margin:0 0 6px;font-size:24px;color:var(--deep)}
-.parent-level-pill{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:999px;background:linear-gradient(135deg,#cfae6d,#ddc186);color:#fff;font-weight:900;margin-top:10px}
-.parent-rank-box{min-width:180px;background:#f7faf8;border:1px solid var(--line);border-radius:22px;padding:16px;text-align:center}
-.parent-rank-box span{display:block;color:var(--muted);font-size:13px}
-.parent-rank-box strong{display:block;color:var(--deep);font-size:32px;margin-top:6px}
-.parent-week-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-.parent-week-box{background:#f7faf8;border:1px solid var(--line);border-radius:20px;padding:16px;text-align:center}
-.parent-week-box strong{display:block;color:var(--deep);font-size:28px}
-.parent-week-box span{display:block;color:var(--muted);font-size:12px;margin-top:6px}
-.progress-wrap{padding-top:6px}
-.progress-labels{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:10px}
-.progress-labels strong{color:var(--deep);font-size:24px}
-.progress-track{height:14px;background:#edf2ef;border-radius:999px;overflow:hidden}
-.progress-fill{height:100%;background:linear-gradient(90deg,#0f5f43,#1f8e66);border-radius:999px}
-.parent-alerts{display:grid;gap:10px}
-.parent-alert-item{display:flex;gap:12px;align-items:flex-start;background:#fff;border:1px solid var(--line);border-radius:20px;padding:14px}
-.parent-alert-item .icon{width:42px;height:42px;border-radius:14px;background:#f4f8f5;display:grid;place-items:center;flex:none}
-.parent-alert-item strong{display:block;color:var(--deep);margin-bottom:4px}
-.parent-alert-item span{display:block;color:var(--muted);line-height:1.8}
-@media (max-width:900px){
-  .parent-overview-grid,.parent-analysis-grid,.parent-actions-grid,.parent-week-grid{grid-template-columns:1fr !important}
-  .parent-hero-head{flex-direction:column}
-}
-</style>
-
-
-<style id="parent-followup-login-fix-style">
-.parent-login-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
-.parent-login-grid input{width:100%;border:1px solid var(--line);border-radius:16px;padding:14px;background:#fff;font:inherit}
-.parent-login-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
-.parent-actions-grid-strong .btn{min-height:58px;font-size:15px;font-weight:900}
-@media (max-width:900px){
-  .parent-login-grid,.parent-login-actions{grid-template-columns:1fr !important}
-}
-</style>
-
-
-<style id="oai-device-responsive-fix">
-/* auto device layout */
-body.device-mobile .app{max-width:460px}
-body.device-ipad .app{max-width:900px}
-body.device-desktop .app{max-width:1280px}
-
-body.device-mobile .screen{padding:0 14px 108px !important}
-body.device-ipad .screen{padding:0 18px 118px !important}
-body.device-desktop .screen{padding:0 22px 124px !important}
-
-/* remove top gap hard */
-html,body,.app{padding-top:0 !important;margin-top:0 !important}
-.screen,.screen.active{padding-top:0 !important;margin-top:0 !important}
-.topbar{margin-top:0 !important;padding-top:0 !important}
-.hero,.card,.teacher-shell,.teacher-hero{margin-top:0 !important}
-body::before{display:none !important}
-
-/* tab bars more visible + slide on mobile */
-.tabbar,.teacher-tabs{
-  scrollbar-width:thin;
-  scrollbar-color: rgba(16,58,46,.28) transparent;
-}
-.tabbar::-webkit-scrollbar,.teacher-tabs::-webkit-scrollbar{height:7px}
-.tabbar::-webkit-scrollbar-thumb,.teacher-tabs::-webkit-scrollbar-thumb{
-  background:rgba(16,58,46,.28);border-radius:999px
-}
-body.device-mobile .tabbar,
-body.device-mobile .teacher-tabs{
-  display:flex !important;
-  flex-wrap:nowrap !important;
-  overflow-x:auto !important;
-  overflow-y:hidden !important;
-  -webkit-overflow-scrolling:touch;
-  scroll-behavior:smooth;
-  gap:10px !important;
-  padding:4px 2px 10px !important;
-  margin-bottom:14px !important;
-  border-bottom:1px solid rgba(16,58,46,.08);
-}
-body.device-mobile .tabbar button,
-body.device-mobile .teacher-tabs button{
-  flex:0 0 auto !important;
-  white-space:nowrap !important;
-  border:1px solid rgba(16,58,46,.08) !important;
-  background:#fff !important;
-  color:var(--deep) !important;
-  box-shadow:0 8px 16px rgba(16,58,46,.06);
-}
-body.device-mobile .tabbar button.active,
-body.device-mobile .teacher-tabs button.active{
-  background:linear-gradient(135deg,var(--deep),var(--green)) !important;
-  color:#fff !important;
-  border-color:transparent !important;
-  box-shadow:0 10px 22px rgba(16,58,46,.16);
-}
-
-/* better layouts on ipad/desktop */
-body.device-ipad .teacher-grid,
-body.device-desktop .teacher-grid{grid-template-columns:repeat(2,1fr)}
-body.device-ipad .teacher-kpis{grid-template-columns:repeat(4,1fr)}
-body.device-desktop .teacher-kpis{grid-template-columns:repeat(4,1fr)}
-body.device-ipad .shortcuts{grid-template-columns:repeat(4,1fr)}
-body.device-desktop .shortcuts{grid-template-columns:repeat(4,1fr)}
-body.device-ipad .bottom-nav{width:min(760px,calc(100% - 28px))}
-body.device-desktop .bottom-nav{width:min(920px,calc(100% - 34px))}
-body.device-mobile .bottom-nav{width:min(430px,calc(100% - 18px))}
-
-/* keep sections close to top on home */
-#home .hero, #teacher_dashboard .teacher-hero, #account_choice .card:first-child,
-#student_login .card:first-child, #teacher_login .card:first-child{
-  margin-top:0 !important;
-}
-</style>
-
-
-<style id="oai-more-detail-patch-style">
-.more-detail-pro-card{padding:20px;border-radius:28px}
-.more-detail-title{margin:0 0 10px;color:var(--deep);font-size:28px}
-.more-detail-lead{margin:0 0 14px;color:var(--muted);line-height:2;font-size:15px}
-.more-detail-block{background:#fff;border:1px solid var(--line);border-radius:20px;padding:16px;margin:12px 0;box-shadow:0 8px 18px rgba(16,58,46,.05)}
-.more-detail-block h3{margin:0 0 8px;color:var(--deep);font-size:18px}
-.more-detail-block p{margin:0;line-height:2;color:var(--text)}
-.more-detail-list{display:grid;gap:12px}
-.more-detail-item{display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid var(--line);background:#fff;border-radius:20px;padding:16px;box-shadow:0 8px 18px rgba(16,58,46,.05)}
-.more-detail-item .icon{width:42px;height:42px;border-radius:14px;background:var(--mint);display:grid;place-items:center;font-size:20px}
-.more-detail-item strong{display:block;color:var(--deep);margin-bottom:4px}
-.more-detail-item span{display:block;color:var(--muted);line-height:1.8}
-</style>
-
-
-<style id="oai-more-fullpage-style">
-.more-detail-card{animation:slideInPanel .28s ease}
-.more-detail-content{display:grid;gap:14px;line-height:2}
-.more-detail-title{margin:0;color:var(--deep);font-size:22px}
-.more-detail-lead{margin:0;color:var(--muted);font-size:14px}
-.more-detail-block{background:#fff;border:1px solid var(--line);border-radius:22px;padding:16px;box-shadow:0 8px 18px rgba(16,58,46,.05)}
-.more-detail-block h3{margin:0 0 10px;color:var(--deep);font-size:16px}
-.more-detail-block p{margin:0;color:var(--text);font-size:14px;line-height:2}
-.more-detail-list{display:grid;gap:10px}
-.more-detail-item{display:flex;align-items:flex-start;gap:10px;background:#f9fbfa;border:1px solid var(--line);border-radius:18px;padding:12px 14px}
-.more-detail-item .icon{width:34px;height:34px;border-radius:12px;background:var(--mint);display:grid;place-items:center;flex:none}
-.more-detail-item strong{display:block;color:var(--deep);font-size:14px;margin-bottom:2px}
-.more-detail-item span{display:block;color:var(--muted);font-size:13px;line-height:1.9}
-</style>
-
-
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script id="math-bank-firebase-config">
-window.MATH_BANK_CLOUD_CONFIG = {
-  enabled: true,
-  firebaseConfig: {
-    apiKey: "AIzaSyDP-pi0tbF09bNRihrLz_kUs-JBoa9Cw4Y",
-    authDomain: "sara-haywire.firebaseapp.com",
-    projectId: "sara-haywire",
-    storageBucket: "sara-haywire.firebasestorage.app",
-    messagingSenderId: "333467940977",
-    appId: "1:333467940977:web:97d056d5dbff2debbf43d0"
-  },
-  collection: "math_bank",
-  docId: "shared_bank"
-};
-</script>
-<style id="math-bank-sync-badge-style">
-.sync-status-badge{
-  display:inline-flex;align-items:center;gap:8px;
-  padding:8px 12px;border-radius:999px;
-  background:#edf6f0;color:#176242;font-size:12px;font-weight:800;
-  border:1px solid #cfe9db;box-shadow:0 6px 14px rgba(16,58,46,.06)
-}
-.blue-import-btn{touch-action:manipulation}
-</style>
-
-</head><body><h1>التقرير الشامل - بنك الرياضيات</h1><div class="muted">تم إنشاؤه تلقائيًا من التقارير الذكية</div><div class="grid">${['srStudents','srClasses','srDeposits','srWithdrawals','srTransfers','srTasks','srSubmitted','srPending'].map(id=>{ const el=document.getElementById(id); const label=el&&el.nextElementSibling?el.nextElementSibling.textContent:''; return `<div class="card"><strong>${label}</strong><div style="font-size:24px;margin-top:8px">${el?el.textContent:''}</div></div>`; }).join('')}</div><div class="card"><h3>أفضل الطلاب / الطالبات</h3>${document.getElementById('smartTopStudents')?.innerHTML||''}</div><div class="card"><h3>مؤشر أداء الطالب / الطالبة</h3>${document.getElementById('smartPerformanceIndicators')?.innerHTML||''}</div><div class="card"><h3>تحليل الفصول</h3>${document.getElementById('smartClassCards')?.innerHTML||''}</div><div class="card"><h3>التنبيهات الذكية</h3>${document.getElementById('smartAlerts')?.innerHTML||''}</div>
-<style id="student-settings-pro-style">
-.student-settings-pro{margin-top:16px;display:grid;gap:14px}
-.student-settings-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
-.student-settings-head h3{margin:0;font-size:18px;color:var(--deep)}
-.student-class-cards{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-.student-class-card{background:#fff;border:1px solid var(--line);border-radius:26px;padding:18px;box-shadow:0 12px 26px rgba(16,58,46,.06);display:grid;gap:12px}
-.student-class-card h4{margin:0;font-size:18px;color:var(--deep)}
-.student-class-meta{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-.student-class-meta .mini{background:#f7faf8;border:1px solid var(--line);border-radius:18px;padding:12px;text-align:center}
-.student-class-meta strong{display:block;font-size:18px;color:var(--deep)}
-.student-class-meta span{display:block;font-size:12px;color:var(--muted);margin-top:4px}
-.student-class-actions{display:flex;gap:8px;flex-wrap:wrap}
-.student-class-actions .btn,.student-card-actions .btn,.student-bulk-actions .btn{padding:11px 12px;border-radius:16px;font-size:13px}
-.student-detail-shell{background:#fff;border:1px solid var(--line);border-radius:28px;padding:18px;box-shadow:0 12px 26px rgba(16,58,46,.06);display:grid;gap:14px}
-.student-detail-header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
-.student-detail-title h3{margin:0;font-size:20px;color:var(--deep)}
-.student-detail-title p{margin:6px 0 0;color:var(--muted);font-size:13px}
-.student-bulk-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.student-filters{display:grid;grid-template-columns:1.2fr 1fr 1fr 1fr;gap:10px}
-.student-filters input,.student-filters select{border:1px solid var(--line);background:#f8fbf9;border-radius:16px;padding:13px 14px;font-size:14px;outline:none}
-.student-cards-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
-.student-card-pro{background:linear-gradient(180deg,#fff 0%,#fbfdfc 100%);border:1px solid var(--line);border-radius:28px;padding:16px;box-shadow:0 12px 24px rgba(16,58,46,.06);display:grid;gap:12px;position:relative}
-.student-card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
-.student-card-name{font-size:22px;font-weight:900;color:var(--deep);line-height:1.4}
-.student-card-sub{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.7}
-.student-status-toggle{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
-.student-status-badge{display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:999px;font-size:12px;font-weight:900;background:#edf6f0;color:var(--green)}
-.student-status-badge.frozen{background:#fff0ef;color:#a63f3c}
-.student-card-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.student-card-metrics .metric{background:#f7faf8;border:1px solid var(--line);border-radius:18px;padding:10px;text-align:center}
-.student-card-metrics strong{display:block;font-size:16px;color:var(--deep)}
-.student-card-metrics span{display:block;font-size:11px;color:var(--muted);margin-top:4px}
-.student-card-actions{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-.student-performance-pill{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;font-size:12px;font-weight:900}
-.student-performance-pill.good{background:#eef9ef;color:#177245}
-.student-performance-pill.mid{background:#fff7e8;color:#9a6a08}
-.student-performance-pill.low{background:#fff0ef;color:#a63f3c}
-.student-empty{padding:18px;border:1px dashed var(--line);border-radius:20px;text-align:center;color:var(--muted);background:#fafcfb}
-@media(max-width:980px){.student-class-cards,.student-cards-grid{grid-template-columns:1fr}.student-bulk-actions,.student-filters{grid-template-columns:1fr 1fr}}
-@media(max-width:640px){.student-card-actions,.student-card-metrics,.student-class-meta,.student-bulk-actions,.student-filters{grid-template-columns:1fr}}
-</style>
-
-
-<script id="student-settings-pro-script">
-(function(){
-  function fmt(n){ return (typeof formatMoney==='function') ? formatMoney(Number(n||0)) : String(Number(n||0)); }
-  function getLevel(balance){ balance=Number(balance||0); return balance>=41000?'ألماسي':balance>=31000?'بلاتيني':balance>=16000?'ذهبي':balance>=11000?'فضي':'برونزي'; }
-  function levelEmoji(level){ return {برونزي:'🥉',فضي:'🥈',ذهبي:'🥇',بلاتيني:'💠',ألماسي:'💎'}[level] || '💳'; }
-  function getSubmittedCount(student){
-    if(!window.bankData || !Array.isArray(bankData.performanceTasks)) return 0;
-    return bankData.performanceTasks.filter(function(task){
-      return task.classId===student.classId && task.entries && task.entries[student.id] && task.entries[student.id].status==='submitted';
-    }).length;
-  }
-  function getDeductionCount(student){
-    return (student.history||[]).filter(function(h){ return h.type==='withdraw'; }).length;
-  }
-  function getPerformanceInfo(student){
-    const submitted = getSubmittedCount(student);
-    const deductions = getDeductionCount(student);
-    const balance = Number(student.balance||0);
-    if(balance>=8000 && submitted>=1 && deductions<=1) return {label:'ممتاز 🟢', cls:'good'};
-    if(balance>=3000 && deductions<=3) return {label:'جيد 🟡', cls:'mid'};
-    return {label:'يحتاج متابعة 🔴', cls:'low'};
-  }
-  function ensureSettingsState(){
-    if(!window.__studentSettingsState) window.__studentSettingsState = {classId:'', query:'', level:'all', status:'all'};
-    return window.__studentSettingsState;
-  }
-  function getStudentsByClassIdPro(classId){
-    return (window.bankData?.students||[]).filter(function(s){ return s.classId===classId; });
-  }
-  function buildClassStats(c){
-    const students = getStudentsByClassIdPro(c.id);
-    const total = students.reduce((a,b)=>a+Number(b.balance||0),0);
-    const active = students.filter(s=>!s.isFrozen).length;
-    const pending = students.filter(function(st){
-      return (bankData.performanceTasks||[]).some(function(task){
-        if(task.classId!==c.id) return false;
-        const e = task.entries?.[st.id];
-        return !e || (e.status!=='submitted' && e.status!=='graded');
-      });
-    }).length;
-    return {students,total,active,pending};
-  }
-  function insertStudentSettingsSection(){
-    const pane = document.getElementById('teacherPaneStudents');
-    if(!pane || document.getElementById('studentSettingsProWrap')) return;
-    const wrap = document.createElement('div');
-    wrap.id = 'studentSettingsProWrap';
-    wrap.className = 'student-settings-pro';
-    wrap.innerHTML = `
-      <div class="student-settings-head">
-        <div><h3>إعدادات الطلاب / الطالبات حسب الفصل</h3><div class="teacher-note">اختاري الفصل ثم افتحي صفحة مستقلة تعرض بطاقات الطلاب / الطالبات مع أدوات فردية وجماعية بشكل احترافي.</div></div>
-        <span class="pill">لوحة تحكم متقدمة</span>
-      </div>
-      <div id="studentClassCards" class="student-class-cards"></div>
-      <div id="studentClassDetail" class="student-detail-shell hidden"></div>`;
-    pane.appendChild(wrap);
-  }
-  function renderClassCards(){
-    const holder = document.getElementById('studentClassCards'); if(!holder || !window.bankData) return;
-    holder.innerHTML = (bankData.classes||[]).map(function(c){
-      const st = buildClassStats(c);
-      return `<div class="student-class-card">
-        <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start"><div><h4>${c.name}</h4><div class="teacher-note">عدد الطلاب / الطالبات في الفصل: ${st.students.length}</div></div><span class="pill">${st.active} نشط</span></div>
-        <div class="student-class-meta">
-          <div class="mini"><strong>${st.students.length}</strong><span>عدد الطلاب / الطالبات</span></div>
-          <div class="mini"><strong>${fmt(st.total)}</strong><span>إجمالي الأرصدة</span></div>
-          <div class="mini"><strong>${st.pending}</strong><span>مهام غير مسلّمة</span></div>
-          <div class="mini"><strong>${st.students.filter(s=>Number(s.balance||0)>=11000).length}</strong><span>قريبون من الترقية</span></div>
-        </div>
-        <div class="student-class-actions">
-          <button class="btn btn-green" onclick="openStudentSettingsClass('${c.id}')">فتح الفصل</button>
-          <button class="btn btn-gold" onclick="bulkClassMessage('${c.id}')">رسالة جماعية</button>
-        </div>
-      </div>`;
-    }).join('') || '<div class="student-empty">لا توجد فصول بعد. أضيفي فصلًا جديدًا أولًا.</div>';
-  }
-  function renderClassDetail(){
-    const detail = document.getElementById('studentClassDetail'); if(!detail || !window.bankData) return;
-    const state = ensureSettingsState();
-    if(!state.classId){ detail.classList.add('hidden'); detail.innerHTML=''; return; }
-    const cls = (bankData.classes||[]).find(c=>c.id===state.classId);
-    if(!cls){ detail.classList.add('hidden'); detail.innerHTML=''; return; }
-    const students = getStudentsByClassIdPro(cls.id).filter(function(s){
-      const q = (state.query||'').trim();
-      const levelOk = state.level==='all' || getLevel(s.balance)===state.level;
-      const statusOk = state.status==='all' || (state.status==='active' ? !s.isFrozen : s.isFrozen);
-      const queryOk = !q || (s.name||'').includes(q) || (s.username||'').includes(q) || (s.account||'').includes(q);
-      return levelOk && statusOk && queryOk;
-    });
-    const stats = buildClassStats(cls);
-    detail.classList.remove('hidden');
-    detail.classList.add('page-mode');
-    detail.innerHTML = `
-      <div class="student-detail-header">
-        <div class="student-detail-title"><h3>${cls.name}</h3><p>صفحة مستقلة لإدارة الطلاب / الطالبات داخل الفصل مع أدوات جماعية وأزرار خاصة بكل طالب / طالبة.</p></div>
-        <button class="ghost" onclick="closeStudentSettingsClass()">رجوع إلى الفصول</button>
-      </div>
-      <div class="teacher-mini-kpis">
-        <div class="teacher-mini-kpi"><strong>${stats.students.length}</strong><span>عدد الطلاب / الطالبات</span></div>
-        <div class="teacher-mini-kpi"><strong>${fmt(stats.total)}</strong><span>إجمالي الأرصدة</span></div>
-        <div class="teacher-mini-kpi"><strong>${stats.pending}</strong><span>غير مسلّمين المهمة</span></div>
-      </div>
-      <div class="student-bulk-actions">
-        <button class="btn btn-green" onclick="quickClassOperation('${cls.id}','deposit')">إيداع للفصل كامل</button>
-        <button class="btn btn-gold" onclick="quickClassOperation('${cls.id}','withdraw')">خصم للفصل كامل</button>
-        <button class="btn btn-green" onclick="assignTaskToClassFromSettings('${cls.id}')">إرسال مهمة للفصل كامل</button>
-        <button class="btn btn-gold" onclick="bulkClassMessage('${cls.id}')">رسالة لولي الأمر للفصل كامل</button>
-        <button class="btn btn-light" onclick="printClassReport('${cls.id}')">تصدير تقرير الفصل</button>
-        <button class="btn ${cls.isDisabled?'btn-green':'btn-gold'}" onclick="toggleClassEnabled('${cls.id}')">${cls.isDisabled?'تفعيل الفصل':'إيقاف الفصل'}</button>
-      </div>
-      <div class="student-filters">
-        <input id="studentSettingsSearch" type="text" value="${(state.query||'').replace(/"/g,'&quot;')}" placeholder="بحث باسم الطالب / الطالبة أو اسم المستخدم" oninput="updateStudentSettingsFilters()">
-        <select id="studentSettingsLevel" onchange="updateStudentSettingsFilters()"><option value="all">كل المستويات</option><option value="برونزي" ${state.level==='برونزي'?'selected':''}>برونزي</option><option value="فضي" ${state.level==='فضي'?'selected':''}>فضي</option><option value="ذهبي" ${state.level==='ذهبي'?'selected':''}>ذهبي</option><option value="بلاتيني" ${state.level==='بلاتيني'?'selected':''}>بلاتيني</option><option value="ألماسي" ${state.level==='ألماسي'?'selected':''}>ألماسي</option></select>
-        <select id="studentSettingsStatus" onchange="updateStudentSettingsFilters()"><option value="all">كل الحالات</option><option value="active" ${state.status==='active'?'selected':''}>الحسابات المفعلة</option><option value="frozen" ${state.status==='frozen'?'selected':''}>الحسابات الموقوفة</option></select>
-        <div class="student-status-badge">الأزرار أدناه خاصة بكل طالب / طالبة</div>
-      </div>
-      <div id="studentCardsGrid" class="student-cards-grid">${students.map(renderStudentCard).join('') || '<div class="student-empty">لا توجد نتائج مطابقة داخل هذا الفصل.</div>'}</div>`;
-  }
-  function renderStudentCard(student){
-    const level = getLevel(student.balance);
-    const perf = getPerformanceInfo(student);
-    const submitted = getSubmittedCount(student);
-    const deductions = getDeductionCount(student);
-    const status = student.isFrozen ? 'موقوف' : 'مفعل';
-    return `<div class="student-card-pro">
-      <div class="student-card-top">
-        <div>
-          <div class="student-card-name">${student.name}</div>
-          <div class="student-card-sub">${levelEmoji(level)} ${level} • الرصيد: ${fmt(student.balance)} ر.س<br>PIN: ${student.password || '—'}<br>ولي الأمر: ${student.guardian || '—'}</div>
-        </div>
-        <div style="display:grid;gap:8px;justify-items:end">
-          <span class="student-status-badge ${student.isFrozen?'frozen':''}">${status}</span>
-          <span class="student-performance-pill ${perf.cls}">${perf.label}</span>
-        </div>
-      </div>
-      <div class="student-card-metrics">
-        <div class="metric"><strong>${fmt(student.balance)}</strong><span>الرصيد</span></div>
-        <div class="metric"><strong>${submitted}</strong><span>المهام المسلّمة</span></div>
-        <div class="metric"><strong>${deductions}</strong><span>عدد الخصومات</span></div>
-      </div>
-      <div class="student-card-actions">
-        <button class="btn btn-green" onclick="openStudentFromSettings('${student.id}')">دخول الطالب / الطالبة</button>
-        <button class="btn btn-light" onclick="openStudentStatement('${student.id}')">كشف الحساب</button>
-        <button class="btn btn-gold" onclick="quickStudentOperation('${student.id}')">عملية سريعة</button>
-        <button class="btn btn-light" onclick="addStudentNote('${student.id}')">ملاحظة</button>
-        <button class="btn btn-light" onclick="showStudentTasksSummary('${student.id}')">المهام</button>
-        <button class="btn btn-light" onclick="markAttendanceForStudent('${student.id}')">الحضور</button>
-        <button class="btn btn-green" onclick="sendRewardToStudent('${student.id}')">مكافأة</button>
-        <button class="btn btn-gold" onclick="messageGuardianFromSettings('${student.id}')">رسالة ولي الأمر</button>
-        <button class="btn btn-light" onclick="changeStudentPasswordFromSettings('${student.id}')">تغيير كلمة المرور</button>
-        <button class="btn btn-light" onclick="printStudentReport('${student.id}')">تقرير PDF</button>
-        <button class="btn ${student.isFrozen?'btn-green':'btn-gold'}" onclick="toggleStudentFreeze('${student.id}')">${student.isFrozen?'تفعيل الحساب':'تجميد الحساب'}</button>
-        <button class="btn" style="background:#c4002f;color:#fff" onclick="deleteStudentFromSettings('${student.id}')">حذف الطالب / الطالبة</button>
-      </div>
-    </div>`;
-  }
-  function ensureHistory(st){ if(!Array.isArray(st.history)) st.history=[]; return st.history; }
-  function addHistory(st, type, amount, reason){
-    const now = new Date();
-    ensureHistory(st).push({id:'h'+Date.now()+Math.random().toString(16).slice(2,6), type:type, amount:Number(amount||0), reason:reason||'', date: now.toLocaleDateString('en-CA')+' '+now.toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'})});
-  }
-  window.openStudentSettingsClass = function(classId){ const state = ensureSettingsState(); state.classId = classId; renderClassDetail(); };
-  window.closeStudentSettingsClass = function(){ const state = ensureSettingsState(); state.classId=''; renderClassDetail(); };
-  window.updateStudentSettingsFilters = function(){
-    const state = ensureSettingsState();
-    state.query = document.getElementById('studentSettingsSearch')?.value || '';
-    state.level = document.getElementById('studentSettingsLevel')?.value || 'all';
-    state.status = document.getElementById('studentSettingsStatus')?.value || 'all';
-    renderClassDetail();
-  };
-  window.bulkClassMessage = function(classId){
-    const text = prompt('اكتبي رسالة جماعية لأولياء أمور الفصل:');
-    if(!text || !window.bankData) return;
-    (bankData.students||[]).filter(s=>s.classId===classId && s.guardian).forEach(function(s, idx){
-      setTimeout(function(){ if(typeof openWhatsAppNumber==='function') openWhatsAppNumber(s.guardian, text.replace('{الطالب / الطالبة}', s.name)); }, idx*250);
-    });
-  };
-  window.quickClassOperation = function(classId, type){
-    const amount = Number(prompt(type==='deposit'?'مبلغ الإيداع للفصل كامل':'مبلغ الخصم للفصل كامل') || 0);
-    if(!(amount>0)) return;
-    const reason = prompt('اكتبي السبب:') || (type==='deposit'?'مكافأة جماعية':'خصم جماعي');
-    (bankData.students||[]).filter(s=>s.classId===classId).forEach(function(st){
-      st.balance = Math.max(0, Number(st.balance||0) + (type==='deposit'? amount : -amount));
-      addHistory(st, type==='deposit'?'deposit':'withdraw', amount, reason);
-      bankData.operations.push({id:'op'+Date.now()+Math.random().toString(16).slice(2,6), studentId:st.id, studentName:st.name, type:type==='deposit'?'deposit':'withdraw', amount:amount, reason:reason, date:new Date().toLocaleDateString('en-CA')});
-    });
-    saveBankData();
-    refreshTeacherUI();
-    alert('تم تنفيذ العملية على طلاب / طالبات الفصل.');
-  };
-  window.assignTaskToClassFromSettings = function(classId){
-    const btn = Array.from(document.querySelectorAll('#teacherTabs button')).find(function(b){ return b.textContent.includes('المهام الأدائية'); });
-    if(typeof showTeacherPane==='function') showTeacherPane('teacherPanePerformance', btn||null);
-    setTimeout(function(){ const sel=document.getElementById('perfTaskClassSelect'); if(sel){ sel.value = classId; sel.dispatchEvent(new Event('change')); } }, 80);
-  };
-  window.toggleClassEnabled = function(classId){
-    const cls = (bankData.classes||[]).find(c=>c.id===classId); if(!cls) return;
-    cls.isDisabled = !cls.isDisabled; saveBankData(); refreshTeacherUI();
-  };
-  window.openStudentFromSettings = function(studentId){
-    if(!window.getStudent) return;
-    const st = getStudent(studentId); if(!st) return;
-    sessionStorage.setItem('currentStudentId', st.id); sessionStorage.setItem('studentLogged','1');
-    if(typeof go==='function') go('account');
-    setTimeout(function(){ if(typeof renderStudentAccount==='function') renderStudentAccount(); }, 80);
-  };
-  window.openStudentStatement = function(studentId){
-    openStudentFromSettings(studentId);
-    setTimeout(function(){
-      const btn = Array.from(document.querySelectorAll('#account .tabbar button')).find(function(b){ return b.textContent.includes('كشف الحساب'); });
-      if(btn) btn.click();
-    }, 120);
-  };
-  window.quickStudentOperation = function(studentId){
-    const st = getStudent(studentId); if(!st) return;
-    const type = prompt('اكتبي نوع العملية: deposit للإيداع أو withdraw للخصم','deposit');
-    if(!type || !['deposit','withdraw'].includes(type)) return;
-    const amount = Number(prompt('المبلغ') || 0); if(!(amount>0)) return;
-    const reason = prompt('السبب') || (type==='deposit'?'عملية سريعة':'خصم سريع');
-    st.balance = Math.max(0, Number(st.balance||0) + (type==='deposit'?amount:-amount));
-    addHistory(st,type,amount,reason);
-    bankData.operations.push({id:'op'+Date.now(), studentId:st.id, studentName:st.name, type:type, amount:amount, reason:reason, date:new Date().toLocaleDateString('en-CA')});
-    saveBankData(); refreshTeacherUI();
-  };
-  window.addStudentNote = function(studentId){
-    const st = getStudent(studentId); if(!st) return;
-    const note = prompt('أضيفي ملاحظة للطالب / الطالبة:'); if(!note) return;
-    if(!Array.isArray(st.notes)) st.notes = [];
-    st.notes.unshift({id:'n'+Date.now(), text:note, date:new Date().toLocaleDateString('ar-SA')});
-    saveBankData(); alert('تم حفظ الملاحظة.');
-  };
-  window.showStudentTasksSummary = function(studentId){
-    const st = getStudent(studentId); if(!st) return;
-    const tasks = (bankData.performanceTasks||[]).filter(t=>t.classId===st.classId);
-    const lines = tasks.map(function(t){ const e=t.entries?.[st.id]||{}; return `${t.title} — ${e.status==='graded'?'مقيمة':e.status==='submitted'?'تم التسليم':'بانتظار التسليم'}`; });
-    alert(lines.length ? lines.join('\n') : 'لا توجد مهام أدائية حالياً لهذا الطالب / لهذه الطالبة.');
-  };
-  window.markAttendanceForStudent = function(studentId){
-    const st = getStudent(studentId); if(!st) return;
-    const status = prompt('اكتبي حالة الحضور: حاضر / غياب / استئذان','حاضر'); if(!status) return;
-    st.attendanceStatus = status; saveBankData(); alert('تم حفظ حالة الحضور.');
-  };
-  window.sendRewardToStudent = function(studentId){
-    const st = getStudent(studentId); if(!st) return;
-    const amount = Number(prompt('مبلغ المكافأة') || 0); if(!(amount>0)) return;
-    const reason = prompt('سبب المكافأة') || 'مكافأة تميز';
-    st.balance = Number(st.balance||0) + amount; addHistory(st,'deposit',amount,reason);
-    bankData.operations.push({id:'op'+Date.now(), studentId:st.id, studentName:st.name, type:'deposit', amount:amount, reason:reason, date:new Date().toLocaleDateString('en-CA')});
-    saveBankData(); refreshTeacherUI();
-  };
-  window.messageGuardianFromSettings = function(studentId){
-    const st = getStudent(studentId); if(!st || !st.guardian) return alert('لا يوجد رقم ولي أمر محفوظ.');
-    const text = prompt('اكتبي رسالة ولي الأمر:','تنبيه من بنك الرياضيات\nالطالب / الطالبة: '+st.name); if(!text) return;
-    if(typeof openWhatsAppNumber==='function') openWhatsAppNumber(st.guardian, text);
-  };
-  window.changeStudentPasswordFromSettings = function(studentId){
-    const st = getStudent(studentId); if(!st) return;
-    const pass = prompt('كلمة المرور الجديدة:', st.password || ''); if(!pass) return;
-    st.password = pass; saveBankData(); refreshTeacherUI();
-  };
-  
-
-function openPrintWindow(title, bodyHtml){
-  const w = window.open('', '_blank');
-  if(!w) return;
-  const printHtml = `<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-<meta charset="UTF-8">
-<title></title>
-<style>
-  body{font-family:Arial,sans-serif;padding:24px;color:#183229}
-  h1{margin-top:0}
-  table{width:100%;border-collapse:collapse;margin-top:16px}
-  td,th{border:1px solid #ddd;padding:8px;text-align:right}
-  .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}
-</style>
-
-<style id="oai-more-fullpage-style">
-.more-detail-card{animation:slideInPanel .28s ease}
-.more-detail-content{display:grid;gap:14px;line-height:2}
-.more-detail-title{margin:0;color:var(--deep);font-size:22px}
-.more-detail-lead{margin:0;color:var(--muted);font-size:14px}
-.more-detail-block{background:#fff;border:1px solid var(--line);border-radius:22px;padding:16px;box-shadow:0 8px 18px rgba(16,58,46,.05)}
-.more-detail-block h3{margin:0 0 10px;color:var(--deep);font-size:16px}
-.more-detail-block p{margin:0;color:var(--text);font-size:14px;line-height:2}
-.more-detail-list{display:grid;gap:10px}
-.more-detail-item{display:flex;align-items:flex-start;gap:10px;background:#f9fbfa;border:1px solid var(--line);border-radius:18px;padding:12px 14px}
-.more-detail-item .icon{width:34px;height:34px;border-radius:12px;background:var(--mint);display:grid;place-items:center;flex:none}
-.more-detail-item strong{display:block;color:var(--deep);font-size:14px;margin-bottom:2px}
-.more-detail-item span{display:block;color:var(--muted);font-size:13px;line-height:1.9}
-</style>
-
-
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script id="math-bank-firebase-config">
-window.MATH_BANK_CLOUD_CONFIG = {
-  enabled: true,
-  firebaseConfig: {
-    apiKey: "AIzaSyDP-pi0tbF09bNRihrLz_kUs-JBoa9Cw4Y",
-    authDomain: "sara-haywire.firebaseapp.com",
-    projectId: "sara-haywire",
-    storageBucket: "sara-haywire.firebasestorage.app",
-    messagingSenderId: "333467940977",
-    appId: "1:333467940977:web:97d056d5dbff2debbf43d0"
-  },
-  collection: "math_bank",
-  docId: "shared_bank"
-};
-</script>
-<style id="math-bank-sync-badge-style">
-.sync-status-badge{
-  display:inline-flex;align-items:center;gap:8px;
-  padding:8px 12px;border-radius:999px;
-  background:#edf6f0;color:#176242;font-size:12px;font-weight:800;
-  border:1px solid #cfe9db;box-shadow:0 6px 14px rgba(16,58,46,.06)
-}
-.blue-import-btn{touch-action:manipulation}
-</style>
-
-</head>
-<body>
-  <h1></h1>
-  
-
-<script id="oai-more-fullpage-script">
-function goBackFromMoreDetail(){
-  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
-  var listScreen = document.getElementById('more');
-  if(listScreen) listScreen.classList.add('active');
-  window.scrollTo({top:0, behavior:'auto'});
-}
-
-function openMoreInfo(type){
-  var data = {
-    about:{
-      title:'من نحن',
-      sub:'نبذة عن بنك الرياضيات',
-      html:`
-        <h2 class="more-detail-title">من نحن</h2>
-        <p class="more-detail-lead">بنك الرياضيات منصة تعليمية تحفيزية تهدف إلى تعزيز مشاركة الطلاب داخل الحصة الدراسية من خلال نظام نقاط مستوحى من الأنظمة المصرفية.</p>
-        <div class="more-detail-block"><p>يمنح البنك الطلاب رصيدًا تحفيزيًا مقابل المشاركة والإنجاز والالتزام، مما يسهم في تنمية روح التنافس الإيجابي وتحفيز التعلم بطريقة ممتعة ومبتكرة.</p></div>
-        <div class="more-detail-block"><h3>الإشراف</h3><p>يشرف على بنك الرياضيات الأستاذة سارة حقوي.</p></div>
-      `
-    },
-    contact:{
-      title:'اتصل بنا',
-      sub:'قنوات التواصل الرسمية',
-      html:`
-        <h2 class="more-detail-title">اتصل بنا</h2>
-        <p class="more-detail-lead">للاستفسارات أو الملاحظات يمكنكم التواصل مع إدارة بنك الرياضيات عبر الوسائل التالية:</p>
-        <div class="more-detail-list">
-          <div class="more-detail-item"><div class="icon">📞</div><div><strong>خدمة الطلاب وأولياء الأمور</strong><span>0502234335</span></div></div>
-          <div class="more-detail-item"><div class="icon">☎️</div><div><strong>الإدارة العامة</strong><span>0556891201</span></div></div>
-          <div class="more-detail-item"><div class="icon">✉️</div><div><strong>البريد الإلكتروني</strong><span>Saramathss@hotmail.com</span></div></div>
-          <div class="more-detail-item"><div class="icon">🏫</div><div><strong>الموقع</strong><span>مدرسة رواد الشرق الأهلية</span></div></div>
-        </div>
-      `
-    },
-    settings:{
-      title:'الإعدادات',
-      sub:'إدارة الحساب والبيانات',
-      html:`
-        <h2 class="more-detail-title">الإعدادات</h2>
-        <p class="more-detail-lead">تتيح هذه الصفحة إدارة إعدادات الحساب داخل نظام بنك الرياضيات.</p>
-        <div class="more-detail-list">
-          <div class="more-detail-item"><div class="icon">🔐</div><div><strong>تغيير كلمة المرور</strong><span>تحديث كلمة المرور لحماية الحساب.</span></div></div>
-          <div class="more-detail-item"><div class="icon">👤</div><div><strong>تعديل بيانات الحساب</strong><span>مراجعة اسم المستخدم والبيانات الأساسية.</span></div></div>
-          <div class="more-detail-item"><div class="icon">🔔</div><div><strong>إدارة الإشعارات</strong><span>التحكم في التنبيهات داخل النظام.</span></div></div>
-          <div class="more-detail-item"><div class="icon">🚪</div><div><strong>تسجيل الخروج</strong><span>إنهاء الجلسة الحالية بأمان.</span></div></div>
-        </div>
-      `
-    },
-    privacy:{
-      title:'سياسة الخصوصية',
-      sub:'استخدام البيانات داخل النظام',
-      html:`
-        <h2 class="more-detail-title">سياسة الخصوصية</h2>
-        <div class="more-detail-block"><p>يحرص بنك الرياضيات على حماية خصوصية بيانات الطلاب وأولياء الأمور.</p></div>
-        <div class="more-detail-block"><p>يتم استخدام المعلومات داخل النظام لأغراض تعليمية فقط، ولا يتم مشاركة أي بيانات خارج إطار المدرسة أو الجهات التعليمية المعنية.</p></div>
-      `
-    },
-    disclaimer:{
-      title:'إخلاء المسؤولية',
-      sub:'تنويه حول طبيعة النظام',
-      html:`
-        <h2 class="more-detail-title">إخلاء المسؤولية</h2>
-        <div class="more-detail-block"><p>بنك الرياضيات نظام تحفيزي تعليمي يهدف إلى تشجيع الطلاب على المشاركة والتفاعل داخل الحصة الدراسية.</p></div>
-        <div class="more-detail-block"><p>النقاط والأرصدة المستخدمة داخل النظام هي لأغراض تعليمية وتحفيزية فقط، ولا تمثل أي قيمة مالية حقيقية.</p></div>
-      `
-    },
-    terms:{
-      title:'الأحكام والشروط',
-      sub:'ضوابط استخدام بنك الرياضيات',
-      html:`
-        <h2 class="more-detail-title">الأحكام والشروط</h2>
-        <div class="more-detail-block"><p>يهدف بنك الرياضيات إلى تعزيز بيئة تعليمية محفزة داخل الفصل الدراسي.</p></div>
-        <div class="more-detail-block"><p>يتم منح النقاط للطلاب وفق معايير تعليمية يحددها المعلم، ويُستخدم النظام كوسيلة تعليمية لتحفيز المشاركة والانضباط وتحقيق التميز.</p></div>
-      `
-    }
-  };
-
-  var item = data[type];
-  if(!item) return;
-
-  var title = document.getElementById('moreDetailTitle');
-  var sub = document.getElementById('moreDetailSub');
-  var content = document.getElementById('moreDetailContent');
-
-  if(title) title.textContent = item.title;
-  if(sub) sub.textContent = item.sub;
-  if(content) content.innerHTML = item.html;
-
-  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
-  var detailScreen = document.getElementById('more_detail');
-  if(detailScreen) detailScreen.classList.add('active');
-  window.scrollTo({top:0, behavior:'auto'});
-}
-</script>
-
-
-<script id="oai-more-override-final">
-function openMoreInfo(type){
-  var data = {
-    about:{title:'من نحن',sub:'نبذة عن بنك الرياضيات',html:`<h2 class="more-detail-title">من نحن</h2><p class="more-detail-lead">بنك الرياضيات منصة تعليمية تحفيزية تهدف إلى تعزيز مشاركة الطلاب داخل الحصة الدراسية من خلال نظام نقاط مستوحى من الأنظمة المصرفية.</p><div class="more-detail-block"><p>يمنح البنك الطلاب رصيدًا تحفيزيًا مقابل المشاركة والإنجاز والالتزام، مما يسهم في تنمية روح التنافس الإيجابي وتحفيز التعلم بطريقة ممتعة ومبتكرة.</p></div><div class="more-detail-block"><h3>الإشراف</h3><p>يشرف على بنك الرياضيات الأستاذة سارة حقوي.</p></div>`},
-    contact:{title:'اتصل بنا',sub:'قنوات التواصل الرسمية',html:`<h2 class="more-detail-title">اتصل بنا</h2><p class="more-detail-lead">للاستفسارات أو الملاحظات يمكنكم التواصل مع إدارة بنك الرياضيات عبر الوسائل التالية:</p><div class="more-detail-list"><div class="more-detail-item"><div class="icon">📞</div><div><strong>خدمة الطلاب وأولياء الأمور</strong><span>0502234335</span></div></div><div class="more-detail-item"><div class="icon">☎️</div><div><strong>الإدارة العامة</strong><span>0556891201</span></div></div><div class="more-detail-item"><div class="icon">✉️</div><div><strong>البريد الإلكتروني</strong><span>Saramathss@hotmail.com</span></div></div><div class="more-detail-item"><div class="icon">🏫</div><div><strong>الموقع</strong><span>مدرسة رواد الشرق الأهلية</span></div></div></div>`},
-    settings:{title:'الإعدادات',sub:'إدارة الحساب والبيانات',html:`<h2 class="more-detail-title">الإعدادات</h2><p class="more-detail-lead">تتيح هذه الصفحة إدارة إعدادات الحساب داخل نظام بنك الرياضيات.</p><div class="more-detail-list"><div class="more-detail-item"><div class="icon">🔐</div><div><strong>تغيير كلمة المرور</strong><span>تحديث كلمة المرور لحماية الحساب.</span></div></div><div class="more-detail-item"><div class="icon">👤</div><div><strong>تعديل بيانات الحساب</strong><span>مراجعة اسم المستخدم والبيانات الأساسية.</span></div></div><div class="more-detail-item"><div class="icon">🔔</div><div><strong>إدارة الإشعارات</strong><span>التحكم في التنبيهات داخل النظام.</span></div></div><div class="more-detail-item"><div class="icon">🚪</div><div><strong>تسجيل الخروج</strong><span>إنهاء الجلسة الحالية بأمان.</span></div></div></div>`},
-    privacy:{title:'سياسة الخصوصية',sub:'استخدام البيانات داخل النظام',html:`<h2 class="more-detail-title">سياسة الخصوصية</h2><div class="more-detail-block"><p>يحرص بنك الرياضيات على حماية خصوصية بيانات الطلاب وأولياء الأمور.</p></div><div class="more-detail-block"><p>يتم استخدام المعلومات داخل النظام لأغراض تعليمية فقط، ولا يتم مشاركة أي بيانات خارج إطار المدرسة أو الجهات التعليمية المعنية.</p></div>`},
-    disclaimer:{title:'إخلاء المسؤولية',sub:'تنويه حول طبيعة النظام',html:`<h2 class="more-detail-title">إخلاء المسؤولية</h2><div class="more-detail-block"><p>بنك الرياضيات نظام تحفيزي تعليمي يهدف إلى تشجيع الطلاب على المشاركة والتفاعل داخل الحصة الدراسية.</p></div><div class="more-detail-block"><p>النقاط والأرصدة المستخدمة داخل النظام هي لأغراض تعليمية وتحفيزية فقط، ولا تمثل أي قيمة مالية حقيقية.</p></div>`},
-    terms:{title:'الأحكام والشروط',sub:'ضوابط استخدام بنك الرياضيات',html:`<h2 class="more-detail-title">الأحكام والشروط</h2><div class="more-detail-block"><p>يهدف بنك الرياضيات إلى تعزيز بيئة تعليمية محفزة داخل الفصل الدراسي.</p></div><div class="more-detail-block"><p>يتم منح النقاط للطلاب وفق معايير تعليمية يحددها المعلم، ويُستخدم النظام كوسيلة تعليمية لتحفيز المشاركة والانضباط وتحقيق التميز.</p></div>`}
-  };
-  var item = data[type];
-  if(!item) return;
-  var title = document.getElementById('moreDetailTitle');
-  var sub = document.getElementById('moreDetailSub');
-  var content = document.getElementById('moreDetailContent');
-  if(title) title.textContent = item.title;
-  if(sub) sub.textContent = item.sub;
-  if(content) content.innerHTML = item.html;
-  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
-  var detailScreen = document.getElementById('more_detail');
-  if(detailScreen) detailScreen.classList.add('active');
-  window.scrollTo({top:0, behavior:'auto'});
-}
-</script>
-
-
-<script id="math-bank-live-sync-script">
-(function(){
-  let db = null;
-  let ready = false;
-  let applyingRemote = false;
-  let listenerStarted = false;
-
-  function cfg(){ return window.MATH_BANK_CLOUD_CONFIG || {}; }
-
-  function setStatus(text, ok){
-    const el = document.getElementById('syncStatusBadge');
-    if(!el) return;
-    el.textContent = text;
-    el.style.background = ok ? '#edf6f0' : '#fff7e8';
-    el.style.color = ok ? '#176242' : '#9a6a15';
-    el.style.borderColor = ok ? '#cfe9db' : '#f1dfb5';
-  }
-
-  function getLocalData(){
-    try{
-      if(typeof bankData !== 'undefined' && bankData) return JSON.parse(JSON.stringify(bankData));
-    }catch(e){}
-    try{
-      const raw = localStorage.getItem('greenBankTeacherData_v1') || localStorage.getItem('bankData_v10');
-      if(raw) return JSON.parse(raw);
-    }catch(e){}
-    return null;
-  }
-
-  function saveLocalData(data){
-    if(!data) return;
-    try{
-      window.bankData = data;
-      if(typeof bankData !== 'undefined'){ bankData = data; }
-    }catch(e){}
-    try{ localStorage.setItem('greenBankTeacherData_v1', JSON.stringify(data)); }catch(e){}
-    try{ localStorage.setItem('bankData_v10', JSON.stringify(data)); }catch(e){}
-  }
-
-  function refreshUI(){
-    try{ if(typeof refreshTeacherUI === 'function') refreshTeacherUI(); }catch(e){}
-    try{ if(typeof renderTeacher === 'function') renderTeacher(); }catch(e){}
-    try{ if(typeof renderStudentAccount === 'function') renderStudentAccount(); }catch(e){}
-    try{ if(typeof updateParentFollowup === 'function') updateParentFollowup(); }catch(e){}
-    try{ if(typeof updateHonorBoard === 'function') updateHonorBoard(); }catch(e){}
-    try{ if(typeof renderLeaderboard === 'function') renderLeaderboard(); }catch(e){}
-    try{ if(typeof renderClassCards === 'function') renderClassCards(); }catch(e){}
-    try{ if(typeof renderClassDetail === 'function') renderClassDetail(); }catch(e){}
-  }
-
-  async function initFirebase(){
-    if(ready) return true;
-    try{
-      const c = cfg();
-      if(!c.enabled) return false;
-      if(!firebase.apps.length){
-        firebase.initializeApp(c.firebaseConfig);
-      }
-      db = firebase.firestore();
-      ready = true;
-      setStatus('☁️ المزامنة مفعلة', true);
-      return true;
-    }catch(err){
-      console.warn(err);
-      setStatus('⚠️ تعذر تفعيل المزامنة', false);
-      return false;
-    }
-  }
-
-  async function pushToCloud(data){
-    if(applyingRemote) return false;
-    if(!await initFirebase()) return false;
-    try{
-      const c = cfg();
-      await db.collection(c.collection).doc(c.docId).set({
-        bankData: data,
-        updatedAt: Date.now()
-      }, {merge:true});
-      setStatus('☁️ تم تحديث جميع الأجهزة', true);
-      return true;
-    }catch(err){
-      console.warn(err);
-      setStatus('⚠️ فشل رفع التحديث', false);
-      return false;
-    }
-  }
-
-  async function pullFromCloud(){
-    if(!await initFirebase()) return null;
-    try{
-      const c = cfg();
-      const snap = await db.collection(c.collection).doc(c.docId).get();
-      if(!snap.exists) return null;
-      const data = snap.data() || {};
-      return data.bankData || null;
-    }catch(err){
-      console.warn(err);
-      return null;
-    }
-  }
-
-  async function startRealtime(){
-    if(listenerStarted) return;
-    if(!await initFirebase()) return;
-    listenerStarted = true;
-    const c = cfg();
-    db.collection(c.collection).doc(c.docId).onSnapshot(function(snap){
-      if(!snap.exists) return;
-      const data = snap.data() || {};
-      if(!data.bankData) return;
-      applyingRemote = true;
-      saveLocalData(data.bankData);
-      refreshUI();
-      applyingRemote = false;
-      setStatus('☁️ تم جلب آخر تحديث', true);
-    }, function(err){
-      console.warn(err);
-    });
-  }
-
-  const oldSave = window.saveBankData;
-  if(typeof oldSave === 'function'){
-    window.saveBankData = function(){
-      const out = oldSave.apply(this, arguments);
-      const data = getLocalData();
-      if(data) pushToCloud(data);
-      return out;
+    return {
+      total: total,
+      submitted: submitted,
+      pending: Math.max(0, total - submitted),
+      avg: scored ? Math.round((scoreSum / (scored * Number(task.maxScore || 20))) * 100) : 0
     };
   }
 
-  window.cloudPushNow = async function(){
-    const data = getLocalData();
-    if(data) await pushToCloud(data);
+  window.renderSmartReports = function(){
+    var data = window.bankData;
+    if(!data) return;
+
+    var students = data.students || [];
+    var classes = data.classes || [];
+    var ops = data.operations || [];
+    var tasks = data.performanceTasks || [];
+    var dep = 0, wd = 0, tr = 0;
+
+    ops.forEach(function(op){
+      var a = Number(op.amount || 0);
+      if(op.type === 'deposit') dep += a;
+      else if(op.type === 'withdraw') wd += a;
+      else if(op.type === 'transfer') tr += a;
+    });
+
+    var submitted = 0, pending = 0, avgSum = 0, avgCount = 0;
+    var bestTaskName = '—', bestRate = -1;
+
+    tasks.forEach(function(t){
+      var s = getTaskStats(t);
+      submitted += s.submitted;
+      pending += s.pending;
+      if(s.avg > 0){ avgSum += s.avg; avgCount++; }
+      var rate = s.total ? (s.submitted / s.total) * 100 : 0;
+      if(rate > bestRate){ bestRate = rate; bestTaskName = t.title || '—'; }
+    });
+
+    function setText(id, val){
+      var el = document.getElementById(id);
+      if(el) el.textContent = val;
+    }
+
+    setText('srStudents', students.length);
+    setText('srClasses', classes.length);
+    setText('srDeposits', money(dep));
+    setText('srWithdrawals', money(wd));
+    setText('srTransfers', money(tr));
+    setText('srTasks', tasks.length);
+    setText('srSubmitted', submitted);
+    setText('srPending', pending);
+    setText('srAvgScore', (avgCount ? Math.round(avgSum / avgCount) : 0) + '%');
+    setText('srBestTask', bestTaskName);
+
+    var classWrap = document.getElementById('smartClassCards');
+    if(classWrap){
+      if(!classes.length){
+        classWrap.innerHTML = '<div class="performance-empty">لا توجد فصول مضافة بعد.</div>';
+      }else{
+        classWrap.innerHTML = classes.map(function(cls){
+          var clsStudents = students.filter(function(s){ return s.classId === cls.id; });
+          var avgBal = clsStudents.length ? Math.round(clsStudents.reduce(function(a,s){ return a + Number(s.balance || 0); }, 0) / clsStudents.length) : 0;
+          var top = clsStudents.slice().sort(function(a,b){ return Number(b.balance || 0) - Number(a.balance || 0); })[0];
+          var clsTasks = tasks.filter(function(t){ return t.classId === cls.id; });
+          var clsSub = 0, clsPend = 0;
+          clsTasks.forEach(function(t){ var st = getTaskStats(t); clsSub += st.submitted; clsPend += st.pending; });
+          return '<div class="smart-class-card"><div class="top"><strong>' + esc(cls.name || '—') + '</strong><span class="pill">' + clsStudents.length + ' طالبة</span></div><div class="meta">متوسط الرصيد: ' + money(avgBal) + ' ر.س<br>أعلى طالب / طالبة: ' + esc(top ? top.name : '—') + '<br>تم التسليم: ' + clsSub + ' • لم يتم: ' + clsPend + '</div></div>';
+        }).join('');
+      }
+    }
+
+    var topWrap = document.getElementById('smartTopStudents');
+    if(topWrap){
+      var ranked = students.slice().sort(function(a,b){ return Number(b.balance || 0) - Number(a.balance || 0); }).slice(0,5);
+      topWrap.innerHTML = ranked.length ? ranked.map(function(st, i){
+        return '<div class="smart-top-item"><div style="display:flex;align-items:center;gap:10px"><div class="smart-rank">' + (i + 1) + '</div><div><strong>' + esc(st.name || '—') + '</strong><div class="meta">' + esc(getClassNameSafe(st.classId)) + '</div></div></div><strong>' + money(st.balance || 0) + ' ر.س</strong></div>';
+      }).join('') : '<div class="performance-empty">لا يوجد طلاب / طالبات للعرض.</div>';
+    }
+
+    var perfWrap = document.getElementById('smartPerformanceIndicators');
+    if(perfWrap){
+      var perfStudents = students.slice().sort(function(a,b){ return Number(b.balance||0)-Number(a.balance||0); }).slice(0,5);
+      perfWrap.innerHTML = perfStudents.length ? perfStudents.map(function(st){
+        var bal = Number(st.balance || 0);
+        var label = bal >= 11000 ? 'ممتاز' : (bal >= 5000 ? 'جيد' : 'يحتاج متابعة');
+        return '<div class="smart-top-item"><div><strong>' + esc(st.name || '—') + '</strong><div class="meta">' + label + '</div></div><strong>' + money(bal) + ' ر.س</strong></div>';
+      }).join('') : '<div class="performance-empty">لا توجد بيانات متاحة.</div>';
+    }
+
+    var taskWrap = document.getElementById('smartTaskList');
+    if(taskWrap){
+      taskWrap.innerHTML = tasks.length ? tasks.map(function(t){
+        var s = getTaskStats(t);
+        return '<div class="smart-task-item"><div><strong>' + esc(t.title || '—') + '</strong><div class="meta">' + esc(getClassNameSafe(t.classId)) + ' • تم التسليم ' + s.submitted + '/' + s.total + ' • متوسط الدرجات ' + s.avg + '%</div></div><span class="pill">' + s.pending + ' لم يتم</span></div>';
+      }).join('') : '<div class="performance-empty">لا توجد مهام أدائية بعد.</div>';
+    }
+
+    var alerts = document.getElementById('smartAlerts');
+    if(alerts){
+      var low = students.filter(function(s){ return Number(s.balance || 0) < 1000; }).slice(0,3);
+      var near = students.filter(function(s){ var b = Number(s.balance || 0); return b >= 9000 && b < 11000; }).slice(0,3);
+      var late = [];
+      tasks.forEach(function(t){
+        var tStudents = students.filter(function(s){ return s.classId === t.classId; });
+        tStudents.forEach(function(st){
+          var entry = (t.entries && t.entries[st.id]) || {};
+          var status = t.submissionStatus && t.submissionStatus[st.id];
+          if(!(status === true || entry.submittedAt || entry.attachmentData || entry.attachmentName || entry.videoLink)){
+            late.push({name: st.name, task: t.title});
+          }
+        });
+      });
+      var items = [];
+      late.slice(0,3).forEach(function(x){ items.push('<div class="smart-alert warn"><strong>لم يتم تسليم مهمة</strong><span>' + esc(x.name || '—') + ' • ' + esc(x.task || '—') + '</span></div>'); });
+      low.forEach(function(x){ items.push('<div class="smart-alert"><strong>رصيد منخفض</strong><span>' + esc(x.name || '—') + ' • ' + money(x.balance || 0) + ' ر.س</span></div>'); });
+      near.forEach(function(x){ items.push('<div class="smart-alert ok"><strong>قريبة من الترقية</strong><span>' + esc(x.name || '—') + ' • ' + money(x.balance || 0) + ' ر.س</span></div>'); });
+      alerts.innerHTML = items.length ? items.join('') : '<div class="performance-empty">لا توجد تنبيهات حالية.</div>';
+    }
+
+    if(typeof window.drawSmartOpsChart === 'function') window.drawSmartOpsChart(dep, wd, tr);
   };
 
-  window.cloudRefreshNow = async function(){
-    const remote = await pullFromCloud();
-    if(remote){
-      applyingRemote = true;
-      saveLocalData(remote);
-      refreshUI();
-      applyingRemote = false;
-      setStatus('☁️ تم جلب آخر تحديث', true);
+  window.drawSmartOpsChart = function(dep, wd, tr){
+    var canvas = document.getElementById('smartOpsChart');
+    if(!canvas || !canvas.getContext) return;
+    var ctx = canvas.getContext('2d');
+    var total = Math.max(1, dep + wd + tr);
+    var values = [dep, wd, tr];
+    var colors = ['#1f7f57','#c7a465','#103a2e'];
+    var labels = ['إيداع','سحب','تحويل'];
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    var start = -Math.PI/2;
+    values.forEach(function(v, i){
+      var angle = (v/total) * Math.PI * 2;
+      ctx.beginPath();
+      ctx.moveTo(110,110);
+      ctx.arc(110,110,80,start,start+angle);
+      ctx.closePath();
+      ctx.fillStyle = colors[i];
+      ctx.fill();
+      start += angle;
+    });
+    ctx.beginPath();
+    ctx.fillStyle = '#fff';
+    ctx.arc(110,110,36,0,Math.PI*2);
+    ctx.fill();
+    ctx.fillStyle = '#103a2e';
+    ctx.font = 'bold 14px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('BN',110,116);
+    labels.forEach(function(lab, i){
+      ctx.fillStyle = colors[i];
+      ctx.fillRect(210,35 + i*34,14,14);
+      ctx.fillStyle = '#183229';
+      ctx.textAlign = 'right';
+      ctx.font = '12px Arial';
+      ctx.fillText(lab + ': ' + money(values[i]), 270, 47 + i*34);
+    });
+  };
+
+  window.generateSmartTeacherReport = function(){
+    try{ window.renderSmartReports(); }catch(e){}
+    var htmlReport = '<html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>تقرير شامل - بنك الرياضيات</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{color:#103a2e}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.card{border:1px solid #dce6df;border-radius:16px;padding:14px;margin-bottom:12px}.muted{color:#6b8178;font-size:13px}</style></head><body>'
+      + '<h1>التقرير الشامل - بنك الرياضيات</h1>'
+      + '<div class="muted">تم إنشاؤه تلقائيًا من التقارير الذكية</div>'
+      + '<div class="grid">'
+      + ['srStudents','srClasses','srDeposits','srWithdrawals','srTransfers','srTasks','srSubmitted','srPending'].map(function(id){
+          var el = document.getElementById(id);
+          var label = el && el.nextElementSibling ? el.nextElementSibling.textContent : '';
+          return '<div class="card"><strong>' + esc(label) + '</strong><div style="font-size:24px;margin-top:8px">' + esc(el ? el.textContent : '') + '</div></div>';
+        }).join('')
+      + '</div>'
+      + '<div class="card"><h3>أفضل الطلاب / الطالبات</h3>' + (document.getElementById('smartTopStudents')?.innerHTML || '') + '</div>'
+      + '<div class="card"><h3>مؤشر أداء الطالب / الطالبة</h3>' + (document.getElementById('smartPerformanceIndicators')?.innerHTML || '') + '</div>'
+      + '<div class="card"><h3>تحليل الفصول</h3>' + (document.getElementById('smartClassCards')?.innerHTML || '') + '</div>'
+      + '<div class="card"><h3>التنبيهات الذكية</h3>' + (document.getElementById('smartAlerts')?.innerHTML || '') + '</div>'
+      + '</body></html>';
+
+    var w = window.open('', '_blank');
+    if(!w) return;
+    w.document.write(htmlReport);
+    w.document.close();
+    setTimeout(function(){ try{ w.print(); }catch(e){} }, 400);
+    var status = document.getElementById('smartReportStatus');
+    if(status){
+      status.classList.remove('hidden');
+      setTimeout(function(){ status.classList.add('hidden'); }, 2000);
     }
   };
 
-  document.addEventListener('DOMContentLoaded', async function(){
-    const ok = await initFirebase();
-    if(!ok) return;
-    const remote = await pullFromCloud();
-    if(remote){
-      applyingRemote = true;
-      saveLocalData(remote);
-      refreshUI();
-      applyingRemote = false;
-      setStatus('☁️ تم جلب آخر تحديث', true);
-    }else{
-      const local = getLocalData();
-      if(local) await pushToCloud(local);
-    }
-    startRealtime();
+  document.addEventListener('DOMContentLoaded', function(){
+    setTimeout(function(){ try{ window.renderSmartReports(); }catch(e){} }, 500);
   });
+
+  var oldShow = window.showTeacherPane;
+  if(typeof oldShow === 'function'){
+    window.showTeacherPane = function(id, btn){
+      oldShow(id, btn);
+      if(id === 'teacherPaneReportsSmart'){
+        setTimeout(function(){ try{ window.renderSmartReports(); }catch(e){} }, 50);
+      }
+    };
+  }
 })();
 </script>
 
-</body>
-</html>`;
-  function openMoreInfo(type){
-  var data={
-    about:{
-      title:'من نحن',
-      sub:'نبذة عن بنك الرياضيات',
-      html:`
-        <h2 class="more-detail-title">من نحن</h2>
-        <p class="more-detail-lead">بنك الرياضيات منصة تعليمية تحفيزية تهدف إلى تعزيز مشاركة الطلاب داخل الحصة الدراسية من خلال نظام نقاط مستوحى من الأنظمة المصرفية.</p>
-        <div class="more-detail-block"><p>يمنح البنك الطلاب رصيدًا تحفيزيًا مقابل المشاركة والإنجاز والالتزام، مما يسهم في تنمية روح التنافس الإيجابي وتحفيز التعلم بطريقة ممتعة ومبتكرة.</p></div>
-        <div class="more-detail-block"><h3>الإشراف</h3><p>يشرف على بنك الرياضيات <strong>الأستاذة: سارة حقوي</strong>.</p></div>
-      `
-    },
-    contact:{
-      title:'اتصل بنا',
-      sub:'قنوات التواصل الرسمية',
-      html:`
-        <h2 class="more-detail-title">اتصل بنا</h2>
-        <p class="more-detail-lead">للاستفسارات أو الملاحظات يمكنكم التواصل مع إدارة بنك الرياضيات عبر الوسائل التالية:</p>
-        <div class="more-detail-list">
-          <div class="more-detail-item"><div class="icon">📞</div><div><strong>خدمة الطلاب وأولياء الأمور</strong><span>0502234335</span></div></div>
-          <div class="more-detail-item"><div class="icon">☎️</div><div><strong>الإدارة العامة</strong><span>0556891201</span></div></div>
-          <div class="more-detail-item"><div class="icon">✉️</div><div><strong>البريد الإلكتروني</strong><span>Saramathss@hotmail.com</span></div></div>
-          <div class="more-detail-item"><div class="icon">🏫</div><div><strong>الموقع</strong><span>مدرسة رواد الشرق الأهلية</span></div></div>
-        </div>
-      `
-    },
-    settings:{
-      title:'الإعدادات',
-      sub:'إدارة الحساب والبيانات',
-      html:`
-        <h2 class="more-detail-title">الإعدادات</h2>
-        <p class="more-detail-lead">تتيح هذه الصفحة إدارة إعدادات الحساب داخل نظام بنك الرياضيات.</p>
-        <div class="more-detail-list">
-          <div class="more-detail-item"><div class="icon">🔐</div><div><strong>تغيير كلمة المرور</strong><span>تحديث كلمة المرور لحماية الحساب.</span></div></div>
-          <div class="more-detail-item"><div class="icon">👤</div><div><strong>تعديل بيانات الحساب</strong><span>مراجعة اسم المستخدم والبيانات الأساسية.</span></div></div>
-          <div class="more-detail-item"><div class="icon">🔔</div><div><strong>إدارة الإشعارات</strong><span>التحكم في التنبيهات داخل النظام.</span></div></div>
-          <div class="more-detail-item"><div class="icon">🚪</div><div><strong>تسجيل الخروج</strong><span>إنهاء الجلسة الحالية بأمان.</span></div></div>
-        </div>
-      `
-    },
-    privacy:{
-      title:'سياسة الخصوصية',
-      sub:'استخدام البيانات داخل النظام',
-      html:`
-        <h2 class="more-detail-title">سياسة الخصوصية</h2>
-        <div class="more-detail-block"><p>يحرص بنك الرياضيات على حماية خصوصية بيانات الطلاب وأولياء الأمور.</p></div>
-        <div class="more-detail-block"><p>يتم استخدام المعلومات داخل النظام لأغراض تعليمية فقط، ولا يتم مشاركة أي بيانات خارج إطار المدرسة أو الجهات التعليمية المعنية.</p></div>
-      `
-    },
-    disclaimer:{
-      title:'إخلاء المسؤولية',
-      sub:'تنويه حول طبيعة النظام',
-      html:`
-        <h2 class="more-detail-title">إخلاء المسؤولية</h2>
-        <div class="more-detail-block"><p>بنك الرياضيات نظام تحفيزي تعليمي يهدف إلى تشجيع الطلاب على المشاركة والتفاعل داخل الحصة الدراسية.</p></div>
-        <div class="more-detail-block"><p>النقاط والأرصدة المستخدمة داخل النظام هي لأغراض تعليمية وتحفيزية فقط، ولا تمثل أي قيمة مالية حقيقية.</p></div>
-      `
-    },
-    terms:{
-      title:'الأحكام والشروط',
-      sub:'ضوابط استخدام بنك الرياضيات',
-      html:`
-        <h2 class="more-detail-title">الأحكام والشروط</h2>
-        <div class="more-detail-block"><p>يهدف بنك الرياضيات إلى تعزيز بيئة تعليمية محفزة داخل الفصل الدراسي.</p></div>
-        <div class="more-detail-block"><p>يتم منح النقاط للطلاب وفق معايير تعليمية يحددها المعلم، ويُستخدم النظام كوسيلة تعليمية لتحفيز المشاركة والانضباط وتحقيق التميز.</p></div>
-      `
-    }
-  };
-  var item=data[type];
-  if(!item) return;
-  var title=document.getElementById('moreDetailTitle');
-  var sub=document.getElementById('moreDetailSub');
-  var content=document.getElementById('moreDetailContent');
-  if(title) title.textContent=item.title;
-  if(sub) sub.textContent=item.sub;
-  if(content) content.innerHTML=item.html;
-  go('more_detail');
-}
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script id="math-bank-firebase-config">
+window.MATH_BANK_CLOUD_CONFIG = {
+  enabled: true,
+  firebaseConfig: {
+    apiKey: "AIzaSyDP-pi0tbF09bNRihrLz_kUs-JBoa9Cw4Y",
+    authDomain: "sara-haywire.firebaseapp.com",
+    projectId: "sara-haywire",
+    storageBucket: "sara-haywire.firebasestorage.app",
+    messagingSenderId: "333467940977",
+    appId: "1:333467940977:web:97d056d5dbff2debbf43d0"
+  },
+  collection: "math_bank",
+  docId: "shared_bank"
+};
 </script>
+<style id="math-bank-sync-badge-style">
+.sync-status-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:8px 12px;border-radius:999px;
+  background:#edf6f0;color:#176242;font-size:12px;font-weight:800;
+  border:1px solid #cfe9db;box-shadow:0 6px 14px rgba(16,58,46,.06)
+}
+.blue-import-btn{touch-action:manipulation}
+</style>
 
 <script id="students-router-home-reset-fix">
 (function(){
@@ -5995,7 +4889,7 @@ function openMoreInfo(type){
 <script id="student-settings-final-v10-script">
 (function(){
   const MAX_ABSENCE = 10;
-  function esc(s){ return String(s||'').replace(/[&<>\"]/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]; }); }
+  function { return String(s||'').replace(/[&<>\"]/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]; }); }
   function fmt(n){ return (typeof formatMoney==='function') ? formatMoney(Number(n||0)) : String(Number(n||0)); }
   function getLevel(balance){ balance=Number(balance||0); return balance>=41000?'ألماسي':balance>=31000?'بلاتيني':balance>=16000?'ذهبي':balance>=11000?'فضي':'برونزي'; }
   function levelEmoji(level){ return {برونزي:'🥉',فضي:'🥈',ذهبي:'🥇',بلاتيني:'💠',ألماسي:'💎'}[level] || '💳'; }
@@ -6028,7 +4922,7 @@ function openMoreInfo(type){
     holder.innerHTML = (bankData.classes||[]).map(function(c){
       const st = buildClassStats(c);
       return `<div class="student-class-card">
-        <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start"><div><h4>${esc(c.name)}</h4><div class="teacher-note">عدد الطلاب / الطالبات في الفصل: ${st.students.length}</div></div><span class="pill">${st.active} نشط</span></div>
+        <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start"><div><h4>${}</h4><div class="teacher-note">عدد الطلاب / الطالبات في الفصل: ${st.students.length}</div></div><span class="pill">${st.active} نشط</span></div>
         <div class="student-class-meta">
           <div class="mini"><strong>${st.students.length}</strong><span>عدد الطلاب / الطالبات</span></div>
           <div class="mini"><strong>${fmt(st.total)}</strong><span>إجمالي الأرصدة</span></div>
@@ -6053,8 +4947,8 @@ function openMoreInfo(type){
     return `<div class="student-card-pro">
       <div class="student-card-top">
         <div>
-          <div class="student-card-name">${esc(student.name||'—')}</div>
-          <div class="student-card-sub">PIN: ${esc(student.password||'—')}<br>ولي الأمر: ${esc(student.guardian||'—')}</div>
+          <div class="student-card-name">${}</div>
+          <div class="student-card-sub">PIN: ${}<br>ولي الأمر: ${}</div>
           <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
             <span class="account-type-badge">💳 <span>نوع الحساب: ${level}</span> <small>${levelEmoji(level)}</small></span>
           </div>
@@ -6117,7 +5011,7 @@ function openMoreInfo(type){
     detail.classList.add('page-mode');
     detail.innerHTML = `
       <div class="student-detail-header">
-        <div class="student-detail-title"><h3>${esc(cls.name)}</h3><p>صفحة خاصة بالفصل تتضمن بطاقات الطلاب / الطالبات مع أدوات فردية واضحة وزر رجوع للخلف.</p></div>
+        <div class="student-detail-title"><h3>${}</h3><p>صفحة خاصة بالفصل تتضمن بطاقات الطلاب / الطالبات مع أدوات فردية واضحة وزر رجوع للخلف.</p></div>
         <button class="ghost" onclick="closeStudentSettingsClass()">رجوع للخلف</button>
       </div>
       <div class="teacher-mini-kpis">
@@ -6133,7 +5027,7 @@ function openMoreInfo(type){
         <button class="btn ${cls.isDisabled?'btn-green':'btn-gold'}" onclick="toggleClassEnabled('${cls.id}')">${cls.isDisabled?'تفعيل الفصل':'إيقاف الفصل'}</button>
       </div>
       <div class="student-filters">
-        <input id="studentSettingsSearch" type="text" value="${esc(state.query||'')}" placeholder="بحث باسم الطالب / الطالبة أو اسم المستخدم" oninput="updateStudentSettingsFilters()">
+        <input id="studentSettingsSearch" type="text" value="${}" placeholder="بحث باسم الطالب / الطالبة أو اسم المستخدم" oninput="updateStudentSettingsFilters()">
         <select id="studentSettingsLevel" onchange="updateStudentSettingsFilters()"><option value="all">كل المستويات</option><option value="برونزي" ${state.level==='برونزي'?'selected':''}>برونزي</option><option value="فضي" ${state.level==='فضي'?'selected':''}>فضي</option><option value="ذهبي" ${state.level==='ذهبي'?'selected':''}>ذهبي</option><option value="بلاتيني" ${state.level==='بلاتيني'?'selected':''}>بلاتيني</option><option value="ألماسي" ${state.level==='ألماسي'?'selected':''}>ألماسي</option></select>
         <select id="studentSettingsStatus" onchange="updateStudentSettingsFilters()"><option value="all">كل الحالات</option><option value="active" ${state.status==='active'?'selected':''}>الحسابات المفعلة</option><option value="frozen" ${state.status==='frozen'?'selected':''}>الحسابات الموقوفة</option></select>
         <div class="student-status-badge">الأزرار أدناه خاصة بكل طالب / طالبة</div>
