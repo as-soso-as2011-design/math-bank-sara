@@ -738,13 +738,14 @@ window.MATH_BANK_CLOUD_CONFIG = {
   docId: "shared_bank"
 };
 </script>
-<style id="math-bank-sync-style">
+<style id="math-bank-sync-badge-style">
 .sync-status-badge{
   display:inline-flex;align-items:center;gap:8px;
   padding:8px 12px;border-radius:999px;
   background:#edf6f0;color:#176242;font-size:12px;font-weight:800;
-  border:1px solid #cfe9db
+  border:1px solid #cfe9db;box-shadow:0 6px 14px rgba(16,58,46,.06)
 }
+.blue-import-btn{touch-action:manipulation}
 </style>
 
 </head>
@@ -1263,7 +1264,7 @@ window.MATH_BANK_CLOUD_CONFIG = {
   </div>
 
   <div class="teacher-shell">
-    <div class="teacher-hero">
+    <div class="teacher-hero"><div id="syncStatusBadge" class="sync-status-badge">⏳ جارِ تفعيل المزامنة</div>
       <div class="badge">👩🏻‍🏫 التحكم الإداري</div>
       <h2 style="margin:0;font-size:26px">لوحة تحكم المعلمة</h2>
       <p style="margin:8px 0 0;line-height:1.9;color:rgba(255,255,255,.92)">إضافة الفصول، إدارة الطلاب، تنفيذ إيداع / سحب / تحويل، وإرسال العمليات لولي الأمر عبر واتساب.</p>
@@ -2455,7 +2456,7 @@ function loadBankData(){
   try{ bankData = JSON.parse(localStorage.getItem(BANK_KEY) || 'null'); }catch(e){ bankData = null; }
   if(!bankData){ bankData = defaultBankData(); }
   window.bankData = bankData;
-  saveBankData();
+  try{ localStorage.setItem(BANK_KEY, JSON.stringify(bankData)); }catch(e){}
 }
 function formatMoney(v){ return new Intl.NumberFormat('ar-SA').format(Number(v||0)); }
 function normalizePhone(v){ return String(v||'').replace(/\D/g,''); }
@@ -4343,13 +4344,14 @@ window.MATH_BANK_CLOUD_CONFIG = {
   docId: "shared_bank"
 };
 </script>
-<style id="math-bank-sync-style">
+<style id="math-bank-sync-badge-style">
 .sync-status-badge{
   display:inline-flex;align-items:center;gap:8px;
   padding:8px 12px;border-radius:999px;
   background:#edf6f0;color:#176242;font-size:12px;font-weight:800;
-  border:1px solid #cfe9db
+  border:1px solid #cfe9db;box-shadow:0 6px 14px rgba(16,58,46,.06)
 }
+.blue-import-btn{touch-action:manipulation}
 </style>
 
 </head><body>'
@@ -4820,13 +4822,14 @@ window.MATH_BANK_CLOUD_CONFIG = {
   docId: "shared_bank"
 };
 </script>
-<style id="math-bank-sync-style">
+<style id="math-bank-sync-badge-style">
 .sync-status-badge{
   display:inline-flex;align-items:center;gap:8px;
   padding:8px 12px;border-radius:999px;
   background:#edf6f0;color:#176242;font-size:12px;font-weight:800;
-  border:1px solid #cfe9db
+  border:1px solid #cfe9db;box-shadow:0 6px 14px rgba(16,58,46,.06)
 }
+.blue-import-btn{touch-action:manipulation}
 </style>
 
 </head><body><h1>التقرير الشامل - بنك الرياضيات</h1><div class="muted">تم إنشاؤه تلقائيًا من التقارير الذكية</div><div class="grid">${['srStudents','srClasses','srDeposits','srWithdrawals','srTransfers','srTasks','srSubmitted','srPending'].map(id=>{ const el=document.getElementById(id); const label=el&&el.nextElementSibling?el.nextElementSibling.textContent:''; return `<div class="card"><strong>${label}</strong><div style="font-size:24px;margin-top:8px">${el?el.textContent:''}</div></div>`; }).join('')}</div><div class="card"><h3>أفضل الطلاب / الطالبات</h3>${document.getElementById('smartTopStudents')?.innerHTML||''}</div><div class="card"><h3>مؤشر أداء الطالب / الطالبة</h3>${document.getElementById('smartPerformanceIndicators')?.innerHTML||''}</div><div class="card"><h3>تحليل الفصول</h3>${document.getElementById('smartClassCards')?.innerHTML||''}</div><div class="card"><h3>التنبيهات الذكية</h3>${document.getElementById('smartAlerts')?.innerHTML||''}</div>
@@ -5184,13 +5187,14 @@ window.MATH_BANK_CLOUD_CONFIG = {
   docId: "shared_bank"
 };
 </script>
-<style id="math-bank-sync-style">
+<style id="math-bank-sync-badge-style">
 .sync-status-badge{
   display:inline-flex;align-items:center;gap:8px;
   padding:8px 12px;border-radius:999px;
   background:#edf6f0;color:#176242;font-size:12px;font-weight:800;
-  border:1px solid #cfe9db
+  border:1px solid #cfe9db;box-shadow:0 6px 14px rgba(16,58,46,.06)
 }
+.blue-import-btn{touch-action:manipulation}
 </style>
 
 </head>
@@ -5361,11 +5365,13 @@ function openMoreInfo(type){
 
   function refreshUI(){
     try{ if(typeof refreshTeacherUI === 'function') refreshTeacherUI(); }catch(e){}
+    try{ if(typeof renderTeacher === 'function') renderTeacher(); }catch(e){}
     try{ if(typeof renderStudentAccount === 'function') renderStudentAccount(); }catch(e){}
     try{ if(typeof updateParentFollowup === 'function') updateParentFollowup(); }catch(e){}
     try{ if(typeof updateHonorBoard === 'function') updateHonorBoard(); }catch(e){}
     try{ if(typeof renderLeaderboard === 'function') renderLeaderboard(); }catch(e){}
-    try{ if(typeof renderHomeData === 'function') renderHomeData(); }catch(e){}
+    try{ if(typeof renderClassCards === 'function') renderClassCards(); }catch(e){}
+    try{ if(typeof renderClassDetail === 'function') renderClassDetail(); }catch(e){}
   }
 
   async function initFirebase(){
@@ -5438,23 +5444,21 @@ function openMoreInfo(type){
     });
   }
 
-  // wrap saveBankData
-  const oldSaveBankData = window.saveBankData;
-  window.saveBankData = function(){
-    let res;
-    if(typeof oldSaveBankData === 'function'){
-      res = oldSaveBankData.apply(this, arguments);
-    }
-    const data = getLocalData();
-    if(data) pushToCloud(data);
-    return res;
-  };
+  const oldSave = window.saveBankData;
+  if(typeof oldSave === 'function'){
+    window.saveBankData = function(){
+      const out = oldSave.apply(this, arguments);
+      const data = getLocalData();
+      if(data) pushToCloud(data);
+      return out;
+    };
+  }
 
-  // expose manual actions
   window.cloudPushNow = async function(){
     const data = getLocalData();
     if(data) await pushToCloud(data);
   };
+
   window.cloudRefreshNow = async function(){
     const remote = await pullFromCloud();
     if(remote){
@@ -5466,7 +5470,6 @@ function openMoreInfo(type){
     }
   };
 
-  // first load
   document.addEventListener('DOMContentLoaded', async function(){
     const ok = await initFirebase();
     if(!ok) return;
@@ -5730,20 +5733,25 @@ function openMoreInfo(type){
     const modal = document.getElementById('blueImportTeacherModal');
     if(modal) modal.classList.remove('show');
   };
-  window.runBlueImportTeacher = function(){
+  window.runBlueImportTeacher = async function(){
     try {
       const currentRaw = localStorage.getItem(GREEN_BANK_KEY);
       if(currentRaw) localStorage.setItem(GREEN_BANK_BACKUP_KEY, currentRaw);
       const currentBank = currentRaw ? JSON.parse(currentRaw) : null;
       const nextBank = convertBlueToGreen(currentBank);
       localStorage.setItem(GREEN_BANK_KEY, JSON.stringify(nextBank));
+      try{ if(typeof bankData !== 'undefined') bankData = nextBank; }catch(e){}
       window.bankData = nextBank;
+      try{ if(typeof saveBankData === 'function') saveBankData(); }catch(e){}
+      if(typeof window.cloudPushNow === 'function'){
+        try{ await window.cloudPushNow(); }catch(e){}
+      }
       closeBlueImportTeacherModal();
       try { if(typeof renderTeacher === 'function') renderTeacher(); } catch(e){}
       try { if(typeof refreshTeacherUI === 'function') refreshTeacherUI(); } catch(e){}
       try { if(typeof renderClassCards === 'function') renderClassCards(); } catch(e){}
       try { if(typeof renderClassDetail === 'function') renderClassDetail(); } catch(e){}
-      alert('تم نقل بيانات البنك الأزرق بنجاح.');
+      alert('تم نقل بيانات البنك الأزرق وتحديثها على جميع الأجهزة.');
     } catch(err) {
       alert('تعذر نقل البيانات: ' + (err && err.message ? err.message : err));
     }
@@ -5756,7 +5764,11 @@ function openMoreInfo(type){
     wrap.className = 'blue-import-wrap';
     wrap.innerHTML = '<button id="blueImportTeacherBtn" class="blue-import-btn" type="button">🔄 نقل بيانات البنك الأزرق</button>';
     hero.appendChild(wrap);
-    wrap.querySelector('button').addEventListener('click', openBlueImportTeacherModal);
+    var btn = wrap.querySelector('button');
+    btn.onclick = openBlueImportTeacherModal;
+    btn.addEventListener('click', openBlueImportTeacherModal, {passive:true});
+    btn.addEventListener('touchend', function(e){ e.preventDefault(); openBlueImportTeacherModal(); }, {passive:false});
+    btn.addEventListener('pointerup', openBlueImportTeacherModal, {passive:true});
   }
 
   const oldRenderTeacher = window.renderTeacher;
@@ -7954,11 +7966,13 @@ function openMoreInfo(type){
 
   function refreshUI(){
     try{ if(typeof refreshTeacherUI === 'function') refreshTeacherUI(); }catch(e){}
+    try{ if(typeof renderTeacher === 'function') renderTeacher(); }catch(e){}
     try{ if(typeof renderStudentAccount === 'function') renderStudentAccount(); }catch(e){}
     try{ if(typeof updateParentFollowup === 'function') updateParentFollowup(); }catch(e){}
     try{ if(typeof updateHonorBoard === 'function') updateHonorBoard(); }catch(e){}
     try{ if(typeof renderLeaderboard === 'function') renderLeaderboard(); }catch(e){}
-    try{ if(typeof renderHomeData === 'function') renderHomeData(); }catch(e){}
+    try{ if(typeof renderClassCards === 'function') renderClassCards(); }catch(e){}
+    try{ if(typeof renderClassDetail === 'function') renderClassDetail(); }catch(e){}
   }
 
   async function initFirebase(){
@@ -8031,23 +8045,21 @@ function openMoreInfo(type){
     });
   }
 
-  // wrap saveBankData
-  const oldSaveBankData = window.saveBankData;
-  window.saveBankData = function(){
-    let res;
-    if(typeof oldSaveBankData === 'function'){
-      res = oldSaveBankData.apply(this, arguments);
-    }
-    const data = getLocalData();
-    if(data) pushToCloud(data);
-    return res;
-  };
+  const oldSave = window.saveBankData;
+  if(typeof oldSave === 'function'){
+    window.saveBankData = function(){
+      const out = oldSave.apply(this, arguments);
+      const data = getLocalData();
+      if(data) pushToCloud(data);
+      return out;
+    };
+  }
 
-  // expose manual actions
   window.cloudPushNow = async function(){
     const data = getLocalData();
     if(data) await pushToCloud(data);
   };
+
   window.cloudRefreshNow = async function(){
     const remote = await pullFromCloud();
     if(remote){
@@ -8059,7 +8071,6 @@ function openMoreInfo(type){
     }
   };
 
-  // first load
   document.addEventListener('DOMContentLoaded', async function(){
     const ok = await initFirebase();
     if(!ok) return;
