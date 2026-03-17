@@ -690,7 +690,7 @@ body.device-mobile .bottom-nav{width:min(430px,calc(100% - 18px))}
 </style>
 
 
-<style id="oai-more-detail-patch-style">
+<style id="oai-more-detail-final-style">
 .more-detail-pro-card{padding:20px;border-radius:28px}
 .more-detail-title{margin:0 0 10px;color:var(--deep);font-size:28px}
 .more-detail-lead{margin:0 0 14px;color:var(--muted);line-height:2;font-size:15px}
@@ -4246,7 +4246,7 @@ body.device-mobile .bottom-nav{width:min(430px,calc(100% - 18px))}
 </style>
 
 
-<style id="oai-more-detail-patch-style">
+<style id="oai-more-detail-final-style">
 .more-detail-pro-card{padding:20px;border-radius:28px}
 .more-detail-title{margin:0 0 10px;color:var(--deep);font-size:28px}
 .more-detail-lead{margin:0 0 14px;color:var(--muted);line-height:2;font-size:15px}
@@ -4680,7 +4680,7 @@ body.device-mobile .bottom-nav{width:min(430px,calc(100% - 18px))}
 </style>
 
 
-<style id="oai-more-detail-patch-style">
+<style id="oai-more-detail-final-style">
 .more-detail-pro-card{padding:20px;border-radius:28px}
 .more-detail-title{margin:0 0 10px;color:var(--deep);font-size:28px}
 .more-detail-lead{margin:0 0 14px;color:var(--muted);line-height:2;font-size:15px}
@@ -5016,7 +5016,7 @@ function openPrintWindow(title, bodyHtml){
       .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}
     </style>
   
-<style id="oai-more-detail-patch-style">
+<style id="oai-more-detail-final-style">
 .more-detail-pro-card{padding:20px;border-radius:28px}
 .more-detail-title{margin:0 0 10px;color:var(--deep);font-size:28px}
 .more-detail-lead{margin:0 0 14px;color:var(--muted);line-height:2;font-size:15px}
@@ -5036,23 +5036,7 @@ function openPrintWindow(title, bodyHtml){
     
   </body>
   </html>`;
-  w.document.write(printHtml);
-  w.document.close();
-  w.focus();
-  setTimeout(() => w.print(), 300);
-}
-
-function goAccountTab(tabId){
-  try{
-    go('account');
-    setTimeout(function(){
-      var btnMap={statement:0,operations:2,rouletteTab:6,pdfTab:5};
-      var tabs=document.querySelectorAll('#account .tabbar button');
-      var btn=(typeof btnMap[tabId]!=='undefined' && tabs[btnMap[tabId]])?tabs[btnMap[tabId]]:null;
-      if(typeof showTab==='function'){ showTab(tabId, btn); }
-    },120);
-  }catch(e){ console.log(e); }
-}
+  
 function openMoreInfo(type){
   var data={
     about:{
@@ -5062,7 +5046,7 @@ function openMoreInfo(type){
         <h2 class="more-detail-title">من نحن</h2>
         <p class="more-detail-lead">بنك الرياضيات منصة تعليمية تحفيزية تهدف إلى تعزيز مشاركة الطلاب داخل الحصة الدراسية من خلال نظام نقاط مستوحى من الأنظمة المصرفية.</p>
         <div class="more-detail-block"><p>يمنح البنك الطلاب رصيدًا تحفيزيًا مقابل المشاركة والإنجاز والالتزام، مما يسهم في تنمية روح التنافس الإيجابي وتحفيز التعلم بطريقة ممتعة ومبتكرة.</p></div>
-        <div class="more-detail-block"><h3>الإشراف</h3><p>يشرف على بنك الرياضيات <strong>الأستاذة: سارة حقوي</strong>.</p></div>
+        <div class="more-detail-block"><h3>الإشراف</h3><p>يشرف على بنك الرياضيات الأستاذة سارة حقوي.</p></div>
       `
     },
     contact:{
@@ -5072,10 +5056,10 @@ function openMoreInfo(type){
         <h2 class="more-detail-title">اتصل بنا</h2>
         <p class="more-detail-lead">للاستفسارات أو الملاحظات يمكنكم التواصل مع إدارة بنك الرياضيات عبر الوسائل التالية:</p>
         <div class="more-detail-list">
-          <div class="more-detail-item"><div class="icon">📞</div><div><strong>خدمة الطلاب وأولياء الأمور</strong><span>0502234335</span></div></div>
-          <div class="more-detail-item"><div class="icon">☎️</div><div><strong>الإدارة العامة</strong><span>0556891201</span></div></div>
-          <div class="more-detail-item"><div class="icon">✉️</div><div><strong>البريد الإلكتروني</strong><span>Saramathss@hotmail.com</span></div></div>
-          <div class="more-detail-item"><div class="icon">🏫</div><div><strong>الموقع</strong><span>مدرسة رواد الشرق الأهلية</span></div></div>
+          <div class="more-detail-item"><div><strong>خدمة الطلاب وأولياء الأمور</strong><span>0502234335</span></div><div class="icon">📞</div></div>
+          <div class="more-detail-item"><div><strong>الإدارة العامة</strong><span>0556891201</span></div><div class="icon">☎️</div></div>
+          <div class="more-detail-item"><div><strong>البريد الإلكتروني</strong><span>Saramathss@hotmail.com</span></div><div class="icon">✉️</div></div>
+          <div class="more-detail-item"><div><strong>الموقع</strong><span>مدرسة رواد الشرق الأهلية</span></div><div class="icon">🏫</div></div>
         </div>
       `
     },
@@ -5086,10 +5070,10 @@ function openMoreInfo(type){
         <h2 class="more-detail-title">الإعدادات</h2>
         <p class="more-detail-lead">تتيح هذه الصفحة إدارة إعدادات الحساب داخل نظام بنك الرياضيات.</p>
         <div class="more-detail-list">
-          <div class="more-detail-item"><div class="icon">🔐</div><div><strong>تغيير كلمة المرور</strong><span>تحديث كلمة المرور لحماية الحساب.</span></div></div>
-          <div class="more-detail-item"><div class="icon">👤</div><div><strong>تعديل بيانات الحساب</strong><span>مراجعة اسم المستخدم والبيانات الأساسية.</span></div></div>
-          <div class="more-detail-item"><div class="icon">🔔</div><div><strong>إدارة الإشعارات</strong><span>التحكم في التنبيهات داخل النظام.</span></div></div>
-          <div class="more-detail-item"><div class="icon">🚪</div><div><strong>تسجيل الخروج</strong><span>إنهاء الجلسة الحالية بأمان.</span></div></div>
+          <div class="more-detail-item"><div><strong>تغيير كلمة المرور</strong><span>تحديث كلمة المرور لحماية الحساب.</span></div><div class="icon">🔐</div></div>
+          <div class="more-detail-item"><div><strong>تعديل بيانات الحساب</strong><span>مراجعة اسم المستخدم والبيانات الأساسية.</span></div><div class="icon">👤</div></div>
+          <div class="more-detail-item"><div><strong>إدارة الإشعارات</strong><span>التحكم في التنبيهات داخل النظام.</span></div><div class="icon">🔔</div></div>
+          <div class="more-detail-item"><div><strong>تسجيل الخروج</strong><span>إنهاء الجلسة الحالية بأمان.</span></div><div class="icon">🚪</div></div>
         </div>
       `
     },
@@ -5121,16 +5105,27 @@ function openMoreInfo(type){
       `
     }
   };
-  var item=data[type];
+  var item = data[type];
   if(!item) return;
-  var title=document.getElementById('moreDetailTitle');
-  var sub=document.getElementById('moreDetailSub');
-  var content=document.getElementById('moreDetailContent');
-  if(title) title.textContent=item.title;
-  if(sub) sub.textContent=item.sub;
-  if(content) content.innerHTML=item.html;
-  go('more_detail');
+  var title = document.getElementById('moreDetailTitle');
+  var sub = document.getElementById('moreDetailSub');
+  var content = document.getElementById('moreDetailContent');
+  if(title) title.textContent = item.title;
+  if(sub) sub.textContent = item.sub;
+  if(content) content.innerHTML = item.html;
+  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+  var detail = document.getElementById('more_detail');
+  if(detail) detail.classList.add('active');
+  window.scrollTo(0,0);
 }
+
+function goBackFromMoreDetail(){
+  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+  var listScreen = document.getElementById('more');
+  if(listScreen) listScreen.classList.add('active');
+  window.scrollTo(0,0);
+}
+
 </script>
 
 <script id="students-router-home-reset-fix">
