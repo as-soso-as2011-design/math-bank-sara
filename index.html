@@ -614,96 +614,6 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
 }
 </style>
 
-
-<style id="oai-device-responsive-fix">
-/* auto device layout */
-body.device-mobile .app{max-width:460px}
-body.device-ipad .app{max-width:900px}
-body.device-desktop .app{max-width:1280px}
-
-body.device-mobile .screen{padding:0 14px 108px !important}
-body.device-ipad .screen{padding:0 18px 118px !important}
-body.device-desktop .screen{padding:0 22px 124px !important}
-
-/* remove top gap hard */
-html,body,.app{padding-top:0 !important;margin-top:0 !important}
-.screen,.screen.active{padding-top:0 !important;margin-top:0 !important}
-.topbar{margin-top:0 !important;padding-top:0 !important}
-.hero,.card,.teacher-shell,.teacher-hero{margin-top:0 !important}
-body::before{display:none !important}
-
-/* tab bars more visible + slide on mobile */
-.tabbar,.teacher-tabs{
-  scrollbar-width:thin;
-  scrollbar-color: rgba(16,58,46,.28) transparent;
-}
-.tabbar::-webkit-scrollbar,.teacher-tabs::-webkit-scrollbar{height:7px}
-.tabbar::-webkit-scrollbar-thumb,.teacher-tabs::-webkit-scrollbar-thumb{
-  background:rgba(16,58,46,.28);border-radius:999px
-}
-body.device-mobile .tabbar,
-body.device-mobile .teacher-tabs{
-  display:flex !important;
-  flex-wrap:nowrap !important;
-  overflow-x:auto !important;
-  overflow-y:hidden !important;
-  -webkit-overflow-scrolling:touch;
-  scroll-behavior:smooth;
-  gap:10px !important;
-  padding:4px 2px 10px !important;
-  margin-bottom:14px !important;
-  border-bottom:1px solid rgba(16,58,46,.08);
-}
-body.device-mobile .tabbar button,
-body.device-mobile .teacher-tabs button{
-  flex:0 0 auto !important;
-  white-space:nowrap !important;
-  border:1px solid rgba(16,58,46,.08) !important;
-  background:#fff !important;
-  color:var(--deep) !important;
-  box-shadow:0 8px 16px rgba(16,58,46,.06);
-}
-body.device-mobile .tabbar button.active,
-body.device-mobile .teacher-tabs button.active{
-  background:linear-gradient(135deg,var(--deep),var(--green)) !important;
-  color:#fff !important;
-  border-color:transparent !important;
-  box-shadow:0 10px 22px rgba(16,58,46,.16);
-}
-
-/* better layouts on ipad/desktop */
-body.device-ipad .teacher-grid,
-body.device-desktop .teacher-grid{grid-template-columns:repeat(2,1fr)}
-body.device-ipad .teacher-kpis{grid-template-columns:repeat(4,1fr)}
-body.device-desktop .teacher-kpis{grid-template-columns:repeat(4,1fr)}
-body.device-ipad .shortcuts{grid-template-columns:repeat(4,1fr)}
-body.device-desktop .shortcuts{grid-template-columns:repeat(4,1fr)}
-body.device-ipad .bottom-nav{width:min(760px,calc(100% - 28px))}
-body.device-desktop .bottom-nav{width:min(920px,calc(100% - 34px))}
-body.device-mobile .bottom-nav{width:min(430px,calc(100% - 18px))}
-
-/* keep sections close to top on home */
-#home .hero, #teacher_dashboard .teacher-hero, #account_choice .card:first-child,
-#student_login .card:first-child, #teacher_login .card:first-child{
-  margin-top:0 !important;
-}
-</style>
-
-
-<style id="oai-more-detail-patch-style">
-.more-detail-pro-card{padding:20px;border-radius:28px}
-.more-detail-title{margin:0 0 10px;color:var(--deep);font-size:28px}
-.more-detail-lead{margin:0 0 14px;color:var(--muted);line-height:2;font-size:15px}
-.more-detail-block{background:#fff;border:1px solid var(--line);border-radius:20px;padding:16px;margin:12px 0;box-shadow:0 8px 18px rgba(16,58,46,.05)}
-.more-detail-block h3{margin:0 0 8px;color:var(--deep);font-size:18px}
-.more-detail-block p{margin:0;line-height:2;color:var(--text)}
-.more-detail-list{display:grid;gap:12px}
-.more-detail-item{display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid var(--line);background:#fff;border-radius:20px;padding:16px;box-shadow:0 8px 18px rgba(16,58,46,.05)}
-.more-detail-item .icon{width:42px;height:42px;border-radius:14px;background:var(--mint);display:grid;place-items:center;font-size:20px}
-.more-detail-item strong{display:block;color:var(--deep);margin-bottom:4px}
-.more-detail-item span{display:block;color:var(--muted);line-height:1.8}
-</style>
-
 </head>
 <body>
 <div class="app">
@@ -1600,10 +1510,15 @@ body.device-mobile .bottom-nav{width:min(430px,calc(100% - 18px))}
 <section id="more_detail" class="screen">
   <div class="topbar">
     <div class="brand"><div class="logo">BN</div><div><h1 id="moreDetailTitle">التفاصيل</h1><p id="moreDetailSub">صفحة معلومات إضافية</p></div></div>
-    <button class="ghost" type="button" onclick="goBackFromMoreDetail()">رجوع للخلف</button>
+    <button class="ghost" type="button" onclick="go('more')">←</button>
   </div>
-  <div class="card more-detail-pro-card">
+  <div class="card more-detail-card">
     <div id="moreDetailContent" class="more-detail-content"></div>
+  </div>
+  <div class="footer footer-custom">
+    <div class="footer-line footer-line-1">الرياضيات لغة الأذكياء</div>
+    <div class="footer-line footer-line-2">نحو تعليم محفّز وعقول مفكّرة © بنك الرياضيات – إشراف الأستاذة سارة حقوي</div>
+    <div class="footer-line footer-line-3">🏫 مدرسة رواد الشرق الأهلية</div>
   </div>
 </section>
 
@@ -4170,96 +4085,6 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
 }
 </style>
 
-
-<style id="oai-device-responsive-fix">
-/* auto device layout */
-body.device-mobile .app{max-width:460px}
-body.device-ipad .app{max-width:900px}
-body.device-desktop .app{max-width:1280px}
-
-body.device-mobile .screen{padding:0 14px 108px !important}
-body.device-ipad .screen{padding:0 18px 118px !important}
-body.device-desktop .screen{padding:0 22px 124px !important}
-
-/* remove top gap hard */
-html,body,.app{padding-top:0 !important;margin-top:0 !important}
-.screen,.screen.active{padding-top:0 !important;margin-top:0 !important}
-.topbar{margin-top:0 !important;padding-top:0 !important}
-.hero,.card,.teacher-shell,.teacher-hero{margin-top:0 !important}
-body::before{display:none !important}
-
-/* tab bars more visible + slide on mobile */
-.tabbar,.teacher-tabs{
-  scrollbar-width:thin;
-  scrollbar-color: rgba(16,58,46,.28) transparent;
-}
-.tabbar::-webkit-scrollbar,.teacher-tabs::-webkit-scrollbar{height:7px}
-.tabbar::-webkit-scrollbar-thumb,.teacher-tabs::-webkit-scrollbar-thumb{
-  background:rgba(16,58,46,.28);border-radius:999px
-}
-body.device-mobile .tabbar,
-body.device-mobile .teacher-tabs{
-  display:flex !important;
-  flex-wrap:nowrap !important;
-  overflow-x:auto !important;
-  overflow-y:hidden !important;
-  -webkit-overflow-scrolling:touch;
-  scroll-behavior:smooth;
-  gap:10px !important;
-  padding:4px 2px 10px !important;
-  margin-bottom:14px !important;
-  border-bottom:1px solid rgba(16,58,46,.08);
-}
-body.device-mobile .tabbar button,
-body.device-mobile .teacher-tabs button{
-  flex:0 0 auto !important;
-  white-space:nowrap !important;
-  border:1px solid rgba(16,58,46,.08) !important;
-  background:#fff !important;
-  color:var(--deep) !important;
-  box-shadow:0 8px 16px rgba(16,58,46,.06);
-}
-body.device-mobile .tabbar button.active,
-body.device-mobile .teacher-tabs button.active{
-  background:linear-gradient(135deg,var(--deep),var(--green)) !important;
-  color:#fff !important;
-  border-color:transparent !important;
-  box-shadow:0 10px 22px rgba(16,58,46,.16);
-}
-
-/* better layouts on ipad/desktop */
-body.device-ipad .teacher-grid,
-body.device-desktop .teacher-grid{grid-template-columns:repeat(2,1fr)}
-body.device-ipad .teacher-kpis{grid-template-columns:repeat(4,1fr)}
-body.device-desktop .teacher-kpis{grid-template-columns:repeat(4,1fr)}
-body.device-ipad .shortcuts{grid-template-columns:repeat(4,1fr)}
-body.device-desktop .shortcuts{grid-template-columns:repeat(4,1fr)}
-body.device-ipad .bottom-nav{width:min(760px,calc(100% - 28px))}
-body.device-desktop .bottom-nav{width:min(920px,calc(100% - 34px))}
-body.device-mobile .bottom-nav{width:min(430px,calc(100% - 18px))}
-
-/* keep sections close to top on home */
-#home .hero, #teacher_dashboard .teacher-hero, #account_choice .card:first-child,
-#student_login .card:first-child, #teacher_login .card:first-child{
-  margin-top:0 !important;
-}
-</style>
-
-
-<style id="oai-more-detail-patch-style">
-.more-detail-pro-card{padding:20px;border-radius:28px}
-.more-detail-title{margin:0 0 10px;color:var(--deep);font-size:28px}
-.more-detail-lead{margin:0 0 14px;color:var(--muted);line-height:2;font-size:15px}
-.more-detail-block{background:#fff;border:1px solid var(--line);border-radius:20px;padding:16px;margin:12px 0;box-shadow:0 8px 18px rgba(16,58,46,.05)}
-.more-detail-block h3{margin:0 0 8px;color:var(--deep);font-size:18px}
-.more-detail-block p{margin:0;line-height:2;color:var(--text)}
-.more-detail-list{display:grid;gap:12px}
-.more-detail-item{display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid var(--line);background:#fff;border-radius:20px;padding:16px;box-shadow:0 8px 18px rgba(16,58,46,.05)}
-.more-detail-item .icon{width:42px;height:42px;border-radius:14px;background:var(--mint);display:grid;place-items:center;font-size:20px}
-.more-detail-item strong{display:block;color:var(--deep);margin-bottom:4px}
-.more-detail-item span{display:block;color:var(--muted);line-height:1.8}
-</style>
-
 </head><body>'
       + '<h1>تقرير بنك الرياضيات</h1>'
       + '<div class="meta">الطالبة: '+esc(student.name)+'</div>'
@@ -4604,96 +4429,6 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
 }
 </style>
 
-
-<style id="oai-device-responsive-fix">
-/* auto device layout */
-body.device-mobile .app{max-width:460px}
-body.device-ipad .app{max-width:900px}
-body.device-desktop .app{max-width:1280px}
-
-body.device-mobile .screen{padding:0 14px 108px !important}
-body.device-ipad .screen{padding:0 18px 118px !important}
-body.device-desktop .screen{padding:0 22px 124px !important}
-
-/* remove top gap hard */
-html,body,.app{padding-top:0 !important;margin-top:0 !important}
-.screen,.screen.active{padding-top:0 !important;margin-top:0 !important}
-.topbar{margin-top:0 !important;padding-top:0 !important}
-.hero,.card,.teacher-shell,.teacher-hero{margin-top:0 !important}
-body::before{display:none !important}
-
-/* tab bars more visible + slide on mobile */
-.tabbar,.teacher-tabs{
-  scrollbar-width:thin;
-  scrollbar-color: rgba(16,58,46,.28) transparent;
-}
-.tabbar::-webkit-scrollbar,.teacher-tabs::-webkit-scrollbar{height:7px}
-.tabbar::-webkit-scrollbar-thumb,.teacher-tabs::-webkit-scrollbar-thumb{
-  background:rgba(16,58,46,.28);border-radius:999px
-}
-body.device-mobile .tabbar,
-body.device-mobile .teacher-tabs{
-  display:flex !important;
-  flex-wrap:nowrap !important;
-  overflow-x:auto !important;
-  overflow-y:hidden !important;
-  -webkit-overflow-scrolling:touch;
-  scroll-behavior:smooth;
-  gap:10px !important;
-  padding:4px 2px 10px !important;
-  margin-bottom:14px !important;
-  border-bottom:1px solid rgba(16,58,46,.08);
-}
-body.device-mobile .tabbar button,
-body.device-mobile .teacher-tabs button{
-  flex:0 0 auto !important;
-  white-space:nowrap !important;
-  border:1px solid rgba(16,58,46,.08) !important;
-  background:#fff !important;
-  color:var(--deep) !important;
-  box-shadow:0 8px 16px rgba(16,58,46,.06);
-}
-body.device-mobile .tabbar button.active,
-body.device-mobile .teacher-tabs button.active{
-  background:linear-gradient(135deg,var(--deep),var(--green)) !important;
-  color:#fff !important;
-  border-color:transparent !important;
-  box-shadow:0 10px 22px rgba(16,58,46,.16);
-}
-
-/* better layouts on ipad/desktop */
-body.device-ipad .teacher-grid,
-body.device-desktop .teacher-grid{grid-template-columns:repeat(2,1fr)}
-body.device-ipad .teacher-kpis{grid-template-columns:repeat(4,1fr)}
-body.device-desktop .teacher-kpis{grid-template-columns:repeat(4,1fr)}
-body.device-ipad .shortcuts{grid-template-columns:repeat(4,1fr)}
-body.device-desktop .shortcuts{grid-template-columns:repeat(4,1fr)}
-body.device-ipad .bottom-nav{width:min(760px,calc(100% - 28px))}
-body.device-desktop .bottom-nav{width:min(920px,calc(100% - 34px))}
-body.device-mobile .bottom-nav{width:min(430px,calc(100% - 18px))}
-
-/* keep sections close to top on home */
-#home .hero, #teacher_dashboard .teacher-hero, #account_choice .card:first-child,
-#student_login .card:first-child, #teacher_login .card:first-child{
-  margin-top:0 !important;
-}
-</style>
-
-
-<style id="oai-more-detail-patch-style">
-.more-detail-pro-card{padding:20px;border-radius:28px}
-.more-detail-title{margin:0 0 10px;color:var(--deep);font-size:28px}
-.more-detail-lead{margin:0 0 14px;color:var(--muted);line-height:2;font-size:15px}
-.more-detail-block{background:#fff;border:1px solid var(--line);border-radius:20px;padding:16px;margin:12px 0;box-shadow:0 8px 18px rgba(16,58,46,.05)}
-.more-detail-block h3{margin:0 0 8px;color:var(--deep);font-size:18px}
-.more-detail-block p{margin:0;line-height:2;color:var(--text)}
-.more-detail-list{display:grid;gap:12px}
-.more-detail-item{display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid var(--line);background:#fff;border-radius:20px;padding:16px;box-shadow:0 8px 18px rgba(16,58,46,.05)}
-.more-detail-item .icon{width:42px;height:42px;border-radius:14px;background:var(--mint);display:grid;place-items:center;font-size:20px}
-.more-detail-item strong{display:block;color:var(--deep);margin-bottom:4px}
-.more-detail-item span{display:block;color:var(--muted);line-height:1.8}
-</style>
-
 </head><body><h1>التقرير الشامل - بنك الرياضيات</h1><div class="muted">تم إنشاؤه تلقائيًا من التقارير الذكية</div><div class="grid">${['srStudents','srClasses','srDeposits','srWithdrawals','srTransfers','srTasks','srSubmitted','srPending'].map(id=>{ const el=document.getElementById(id); const label=el&&el.nextElementSibling?el.nextElementSibling.textContent:''; return `<div class="card"><strong>${label}</strong><div style="font-size:24px;margin-top:8px">${el?el.textContent:''}</div></div>`; }).join('')}</div><div class="card"><h3>أفضل الطلاب / الطالبات</h3>${document.getElementById('smartTopStudents')?.innerHTML||''}</div><div class="card"><h3>مؤشر أداء الطالب / الطالبة</h3>${document.getElementById('smartPerformanceIndicators')?.innerHTML||''}</div><div class="card"><h3>تحليل الفصول</h3>${document.getElementById('smartClassCards')?.innerHTML||''}</div><div class="card"><h3>التنبيهات الذكية</h3>${document.getElementById('smartAlerts')?.innerHTML||''}</div>
 <style id="student-settings-pro-style">
 .student-settings-pro{margin-top:16px;display:grid;gap:14px}
@@ -4999,7 +4734,6 @@ body.device-mobile .bottom-nav{width:min(430px,calc(100% - 18px))}
     st.password = pass; saveBankData(); refreshTeacherUI();
   };
   
-
 function openPrintWindow(title, bodyHtml){
   const w = window.open('', '_blank');
   if(!w) return;
@@ -5015,25 +4749,10 @@ function openPrintWindow(title, bodyHtml){
       td,th{border:1px solid #ddd;padding:8px;text-align:right}
       .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}
     </style>
-  
-<style id="oai-more-detail-patch-style">
-.more-detail-pro-card{padding:20px;border-radius:28px}
-.more-detail-title{margin:0 0 10px;color:var(--deep);font-size:28px}
-.more-detail-lead{margin:0 0 14px;color:var(--muted);line-height:2;font-size:15px}
-.more-detail-block{background:#fff;border:1px solid var(--line);border-radius:20px;padding:16px;margin:12px 0;box-shadow:0 8px 18px rgba(16,58,46,.05)}
-.more-detail-block h3{margin:0 0 8px;color:var(--deep);font-size:18px}
-.more-detail-block p{margin:0;line-height:2;color:var(--text)}
-.more-detail-list{display:grid;gap:12px}
-.more-detail-item{display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid var(--line);background:#fff;border-radius:20px;padding:16px;box-shadow:0 8px 18px rgba(16,58,46,.05)}
-.more-detail-item .icon{width:42px;height:42px;border-radius:14px;background:var(--mint);display:grid;place-items:center;font-size:20px}
-.more-detail-item strong{display:block;color:var(--deep);margin-bottom:4px}
-.more-detail-item span{display:block;color:var(--muted);line-height:1.8}
-</style>
-
-</head>
+  </head>
   <body>
     <h1></h1>
-    
+    ${bodyHtml}
   </body>
   </html>`;
   w.document.write(printHtml);
@@ -7305,53 +7024,6 @@ document.addEventListener('DOMContentLoaded', function(){
       }catch(e){}
     }, 150);
   };
-})();
-</script>
-
-
-<script id="oai-device-responsive-script">
-(function(){
-  function applyDeviceMode(){
-    const ua = navigator.userAgent || '';
-    const w = Math.max(window.innerWidth || 0, screen.width || 0);
-    const isIpad = /iPad/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-    document.body.classList.remove('device-mobile','device-ipad','device-desktop');
-    if(isIpad || (w > 700 && w <= 1100 && 'ontouchstart' in window)){
-      document.body.classList.add('device-ipad');
-    }else if(w > 1100){
-      document.body.classList.add('device-desktop');
-    }else{
-      document.body.classList.add('device-mobile');
-    }
-  }
-
-  function trimTopGaps(){
-    try{
-      document.documentElement.style.marginTop = '0';
-      document.documentElement.style.paddingTop = '0';
-      document.body.style.marginTop = '0';
-      document.body.style.paddingTop = '0';
-      const firsts = document.querySelectorAll('.screen, .topbar, .hero, .card');
-      firsts.forEach(el => {
-        if(el && el.style){
-          if(getComputedStyle(el).marginTop !== '0px') el.style.marginTop = '0';
-          if(getComputedStyle(el).paddingTop !== '0px' && el.classList.contains('screen')) el.style.paddingTop = '0';
-        }
-      });
-      window.scrollTo(0,0);
-    }catch(e){}
-  }
-
-  document.addEventListener('DOMContentLoaded', function(){
-    applyDeviceMode();
-    setTimeout(trimTopGaps, 60);
-    setTimeout(trimTopGaps, 400);
-  });
-  window.addEventListener('resize', applyDeviceMode);
-  window.addEventListener('orientationchange', function(){
-    applyDeviceMode();
-    setTimeout(trimTopGaps, 120);
-  });
 })();
 </script>
 
