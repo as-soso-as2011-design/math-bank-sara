@@ -5481,20 +5481,55 @@ function openMoreInfo(type){
     const modal = document.getElementById('blueImportTeacherModal');
     if(modal) modal.classList.remove('show');
   };
-  window.runBlueImportTeacher = function(){
+  window.runBlueImportTeacher = async function(){
     try {
       const currentRaw = localStorage.getItem(GREEN_BANK_KEY);
       if(currentRaw) localStorage.setItem(GREEN_BANK_BACKUP_KEY, currentRaw);
       const currentBank = currentRaw ? JSON.parse(currentRaw) : null;
       const nextBank = convertBlueToGreen(currentBank);
+
+      // تحديث نسخة البنك الحالية داخل الجهاز
       localStorage.setItem(GREEN_BANK_KEY, JSON.stringify(nextBank));
       window.bankData = nextBank;
+
+      // إذا كان النظام يملك دالة حفظ مركزية فاستدعها أولاً
+      try {
+        if(typeof saveBankData === 'function'){
+          saveBankData();
+        }
+      } catch(e){}
+
+      // إذا كانت هناك مزامنة سحابية جاهزة فعّليها بعد النقل
+      let pushedToCloud = false;
+      try {
+        if(typeof cloudPushNow === 'function'){
+          await cloudPushNow();
+          pushedToCloud = true;
+        } else if(typeof pushCloudData === 'function'){
+          await pushCloudData(nextBank);
+          pushedToCloud = true;
+        } else if(typeof syncBankToCloud === 'function'){
+          await syncBankToCloud(nextBank);
+          pushedToCloud = true;
+        }
+      } catch(e){
+        console.warn('blue import cloud push failed', e);
+      }
+
       closeBlueImportTeacherModal();
       try { if(typeof renderTeacher === 'function') renderTeacher(); } catch(e){}
       try { if(typeof refreshTeacherUI === 'function') refreshTeacherUI(); } catch(e){}
       try { if(typeof renderClassCards === 'function') renderClassCards(); } catch(e){}
       try { if(typeof renderClassDetail === 'function') renderClassDetail(); } catch(e){}
-      alert('تم نقل بيانات البنك الأزرق بنجاح.');
+      try { if(typeof updateHomeCard === 'function') updateHomeCard(); } catch(e){}
+      try { if(typeof updateHonorBoard === 'function') updateHonorBoard(); } catch(e){}
+      try { if(typeof bindParentButtons === 'function') bindParentButtons(); } catch(e){}
+
+      if(pushedToCloud){
+        alert('تم نقل بيانات البنك الأزرق وتحديثها على الأجهزة المرتبطة.');
+      } else {
+        alert('تم نقل بيانات البنك الأزرق على هذا الجهاز. ولتصل لباقي الأجهزة لازم تفعيل المزامنة السحابية داخل الملف.');
+      }
     } catch(err) {
       alert('تعذر نقل البيانات: ' + (err && err.message ? err.message : err));
     }
