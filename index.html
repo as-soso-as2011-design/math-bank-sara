@@ -720,6 +720,33 @@ body.device-mobile .bottom-nav{width:min(430px,calc(100% - 18px))}
 .more-detail-item span{display:block;color:var(--muted);font-size:13px;line-height:1.9}
 </style>
 
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script id="math-bank-firebase-config">
+window.MATH_BANK_CLOUD_CONFIG = {
+  enabled: true,
+  firebaseConfig: {
+    apiKey: "AIzaSyDP-pi0tbF09bNRihrLz_kUs-JBoa9Cw4Y",
+    authDomain: "sara-haywire.firebaseapp.com",
+    projectId: "sara-haywire",
+    storageBucket: "sara-haywire.firebasestorage.app",
+    messagingSenderId: "333467940977",
+    appId: "1:333467940977:web:97d056d5dbff2debbf43d0"
+  },
+  collection: "math_bank",
+  docId: "shared_bank"
+};
+</script>
+<style id="math-bank-sync-style">
+.sync-status-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:8px 12px;border-radius:999px;
+  background:#edf6f0;color:#176242;font-size:12px;font-weight:800;
+  border:1px solid #cfe9db
+}
+</style>
+
 </head>
 <body>
 <div class="app">
@@ -4298,6 +4325,33 @@ body.device-mobile .bottom-nav{width:min(430px,calc(100% - 18px))}
 .more-detail-item span{display:block;color:var(--muted);font-size:13px;line-height:1.9}
 </style>
 
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script id="math-bank-firebase-config">
+window.MATH_BANK_CLOUD_CONFIG = {
+  enabled: true,
+  firebaseConfig: {
+    apiKey: "AIzaSyDP-pi0tbF09bNRihrLz_kUs-JBoa9Cw4Y",
+    authDomain: "sara-haywire.firebaseapp.com",
+    projectId: "sara-haywire",
+    storageBucket: "sara-haywire.firebasestorage.app",
+    messagingSenderId: "333467940977",
+    appId: "1:333467940977:web:97d056d5dbff2debbf43d0"
+  },
+  collection: "math_bank",
+  docId: "shared_bank"
+};
+</script>
+<style id="math-bank-sync-style">
+.sync-status-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:8px 12px;border-radius:999px;
+  background:#edf6f0;color:#176242;font-size:12px;font-weight:800;
+  border:1px solid #cfe9db
+}
+</style>
+
 </head><body>'
       + '<h1>تقرير بنك الرياضيات</h1>'
       + '<div class="meta">الطالبة: '+esc(student.name)+'</div>'
@@ -4748,6 +4802,33 @@ body.device-mobile .bottom-nav{width:min(430px,calc(100% - 18px))}
 .more-detail-item span{display:block;color:var(--muted);font-size:13px;line-height:1.9}
 </style>
 
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script id="math-bank-firebase-config">
+window.MATH_BANK_CLOUD_CONFIG = {
+  enabled: true,
+  firebaseConfig: {
+    apiKey: "AIzaSyDP-pi0tbF09bNRihrLz_kUs-JBoa9Cw4Y",
+    authDomain: "sara-haywire.firebaseapp.com",
+    projectId: "sara-haywire",
+    storageBucket: "sara-haywire.firebasestorage.app",
+    messagingSenderId: "333467940977",
+    appId: "1:333467940977:web:97d056d5dbff2debbf43d0"
+  },
+  collection: "math_bank",
+  docId: "shared_bank"
+};
+</script>
+<style id="math-bank-sync-style">
+.sync-status-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:8px 12px;border-radius:999px;
+  background:#edf6f0;color:#176242;font-size:12px;font-weight:800;
+  border:1px solid #cfe9db
+}
+</style>
+
 </head><body><h1>التقرير الشامل - بنك الرياضيات</h1><div class="muted">تم إنشاؤه تلقائيًا من التقارير الذكية</div><div class="grid">${['srStudents','srClasses','srDeposits','srWithdrawals','srTransfers','srTasks','srSubmitted','srPending'].map(id=>{ const el=document.getElementById(id); const label=el&&el.nextElementSibling?el.nextElementSibling.textContent:''; return `<div class="card"><strong>${label}</strong><div style="font-size:24px;margin-top:8px">${el?el.textContent:''}</div></div>`; }).join('')}</div><div class="card"><h3>أفضل الطلاب / الطالبات</h3>${document.getElementById('smartTopStudents')?.innerHTML||''}</div><div class="card"><h3>مؤشر أداء الطالب / الطالبة</h3>${document.getElementById('smartPerformanceIndicators')?.innerHTML||''}</div><div class="card"><h3>تحليل الفصول</h3>${document.getElementById('smartClassCards')?.innerHTML||''}</div><div class="card"><h3>التنبيهات الذكية</h3>${document.getElementById('smartAlerts')?.innerHTML||''}</div>
 <style id="student-settings-pro-style">
 .student-settings-pro{margin-top:16px;display:grid;gap:14px}
@@ -5054,7 +5135,6 @@ body.device-mobile .bottom-nav{width:min(430px,calc(100% - 18px))}
   };
   
 
-
 function openPrintWindow(title, bodyHtml){
   const w = window.open('', '_blank');
   if(!w) return;
@@ -5062,7 +5142,7 @@ function openPrintWindow(title, bodyHtml){
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<title>${title}</title>
+<title></title>
 <style>
   body{font-family:Arial,sans-serif;padding:24px;color:#183229}
   h1{margin-top:0}
@@ -5070,62 +5150,55 @@ function openPrintWindow(title, bodyHtml){
   td,th{border:1px solid #ddd;padding:8px;text-align:right}
   .box{border:1px solid #ddd;border-radius:12px;padding:12px;margin:10px 0}
 </style>
+
+<style id="oai-more-fullpage-style">
+.more-detail-card{animation:slideInPanel .28s ease}
+.more-detail-content{display:grid;gap:14px;line-height:2}
+.more-detail-title{margin:0;color:var(--deep);font-size:22px}
+.more-detail-lead{margin:0;color:var(--muted);font-size:14px}
+.more-detail-block{background:#fff;border:1px solid var(--line);border-radius:22px;padding:16px;box-shadow:0 8px 18px rgba(16,58,46,.05)}
+.more-detail-block h3{margin:0 0 10px;color:var(--deep);font-size:16px}
+.more-detail-block p{margin:0;color:var(--text);font-size:14px;line-height:2}
+.more-detail-list{display:grid;gap:10px}
+.more-detail-item{display:flex;align-items:flex-start;gap:10px;background:#f9fbfa;border:1px solid var(--line);border-radius:18px;padding:12px 14px}
+.more-detail-item .icon{width:34px;height:34px;border-radius:12px;background:var(--mint);display:grid;place-items:center;flex:none}
+.more-detail-item strong{display:block;color:var(--deep);font-size:14px;margin-bottom:2px}
+.more-detail-item span{display:block;color:var(--muted);font-size:13px;line-height:1.9}
+</style>
+
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script id="math-bank-firebase-config">
+window.MATH_BANK_CLOUD_CONFIG = {
+  enabled: true,
+  firebaseConfig: {
+    apiKey: "AIzaSyDP-pi0tbF09bNRihrLz_kUs-JBoa9Cw4Y",
+    authDomain: "sara-haywire.firebaseapp.com",
+    projectId: "sara-haywire",
+    storageBucket: "sara-haywire.firebasestorage.app",
+    messagingSenderId: "333467940977",
+    appId: "1:333467940977:web:97d056d5dbff2debbf43d0"
+  },
+  collection: "math_bank",
+  docId: "shared_bank"
+};
+</script>
+<style id="math-bank-sync-style">
+.sync-status-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:8px 12px;border-radius:999px;
+  background:#edf6f0;color:#176242;font-size:12px;font-weight:800;
+  border:1px solid #cfe9db
+}
+</style>
+
 </head>
 <body>
-  <h1>${title}</h1>
-  ${bodyHtml}
-</body>
-</html>`;
-  w.document.write(printHtml);
-  w.document.close();
-  w.focus();
-  setTimeout(() => w.print(), 300);
-}
+  <h1></h1>
+  
 
-function goAccountTab(tabId){
-  try{
-    if(typeof go === 'function') go('account');
-    setTimeout(function(){
-      var btn = document.querySelector('#account .tabbar button[onclick*="' + tabId + '"]');
-      if(btn){ btn.click(); return; }
-      var tabs = document.querySelectorAll('#account .tab-content');
-      tabs.forEach(function(t){ t.classList.remove('active'); });
-      var target = document.getElementById(tabId);
-      if(target) target.classList.add('active');
-      var buttons = document.querySelectorAll('#account .tabbar button');
-      buttons.forEach(function(b){ b.classList.remove('active'); });
-    }, 120);
-  }catch(e){ console.log(e); }
-}
-
-window.printStudentReport = function(studentId){
-  if(typeof getStudent !== 'function') return;
-  const st = getStudent(studentId);
-  if(!st) return;
-  const rows = (st.history||[]).slice().reverse().map(function(h){
-    return `<tr><td>${h.date||''}</td><td>${h.type||''}</td><td>${h.amount||''}</td><td>${h.reason||''}</td></tr>`;
-  }).join('') || '<tr><td colspan="4">لا توجد عمليات</td></tr>';
-
-  openPrintWindow('تقرير الطالب / الطالبة',
-    `<div class="box"><strong>${st.name||''}</strong><br>الرصيد: ${st.balance||0} ر.س</div>
-     <table><thead><tr><th>التاريخ</th><th>النوع</th><th>المبلغ</th><th>السبب</th></tr></thead><tbody>${rows}</tbody></table>`
-  );
-};
-
-window.printClassReport = function(classId){
-  if(typeof bankData === 'undefined' || !bankData || !Array.isArray(bankData.students)) return;
-  const cls = (bankData.classes||[]).find(function(c){ return c.id === classId; });
-  const students = (bankData.students||[]).filter(function(s){ return s.classId === classId; });
-  const rows = students.map(function(st){
-    return `<tr><td>${st.name||''}</td><td>${st.balance||0}</td><td>${st.account||''}</td></tr>`;
-  }).join('') || '<tr><td colspan="3">لا يوجد طلاب / طالبات</td></tr>';
-
-  openPrintWindow('تقرير الفصل',
-    `<div class="box"><strong>${cls ? cls.name : ''}</strong><br>عدد الطلاب / الطالبات: ${students.length}</div>
-     <table><thead><tr><th>الاسم</th><th>الرصيد</th><th>رقم الحساب</th></tr></thead><tbody>${rows}</tbody></table>`
-  );
-};
-
+<script id="oai-more-fullpage-script">
 function goBackFromMoreDetail(){
   document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
   var listScreen = document.getElementById('more');
@@ -5218,6 +5291,282 @@ function openMoreInfo(type){
   if(detailScreen) detailScreen.classList.add('active');
   window.scrollTo({top:0, behavior:'auto'});
 }
+</script>
+
+
+<script id="oai-more-override-final">
+function openMoreInfo(type){
+  var data = {
+    about:{title:'من نحن',sub:'نبذة عن بنك الرياضيات',html:`<h2 class="more-detail-title">من نحن</h2><p class="more-detail-lead">بنك الرياضيات منصة تعليمية تحفيزية تهدف إلى تعزيز مشاركة الطلاب داخل الحصة الدراسية من خلال نظام نقاط مستوحى من الأنظمة المصرفية.</p><div class="more-detail-block"><p>يمنح البنك الطلاب رصيدًا تحفيزيًا مقابل المشاركة والإنجاز والالتزام، مما يسهم في تنمية روح التنافس الإيجابي وتحفيز التعلم بطريقة ممتعة ومبتكرة.</p></div><div class="more-detail-block"><h3>الإشراف</h3><p>يشرف على بنك الرياضيات الأستاذة سارة حقوي.</p></div>`},
+    contact:{title:'اتصل بنا',sub:'قنوات التواصل الرسمية',html:`<h2 class="more-detail-title">اتصل بنا</h2><p class="more-detail-lead">للاستفسارات أو الملاحظات يمكنكم التواصل مع إدارة بنك الرياضيات عبر الوسائل التالية:</p><div class="more-detail-list"><div class="more-detail-item"><div class="icon">📞</div><div><strong>خدمة الطلاب وأولياء الأمور</strong><span>0502234335</span></div></div><div class="more-detail-item"><div class="icon">☎️</div><div><strong>الإدارة العامة</strong><span>0556891201</span></div></div><div class="more-detail-item"><div class="icon">✉️</div><div><strong>البريد الإلكتروني</strong><span>Saramathss@hotmail.com</span></div></div><div class="more-detail-item"><div class="icon">🏫</div><div><strong>الموقع</strong><span>مدرسة رواد الشرق الأهلية</span></div></div></div>`},
+    settings:{title:'الإعدادات',sub:'إدارة الحساب والبيانات',html:`<h2 class="more-detail-title">الإعدادات</h2><p class="more-detail-lead">تتيح هذه الصفحة إدارة إعدادات الحساب داخل نظام بنك الرياضيات.</p><div class="more-detail-list"><div class="more-detail-item"><div class="icon">🔐</div><div><strong>تغيير كلمة المرور</strong><span>تحديث كلمة المرور لحماية الحساب.</span></div></div><div class="more-detail-item"><div class="icon">👤</div><div><strong>تعديل بيانات الحساب</strong><span>مراجعة اسم المستخدم والبيانات الأساسية.</span></div></div><div class="more-detail-item"><div class="icon">🔔</div><div><strong>إدارة الإشعارات</strong><span>التحكم في التنبيهات داخل النظام.</span></div></div><div class="more-detail-item"><div class="icon">🚪</div><div><strong>تسجيل الخروج</strong><span>إنهاء الجلسة الحالية بأمان.</span></div></div></div>`},
+    privacy:{title:'سياسة الخصوصية',sub:'استخدام البيانات داخل النظام',html:`<h2 class="more-detail-title">سياسة الخصوصية</h2><div class="more-detail-block"><p>يحرص بنك الرياضيات على حماية خصوصية بيانات الطلاب وأولياء الأمور.</p></div><div class="more-detail-block"><p>يتم استخدام المعلومات داخل النظام لأغراض تعليمية فقط، ولا يتم مشاركة أي بيانات خارج إطار المدرسة أو الجهات التعليمية المعنية.</p></div>`},
+    disclaimer:{title:'إخلاء المسؤولية',sub:'تنويه حول طبيعة النظام',html:`<h2 class="more-detail-title">إخلاء المسؤولية</h2><div class="more-detail-block"><p>بنك الرياضيات نظام تحفيزي تعليمي يهدف إلى تشجيع الطلاب على المشاركة والتفاعل داخل الحصة الدراسية.</p></div><div class="more-detail-block"><p>النقاط والأرصدة المستخدمة داخل النظام هي لأغراض تعليمية وتحفيزية فقط، ولا تمثل أي قيمة مالية حقيقية.</p></div>`},
+    terms:{title:'الأحكام والشروط',sub:'ضوابط استخدام بنك الرياضيات',html:`<h2 class="more-detail-title">الأحكام والشروط</h2><div class="more-detail-block"><p>يهدف بنك الرياضيات إلى تعزيز بيئة تعليمية محفزة داخل الفصل الدراسي.</p></div><div class="more-detail-block"><p>يتم منح النقاط للطلاب وفق معايير تعليمية يحددها المعلم، ويُستخدم النظام كوسيلة تعليمية لتحفيز المشاركة والانضباط وتحقيق التميز.</p></div>`}
+  };
+  var item = data[type];
+  if(!item) return;
+  var title = document.getElementById('moreDetailTitle');
+  var sub = document.getElementById('moreDetailSub');
+  var content = document.getElementById('moreDetailContent');
+  if(title) title.textContent = item.title;
+  if(sub) sub.textContent = item.sub;
+  if(content) content.innerHTML = item.html;
+  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+  var detailScreen = document.getElementById('more_detail');
+  if(detailScreen) detailScreen.classList.add('active');
+  window.scrollTo({top:0, behavior:'auto'});
+}
+</script>
+
+
+<script id="math-bank-live-sync-script">
+(function(){
+  let db = null;
+  let ready = false;
+  let applyingRemote = false;
+  let listenerStarted = false;
+
+  function cfg(){ return window.MATH_BANK_CLOUD_CONFIG || {}; }
+
+  function setStatus(text, ok){
+    const el = document.getElementById('syncStatusBadge');
+    if(!el) return;
+    el.textContent = text;
+    el.style.background = ok ? '#edf6f0' : '#fff7e8';
+    el.style.color = ok ? '#176242' : '#9a6a15';
+    el.style.borderColor = ok ? '#cfe9db' : '#f1dfb5';
+  }
+
+  function getLocalData(){
+    try{
+      if(typeof bankData !== 'undefined' && bankData) return JSON.parse(JSON.stringify(bankData));
+    }catch(e){}
+    try{
+      const raw = localStorage.getItem('greenBankTeacherData_v1') || localStorage.getItem('bankData_v10');
+      if(raw) return JSON.parse(raw);
+    }catch(e){}
+    return null;
+  }
+
+  function saveLocalData(data){
+    if(!data) return;
+    try{
+      window.bankData = data;
+      if(typeof bankData !== 'undefined'){ bankData = data; }
+    }catch(e){}
+    try{ localStorage.setItem('greenBankTeacherData_v1', JSON.stringify(data)); }catch(e){}
+    try{ localStorage.setItem('bankData_v10', JSON.stringify(data)); }catch(e){}
+  }
+
+  function refreshUI(){
+    try{ if(typeof refreshTeacherUI === 'function') refreshTeacherUI(); }catch(e){}
+    try{ if(typeof renderStudentAccount === 'function') renderStudentAccount(); }catch(e){}
+    try{ if(typeof updateParentFollowup === 'function') updateParentFollowup(); }catch(e){}
+    try{ if(typeof updateHonorBoard === 'function') updateHonorBoard(); }catch(e){}
+    try{ if(typeof renderLeaderboard === 'function') renderLeaderboard(); }catch(e){}
+    try{ if(typeof renderHomeData === 'function') renderHomeData(); }catch(e){}
+  }
+
+  async function initFirebase(){
+    if(ready) return true;
+    try{
+      const c = cfg();
+      if(!c.enabled) return false;
+      if(!firebase.apps.length){
+        firebase.initializeApp(c.firebaseConfig);
+      }
+      db = firebase.firestore();
+      ready = true;
+      setStatus('☁️ المزامنة مفعلة', true);
+      return true;
+    }catch(err){
+      console.warn(err);
+      setStatus('⚠️ تعذر تفعيل المزامنة', false);
+      return false;
+    }
+  }
+
+  async function pushToCloud(data){
+    if(applyingRemote) return false;
+    if(!await initFirebase()) return false;
+    try{
+      const c = cfg();
+      await db.collection(c.collection).doc(c.docId).set({
+        bankData: data,
+        updatedAt: Date.now()
+      }, {merge:true});
+      setStatus('☁️ تم تحديث جميع الأجهزة', true);
+      return true;
+    }catch(err){
+      console.warn(err);
+      setStatus('⚠️ فشل رفع التحديث', false);
+      return false;
+    }
+  }
+
+  async function pullFromCloud(){
+    if(!await initFirebase()) return null;
+    try{
+      const c = cfg();
+      const snap = await db.collection(c.collection).doc(c.docId).get();
+      if(!snap.exists) return null;
+      const data = snap.data() || {};
+      return data.bankData || null;
+    }catch(err){
+      console.warn(err);
+      return null;
+    }
+  }
+
+  async function startRealtime(){
+    if(listenerStarted) return;
+    if(!await initFirebase()) return;
+    listenerStarted = true;
+    const c = cfg();
+    db.collection(c.collection).doc(c.docId).onSnapshot(function(snap){
+      if(!snap.exists) return;
+      const data = snap.data() || {};
+      if(!data.bankData) return;
+      applyingRemote = true;
+      saveLocalData(data.bankData);
+      refreshUI();
+      applyingRemote = false;
+      setStatus('☁️ تم جلب آخر تحديث', true);
+    }, function(err){
+      console.warn(err);
+    });
+  }
+
+  // wrap saveBankData
+  const oldSaveBankData = window.saveBankData;
+  window.saveBankData = function(){
+    let res;
+    if(typeof oldSaveBankData === 'function'){
+      res = oldSaveBankData.apply(this, arguments);
+    }
+    const data = getLocalData();
+    if(data) pushToCloud(data);
+    return res;
+  };
+
+  // expose manual actions
+  window.cloudPushNow = async function(){
+    const data = getLocalData();
+    if(data) await pushToCloud(data);
+  };
+  window.cloudRefreshNow = async function(){
+    const remote = await pullFromCloud();
+    if(remote){
+      applyingRemote = true;
+      saveLocalData(remote);
+      refreshUI();
+      applyingRemote = false;
+      setStatus('☁️ تم جلب آخر تحديث', true);
+    }
+  };
+
+  // first load
+  document.addEventListener('DOMContentLoaded', async function(){
+    const ok = await initFirebase();
+    if(!ok) return;
+    const remote = await pullFromCloud();
+    if(remote){
+      applyingRemote = true;
+      saveLocalData(remote);
+      refreshUI();
+      applyingRemote = false;
+      setStatus('☁️ تم جلب آخر تحديث', true);
+    }else{
+      const local = getLocalData();
+      if(local) await pushToCloud(local);
+    }
+    startRealtime();
+  });
+})();
+</script>
+
+</body>
+</html>`;
+  function openMoreInfo(type){
+  var data={
+    about:{
+      title:'من نحن',
+      sub:'نبذة عن بنك الرياضيات',
+      html:`
+        <h2 class="more-detail-title">من نحن</h2>
+        <p class="more-detail-lead">بنك الرياضيات منصة تعليمية تحفيزية تهدف إلى تعزيز مشاركة الطلاب داخل الحصة الدراسية من خلال نظام نقاط مستوحى من الأنظمة المصرفية.</p>
+        <div class="more-detail-block"><p>يمنح البنك الطلاب رصيدًا تحفيزيًا مقابل المشاركة والإنجاز والالتزام، مما يسهم في تنمية روح التنافس الإيجابي وتحفيز التعلم بطريقة ممتعة ومبتكرة.</p></div>
+        <div class="more-detail-block"><h3>الإشراف</h3><p>يشرف على بنك الرياضيات <strong>الأستاذة: سارة حقوي</strong>.</p></div>
+      `
+    },
+    contact:{
+      title:'اتصل بنا',
+      sub:'قنوات التواصل الرسمية',
+      html:`
+        <h2 class="more-detail-title">اتصل بنا</h2>
+        <p class="more-detail-lead">للاستفسارات أو الملاحظات يمكنكم التواصل مع إدارة بنك الرياضيات عبر الوسائل التالية:</p>
+        <div class="more-detail-list">
+          <div class="more-detail-item"><div class="icon">📞</div><div><strong>خدمة الطلاب وأولياء الأمور</strong><span>0502234335</span></div></div>
+          <div class="more-detail-item"><div class="icon">☎️</div><div><strong>الإدارة العامة</strong><span>0556891201</span></div></div>
+          <div class="more-detail-item"><div class="icon">✉️</div><div><strong>البريد الإلكتروني</strong><span>Saramathss@hotmail.com</span></div></div>
+          <div class="more-detail-item"><div class="icon">🏫</div><div><strong>الموقع</strong><span>مدرسة رواد الشرق الأهلية</span></div></div>
+        </div>
+      `
+    },
+    settings:{
+      title:'الإعدادات',
+      sub:'إدارة الحساب والبيانات',
+      html:`
+        <h2 class="more-detail-title">الإعدادات</h2>
+        <p class="more-detail-lead">تتيح هذه الصفحة إدارة إعدادات الحساب داخل نظام بنك الرياضيات.</p>
+        <div class="more-detail-list">
+          <div class="more-detail-item"><div class="icon">🔐</div><div><strong>تغيير كلمة المرور</strong><span>تحديث كلمة المرور لحماية الحساب.</span></div></div>
+          <div class="more-detail-item"><div class="icon">👤</div><div><strong>تعديل بيانات الحساب</strong><span>مراجعة اسم المستخدم والبيانات الأساسية.</span></div></div>
+          <div class="more-detail-item"><div class="icon">🔔</div><div><strong>إدارة الإشعارات</strong><span>التحكم في التنبيهات داخل النظام.</span></div></div>
+          <div class="more-detail-item"><div class="icon">🚪</div><div><strong>تسجيل الخروج</strong><span>إنهاء الجلسة الحالية بأمان.</span></div></div>
+        </div>
+      `
+    },
+    privacy:{
+      title:'سياسة الخصوصية',
+      sub:'استخدام البيانات داخل النظام',
+      html:`
+        <h2 class="more-detail-title">سياسة الخصوصية</h2>
+        <div class="more-detail-block"><p>يحرص بنك الرياضيات على حماية خصوصية بيانات الطلاب وأولياء الأمور.</p></div>
+        <div class="more-detail-block"><p>يتم استخدام المعلومات داخل النظام لأغراض تعليمية فقط، ولا يتم مشاركة أي بيانات خارج إطار المدرسة أو الجهات التعليمية المعنية.</p></div>
+      `
+    },
+    disclaimer:{
+      title:'إخلاء المسؤولية',
+      sub:'تنويه حول طبيعة النظام',
+      html:`
+        <h2 class="more-detail-title">إخلاء المسؤولية</h2>
+        <div class="more-detail-block"><p>بنك الرياضيات نظام تحفيزي تعليمي يهدف إلى تشجيع الطلاب على المشاركة والتفاعل داخل الحصة الدراسية.</p></div>
+        <div class="more-detail-block"><p>النقاط والأرصدة المستخدمة داخل النظام هي لأغراض تعليمية وتحفيزية فقط، ولا تمثل أي قيمة مالية حقيقية.</p></div>
+      `
+    },
+    terms:{
+      title:'الأحكام والشروط',
+      sub:'ضوابط استخدام بنك الرياضيات',
+      html:`
+        <h2 class="more-detail-title">الأحكام والشروط</h2>
+        <div class="more-detail-block"><p>يهدف بنك الرياضيات إلى تعزيز بيئة تعليمية محفزة داخل الفصل الدراسي.</p></div>
+        <div class="more-detail-block"><p>يتم منح النقاط للطلاب وفق معايير تعليمية يحددها المعلم، ويُستخدم النظام كوسيلة تعليمية لتحفيز المشاركة والانضباط وتحقيق التميز.</p></div>
+      `
+    }
+  };
+  var item=data[type];
+  if(!item) return;
+  var title=document.getElementById('moreDetailTitle');
+  var sub=document.getElementById('moreDetailSub');
+  var content=document.getElementById('moreDetailContent');
+  if(title) title.textContent=item.title;
+  if(sub) sub.textContent=item.sub;
+  if(content) content.innerHTML=item.html;
+  go('more_detail');
+}
+</script>
 
 <script id="students-router-home-reset-fix">
 (function(){
@@ -7561,6 +7910,173 @@ function openMoreInfo(type){
   if(detailScreen) detailScreen.classList.add('active');
   window.scrollTo({top:0, behavior:'auto'});
 }
+</script>
+
+
+<script id="math-bank-live-sync-script">
+(function(){
+  let db = null;
+  let ready = false;
+  let applyingRemote = false;
+  let listenerStarted = false;
+
+  function cfg(){ return window.MATH_BANK_CLOUD_CONFIG || {}; }
+
+  function setStatus(text, ok){
+    const el = document.getElementById('syncStatusBadge');
+    if(!el) return;
+    el.textContent = text;
+    el.style.background = ok ? '#edf6f0' : '#fff7e8';
+    el.style.color = ok ? '#176242' : '#9a6a15';
+    el.style.borderColor = ok ? '#cfe9db' : '#f1dfb5';
+  }
+
+  function getLocalData(){
+    try{
+      if(typeof bankData !== 'undefined' && bankData) return JSON.parse(JSON.stringify(bankData));
+    }catch(e){}
+    try{
+      const raw = localStorage.getItem('greenBankTeacherData_v1') || localStorage.getItem('bankData_v10');
+      if(raw) return JSON.parse(raw);
+    }catch(e){}
+    return null;
+  }
+
+  function saveLocalData(data){
+    if(!data) return;
+    try{
+      window.bankData = data;
+      if(typeof bankData !== 'undefined'){ bankData = data; }
+    }catch(e){}
+    try{ localStorage.setItem('greenBankTeacherData_v1', JSON.stringify(data)); }catch(e){}
+    try{ localStorage.setItem('bankData_v10', JSON.stringify(data)); }catch(e){}
+  }
+
+  function refreshUI(){
+    try{ if(typeof refreshTeacherUI === 'function') refreshTeacherUI(); }catch(e){}
+    try{ if(typeof renderStudentAccount === 'function') renderStudentAccount(); }catch(e){}
+    try{ if(typeof updateParentFollowup === 'function') updateParentFollowup(); }catch(e){}
+    try{ if(typeof updateHonorBoard === 'function') updateHonorBoard(); }catch(e){}
+    try{ if(typeof renderLeaderboard === 'function') renderLeaderboard(); }catch(e){}
+    try{ if(typeof renderHomeData === 'function') renderHomeData(); }catch(e){}
+  }
+
+  async function initFirebase(){
+    if(ready) return true;
+    try{
+      const c = cfg();
+      if(!c.enabled) return false;
+      if(!firebase.apps.length){
+        firebase.initializeApp(c.firebaseConfig);
+      }
+      db = firebase.firestore();
+      ready = true;
+      setStatus('☁️ المزامنة مفعلة', true);
+      return true;
+    }catch(err){
+      console.warn(err);
+      setStatus('⚠️ تعذر تفعيل المزامنة', false);
+      return false;
+    }
+  }
+
+  async function pushToCloud(data){
+    if(applyingRemote) return false;
+    if(!await initFirebase()) return false;
+    try{
+      const c = cfg();
+      await db.collection(c.collection).doc(c.docId).set({
+        bankData: data,
+        updatedAt: Date.now()
+      }, {merge:true});
+      setStatus('☁️ تم تحديث جميع الأجهزة', true);
+      return true;
+    }catch(err){
+      console.warn(err);
+      setStatus('⚠️ فشل رفع التحديث', false);
+      return false;
+    }
+  }
+
+  async function pullFromCloud(){
+    if(!await initFirebase()) return null;
+    try{
+      const c = cfg();
+      const snap = await db.collection(c.collection).doc(c.docId).get();
+      if(!snap.exists) return null;
+      const data = snap.data() || {};
+      return data.bankData || null;
+    }catch(err){
+      console.warn(err);
+      return null;
+    }
+  }
+
+  async function startRealtime(){
+    if(listenerStarted) return;
+    if(!await initFirebase()) return;
+    listenerStarted = true;
+    const c = cfg();
+    db.collection(c.collection).doc(c.docId).onSnapshot(function(snap){
+      if(!snap.exists) return;
+      const data = snap.data() || {};
+      if(!data.bankData) return;
+      applyingRemote = true;
+      saveLocalData(data.bankData);
+      refreshUI();
+      applyingRemote = false;
+      setStatus('☁️ تم جلب آخر تحديث', true);
+    }, function(err){
+      console.warn(err);
+    });
+  }
+
+  // wrap saveBankData
+  const oldSaveBankData = window.saveBankData;
+  window.saveBankData = function(){
+    let res;
+    if(typeof oldSaveBankData === 'function'){
+      res = oldSaveBankData.apply(this, arguments);
+    }
+    const data = getLocalData();
+    if(data) pushToCloud(data);
+    return res;
+  };
+
+  // expose manual actions
+  window.cloudPushNow = async function(){
+    const data = getLocalData();
+    if(data) await pushToCloud(data);
+  };
+  window.cloudRefreshNow = async function(){
+    const remote = await pullFromCloud();
+    if(remote){
+      applyingRemote = true;
+      saveLocalData(remote);
+      refreshUI();
+      applyingRemote = false;
+      setStatus('☁️ تم جلب آخر تحديث', true);
+    }
+  };
+
+  // first load
+  document.addEventListener('DOMContentLoaded', async function(){
+    const ok = await initFirebase();
+    if(!ok) return;
+    const remote = await pullFromCloud();
+    if(remote){
+      applyingRemote = true;
+      saveLocalData(remote);
+      refreshUI();
+      applyingRemote = false;
+      setStatus('☁️ تم جلب آخر تحديث', true);
+    }else{
+      const local = getLocalData();
+      if(local) await pushToCloud(local);
+    }
+    startRealtime();
+  });
+})();
 </script>
 
 </body></html>
