@@ -698,6 +698,27 @@ body.device-mobile .bottom-nav{width:min(430px,calc(100% - 18px))}
 }
 </style>
 
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+
+<script id="oai-firebase-live-config">
+window.MATH_BANK_CLOUD_CONFIG = {
+  enabled: true,
+  firebaseConfig: {
+    apiKey: "AIzaSyDP-pi0tbF09bNRihrLz_kUs-JBoa9Cw4Y",
+    authDomain: "sara-haywire.firebaseapp.com",
+    projectId: "sara-haywire",
+    storageBucket: "sara-haywire.firebasestorage.app",
+    messagingSenderId: "333467940977",
+    appId: "1:333467940977:web:97d056d5dbff2debbf43d0"
+  },
+  collection: "math_bank",
+  docId: "shared_bank"
+};
+</script>
+
 </head>
 <body>
 <div class="app">
@@ -1310,6 +1331,17 @@ body.device-mobile .bottom-nav{width:min(430px,calc(100% - 18px))}
     </div>
 
     <div id="teacherPaneHome" class="teacher-pane active card">
+
+<div class="cloud-sync-card" id="cloudSyncCard">
+  <h3>المزامنة السحابية بين الأجهزة</h3>
+  <p>تم تفعيل Firebase لهذا الملف. أي حفظ أو نقل من البنك الأزرق سيحاول المزامنة مع جميع الأجهزة.</p>
+  <div class="cloud-sync-grid">
+    <button class="btn btn-green" type="button" onclick="cloudPushNow()">رفع البيانات للسحابة</button>
+    <button class="btn btn-light" type="button" onclick="cloudRefreshFromServer()">جلب آخر بيانات من السحابة</button>
+  </div>
+  <div class="cloud-sync-status" id="cloudSyncStatus">الحالة: جارٍ تفعيل المزامنة...</div>
+</div>
+
       <div class="teacher-grid">
         <div class="teacher-box">
           <h3>ملخص سريع</h3>
@@ -4261,6 +4293,27 @@ body.device-mobile .bottom-nav{width:min(430px,calc(100% - 18px))}
 }
 </style>
 
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+
+<script id="oai-firebase-live-config">
+window.MATH_BANK_CLOUD_CONFIG = {
+  enabled: true,
+  firebaseConfig: {
+    apiKey: "AIzaSyDP-pi0tbF09bNRihrLz_kUs-JBoa9Cw4Y",
+    authDomain: "sara-haywire.firebaseapp.com",
+    projectId: "sara-haywire",
+    storageBucket: "sara-haywire.firebasestorage.app",
+    messagingSenderId: "333467940977",
+    appId: "1:333467940977:web:97d056d5dbff2debbf43d0"
+  },
+  collection: "math_bank",
+  docId: "shared_bank"
+};
+</script>
+
 </head><body>'
       + '<h1>تقرير بنك الرياضيات</h1>'
       + '<div class="meta">الطالبة: '+esc(student.name)+'</div>'
@@ -4513,6 +4566,27 @@ body.device-mobile .bottom-nav{width:min(430px,calc(100% - 18px))}
   }
 }
 </style>
+
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+
+<script id="oai-firebase-live-config">
+window.MATH_BANK_CLOUD_CONFIG = {
+  enabled: true,
+  firebaseConfig: {
+    apiKey: "AIzaSyDP-pi0tbF09bNRihrLz_kUs-JBoa9Cw4Y",
+    authDomain: "sara-haywire.firebaseapp.com",
+    projectId: "sara-haywire",
+    storageBucket: "sara-haywire.firebasestorage.app",
+    messagingSenderId: "333467940977",
+    appId: "1:333467940977:web:97d056d5dbff2debbf43d0"
+  },
+  collection: "math_bank",
+  docId: "shared_bank"
+};
+</script>
 
 </head><body><h1>التقرير الشامل - بنك الرياضيات</h1><div class="muted">تم إنشاؤه تلقائيًا من التقارير الذكية</div><div class="grid">${['srStudents','srClasses','srDeposits','srWithdrawals','srTransfers','srTasks','srSubmitted','srPending'].map(id=>{ const el=document.getElementById(id); const label=el&&el.nextElementSibling?el.nextElementSibling.textContent:''; return `<div class="card"><strong>${label}</strong><div style="font-size:24px;margin-top:8px">${el?el.textContent:''}</div></div>`; }).join('')}</div><div class="card"><h3>أفضل الطلاب / الطالبات</h3>${document.getElementById('smartTopStudents')?.innerHTML||''}</div><div class="card"><h3>تحليل الفصول</h3>${document.getElementById('smartClassCards')?.innerHTML||''}</div><div class="card"><h3>التنبيهات الذكية</h3>${document.getElementById('smartAlerts')?.innerHTML||''}</div>
 <script id="smart-reports-override-v7">
@@ -4773,6 +4847,27 @@ body.device-mobile .bottom-nav{width:min(430px,calc(100% - 18px))}
   }
 }
 </style>
+
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+
+<script id="oai-firebase-live-config">
+window.MATH_BANK_CLOUD_CONFIG = {
+  enabled: true,
+  firebaseConfig: {
+    apiKey: "AIzaSyDP-pi0tbF09bNRihrLz_kUs-JBoa9Cw4Y",
+    authDomain: "sara-haywire.firebaseapp.com",
+    projectId: "sara-haywire",
+    storageBucket: "sara-haywire.firebasestorage.app",
+    messagingSenderId: "333467940977",
+    appId: "1:333467940977:web:97d056d5dbff2debbf43d0"
+  },
+  collection: "math_bank",
+  docId: "shared_bank"
+};
+</script>
 
 </head><body><h1>التقرير الشامل - بنك الرياضيات</h1><div class="muted">تم إنشاؤه تلقائيًا من التقارير الذكية</div><div class="grid">${['srStudents','srClasses','srDeposits','srWithdrawals','srTransfers','srTasks','srSubmitted','srPending'].map(id=>{ const el=document.getElementById(id); const label=el&&el.nextElementSibling?el.nextElementSibling.textContent:''; return `<div class="card"><strong>${label}</strong><div style="font-size:24px;margin-top:8px">${el?el.textContent:''}</div></div>`; }).join('')}</div><div class="card"><h3>أفضل الطلاب / الطالبات</h3>${document.getElementById('smartTopStudents')?.innerHTML||''}</div><div class="card"><h3>مؤشر أداء الطالب / الطالبة</h3>${document.getElementById('smartPerformanceIndicators')?.innerHTML||''}</div><div class="card"><h3>تحليل الفصول</h3>${document.getElementById('smartClassCards')?.innerHTML||''}</div><div class="card"><h3>التنبيهات الذكية</h3>${document.getElementById('smartAlerts')?.innerHTML||''}</div>
 <style id="student-settings-pro-style">
@@ -5226,6 +5321,27 @@ body.device-mobile .bottom-nav{width:min(430px,calc(100% - 18px))}
 }
 </style>
 
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+
+<script id="oai-firebase-live-config">
+window.MATH_BANK_CLOUD_CONFIG = {
+  enabled: true,
+  firebaseConfig: {
+    apiKey: "AIzaSyDP-pi0tbF09bNRihrLz_kUs-JBoa9Cw4Y",
+    authDomain: "sara-haywire.firebaseapp.com",
+    projectId: "sara-haywire",
+    storageBucket: "sara-haywire.firebasestorage.app",
+    messagingSenderId: "333467940977",
+    appId: "1:333467940977:web:97d056d5dbff2debbf43d0"
+  },
+  collection: "math_bank",
+  docId: "shared_bank"
+};
+</script>
+
 </head><body><h1>${title}</h1>${bodyHtml}
 <script>
 function goAccountTab(tabId){
@@ -5481,55 +5597,20 @@ function openMoreInfo(type){
     const modal = document.getElementById('blueImportTeacherModal');
     if(modal) modal.classList.remove('show');
   };
-  window.runBlueImportTeacher = async function(){
+  window.runBlueImportTeacher = function(){
     try {
       const currentRaw = localStorage.getItem(GREEN_BANK_KEY);
       if(currentRaw) localStorage.setItem(GREEN_BANK_BACKUP_KEY, currentRaw);
       const currentBank = currentRaw ? JSON.parse(currentRaw) : null;
       const nextBank = convertBlueToGreen(currentBank);
-
-      // تحديث نسخة البنك الحالية داخل الجهاز
       localStorage.setItem(GREEN_BANK_KEY, JSON.stringify(nextBank));
       window.bankData = nextBank;
-
-      // إذا كان النظام يملك دالة حفظ مركزية فاستدعها أولاً
-      try {
-        if(typeof saveBankData === 'function'){
-          saveBankData();
-        }
-      } catch(e){}
-
-      // إذا كانت هناك مزامنة سحابية جاهزة فعّليها بعد النقل
-      let pushedToCloud = false;
-      try {
-        if(typeof cloudPushNow === 'function'){
-          await cloudPushNow();
-          pushedToCloud = true;
-        } else if(typeof pushCloudData === 'function'){
-          await pushCloudData(nextBank);
-          pushedToCloud = true;
-        } else if(typeof syncBankToCloud === 'function'){
-          await syncBankToCloud(nextBank);
-          pushedToCloud = true;
-        }
-      } catch(e){
-        console.warn('blue import cloud push failed', e);
-      }
-
       closeBlueImportTeacherModal();
       try { if(typeof renderTeacher === 'function') renderTeacher(); } catch(e){}
       try { if(typeof refreshTeacherUI === 'function') refreshTeacherUI(); } catch(e){}
       try { if(typeof renderClassCards === 'function') renderClassCards(); } catch(e){}
       try { if(typeof renderClassDetail === 'function') renderClassDetail(); } catch(e){}
-      try { if(typeof updateHomeCard === 'function') updateHomeCard(); } catch(e){}
-      try { if(typeof updateHonorBoard === 'function') updateHonorBoard(); } catch(e){}
-      try { if(typeof bindParentButtons === 'function') bindParentButtons(); } catch(e){}
-
-      if(pushedToCloud){
-        alert('تم نقل بيانات البنك الأزرق وتحديثها على الأجهزة المرتبطة.');
-      } else {
-        alert('تم نقل بيانات البنك الأزرق على هذا الجهاز. ولتصل لباقي الأجهزة لازم تفعيل المزامنة السحابية داخل الملف.');
-      }
+      alert('تم نقل بيانات البنك الأزرق بنجاح.');
     } catch(err) {
       alert('تعذر نقل البيانات: ' + (err && err.message ? err.message : err));
     }
@@ -7720,6 +7801,206 @@ document.addEventListener('DOMContentLoaded', function(){
 
   window.addEventListener('resize', applyDeviceMode);
   window.addEventListener('orientationchange', applyDeviceMode);
+})();
+</script>
+
+
+<script id="oai-cloud-sync-live-script">
+(function(){
+  let cloudDb = null;
+  let cloudReady = false;
+  let listenerStarted = false;
+
+  function cfg(){
+    return window.MATH_BANK_CLOUD_CONFIG || {};
+  }
+
+  function updateCloudStatus(msg, ok){
+    const el = document.getElementById('cloudSyncStatus');
+    if(!el) return;
+    el.textContent = msg;
+    el.style.background = ok ? '#edf6f0' : '#fff7e8';
+    el.style.color = ok ? '#176242' : '#9a6a15';
+  }
+
+  function getLocalBankData(){
+    try{
+      if(typeof bankData !== 'undefined' && bankData) return JSON.parse(JSON.stringify(bankData));
+    }catch(e){}
+    try{
+      const raw = localStorage.getItem('greenBankTeacherData_v1') || localStorage.getItem('bankData_v10');
+      if(raw) return JSON.parse(raw);
+    }catch(e){}
+    return null;
+  }
+
+  function saveLocalBankData(data){
+    try{
+      if(typeof bankData !== 'undefined'){
+        bankData = data;
+        window.bankData = data;
+      } else {
+        window.bankData = data;
+      }
+    }catch(e){}
+    try{ localStorage.setItem('greenBankTeacherData_v1', JSON.stringify(data)); }catch(e){}
+    try{ localStorage.setItem('bankData_v10', JSON.stringify(data)); }catch(e){}
+  }
+
+  function refreshAllUI(){
+    try{ if(typeof refreshTeacherUI === 'function') refreshTeacherUI(); }catch(e){}
+    try{ if(typeof renderStudentAccount === 'function') renderStudentAccount(); }catch(e){}
+    try{ if(typeof updateParentFollowup === 'function') updateParentFollowup(); }catch(e){}
+    try{ if(typeof updateHonorBoard === 'function') updateHonorBoard(); }catch(e){}
+    try{ if(typeof updateHomeCard === 'function') updateHomeCard(); }catch(e){}
+    try{ if(typeof renderLeaderboard === 'function') renderLeaderboard(); }catch(e){}
+  }
+
+  async function initCloud(){
+    if(cloudReady) return true;
+    const c = cfg();
+    const f = c.firebaseConfig || {};
+    if(!(c.enabled && f.apiKey && f.projectId && f.appId)){
+      updateCloudStatus('الحالة: إعدادات Firebase غير مكتملة', false);
+      return false;
+    }
+    try{
+      if(!firebase.apps.length){
+        firebase.initializeApp(f);
+      }
+      cloudDb = firebase.firestore();
+      cloudReady = true;
+      updateCloudStatus('الحالة: المزامنة السحابية مفعلة', true);
+      if(!listenerStarted) startRealtimeListener();
+      return true;
+    }catch(err){
+      console.warn('firebase init error', err);
+      updateCloudStatus('الحالة: تعذر تشغيل Firebase', false);
+      return false;
+    }
+  }
+
+  async function pushCloudData(data){
+    if(!await initCloud()) return false;
+    try{
+      const c = cfg();
+      await cloudDb.collection(c.collection).doc(c.docId).set({
+        bankData: data,
+        updatedAt: Date.now()
+      }, {merge:true});
+      updateCloudStatus('الحالة: تم رفع البيانات إلى السحابة', true);
+      return true;
+    }catch(err){
+      console.warn('pushCloudData error', err);
+      updateCloudStatus('الحالة: تعذر رفع البيانات إلى السحابة', false);
+      return false;
+    }
+  }
+
+  async function pullCloudData(){
+    if(!await initCloud()) return null;
+    try{
+      const c = cfg();
+      const snap = await cloudDb.collection(c.collection).doc(c.docId).get();
+      if(!snap.exists) return null;
+      const data = snap.data() || {};
+      return data.bankData || null;
+    }catch(err){
+      console.warn('pullCloudData error', err);
+      return null;
+    }
+  }
+
+  function startRealtimeListener(){
+    if(listenerStarted || !cloudDb) return;
+    listenerStarted = true;
+    const c = cfg();
+    cloudDb.collection(c.collection).doc(c.docId).onSnapshot(function(snap){
+      if(!snap.exists) return;
+      const data = snap.data() || {};
+      if(!data.bankData) return;
+      saveLocalBankData(data.bankData);
+      refreshAllUI();
+      updateCloudStatus('الحالة: تم تحديث البيانات من السحابة', true);
+    }, function(err){
+      console.warn('onSnapshot error', err);
+    });
+  }
+
+  window.cloudPushNow = async function(){
+    const data = getLocalBankData();
+    if(!data){
+      alert('لا توجد بيانات بنك لرفعها.');
+      return;
+    }
+    const ok = await pushCloudData(data);
+    if(ok) alert('تم رفع بيانات البنك إلى السحابة.');
+  };
+
+  window.cloudRefreshFromServer = async function(){
+    const data = await pullCloudData();
+    if(!data){
+      alert('لا توجد بيانات سحابية حالياً.');
+      return;
+    }
+    saveLocalBankData(data);
+    refreshAllUI();
+    alert('تم جلب آخر بيانات البنك من السحابة.');
+  };
+
+  window.pushCloudData = pushCloudData;
+  window.pullCloudData = pullCloudData;
+  window.syncBankToCloud = async function(){
+    const data = getLocalBankData();
+    if(data) return await pushCloudData(data);
+    return false;
+  };
+
+  // wrap saveBankData to push automatically
+  const oldSaveBankData = window.saveBankData;
+  window.saveBankData = function(){
+    let result;
+    try{
+      if(typeof oldSaveBankData === 'function'){
+        result = oldSaveBankData.apply(this, arguments);
+      }
+    }catch(e){ console.warn(e); }
+    const data = getLocalBankData();
+    if(data) pushCloudData(data);
+    return result;
+  };
+
+  // improve blue import button to sync cloud after local import
+  const oldRunBlueImportTeacher = window.runBlueImportTeacher;
+  if(typeof oldRunBlueImportTeacher === 'function'){
+    window.runBlueImportTeacher = async function(){
+      const result = oldRunBlueImportTeacher.apply(this, arguments);
+      setTimeout(async function(){
+        const data = getLocalBankData();
+        if(data){
+          const synced = await pushCloudData(data);
+          if(synced){
+            try{ alert('تم نقل بيانات البنك الأزرق ومزامنتها مع جميع الأجهزة.'); }catch(e){}
+          }
+        }
+      }, 300);
+      return result;
+    };
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    initCloud().then(async function(ok){
+      if(!ok) return;
+      const remote = await pullCloudData();
+      if(remote){
+        saveLocalBankData(remote);
+        refreshAllUI();
+      } else {
+        const local = getLocalBankData();
+        if(local) pushCloudData(local);
+      }
+    });
+  });
 })();
 </script>
 
