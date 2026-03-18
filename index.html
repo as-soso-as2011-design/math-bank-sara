@@ -264,6 +264,21 @@
 @media (max-width:900px){.bank-grid{grid-template-columns:1fr 1fr}}
 @media (max-width:560px){.bank-grid{grid-template-columns:1fr}}
 
+
+/* VIP functional additions without changing the core visual identity */
+.filter-bar{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:10px;margin:12px 0 16px}
+.class-extra-actions{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-top:10px}
+.student-extra-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.student-extra-box{background:#fff;border:1px solid #e7f0ea;border-radius:14px;padding:10px 12px;font-size:13px;line-height:1.7}
+.student-extra-box b{display:block;color:var(--green-3)}
+.student-extra-actions{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:12px}
+@media (max-width:900px){
+  .filter-bar,.class-extra-actions,.student-extra-grid,.student-extra-actions{grid-template-columns:1fr 1fr}
+}
+@media (max-width:560px){
+  .filter-bar,.class-extra-actions,.student-extra-grid,.student-extra-actions{grid-template-columns:1fr}
+}
+
 </style>
 </head>
 <body>
@@ -439,6 +454,11 @@
         </div>
         <div class="panel" style="margin-top:18px">
           <div class="split"><h4>قائمة الطلاب</h4><span class="tag" id="studentsCountTag">0 طالب/طالبة</span></div>
+          <div class="filter-bar">
+            <input class="input" id="filterNameInput" placeholder="بحث بالاسم">
+            <select class="select" id="filterClassSelect"><option value="">كل الفصول</option></select>
+            <select class="select" id="filterLevelSelect"><option value="">كل المستويات</option><option>برونزي</option><option>فضي</option><option>ذهبي</option><option>ماسي</option></select>
+          </div>
           <div class="grid-3" id="studentsList"></div>
         </div>
       </div>
@@ -598,6 +618,7 @@
     </div>
   </div>
 
+  <div class="modal" id="vipActionModal"><div class="modal-body"><div class="modal-top"><h3 id="vipModalTitle" style="margin:0">تنفيذ إجراء</h3><button class="small-btn" type="button" onclick="VIP.close()">إغلاق</button></div><div id="vipModalContent"></div></div></div>
   <div class="toast" id="toast"></div>
 
   <script>
@@ -1273,7 +1294,378 @@ function logoutTeacher(){
 }
 </script>
 
+
+<script>
+(function(){
+  if(!window.app) return;
+
+  function enrich(st, i){
+    return Object.assign({
+      accountNumber: st.accountNumber || st.code || String(1001+i),
+      username: st.username || ('student'+(i+1)),
+      level: st.level || ['برونزي','فضي','ذهبي','ماسي'][i%4],
+      expiry: st.expiry || '2026-12-31',
+      absences: Number(st.absences || 0),
+      pointsPenalty: Number(st.pointsPenalty || 0),
+      statusMode: st.statusMode || 'نشط',
+      statusReason: st.statusReason || '',
+      tasksMeta: st.tasksMeta || {assigned:0, submitted:0, missed:0}
+    }, st);
+  }
+
+  const oldLoad = app.load.bind(app);
+  app.load = function(){
+    oldLoad();
+    this.state.students = (this.state.students || []).map(enrich);
+    this.save();
+  };
+
+  const oldSeed = app.seedDemo.bind(app);
+  app.seedDemo = function(clear=false){
+    oldSeed(clear);
+    this.state.students = (this.state.students || []).map(enrich);
+    this.save();
+  };
+
+  function findStudent(id){ return app.state.students.find(s=>s.id===id); }
+  function className(id){ return app.state.classes.find(c=>c.id===id)?.name || '—'; }
+  function txLabel(type){
+    return ({deposit:'إيداع', withdraw:'سحب', transfer_in:'تحويل', transfer_out:'تحويل', note:'ملاحظة', task:'مهمة أدائية', roulette:'جائزة روليت'})[type] || type;
+  }
+
+  window.VIP = {
+    open(title, html){
+      document.getElementById('vipModalTitle').textContent = title;
+      document.getElementById('vipModalContent').innerHTML = html;
+      document.getElementById('vipActionModal').classList.add('show');
+    },
+    close(){
+      document.getElementById('vipActionModal').classList.remove('show');
+    }
+  };
+
+  function persist(msg){
+    app.save();
+    app.renderAll();
+    if(msg) app.toast(msg);
+  }
+
+  app.renderOverview = function(){
+    const totalBalance = this.state.students.reduce((a,s)=>a+s.balance,0);
+    this.refs.sumBalance.textContent = totalBalance;
+    this.refs.sumClasses.textContent = this.state.classes.length;
+    this.refs.sumStudents.textContent = this.state.students.length;
+    this.refs.sumTransactions.textContent = this.state.transactions.length;
+    const selectedClass = this.state.classes.find(c=>c.id===this.state.selectedClassId);
+    this.refs.selectedClassBadge.textContent = selectedClass ? selectedClass.name : 'لا يوجد فصل محدد';
+    if(!this.state.selectedClassId && this.state.classes[0]) this.state.selectedClassId = this.state.classes[0].id;
+
+    const filterClass = document.getElementById('filterClassSelect');
+    if(filterClass){
+      filterClass.innerHTML = '<option value="">كل الفصول</option>' + this.state.classes.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+    }
+
+    if(this.state.classes.length===0){
+      this.refs.classesList.innerHTML = '<div class="empty">لا توجد فصول بعد.</div>';
+    } else {
+      this.refs.classesList.innerHTML = this.state.classes.map(cls=>{
+        const count = this.state.students.filter(s=>s.classId===cls.id).length;
+        return `<div class="class-item ${cls.id===this.state.selectedClassId?'active':''}" data-classid="${cls.id}">
+          <div class="split"><div><h5>${cls.name}</h5><div class="tiny">${cls.meta}</div></div><span class="tag">${count} طالب/طالبة</span></div>
+          <div class="class-extra-actions">
+            <button class="small-btn" data-classdeposit="${cls.id}">إيداع للكل</button>
+            <button class="small-btn" data-classwithdraw="${cls.id}">سحب من الكل</button>
+            <button class="small-btn" data-classpdf="${cls.id}">تقرير PDF</button>
+            <button class="small-btn" data-classmsg="${cls.id}">رسالة جماعية</button>
+            <button class="small-btn" data-classdelete="${cls.id}">حذف الفصل</button>
+          </div>
+        </div>`;
+      }).join('');
+      this.refs.classesList.querySelectorAll('[data-classid]').forEach(el=>el.onclick=(e)=>{
+        const ds = e.target.dataset;
+        if(ds.classdeposit || ds.classwithdraw || ds.classpdf || ds.classmsg || ds.classdelete) return;
+        this.state.selectedClassId = el.dataset.classid;
+        persist();
+      });
+      this.refs.classesList.querySelectorAll('[data-classdeposit]').forEach(b=>b.onclick=()=>openClassBulk(b.dataset.classdeposit,'deposit'));
+      this.refs.classesList.querySelectorAll('[data-classwithdraw]').forEach(b=>b.onclick=()=>openClassBulk(b.dataset.classwithdraw,'withdraw'));
+      this.refs.classesList.querySelectorAll('[data-classpdf]').forEach(b=>b.onclick=()=>classPdf(b.dataset.classpdf));
+      this.refs.classesList.querySelectorAll('[data-classmsg]').forEach(b=>b.onclick=()=>copyClassMessage(b.dataset.classmsg));
+      this.refs.classesList.querySelectorAll('[data-classdelete]').forEach(b=>b.onclick=()=>deleteClass(b.dataset.classdelete));
+    }
+    this.renderRecentList(this.refs.recentTransactions, this.state.transactions.slice(0,5));
+  };
+
+  app.renderStudents = function(){
+    const selectedClassId = this.state.selectedClassId || this.state.classes[0]?.id || null;
+    let list = selectedClassId ? this.state.students.filter(s=>s.classId===selectedClassId) : this.state.students.slice();
+    const nameFilter = (document.getElementById('filterNameInput')?.value || '').trim().toLowerCase();
+    const classFilter = document.getElementById('filterClassSelect')?.value || '';
+    const levelFilter = document.getElementById('filterLevelSelect')?.value || '';
+    if(classFilter) list = list.filter(s=>s.classId===classFilter);
+    if(levelFilter) list = list.filter(s=>(s.level || '')===levelFilter);
+    if(nameFilter) list = list.filter(s=>(s.name || '').toLowerCase().includes(nameFilter));
+
+    this.refs.studentsCountTag.textContent = `${list.length} طالب/طالبة`;
+    if(!this.state.selectedStudentId && this.state.students[0]) this.state.selectedStudentId = this.state.students[0].id;
+
+    if(this.state.students.length===0){
+      this.refs.studentsList.innerHTML = '<div class="empty" style="grid-column:1/-1">أضيفي طالبًا أو طالبة لبدء العمل.</div>';
+    } else {
+      this.refs.studentsList.innerHTML = list.map((st, i)=>{
+        st = enrich(st, i);
+        return `<div class="student-item ${st.id===this.state.selectedStudentId?'active':''}" data-studentid="${st.id}">
+          <div class="split"><div class="row-start"><div class="avatar">${st.name.charAt(0)}</div><div><h5>${st.name}</h5><div class="tiny">${className(st.classId)} • ${st.parentPhone || '—'}</div></div></div><span class="tag">${st.balance} نقطة</span></div>
+          <div class="student-extra-grid">
+            <div class="student-extra-box">رقم الحساب<b>${st.accountNumber || '—'}</b></div>
+            <div class="student-extra-box">اسم المستخدم<b>${st.username || '—'}</b></div>
+            <div class="student-extra-box">مستوى الحساب<b>${st.level || '—'}</b></div>
+            <div class="student-extra-box">تاريخ الانتهاء<b>${st.expiry || '—'}</b></div>
+            <div class="student-extra-box">الحالة<b>${st.statusMode || 'نشط'}</b></div>
+            <div class="student-extra-box">الغياب / خصم النقاط<b>${st.absences || 0} / ${st.pointsPenalty || 0}</b></div>
+          </div>
+          <div class="student-extra-actions">
+            <button class="small-btn" data-open="${st.id}">دخول الحساب</button>
+            <button class="small-btn" data-edit="${st.id}">تعديل الاسم</button>
+            <button class="small-btn" data-note="${st.id}">ملاحظة</button>
+            <button class="small-btn" data-statement="${st.id}">كشف الحساب</button>
+
+            <button class="small-btn" data-op="${st.id}">عملية سريعة</button>
+            <button class="small-btn" data-parent="${st.id}">رسالة ولي الأمر</button>
+            <button class="small-btn" data-task="${st.id}">المهام الأدائية</button>
+            <button class="small-btn" data-pdf="${st.id}">تقرير PDF</button>
+
+            <button class="small-btn" data-freeze="${st.id}">تجميد الحساب</button>
+            <button class="small-btn" data-activate="${st.id}">تفعيل الحساب</button>
+            <button class="small-btn" data-lock="${st.id}">إقفال الحساب</button>
+            <button class="small-btn" data-delete="${st.id}">حذف الطالب/ة</button>
+          </div>
+        </div>`;
+      }).join('');
+
+      const box = this.refs.studentsList;
+      box.querySelectorAll('[data-studentid]').forEach(el=>el.onclick=(e)=>{
+        const ds = e.target.dataset;
+        if(ds.open || ds.edit || ds.note || ds.statement || ds.op || ds.parent || ds.task || ds.pdf || ds.freeze || ds.activate || ds.lock || ds.delete) return;
+        this.state.selectedStudentId = el.dataset.studentid;
+        persist();
+      });
+      box.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>{localStorage.setItem('masraf_selected_student_id', b.dataset.open); app.state.previewStudentId = b.dataset.open; app.state.currentView='student'; persist('تم تحديد الحساب لواجهة الطالبة');});
+      box.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>editName(b.dataset.edit));
+      box.querySelectorAll('[data-note]').forEach(b=>b.onclick=()=>noteModal(b.dataset.note));
+      box.querySelectorAll('[data-statement]').forEach(b=>b.onclick=()=>statementModal(b.dataset.statement));
+      box.querySelectorAll('[data-op]').forEach(b=>b.onclick=()=>quickOpModal(b.dataset.op));
+      box.querySelectorAll('[data-parent]').forEach(b=>b.onclick=()=>copyParentMessage(b.dataset.parent));
+      box.querySelectorAll('[data-task]').forEach(b=>b.onclick=()=>tasksModal(b.dataset.task));
+      box.querySelectorAll('[data-pdf]').forEach(b=>b.onclick=()=>pdfStudent(b.dataset.pdf));
+      box.querySelectorAll('[data-freeze]').forEach(b=>b.onclick=()=>statusModal(b.dataset.freeze,'مجمد'));
+      box.querySelectorAll('[data-activate]').forEach(b=>b.onclick=()=>activateAccount(b.dataset.activate));
+      box.querySelectorAll('[data-lock]').forEach(b=>b.onclick=()=>statusModal(b.dataset.lock,'مغلق'));
+      box.querySelectorAll('[data-delete]').forEach(b=>b.onclick=()=>deleteStudent(b.dataset.delete));
+    }
+
+    const studentOptions = this.state.students.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
+    ['operationStudentSelect','operationTargetSelect','rouletteStudentSelect','studentPreviewSelect','taskRewardStudentSelect'].forEach(id=> this.refs[id].innerHTML = studentOptions || '<option value="">لا يوجد طلاب</option>');
+    if(this.state.selectedStudentId) this.refs.operationStudentSelect.value = this.state.selectedStudentId;
+    if(this.state.previewStudentId) this.refs.studentPreviewSelect.value = this.state.previewStudentId;
+    if(this.state.selectedStudentId) this.refs.rouletteStudentSelect.value = this.state.selectedStudentId;
+  };
+
+  function editName(id){
+    const s=findStudent(id); if(!s) return;
+    VIP.open('تعديل الاسم', `<div class="field"><label>الاسم الجديد</label><input id="vipNameInput" class="input" value="${s.name}"></div><div class="actions-row" style="margin-top:12px"><button class="btn primary" onclick="VIP_saveName('${id}')">حفظ</button></div>`);
+  }
+  window.VIP_saveName = function(id){
+    const s=findStudent(id); if(!s) return;
+    const v=document.getElementById('vipNameInput').value.trim();
+    if(!v) return;
+    s.name = v;
+    VIP.close(); persist('تم تعديل الاسم');
+  };
+
+  function noteModal(id){
+    VIP.open('ملاحظة الطالب/ة', `
+      <div class="field"><label>نوع الملاحظة</label>
+        <select id="vipNoteType" class="select" onchange="document.getElementById('vipOtherWrap').style.display=this.value==='other'?'grid':'none'">
+          <option value="absent">غائب/ة عن الحصة</option>
+          <option value="late">متأخر/ة عن الحصة</option>
+          <option value="other">أخرى</option>
+        </select>
+      </div>
+      <div class="field" id="vipOtherWrap" style="display:none"><label>النص</label><textarea id="vipOtherText" class="textarea"></textarea></div>
+      <div class="actions-row" style="margin-top:12px"><button class="btn primary" onclick="VIP_saveNote('${id}')">حفظ</button></div>`);
+  }
+  window.VIP_saveNote = function(id){
+    const s=findStudent(id); if(!s) return;
+    const type=document.getElementById('vipNoteType').value;
+    const custom=(document.getElementById('vipOtherText')?.value || '').trim();
+    let reason='ملاحظة';
+    if(type==='absent'){ reason='غائب/ة عن الحصة'; s.absences=(s.absences||0)+1; s.pointsPenalty=(s.pointsPenalty||0)+10; }
+    else if(type==='late'){ reason='متأخر/ة عن الحصة'; s.pointsPenalty=(s.pointsPenalty||0)+5; }
+    else reason=custom || 'أخرى';
+    app.addTransaction({studentId:id, type:'note', amount:0, reason});
+    VIP.close(); persist('تم تسجيل الملاحظة');
+  };
+
+  function quickOpModal(id){
+    VIP.open('عملية سريعة', `
+      <div class="field"><label>نوع العملية</label>
+        <select id="vipOpType" class="select">
+          <option value="deposit">إيداع</option>
+          <option value="transfer_in">تحويل</option>
+          <option value="withdraw">سحب</option>
+        </select>
+      </div>
+      <div class="field"><label>القيمة</label><input id="vipOpAmount" type="number" class="input" value="0"></div>
+      <div class="field"><label>السبب</label>
+        <select id="vipOpReasonSelect" class="select" onchange="document.getElementById('vipOpReasonCustomWrap').style.display=this.value==='أخرى'?'grid':'none'">
+          <option>مشاركة مميزة</option>
+          <option>حل سؤال صعب</option>
+          <option>مساعدة زميلة</option>
+          <option>تسليم مبكر</option>
+          <option>درجة كاملة</option>
+          <option>سلوك غير مناسب</option>
+          <option>عدم إحضار الواجب</option>
+          <option>أخرى</option>
+        </select>
+      </div>
+      <div class="field" id="vipOpReasonCustomWrap" style="display:none"><label>سبب آخر</label><input id="vipOpReasonCustom" class="input"></div>
+      <div class="actions-row" style="margin-top:12px"><button class="btn primary" onclick="VIP_saveQuick('${id}')">تنفيذ العملية</button></div>`);
+  }
+  window.VIP_saveQuick = function(id){
+    const type=document.getElementById('vipOpType').value;
+    const amount=Number(document.getElementById('vipOpAmount').value||0);
+    let reason=document.getElementById('vipOpReasonSelect').value;
+    if(reason==='أخرى') reason=document.getElementById('vipOpReasonCustom').value.trim() || 'أخرى';
+    app.addTransaction({studentId:id, type, amount, reason});
+    VIP.close(); persist('تم تنفيذ العملية');
+  };
+
+  function statusModal(id, mode){
+    VIP.open(mode, `<div class="field"><label>اذكري السبب</label><textarea id="vipStatusReason" class="textarea"></textarea></div><div class="actions-row" style="margin-top:12px"><button class="btn primary" onclick="VIP_saveStatus('${id}','${mode}')">حفظ</button></div>`);
+  }
+  window.VIP_saveStatus = function(id, mode){
+    const s=findStudent(id); if(!s) return;
+    s.statusMode = mode;
+    s.statusReason = document.getElementById('vipStatusReason').value.trim() || 'بدون سبب';
+    VIP.close(); persist(mode==='مجمد' ? 'تم تجميد الحساب' : 'تم إقفال الحساب');
+  };
+  function activateAccount(id){
+    const s=findStudent(id); if(!s) return;
+    s.statusMode='نشط'; s.statusReason=''; persist('تم تفعيل الحساب');
+  }
+  function deleteStudent(id){
+    const s=findStudent(id); if(!s) return;
+    if(confirm(`حذف ${s.name}؟`)){
+      app.state.students = app.state.students.filter(x=>x.id!==id);
+      persist('تم حذف الطالب/ة');
+    }
+  }
+
+  function statementModal(id){
+    const s=findStudent(id); if(!s) return;
+    const rows=app.state.transactions.filter(t=>t.studentId===id).map(t=>`<tr><td>${txLabel(t.type)}</td><td>${t.reason||'—'}</td><td>${t.amount||'—'}</td></tr>`).join('');
+    VIP.open(`كشف حساب ${s.name}`, `<table class="table"><thead><tr><th>العملية</th><th>السبب</th><th>القيمة</th></tr></thead><tbody>${rows || '<tr><td colspan="3">لا توجد بيانات</td></tr>'}</tbody></table>`);
+  }
+
+  function tasksModal(id){
+    const s=findStudent(id); if(!s) return;
+    const t=s.tasksMeta || {assigned:0, submitted:0, missed:0};
+    VIP.open('المهام الأدائية', `
+      <div class="field"><label>عدد المهام</label><input id="vipAssigned" type="number" class="input" value="${t.assigned||0}"></div>
+      <div class="field"><label>سلّم</label><input id="vipSubmitted" type="number" class="input" value="${t.submitted||0}"></div>
+      <div class="field"><label>لم يسلم</label><input id="vipMissed" type="number" class="input" value="${t.missed||0}"></div>
+      <div class="actions-row" style="margin-top:12px"><button class="btn primary" onclick="VIP_saveTasks('${id}')">حفظ</button></div>`);
+  }
+  window.VIP_saveTasks = function(id){
+    const s=findStudent(id); if(!s) return;
+    s.tasksMeta = {
+      assigned:Number(document.getElementById('vipAssigned').value||0),
+      submitted:Number(document.getElementById('vipSubmitted').value||0),
+      missed:Number(document.getElementById('vipMissed').value||0)
+    };
+    VIP.close(); persist('تم تحديث حالة المهام');
+  };
+
+  function pdfStudent(id){
+    const s=findStudent(id); if(!s) return;
+    const rows=app.state.transactions.filter(t=>t.studentId===id).map(t=>`<tr><td>${txLabel(t.type)}</td><td>${t.reason||'—'}</td><td>${t.amount||'—'}</td></tr>`).join('');
+    const date=new Date().toLocaleDateString('ar-SA'); const day=new Date().toLocaleDateString('ar-SA',{weekday:'long'});
+    const w=window.open('','_blank');
+    w.document.write(`<html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>تقرير ${s.name}</title><style>body{font-family:Tahoma;padding:30px;color:#213b2e}table{width:100%;border-collapse:collapse;margin-top:16px}th,td{border:1px solid #dbe8de;padding:10px;text-align:right}th{background:#eef6f0}.head{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #4f8b67;padding-bottom:14px}</style></head><body><div class="head"><div><h1>مصرف التعليم</h1><div>اسم المعلمة: أ. ساره مداوي حقوي<br>المادة: الرياضيات<br>اليوم: ${day}<br>التاريخ: ${date}</div></div><div>تقرير PDF</div></div><h2>${s.name}</h2><div>الفصل: ${className(s.classId)} • رقم الحساب: ${s.accountNumber || '—'} • اسم المستخدم: ${s.username || '—'}</div><table><thead><tr><th>العملية</th><th>السبب</th><th>القيمة</th></tr></thead><tbody>${rows || '<tr><td colspan="3">لا توجد بيانات</td></tr>'}</tbody></table><script>window.print()<\/script></body></html>`);
+    w.document.close();
+  }
+
+  function copyParentMessage(id){
+    const s=findStudent(id); if(!s) return;
+    const msg=`تنبيه من مصرف التعليم: ${s.name} في ${className(s.classId)}. الرصيد الحالي ${s.balance} نقطة، وعدد الغياب ${s.absences||0}.`;
+    navigator.clipboard.writeText(msg); app.toast('تم نسخ رسالة ولي الأمر');
+  }
+
+  function openClassBulk(classId, mode){
+    VIP.open(mode==='deposit' ? 'إيداع للكل' : 'سحب من الكل', `
+      <div class="field"><label>القيمة</label><input id="vipClassAmount" type="number" class="input" value="0"></div>
+      <div class="field"><label>السبب</label>
+        <select id="vipClassReason" class="select" onchange="document.getElementById('vipClassOtherWrap').style.display=this.value==='أخرى'?'grid':'none'">
+          <option>تميز الفصل</option>
+          <option>انضباط جماعي</option>
+          <option>إكمال هدف جماعي</option>
+          <option>تفاعل ممتاز</option>
+          <option>أسبوع مميز</option>
+          <option>إنجاز جماعي</option>
+          <option>فوز الفصل</option>
+          <option>مبادرة جماعية</option>
+          <option>أخرى</option>
+        </select>
+      </div>
+      <div class="field" id="vipClassOtherWrap" style="display:none"><label>سبب آخر</label><input id="vipClassOther" class="input"></div>
+      <div class="actions-row" style="margin-top:12px"><button class="btn primary" onclick="VIP_saveClassBulk('${classId}','${mode}')">تنفيذ</button></div>`);
+  }
+  window.VIP_saveClassBulk = function(classId, mode){
+    const amount=Number(document.getElementById('vipClassAmount').value||0);
+    let reason=document.getElementById('vipClassReason').value;
+    if(reason==='أخرى') reason=document.getElementById('vipClassOther').value.trim() || 'أخرى';
+    app.state.students.filter(s=>s.classId===classId).forEach(s=>app.addTransaction({studentId:s.id, type:mode, amount, reason}));
+    VIP.close(); persist(mode==='deposit' ? 'تم الإيداع للكل' : 'تم السحب من الكل');
+  };
+
+  function classPdf(classId){
+    const cls=app.state.classes.find(c=>c.id===classId); if(!cls) return;
+    const rows=app.state.students.filter(s=>s.classId===classId).map(s=>`<tr><td>${s.name}</td><td>${s.username || '—'}</td><td>${s.accountNumber || '—'}</td><td>${s.balance}</td><td>${s.level || '—'}</td></tr>`).join('');
+    const date=new Date().toLocaleDateString('ar-SA'); const day=new Date().toLocaleDateString('ar-SA',{weekday:'long'});
+    const w=window.open('','_blank');
+    w.document.write(`<html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>تقرير ${cls.name}</title><style>body{font-family:Tahoma;padding:30px;color:#213b2e}table{width:100%;border-collapse:collapse;margin-top:16px}th,td{border:1px solid #dbe8de;padding:10px;text-align:right}th{background:#eef6f0}.head{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #4f8b67;padding-bottom:14px}</style></head><body><div class="head"><div><h1>مصرف التعليم</h1><div>اسم المعلمة: أ. ساره مداوي حقوي<br>المادة: ${cls.meta || 'الرياضيات'}<br>اليوم: ${day}<br>التاريخ: ${date}</div></div><div>تقرير الفصل</div></div><h2>${cls.name}</h2><table><thead><tr><th>الاسم</th><th>اسم المستخدم</th><th>رقم الحساب</th><th>الرصيد</th><th>المستوى</th></tr></thead><tbody>${rows || '<tr><td colspan="5">لا يوجد طلاب</td></tr>'}</tbody></table><script>window.print()<\/script></body></html>`);
+    w.document.close();
+  }
+
+  function copyClassMessage(classId){
+    const cls=app.state.classes.find(c=>c.id===classId); if(!cls) return;
+    const msg=`رسالة جماعية من مصرف التعليم إلى أولياء أمور ${cls.name}: متابعة مستمرة وتحفيز داخل الفصل.`;
+    navigator.clipboard.writeText(msg); app.toast('تم نسخ الرسالة الجماعية');
+  }
+
+  function deleteClass(classId){
+    const cls=app.state.classes.find(c=>c.id===classId); if(!cls) return;
+    if(confirm(`حذف الفصل ${cls.name}؟ سيتم حذف الطلاب المرتبطين به.`)){
+      app.state.students = app.state.students.filter(s=>s.classId!==classId);
+      app.state.classes = app.state.classes.filter(c=>c.id!==classId);
+      if(app.state.selectedClassId === classId) app.state.selectedClassId = app.state.classes[0]?.id || null;
+      persist('تم حذف الفصل');
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', ()=>{
+    const modal=document.getElementById('vipActionModal');
+    if(modal) modal.addEventListener('click', e=>{ if(e.target===modal) VIP.close(); });
+    setTimeout(()=>{
+      ['filterNameInput','filterClassSelect','filterLevelSelect'].forEach(id=>{
+        const el=document.getElementById(id);
+        if(el) el.oninput = el.onchange = ()=> app.renderStudents();
+      });
+    }, 250);
+  });
+})();
+</script>
+
 </body>
 </html>
-
-<!-- VIP features active -->
