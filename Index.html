@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مصرف التعليم - لوحة المعلمة VIP</title>
+<style>
+:root{
+  --bg:#f5faf6; --panel:#ffffff; --soft:#eef6f0; --soft-2:#e6f1e9; --line:#dfe9e2;
+  --green:#74a687; --green-2:#4f8b67; --green-3:#29543d; --muted:#6e8274;
+  --danger:#ca6666; --warn:#d6a14a; --shadow:0 14px 35px rgba(58,105,77,.10);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:linear-gradient(180deg,#fbfdfb 0%,#f2f7f3 45%,#edf5ef 100%);color:var(--green-3);font-family:"Segoe UI",Tahoma,Arial,sans-serif}
+button,input,select,textarea{font:inherit}
+.page{max-width:1480px;margin:0 auto;padding:20px}
+.topbar,.panel,.login-card,.modal-box{background:rgba(255,255,255,.88);backdrop-filter:blur(14px);border:1px solid var(--line);box-shadow:var(--shadow)}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;padding:14px 18px;border-radius:26px;position:sticky;top:8px;z-index:20}
+.brand{display:flex;align-items:center;gap:14px}
+.logo{width:78px;height:78px;border-radius:26px;object-fit:cover;background:#fff;border:1px solid var(--line);box-shadow:0 10px 24px rgba(0,0,0,.08)}
+.brand h1{margin:0;font-size:30px;font-weight:900}
+.brand small{display:block;color:var(--muted);margin-top:4px}
+.row-actions{display:flex;gap:10px;flex-wrap:wrap}
+.btn{border:none;cursor:pointer;padding:12px 16px;border-radius:16px;font-weight:900;transition:.18s}
+.btn:hover{transform:translateY(-1px)}
+.btn.primary{background:linear-gradient(135deg,var(--green-2),var(--green));color:#fff}
+.btn.soft{background:var(--soft);color:var(--green-3)}
+.btn.warn{background:linear-gradient(135deg,#dfb56e,#c99546);color:#fff}
+.btn.danger{background:linear-gradient(135deg,#db8a8a,#ca6666);color:#fff}
+.hero{display:grid;grid-template-columns:1.25fr .95fr;gap:18px;margin-top:18px}
+.panel{border-radius:30px;padding:20px}
+.hero-copy{background:linear-gradient(135deg,#edf7ef 0%,#dceee1 100%);position:relative;overflow:hidden}
+.hero-copy:before,.hero-copy:after{content:"";position:absolute;border-radius:50%;background:rgba(255,255,255,.24)}
+.hero-copy:before{width:220px;height:220px;left:-50px;top:-60px}
+.hero-copy:after{width:160px;height:160px;right:-30px;bottom:-40px}
+.hero-copy h2{margin:0 0 10px;font-size:46px;letter-spacing:-1px;position:relative;z-index:1}
+.hero-copy p{margin:0;line-height:1.95;color:#52685c;position:relative;z-index:1}
+.hero-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.stat{background:#fff;border:1px solid var(--line);border-radius:22px;padding:16px;box-shadow:0 8px 20px rgba(58,105,77,.06)}
+.stat h4{margin:0 0 6px;font-size:14px;color:var(--muted)}
+.stat strong{font-size:28px}
+.main-grid{display:grid;grid-template-columns:.95fr 1.05fr;gap:18px;margin-top:18px}
+.section-title{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.section-title h3{margin:0;font-size:28px}
+.badge{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:var(--soft);font-size:12px;font-weight:900}
+.field-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.field{display:grid;gap:7px}
+.field label{font-size:13px;font-weight:800;color:var(--green-3)}
+.input,.select,.textarea{width:100%;padding:12px 14px;border-radius:16px;border:1px solid var(--line);background:#fbfdfb;outline:none}
+.textarea{min-height:95px;resize:vertical}
+.input:focus,.select:focus,.textarea:focus{border-color:#9ec7ac;box-shadow:0 0 0 4px rgba(116,166,135,.08)}
+.class-grid,.student-grid{display:grid;grid-template-columns:1fr;gap:14px}
+.class-card,.student-card{background:#fff;border:1px solid var(--line);border-radius:26px;padding:16px;box-shadow:0 10px 24px rgba(58,105,77,.06)}
+.split{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.meta{color:var(--muted);font-size:13px;line-height:1.8}
+.class-actions,.student-actions{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:12px}
+.mini-btn{border:none;border-radius:14px;padding:10px 8px;font-weight:800;cursor:pointer;background:#f7fbf8;color:var(--green-3);border:1px solid #e3ece6}
+.mini-btn:hover{background:#eef6f0}
+.mini-btn.warn{background:#fff5ea;color:#9a6a2f;border-color:#f0dcc1}
+.mini-btn.danger{background:#fff1f1;color:#a95050;border-color:#efcfcf}
+.student-info-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}
+.info-box{background:linear-gradient(180deg,#fbfdfb,#f7fbf8);border:1px solid #e8efea;border-radius:16px;padding:10px 12px;font-size:13px;line-height:1.7}
+.info-box b{display:block;color:var(--green-3)}
+.student-note{margin-top:10px;padding:10px 12px;background:#fbfdfb;border:1px solid #e7efea;border-radius:14px;color:#5b6f64;font-size:13px}
+.table{width:100%;border-collapse:collapse}
+.table th,.table td{padding:12px 10px;border-bottom:1px solid #edf3ee;text-align:right;font-size:14px}
+.table th{color:var(--muted)}
+.modal{position:fixed;inset:0;background:rgba(27,41,32,.32);display:none;align-items:center;justify-content:center;padding:20px;z-index:50}
+.modal.show{display:flex}
+.modal-box{width:min(760px,96vw);border-radius:28px;padding:22px}
+.modal-top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}
+.toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%) translateY(20px);background:#1f3d2d;color:#fff;padding:12px 18px;border-radius:999px;opacity:0;pointer-events:none;transition:.25s;z-index:60}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.login-gate,.pass-modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(243,250,245,.96),rgba(220,239,226,.98));padding:20px;z-index:100}
+.pass-modal{display:none;background:rgba(27,41,32,.3);z-index:101}
+.pass-modal.open{display:flex}
+.login-card,.pass-sheet{width:min(470px,96vw);border-radius:32px;padding:28px}
+.login-card h2{margin:14px 0 8px;font-size:32px}
+.login-card p,.pass-sheet p{margin:0 0 16px;color:var(--muted);line-height:1.8}
+.login-error{display:none;margin-top:8px;padding:10px 12px;border-radius:14px;background:#fff1f1;color:#b84b4b;border:1px solid #f0c9c9;font-weight:700}
+@media (max-width:1200px){.hero,.main-grid{grid-template-columns:1fr}.hero-summary,.field-grid,.student-info-grid{grid-template-columns:1fr 1fr}.class-actions,.student-actions{grid-template-columns:repeat(3,1fr)}}
+@media (max-width:760px){.hero-summary,.field-grid,.student-info-grid,.class-actions,.student-actions{grid-template-columns:1fr}.hero-copy h2{font-size:34px}}
+</style>
+</head>
+<body>
+<div id="loginGate" class="login-gate">
+  <div class="login-card">
+    <div class="badge">👩‍🏫 دخول المعلمة</div>
+    <h2>مرحبًا بك</h2>
+    <p>حفظ كلمة السر • تغيير كلمة السر</p>
+    <form onsubmit="event.preventDefault(); loginTeacher();">
+      <div class="field"><label>اسم المستخدم</label><input id="loginUser" class="input" placeholder="اسم المستخدم"></div>
+      <div class="field"><label>كلمة السر</label><input id="loginPass" type="password" class="input" placeholder="كلمة السر"></div>
+      <div id="loginError" class="login-error">اسم المستخدم أو كلمة السر غير صحيحة.</div>
+      <div class="row-actions" style="margin-top:10px">
+        <button class="btn primary" type="submit">دخول الحساب</button>
+        <button class="btn soft" type="button" onclick="openPassModal()">تغيير كلمة السر</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="passModal" class="pass-modal">
+  <div class="pass-sheet panel">
+    <h3 style="margin:0 0 8px">تغيير رقم السر</h3>
+    <p>أدخلي اسم المستخدم وكلمة السر الحالية ثم الجديدة.</p>
+    <div class="field"><label>اسم المستخدم</label><input id="resetUser" class="input"></div>
+    <div class="field"><label>كلمة السر الحالية</label><input id="resetCurrent" type="password" class="input"></div>
+    <div class="field"><label>كلمة السر الجديدة</label><input id="resetNew" type="password" class="input"></div>
+    <div class="field"><label>تأكيد كلمة السر الجديدة</label><input id="resetConfirm" type="password" class="input"></div>
+    <div id="resetError" class="login-error">تحققي من البيانات.</div>
+    <div class="row-actions">
+      <button class="btn primary" type="button" onclick="savePassword()">حفظ كلمة السر</button>
+      <button class="btn soft" type="button" onclick="closePassModal()">رجوع لصفحة الدخول</button>
+    </div>
+  </div>
+</div>
+
+<div class="page" id="appPage" style="visibility:hidden">
+  <header class="topbar">
+    <div class="brand">
+      <img class="logo" src="logo.png" alt="شعار مصرف التعليم">
+      <div>
+        <h1>مصرف التعليم</h1>
+        <small>لوحة المعلمة • VIP</small>
+      </div>
+    </div>
+    <div class="row-actions">
+      <button class="btn soft" onclick="openPassModal()">تغيير كلمة السر</button>
+      <button class="btn warn" onclick="backupData()">نسخة احتياطية للبيانات</button>
+      <button class="btn danger" onclick="logoutTeacher()">تسجيل الخروج</button>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="panel hero-copy">
+      <h2>مصرف التعليم</h2>
+      <p>منصة تعليمية ذكية لإدارة التحفيز والمتابعة داخل الفصل، تساعد المعلمة على تنظيم الفصول والطلاب، توثيق الأداء، متابعة المهام الأدائية، وإرسال التقارير والتواصل مع أولياء الأمور بسهولة.<br><br>✨ <strong>وانطلاقًا من قناعتي الراسخة:</strong><br><strong>الرياضيات لغة الأذكياء</strong></p>
+    </div>
+    <div class="panel">
+      <div class="hero-summary">
+        <div class="stat"><h4>إجمالي الرصيد</h4><strong id="sumBalance">0</strong></div>
+        <div class="stat"><h4>عدد الطلاب</h4><strong id="sumStudents">0</strong></div>
+        <div class="stat"><h4>عدد العمليات</h4><strong id="sumTransactions">0</strong></div>
+        <div class="stat"><h4>عدد الفصول</h4><strong id="sumClasses">0</strong></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="main-grid">
+    <div class="panel">
+      <div class="section-title"><h3>إضافة فصل / طالب</h3><span class="badge">إدارة أساسية</span></div>
+      <div class="field-grid">
+        <div class="field"><label>اسم الفصل</label><input id="classNameInput" class="input" placeholder="مثال: الصف الخامس (أ)"></div>
+        <div class="field"><label>المادة</label><input id="classSubjectInput" class="input" value="الرياضيات"></div>
+        <div class="field"><label>اسم الطالب/ة</label><input id="studentNameInput" class="input" placeholder="اسم الطالب/ة"></div>
+        <div class="field"><label>الفصل</label><select id="studentClassSelect" class="select"></select></div>
+
+        <div class="field"><label>رقم الحساب</label><input id="accountInput" class="input" placeholder="1001"></div>
+        <div class="field"><label>اسم المستخدم</label><input id="usernameInput" class="input" placeholder="username"></div>
+        <div class="field"><label>مستوى الحساب</label>
+          <select id="levelInput" class="select">
+            <option>برونزي</option><option>فضي</option><option>ذهبي</option><option>ماسي</option>
+          </select>
+        </div>
+        <div class="field"><label>تاريخ الانتهاء</label><input id="expiryInput" type="date" class="input"></div>
+
+        <div class="field"><label>رقم ولي الأمر</label><input id="parentPhoneInput" class="input" placeholder="05xxxxxxxx"></div>
+        <div class="field"><label>الرصيد</label><input id="balanceInput" type="number" class="input" value="0"></div>
+      </div>
+      <div class="row-actions" style="margin-top:14px">
+        <button class="btn soft" onclick="addClass()">إضافة الفصل</button>
+        <button class="btn primary" onclick="addStudent()">إضافة الطالب/ة</button>
+      </div>
+
+      <div class="section-title" style="margin-top:24px"><h3>الفصول</h3><span class="badge" id="classCountBadge">0 فصل</span></div>
+      <div id="classGrid" class="class-grid"></div>
+    </div>
+
+    <div class="panel">
+      <div class="section-title"><h3>آخر العمليات</h3><span class="badge" id="txCountBadge">0 عملية</span></div>
+      <table class="table">
+        <thead><tr><th>الاسم</th><th>العملية</th><th>السبب</th><th>القيمة</th></tr></thead>
+        <tbody id="txTable"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="panel" style="margin-top:18px">
+    <div class="section-title"><h3>قائمة الطلاب</h3><span class="badge" id="studentCountBadge">0 طالب/ة</span></div>
+    <div id="studentGrid" class="student-grid"></div>
+  </section>
+</div>
+
+<div id="modal" class="modal">
+  <div class="modal-box">
+    <div class="modal-top">
+      <h3 id="modalTitle" style="margin:0">تفاصيل</h3>
+      <button class="btn soft" onclick="closeModal()">إغلاق</button>
+    </div>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+const STORE_KEY = 'masraf_teacher_vip_store';
+const AUTH_USER = 'masraf_teacher_username';
+const AUTH_PASS = 'masraf_teacher_password';
+const AUTH_OK = 'masraf_teacher_auth';
+const LINKED_STUDENT_KEY = 'masraf_selected_student_id';
+
+function uid(){ return 'id_' + Math.random().toString(36).slice(2,9); }
+function defaultState(){
+  return {
+    classes:[
+      {id:uid(), name:'الصف الخامس (أ)', subject:'الرياضيات'},
+      {id:uid(), name:'الصف السادس (أ)', subject:'الرياضيات'}
+    ],
+    students:[
+      {id:uid(), name:'سارة أحمد', classId:'', parentPhone:'0500000001', balance:850, accountNumber:'1001', username:'sara', level:'ذهبي', expiry:'2026-12-31', absences:0, pointsPenalty:0, status:'نشط', statusReason:'', tasks:{assigned:3, submitted:2, missed:1}},
+      {id:uid(), name:'نورة خالد', classId:'', parentPhone:'0500000002', balance:390, accountNumber:'1002', username:'nora', level:'فضي', expiry:'2026-12-31', absences:1, pointsPenalty:10, status:'نشط', statusReason:'', tasks:{assigned:2, submitted:1, missed:1}}
+    ],
+    transactions:[]
+  }
+}
+function hydrate(state){
+  state = state || defaultState();
+  state.classes = state.classes || [];
+  state.students = (state.students || []).map((s,i)=>({
+    id:s.id||uid(),
+    name:s.name||'طالب/ة',
+    classId:s.classId || state.classes[0]?.id || '',
+    parentPhone:s.parentPhone||'',
+    balance:Number(s.balance||0),
+    accountNumber:s.accountNumber || String(1001+i),
+    username:s.username || ('student'+(i+1)),
+    level:s.level || 'برونزي',
+    expiry:s.expiry || '2026-12-31',
+    absences:Number(s.absences||0),
+    pointsPenalty:Number(s.pointsPenalty||0),
+    status:s.status || 'نشط',
+    statusReason:s.statusReason || '',
+    tasks:s.tasks || {assigned:0, submitted:0, missed:0}
+  }));
+  if(state.students[0] && !state.students[0].classId && state.classes[0]) state.students[0].classId = state.classes[0].id;
+  if(state.students[1] && !state.students[1].classId && state.classes[0]) state.students[1].classId = state.classes[0].id;
+  state.transactions = state.transactions || [];
+  return state;
+}
+let state;
+try{ state = hydrate(JSON.parse(localStorage.getItem(STORE_KEY) || 'null')); }catch(e){ state = hydrate(defaultState()); }
+
+function save(){ localStorage.setItem(STORE_KEY, JSON.stringify(state)); render(); }
+function toast(msg){
+  const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
+  clearTimeout(window._toastT); window._toastT=setTimeout(()=>t.classList.remove('show'),2200);
+}
+function className(id){ return state.classes.find(c=>c.id===id)?.name || '—'; }
+function txLabel(type){
+  return {
+    deposit:'إيداع', withdraw:'سحب', transfer:'تحويل', note:'ملاحظة',
+    class_deposit:'إيداع للفصل', class_withdraw:'سحب من الفصل', freeze:'تجميد',
+    activate:'تفعيل', lock:'إقفال', task:'مهام أدائية', delete:'حذف'
+  }[type] || type;
+}
+function addTx(studentName, type, reason, value){
+  state.transactions.unshift({id:uid(), studentName, type, reason, value});
+  if(state.transactions.length > 50) state.transactions.length = 50;
+}
+function render(){
+  document.getElementById('sumBalance').textContent = state.students.reduce((a,s)=>a+Number(s.balance||0),0);
+  document.getElementById('sumStudents').textContent = state.students.length;
+  document.getElementById('sumTransactions').textContent = state.transactions.length;
+  document.getElementById('sumClasses').textContent = state.classes.length;
+  document.getElementById('classCountBadge').textContent = `${state.classes.length} فصل`;
+  document.getElementById('studentCountBadge').textContent = `${state.students.length} طالب/ة`;
+  document.getElementById('txCountBadge').textContent = `${state.transactions.length} عملية`;
+
+  const classSelect = document.getElementById('studentClassSelect');
+  classSelect.innerHTML = state.classes.length ? state.classes.map(c=>`<option value="${c.id}">${c.name}</option>`).join('') : '<option value="">أضيفي فصلًا أولًا</option>';
+
+  document.getElementById('classGrid').innerHTML = state.classes.map(c=>{
+    const students = state.students.filter(s=>s.classId===c.id);
+    const total = students.reduce((a,s)=>a+Number(s.balance||0),0);
+    return `
+      <div class="class-card">
+        <div class="split">
+          <div>
+            <div style="font-size:22px;font-weight:900">${c.name}</div>
+            <div class="meta">${c.subject} • ${students.length} طالب/ة • إجمالي الرصيد ${total} نقطة</div>
+          </div>
+          <span class="badge">الفصل</span>
+        </div>
+        <div class="class-actions">
+          <button class="mini-btn" onclick="classDeposit('${c.id}')">إيداع للكل</button>
+          <button class="mini-btn" onclick="classWithdraw('${c.id}')">سحب من الكل</button>
+          <button class="mini-btn" onclick="classPdf('${c.id}')">تقرير PDF للفصل</button>
+          <button class="mini-btn" onclick="classMessage('${c.id}')">رسالة جماعية</button>
+          <button class="mini-btn danger" onclick="deleteClass('${c.id}')">حذف الفصل</button>
+        </div>
+      </div>
+    `;
+  }).join('') || '<div class="meta">لا توجد فصول بعد.</div>';
+
+  document.getElementById('studentGrid').innerHTML = state.students.map(s=>{
+    const statusClass = s.status==='نشط' ? '' : s.status==='مجمد' ? 'warn' : 'danger';
+    return `
+      <div class="student-card">
+        <div class="split">
+          <div>
+            <div style="font-size:24px;font-weight:900">${s.name}</div>
+            <div class="meta">${className(s.classId)} • ${s.parentPhone || '—'}</div>
+          </div>
+          <div class="split">
+            <span class="badge">${s.balance} نقطة</span>
+            <span class="badge ${statusClass}">${s.status}</span>
+          </div>
+        </div>
+
+        <div class="student-info-grid">
+          <div class="info-box">رقم الحساب<b>${s.accountNumber || '—'}</b></div>
+          <div class="info-box">اسم المستخدم<b>${s.username || '—'}</b></div>
+          <div class="info-box">مستوى الحساب<b>${s.level || '—'}</b></div>
+          <div class="info-box">تاريخ الانتهاء<b>${s.expiry || '—'}</b></div>
+        </div>
+
+        <div class="student-note">
+          عدد الغياب: <strong>${s.absences || 0}</strong> • خصم النقاط: <strong>${s.pointsPenalty || 0}</strong>
+          ${s.statusReason ? `<br>سبب الحالة: <strong>${s.statusReason}</strong>` : ''}
+        </div>
+
+        <div class="student-actions">
+          <button class="mini-btn" onclick="openAccount('${s.id}')">دخول الحساب</button>
+          <button class="mini-btn" onclick="editName('${s.id}')">تعديل الاسم</button>
+          <button class="mini-btn" onclick="noteModal('${s.id}')">ملاحظة</button>
+          <button class="mini-btn" onclick="statementModal('${s.id}')">كشف الحساب</button>
+          <button class="mini-btn" onclick="quickOpModal('${s.id}')">عملية سريعة</button>
+
+          <button class="mini-btn" onclick="parentMessage('${s.id}')">رسالة ولي الأمر</button>
+          <button class="mini-btn" onclick="tasksModal('${s.id}')">المهام الأدائية</button>
+          <button class="mini-btn" onclick="pdfStudent('${s.id}')">تقرير PDF</button>
+          <button class="mini-btn warn" onclick="freezeModal('${s.id}')">تجميد الحساب</button>
+          <button class="mini-btn" onclick="activateAccount('${s.id}')">تفعيل الحساب</button>
+
+          <button class="mini-btn danger" onclick="lockModal('${s.id}')">إقفال الحساب</button>
+          <button class="mini-btn danger" onclick="deleteStudent('${s.id}')">حذف الطالب/ة</button>
+        </div>
+      </div>
+    `;
+  }).join('') || '<div class="meta">لا يوجد طلاب بعد.</div>';
+
+  document.getElementById('txTable').innerHTML = state.transactions.slice(0,10).map(t=>`
+    <tr><td>${t.studentName}</td><td>${txLabel(t.type)}</td><td>${t.reason || '—'}</td><td>${t.value ?? '—'}</td></tr>
+  `).join('') || '<tr><td colspan="4">لا توجد عمليات بعد.</td></tr>';
+
+  localStorage.setItem(STORE_KEY, JSON.stringify(state));
+}
+function addClass(){
+  const name = document.getElementById('classNameInput').value.trim();
+  const subject = document.getElementById('classSubjectInput').value.trim() || 'الرياضيات';
+  if(!name) return toast('أدخلي اسم الفصل');
+  state.classes.push({id:uid(), name, subject});
+  document.getElementById('classNameInput').value = '';
+  save(); toast('تمت إضافة الفصل');
+}
+function addStudent(){
+  const name = document.getElementById('studentNameInput').value.trim();
+  const classId = document.getElementById('studentClassSelect').value;
+  const parentPhone = document.getElementById('parentPhoneInput').value.trim();
+  const balance = Number(document.getElementById('balanceInput').value || 0);
+  const accountNumber = document.getElementById('accountInput').value.trim();
+  const username = document.getElementById('usernameInput').value.trim();
+  const level = document.getElementById('levelInput').value;
+  const expiry = document.getElementById('expiryInput').value;
+  if(!name || !classId || !accountNumber || !username) return toast('أكملي البيانات الأساسية');
+  state.students.unshift({
+    id:uid(), name, classId, parentPhone, balance, accountNumber, username, level, expiry,
+    absences:0, pointsPenalty:0, status:'نشط', statusReason:'', tasks:{assigned:0, submitted:0, missed:0}
+  });
+  addTx(name, 'deposit', 'فتح حساب جديد', balance);
+  ['studentNameInput','parentPhoneInput','accountInput','usernameInput','expiryInput'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('balanceInput').value='0';
+  save(); toast('تمت إضافة الطالب/ة');
+}
+function getStudent(id){ return state.students.find(s=>s.id===id); }
+function editName(id){
+  const s=getStudent(id); if(!s) return;
+  const v=prompt('الاسم الجديد', s.name);
+  if(v){ s.name=v.trim()||s.name; save(); toast('تم تعديل الاسم'); }
+}
+function deleteStudent(id){
+  const s=getStudent(id); if(!s) return;
+  if(confirm(`حذف ${s.name}؟`)){ state.students = state.students.filter(x=>x.id!==id); addTx(s.name,'delete','حذف الطالب/ة','—'); save(); toast('تم حذف الطالب/ة'); }
+}
+function openModal(title, body){
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalBody').innerHTML = body;
+  document.getElementById('modal').classList.add('show');
+}
+function closeModal(){ document.getElementById('modal').classList.remove('show'); }
+function noteModal(id){
+  openModal('ملاحظة الطالب/ة', `
+    <div class="field"><label>نوع الملاحظة</label>
+      <select id="noteType" class="select">
+        <option>غائب/ة عن الحصة</option>
+        <option>متأخر/ة عن الحصة</option>
+        <option>أخرى</option>
+      </select>
+    </div>
+    <div class="field"><label>محتوى إضافي</label><textarea id="noteText" class="textarea" placeholder="يظهر عند اختيار أخرى أو لإضافة تفاصيل"></textarea></div>
+    <div class="row-actions"><button class="btn primary" onclick="saveNote('${id}')">تنفيذ</button></div>
+  `);
+}
+function saveNote(id){
+  const s=getStudent(id); if(!s) return;
+  const type=document.getElementById('noteType').value;
+  const text=document.getElementById('noteText').value.trim();
+  const finalText = type==='أخرى' ? (text || 'ملاحظة أخرى') : (text ? type + ' - ' + text : type);
+  if(type.includes('غائب')){ s.absences += 1; s.pointsPenalty += 10; }
+  if(type.includes('متأخر')){ s.pointsPenalty += 5; }
+  addTx(s.name,'note',finalText,'—');
+  closeModal(); save(); toast('تم تسجيل الملاحظة');
+}
+function freezeModal(id){
+  openModal('تجميد الحساب', `
+    <div class="field"><label>سبب التجميد</label><textarea id="statusReason" class="textarea" placeholder="اذكري السبب"></textarea></div>
+    <div class="row-actions"><button class="btn warn" onclick="saveFreeze('${id}')">تجميد الحساب</button></div>
+  `);
+}
+function saveFreeze(id){
+  const s=getStudent(id); if(!s) return;
+  const reason=document.getElementById('statusReason').value.trim() || 'بدون سبب';
+  s.status='مجمد'; s.statusReason=reason; addTx(s.name,'freeze',reason,'—');
+  closeModal(); save(); toast('تم تجميد الحساب');
+}
+function lockModal(id){
+  openModal('إقفال الحساب', `
+    <div class="field"><label>سبب الإقفال</label><textarea id="statusReason" class="textarea" placeholder="اذكري السبب"></textarea></div>
+    <div class="row-actions"><button class="btn danger" onclick="saveLock('${id}')">إقفال الحساب</button></div>
+  `);
+}
+function saveLock(id){
+  const s=getStudent(id); if(!s) return;
+  const reason=document.getElementById('statusReason').value.trim() || 'بدون سبب';
+  s.status='مغلق'; s.statusReason=reason; addTx(s.name,'lock',reason,'—');
+  closeModal(); save(); toast('تم إقفال الحساب');
+}
+function activateAccount(id){
+  const s=getStudent(id); if(!s) return;
+  s.status='نشط'; s.statusReason=''; addTx(s.name,'activate','إعادة تفعيل الحساب','—'); save(); toast('تم تفعيل الحساب');
+}
+function quickOpModal(id){
+  openModal('عملية سريعة', `
+    <div class="field"><label>نوع العملية</label>
+      <select id="opType" class="select">
+        <option value="deposit">إيداع</option>
+        <option value="transfer">تحويل</option>
+        <option value="withdraw">سحب</option>
+      </select>
+    </div>
+    <div class="field"><label>القيمة</label><input id="opValue" type="number" class="input" value="0"></div>
+    <div class="field"><label>السبب</label><input id="opReason" class="input" placeholder="اذكري السبب"></div>
+    <div class="row-actions"><button class="btn primary" onclick="saveQuickOp('${id}')">تنفيذ العملية</button></div>
+  `);
+}
+function saveQuickOp(id){
+  const s=getStudent(id); if(!s) return;
+  const type=document.getElementById('opType').value;
+  const value=Number(document.getElementById('opValue').value || 0);
+  const reason=document.getElementById('opReason').value.trim() || 'بدون سبب';
+  if(type==='deposit' || type==='transfer') s.balance += value;
+  if(type==='withdraw') s.balance = Math.max(0, s.balance - value);
+  addTx(s.name,type,reason,value);
+  closeModal(); save(); toast('تم تنفيذ العملية');
+}
+function statementModal(id){
+  const s=getStudent(id); if(!s) return;
+  const rows = state.transactions.filter(t=>t.studentName===s.name).map(t=>`<tr><td>${txLabel(t.type)}</td><td>${t.reason||'—'}</td><td>${t.value ?? '—'}</td></tr>`).join('') || '<tr><td colspan="3">لا توجد عمليات</td></tr>';
+  openModal(`كشف حساب ${s.name}`, `<table class="table"><thead><tr><th>العملية</th><th>السبب</th><th>القيمة</th></tr></thead><tbody>${rows}</tbody></table>`);
+}
+function parentMessage(id){
+  const s=getStudent(id); if(!s) return;
+  const msg = `تنبيه من مصرف التعليم: ${s.name} في ${className(s.classId)}. الرصيد الحالي ${s.balance} نقطة، وعدد الغياب ${s.absences}.`;
+  navigator.clipboard.writeText(msg); toast('تم نسخ رسالة ولي الأمر');
+}
+function tasksModal(id){
+  const s=getStudent(id); if(!s) return;
+  openModal('المهام الأدائية', `
+    <div class="field-grid">
+      <div class="field"><label>عدد المهام</label><input id="taskAssigned" type="number" class="input" value="${s.tasks.assigned||0}"></div>
+      <div class="field"><label>سلّم</label><input id="taskSubmitted" type="number" class="input" value="${s.tasks.submitted||0}"></div>
+      <div class="field"><label>لم يسلّم</label><input id="taskMissed" type="number" class="input" value="${s.tasks.missed||0}"></div>
+    </div>
+    <div class="row-actions" style="margin-top:12px"><button class="btn primary" onclick="saveTasks('${id}')">حفظ</button></div>
+  `);
+}
+function saveTasks(id){
+  const s=getStudent(id); if(!s) return;
+  s.tasks = {
+    assigned:Number(document.getElementById('taskAssigned').value || 0),
+    submitted:Number(document.getElementById('taskSubmitted').value || 0),
+    missed:Number(document.getElementById('taskMissed').value || 0)
+  };
+  addTx(s.name,'task','تحديث حالة المهام',`${s.tasks.submitted}/${s.tasks.assigned}`);
+  closeModal(); save(); toast('تم تحديث المهام');
+}
+function pdfStudent(id){
+  const s=getStudent(id); if(!s) return;
+  const rows = state.transactions.filter(t=>t.studentName===s.name).map(t=>`<tr><td>${txLabel(t.type)}</td><td>${t.reason||'—'}</td><td>${t.value ?? '—'}</td></tr>`).join('');
+  const date = new Date().toLocaleDateString('ar-SA');
+  const day = new Date().toLocaleDateString('ar-SA',{weekday:'long'});
+  const w=window.open('', '_blank');
+  w.document.write(`
+    <html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>تقرير ${s.name}</title>
+    <style>body{font-family:Tahoma;padding:30px;color:#213b2e}table{width:100%;border-collapse:collapse;margin-top:16px}th,td{border:1px solid #dbe8de;padding:10px;text-align:right}th{background:#eef6f0}.head{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #4f8b67;padding-bottom:14px}</style>
+    </head><body>
+      <div class="head"><div><h1>مصرف التعليم</h1><div>اسم المعلمة: أ. ساره مداوي حقوي<br>المادة: الرياضيات<br>اليوم: ${day}<br>التاريخ: ${date}</div></div><div>تقرير PDF</div></div>
+      <h2>${s.name}</h2>
+      <div>الفصل: ${className(s.classId)} • رقم الحساب: ${s.accountNumber} • اسم المستخدم: ${s.username}</div>
+      <table><thead><tr><th>العملية</th><th>السبب</th><th>القيمة</th></tr></thead><tbody>${rows || '<tr><td colspan="3">لا توجد بيانات</td></tr>'}</tbody></table>
+      <script>window.print()<\/script>
+    </body></html>
+  `);
+  w.document.close();
+}
+function openAccount(id){
+  localStorage.setItem(LINKED_STUDENT_KEY, id);
+  toast('تم تحديد الحساب. افتحي ملف الطالب/ة.');
+}
+function classDeposit(id){
+  openModal('إيداع للفصل كامل', `
+    <div class="field"><label>القيمة</label><input id="classValue" type="number" class="input" value="0"></div>
+    <div class="field"><label>السبب</label><input id="classReason" class="input" placeholder="اذكري السبب"></div>
+    <div class="row-actions"><button class="btn primary" onclick="saveClassDeposit('${id}')">تنفيذ</button></div>
+  `);
+}
+function saveClassDeposit(id){
+  const value=Number(document.getElementById('classValue').value || 0);
+  const reason=document.getElementById('classReason').value.trim() || 'إيداع جماعي';
+  state.students.filter(s=>s.classId===id).forEach(s=>{ s.balance += value; addTx(s.name,'class_deposit',reason,value); });
+  closeModal(); save(); toast('تم الإيداع لجميع طلاب الفصل');
+}
+function classWithdraw(id){
+  openModal('سحب من الفصل كامل', `
+    <div class="field"><label>القيمة</label><input id="classValue" type="number" class="input" value="0"></div>
+    <div class="field"><label>السبب</label><input id="classReason" class="input" placeholder="اذكري السبب"></div>
+    <div class="row-actions"><button class="btn warn" onclick="saveClassWithdraw('${id}')">تنفيذ</button></div>
+  `);
+}
+function saveClassWithdraw(id){
+  const value=Number(document.getElementById('classValue').value || 0);
+  const reason=document.getElementById('classReason').value.trim() || 'سحب جماعي';
+  state.students.filter(s=>s.classId===id).forEach(s=>{ s.balance = Math.max(0, s.balance - value); addTx(s.name,'class_withdraw',reason,value); });
+  closeModal(); save(); toast('تم السحب من جميع طلاب الفصل');
+}
+function classMessage(id){
+  const cls = state.classes.find(c=>c.id===id); if(!cls) return;
+  const students = state.students.filter(s=>s.classId===id);
+  const msg = `رسالة جماعية من مصرف التعليم لطلاب ${cls.name}: متابعة مستمرة وتحفيز داخل الفصل. عدد الطلاب ${students.length}.`;
+  navigator.clipboard.writeText(msg); toast('تم نسخ الرسالة الجماعية');
+}
+function classPdf(id){
+  const cls = state.classes.find(c=>c.id===id); if(!cls) return;
+  const students = state.students.filter(s=>s.classId===id);
+  const rows = students.map(s=>`<tr><td>${s.name}</td><td>${s.username}</td><td>${s.accountNumber}</td><td>${s.balance}</td><td>${s.status}</td></tr>`).join('');
+  const date = new Date().toLocaleDateString('ar-SA');
+  const day = new Date().toLocaleDateString('ar-SA',{weekday:'long'});
+  const w=window.open('', '_blank');
+  w.document.write(`
+    <html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>تقرير ${cls.name}</title>
+    <style>body{font-family:Tahoma;padding:30px;color:#213b2e}table{width:100%;border-collapse:collapse;margin-top:16px}th,td{border:1px solid #dbe8de;padding:10px;text-align:right}th{background:#eef6f0}.head{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #4f8b67;padding-bottom:14px}</style>
+    </head><body>
+      <div class="head"><div><h1>مصرف التعليم</h1><div>اسم المعلمة: أ. ساره مداوي حقوي<br>المادة: ${cls.subject}<br>اليوم: ${day}<br>التاريخ: ${date}</div></div><div>تقرير الفصل</div></div>
+      <h2>${cls.name}</h2>
+      <table><thead><tr><th>الاسم</th><th>اسم المستخدم</th><th>رقم الحساب</th><th>الرصيد</th><th>الحالة</th></tr></thead><tbody>${rows || '<tr><td colspan="5">لا يوجد طلاب</td></tr>'}</tbody></table>
+      <script>window.print()<\/script>
+    </body></html>
+  `);
+  w.document.close();
+}
+function deleteClass(id){
+  const cls = state.classes.find(c=>c.id===id); if(!cls) return;
+  if(confirm(`حذف الفصل ${cls.name}؟ سيتم حذف طلابه أيضًا.`)){
+    state.classes = state.classes.filter(c=>c.id!==id);
+    state.students = state.students.filter(s=>s.classId!==id);
+    save(); toast('تم حذف الفصل');
+  }
+}
+function loginTeacher(){
+  if(!localStorage.getItem(AUTH_USER)) localStorage.setItem(AUTH_USER,'teacher');
+  if(!localStorage.getItem(AUTH_PASS)) localStorage.setItem(AUTH_PASS,'1234');
+  const u=document.getElementById('loginUser').value.trim();
+  const p=document.getElementById('loginPass').value.trim();
+  const su=localStorage.getItem(AUTH_USER); const sp=localStorage.getItem(AUTH_PASS);
+  const err=document.getElementById('loginError');
+  if(u===su && p===sp){
+    err.style.display='none';
+    localStorage.setItem(AUTH_OK,'1');
+    document.getElementById('loginGate').style.display='none';
+    document.getElementById('appPage').style.visibility='visible';
+  }else err.style.display='block';
+}
+function openPassModal(){ document.getElementById('passModal').classList.add('open'); document.getElementById('resetError').style.display='none'; }
+function closePassModal(){ document.getElementById('passModal').classList.remove('open'); }
+function savePassword(){
+  const u=document.getElementById('resetUser').value.trim();
+  const c=document.getElementById('resetCurrent').value.trim();
+  const n=document.getElementById('resetNew').value.trim();
+  const k=document.getElementById('resetConfirm').value.trim();
+  const err=document.getElementById('resetError');
+  const su=localStorage.getItem(AUTH_USER)||'teacher';
+  const sp=localStorage.getItem(AUTH_PASS)||'1234';
+  if(u!==su || c!==sp){ err.textContent='اسم المستخدم أو كلمة السر الحالية غير صحيحة.'; err.style.display='block'; return; }
+  if(!n || n.length<4){ err.textContent='كلمة السر الجديدة يجب أن تكون 4 خانات أو أكثر.'; err.style.display='block'; return; }
+  if(n!==k){ err.textContent='تأكيد كلمة السر غير مطابق.'; err.style.display='block'; return; }
+  localStorage.setItem(AUTH_PASS,n); closePassModal(); toast('تم تغيير كلمة السر بنجاح');
+}
+function backupData(){
+  const blob = new Blob([JSON.stringify(state,null,2)], {type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='masraf-teacher-vip-backup.json'; a.click();
+}
+function logoutTeacher(){
+  localStorage.setItem(AUTH_OK,'0');
+  document.getElementById('appPage').style.visibility='hidden';
+  document.getElementById('loginGate').style.display='flex';
+}
+document.getElementById('modal').addEventListener('click', e=>{ if(e.target.id==='modal') closeModal(); });
+document.getElementById('passModal').addEventListener('click', e=>{ if(e.target.id==='passModal') closePassModal(); });
+if(localStorage.getItem(AUTH_OK)==='1'){
+  document.getElementById('loginGate').style.display='none';
+  document.getElementById('appPage').style.visibility='visible';
+}
+render();
+</script>
+</body>
+</html>
