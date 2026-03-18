@@ -614,6 +614,140 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
 }
 </style>
 
+
+<style id="oai-device-responsive-fix">
+/* auto device layout */
+body.device-mobile .app{max-width:460px}
+body.device-ipad .app{max-width:900px}
+body.device-desktop .app{max-width:1280px}
+
+body.device-mobile .screen{padding:0 14px 108px !important}
+body.device-ipad .screen{padding:0 18px 118px !important}
+body.device-desktop .screen{padding:0 22px 124px !important}
+
+/* remove top gap hard */
+html,body,.app{padding-top:0 !important;margin-top:0 !important}
+.screen,.screen.active{padding-top:0 !important;margin-top:0 !important}
+.topbar{margin-top:0 !important;padding-top:0 !important}
+.hero,.card,.teacher-shell,.teacher-hero{margin-top:0 !important}
+body::before{display:none !important}
+
+/* tab bars more visible + slide on mobile */
+.tabbar,.teacher-tabs{
+  scrollbar-width:thin;
+  scrollbar-color: rgba(16,58,46,.28) transparent;
+}
+.tabbar::-webkit-scrollbar,.teacher-tabs::-webkit-scrollbar{height:7px}
+.tabbar::-webkit-scrollbar-thumb,.teacher-tabs::-webkit-scrollbar-thumb{
+  background:rgba(16,58,46,.28);border-radius:999px
+}
+body.device-mobile .tabbar,
+body.device-mobile .teacher-tabs{
+  display:flex !important;
+  flex-wrap:nowrap !important;
+  overflow-x:auto !important;
+  overflow-y:hidden !important;
+  -webkit-overflow-scrolling:touch;
+  scroll-behavior:smooth;
+  gap:10px !important;
+  padding:4px 2px 10px !important;
+  margin-bottom:14px !important;
+  border-bottom:1px solid rgba(16,58,46,.08);
+}
+body.device-mobile .tabbar button,
+body.device-mobile .teacher-tabs button{
+  flex:0 0 auto !important;
+  white-space:nowrap !important;
+  border:1px solid rgba(16,58,46,.08) !important;
+  background:#fff !important;
+  color:var(--deep) !important;
+  box-shadow:0 8px 16px rgba(16,58,46,.06);
+}
+body.device-mobile .tabbar button.active,
+body.device-mobile .teacher-tabs button.active{
+  background:linear-gradient(135deg,var(--deep),var(--green)) !important;
+  color:#fff !important;
+  border-color:transparent !important;
+  box-shadow:0 10px 22px rgba(16,58,46,.16);
+}
+
+/* better layouts on ipad/desktop */
+body.device-ipad .teacher-grid,
+body.device-desktop .teacher-grid{grid-template-columns:repeat(2,1fr)}
+body.device-ipad .teacher-kpis{grid-template-columns:repeat(4,1fr)}
+body.device-desktop .teacher-kpis{grid-template-columns:repeat(4,1fr)}
+body.device-ipad .shortcuts{grid-template-columns:repeat(4,1fr)}
+body.device-desktop .shortcuts{grid-template-columns:repeat(4,1fr)}
+body.device-ipad .bottom-nav{width:min(760px,calc(100% - 28px))}
+body.device-desktop .bottom-nav{width:min(920px,calc(100% - 34px))}
+body.device-mobile .bottom-nav{width:min(430px,calc(100% - 18px))}
+
+/* keep sections close to top on home */
+#home .hero, #teacher_dashboard .teacher-hero, #account_choice .card:first-child,
+#student_login .card:first-child, #teacher_login .card:first-child{
+  margin-top:0 !important;
+}
+</style>
+
+
+<style id="oai-more-detail-patch-style">
+.more-detail-pro-card{padding:20px;border-radius:28px}
+.more-detail-title{margin:0 0 10px;color:var(--deep);font-size:28px}
+.more-detail-lead{margin:0 0 14px;color:var(--muted);line-height:2;font-size:15px}
+.more-detail-block{background:#fff;border:1px solid var(--line);border-radius:20px;padding:16px;margin:12px 0;box-shadow:0 8px 18px rgba(16,58,46,.05)}
+.more-detail-block h3{margin:0 0 8px;color:var(--deep);font-size:18px}
+.more-detail-block p{margin:0;line-height:2;color:var(--text)}
+.more-detail-list{display:grid;gap:12px}
+.more-detail-item{display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid var(--line);background:#fff;border-radius:20px;padding:16px;box-shadow:0 8px 18px rgba(16,58,46,.05)}
+.more-detail-item .icon{width:42px;height:42px;border-radius:14px;background:var(--mint);display:grid;place-items:center;font-size:20px}
+.more-detail-item strong{display:block;color:var(--deep);margin-bottom:4px}
+.more-detail-item span{display:block;color:var(--muted);line-height:1.8}
+</style>
+
+
+<style id="oai-more-fullpage-style">
+.more-detail-card{animation:slideInPanel .28s ease}
+.more-detail-content{display:grid;gap:14px;line-height:2}
+.more-detail-title{margin:0;color:var(--deep);font-size:22px}
+.more-detail-lead{margin:0;color:var(--muted);font-size:14px}
+.more-detail-block{background:#fff;border:1px solid var(--line);border-radius:22px;padding:16px;box-shadow:0 8px 18px rgba(16,58,46,.05)}
+.more-detail-block h3{margin:0 0 10px;color:var(--deep);font-size:16px}
+.more-detail-block p{margin:0;color:var(--text);font-size:14px;line-height:2}
+.more-detail-list{display:grid;gap:10px}
+.more-detail-item{display:flex;align-items:flex-start;gap:10px;background:#f9fbfa;border:1px solid var(--line);border-radius:18px;padding:12px 14px}
+.more-detail-item .icon{width:34px;height:34px;border-radius:12px;background:var(--mint);display:grid;place-items:center;flex:none}
+.more-detail-item strong{display:block;color:var(--deep);font-size:14px;margin-bottom:2px}
+.more-detail-item span{display:block;color:var(--muted);font-size:13px;line-height:1.9}
+</style>
+
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script id="math-bank-firebase-config">
+window.MATH_BANK_CLOUD_CONFIG = {
+  enabled: true,
+  firebaseConfig: {
+    apiKey: "AIzaSyDP-pi0tbF09bNRihrLz_kUs-JBoa9Cw4Y",
+    authDomain: "sara-haywire.firebaseapp.com",
+    projectId: "sara-haywire",
+    storageBucket: "sara-haywire.firebasestorage.app",
+    messagingSenderId: "333467940977",
+    appId: "1:333467940977:web:97d056d5dbff2debbf43d0"
+  },
+  collection: "math_bank",
+  docId: "shared_bank"
+};
+</script>
+<style id="math-bank-sync-badge-style">
+.sync-status-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:8px 12px;border-radius:999px;
+  background:#edf6f0;color:#176242;font-size:12px;font-weight:800;
+  border:1px solid #cfe9db;box-shadow:0 6px 14px rgba(16,58,46,.06)
+}
+.blue-import-btn{touch-action:manipulation}
+</style>
+
 </head>
 <body>
 <div class="app">
@@ -1130,7 +1264,7 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
   </div>
 
   <div class="teacher-shell">
-    <div class="teacher-hero">
+    <div class="teacher-hero"><div id="syncStatusBadge" class="sync-status-badge">⏳ جارِ تفعيل المزامنة</div>
       <div class="badge">👩🏻‍🏫 التحكم الإداري</div>
       <h2 style="margin:0;font-size:26px">لوحة تحكم المعلمة</h2>
       <p style="margin:8px 0 0;line-height:1.9;color:rgba(255,255,255,.92)">إضافة الفصول، إدارة الطلاب، تنفيذ إيداع / سحب / تحويل، وإرسال العمليات لولي الأمر عبر واتساب.</p>
@@ -1509,16 +1643,17 @@ html,body{margin-top:0!important;padding-top:0!important;overflow-x:hidden!impor
 
 <section id="more_detail" class="screen">
   <div class="topbar">
-    <div class="brand"><div class="logo">BN</div><div><h1 id="moreDetailTitle">التفاصيل</h1><p id="moreDetailSub">صفحة معلومات إضافية</p></div></div>
-    <button class="ghost" type="button" onclick="go('more')">←</button>
+    <div class="brand">
+      <div class="logo">BN</div>
+      <div>
+        <h1 id="moreDetailTitle">التفاصيل</h1>
+        <p id="moreDetailSub">صفحة مستقلة لعرض محتوى المزيد</p>
+      </div>
+    </div>
+    <button class="ghost" type="button" onclick="goBackFromMoreDetail()">رجوع للخلف</button>
   </div>
   <div class="card more-detail-card">
     <div id="moreDetailContent" class="more-detail-content"></div>
-  </div>
-  <div class="footer footer-custom">
-    <div class="footer-line footer-line-1">الرياضيات لغة الأذكياء</div>
-    <div class="footer-line footer-line-2">نحو تعليم محفّز وعقول مفكّرة © بنك الرياضيات – إشراف الأستاذة سارة حقوي</div>
-    <div class="footer-line footer-line-3">🏫 مدرسة رواد الشرق الأهلية</div>
   </div>
 </section>
 
@@ -2321,7 +2456,7 @@ function loadBankData(){
   try{ bankData = JSON.parse(localStorage.getItem(BANK_KEY) || 'null'); }catch(e){ bankData = null; }
   if(!bankData){ bankData = defaultBankData(); }
   window.bankData = bankData;
-  saveBankData();
+  try{ localStorage.setItem(BANK_KEY, JSON.stringify(bankData)); }catch(e){}
 }
 function formatMoney(v){ return new Intl.NumberFormat('ar-SA').format(Number(v||0)); }
 function normalizePhone(v){ return String(v||'').replace(/\D/g,''); }
@@ -3079,7 +3214,7 @@ window.addEventListener('load', function(){
 <script id="performance-upgrade-v2-script">
 (function(){
   function fmtDate(v){ if(!v) return '—'; try{ return new Date(v).toLocaleDateString('ar-SA'); }catch(e){ return v; } }
-  function esc(s){ return String(s||'').replace(/[&<>"]/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]; }); }
+  function { return String(s||'').replace(/[&<>"]/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]; }); }
   function installPerformanceForm(){
     const titleEl=document.getElementById('perfTaskTitle');
     if(!titleEl || document.getElementById('perfTaskStart')) return;
@@ -3127,14 +3262,14 @@ window.addEventListener('load', function(){
         const rows=students.length ? students.map(st=>{
           const entry = (typeof ensurePerformanceEntry==='function') ? ensurePerformanceEntry(task, st.id) : (task.entries[st.id]||(task.entries[st.id]={score:0,status:'pending',noteInternal:'',showToStudent:!!task.visibleDefault,attachmentName:'',attachmentData:'',attachmentMime:'',videoLink:'',awardedPoints:0}));
           return `<div class="performance-student-row">
-            <div class="performance-student-head"><div><div class="performance-student-name">${esc(st.name)}</div><div class="teacher-note">${esc(className)} • الرصيد الحالي ${typeof formatMoney==='function'?formatMoney(st.balance):st.balance} ر.س</div></div><div class="performance-private">${entry.attachmentName ? 'مرفق محفوظ 🔒' : 'بدون مرفق'}</div></div>
+            <div class="performance-student-head"><div><div class="performance-student-name">${}</div><div class="teacher-note">${} • الرصيد الحالي ${typeof formatMoney==='function'?formatMoney(st.balance):st.balance} ر.س</div></div><div class="performance-private">${entry.attachmentName ? 'مرفق محفوظ 🔒' : 'بدون مرفق'}</div></div>
             <div class="teacher-subgrid">
               <div class="field"><label>الدرجة</label><input id="perfScore_${task.id}_${st.id}" type="number" min="0" max="${Number(task.maxScore||0)}" value="${Number(entry.score||0)}"></div>
               <div class="field"><label>الحالة</label><select id="perfStatus_${task.id}_${st.id}"><option value="pending" ${entry.status==='pending'?'selected':''}>بانتظار الاستلام</option><option value="received" ${entry.status==='received'?'selected':''}>تم الاستلام</option><option value="rated" ${entry.status==='rated'?'selected':''}>تم التقييم</option><option value="closed" ${entry.status==='closed'?'selected':''}>مغلق</option></select></div>
             </div>
             <div class="teacher-subgrid">
-              <div class="field"><label>ملاحظة داخلية</label><input id="perfNote_${task.id}_${st.id}" type="text" value="${esc(entry.noteInternal||'')}" placeholder="خاصة بالمعلمة"></div>
-              <div class="field"><label>رابط فيديو/درايف</label><input id="perfVideo_${task.id}_${st.id}" type="text" value="${esc(entry.videoLink||'')}" placeholder="اختياري"></div>
+              <div class="field"><label>ملاحظة داخلية</label><input id="perfNote_${task.id}_${st.id}" type="text" value="${}" placeholder="خاصة بالمعلمة"></div>
+              <div class="field"><label>رابط فيديو/درايف</label><input id="perfVideo_${task.id}_${st.id}" type="text" value="${}" placeholder="اختياري"></div>
             </div>
             <div class="performance-attach">
               <label class="ghost" style="cursor:pointer">إرفاق العمل الآن<input type="file" accept="image/*,.pdf,video/*" style="display:none" onchange="cacheTaskAttachment('${task.id}','${st.id}',this)"></label>
@@ -3144,7 +3279,7 @@ window.addEventListener('load', function(){
             <div class="teacher-actions" style="margin-top:10px"><button class="btn btn-green" type="button" onclick="savePerformanceAssessment('${task.id}','${st.id}')">حفظ تقييم الطالبة</button><div class="performance-private">النقاط الحالية: ${new Intl.NumberFormat('ar-SA').format(Number(entry.awardedPoints||0))}</div></div>
           </div>`;
         }).join('') : '<div class="performance-empty">لا يوجد طلاب في هذا الفصل بعد.</div>';
-        return `<div class="performance-card"><div class="perf-highlight"><strong>${esc(task.title)}</strong><div>${esc(className)}</div></div><div class="perf-meta-grid"><div class="perf-meta-box"><span class="label">تاريخ الإضافة</span><span class="value">${fmtDate(task.createdAt)}</span></div><div class="perf-meta-box"><span class="label">تاريخ بدء المهمة</span><span class="value">${fmtDate(task.startDate)}</span></div><div class="perf-meta-box"><span class="label">آخر موعد للتسليم</span><span class="value">${fmtDate(task.dueDate)}</span></div></div><div class="performance-meta"><span class="pill">${esc(task.skill||'بدون مهارة محددة')}</span><span class="pill">الدرجة ${Number(task.maxScore||0)}</span><span class="pill">النقاط ${Number(task.pointRate||0)}</span></div>${rows}</div>`;
+        return `<div class="performance-card"><div class="perf-highlight"><strong>${}</strong><div>${}</div></div><div class="perf-meta-grid"><div class="perf-meta-box"><span class="label">تاريخ الإضافة</span><span class="value">${fmtDate(task.createdAt)}</span></div><div class="perf-meta-box"><span class="label">تاريخ بدء المهمة</span><span class="value">${fmtDate(task.startDate)}</span></div><div class="perf-meta-box"><span class="label">آخر موعد للتسليم</span><span class="value">${fmtDate(task.dueDate)}</span></div></div><div class="performance-meta"><span class="pill">${}</span><span class="pill">الدرجة ${Number(task.maxScore||0)}</span><span class="pill">النقاط ${Number(task.pointRate||0)}</span></div>${rows}</div>`;
       }).join('');
     }
     let attachCount=0, rated=0;
@@ -3167,7 +3302,7 @@ window.addEventListener('load', function(){
         points += Number(entry.awardedPoints||0);
         const statusMap={pending:'بانتظار الاستلام',received:'تم الاستلام',rated:'تم التقييم',closed:'مغلق'};
         const canShow=entry.showToStudent;
-        return `<div class="performance-student-row"><div class="perf-highlight"><strong>${esc(task.title)}</strong><div>${statusMap[entry.status]||'بانتظار الاستلام'}</div></div><div class="perf-meta-grid"><div class="perf-meta-box"><span class="label">تاريخ الإضافة</span><span class="value">${fmtDate(task.createdAt)}</span></div><div class="perf-meta-box"><span class="label">تاريخ بدء المهمة</span><span class="value">${fmtDate(task.startDate)}</span></div><div class="perf-meta-box"><span class="label">آخر موعد للتسليم</span><span class="value">${fmtDate(task.dueDate)}</span></div></div><div class="teacher-subgrid"><div class="field"><label>الدرجة</label><input type="text" readonly value="${Number(entry.score||0)} / ${Number(task.maxScore||0)}"></div><div class="field"><label>النقاط المضافة</label><input type="text" readonly value="${new Intl.NumberFormat('ar-SA').format(Number(entry.awardedPoints||0))}"></div></div><div class="student-attach-hero"><div><div class="tag">📎 مرفق العمل</div><div class="sub">المرفق ظاهر بشكل واضح داخل المهمة إذا سمحت المعلمة بإظهاره.</div></div><div>${canShow && (entry.attachmentData||entry.videoLink) ? 'مرفق خاص 🔒' : 'لا يوجد مرفق ظاهر'}</div></div><div class="performance-attach">${canShow && entry.attachmentData ? `<button class="ghost" type="button" onclick="openTaskAttachment('${task.id}','${student.id}')">فتح المرفق</button>` : ''}${canShow && entry.videoLink ? `<a class="performance-link" href="${entry.videoLink}" target="_blank" rel="noopener">فتح الرابط</a>` : ''}</div></div>`;
+        return `<div class="performance-student-row"><div class="perf-highlight"><strong>${}</strong><div>${statusMap[entry.status]||'بانتظار الاستلام'}</div></div><div class="perf-meta-grid"><div class="perf-meta-box"><span class="label">تاريخ الإضافة</span><span class="value">${fmtDate(task.createdAt)}</span></div><div class="perf-meta-box"><span class="label">تاريخ بدء المهمة</span><span class="value">${fmtDate(task.startDate)}</span></div><div class="perf-meta-box"><span class="label">آخر موعد للتسليم</span><span class="value">${fmtDate(task.dueDate)}</span></div></div><div class="teacher-subgrid"><div class="field"><label>الدرجة</label><input type="text" readonly value="${Number(entry.score||0)} / ${Number(task.maxScore||0)}"></div><div class="field"><label>النقاط المضافة</label><input type="text" readonly value="${new Intl.NumberFormat('ar-SA').format(Number(entry.awardedPoints||0))}"></div></div><div class="student-attach-hero"><div><div class="tag">📎 مرفق العمل</div><div class="sub">المرفق ظاهر بشكل واضح داخل المهمة إذا سمحت المعلمة بإظهاره.</div></div><div>${canShow && (entry.attachmentData||entry.videoLink) ? 'مرفق خاص 🔒' : 'لا يوجد مرفق ظاهر'}</div></div><div class="performance-attach">${canShow && entry.attachmentData ? `<button class="ghost" type="button" onclick="openTaskAttachment('${task.id}','${student.id}')">فتح المرفق</button>` : ''}${canShow && entry.videoLink ? `<a class="performance-link" href="${entry.videoLink}" target="_blank" rel="noopener">فتح الرابط</a>` : ''}</div></div>`;
       }).join('');
     }
     const c=document.getElementById('studentPerfCount'); if(c) c.textContent=new Intl.NumberFormat('ar-SA').format(tasks.length);
@@ -3205,7 +3340,7 @@ window.addEventListener('load', function(){
     if(!v) return '—';
     try{ return new Date(v).toLocaleDateString('ar-SA'); }catch(e){ return v; }
   }
-  function esc(s){ return String(s||'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+  function { return String(s||'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
   function perfNotice(msg, ok){
     const box = document.getElementById('performanceTaskMsg');
     if(!box) return;
@@ -3294,11 +3429,11 @@ window.addEventListener('load', function(){
         return `
           <div class="performance-card">
             <div class="perf-highlight">
-              <strong>${esc(task.title)}</strong>
+              <strong>${}</strong>
               <div>${statusMap[entry.status] || 'بانتظار الاستلام'}</div>
             </div>
             <div class="perf-meta-grid">
-              <div class="perf-meta-box"><span class="label">عنوان المهمة</span><span class="value">${esc(task.title)}</span></div>
+              <div class="perf-meta-box"><span class="label">عنوان المهمة</span><span class="value">${}</span></div>
               <div class="perf-meta-box"><span class="label">تاريخ البداية</span><span class="value">${fmtDate(task.startDate)}</span></div>
               <div class="perf-meta-box"><span class="label">آخر موعد للتسليم</span><span class="value">${fmtDate(task.dueDate)}</span></div>
             </div>
@@ -3348,7 +3483,7 @@ window.addEventListener('load', function(){
 <script id="performance-hard-fix">
 (function(){
   function fmtDate(v){ if(!v) return '—'; try{ return new Date(v).toLocaleDateString('ar-SA'); }catch(e){ return v; } }
-  function esc(s){ return String(s||'').replace(/[&<>"]/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]; }); }
+  function { return String(s||'').replace(/[&<>"]/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]; }); }
   function ensurePerf(){
     if(!window.bankData) return [];
     if(!Array.isArray(bankData.performanceTasks)) bankData.performanceTasks=[];
@@ -3369,7 +3504,7 @@ window.addEventListener('load', function(){
     const el=document.getElementById('perfTaskClassSelect');
     if(!el || !window.bankData) return;
     const current=el.value;
-    el.innerHTML='<option value="">اختر الفصل</option>' + (bankData.classes||[]).map(function(c){ return '<option value="'+c.id+'">'+esc(c.name)+'</option>'; }).join('');
+    el.innerHTML='<option value="">اختر الفصل</option>' + (bankData.classes||[]).map(function(c){ return '<option value="'+c.id+'">'++'</option>'; }).join('');
     if(current) el.value=current;
   }
   function showMsg(id){ const msg=document.getElementById(id); if(msg){ msg.classList.remove('hidden'); setTimeout(function(){ msg.classList.add('hidden'); }, 1800); } }
@@ -3404,9 +3539,9 @@ window.addEventListener('load', function(){
       const rows = students.length ? students.map(function(st){
         const entry=ensureEntry(task, st.id);
         const statusMap={pending:'بانتظار الاستلام',received:'تم الاستلام',rated:'تم التقييم',closed:'مغلق'};
-        return '<div class="performance-student-row"><div class="performance-student-head"><div><div class="performance-student-name">'+esc(st.name)+'</div><div class="teacher-note">'+esc(className)+' • الرصيد الحالي '+(typeof formatMoney==='function' ? formatMoney(st.balance) : st.balance)+' ر.س</div></div><div class="performance-private">'+(statusMap[entry.status]||'بانتظار الاستلام')+'</div></div></div>';
+        return '<div class="performance-student-row"><div class="performance-student-head"><div><div class="performance-student-name">'++'</div><div class="teacher-note">'++' • الرصيد الحالي '+(typeof formatMoney==='function' ? formatMoney(st.balance) : st.balance)+' ر.س</div></div><div class="performance-private">'+(statusMap[entry.status]||'بانتظار الاستلام')+'</div></div></div>';
       }).join('') : '<div class="performance-empty">لا يوجد طالبات داخل هذا الفصل حاليًا.</div>';
-      return '<div class="performance-card"><h4>'+esc(task.title)+'</h4><div class="performance-meta"><span class="pill">'+esc(className)+'</span><span class="pill">بدء: '+fmtDate(task.startDate)+'</span><span class="pill">التسليم: '+fmtDate(task.dueDate)+'</span></div>'+rows+'</div>';
+      return '<div class="performance-card"><h4>'++'</h4><div class="performance-meta"><span class="pill">'++'</span><span class="pill">بدء: '+fmtDate(task.startDate)+'</span><span class="pill">التسليم: '+fmtDate(task.dueDate)+'</span></div>'+rows+'</div>';
     }).join('');
   };
 
@@ -3429,7 +3564,7 @@ window.addEventListener('load', function(){
         points += Number(entry.awardedPoints||0);
         const statusMap={pending:'بانتظار الاستلام',received:'تم الاستلام',rated:'تم التقييم',closed:'مغلق'};
         const canShow=entry.showToStudent;
-        return '<div class="performance-student-row"><div class="perf-highlight"><strong>'+esc(task.title)+'</strong><div>'+(statusMap[entry.status]||'بانتظار الاستلام')+'</div></div><div class="perf-meta-grid"><div class="perf-meta-box"><span class="label">عنوان المهمة</span><span class="value">'+esc(task.title)+'</span></div><div class="perf-meta-box"><span class="label">تاريخ البداية</span><span class="value">'+fmtDate(task.startDate)+'</span></div><div class="perf-meta-box"><span class="label">آخر موعد للتسليم</span><span class="value">'+fmtDate(task.dueDate)+'</span></div></div><div class="teacher-subgrid"><div class="field"><label>الدرجة</label><input type="text" readonly value="'+Number(entry.score||0)+' / '+Number(task.maxScore||0)+'"></div><div class="field"><label>الحالة</label><input type="text" readonly value="'+(statusMap[entry.status]||'بانتظار الاستلام')+'"></div></div><div class="student-attach-hero"><div><div class="tag">📎 مرفق العمل</div><div class="sub">المرفق يظهر إذا سمحت المعلمة بإظهاره.</div></div><div>'+(canShow && (entry.attachmentData||entry.videoLink) ? 'مرفق خاص 🔒' : 'لا يوجد مرفق ظاهر')+'</div></div></div>';
+        return '<div class="performance-student-row"><div class="perf-highlight"><strong>'++'</strong><div>'+(statusMap[entry.status]||'بانتظار الاستلام')+'</div></div><div class="perf-meta-grid"><div class="perf-meta-box"><span class="label">عنوان المهمة</span><span class="value">'++'</span></div><div class="perf-meta-box"><span class="label">تاريخ البداية</span><span class="value">'+fmtDate(task.startDate)+'</span></div><div class="perf-meta-box"><span class="label">آخر موعد للتسليم</span><span class="value">'+fmtDate(task.dueDate)+'</span></div></div><div class="teacher-subgrid"><div class="field"><label>الدرجة</label><input type="text" readonly value="'+Number(entry.score||0)+' / '+Number(task.maxScore||0)+'"></div><div class="field"><label>الحالة</label><input type="text" readonly value="'+(statusMap[entry.status]||'بانتظار الاستلام')+'"></div></div><div class="student-attach-hero"><div><div class="tag">📎 مرفق العمل</div><div class="sub">المرفق يظهر إذا سمحت المعلمة بإظهاره.</div></div><div>'+(canShow && (entry.attachmentData||entry.videoLink) ? 'مرفق خاص 🔒' : 'لا يوجد مرفق ظاهر')+'</div></div></div>';
       }).join('');
     }
     if(c) c.textContent=String(tasks.length);
@@ -3780,7 +3915,7 @@ window.addEventListener('load', function(){
   function getCurrentStudentSafe(){
     try{ return (typeof getCurrentStudent==='function') ? getCurrentStudent() : null; }catch(e){ return null; }
   }
-  function esc(s){ return String(s||'').replace(/[&<>\"]/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]; }); }
+  function { return String(s||'').replace(/[&<>\"]/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]; }); }
   function fmtDate(v){ if(!v) return '—'; try{ return new Date(v).toLocaleDateString('ar-SA'); }catch(e){ return v; } }
   function ensureTasks(){ if(!window.bankData) return []; if(!Array.isArray(bankData.performanceTasks)) bankData.performanceTasks=[]; return bankData.performanceTasks; }
   function ensureEntry(task, studentId){
@@ -3914,18 +4049,18 @@ window.addEventListener('load', function(){
         var students = (bankData.students||[]).filter(function(s){ return s.classId===task.classId; });
         var taskAttach = getTeacherAttachmentFromTask(task);
         return '<div class="performance-card">'
-          + '<div class="performance-student-head"><div><h4 style="margin:0 0 6px">'+esc(task.title)+'</h4><div class="teacher-note">'+esc(task.skill||'مهمة أدائية')+' • يبدأ '+fmtDate(task.startDate)+' • التسليم '+fmtDate(task.dueDate)+'</div></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="ghost" type="button" onclick="deletePerformanceTask(\''+task.id+'\')">حذف المهمة</button>'+(taskAttach.data||taskAttach.link?'<button class="ghost" type="button" onclick="openTeacherTaskAttachment(\''+task.id+'\')">فتح مرفق المهمة</button>':'')+'</div></div>'
-          + '<div class="performance-meta"><span class="pill">'+esc(typeof getClassName==='function'?getClassName(task.classId):task.classId)+'</span><span class="pill">الدرجة '+Number(task.maxScore||0)+'</span><span class="pill">النقاط '+Number(task.pointRate||0)+'</span><span class="pill">'+(taskAttach.name?('مرفق: '+esc(taskAttach.name)):(taskAttach.link?'رابط مرفق':'بدون مرفق'))+'</span></div>'
+          + '<div class="performance-student-head"><div><h4 style="margin:0 0 6px">'++'</h4><div class="teacher-note">'++' • يبدأ '+fmtDate(task.startDate)+' • التسليم '+fmtDate(task.dueDate)+'</div></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="ghost" type="button" onclick="deletePerformanceTask(\''+task.id+'\')">حذف المهمة</button>'+(taskAttach.data||taskAttach.link?'<button class="ghost" type="button" onclick="openTeacherTaskAttachment(\''+task.id+'\')">فتح مرفق المهمة</button>':'')+'</div></div>'
+          + '<div class="performance-meta"><span class="pill">'+:task.classId)+'</span><span class="pill">الدرجة '+Number(task.maxScore||0)+'</span><span class="pill">النقاط '+Number(task.pointRate||0)+'</span><span class="pill">'+(taskAttach.name?('مرفق: '+):(taskAttach.link?'رابط مرفق':'بدون مرفق'))+'</span></div>'
           + (students.length ? students.map(function(st){
             var entry = ensureEntry(task, st.id);
             return '<div class="performance-student-row">'
-              + '<div class="performance-student-head"><div><div class="performance-student-name">'+esc(st.name)+'</div><div class="teacher-note">'+esc(typeof getClassName==='function'?getClassName(st.classId):st.classId)+' • الرصيد الحالي '+(typeof formatMoney==='function'?formatMoney(st.balance):st.balance)+' ر.س</div></div><div class="performance-private">'+(entry.submittedAt ? ('تم التسليم '+fmtDate(entry.submittedAt)) : 'بانتظار تسليم الطالبة')+'</div></div>'
+              + '<div class="performance-student-head"><div><div class="performance-student-name">'++'</div><div class="teacher-note">'+:st.classId)+' • الرصيد الحالي '+(typeof formatMoney==='function'?formatMoney(st.balance):st.balance)+' ر.س</div></div><div class="performance-private">'+(entry.submittedAt ? ('تم التسليم '+fmtDate(entry.submittedAt)) : 'بانتظار تسليم الطالبة')+'</div></div>'
               + '<div class="teacher-subgrid">'
-              + '<div class="field"><label>مرفق الطالبة المرسل</label><div class="performance-private">'+(entry.studentAttachmentName?esc(entry.studentAttachmentName):(entry.studentVideoLink?'رابط مرفق':'لا يوجد'))+'</div>'+(entry.studentAttachmentData||entry.studentVideoLink?'<div style="margin-top:8px"><button class="ghost" type="button" onclick="openStudentSubmissionAttachment(\''+task.id+'\',\''+st.id+'\')">فتح مرفق الطالبة</button></div>':'')+'</div>'
+              + '<div class="field"><label>مرفق الطالبة المرسل</label><div class="performance-private">'+(entry.studentAttachmentName?:(entry.studentVideoLink?'رابط مرفق':'لا يوجد'))+'</div>'+(entry.studentAttachmentData||entry.studentVideoLink?'<div style="margin-top:8px"><button class="ghost" type="button" onclick="openStudentSubmissionAttachment(\''+task.id+'\',\''+st.id+'\')">فتح مرفق الطالبة</button></div>':'')+'</div>'
               + '<div class="field"><label>خانة إدخال الدرجة</label><input id="perfScore_'+task.id+'_'+st.id+'" type="number" min="0" max="'+Number(task.maxScore||0)+'" value="'+Number(entry.score||0)+'" /></div>'
               + '</div>'
               + '<div class="teacher-subgrid">'
-              + '<div class="field"><label>رسالة قصيرة للطالبة</label><input id="perfTeacherMsg_'+task.id+'_'+st.id+'" type="text" value="'+esc(entry.reviewMessage||'')+'" placeholder="اختياري" /></div>'
+              + '<div class="field"><label>رسالة قصيرة للطالبة</label><input id="perfTeacherMsg_'+task.id+'_'+st.id+'" type="text" value="'++'" placeholder="اختياري" /></div>'
               + '<div class="field"><label>إظهار المرفق للطالبة</label><label class="chip-pill"><input id="perfShow_'+task.id+'_'+st.id+'" type="checkbox" style="width:auto" '+(entry.showToStudent?'checked':'')+'> نعم</label></div>'
               + '</div>'
               + '<div class="teacher-actions" style="margin-top:10px"><button class="btn btn-green" type="button" onclick="approvePerformanceAssessment(\''+task.id+'\',\''+st.id+'\')">اعتماد التقييم</button><div class="performance-private">النقاط الحالية: '+Number(entry.awardedPoints||0)+'</div></div>'
@@ -3953,9 +4088,9 @@ window.addEventListener('load', function(){
         var taskAttach = getTeacherAttachmentFromTask(task);
         var teacherVisible = !!entry.showToStudent;
         return '<div class="performance-student-row">'
-          + '<div class="perf-highlight"><strong>'+esc(task.title)+'</strong><div>'+((entry.status==='rated')?'تم التقييم':(entry.status==='received'?'بانتظار التقييم':'بانتظار الاستلام'))+'</div></div>'
+          + '<div class="perf-highlight"><strong>'++'</strong><div>'+((entry.status==='rated')?'تم التقييم':(entry.status==='received'?'بانتظار التقييم':'بانتظار الاستلام'))+'</div></div>'
           + '<div class="perf-meta-grid">'
-          + '<div class="perf-meta-box"><span class="label">عنوان المهمة</span><span class="value">'+esc(task.title)+'</span></div>'
+          + '<div class="perf-meta-box"><span class="label">عنوان المهمة</span><span class="value">'++'</span></div>'
           + '<div class="perf-meta-box"><span class="label">تاريخ البداية</span><span class="value">'+fmtDate(task.startDate)+'</span></div>'
           + '<div class="perf-meta-box"><span class="label">آخر موعد للتسليم</span><span class="value">'+fmtDate(task.dueDate)+'</span></div>'
           + '<div class="perf-meta-box"><span class="label">الدرجة</span><span class="value">'+Number(entry.score||0)+' / '+Number(task.maxScore||0)+'</span></div>'
@@ -3965,11 +4100,11 @@ window.addEventListener('load', function(){
           + '<div class="student-attach-hero"><div><div class="tag">📎 مرفق العمل</div><div class="sub">'+(teacherVisible && (taskAttach.name||taskAttach.link) ? 'المرفق ظاهر لك' : 'المرفق يظهر إذا سمحت المعلمة بإظهاره')+'</div></div>' + (teacherVisible && (taskAttach.data||taskAttach.link) ? '<div><button class="ghost" type="button" onclick="openTeacherTaskAttachment(\''+task.id+'\')">فتح مرفق المهمة</button></div>' : '<div class="performance-private">لا يوجد مرفق ظاهر</div>') + '</div>'
           + '<div class="teacher-subgrid" style="margin-top:12px">'
           + '<div class="field"><label>رفع تسليمك (صورة أو PDF)</label><input id="studentSubmitFile_'+task.id+'" type="file" accept="image/*,.pdf,video/*" /></div>'
-          + '<div class="field"><label>رابط تسليم (اختياري)</label><input id="studentSubmitLink_'+task.id+'" type="text" placeholder="رابط درايف أو فيديو" value="'+esc(entry.studentVideoLink||'')+'" /></div>'
+          + '<div class="field"><label>رابط تسليم (اختياري)</label><input id="studentSubmitLink_'+task.id+'" type="text" placeholder="رابط درايف أو فيديو" value="'++'" /></div>'
           + '</div>'
           + '<button class="btn btn-green" type="button" onclick="submitStudentTask(\''+task.id+'\')">تسليم المهمة</button>'
           + '<div id="studentSubmitMsg_'+task.id+'" class="notice ok hidden">تم التسليم</div>'
-          + (entry.reviewMessage ? '<div class="performance-note" style="margin-top:10px">ملاحظة المعلمة: '+esc(entry.reviewMessage)+'</div>' : '')
+          + (entry.reviewMessage ? '<div class="performance-note" style="margin-top:10px">ملاحظة المعلمة: '++'</div>' : '')
           + '</div>';
       }).join('');
     }
@@ -4026,43 +4161,400 @@ window.generatePdfReport = function(){
   if(!from || !to){ alert('اختاري من تاريخ وإلى تاريخ'); return; }
 
   var fromD = new Date(from), toD = new Date(to);
-  function esc(s){
+  var esc = function(s){
     return String(s || '').replace(/[&<>"]/g, function(c){
       return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c] || c;
     });
-  }
-  function label(t){
-    if(typeof opLabel === 'function') return opLabel(t);
-    return t || '—';
-  }
-  function money(v){
-    return (typeof formatMoney === 'function') ? formatMoney(v) : Number(v || 0).toLocaleString('ar-SA');
-  }
+  };
 
   var ops = (student.history || []).filter(function(h){
-    var d = new Date((h.date || '').split(' ')[0]);
+    var raw = (h.date || '').split(' ')[0];
+    var d = new Date(raw);
     return !isNaN(d) && d >= fromD && d <= toD;
   });
 
   var rows = ops.length ? ops.map(function(h){
+    var amount = (typeof formatMoney === 'function') ? formatMoney(h.amount) : (h.amount || 0);
+    var sign = (h.type === 'withdraw') ? '-' : '+';
+    var typeText = (typeof opLabel === 'function') ? opLabel(h.type) : (h.type || '');
     return '<tr>'
       + '<td>' + esc(h.date || '—') + '</td>'
-      + '<td>' + esc(label(h.type)) + '</td>'
+      + '<td>' + esc(typeText) + '</td>'
       + '<td>' + esc(h.reason || '—') + '</td>'
-      + '<td>' + ((h.type === 'withdraw' ? '-' : '+') + esc(money(h.amount))) + '</td>'
+      + '<td>' + esc(sign + amount) + '</td>'
       + '</tr>';
   }).join('') : '<tr><td colspan="4">لا توجد عمليات في هذه الفترة</td></tr>';
 
-  var reportHtml = '<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="utf-8"><title>تقرير بنك الرياضيات</title>'
-    + '<style>body{font-family:Arial;padding:24px;color:#183229}h1{margin:0 0 8px}table{width:100%;border-collapse:collapse;margin-top:16px}th,td{border:1px solid #ddd;padding:8px;text-align:right}.meta{margin:6px 0;color:#555}</style>'
-    + '</head><body>'
+  var reportHtml = '<html dir="rtl" lang="ar"><head><meta charset="utf-8"><title>تقرير بنك الرياضيات</title>'
+    + '<style>'
+    + 'body{font-family:Arial;padding:24px;color:#183229}'
+    + 'h1{margin:0 0 8px}'
+    + 'table{width:100%;border-collapse:collapse;margin-top:16px}'
+    + 'th,td{border:1px solid #ddd;padding:8px;text-align:right}'
+    + '.meta{margin:6px 0;color:#555}'
+    + '</style></head><body>'
     + '<h1>تقرير بنك الرياضيات</h1>'
     + '<div class="meta">الطالبة: ' + esc(student.name || '') + '</div>'
     + '<div class="meta">الفترة: من ' + esc(from) + ' إلى ' + esc(to) + '</div>'
-    + '<div class="meta">الرصيد الحالي: ' + esc(money(student.balance || 0)) + ' ر.س</div>'
+    + '<div class="meta">الرصيد الحالي: ' + esc((typeof formatMoney==='function' ? formatMoney(student.balance) : (student.balance || 0))) + ' ر.س</div>'
     + '<table><thead><tr><th>التاريخ</th><th>النوع</th><th>السبب</th><th>القيمة</th></tr></thead><tbody>'
     + rows
-    + '</tbody></table></body></html>';
+    + '</tbody></table>
+<style id="oai-student-fixes-style">
+#account .tab-content{display:none}
+#account .tab-content.active{display:block}
+#account .tab-content.card{margin-top:12px}
+.analysis-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px}
+.analysis-kpi{background:#fff;border:1px solid var(--line);border-radius:20px;padding:12px;text-align:center;box-shadow:0 8px 18px rgba(16,58,46,.05)}
+.analysis-kpi strong{display:block;font-size:18px;color:var(--deep);margin-bottom:4px}
+.analysis-kpi span{display:block;font-size:11px;color:var(--muted);font-weight:700}
+.analysis-grid{display:grid;gap:12px}
+.analysis-card{background:#fff;border:1px solid var(--line);border-radius:22px;padding:12px;box-shadow:0 8px 18px rgba(16,58,46,.05)}
+.analysis-card h4{margin:0 0 10px;font-size:14px;color:var(--deep)}
+.analysis-progress-track{height:16px;background:#edf3ef;border-radius:999px;overflow:hidden}
+.analysis-progress-fill{height:100%;background:linear-gradient(135deg,var(--gold),var(--gold2));border-radius:999px}
+.analysis-progress-meta{display:flex;justify-content:space-between;gap:10px;margin-top:8px;font-size:12px;color:var(--muted);font-weight:700}
+@media(max-width:560px){
+  .analysis-kpis{grid-template-columns:1fr 1fr 1fr}
+}
+</style>
+
+<script id="oai-student-fixes-script">
+(function(){
+  function fmt(v){
+    try{ return (typeof formatMoney === 'function') ? formatMoney(v) : Number(v||0).toLocaleString('ar-SA'); }
+    catch(e){ return String(v||0); }
+  }
+
+  function getStudent(){
+    try{
+      if(typeof getCurrentStudentSafe === 'function'){
+        var st = getCurrentStudentSafe();
+        if(st) return st;
+      }
+    }catch(e){}
+    try{
+      var students = (window.bankData && window.bankData.students) ? window.bankData.students : [];
+      var sid = sessionStorage.getItem('currentStudentId');
+      var acc = sessionStorage.getItem('currentStudentAccount') || window.currentStudentAccount;
+      return students.find(function(s){
+        return (sid && (s.id === sid)) ||
+               (acc && (s.accountNumber === acc || s.username === acc || s.id === acc));
+      }) || null;
+    }catch(e){}
+    return null;
+  }
+
+  function getClassNameSafe(id){
+    try{
+      if(typeof getClassName === 'function') return getClassName(id);
+      var cls = (window.bankData && window.bankData.classes || []).find(function(c){ return c.id === id; });
+      return cls ? cls.name : (id || '—');
+    }catch(e){ return id || '—'; }
+  }
+
+  function getLevelSafe(balance){
+    try{
+      if(typeof getLevel === 'function') return getLevel(balance||0);
+    }catch(e){}
+    var b = Number(balance||0);
+    if(b >= 41000) return 'ألماسي';
+    if(b >= 31000) return 'بلاتيني';
+    if(b >= 16000) return 'ذهبي';
+    if(b >= 11000) return 'فضي';
+    return 'برونزي';
+  }
+
+  function nextTarget(balance){
+    var b = Number(balance||0);
+    if(b < 11000) return 11000;
+    if(b < 16000) return 16000;
+    if(b < 31000) return 31000;
+    if(b < 41000) return 41000;
+    return b || 41000;
+  }
+
+  function normalizeStudentTabs(){
+    var account = document.getElementById('account');
+    if(!account) return;
+    var hostCard = account.querySelector('.card');
+    var tabbar = hostCard ? hostCard.querySelector('.tabbar') : null;
+    if(!hostCard || !tabbar) return;
+
+    ['statement','latest','operations','detailsTab','upgradeTab','pdfTab','rouletteTab','analysisTab','performanceStudentTab']
+      .forEach(function(id){
+        var el = document.getElementById(id);
+        if(el && el.parentElement !== hostCard){
+          hostCard.appendChild(el);
+        }
+      });
+  }
+
+  function bindPdfButton(){
+    var btn = document.getElementById('generatePdfReportBtn');
+    if(!btn || btn.dataset.boundPdf === '1') return;
+    btn.dataset.boundPdf = '1';
+    btn.onclick = function(){
+      if(typeof window.generatePdfReport === 'function'){
+        window.generatePdfReport();
+      }
+    };
+  }
+
+  window.generatePdfReport = function(){
+    try{
+      var student = getStudent();
+      if(!student){ alert('سجلي دخول الطالب / الطالبة أولاً'); return; }
+
+      var from = (document.getElementById('pdfFromDate') && document.getElementById('pdfFromDate').value) || '';
+      var to = (document.getElementById('pdfToDate') && document.getElementById('pdfToDate').value) || '';
+      var ops = (student.history || []).slice();
+
+      if(from){
+        var fromD = new Date(from);
+        ops = ops.filter(function(h){
+          var raw = String(h.date || '').split(' ')[0];
+          var d = new Date(raw);
+          return !isNaN(d) && d >= fromD;
+        });
+      }
+      if(to){
+        var toD = new Date(to);
+        ops = ops.filter(function(h){
+          var raw = String(h.date || '').split(' ')[0];
+          var d = new Date(raw);
+          return !isNaN(d) && d <= toD;
+        });
+      }
+
+      function esc(s){
+        return String(s || '').replace(/[&<>"]/g, function(c){
+          return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c] || c;
+        });
+      }
+      function typeLabel(t){
+        if(typeof opLabel === 'function') return opLabel(t);
+        if(t === 'deposit') return 'إيداع';
+        if(t === 'withdraw') return 'سحب';
+        if(t === 'transfer') return 'تحويل';
+        return t || '—';
+      }
+
+      var rows = ops.length ? ops.map(function(h){
+        var sign = h.type === 'withdraw' ? '-' : '+';
+        return '<tr>'
+          + '<td>' + esc(h.date || '—') + '</td>'
+          + '<td>' + esc(typeLabel(h.type)) + '</td>'
+          + '<td>' + esc(h.reason || '—') + '</td>'
+          + '<td>' + esc(sign + fmt(h.amount || 0)) + '</td>'
+          + '</tr>';
+      }).join('') : '<tr><td colspan="4">لا توجد عمليات في هذه الفترة</td></tr>';
+
+      var reportHtml = '<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>تقرير بنك الرياضيات</title>'
+        + '<style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin:0 0 10px;color:#103a2e}.meta{margin:6px 0;color:#666}table{width:100%;border-collapse:collapse;margin-top:16px}th,td{border:1px solid #ddd;padding:8px;text-align:right}</style>'
+        + '</head><body>'
+        + '<h1>تقرير بنك الرياضيات</h1>'
+        + '<div class="meta">الطالب / الطالبة: ' + esc(student.name || '') + '</div>'
+        + '<div class="meta">الفصل: ' + esc(getClassNameSafe(student.classId)) + '</div>'
+        + '<div class="meta">الرصيد الحالي: ' + esc(fmt(student.balance || 0)) + ' ر.س</div>'
+        + '<div class="meta">الفترة: ' + esc(from || 'من البداية') + ' إلى ' + esc(to || 'حتى اليوم') + '</div>'
+        + '<table><thead><tr><th>التاريخ</th><th>النوع</th><th>السبب</th><th>القيمة</th></tr></thead><tbody>'
+        + rows + '</tbody></table></body></html>';
+
+      var w = window.open('', '_blank');
+      if(!w){ alert('اسمحي بفتح النافذة لإخراج التقرير'); return; }
+      w.document.write(reportHtml);
+      w.document.close();
+      w.focus();
+      setTimeout(function(){ try{ w.print(); }catch(e){} }, 300);
+
+      var msg = document.getElementById('pdfReportMsg');
+      if(msg){
+        msg.classList.remove('hidden');
+        setTimeout(function(){ msg.classList.add('hidden'); }, 2500);
+      }
+    }catch(err){
+      console.error(err);
+      alert('تعذر إنشاء التقرير');
+    }
+  };
+
+  function drawBar(canvas, dep, wd, tr){
+    if(!canvas || !canvas.getContext) return;
+    var ctx = canvas.getContext('2d');
+    var w = canvas.width = canvas.clientWidth || 320;
+    var h = canvas.height = canvas.clientHeight || 190;
+    ctx.clearRect(0,0,w,h);
+    var vals = [dep, wd, tr];
+    var labels = ['إيداع','سحب','تحويل'];
+    var cols = ['#1f7f57','#c7a465','#103a2e'];
+    var max = Math.max(1, dep, wd, tr);
+    vals.forEach(function(v,i){
+      var bw = 46, gap = 44, x = 34 + i*(bw+gap);
+      var bh = Math.max(12, (v/max) * 110);
+      var y = h - 40 - bh;
+      ctx.fillStyle = cols[i];
+      ctx.fillRect(x, y, bw, bh);
+      ctx.fillStyle = '#183229';
+      ctx.font = '12px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText(labels[i], x + bw/2, h - 14);
+      ctx.fillText(String(v), x + bw/2, y - 8);
+    });
+  }
+
+  function drawPie(canvas, dep, wd, tr){
+    if(!canvas || !canvas.getContext) return;
+    var ctx = canvas.getContext('2d');
+    var w = canvas.width = 320, h = canvas.height = 260;
+    ctx.clearRect(0,0,w,h);
+    var vals = [dep, wd, tr];
+    var names = ['إيداع','سحب','تحويل'];
+    var cols = ['#1f7f57','#c7a465','#103a2e'];
+    var total = Math.max(1, dep + wd + tr);
+    var start = -Math.PI/2;
+    vals.forEach(function(v, i){
+      var ang = (v/total) * Math.PI * 2;
+      ctx.beginPath();
+      ctx.moveTo(110,110);
+      ctx.arc(110,110,80,start,start+ang);
+      ctx.closePath();
+      ctx.fillStyle = cols[i];
+      ctx.fill();
+      start += ang;
+    });
+    ctx.beginPath();
+    ctx.fillStyle = '#fff';
+    ctx.arc(110,110,40,0,Math.PI*2);
+    ctx.fill();
+
+    names.forEach(function(name,i){
+      ctx.fillStyle = cols[i];
+      ctx.fillRect(220, 52 + i*34, 14, 14);
+      ctx.fillStyle = '#183229';
+      ctx.textAlign = 'right';
+      ctx.font = '12px Arial';
+      ctx.fillText(name + ': ' + fmt(vals[i]), 305, 64 + i*34);
+    });
+  }
+
+  function renderStudentPanels(){
+    var student = getStudent();
+    if(!student) return;
+
+    var details = document.getElementById('detailsTab');
+    if(details){
+      details.innerHTML = ''
+        + '<div class="section-head"><h3>تفاصيل الحساب</h3><span class="pill">' + getLevelSafe(student.balance || 0) + '</span></div>'
+        + '<div class="list">'
+        +   '<div class="row"><div><div class="name">اسم الطالب / الطالبة</div></div><div class="value">' + (student.name || '—') + '</div></div>'
+        +   '<div class="row"><div><div class="name">رقم الحساب</div></div><div class="value">' + (student.accountNumber || student.id || '—') + '</div></div>'
+        +   '<div class="row"><div><div class="name">الفصل</div></div><div class="value">' + getClassNameSafe(student.classId) + '</div></div>'
+        +   '<div class="row"><div><div class="name">الرصيد الحالي</div></div><div class="value green">' + fmt(student.balance || 0) + ' ر.س</div></div>'
+        + '</div>';
+    }
+
+    var upgrade = document.getElementById('upgradeTab');
+    if(upgrade){
+      var bal = Number(student.balance || 0);
+      var target = nextTarget(bal);
+      var remain = Math.max(0, target - bal);
+      var percent = target > 0 ? Math.min(100, Math.round((bal / target) * 100)) : 0;
+      upgrade.innerHTML = ''
+        + '<div class="section-head"><h3>ترقية الحساب</h3><span class="pill">يعتمد على الرصيد</span></div>'
+        + '<div class="muted">ترقية الحساب تعتمد على الرصيد الحالي للطالب / الطالبة.</div>'
+        + '<div class="progress"><div style="width:' + percent + '%"></div></div>'
+        + '<div class="muted">المستوى الحالي: ' + getLevelSafe(bal) + ' • المتبقي للمستوى التالي: ' + fmt(remain) + ' ر.س</div>'
+        + '<div class="levels">'
+        +   '<div class="level"><div><div class="name">برونزي</div><div class="meta">حتى 10,999 ر.س</div></div><div class="badge-tier bronze">Bronze</div></div>'
+        +   '<div class="level"><div><div class="name">فضي</div><div class="meta">من 11,000 إلى 15,999 ر.س</div></div><div class="badge-tier silver">Silver</div></div>'
+        +   '<div class="level"><div><div class="name">ذهبي</div><div class="meta">من 16,000 إلى 30,999 ر.س</div></div><div class="badge-tier gold-tier">Gold</div></div>'
+        +   '<div class="level"><div><div class="name">بلاتيني</div><div class="meta">من 31,000 إلى 40,999 ر.س</div></div><div class="badge-tier platinum">Platinum</div></div>'
+        +   '<div class="level"><div><div class="name">ألماسي</div><div class="meta">41,000 ر.س فأكثر</div></div><div class="badge-tier diamond">Diamond</div></div>'
+        + '</div>';
+    }
+
+    var analysis = document.getElementById('analysisTab');
+    if(analysis){
+      var ops = (student.history || []);
+      var dep = 0, wd = 0, tr = 0;
+      ops.forEach(function(h){
+        var a = Number(h.amount || 0);
+        if(h.type === 'deposit') dep += a;
+        else if(h.type === 'withdraw') wd += a;
+        else if(h.type === 'transfer') tr += a;
+      });
+      var target2 = nextTarget(student.balance || 0);
+      var p = target2 > 0 ? Math.min(100, Math.round((Number(student.balance || 0) / target2) * 100)) : 0;
+
+      analysis.innerHTML = ''
+        + '<div class="section-head"><h3>تحليل بياناتي</h3><span class="pill">تحليل بياني</span></div>'
+        + '<div class="analysis-kpis">'
+        +   '<div class="analysis-kpi"><strong>' + fmt(dep) + '</strong><span>إجمالي الإيداع</span></div>'
+        +   '<div class="analysis-kpi"><strong>' + fmt(wd) + '</strong><span>إجمالي السحب</span></div>'
+        +   '<div class="analysis-kpi"><strong>' + fmt(tr) + '</strong><span>إجمالي التحويل</span></div>'
+        + '</div>'
+        + '<div class="analysis-grid">'
+        +   '<div class="analysis-card"><h4>الرسم البياني للعمليات</h4><canvas id="studentBarChart" style="width:100%;height:190px"></canvas></div>'
+        +   '<div class="analysis-card"><h4>رسم دائري لتوزيع العمليات</h4><canvas id="studentPieChart" width="320" height="260" style="width:100%;height:260px"></canvas></div>'
+        +   '<div class="analysis-card"><h4>تقدم الرصيد نحو الترقية</h4><div class="analysis-progress-track"><div class="analysis-progress-fill" style="width:' + p + '%"></div></div><div class="analysis-progress-meta"><span>الرصيد الحالي: ' + fmt(student.balance || 0) + ' ر.س</span><span>المستوى التالي: ' + fmt(target2) + ' ر.س</span></div></div>'
+        + '</div>';
+
+      setTimeout(function(){
+        drawBar(document.getElementById('studentBarChart'), dep, wd, tr);
+        drawPie(document.getElementById('studentPieChart'), dep, wd, tr);
+      }, 30);
+    }
+  }
+
+  var oldShowTab = window.showTab;
+  window.showTab = function(id, btn){
+    normalizeStudentTabs();
+
+    var scope = document.querySelector('#account .card') || document.getElementById('account');
+    if(scope){
+      scope.querySelectorAll('.tab-content').forEach(function(t){ t.classList.remove('active'); });
+      var target = document.getElementById(id);
+      if(target) target.classList.add('active');
+    }
+
+    var tabbar = document.querySelector('#account .tabbar');
+    if(tabbar){
+      tabbar.querySelectorAll('button').forEach(function(b){ b.classList.remove('active'); });
+      if(btn) btn.classList.add('active');
+    }
+
+    renderStudentPanels();
+    bindPdfButton();
+
+    if(typeof oldShowTab === 'function' && !scope){
+      try{ oldShowTab(id, btn); }catch(e){}
+    }
+  };
+
+  function boot(){
+    normalizeStudentTabs();
+    renderStudentPanels();
+    bindPdfButton();
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    setTimeout(boot, 250);
+    setTimeout(boot, 900);
+  });
+
+  var oldRenderStudentAccount = window.renderStudentAccount;
+  if(typeof oldRenderStudentAccount === 'function'){
+    window.renderStudentAccount = function(){
+      var out = oldRenderStudentAccount.apply(this, arguments);
+      setTimeout(boot, 80);
+      return out;
+    };
+  }
+})();
+</script>
+
+</body></html>';
 
   var w = window.open('', '_blank');
   if(!w) return;
@@ -4072,7 +4564,9 @@ window.generatePdfReport = function(){
   setTimeout(function(){ try{ w.print(); }catch(e){} }, 300);
 };
 
-window.renderSmartReports = function(){
+
+<script id="smart-reports-script">
+(function(){
   function money(v){ return Number(v || 0).toLocaleString('ar-SA'); }
   function esc(s){
     return String(s || '').replace(/[&<>"]/g, function(c){
@@ -4103,55 +4597,57 @@ window.renderSmartReports = function(){
     };
   }
 
-  var data = window.bankData;
-  if(!data) return;
+  window.renderSmartReports = function(){
+    var data = window.bankData;
+    if(!data) return;
 
-  var students = data.students || [];
-  var classes = data.classes || [];
-  var ops = data.operations || [];
-  var tasks = data.performanceTasks || [];
-  var dep = 0, wd = 0, tr = 0;
+    var students = data.students || [];
+    var classes = data.classes || [];
+    var ops = data.operations || [];
+    var tasks = data.performanceTasks || [];
+    var dep = 0, wd = 0, tr = 0;
 
-  ops.forEach(function(op){
-    var a = Number(op.amount || 0);
-    if(op.type === 'deposit') dep += a;
-    else if(op.type === 'withdraw') wd += a;
-    else if(op.type === 'transfer') tr += a;
-  });
+    ops.forEach(function(op){
+      var a = Number(op.amount || 0);
+      if(op.type === 'deposit') dep += a;
+      else if(op.type === 'withdraw') wd += a;
+      else if(op.type === 'transfer') tr += a;
+    });
 
-  var submitted = 0, pending = 0, avgSum = 0, avgCount = 0;
-  var bestTaskName = '—', bestRate = -1;
+    var submitted = 0, pending = 0, avgSum = 0, avgCount = 0;
+    var bestTaskName = '—', bestRate = -1;
 
-  tasks.forEach(function(t){
-    var s = getTaskStats(t);
-    submitted += s.submitted;
-    pending += s.pending;
-    if(s.avg > 0){ avgSum += s.avg; avgCount++; }
-    var rate = s.total ? (s.submitted / s.total) * 100 : 0;
-    if(rate > bestRate){ bestRate = rate; bestTaskName = t.title || '—'; }
-  });
+    tasks.forEach(function(t){
+      var s = getTaskStats(t);
+      submitted += s.submitted;
+      pending += s.pending;
+      if(s.avg > 0){ avgSum += s.avg; avgCount++; }
+      var rate = s.total ? (s.submitted / s.total) * 100 : 0;
+      if(rate > bestRate){ bestRate = rate; bestTaskName = t.title || '—'; }
+    });
 
-  function setText(id, val){
-    var el = document.getElementById(id);
-    if(el) el.textContent = val;
-  }
+    function setText(id, val){
+      var el = document.getElementById(id);
+      if(el) el.textContent = val;
+    }
 
-  setText('srStudents', students.length);
-  setText('srClasses', classes.length);
-  setText('srDeposits', money(dep));
-  setText('srWithdrawals', money(wd));
-  setText('srTransfers', money(tr));
-  setText('srTasks', tasks.length);
-  setText('srSubmitted', submitted);
-  setText('srPending', pending);
-  setText('srAvgScore', (avgCount ? Math.round(avgSum / avgCount) : 0) + '%');
-  setText('srBestTask', bestTaskName);
+    setText('srStudents', students.length);
+    setText('srClasses', classes.length);
+    setText('srDeposits', money(dep));
+    setText('srWithdrawals', money(wd));
+    setText('srTransfers', money(tr));
+    setText('srTasks', tasks.length);
+    setText('srSubmitted', submitted);
+    setText('srPending', pending);
+    setText('srAvgScore', (avgCount ? Math.round(avgSum / avgCount) : 0) + '%');
+    setText('srBestTask', bestTaskName);
 
-  var classWrap = document.getElementById('smartClassCards');
-  if(classWrap){
-    classWrap.innerHTML = !classes.length
-      ? '<div class="performance-empty">لا توجد فصول مضافة بعد.</div>'
-      : classes.map(function(cls){
+    var classWrap = document.getElementById('smartClassCards');
+    if(classWrap){
+      if(!classes.length){
+        classWrap.innerHTML = '<div class="performance-empty">لا توجد فصول مضافة بعد.</div>';
+      }else{
+        classWrap.innerHTML = classes.map(function(cls){
           var clsStudents = students.filter(function(s){ return s.classId === cls.id; });
           var avgBal = clsStudents.length ? Math.round(clsStudents.reduce(function(a,s){ return a + Number(s.balance || 0); }, 0) / clsStudents.length) : 0;
           var top = clsStudents.slice().sort(function(a,b){ return Number(b.balance || 0) - Number(a.balance || 0); })[0];
@@ -4160,231 +4656,524 @@ window.renderSmartReports = function(){
           clsTasks.forEach(function(t){ var st = getTaskStats(t); clsSub += st.submitted; clsPend += st.pending; });
           return '<div class="smart-class-card"><div class="top"><strong>' + esc(cls.name || '—') + '</strong><span class="pill">' + clsStudents.length + ' طالبة</span></div><div class="meta">متوسط الرصيد: ' + money(avgBal) + ' ر.س<br>أعلى طالب / طالبة: ' + esc(top ? top.name : '—') + '<br>تم التسليم: ' + clsSub + ' • لم يتم: ' + clsPend + '</div></div>';
         }).join('');
-  }
+      }
+    }
 
-  var topWrap = document.getElementById('smartTopStudents');
-  if(topWrap){
-    var ranked = students.slice().sort(function(a,b){ return Number(b.balance || 0) - Number(a.balance || 0); }).slice(0,5);
-    topWrap.innerHTML = ranked.length
-      ? ranked.map(function(st, i){
-          return '<div class="smart-top-item"><div style="display:flex;align-items:center;gap:10px"><div class="smart-rank">' + (i + 1) + '</div><div><strong>' + esc(st.name || '—') + '</strong><div class="meta">' + esc(getClassNameSafe(st.classId)) + '</div></div></div><strong>' + money(st.balance || 0) + ' ر.س</strong></div>';
+    var topWrap = document.getElementById('smartTopStudents');
+    if(topWrap){
+      var ranked = students.slice().sort(function(a,b){ return Number(b.balance || 0) - Number(a.balance || 0); }).slice(0,5);
+      topWrap.innerHTML = ranked.length ? ranked.map(function(st, i){
+        return '<div class="smart-top-item"><div style="display:flex;align-items:center;gap:10px"><div class="smart-rank">' + (i + 1) + '</div><div><strong>' + esc(st.name || '—') + '</strong><div class="meta">' + esc(getClassNameSafe(st.classId)) + '</div></div></div><strong>' + money(st.balance || 0) + ' ر.س</strong></div>';
+      }).join('') : '<div class="performance-empty">لا يوجد طلاب / طالبات للعرض.</div>';
+    }
+
+    var perfWrap = document.getElementById('smartPerformanceIndicators');
+    if(perfWrap){
+      var perfStudents = students.slice().sort(function(a,b){ return Number(b.balance||0)-Number(a.balance||0); }).slice(0,5);
+      perfWrap.innerHTML = perfStudents.length ? perfStudents.map(function(st){
+        var bal = Number(st.balance || 0);
+        var label = bal >= 11000 ? 'ممتاز' : (bal >= 5000 ? 'جيد' : 'يحتاج متابعة');
+        return '<div class="smart-top-item"><div><strong>' + esc(st.name || '—') + '</strong><div class="meta">' + label + '</div></div><strong>' + money(bal) + ' ر.س</strong></div>';
+      }).join('') : '<div class="performance-empty">لا توجد بيانات متاحة.</div>';
+    }
+
+    var taskWrap = document.getElementById('smartTaskList');
+    if(taskWrap){
+      taskWrap.innerHTML = tasks.length ? tasks.map(function(t){
+        var s = getTaskStats(t);
+        return '<div class="smart-task-item"><div><strong>' + esc(t.title || '—') + '</strong><div class="meta">' + esc(getClassNameSafe(t.classId)) + ' • تم التسليم ' + s.submitted + '/' + s.total + ' • متوسط الدرجات ' + s.avg + '%</div></div><span class="pill">' + s.pending + ' لم يتم</span></div>';
+      }).join('') : '<div class="performance-empty">لا توجد مهام أدائية بعد.</div>';
+    }
+
+    var alerts = document.getElementById('smartAlerts');
+    if(alerts){
+      var low = students.filter(function(s){ return Number(s.balance || 0) < 1000; }).slice(0,3);
+      var near = students.filter(function(s){ var b = Number(s.balance || 0); return b >= 9000 && b < 11000; }).slice(0,3);
+      var late = [];
+      tasks.forEach(function(t){
+        var tStudents = students.filter(function(s){ return s.classId === t.classId; });
+        tStudents.forEach(function(st){
+          var entry = (t.entries && t.entries[st.id]) || {};
+          var status = t.submissionStatus && t.submissionStatus[st.id];
+          if(!(status === true || entry.submittedAt || entry.attachmentData || entry.attachmentName || entry.videoLink)){
+            late.push({name: st.name, task: t.title});
+          }
+        });
+      });
+      var items = [];
+      late.slice(0,3).forEach(function(x){ items.push('<div class="smart-alert warn"><strong>لم يتم تسليم مهمة</strong><span>' + esc(x.name || '—') + ' • ' + esc(x.task || '—') + '</span></div>'); });
+      low.forEach(function(x){ items.push('<div class="smart-alert"><strong>رصيد منخفض</strong><span>' + esc(x.name || '—') + ' • ' + money(x.balance || 0) + ' ر.س</span></div>'); });
+      near.forEach(function(x){ items.push('<div class="smart-alert ok"><strong>قريبة من الترقية</strong><span>' + esc(x.name || '—') + ' • ' + money(x.balance || 0) + ' ر.س</span></div>'); });
+      alerts.innerHTML = items.length ? items.join('') : '<div class="performance-empty">لا توجد تنبيهات حالية.</div>';
+    }
+
+    if(typeof window.drawSmartOpsChart === 'function') window.drawSmartOpsChart(dep, wd, tr);
+  };
+
+  window.drawSmartOpsChart = function(dep, wd, tr){
+    var canvas = document.getElementById('smartOpsChart');
+    if(!canvas || !canvas.getContext) return;
+    var ctx = canvas.getContext('2d');
+    var total = Math.max(1, dep + wd + tr);
+    var values = [dep, wd, tr];
+    var colors = ['#1f7f57','#c7a465','#103a2e'];
+    var labels = ['إيداع','سحب','تحويل'];
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    var start = -Math.PI/2;
+    values.forEach(function(v, i){
+      var angle = (v/total) * Math.PI * 2;
+      ctx.beginPath();
+      ctx.moveTo(110,110);
+      ctx.arc(110,110,80,start,start+angle);
+      ctx.closePath();
+      ctx.fillStyle = colors[i];
+      ctx.fill();
+      start += angle;
+    });
+    ctx.beginPath();
+    ctx.fillStyle = '#fff';
+    ctx.arc(110,110,36,0,Math.PI*2);
+    ctx.fill();
+    ctx.fillStyle = '#103a2e';
+    ctx.font = 'bold 14px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('BN',110,116);
+    labels.forEach(function(lab, i){
+      ctx.fillStyle = colors[i];
+      ctx.fillRect(210,35 + i*34,14,14);
+      ctx.fillStyle = '#183229';
+      ctx.textAlign = 'right';
+      ctx.font = '12px Arial';
+      ctx.fillText(lab + ': ' + money(values[i]), 270, 47 + i*34);
+    });
+  };
+
+  window.generateSmartTeacherReport = function(){
+    try{ window.renderSmartReports(); }catch(e){}
+    var htmlReport = '<html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>تقرير شامل - بنك الرياضيات</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{color:#103a2e}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.card{border:1px solid #dce6df;border-radius:16px;padding:14px;margin-bottom:12px}.muted{color:#6b8178;font-size:13px}</style></head><body>'
+      + '<h1>التقرير الشامل - بنك الرياضيات</h1>'
+      + '<div class="muted">تم إنشاؤه تلقائيًا من التقارير الذكية</div>'
+      + '<div class="grid">'
+      + ['srStudents','srClasses','srDeposits','srWithdrawals','srTransfers','srTasks','srSubmitted','srPending'].map(function(id){
+          var el = document.getElementById(id);
+          var label = el && el.nextElementSibling ? el.nextElementSibling.textContent : '';
+          return '<div class="card"><strong>' + esc(label) + '</strong><div style="font-size:24px;margin-top:8px">' + esc(el ? el.textContent : '') + '</div></div>';
         }).join('')
-      : '<div class="performance-empty">لا يوجد طلاب / طالبات للعرض.</div>';
+      + '</div>'
+      + '<div class="card"><h3>أفضل الطلاب / الطالبات</h3>' + (document.getElementById('smartTopStudents')?.innerHTML || '') + '</div>'
+      + '<div class="card"><h3>مؤشر أداء الطالب / الطالبة</h3>' + (document.getElementById('smartPerformanceIndicators')?.innerHTML || '') + '</div>'
+      + '<div class="card"><h3>تحليل الفصول</h3>' + (document.getElementById('smartClassCards')?.innerHTML || '') + '</div>'
+      + '<div class="card"><h3>التنبيهات الذكية</h3>' + (document.getElementById('smartAlerts')?.innerHTML || '') + '</div>'
+      + '
+<style id="oai-student-fixes-style">
+#account .tab-content{display:none}
+#account .tab-content.active{display:block}
+#account .tab-content.card{margin-top:12px}
+.analysis-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px}
+.analysis-kpi{background:#fff;border:1px solid var(--line);border-radius:20px;padding:12px;text-align:center;box-shadow:0 8px 18px rgba(16,58,46,.05)}
+.analysis-kpi strong{display:block;font-size:18px;color:var(--deep);margin-bottom:4px}
+.analysis-kpi span{display:block;font-size:11px;color:var(--muted);font-weight:700}
+.analysis-grid{display:grid;gap:12px}
+.analysis-card{background:#fff;border:1px solid var(--line);border-radius:22px;padding:12px;box-shadow:0 8px 18px rgba(16,58,46,.05)}
+.analysis-card h4{margin:0 0 10px;font-size:14px;color:var(--deep)}
+.analysis-progress-track{height:16px;background:#edf3ef;border-radius:999px;overflow:hidden}
+.analysis-progress-fill{height:100%;background:linear-gradient(135deg,var(--gold),var(--gold2));border-radius:999px}
+.analysis-progress-meta{display:flex;justify-content:space-between;gap:10px;margin-top:8px;font-size:12px;color:var(--muted);font-weight:700}
+@media(max-width:560px){
+  .analysis-kpis{grid-template-columns:1fr 1fr 1fr}
+}
+</style>
+
+<script id="oai-student-fixes-script">
+(function(){
+  function fmt(v){
+    try{ return (typeof formatMoney === 'function') ? formatMoney(v) : Number(v||0).toLocaleString('ar-SA'); }
+    catch(e){ return String(v||0); }
   }
 
-  var perfWrap = document.getElementById('smartPerformanceIndicators');
-  if(perfWrap){
-    var perfStudents = students.slice().sort(function(a,b){ return Number(b.balance||0)-Number(a.balance||0); }).slice(0,5);
-    perfWrap.innerHTML = perfStudents.length
-      ? perfStudents.map(function(st){
-          var bal = Number(st.balance || 0);
-          var text = bal >= 11000 ? 'ممتاز' : (bal >= 5000 ? 'جيد' : 'يحتاج متابعة');
-          return '<div class="smart-top-item"><div><strong>' + esc(st.name || '—') + '</strong><div class="meta">' + text + '</div></div><strong>' + money(bal) + ' ر.س</strong></div>';
-        }).join('')
-      : '<div class="performance-empty">لا توجد بيانات متاحة.</div>';
+  function getStudent(){
+    try{
+      if(typeof getCurrentStudentSafe === 'function'){
+        var st = getCurrentStudentSafe();
+        if(st) return st;
+      }
+    }catch(e){}
+    try{
+      var students = (window.bankData && window.bankData.students) ? window.bankData.students : [];
+      var sid = sessionStorage.getItem('currentStudentId');
+      var acc = sessionStorage.getItem('currentStudentAccount') || window.currentStudentAccount;
+      return students.find(function(s){
+        return (sid && (s.id === sid)) ||
+               (acc && (s.accountNumber === acc || s.username === acc || s.id === acc));
+      }) || null;
+    }catch(e){}
+    return null;
   }
 
-  var taskWrap = document.getElementById('smartTaskList');
-  if(taskWrap){
-    taskWrap.innerHTML = tasks.length
-      ? tasks.map(function(t){
-          var s = getTaskStats(t);
-          return '<div class="smart-task-item"><div><strong>' + esc(t.title || '—') + '</strong><div class="meta">' + esc(getClassNameSafe(t.classId)) + ' • تم التسليم ' + s.submitted + '/' + s.total + ' • متوسط الدرجات ' + s.avg + '%</div></div><span class="pill">' + s.pending + ' لم يتم</span></div>';
-        }).join('')
-      : '<div class="performance-empty">لا توجد مهام أدائية بعد.</div>';
+  function getClassNameSafe(id){
+    try{
+      if(typeof getClassName === 'function') return getClassName(id);
+      var cls = (window.bankData && window.bankData.classes || []).find(function(c){ return c.id === id; });
+      return cls ? cls.name : (id || '—');
+    }catch(e){ return id || '—'; }
   }
 
-  var alerts = document.getElementById('smartAlerts');
-  if(alerts){
-    var low = students.filter(function(s){ return Number(s.balance || 0) < 1000; }).slice(0,3);
-    var near = students.filter(function(s){ var b = Number(s.balance || 0); return b >= 9000 && b < 11000; }).slice(0,3);
-    var late = [];
-    tasks.forEach(function(t){
-      var tStudents = students.filter(function(s){ return s.classId === t.classId; });
-      tStudents.forEach(function(st){
-        var entry = (t.entries && t.entries[st.id]) || {};
-        var status = t.submissionStatus && t.submissionStatus[st.id];
-        if(!(status === true || entry.submittedAt || entry.attachmentData || entry.attachmentName || entry.videoLink)){
-          late.push({name: st.name, task: t.title});
+  function getLevelSafe(balance){
+    try{
+      if(typeof getLevel === 'function') return getLevel(balance||0);
+    }catch(e){}
+    var b = Number(balance||0);
+    if(b >= 41000) return 'ألماسي';
+    if(b >= 31000) return 'بلاتيني';
+    if(b >= 16000) return 'ذهبي';
+    if(b >= 11000) return 'فضي';
+    return 'برونزي';
+  }
+
+  function nextTarget(balance){
+    var b = Number(balance||0);
+    if(b < 11000) return 11000;
+    if(b < 16000) return 16000;
+    if(b < 31000) return 31000;
+    if(b < 41000) return 41000;
+    return b || 41000;
+  }
+
+  function normalizeStudentTabs(){
+    var account = document.getElementById('account');
+    if(!account) return;
+    var hostCard = account.querySelector('.card');
+    var tabbar = hostCard ? hostCard.querySelector('.tabbar') : null;
+    if(!hostCard || !tabbar) return;
+
+    ['statement','latest','operations','detailsTab','upgradeTab','pdfTab','rouletteTab','analysisTab','performanceStudentTab']
+      .forEach(function(id){
+        var el = document.getElementById(id);
+        if(el && el.parentElement !== hostCard){
+          hostCard.appendChild(el);
         }
       });
-    });
-    var items = [];
-    late.slice(0,3).forEach(function(x){ items.push('<div class="smart-alert warn"><strong>لم يتم تسليم مهمة</strong><span>' + esc(x.name || '—') + ' • ' + esc(x.task || '—') + '</span></div>'); });
-    low.forEach(function(x){ items.push('<div class="smart-alert"><strong>رصيد منخفض</strong><span>' + esc(x.name || '—') + ' • ' + money(x.balance || 0) + ' ر.س</span></div>'); });
-    near.forEach(function(x){ items.push('<div class="smart-alert ok"><strong>قريبة من الترقية</strong><span>' + esc(x.name || '—') + ' • ' + money(x.balance || 0) + ' ر.س</span></div>'); });
-    alerts.innerHTML = items.length ? items.join('') : '<div class="performance-empty">لا توجد تنبيهات حالية.</div>';
   }
 
-  if(typeof window.drawSmartOpsChart === 'function') window.drawSmartOpsChart(dep, wd, tr);
-};
+  function bindPdfButton(){
+    var btn = document.getElementById('generatePdfReportBtn');
+    if(!btn || btn.dataset.boundPdf === '1') return;
+    btn.dataset.boundPdf = '1';
+    btn.onclick = function(){
+      if(typeof window.generatePdfReport === 'function'){
+        window.generatePdfReport();
+      }
+    };
+  }
 
-window.drawSmartOpsChart = function(dep, wd, tr){
-  var canvas = document.getElementById('smartOpsChart');
-  if(!canvas || !canvas.getContext) return;
-  var ctx = canvas.getContext('2d');
-  var total = Math.max(1, dep + wd + tr);
-  var values = [dep, wd, tr];
-  var colors = ['#1f7f57','#c7a465','#103a2e'];
-  var labels = ['إيداع','سحب','تحويل'];
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  var start = -Math.PI/2;
-  values.forEach(function(v, i){
-    var angle = (v/total) * Math.PI * 2;
+  window.generatePdfReport = function(){
+    try{
+      var student = getStudent();
+      if(!student){ alert('سجلي دخول الطالب / الطالبة أولاً'); return; }
+
+      var from = (document.getElementById('pdfFromDate') && document.getElementById('pdfFromDate').value) || '';
+      var to = (document.getElementById('pdfToDate') && document.getElementById('pdfToDate').value) || '';
+      var ops = (student.history || []).slice();
+
+      if(from){
+        var fromD = new Date(from);
+        ops = ops.filter(function(h){
+          var raw = String(h.date || '').split(' ')[0];
+          var d = new Date(raw);
+          return !isNaN(d) && d >= fromD;
+        });
+      }
+      if(to){
+        var toD = new Date(to);
+        ops = ops.filter(function(h){
+          var raw = String(h.date || '').split(' ')[0];
+          var d = new Date(raw);
+          return !isNaN(d) && d <= toD;
+        });
+      }
+
+      function esc(s){
+        return String(s || '').replace(/[&<>"]/g, function(c){
+          return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c] || c;
+        });
+      }
+      function typeLabel(t){
+        if(typeof opLabel === 'function') return opLabel(t);
+        if(t === 'deposit') return 'إيداع';
+        if(t === 'withdraw') return 'سحب';
+        if(t === 'transfer') return 'تحويل';
+        return t || '—';
+      }
+
+      var rows = ops.length ? ops.map(function(h){
+        var sign = h.type === 'withdraw' ? '-' : '+';
+        return '<tr>'
+          + '<td>' + esc(h.date || '—') + '</td>'
+          + '<td>' + esc(typeLabel(h.type)) + '</td>'
+          + '<td>' + esc(h.reason || '—') + '</td>'
+          + '<td>' + esc(sign + fmt(h.amount || 0)) + '</td>'
+          + '</tr>';
+      }).join('') : '<tr><td colspan="4">لا توجد عمليات في هذه الفترة</td></tr>';
+
+      var reportHtml = '<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>تقرير بنك الرياضيات</title>'
+        + '<style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin:0 0 10px;color:#103a2e}.meta{margin:6px 0;color:#666}table{width:100%;border-collapse:collapse;margin-top:16px}th,td{border:1px solid #ddd;padding:8px;text-align:right}</style>'
+        + '</head><body>'
+        + '<h1>تقرير بنك الرياضيات</h1>'
+        + '<div class="meta">الطالب / الطالبة: ' + esc(student.name || '') + '</div>'
+        + '<div class="meta">الفصل: ' + esc(getClassNameSafe(student.classId)) + '</div>'
+        + '<div class="meta">الرصيد الحالي: ' + esc(fmt(student.balance || 0)) + ' ر.س</div>'
+        + '<div class="meta">الفترة: ' + esc(from || 'من البداية') + ' إلى ' + esc(to || 'حتى اليوم') + '</div>'
+        + '<table><thead><tr><th>التاريخ</th><th>النوع</th><th>السبب</th><th>القيمة</th></tr></thead><tbody>'
+        + rows + '</tbody></table></body></html>';
+
+      var w = window.open('', '_blank');
+      if(!w){ alert('اسمحي بفتح النافذة لإخراج التقرير'); return; }
+      w.document.write(reportHtml);
+      w.document.close();
+      w.focus();
+      setTimeout(function(){ try{ w.print(); }catch(e){} }, 300);
+
+      var msg = document.getElementById('pdfReportMsg');
+      if(msg){
+        msg.classList.remove('hidden');
+        setTimeout(function(){ msg.classList.add('hidden'); }, 2500);
+      }
+    }catch(err){
+      console.error(err);
+      alert('تعذر إنشاء التقرير');
+    }
+  };
+
+  function drawBar(canvas, dep, wd, tr){
+    if(!canvas || !canvas.getContext) return;
+    var ctx = canvas.getContext('2d');
+    var w = canvas.width = canvas.clientWidth || 320;
+    var h = canvas.height = canvas.clientHeight || 190;
+    ctx.clearRect(0,0,w,h);
+    var vals = [dep, wd, tr];
+    var labels = ['إيداع','سحب','تحويل'];
+    var cols = ['#1f7f57','#c7a465','#103a2e'];
+    var max = Math.max(1, dep, wd, tr);
+    vals.forEach(function(v,i){
+      var bw = 46, gap = 44, x = 34 + i*(bw+gap);
+      var bh = Math.max(12, (v/max) * 110);
+      var y = h - 40 - bh;
+      ctx.fillStyle = cols[i];
+      ctx.fillRect(x, y, bw, bh);
+      ctx.fillStyle = '#183229';
+      ctx.font = '12px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText(labels[i], x + bw/2, h - 14);
+      ctx.fillText(String(v), x + bw/2, y - 8);
+    });
+  }
+
+  function drawPie(canvas, dep, wd, tr){
+    if(!canvas || !canvas.getContext) return;
+    var ctx = canvas.getContext('2d');
+    var w = canvas.width = 320, h = canvas.height = 260;
+    ctx.clearRect(0,0,w,h);
+    var vals = [dep, wd, tr];
+    var names = ['إيداع','سحب','تحويل'];
+    var cols = ['#1f7f57','#c7a465','#103a2e'];
+    var total = Math.max(1, dep + wd + tr);
+    var start = -Math.PI/2;
+    vals.forEach(function(v, i){
+      var ang = (v/total) * Math.PI * 2;
+      ctx.beginPath();
+      ctx.moveTo(110,110);
+      ctx.arc(110,110,80,start,start+ang);
+      ctx.closePath();
+      ctx.fillStyle = cols[i];
+      ctx.fill();
+      start += ang;
+    });
     ctx.beginPath();
-    ctx.moveTo(110,110);
-    ctx.arc(110,110,80,start,start+angle);
-    ctx.closePath();
-    ctx.fillStyle = colors[i];
+    ctx.fillStyle = '#fff';
+    ctx.arc(110,110,40,0,Math.PI*2);
     ctx.fill();
-    start += angle;
-  });
-  ctx.beginPath();
-  ctx.fillStyle = '#fff';
-  ctx.arc(110,110,36,0,Math.PI*2);
-  ctx.fill();
-  ctx.fillStyle = '#103a2e';
-  ctx.font = 'bold 14px Arial';
-  ctx.textAlign = 'center';
-  ctx.fillText('BN',110,116);
-  labels.forEach(function(lab, i){
-    ctx.fillStyle = colors[i];
-    ctx.fillRect(210,35 + i*34,14,14);
-    ctx.fillStyle = '#183229';
-    ctx.textAlign = 'right';
-    ctx.font = '12px Arial';
-    ctx.fillText(lab + ': ' + money(values[i]), 270, 47 + i*34);
-  });
-};
 
-window.generateSmartTeacherReport = function(){
-  try{ window.renderSmartReports(); }catch(e){}
-  function esc(s){
-    return String(s || '').replace(/[&<>"]/g, function(c){
-      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c] || c;
+    names.forEach(function(name,i){
+      ctx.fillStyle = cols[i];
+      ctx.fillRect(220, 52 + i*34, 14, 14);
+      ctx.fillStyle = '#183229';
+      ctx.textAlign = 'right';
+      ctx.font = '12px Arial';
+      ctx.fillText(name + ': ' + fmt(vals[i]), 305, 64 + i*34);
     });
   }
-  var htmlReport = '<html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>تقرير شامل - بنك الرياضيات</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{color:#103a2e}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.card{border:1px solid #dce6df;border-radius:16px;padding:14px;margin-bottom:12px}.muted{color:#6b8178;font-size:13px}</style></head><body>'
-    + '<h1>التقرير الشامل - بنك الرياضيات</h1>'
-    + '<div class="muted">تم إنشاؤه تلقائيًا من التقارير الذكية</div>'
-    + '<div class="grid">'
-    + ['srStudents','srClasses','srDeposits','srWithdrawals','srTransfers','srTasks','srSubmitted','srPending'].map(function(id){
-        var el = document.getElementById(id);
-        var label = el && el.nextElementSibling ? el.nextElementSibling.textContent : '';
-        return '<div class="card"><strong>' + esc(label) + '</strong><div style="font-size:24px;margin-top:8px">' + esc(el ? el.textContent : '') + '</div></div>';
-      }).join('')
-    + '</div>'
-    + '<div class="card"><h3>أفضل الطلاب / الطالبات</h3>' + (document.getElementById('smartTopStudents')?.innerHTML || '') + '</div>'
-    + '<div class="card"><h3>مؤشر أداء الطالب / الطالبة</h3>' + (document.getElementById('smartPerformanceIndicators')?.innerHTML || '') + '</div>'
-    + '<div class="card"><h3>تحليل الفصول</h3>' + (document.getElementById('smartClassCards')?.innerHTML || '') + '</div>'
-    + '<div class="card"><h3>التنبيهات الذكية</h3>' + (document.getElementById('smartAlerts')?.innerHTML || '') + '</div>'
-    + '</body></html>';
 
-  var w = window.open('', '_blank');
-  if(!w) return;
-  w.document.write(htmlReport);
-  w.document.close();
-  setTimeout(function(){ try{ w.print(); }catch(e){} }, 400);
-  var status = document.getElementById('smartReportStatus');
-  if(status){
-    status.classList.remove('hidden');
-    setTimeout(function(){ status.classList.add('hidden'); }, 2000);
+  function renderStudentPanels(){
+    var student = getStudent();
+    if(!student) return;
+
+    var details = document.getElementById('detailsTab');
+    if(details){
+      details.innerHTML = ''
+        + '<div class="section-head"><h3>تفاصيل الحساب</h3><span class="pill">' + getLevelSafe(student.balance || 0) + '</span></div>'
+        + '<div class="list">'
+        +   '<div class="row"><div><div class="name">اسم الطالب / الطالبة</div></div><div class="value">' + (student.name || '—') + '</div></div>'
+        +   '<div class="row"><div><div class="name">رقم الحساب</div></div><div class="value">' + (student.accountNumber || student.id || '—') + '</div></div>'
+        +   '<div class="row"><div><div class="name">الفصل</div></div><div class="value">' + getClassNameSafe(student.classId) + '</div></div>'
+        +   '<div class="row"><div><div class="name">الرصيد الحالي</div></div><div class="value green">' + fmt(student.balance || 0) + ' ر.س</div></div>'
+        + '</div>';
+    }
+
+    var upgrade = document.getElementById('upgradeTab');
+    if(upgrade){
+      var bal = Number(student.balance || 0);
+      var target = nextTarget(bal);
+      var remain = Math.max(0, target - bal);
+      var percent = target > 0 ? Math.min(100, Math.round((bal / target) * 100)) : 0;
+      upgrade.innerHTML = ''
+        + '<div class="section-head"><h3>ترقية الحساب</h3><span class="pill">يعتمد على الرصيد</span></div>'
+        + '<div class="muted">ترقية الحساب تعتمد على الرصيد الحالي للطالب / الطالبة.</div>'
+        + '<div class="progress"><div style="width:' + percent + '%"></div></div>'
+        + '<div class="muted">المستوى الحالي: ' + getLevelSafe(bal) + ' • المتبقي للمستوى التالي: ' + fmt(remain) + ' ر.س</div>'
+        + '<div class="levels">'
+        +   '<div class="level"><div><div class="name">برونزي</div><div class="meta">حتى 10,999 ر.س</div></div><div class="badge-tier bronze">Bronze</div></div>'
+        +   '<div class="level"><div><div class="name">فضي</div><div class="meta">من 11,000 إلى 15,999 ر.س</div></div><div class="badge-tier silver">Silver</div></div>'
+        +   '<div class="level"><div><div class="name">ذهبي</div><div class="meta">من 16,000 إلى 30,999 ر.س</div></div><div class="badge-tier gold-tier">Gold</div></div>'
+        +   '<div class="level"><div><div class="name">بلاتيني</div><div class="meta">من 31,000 إلى 40,999 ر.س</div></div><div class="badge-tier platinum">Platinum</div></div>'
+        +   '<div class="level"><div><div class="name">ألماسي</div><div class="meta">41,000 ر.س فأكثر</div></div><div class="badge-tier diamond">Diamond</div></div>'
+        + '</div>';
+    }
+
+    var analysis = document.getElementById('analysisTab');
+    if(analysis){
+      var ops = (student.history || []);
+      var dep = 0, wd = 0, tr = 0;
+      ops.forEach(function(h){
+        var a = Number(h.amount || 0);
+        if(h.type === 'deposit') dep += a;
+        else if(h.type === 'withdraw') wd += a;
+        else if(h.type === 'transfer') tr += a;
+      });
+      var target2 = nextTarget(student.balance || 0);
+      var p = target2 > 0 ? Math.min(100, Math.round((Number(student.balance || 0) / target2) * 100)) : 0;
+
+      analysis.innerHTML = ''
+        + '<div class="section-head"><h3>تحليل بياناتي</h3><span class="pill">تحليل بياني</span></div>'
+        + '<div class="analysis-kpis">'
+        +   '<div class="analysis-kpi"><strong>' + fmt(dep) + '</strong><span>إجمالي الإيداع</span></div>'
+        +   '<div class="analysis-kpi"><strong>' + fmt(wd) + '</strong><span>إجمالي السحب</span></div>'
+        +   '<div class="analysis-kpi"><strong>' + fmt(tr) + '</strong><span>إجمالي التحويل</span></div>'
+        + '</div>'
+        + '<div class="analysis-grid">'
+        +   '<div class="analysis-card"><h4>الرسم البياني للعمليات</h4><canvas id="studentBarChart" style="width:100%;height:190px"></canvas></div>'
+        +   '<div class="analysis-card"><h4>رسم دائري لتوزيع العمليات</h4><canvas id="studentPieChart" width="320" height="260" style="width:100%;height:260px"></canvas></div>'
+        +   '<div class="analysis-card"><h4>تقدم الرصيد نحو الترقية</h4><div class="analysis-progress-track"><div class="analysis-progress-fill" style="width:' + p + '%"></div></div><div class="analysis-progress-meta"><span>الرصيد الحالي: ' + fmt(student.balance || 0) + ' ر.س</span><span>المستوى التالي: ' + fmt(target2) + ' ر.س</span></div></div>'
+        + '</div>';
+
+      setTimeout(function(){
+        drawBar(document.getElementById('studentBarChart'), dep, wd, tr);
+        drawPie(document.getElementById('studentPieChart'), dep, wd, tr);
+      }, 30);
+    }
   }
-};
 
-document.addEventListener('DOMContentLoaded', function(){
-  setTimeout(function(){ try{ window.renderSmartReports(); }catch(e){} }, 500);
-});
+  var oldShowTab = window.showTab;
+  window.showTab = function(id, btn){
+    normalizeStudentTabs();
 
-var oldShow = window.showTeacherPane;
-if(typeof oldShow === 'function'){
-  window.showTeacherPane = function(id, btn){
-    oldShow(id, btn);
-    if(id === 'teacherPaneReportsSmart'){
-      setTimeout(function(){ try{ window.renderSmartReports(); }catch(e){} }, 50);
+    var scope = document.querySelector('#account .card') || document.getElementById('account');
+    if(scope){
+      scope.querySelectorAll('.tab-content').forEach(function(t){ t.classList.remove('active'); });
+      var target = document.getElementById(id);
+      if(target) target.classList.add('active');
+    }
+
+    var tabbar = document.querySelector('#account .tabbar');
+    if(tabbar){
+      tabbar.querySelectorAll('button').forEach(function(b){ b.classList.remove('active'); });
+      if(btn) btn.classList.add('active');
+    }
+
+    renderStudentPanels();
+    bindPdfButton();
+
+    if(typeof oldShowTab === 'function' && !scope){
+      try{ oldShowTab(id, btn); }catch(e){}
     }
   };
-}
 
-function openMoreInfo(type){
-  var data={
-    about:{
-      title:'من نحن',
-      sub:'نبذة عن بنك الرياضيات',
-      html:`
-        <h2 class="more-detail-title">من نحن</h2>
-        <p class="more-detail-lead">بنك الرياضيات منصة تعليمية تحفيزية تهدف إلى تعزيز مشاركة الطلاب داخل الحصة الدراسية من خلال نظام نقاط مستوحى من الأنظمة المصرفية.</p>
-        <div class="more-detail-block"><p>يمنح البنك الطلاب رصيدًا تحفيزيًا مقابل المشاركة والإنجاز والالتزام، مما يسهم في تنمية روح التنافس الإيجابي وتحفيز التعلم بطريقة ممتعة ومبتكرة.</p></div>
-        <div class="more-detail-block"><h3>الإشراف</h3><p>يشرف على بنك الرياضيات <strong>الأستاذة: سارة حقوي</strong>.</p></div>
-      `
-    },
-    contact:{
-      title:'اتصل بنا',
-      sub:'قنوات التواصل الرسمية',
-      html:`
-        <h2 class="more-detail-title">اتصل بنا</h2>
-        <p class="more-detail-lead">للاستفسارات أو الملاحظات يمكنكم التواصل مع إدارة بنك الرياضيات عبر الوسائل التالية:</p>
-        <div class="more-detail-list">
-          <div class="more-detail-item"><div class="icon">📞</div><div><strong>خدمة الطلاب وأولياء الأمور</strong><span>0502234335</span></div></div>
-          <div class="more-detail-item"><div class="icon">☎️</div><div><strong>الإدارة العامة</strong><span>0556891201</span></div></div>
-          <div class="more-detail-item"><div class="icon">✉️</div><div><strong>البريد الإلكتروني</strong><span>Saramathss@hotmail.com</span></div></div>
-          <div class="more-detail-item"><div class="icon">🏫</div><div><strong>الموقع</strong><span>مدرسة رواد الشرق الأهلية</span></div></div>
-        </div>
-      `
-    },
-    settings:{
-      title:'الإعدادات',
-      sub:'إدارة الحساب والبيانات',
-      html:`
-        <h2 class="more-detail-title">الإعدادات</h2>
-        <p class="more-detail-lead">تتيح هذه الصفحة إدارة إعدادات الحساب داخل نظام بنك الرياضيات.</p>
-        <div class="more-detail-list">
-          <div class="more-detail-item"><div class="icon">🔐</div><div><strong>تغيير كلمة المرور</strong><span>تحديث كلمة المرور لحماية الحساب.</span></div></div>
-          <div class="more-detail-item"><div class="icon">👤</div><div><strong>تعديل بيانات الحساب</strong><span>مراجعة اسم المستخدم والبيانات الأساسية.</span></div></div>
-          <div class="more-detail-item"><div class="icon">🔔</div><div><strong>إدارة الإشعارات</strong><span>التحكم في التنبيهات داخل النظام.</span></div></div>
-          <div class="more-detail-item"><div class="icon">🚪</div><div><strong>تسجيل الخروج</strong><span>إنهاء الجلسة الحالية بأمان.</span></div></div>
-        </div>
-      `
-    },
-    privacy:{
-      title:'سياسة الخصوصية',
-      sub:'استخدام البيانات داخل النظام',
-      html:`
-        <h2 class="more-detail-title">سياسة الخصوصية</h2>
-        <div class="more-detail-block"><p>يحرص بنك الرياضيات على حماية خصوصية بيانات الطلاب وأولياء الأمور.</p></div>
-        <div class="more-detail-block"><p>يتم استخدام المعلومات داخل النظام لأغراض تعليمية فقط، ولا يتم مشاركة أي بيانات خارج إطار المدرسة أو الجهات التعليمية المعنية.</p></div>
-      `
-    },
-    disclaimer:{
-      title:'إخلاء المسؤولية',
-      sub:'تنويه حول طبيعة النظام',
-      html:`
-        <h2 class="more-detail-title">إخلاء المسؤولية</h2>
-        <div class="more-detail-block"><p>بنك الرياضيات نظام تحفيزي تعليمي يهدف إلى تشجيع الطلاب على المشاركة والتفاعل داخل الحصة الدراسية.</p></div>
-        <div class="more-detail-block"><p>النقاط والأرصدة المستخدمة داخل النظام هي لأغراض تعليمية وتحفيزية فقط، ولا تمثل أي قيمة مالية حقيقية.</p></div>
-      `
-    },
-    terms:{
-      title:'الأحكام والشروط',
-      sub:'ضوابط استخدام بنك الرياضيات',
-      html:`
-        <h2 class="more-detail-title">الأحكام والشروط</h2>
-        <div class="more-detail-block"><p>يهدف بنك الرياضيات إلى تعزيز بيئة تعليمية محفزة داخل الفصل الدراسي.</p></div>
-        <div class="more-detail-block"><p>يتم منح النقاط للطلاب وفق معايير تعليمية يحددها المعلم، ويُستخدم النظام كوسيلة تعليمية لتحفيز المشاركة والانضباط وتحقيق التميز.</p></div>
-      `
-    }
-  };
-  var item=data[type];
-  if(!item) return;
-  var title=document.getElementById('moreDetailTitle');
-  var sub=document.getElementById('moreDetailSub');
-  var content=document.getElementById('moreDetailContent');
-  if(title) title.textContent=item.title;
-  if(sub) sub.textContent=item.sub;
-  if(content) content.innerHTML=item.html;
-  go('more_detail');
-}
+  function boot(){
+    normalizeStudentTabs();
+    renderStudentPanels();
+    bindPdfButton();
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    setTimeout(boot, 250);
+    setTimeout(boot, 900);
+  });
+
+  var oldRenderStudentAccount = window.renderStudentAccount;
+  if(typeof oldRenderStudentAccount === 'function'){
+    window.renderStudentAccount = function(){
+      var out = oldRenderStudentAccount.apply(this, arguments);
+      setTimeout(boot, 80);
+      return out;
+    };
+  }
+})();
 </script>
+
+</body></html>';
+
+    var w = window.open('', '_blank');
+    if(!w) return;
+    w.document.write(htmlReport);
+    w.document.close();
+    setTimeout(function(){ try{ w.print(); }catch(e){} }, 400);
+    var status = document.getElementById('smartReportStatus');
+    if(status){
+      status.classList.remove('hidden');
+      setTimeout(function(){ status.classList.add('hidden'); }, 2000);
+    }
+  };
+
+  document.addEventListener('DOMContentLoaded', function(){
+    setTimeout(function(){ try{ window.renderSmartReports(); }catch(e){} }, 500);
+  });
+
+  var oldShow = window.showTeacherPane;
+  if(typeof oldShow === 'function'){
+    window.showTeacherPane = function(id, btn){
+      oldShow(id, btn);
+      if(id === 'teacherPaneReportsSmart'){
+        setTimeout(function(){ try{ window.renderSmartReports(); }catch(e){} }, 50);
+      }
+    };
+  }
+})();
+</script>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script id="math-bank-firebase-config">
+window.MATH_BANK_CLOUD_CONFIG = {
+  enabled: true,
+  firebaseConfig: {
+    apiKey: "AIzaSyDP-pi0tbF09bNRihrLz_kUs-JBoa9Cw4Y",
+    authDomain: "sara-haywire.firebaseapp.com",
+    projectId: "sara-haywire",
+    storageBucket: "sara-haywire.firebasestorage.app",
+    messagingSenderId: "333467940977",
+    appId: "1:333467940977:web:97d056d5dbff2debbf43d0"
+  },
+  collection: "math_bank",
+  docId: "shared_bank"
+};
+</script>
+<style id="math-bank-sync-badge-style">
+.sync-status-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:8px 12px;border-radius:999px;
+  background:#edf6f0;color:#176242;font-size:12px;font-weight:800;
+  border:1px solid #cfe9db;box-shadow:0 6px 14px rgba(16,58,46,.06)
+}
+.blue-import-btn{touch-action:manipulation}
+</style>
 
 <script id="students-router-home-reset-fix">
 (function(){
@@ -4548,20 +5337,25 @@ function openMoreInfo(type){
     const modal = document.getElementById('blueImportTeacherModal');
     if(modal) modal.classList.remove('show');
   };
-  window.runBlueImportTeacher = function(){
+  window.runBlueImportTeacher = async function(){
     try {
       const currentRaw = localStorage.getItem(GREEN_BANK_KEY);
       if(currentRaw) localStorage.setItem(GREEN_BANK_BACKUP_KEY, currentRaw);
       const currentBank = currentRaw ? JSON.parse(currentRaw) : null;
       const nextBank = convertBlueToGreen(currentBank);
       localStorage.setItem(GREEN_BANK_KEY, JSON.stringify(nextBank));
+      try{ if(typeof bankData !== 'undefined') bankData = nextBank; }catch(e){}
       window.bankData = nextBank;
+      try{ if(typeof saveBankData === 'function') saveBankData(); }catch(e){}
+      if(typeof window.cloudPushNow === 'function'){
+        try{ await window.cloudPushNow(); }catch(e){}
+      }
       closeBlueImportTeacherModal();
       try { if(typeof renderTeacher === 'function') renderTeacher(); } catch(e){}
       try { if(typeof refreshTeacherUI === 'function') refreshTeacherUI(); } catch(e){}
       try { if(typeof renderClassCards === 'function') renderClassCards(); } catch(e){}
       try { if(typeof renderClassDetail === 'function') renderClassDetail(); } catch(e){}
-      alert('تم نقل بيانات البنك الأزرق بنجاح.');
+      alert('تم نقل بيانات البنك الأزرق وتحديثها على جميع الأجهزة.');
     } catch(err) {
       alert('تعذر نقل البيانات: ' + (err && err.message ? err.message : err));
     }
@@ -4574,7 +5368,11 @@ function openMoreInfo(type){
     wrap.className = 'blue-import-wrap';
     wrap.innerHTML = '<button id="blueImportTeacherBtn" class="blue-import-btn" type="button">🔄 نقل بيانات البنك الأزرق</button>';
     hero.appendChild(wrap);
-    wrap.querySelector('button').addEventListener('click', openBlueImportTeacherModal);
+    var btn = wrap.querySelector('button');
+    btn.onclick = openBlueImportTeacherModal;
+    btn.addEventListener('click', openBlueImportTeacherModal, {passive:true});
+    btn.addEventListener('touchend', function(e){ e.preventDefault(); openBlueImportTeacherModal(); }, {passive:false});
+    btn.addEventListener('pointerup', openBlueImportTeacherModal, {passive:true});
   }
 
   const oldRenderTeacher = window.renderTeacher;
@@ -4801,7 +5599,7 @@ function openMoreInfo(type){
 <script id="student-settings-final-v10-script">
 (function(){
   const MAX_ABSENCE = 10;
-  function esc(s){ return String(s||'').replace(/[&<>\"]/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]; }); }
+  function { return String(s||'').replace(/[&<>\"]/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]; }); }
   function fmt(n){ return (typeof formatMoney==='function') ? formatMoney(Number(n||0)) : String(Number(n||0)); }
   function getLevel(balance){ balance=Number(balance||0); return balance>=41000?'ألماسي':balance>=31000?'بلاتيني':balance>=16000?'ذهبي':balance>=11000?'فضي':'برونزي'; }
   function levelEmoji(level){ return {برونزي:'🥉',فضي:'🥈',ذهبي:'🥇',بلاتيني:'💠',ألماسي:'💎'}[level] || '💳'; }
@@ -4834,7 +5632,7 @@ function openMoreInfo(type){
     holder.innerHTML = (bankData.classes||[]).map(function(c){
       const st = buildClassStats(c);
       return `<div class="student-class-card">
-        <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start"><div><h4>${esc(c.name)}</h4><div class="teacher-note">عدد الطلاب / الطالبات في الفصل: ${st.students.length}</div></div><span class="pill">${st.active} نشط</span></div>
+        <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start"><div><h4>${}</h4><div class="teacher-note">عدد الطلاب / الطالبات في الفصل: ${st.students.length}</div></div><span class="pill">${st.active} نشط</span></div>
         <div class="student-class-meta">
           <div class="mini"><strong>${st.students.length}</strong><span>عدد الطلاب / الطالبات</span></div>
           <div class="mini"><strong>${fmt(st.total)}</strong><span>إجمالي الأرصدة</span></div>
@@ -4859,8 +5657,8 @@ function openMoreInfo(type){
     return `<div class="student-card-pro">
       <div class="student-card-top">
         <div>
-          <div class="student-card-name">${esc(student.name||'—')}</div>
-          <div class="student-card-sub">PIN: ${esc(student.password||'—')}<br>ولي الأمر: ${esc(student.guardian||'—')}</div>
+          <div class="student-card-name">${}</div>
+          <div class="student-card-sub">PIN: ${}<br>ولي الأمر: ${}</div>
           <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
             <span class="account-type-badge">💳 <span>نوع الحساب: ${level}</span> <small>${levelEmoji(level)}</small></span>
           </div>
@@ -4923,7 +5721,7 @@ function openMoreInfo(type){
     detail.classList.add('page-mode');
     detail.innerHTML = `
       <div class="student-detail-header">
-        <div class="student-detail-title"><h3>${esc(cls.name)}</h3><p>صفحة خاصة بالفصل تتضمن بطاقات الطلاب / الطالبات مع أدوات فردية واضحة وزر رجوع للخلف.</p></div>
+        <div class="student-detail-title"><h3>${}</h3><p>صفحة خاصة بالفصل تتضمن بطاقات الطلاب / الطالبات مع أدوات فردية واضحة وزر رجوع للخلف.</p></div>
         <button class="ghost" onclick="closeStudentSettingsClass()">رجوع للخلف</button>
       </div>
       <div class="teacher-mini-kpis">
@@ -4939,7 +5737,7 @@ function openMoreInfo(type){
         <button class="btn ${cls.isDisabled?'btn-green':'btn-gold'}" onclick="toggleClassEnabled('${cls.id}')">${cls.isDisabled?'تفعيل الفصل':'إيقاف الفصل'}</button>
       </div>
       <div class="student-filters">
-        <input id="studentSettingsSearch" type="text" value="${esc(state.query||'')}" placeholder="بحث باسم الطالب / الطالبة أو اسم المستخدم" oninput="updateStudentSettingsFilters()">
+        <input id="studentSettingsSearch" type="text" value="${}" placeholder="بحث باسم الطالب / الطالبة أو اسم المستخدم" oninput="updateStudentSettingsFilters()">
         <select id="studentSettingsLevel" onchange="updateStudentSettingsFilters()"><option value="all">كل المستويات</option><option value="برونزي" ${state.level==='برونزي'?'selected':''}>برونزي</option><option value="فضي" ${state.level==='فضي'?'selected':''}>فضي</option><option value="ذهبي" ${state.level==='ذهبي'?'selected':''}>ذهبي</option><option value="بلاتيني" ${state.level==='بلاتيني'?'selected':''}>بلاتيني</option><option value="ألماسي" ${state.level==='ألماسي'?'selected':''}>ألماسي</option></select>
         <select id="studentSettingsStatus" onchange="updateStudentSettingsFilters()"><option value="all">كل الحالات</option><option value="active" ${state.status==='active'?'selected':''}>الحسابات المفعلة</option><option value="frozen" ${state.status==='frozen'?'selected':''}>الحسابات الموقوفة</option></select>
         <div class="student-status-badge">الأزرار أدناه خاصة بكل طالب / طالبة</div>
@@ -6558,6 +7356,696 @@ document.addEventListener('DOMContentLoaded', function(){
       }catch(e){}
     }, 150);
   };
+})();
+</script>
+
+
+<script id="oai-device-responsive-script">
+(function(){
+  function applyDeviceMode(){
+    const ua = navigator.userAgent || '';
+    const w = Math.max(window.innerWidth || 0, screen.width || 0);
+    const isIpad = /iPad/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    document.body.classList.remove('device-mobile','device-ipad','device-desktop');
+    if(isIpad || (w > 700 && w <= 1100 && 'ontouchstart' in window)){
+      document.body.classList.add('device-ipad');
+    }else if(w > 1100){
+      document.body.classList.add('device-desktop');
+    }else{
+      document.body.classList.add('device-mobile');
+    }
+  }
+
+  function trimTopGaps(){
+    try{
+      document.documentElement.style.marginTop = '0';
+      document.documentElement.style.paddingTop = '0';
+      document.body.style.marginTop = '0';
+      document.body.style.paddingTop = '0';
+      const firsts = document.querySelectorAll('.screen, .topbar, .hero, .card');
+      firsts.forEach(el => {
+        if(el && el.style){
+          if(getComputedStyle(el).marginTop !== '0px') el.style.marginTop = '0';
+          if(getComputedStyle(el).paddingTop !== '0px' && el.classList.contains('screen')) el.style.paddingTop = '0';
+        }
+      });
+      window.scrollTo(0,0);
+    }catch(e){}
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    applyDeviceMode();
+    setTimeout(trimTopGaps, 60);
+    setTimeout(trimTopGaps, 400);
+  });
+  window.addEventListener('resize', applyDeviceMode);
+  window.addEventListener('orientationchange', function(){
+    applyDeviceMode();
+    setTimeout(trimTopGaps, 120);
+  });
+})();
+</script>
+
+
+<script id="oai-more-fullpage-script">
+function goBackFromMoreDetail(){
+  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+  var listScreen = document.getElementById('more');
+  if(listScreen) listScreen.classList.add('active');
+  window.scrollTo({top:0, behavior:'auto'});
+}
+
+function openMoreInfo(type){
+  var data = {
+    about:{
+      title:'من نحن',
+      sub:'نبذة عن بنك الرياضيات',
+      html:`
+        <h2 class="more-detail-title">من نحن</h2>
+        <p class="more-detail-lead">بنك الرياضيات منصة تعليمية تحفيزية تهدف إلى تعزيز مشاركة الطلاب داخل الحصة الدراسية من خلال نظام نقاط مستوحى من الأنظمة المصرفية.</p>
+        <div class="more-detail-block"><p>يمنح البنك الطلاب رصيدًا تحفيزيًا مقابل المشاركة والإنجاز والالتزام، مما يسهم في تنمية روح التنافس الإيجابي وتحفيز التعلم بطريقة ممتعة ومبتكرة.</p></div>
+        <div class="more-detail-block"><h3>الإشراف</h3><p>يشرف على بنك الرياضيات الأستاذة سارة حقوي.</p></div>
+      `
+    },
+    contact:{
+      title:'اتصل بنا',
+      sub:'قنوات التواصل الرسمية',
+      html:`
+        <h2 class="more-detail-title">اتصل بنا</h2>
+        <p class="more-detail-lead">للاستفسارات أو الملاحظات يمكنكم التواصل مع إدارة بنك الرياضيات عبر الوسائل التالية:</p>
+        <div class="more-detail-list">
+          <div class="more-detail-item"><div class="icon">📞</div><div><strong>خدمة الطلاب وأولياء الأمور</strong><span>0502234335</span></div></div>
+          <div class="more-detail-item"><div class="icon">☎️</div><div><strong>الإدارة العامة</strong><span>0556891201</span></div></div>
+          <div class="more-detail-item"><div class="icon">✉️</div><div><strong>البريد الإلكتروني</strong><span>Saramathss@hotmail.com</span></div></div>
+          <div class="more-detail-item"><div class="icon">🏫</div><div><strong>الموقع</strong><span>مدرسة رواد الشرق الأهلية</span></div></div>
+        </div>
+      `
+    },
+    settings:{
+      title:'الإعدادات',
+      sub:'إدارة الحساب والبيانات',
+      html:`
+        <h2 class="more-detail-title">الإعدادات</h2>
+        <p class="more-detail-lead">تتيح هذه الصفحة إدارة إعدادات الحساب داخل نظام بنك الرياضيات.</p>
+        <div class="more-detail-list">
+          <div class="more-detail-item"><div class="icon">🔐</div><div><strong>تغيير كلمة المرور</strong><span>تحديث كلمة المرور لحماية الحساب.</span></div></div>
+          <div class="more-detail-item"><div class="icon">👤</div><div><strong>تعديل بيانات الحساب</strong><span>مراجعة اسم المستخدم والبيانات الأساسية.</span></div></div>
+          <div class="more-detail-item"><div class="icon">🔔</div><div><strong>إدارة الإشعارات</strong><span>التحكم في التنبيهات داخل النظام.</span></div></div>
+          <div class="more-detail-item"><div class="icon">🚪</div><div><strong>تسجيل الخروج</strong><span>إنهاء الجلسة الحالية بأمان.</span></div></div>
+        </div>
+      `
+    },
+    privacy:{
+      title:'سياسة الخصوصية',
+      sub:'استخدام البيانات داخل النظام',
+      html:`
+        <h2 class="more-detail-title">سياسة الخصوصية</h2>
+        <div class="more-detail-block"><p>يحرص بنك الرياضيات على حماية خصوصية بيانات الطلاب وأولياء الأمور.</p></div>
+        <div class="more-detail-block"><p>يتم استخدام المعلومات داخل النظام لأغراض تعليمية فقط، ولا يتم مشاركة أي بيانات خارج إطار المدرسة أو الجهات التعليمية المعنية.</p></div>
+      `
+    },
+    disclaimer:{
+      title:'إخلاء المسؤولية',
+      sub:'تنويه حول طبيعة النظام',
+      html:`
+        <h2 class="more-detail-title">إخلاء المسؤولية</h2>
+        <div class="more-detail-block"><p>بنك الرياضيات نظام تحفيزي تعليمي يهدف إلى تشجيع الطلاب على المشاركة والتفاعل داخل الحصة الدراسية.</p></div>
+        <div class="more-detail-block"><p>النقاط والأرصدة المستخدمة داخل النظام هي لأغراض تعليمية وتحفيزية فقط، ولا تمثل أي قيمة مالية حقيقية.</p></div>
+      `
+    },
+    terms:{
+      title:'الأحكام والشروط',
+      sub:'ضوابط استخدام بنك الرياضيات',
+      html:`
+        <h2 class="more-detail-title">الأحكام والشروط</h2>
+        <div class="more-detail-block"><p>يهدف بنك الرياضيات إلى تعزيز بيئة تعليمية محفزة داخل الفصل الدراسي.</p></div>
+        <div class="more-detail-block"><p>يتم منح النقاط للطلاب وفق معايير تعليمية يحددها المعلم، ويُستخدم النظام كوسيلة تعليمية لتحفيز المشاركة والانضباط وتحقيق التميز.</p></div>
+      `
+    }
+  };
+
+  var item = data[type];
+  if(!item) return;
+
+  var title = document.getElementById('moreDetailTitle');
+  var sub = document.getElementById('moreDetailSub');
+  var content = document.getElementById('moreDetailContent');
+
+  if(title) title.textContent = item.title;
+  if(sub) sub.textContent = item.sub;
+  if(content) content.innerHTML = item.html;
+
+  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+  var detailScreen = document.getElementById('more_detail');
+  if(detailScreen) detailScreen.classList.add('active');
+  window.scrollTo({top:0, behavior:'auto'});
+}
+</script>
+
+
+<script id="oai-more-override-final">
+function openMoreInfo(type){
+  var data = {
+    about:{title:'من نحن',sub:'نبذة عن بنك الرياضيات',html:`<h2 class="more-detail-title">من نحن</h2><p class="more-detail-lead">بنك الرياضيات منصة تعليمية تحفيزية تهدف إلى تعزيز مشاركة الطلاب داخل الحصة الدراسية من خلال نظام نقاط مستوحى من الأنظمة المصرفية.</p><div class="more-detail-block"><p>يمنح البنك الطلاب رصيدًا تحفيزيًا مقابل المشاركة والإنجاز والالتزام، مما يسهم في تنمية روح التنافس الإيجابي وتحفيز التعلم بطريقة ممتعة ومبتكرة.</p></div><div class="more-detail-block"><h3>الإشراف</h3><p>يشرف على بنك الرياضيات الأستاذة سارة حقوي.</p></div>`},
+    contact:{title:'اتصل بنا',sub:'قنوات التواصل الرسمية',html:`<h2 class="more-detail-title">اتصل بنا</h2><p class="more-detail-lead">للاستفسارات أو الملاحظات يمكنكم التواصل مع إدارة بنك الرياضيات عبر الوسائل التالية:</p><div class="more-detail-list"><div class="more-detail-item"><div class="icon">📞</div><div><strong>خدمة الطلاب وأولياء الأمور</strong><span>0502234335</span></div></div><div class="more-detail-item"><div class="icon">☎️</div><div><strong>الإدارة العامة</strong><span>0556891201</span></div></div><div class="more-detail-item"><div class="icon">✉️</div><div><strong>البريد الإلكتروني</strong><span>Saramathss@hotmail.com</span></div></div><div class="more-detail-item"><div class="icon">🏫</div><div><strong>الموقع</strong><span>مدرسة رواد الشرق الأهلية</span></div></div></div>`},
+    settings:{title:'الإعدادات',sub:'إدارة الحساب والبيانات',html:`<h2 class="more-detail-title">الإعدادات</h2><p class="more-detail-lead">تتيح هذه الصفحة إدارة إعدادات الحساب داخل نظام بنك الرياضيات.</p><div class="more-detail-list"><div class="more-detail-item"><div class="icon">🔐</div><div><strong>تغيير كلمة المرور</strong><span>تحديث كلمة المرور لحماية الحساب.</span></div></div><div class="more-detail-item"><div class="icon">👤</div><div><strong>تعديل بيانات الحساب</strong><span>مراجعة اسم المستخدم والبيانات الأساسية.</span></div></div><div class="more-detail-item"><div class="icon">🔔</div><div><strong>إدارة الإشعارات</strong><span>التحكم في التنبيهات داخل النظام.</span></div></div><div class="more-detail-item"><div class="icon">🚪</div><div><strong>تسجيل الخروج</strong><span>إنهاء الجلسة الحالية بأمان.</span></div></div></div>`},
+    privacy:{title:'سياسة الخصوصية',sub:'استخدام البيانات داخل النظام',html:`<h2 class="more-detail-title">سياسة الخصوصية</h2><div class="more-detail-block"><p>يحرص بنك الرياضيات على حماية خصوصية بيانات الطلاب وأولياء الأمور.</p></div><div class="more-detail-block"><p>يتم استخدام المعلومات داخل النظام لأغراض تعليمية فقط، ولا يتم مشاركة أي بيانات خارج إطار المدرسة أو الجهات التعليمية المعنية.</p></div>`},
+    disclaimer:{title:'إخلاء المسؤولية',sub:'تنويه حول طبيعة النظام',html:`<h2 class="more-detail-title">إخلاء المسؤولية</h2><div class="more-detail-block"><p>بنك الرياضيات نظام تحفيزي تعليمي يهدف إلى تشجيع الطلاب على المشاركة والتفاعل داخل الحصة الدراسية.</p></div><div class="more-detail-block"><p>النقاط والأرصدة المستخدمة داخل النظام هي لأغراض تعليمية وتحفيزية فقط، ولا تمثل أي قيمة مالية حقيقية.</p></div>`},
+    terms:{title:'الأحكام والشروط',sub:'ضوابط استخدام بنك الرياضيات',html:`<h2 class="more-detail-title">الأحكام والشروط</h2><div class="more-detail-block"><p>يهدف بنك الرياضيات إلى تعزيز بيئة تعليمية محفزة داخل الفصل الدراسي.</p></div><div class="more-detail-block"><p>يتم منح النقاط للطلاب وفق معايير تعليمية يحددها المعلم، ويُستخدم النظام كوسيلة تعليمية لتحفيز المشاركة والانضباط وتحقيق التميز.</p></div>`}
+  };
+  var item = data[type];
+  if(!item) return;
+  var title = document.getElementById('moreDetailTitle');
+  var sub = document.getElementById('moreDetailSub');
+  var content = document.getElementById('moreDetailContent');
+  if(title) title.textContent = item.title;
+  if(sub) sub.textContent = item.sub;
+  if(content) content.innerHTML = item.html;
+  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+  var detailScreen = document.getElementById('more_detail');
+  if(detailScreen) detailScreen.classList.add('active');
+  window.scrollTo({top:0, behavior:'auto'});
+}
+</script>
+
+
+<script id="math-bank-live-sync-script">
+(function(){
+  let db = null;
+  let ready = false;
+  let applyingRemote = false;
+  let listenerStarted = false;
+
+  function cfg(){ return window.MATH_BANK_CLOUD_CONFIG || {}; }
+
+  function setStatus(text, ok){
+    const el = document.getElementById('syncStatusBadge');
+    if(!el) return;
+    el.textContent = text;
+    el.style.background = ok ? '#edf6f0' : '#fff7e8';
+    el.style.color = ok ? '#176242' : '#9a6a15';
+    el.style.borderColor = ok ? '#cfe9db' : '#f1dfb5';
+  }
+
+  function getLocalData(){
+    try{
+      if(typeof bankData !== 'undefined' && bankData) return JSON.parse(JSON.stringify(bankData));
+    }catch(e){}
+    try{
+      const raw = localStorage.getItem('greenBankTeacherData_v1') || localStorage.getItem('bankData_v10');
+      if(raw) return JSON.parse(raw);
+    }catch(e){}
+    return null;
+  }
+
+  function saveLocalData(data){
+    if(!data) return;
+    try{
+      window.bankData = data;
+      if(typeof bankData !== 'undefined'){ bankData = data; }
+    }catch(e){}
+    try{ localStorage.setItem('greenBankTeacherData_v1', JSON.stringify(data)); }catch(e){}
+    try{ localStorage.setItem('bankData_v10', JSON.stringify(data)); }catch(e){}
+  }
+
+  function refreshUI(){
+    try{ if(typeof refreshTeacherUI === 'function') refreshTeacherUI(); }catch(e){}
+    try{ if(typeof renderTeacher === 'function') renderTeacher(); }catch(e){}
+    try{ if(typeof renderStudentAccount === 'function') renderStudentAccount(); }catch(e){}
+    try{ if(typeof updateParentFollowup === 'function') updateParentFollowup(); }catch(e){}
+    try{ if(typeof updateHonorBoard === 'function') updateHonorBoard(); }catch(e){}
+    try{ if(typeof renderLeaderboard === 'function') renderLeaderboard(); }catch(e){}
+    try{ if(typeof renderClassCards === 'function') renderClassCards(); }catch(e){}
+    try{ if(typeof renderClassDetail === 'function') renderClassDetail(); }catch(e){}
+  }
+
+  async function initFirebase(){
+    if(ready) return true;
+    try{
+      const c = cfg();
+      if(!c.enabled) return false;
+      if(!firebase.apps.length){
+        firebase.initializeApp(c.firebaseConfig);
+      }
+      db = firebase.firestore();
+      ready = true;
+      setStatus('☁️ المزامنة مفعلة', true);
+      return true;
+    }catch(err){
+      console.warn(err);
+      setStatus('⚠️ تعذر تفعيل المزامنة', false);
+      return false;
+    }
+  }
+
+  async function pushToCloud(data){
+    if(applyingRemote) return false;
+    if(!await initFirebase()) return false;
+    try{
+      const c = cfg();
+      await db.collection(c.collection).doc(c.docId).set({
+        bankData: data,
+        updatedAt: Date.now()
+      }, {merge:true});
+      setStatus('☁️ تم تحديث جميع الأجهزة', true);
+      return true;
+    }catch(err){
+      console.warn(err);
+      setStatus('⚠️ فشل رفع التحديث', false);
+      return false;
+    }
+  }
+
+  async function pullFromCloud(){
+    if(!await initFirebase()) return null;
+    try{
+      const c = cfg();
+      const snap = await db.collection(c.collection).doc(c.docId).get();
+      if(!snap.exists) return null;
+      const data = snap.data() || {};
+      return data.bankData || null;
+    }catch(err){
+      console.warn(err);
+      return null;
+    }
+  }
+
+  async function startRealtime(){
+    if(listenerStarted) return;
+    if(!await initFirebase()) return;
+    listenerStarted = true;
+    const c = cfg();
+    db.collection(c.collection).doc(c.docId).onSnapshot(function(snap){
+      if(!snap.exists) return;
+      const data = snap.data() || {};
+      if(!data.bankData) return;
+      applyingRemote = true;
+      saveLocalData(data.bankData);
+      refreshUI();
+      applyingRemote = false;
+      setStatus('☁️ تم جلب آخر تحديث', true);
+    }, function(err){
+      console.warn(err);
+    });
+  }
+
+  const oldSave = window.saveBankData;
+  if(typeof oldSave === 'function'){
+    window.saveBankData = function(){
+      const out = oldSave.apply(this, arguments);
+      const data = getLocalData();
+      if(data) pushToCloud(data);
+      return out;
+    };
+  }
+
+  window.cloudPushNow = async function(){
+    const data = getLocalData();
+    if(data) await pushToCloud(data);
+  };
+
+  window.cloudRefreshNow = async function(){
+    const remote = await pullFromCloud();
+    if(remote){
+      applyingRemote = true;
+      saveLocalData(remote);
+      refreshUI();
+      applyingRemote = false;
+      setStatus('☁️ تم جلب آخر تحديث', true);
+    }
+  };
+
+  document.addEventListener('DOMContentLoaded', async function(){
+    const ok = await initFirebase();
+    if(!ok) return;
+    const remote = await pullFromCloud();
+    if(remote){
+      applyingRemote = true;
+      saveLocalData(remote);
+      refreshUI();
+      applyingRemote = false;
+      setStatus('☁️ تم جلب آخر تحديث', true);
+    }else{
+      const local = getLocalData();
+      if(local) await pushToCloud(local);
+    }
+    startRealtime();
+  });
+})();
+</script>
+
+
+<style id="oai-student-fixes-style">
+#account .tab-content{display:none}
+#account .tab-content.active{display:block}
+#account .tab-content.card{margin-top:12px}
+.analysis-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px}
+.analysis-kpi{background:#fff;border:1px solid var(--line);border-radius:20px;padding:12px;text-align:center;box-shadow:0 8px 18px rgba(16,58,46,.05)}
+.analysis-kpi strong{display:block;font-size:18px;color:var(--deep);margin-bottom:4px}
+.analysis-kpi span{display:block;font-size:11px;color:var(--muted);font-weight:700}
+.analysis-grid{display:grid;gap:12px}
+.analysis-card{background:#fff;border:1px solid var(--line);border-radius:22px;padding:12px;box-shadow:0 8px 18px rgba(16,58,46,.05)}
+.analysis-card h4{margin:0 0 10px;font-size:14px;color:var(--deep)}
+.analysis-progress-track{height:16px;background:#edf3ef;border-radius:999px;overflow:hidden}
+.analysis-progress-fill{height:100%;background:linear-gradient(135deg,var(--gold),var(--gold2));border-radius:999px}
+.analysis-progress-meta{display:flex;justify-content:space-between;gap:10px;margin-top:8px;font-size:12px;color:var(--muted);font-weight:700}
+@media(max-width:560px){
+  .analysis-kpis{grid-template-columns:1fr 1fr 1fr}
+}
+</style>
+
+<script id="oai-student-fixes-script">
+(function(){
+  function fmt(v){
+    try{ return (typeof formatMoney === 'function') ? formatMoney(v) : Number(v||0).toLocaleString('ar-SA'); }
+    catch(e){ return String(v||0); }
+  }
+
+  function getStudent(){
+    try{
+      if(typeof getCurrentStudentSafe === 'function'){
+        var st = getCurrentStudentSafe();
+        if(st) return st;
+      }
+    }catch(e){}
+    try{
+      var students = (window.bankData && window.bankData.students) ? window.bankData.students : [];
+      var sid = sessionStorage.getItem('currentStudentId');
+      var acc = sessionStorage.getItem('currentStudentAccount') || window.currentStudentAccount;
+      return students.find(function(s){
+        return (sid && (s.id === sid)) ||
+               (acc && (s.accountNumber === acc || s.username === acc || s.id === acc));
+      }) || null;
+    }catch(e){}
+    return null;
+  }
+
+  function getClassNameSafe(id){
+    try{
+      if(typeof getClassName === 'function') return getClassName(id);
+      var cls = (window.bankData && window.bankData.classes || []).find(function(c){ return c.id === id; });
+      return cls ? cls.name : (id || '—');
+    }catch(e){ return id || '—'; }
+  }
+
+  function getLevelSafe(balance){
+    try{
+      if(typeof getLevel === 'function') return getLevel(balance||0);
+    }catch(e){}
+    var b = Number(balance||0);
+    if(b >= 41000) return 'ألماسي';
+    if(b >= 31000) return 'بلاتيني';
+    if(b >= 16000) return 'ذهبي';
+    if(b >= 11000) return 'فضي';
+    return 'برونزي';
+  }
+
+  function nextTarget(balance){
+    var b = Number(balance||0);
+    if(b < 11000) return 11000;
+    if(b < 16000) return 16000;
+    if(b < 31000) return 31000;
+    if(b < 41000) return 41000;
+    return b || 41000;
+  }
+
+  function normalizeStudentTabs(){
+    var account = document.getElementById('account');
+    if(!account) return;
+    var hostCard = account.querySelector('.card');
+    var tabbar = hostCard ? hostCard.querySelector('.tabbar') : null;
+    if(!hostCard || !tabbar) return;
+
+    ['statement','latest','operations','detailsTab','upgradeTab','pdfTab','rouletteTab','analysisTab','performanceStudentTab']
+      .forEach(function(id){
+        var el = document.getElementById(id);
+        if(el && el.parentElement !== hostCard){
+          hostCard.appendChild(el);
+        }
+      });
+  }
+
+  function bindPdfButton(){
+    var btn = document.getElementById('generatePdfReportBtn');
+    if(!btn || btn.dataset.boundPdf === '1') return;
+    btn.dataset.boundPdf = '1';
+    btn.onclick = function(){
+      if(typeof window.generatePdfReport === 'function'){
+        window.generatePdfReport();
+      }
+    };
+  }
+
+  window.generatePdfReport = function(){
+    try{
+      var student = getStudent();
+      if(!student){ alert('سجلي دخول الطالب / الطالبة أولاً'); return; }
+
+      var from = (document.getElementById('pdfFromDate') && document.getElementById('pdfFromDate').value) || '';
+      var to = (document.getElementById('pdfToDate') && document.getElementById('pdfToDate').value) || '';
+      var ops = (student.history || []).slice();
+
+      if(from){
+        var fromD = new Date(from);
+        ops = ops.filter(function(h){
+          var raw = String(h.date || '').split(' ')[0];
+          var d = new Date(raw);
+          return !isNaN(d) && d >= fromD;
+        });
+      }
+      if(to){
+        var toD = new Date(to);
+        ops = ops.filter(function(h){
+          var raw = String(h.date || '').split(' ')[0];
+          var d = new Date(raw);
+          return !isNaN(d) && d <= toD;
+        });
+      }
+
+      function esc(s){
+        return String(s || '').replace(/[&<>"]/g, function(c){
+          return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c] || c;
+        });
+      }
+      function typeLabel(t){
+        if(typeof opLabel === 'function') return opLabel(t);
+        if(t === 'deposit') return 'إيداع';
+        if(t === 'withdraw') return 'سحب';
+        if(t === 'transfer') return 'تحويل';
+        return t || '—';
+      }
+
+      var rows = ops.length ? ops.map(function(h){
+        var sign = h.type === 'withdraw' ? '-' : '+';
+        return '<tr>'
+          + '<td>' + esc(h.date || '—') + '</td>'
+          + '<td>' + esc(typeLabel(h.type)) + '</td>'
+          + '<td>' + esc(h.reason || '—') + '</td>'
+          + '<td>' + esc(sign + fmt(h.amount || 0)) + '</td>'
+          + '</tr>';
+      }).join('') : '<tr><td colspan="4">لا توجد عمليات في هذه الفترة</td></tr>';
+
+      var reportHtml = '<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>تقرير بنك الرياضيات</title>'
+        + '<style>body{font-family:Arial,sans-serif;padding:24px;color:#183229}h1{margin:0 0 10px;color:#103a2e}.meta{margin:6px 0;color:#666}table{width:100%;border-collapse:collapse;margin-top:16px}th,td{border:1px solid #ddd;padding:8px;text-align:right}</style>'
+        + '</head><body>'
+        + '<h1>تقرير بنك الرياضيات</h1>'
+        + '<div class="meta">الطالب / الطالبة: ' + esc(student.name || '') + '</div>'
+        + '<div class="meta">الفصل: ' + esc(getClassNameSafe(student.classId)) + '</div>'
+        + '<div class="meta">الرصيد الحالي: ' + esc(fmt(student.balance || 0)) + ' ر.س</div>'
+        + '<div class="meta">الفترة: ' + esc(from || 'من البداية') + ' إلى ' + esc(to || 'حتى اليوم') + '</div>'
+        + '<table><thead><tr><th>التاريخ</th><th>النوع</th><th>السبب</th><th>القيمة</th></tr></thead><tbody>'
+        + rows + '</tbody></table></body></html>';
+
+      var w = window.open('', '_blank');
+      if(!w){ alert('اسمحي بفتح النافذة لإخراج التقرير'); return; }
+      w.document.write(reportHtml);
+      w.document.close();
+      w.focus();
+      setTimeout(function(){ try{ w.print(); }catch(e){} }, 300);
+
+      var msg = document.getElementById('pdfReportMsg');
+      if(msg){
+        msg.classList.remove('hidden');
+        setTimeout(function(){ msg.classList.add('hidden'); }, 2500);
+      }
+    }catch(err){
+      console.error(err);
+      alert('تعذر إنشاء التقرير');
+    }
+  };
+
+  function drawBar(canvas, dep, wd, tr){
+    if(!canvas || !canvas.getContext) return;
+    var ctx = canvas.getContext('2d');
+    var w = canvas.width = canvas.clientWidth || 320;
+    var h = canvas.height = canvas.clientHeight || 190;
+    ctx.clearRect(0,0,w,h);
+    var vals = [dep, wd, tr];
+    var labels = ['إيداع','سحب','تحويل'];
+    var cols = ['#1f7f57','#c7a465','#103a2e'];
+    var max = Math.max(1, dep, wd, tr);
+    vals.forEach(function(v,i){
+      var bw = 46, gap = 44, x = 34 + i*(bw+gap);
+      var bh = Math.max(12, (v/max) * 110);
+      var y = h - 40 - bh;
+      ctx.fillStyle = cols[i];
+      ctx.fillRect(x, y, bw, bh);
+      ctx.fillStyle = '#183229';
+      ctx.font = '12px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText(labels[i], x + bw/2, h - 14);
+      ctx.fillText(String(v), x + bw/2, y - 8);
+    });
+  }
+
+  function drawPie(canvas, dep, wd, tr){
+    if(!canvas || !canvas.getContext) return;
+    var ctx = canvas.getContext('2d');
+    var w = canvas.width = 320, h = canvas.height = 260;
+    ctx.clearRect(0,0,w,h);
+    var vals = [dep, wd, tr];
+    var names = ['إيداع','سحب','تحويل'];
+    var cols = ['#1f7f57','#c7a465','#103a2e'];
+    var total = Math.max(1, dep + wd + tr);
+    var start = -Math.PI/2;
+    vals.forEach(function(v, i){
+      var ang = (v/total) * Math.PI * 2;
+      ctx.beginPath();
+      ctx.moveTo(110,110);
+      ctx.arc(110,110,80,start,start+ang);
+      ctx.closePath();
+      ctx.fillStyle = cols[i];
+      ctx.fill();
+      start += ang;
+    });
+    ctx.beginPath();
+    ctx.fillStyle = '#fff';
+    ctx.arc(110,110,40,0,Math.PI*2);
+    ctx.fill();
+
+    names.forEach(function(name,i){
+      ctx.fillStyle = cols[i];
+      ctx.fillRect(220, 52 + i*34, 14, 14);
+      ctx.fillStyle = '#183229';
+      ctx.textAlign = 'right';
+      ctx.font = '12px Arial';
+      ctx.fillText(name + ': ' + fmt(vals[i]), 305, 64 + i*34);
+    });
+  }
+
+  function renderStudentPanels(){
+    var student = getStudent();
+    if(!student) return;
+
+    var details = document.getElementById('detailsTab');
+    if(details){
+      details.innerHTML = ''
+        + '<div class="section-head"><h3>تفاصيل الحساب</h3><span class="pill">' + getLevelSafe(student.balance || 0) + '</span></div>'
+        + '<div class="list">'
+        +   '<div class="row"><div><div class="name">اسم الطالب / الطالبة</div></div><div class="value">' + (student.name || '—') + '</div></div>'
+        +   '<div class="row"><div><div class="name">رقم الحساب</div></div><div class="value">' + (student.accountNumber || student.id || '—') + '</div></div>'
+        +   '<div class="row"><div><div class="name">الفصل</div></div><div class="value">' + getClassNameSafe(student.classId) + '</div></div>'
+        +   '<div class="row"><div><div class="name">الرصيد الحالي</div></div><div class="value green">' + fmt(student.balance || 0) + ' ر.س</div></div>'
+        + '</div>';
+    }
+
+    var upgrade = document.getElementById('upgradeTab');
+    if(upgrade){
+      var bal = Number(student.balance || 0);
+      var target = nextTarget(bal);
+      var remain = Math.max(0, target - bal);
+      var percent = target > 0 ? Math.min(100, Math.round((bal / target) * 100)) : 0;
+      upgrade.innerHTML = ''
+        + '<div class="section-head"><h3>ترقية الحساب</h3><span class="pill">يعتمد على الرصيد</span></div>'
+        + '<div class="muted">ترقية الحساب تعتمد على الرصيد الحالي للطالب / الطالبة.</div>'
+        + '<div class="progress"><div style="width:' + percent + '%"></div></div>'
+        + '<div class="muted">المستوى الحالي: ' + getLevelSafe(bal) + ' • المتبقي للمستوى التالي: ' + fmt(remain) + ' ر.س</div>'
+        + '<div class="levels">'
+        +   '<div class="level"><div><div class="name">برونزي</div><div class="meta">حتى 10,999 ر.س</div></div><div class="badge-tier bronze">Bronze</div></div>'
+        +   '<div class="level"><div><div class="name">فضي</div><div class="meta">من 11,000 إلى 15,999 ر.س</div></div><div class="badge-tier silver">Silver</div></div>'
+        +   '<div class="level"><div><div class="name">ذهبي</div><div class="meta">من 16,000 إلى 30,999 ر.س</div></div><div class="badge-tier gold-tier">Gold</div></div>'
+        +   '<div class="level"><div><div class="name">بلاتيني</div><div class="meta">من 31,000 إلى 40,999 ر.س</div></div><div class="badge-tier platinum">Platinum</div></div>'
+        +   '<div class="level"><div><div class="name">ألماسي</div><div class="meta">41,000 ر.س فأكثر</div></div><div class="badge-tier diamond">Diamond</div></div>'
+        + '</div>';
+    }
+
+    var analysis = document.getElementById('analysisTab');
+    if(analysis){
+      var ops = (student.history || []);
+      var dep = 0, wd = 0, tr = 0;
+      ops.forEach(function(h){
+        var a = Number(h.amount || 0);
+        if(h.type === 'deposit') dep += a;
+        else if(h.type === 'withdraw') wd += a;
+        else if(h.type === 'transfer') tr += a;
+      });
+      var target2 = nextTarget(student.balance || 0);
+      var p = target2 > 0 ? Math.min(100, Math.round((Number(student.balance || 0) / target2) * 100)) : 0;
+
+      analysis.innerHTML = ''
+        + '<div class="section-head"><h3>تحليل بياناتي</h3><span class="pill">تحليل بياني</span></div>'
+        + '<div class="analysis-kpis">'
+        +   '<div class="analysis-kpi"><strong>' + fmt(dep) + '</strong><span>إجمالي الإيداع</span></div>'
+        +   '<div class="analysis-kpi"><strong>' + fmt(wd) + '</strong><span>إجمالي السحب</span></div>'
+        +   '<div class="analysis-kpi"><strong>' + fmt(tr) + '</strong><span>إجمالي التحويل</span></div>'
+        + '</div>'
+        + '<div class="analysis-grid">'
+        +   '<div class="analysis-card"><h4>الرسم البياني للعمليات</h4><canvas id="studentBarChart" style="width:100%;height:190px"></canvas></div>'
+        +   '<div class="analysis-card"><h4>رسم دائري لتوزيع العمليات</h4><canvas id="studentPieChart" width="320" height="260" style="width:100%;height:260px"></canvas></div>'
+        +   '<div class="analysis-card"><h4>تقدم الرصيد نحو الترقية</h4><div class="analysis-progress-track"><div class="analysis-progress-fill" style="width:' + p + '%"></div></div><div class="analysis-progress-meta"><span>الرصيد الحالي: ' + fmt(student.balance || 0) + ' ر.س</span><span>المستوى التالي: ' + fmt(target2) + ' ر.س</span></div></div>'
+        + '</div>';
+
+      setTimeout(function(){
+        drawBar(document.getElementById('studentBarChart'), dep, wd, tr);
+        drawPie(document.getElementById('studentPieChart'), dep, wd, tr);
+      }, 30);
+    }
+  }
+
+  var oldShowTab = window.showTab;
+  window.showTab = function(id, btn){
+    normalizeStudentTabs();
+
+    var scope = document.querySelector('#account .card') || document.getElementById('account');
+    if(scope){
+      scope.querySelectorAll('.tab-content').forEach(function(t){ t.classList.remove('active'); });
+      var target = document.getElementById(id);
+      if(target) target.classList.add('active');
+    }
+
+    var tabbar = document.querySelector('#account .tabbar');
+    if(tabbar){
+      tabbar.querySelectorAll('button').forEach(function(b){ b.classList.remove('active'); });
+      if(btn) btn.classList.add('active');
+    }
+
+    renderStudentPanels();
+    bindPdfButton();
+
+    if(typeof oldShowTab === 'function' && !scope){
+      try{ oldShowTab(id, btn); }catch(e){}
+    }
+  };
+
+  function boot(){
+    normalizeStudentTabs();
+    renderStudentPanels();
+    bindPdfButton();
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    setTimeout(boot, 250);
+    setTimeout(boot, 900);
+  });
+
+  var oldRenderStudentAccount = window.renderStudentAccount;
+  if(typeof oldRenderStudentAccount === 'function'){
+    window.renderStudentAccount = function(){
+      var out = oldRenderStudentAccount.apply(this, arguments);
+      setTimeout(boot, 80);
+      return out;
+    };
+  }
 })();
 </script>
 
