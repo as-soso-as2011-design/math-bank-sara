@@ -4638,5 +4638,108 @@ function logoutTeacher(){
 })();
 </script>
 
+
+<script id="advanced-panel-direct-render-fix">
+(function(){
+  const app = window.app;
+  if(!app) return;
+
+  function getStatus(s){ return s.status || s.statusMode || 'مفعل'; }
+  function getLevel(s, i){ return s.level || s.accountLevel || ['برونزي','فضي','ذهبي','ماسي'][i % 4]; }
+  function studentsFor(classId){ return (app.state.students || []).filter(function(s){ return s.classId === classId; }); }
+  function classStats(classId){
+    const rows = studentsFor(classId);
+    return {
+      count: rows.length,
+      total: rows.reduce(function(sum,s){ return sum + Number(s.balance || 0); }, 0),
+      near: rows.filter(function(s){ return Number(s.balance || 0) >= 9000; }).length,
+      pending: rows.filter(function(s){ return Number(s.tasks || 0) === 0; }).length,
+      active: rows.filter(function(s){ return getStatus(s) === 'مفعل'; }).length
+    };
+  }
+
+  function renderCards(){
+    const cardsPage = document.getElementById('advtabCardsPage');
+    const detailPage = document.getElementById('advtabDetailPage');
+    if(!cardsPage || !detailPage) return;
+    const classes = app.state.classes || [];
+    detailPage.classList.add('advtab-hidden');
+    cardsPage.classList.remove('advtab-hidden');
+    cardsPage.innerHTML = `
+      <div class="advtab-grid">
+        ${classes.length ? classes.map(function(cls){
+          const st = classStats(cls.id);
+          return `
+            <div class="advtab-card">
+              <div class="head">
+                <span class="tag">${st.active} نشط</span>
+                <div>
+                  <h4>${cls.name}</h4>
+                  <div class="sub">عدد الطلاب / الطالبات في الفصل: ${st.count}</div>
+                </div>
+              </div>
+              <div class="advtab-stats">
+                <div class="box"><strong>${Number(st.total).toLocaleString('ar-SA')}</strong><span>إجمالي الأرصدة</span></div>
+                <div class="box"><strong>${st.count}</strong><span>عدد الطلاب / الطالبات</span></div>
+                <div class="box"><strong>${st.near}</strong><span>قريبون من الترقية</span></div>
+                <div class="box"><strong>${st.pending}</strong><span>مهام غير مسلمة</span></div>
+              </div>
+              <div class="advtab-actions">
+                <button class="small-btn danger" data-del="${cls.id}">حذف الفصل</button>
+                <button class="small-btn gold" data-msg="${cls.id}">إرسال رسالة جماعية لولي الأمر</button>
+                <button class="small-btn primary" data-open="${cls.id}">دخول الفصل</button>
+                <button class="small-btn class-honor-btn" data-honor="${cls.id}">لوحة الشرف</button>
+              </div>
+            </div>
+          `;
+        }).join('') : '<div class="advtab-card"><div class="head"><div><h4>لا توجد فصول مضافة</h4><div class="sub">أضيفي فصلًا من قسم الفصول والطلاب أولًا.</div></div></div></div>'}
+      </div>
+    `;
+  }
+
+  function bindAdvancedButton(){
+    const btn = document.querySelector('.advtab-subtabs [data-mode="advanced"]');
+    const basicBtn = document.querySelector('.advtab-subtabs [data-mode="basic"]');
+    const basic = document.getElementById('advtabBasic');
+    const advanced = document.getElementById('advtabAdvanced');
+    if(btn && !btn.dataset.directBound){
+      btn.dataset.directBound = '1';
+      btn.onclick = function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        if(basic) basic.classList.add('advtab-hidden');
+        if(advanced) advanced.classList.remove('advtab-hidden');
+        if(basicBtn) basicBtn.classList.remove('active');
+        btn.classList.add('active');
+        renderCards();
+      };
+    }
+    if(basicBtn && !basicBtn.dataset.directBound){
+      basicBtn.dataset.directBound = '1';
+      basicBtn.onclick = function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        if(basic) basic.classList.remove('advtab-hidden');
+        if(advanced) advanced.classList.add('advtab-hidden');
+        if(btn) btn.classList.remove('active');
+        basicBtn.classList.add('active');
+      };
+    }
+  }
+
+  function initFix(){
+    bindAdvancedButton();
+    const advanced = document.getElementById('advtabAdvanced');
+    if(advanced && !advanced.classList.contains('advtab-hidden') && !document.getElementById('advtabCardsPage')?.innerHTML.trim()){
+      renderCards();
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){ setTimeout(initFix, 300); setTimeout(initFix, 900); });
+  const obs = new MutationObserver(function(){ initFix(); });
+  obs.observe(document.body, {subtree:true, childList:true});
+})();
+</script>
+
 </body>
 </html>
