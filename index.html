@@ -4029,5 +4029,614 @@ function logoutTeacher(){
 })();
 </script>
 
+
+<script id="robust-class-actions-fix">
+(function(){
+  const app = window.app;
+  if(!app) return;
+
+  function toast(msg){
+    try{ app.toast && app.toast(msg); }catch(e){}
+  }
+  function currentClassStudents(){
+    const cid = app.state.advtabSelectedClassId;
+    return (app.state.students || []).filter(s => s.classId === cid);
+  }
+  function classNameById(id){
+    const c = (app.state.classes || []).find(x => x.id === id);
+    return c ? c.name : 'الفصل';
+  }
+  function getStudentFromCard(card){
+    const name = card.querySelector('.name') ? card.querySelector('.name').textContent.trim() : '';
+    return (app.state.students || []).find(s => (s.name || '').trim() === name);
+  }
+  function saveRender(msg){
+    app.save && app.save();
+    app.renderAll && app.renderAll();
+    if(msg) toast(msg);
+  }
+  function addTx(student, type, amount, reason){
+    if(typeof app.addTransaction === 'function'){
+      app.addTransaction({studentId: student.id, type, amount, reason});
+    }else{
+      app.state.transactions = app.state.transactions || [];
+      app.state.transactions.unshift({
+        id: app.uid ? app.uid('tx') : ('tx_'+Math.random().toString(36).slice(2,9)),
+        studentId: student.id,
+        type: type,
+        amount: Number(amount || 0),
+        reason: reason || '',
+        createdAt: new Date().toISOString()
+      });
+      if(type === 'deposit' || type === 'task' || type === 'roulette' || type === 'transfer_in') student.balance = Number(student.balance || 0) + Number(amount || 0);
+      if(type === 'withdraw' || type === 'transfer_out') student.balance = Math.max(0, Number(student.balance || 0) - Number(amount || 0));
+    }
+  }
+
+  function openFullStatementFixed(student){
+    const txs = (app.state.transactions || []).filter(t => t.studentId === student.id);
+    const rows = txs.map(tx => {
+      const d = new Date(tx.createdAt || Date.now());
+      const days = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+      const attach = tx.imageData ? '<a href="' + tx.imageData + '" target="_blank">عرض الصورة</a>' : (tx.videoUrl ? '<a href="' + tx.videoUrl + '" target="_blank">رابط العرض</a>' : '—');
+      return '<tr><td>' + d.toLocaleDateString('ar-SA') + '</td><td>' + days[d.getDay()] + '</td><td>' + (tx.lesson || '—') + '</td><td>' + d.toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'}) + '</td><td>' + (tx.subject || ((app.state.pdfProfile||{}).subject || '—')) + '</td><td>' + (tx.type || 'عملية') + '</td><td>' + Number(tx.amount || 0).toLocaleString('ar-SA') + '</td><td>' + (tx.reason || '—') + '</td><td>' + attach + '</td></tr>';
+    }).join('');
+    const w = window.open('', '_blank');
+    if(!w) return;
+    w.document.write('<html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>كشف الحساب</title><style>body{font-family:Tahoma;padding:24px}table{width:100%;border-collapse:collapse;margin-top:12px}th,td{border:1px solid #dfe9e2;padding:10px;text-align:right}th{background:#f5faf6}a{color:#29543d;font-weight:700;text-decoration:none}</style></head><body><h2>كشف الحساب الكامل — ' + student.name + '</h2><table><thead><tr><th>التاريخ</th><th>اليوم</th><th>الحصة</th><th>الوقت</th><th>المادة</th><th>نوع العملية</th><th>المبلغ</th><th>السبب</th><th>المرفق</th></tr></thead><tbody>' + (rows || '<tr><td colspan="9">لا توجد عمليات</td></tr>') + '</tbody></table></body></html>');
+    w.document.close();
+  }
+  window.openFullStatement = openFullStatementFixed;
+
+  function ensureAttachModal(){
+    if(document.getElementById('fixAttachModal')) return;
+    const modal = document.createElement('div');
+    modal.id = 'fixAttachModal';
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:12000;padding:16px';
+    modal.innerHTML = '<div style="width:min(620px,96vw);background:#fff;border-radius:24px;padding:18px"><h3 style="margin:0 0 12px;color:#29543d">إرفاق صورة أو فيديو</h3><input id="fixAttachReason" placeholder="السبب / الوصف" style="width:100%;padding:12px;border:1px solid #dfe9e2;border-radius:12px;margin-top:8px"><input id="fixAttachLesson" placeholder="الحصة" style="width:100%;padding:12px;border:1px solid #dfe9e2;border-radius:12px;margin-top:8px"><input id="fixAttachSubject" placeholder="المادة" style="width:100%;padding:12px;border:1px solid #dfe9e2;border-radius:12px;margin-top:8px"><input id="fixAttachImage" type="file" accept="image/*" style="width:100%;padding:12px;border:1px solid #dfe9e2;border-radius:12px;margin-top:8px"><input id="fixAttachVideo" placeholder="رابط الفيديو (اختياري)" style="width:100%;padding:12px;border:1px solid #dfe9e2;border-radius:12px;margin-top:8px"><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px"><button id="fixAttachCancel" style="padding:12px;border-radius:12px;border:1px solid #dfe9e2;background:#fff">إلغاء</button><button id="fixAttachSave" style="padding:12px;border-radius:12px;border:none;background:linear-gradient(135deg,#4f8b67,#29543d);color:#fff">حفظ</button></div></div>';
+    document.body.appendChild(modal);
+    document.getElementById('fixAttachCancel').onclick = function(){ modal.style.display = 'none'; };
+    modal.addEventListener('click', function(e){ if(e.target === modal) modal.style.display = 'none'; });
+  }
+  function openAttachmentModalFixed(student){
+    ensureAttachModal();
+    const modal = document.getElementById('fixAttachModal');
+    modal.style.display = 'flex';
+    document.getElementById('fixAttachReason').value = '';
+    document.getElementById('fixAttachLesson').value = '';
+    document.getElementById('fixAttachSubject').value = (app.state.pdfProfile && app.state.pdfProfile.subject) || '';
+    document.getElementById('fixAttachImage').value = '';
+    document.getElementById('fixAttachVideo').value = '';
+    document.getElementById('fixAttachSave').onclick = function(){
+      const reason = (document.getElementById('fixAttachReason').value || '').trim() || 'مرفق';
+      const lesson = (document.getElementById('fixAttachLesson').value || '').trim() || '—';
+      const subject = (document.getElementById('fixAttachSubject').value || '').trim() || ((app.state.pdfProfile && app.state.pdfProfile.subject) || '—');
+      const videoUrl = (document.getElementById('fixAttachVideo').value || '').trim();
+      const file = document.getElementById('fixAttachImage').files[0];
+      function commit(imageData){
+        app.state.transactions = app.state.transactions || [];
+        app.state.transactions.unshift({
+          id: app.uid ? app.uid('tx') : ('tx_'+Math.random().toString(36).slice(2,9)),
+          studentId: student.id,
+          type: 'note',
+          amount: 0,
+          reason: reason,
+          createdAt: new Date().toISOString(),
+          lesson: lesson,
+          subject: subject,
+          imageData: imageData || '',
+          videoUrl: videoUrl || '',
+          attachmentType: imageData ? 'image' : (videoUrl ? 'video' : '')
+        });
+        modal.style.display = 'none';
+        saveRender('تم حفظ المرفق');
+      }
+      if(file){
+        const reader = new FileReader();
+        reader.onload = function(){ commit(reader.result || ''); };
+        reader.readAsDataURL(file);
+      } else {
+        commit('');
+      }
+    };
+  }
+  window.openAttachmentModal = openAttachmentModalFixed;
+
+  function directNote(student){
+    const reason = prompt('اكتبي الملاحظة', '') || '';
+    if(!reason.trim()) return;
+    addTx(student, 'note', 0, reason.trim());
+    if(reason.includes('غائب') || reason.includes('متأخر')) student.absences = Number(student.absences || 0) + 1;
+    saveRender('تم حفظ الملاحظة');
+  }
+
+  function directQuick(student){
+    const type = prompt('نوع العملية: deposit أو withdraw أو note', 'deposit');
+    if(!type) return;
+    if(type === 'note') return directNote(student);
+    const amount = Number(prompt('القيمة', '10') || 0);
+    if(!amount) return;
+    const reason = prompt('السبب', type === 'deposit' ? 'إيداع سريع' : 'سحب سريع') || '';
+    addTx(student, type, amount, reason);
+    saveRender('تم تنفيذ العملية');
+  }
+
+  function directReward(student){
+    const amount = Number(prompt('قيمة المكافأة', '10') || 0);
+    if(!amount) return;
+    const reason = prompt('سبب المكافأة', 'مكافأة') || 'مكافأة';
+    addTx(student, 'deposit', amount, reason);
+    saveRender('تم منح المكافأة');
+  }
+
+  function directParentMessage(student){
+    const text = prompt('نص الرسالة لولي الأمر', 'تنبيه من مصرف التعليم: ' + student.name);
+    if(!text) return;
+    window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
+    toast('تم فتح رسالة ولي الأمر');
+  }
+
+  function directPassword(student){
+    const pwd = prompt('كلمة المرور الجديدة', student.password || student.pin || '1234');
+    if(!pwd) return;
+    student.password = pwd;
+    student.pin = pwd;
+    saveRender('تم تغيير كلمة المرور');
+  }
+
+  function directStatus(student, status){
+    student.status = status;
+    student.statusMode = status;
+    addTx(student, 'note', 0, status);
+    saveRender('تم تحديث حالة الحساب');
+  }
+
+  function directStudentPdf(student){
+    if(typeof window.openStudentPdf === 'function') window.openStudentPdf(student);
+    else openFullStatementFixed(student);
+  }
+
+  function openClassById(classId){
+    app.state.advtabSelectedClassId = classId;
+    app.save && app.save();
+    app.renderAll && app.renderAll();
+  }
+
+  function deleteClassById(classId){
+    const cls = (app.state.classes || []).find(c => c.id === classId);
+    if(!cls || !confirm('حذف الفصل ' + cls.name + '؟')) return;
+    app.state.students = (app.state.students || []).filter(s => s.classId !== classId);
+    app.state.classes = (app.state.classes || []).filter(c => c.id !== classId);
+    if(app.state.selectedClassId === classId) app.state.selectedClassId = '';
+    if(app.state.advtabSelectedClassId === classId) app.state.advtabSelectedClassId = '';
+    saveRender('تم حذف الفصل');
+  }
+
+  function directBulk(kind){
+    const amount = Number(prompt(kind === 'deposit' ? 'قيمة الإيداع للكل' : 'قيمة السحب من الكل', '10') || 0);
+    if(!amount) return;
+    const reason = prompt('السبب', kind === 'deposit' ? 'إيداع جماعي' : 'سحب جماعي') || '';
+    currentClassStudents().forEach(student => addTx(student, kind, amount, reason));
+    saveRender(kind === 'deposit' ? 'تم الإيداع للكل' : 'تم السحب من الكل');
+  }
+
+  function directClassPdf(){
+    const rows = currentClassStudents().map(s => '<tr><td>' + s.name + '</td><td>' + (s.code || '—') + '</td><td>' + Number(s.balance||0).toLocaleString('ar-SA') + '</td><td>' + (s.parentPhone || '—') + '</td></tr>').join('');
+    const w = window.open('', '_blank');
+    if(!w) return;
+    w.document.write('<html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>تقرير الفصل</title><style>body{font-family:Tahoma;padding:24px}table{width:100%;border-collapse:collapse;margin-top:12px}th,td{border:1px solid #dfe9e2;padding:10px;text-align:right}th{background:#f5faf6}</style></head><body><h2>تقرير ' + classNameById(app.state.advtabSelectedClassId) + '</h2><table><thead><tr><th>الاسم</th><th>رقم الحساب</th><th>الرصيد</th><th>ولي الأمر</th></tr></thead><tbody>' + (rows || '<tr><td colspan="4">لا توجد بيانات</td></tr>') + '</tbody></table></body></html>');
+    w.document.close();
+  }
+
+  function bindAll(){
+    // ensure page visible after auth gate handled
+    const page = document.querySelector('.page');
+    const gate = document.getElementById('teacherLoginGate');
+    if(page && gate && gate.style.display === 'none') page.style.visibility = 'visible';
+
+    document.querySelectorAll('[data-open]').forEach(btn => {
+      if(btn.dataset.rb === '1') return;
+      btn.dataset.rb = '1';
+      btn.onclick = function(e){ e.preventDefault(); e.stopPropagation(); openClassById(btn.dataset.open); };
+    });
+    document.querySelectorAll('[data-del]').forEach(btn => {
+      if(btn.dataset.rb === '1') return;
+      btn.dataset.rb = '1';
+      btn.onclick = function(e){ e.preventDefault(); e.stopPropagation(); deleteClassById(btn.dataset.del); };
+    });
+    document.querySelectorAll('[data-msg]').forEach(btn => {
+      if(btn.dataset.rb === '1') return;
+      btn.dataset.rb = '1';
+      btn.onclick = function(e){ e.preventDefault(); e.stopPropagation(); const txt='رسالة جماعية من مصرف التعليم لفصل ' + classNameById(btn.dataset.msg); window.open('https://wa.me/?text=' + encodeURIComponent(txt), '_blank'); };
+    });
+    document.querySelectorAll('[data-honor]').forEach(btn => {
+      if(btn.dataset.rb === '1') return;
+      btn.dataset.rb = '1';
+      btn.onclick = function(e){ e.preventDefault(); e.stopPropagation(); app.state.advtabHonorClassId = btn.dataset.honor; app.save && app.save(); app.renderAll && app.renderAll(); };
+    });
+
+    const back = document.getElementById('advtabBackBtn');
+    if(back && !back.dataset.rb){
+      back.dataset.rb='1';
+      back.onclick = function(){ app.state.advtabSelectedClassId=''; app.save && app.save(); app.renderAll && app.renderAll(); };
+    }
+
+    document.querySelectorAll('.advtab-student').forEach(card => {
+      const student = getStudentFromCard(card);
+      if(!student) return;
+      const buttons = Array.from(card.querySelectorAll('.advtab-actions2 button'));
+      buttons.forEach(btn => {
+        if(btn.dataset.rb === '1') return;
+        btn.dataset.rb = '1';
+        const txt = (btn.textContent || '').trim();
+        if(txt.includes('دخول الطالب')) btn.onclick = () => { app.state.currentView='student'; app.state.previewStudentId=student.id; app.save && app.save(); app.renderView && app.renderView(); app.renderStudentView && app.renderStudentView(); };
+        else if(txt.includes('كشف الحساب')) btn.onclick = () => openFullStatementFixed(student);
+        else if(txt.includes('عملية سريعة')) btn.onclick = () => directQuick(student);
+        else if(txt === 'ملاحظة') btn.onclick = () => directNote(student);
+        else if(txt.includes('الحضور')) btn.onclick = () => directNote(student);
+        else if(txt.includes('المهام')) btn.onclick = () => { app.state.currentView='teacher'; app.state.selectedTab='tasks'; app.save && app.save(); app.renderAll && app.renderAll(); };
+        else if(txt.includes('رسالة ولي الأمر')) btn.onclick = () => directParentMessage(student);
+        else if(txt.includes('مكافأة')) btn.onclick = () => directReward(student);
+        else if(txt.includes('تعديل الاسم')) btn.onclick = () => { const n = prompt('الاسم الجديد', student.name || ''); if(n){ student.name=n; saveRender('تم تعديل الاسم'); } };
+        else if(txt.includes('تغيير كلمة المرور')) btn.onclick = () => directPassword(student);
+        else if(txt.includes('تجميد الحساب')) btn.onclick = () => directStatus(student, 'مجمد');
+        else if(txt.includes('تفعيل الحساب')) btn.onclick = () => directStatus(student, 'مفعل');
+        else if(txt.includes('إقفال الحساب')) btn.onclick = () => directStatus(student, 'مغلق');
+        else if(txt.includes('تقرير PDF')) btn.onclick = () => directStudentPdf(student);
+        else if(txt.includes('حذف الطالب')) btn.onclick = () => { if(confirm('حذف ' + student.name + '؟')){ app.state.students = (app.state.students || []).filter(s => s.id !== student.id); saveRender('تم حذف الطالب / الطالبة'); } };
+        else if(txt.includes('إرفاق صورة / فيديو')) btn.onclick = () => openAttachmentModalFixed(student);
+      });
+    });
+
+    document.querySelectorAll('.advtab-toolbar button').forEach(btn => {
+      if(btn.dataset.rb === '1') return;
+      btn.dataset.rb = '1';
+      const txt = (btn.textContent || '').trim();
+      if(txt.includes('إيداع للكل')) btn.onclick = () => directBulk('deposit');
+      else if(txt.includes('رسالة جماعية')) btn.onclick = () => { const txtm = 'رسالة جماعية من مصرف التعليم لفصل ' + classNameById(app.state.advtabSelectedClassId); window.open('https://wa.me/?text=' + encodeURIComponent(txtm), '_blank'); };
+      else if(txt.includes('تقرير PDF')) btn.onclick = () => directClassPdf();
+      else if(txt.includes('سحب من الكل')) btn.onclick = () => directBulk('withdraw');
+      else if(txt.includes('حذف الفصل')) btn.onclick = () => deleteClassById(app.state.advtabSelectedClassId);
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){ setTimeout(bindAll, 300); setTimeout(bindAll, 900); setTimeout(bindAll, 1800); });
+  const obs = new MutationObserver(function(){ bindAll(); });
+  obs.observe(document.body, {subtree:true, childList:true});
+})();
+</script>
+
+
+<script id="advanced-mode-safe-fix">
+(function(){
+  const app = window.app;
+  if(!app) return;
+
+  function setAdvancedMode(mode){
+    const basic = document.getElementById('advtabBasic');
+    const advanced = document.getElementById('advtabAdvanced');
+    const subtabs = document.querySelector('.advtab-subtabs');
+    if(!basic || !advanced || !subtabs) return;
+    const isAdvanced = mode === 'advanced';
+    basic.classList.toggle('advtab-hidden', isAdvanced);
+    advanced.classList.toggle('advtab-hidden', !isAdvanced);
+    subtabs.querySelectorAll('[data-mode]').forEach(function(btn){
+      btn.classList.toggle('active', btn.getAttribute('data-mode') === mode);
+    });
+    app.state.advtabMode = mode;
+    app.save && app.save();
+  }
+
+  function bindSubtabsSafely(){
+    const subtabs = document.querySelector('.advtab-subtabs');
+    if(!subtabs) return;
+    subtabs.querySelectorAll('[data-mode]').forEach(function(btn){
+      if(btn.dataset.safeBound === '1') return;
+      btn.dataset.safeBound = '1';
+      btn.onclick = function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        const mode = this.getAttribute('data-mode') || 'basic';
+        setAdvancedMode(mode);
+      };
+    });
+
+    setAdvancedMode((app.state && app.state.advtabMode) || 'basic');
+  }
+
+  function resetAdvancedWhenLeavingClasses(){
+    const current = app.state && app.state.selectedTab;
+    if(current !== 'classes'){
+      const basic = document.getElementById('advtabBasic');
+      const advanced = document.getElementById('advtabAdvanced');
+      if(basic && advanced){
+        basic.classList.remove('advtab-hidden');
+        advanced.classList.add('advtab-hidden');
+      }
+      if(app.state) app.state.advtabMode = 'basic';
+    }
+  }
+
+  const oldSwitchTab = app.switchTab.bind(app);
+  app.switchTab = function(tab){
+    oldSwitchTab(tab);
+    if(tab !== 'classes'){
+      resetAdvancedWhenLeavingClasses();
+    } else {
+      setTimeout(bindSubtabsSafely, 50);
+    }
+  };
+
+  const oldRenderAll = app.renderAll.bind(app);
+  app.renderAll = function(){
+    oldRenderAll();
+    setTimeout(function(){
+      bindSubtabsSafely();
+      resetAdvancedWhenLeavingClasses();
+    }, 50);
+  };
+
+  document.addEventListener('DOMContentLoaded', function(){
+    setTimeout(function(){
+      bindSubtabsSafely();
+      resetAdvancedWhenLeavingClasses();
+    }, 300);
+  });
+
+  const obs = new MutationObserver(function(){
+    bindSubtabsSafely();
+    resetAdvancedWhenLeavingClasses();
+  });
+  obs.observe(document.body, {subtree:true, childList:true});
+})();
+</script>
+
+
+<script id="advanced-panel-render-fix">
+(function(){
+  const app = window.app;
+  if(!app) return;
+
+  function studentsFor(classId){
+    return (app.state.students || []).filter(function(s){ return s.classId === classId; });
+  }
+  function getStatus(s){ return s.status || s.statusMode || 'مفعل'; }
+  function getLevel(s, i){ return s.level || s.accountLevel || ['برونزي','فضي','ذهبي','ماسي'][i % 4]; }
+  function classStats(classId){
+    const rows = studentsFor(classId);
+    return {
+      count: rows.length,
+      total: rows.reduce(function(sum, s){ return sum + Number(s.balance || 0); }, 0),
+      near: rows.filter(function(s){ return Number(s.balance || 0) >= 9000; }).length,
+      pending: rows.filter(function(s){ return Number(s.tasks || 0) === 0; }).length,
+      active: rows.filter(function(s){ return getStatus(s) === 'مفعل'; }).length
+    };
+  }
+
+  function renderAdvancedCards(){
+    const cardsPage = document.getElementById('advtabCardsPage');
+    const detailPage = document.getElementById('advtabDetailPage');
+    if(!cardsPage || !detailPage) return;
+
+    const classes = app.state.classes || [];
+    detailPage.classList.add('advtab-hidden');
+    cardsPage.classList.remove('advtab-hidden');
+
+    cardsPage.innerHTML = `
+      <div class="advtab-grid">
+        ${classes.map(function(cls){
+          const st = classStats(cls.id);
+          return `
+            <div class="advtab-card">
+              <div class="head">
+                <span class="tag">${st.active} نشط</span>
+                <div>
+                  <h4>${cls.name}</h4>
+                  <div class="sub">عدد الطلاب / الطالبات في الفصل: ${st.count}</div>
+                </div>
+              </div>
+              <div class="advtab-stats">
+                <div class="box"><strong>${Number(st.total).toLocaleString('ar-SA')}</strong><span>إجمالي الأرصدة</span></div>
+                <div class="box"><strong>${st.count}</strong><span>عدد الطلاب / الطالبات</span></div>
+                <div class="box"><strong>${st.near}</strong><span>قريبون من الترقية</span></div>
+                <div class="box"><strong>${st.pending}</strong><span>مهام غير مسلمة</span></div>
+              </div>
+              <div class="advtab-actions">
+                <button class="small-btn danger" data-del="${cls.id}">حذف الفصل</button>
+                <button class="small-btn gold" data-msg="${cls.id}">إرسال رسالة جماعية لولي الأمر</button>
+                <button class="small-btn primary" data-open="${cls.id}">دخول الفصل</button>
+                <button class="small-btn class-honor-btn" data-honor="${cls.id}">لوحة الشرف</button>
+              </div>
+            </div>
+          `;
+        }).join('') || '<div class="panel">لا توجد فصول مضافة بعد.</div>'}
+      </div>
+    `;
+  }
+
+  function renderAdvancedDetail(classId){
+    const cardsPage = document.getElementById('advtabCardsPage');
+    const detailPage = document.getElementById('advtabDetailPage');
+    if(!cardsPage || !detailPage) return;
+
+    const cls = (app.state.classes || []).find(function(c){ return c.id === classId; });
+    if(!cls){ renderAdvancedCards(); return; }
+
+    const rows = studentsFor(classId).map(function(s, i){
+      return Object.assign({}, s, {__level:getLevel(s, i), __status:getStatus(s)});
+    });
+    const stats = classStats(classId);
+
+    cardsPage.classList.add('advtab-hidden');
+    detailPage.classList.remove('advtab-hidden');
+
+    detailPage.innerHTML = `
+      <div class="advtab-detail">
+        <div class="advtab-detailhead">
+          <div>
+            <h3>${cls.name}</h3>
+            <p>صفحة مستقلة لإدارة الطلاب / الطالبات داخل الفصل مع أدوات جماعية وأزرار خاصة بكل طالب / طالبة.</p>
+          </div>
+          <button class="small-btn" id="advtabBackBtn">رجوع إلى بطاقات الفصول</button>
+        </div>
+
+        <div class="advtab-summary">
+          <div class="box"><strong>${stats.count}</strong><span>عدد الطلاب / الطالبات</span></div>
+          <div class="box"><strong>${Number(stats.total).toLocaleString('ar-SA')}</strong><span>إجمالي الأرصدة</span></div>
+          <div class="box"><strong>${stats.pending}</strong><span>غير مسلمين المهمة</span></div>
+        </div>
+
+        <div class="advtab-toolbar">
+          <button class="small-btn primary">إيداع للكل</button>
+          <button class="small-btn gold">رسالة جماعية</button>
+          <button class="small-btn">تقرير PDF</button>
+          <button class="small-btn gold">سحب من الكل</button>
+          <button class="small-btn danger">حذف الفصل</button>
+        </div>
+
+        <div class="advtab-filter">
+          <input id="advtabSearchFix" placeholder="بحث باسم الطالب / الطالبة أو رقم الحساب">
+          <select id="advtabLevelFix">
+            <option value="">كل المستويات</option>
+            <option>برونزي</option><option>فضي</option><option>ذهبي</option><option>ماسي</option>
+          </select>
+          <select id="advtabStatusFix">
+            <option value="">كل الحالات</option>
+            <option>مفعل</option><option>مجمد</option><option>مغلق</option>
+          </select>
+        </div>
+
+        <div class="advtab-students" id="advtabStudentsGridFix"></div>
+      </div>
+    `;
+
+    function drawStudents(){
+      const q = (document.getElementById('advtabSearchFix').value || '').trim();
+      const lvl = document.getElementById('advtabLevelFix').value || '';
+      const stt = document.getElementById('advtabStatusFix').value || '';
+      const filtered = rows.filter(function(st){
+        const hitQ = !q || (st.name || '').includes(q) || String(st.code || '').includes(q);
+        const hitL = !lvl || st.__level === lvl;
+        const hitS = !stt || st.__status === stt;
+        return hitQ && hitL && hitS;
+      });
+      document.getElementById('advtabStudentsGridFix').innerHTML = filtered.map(function(st){
+        return `
+          <div class="advtab-student">
+            <div class="top">
+              <div>
+                <h3 class="name">${st.name}</h3>
+                <div class="info">
+                  المستوى الحالي: ${st.__level} 🏅<br>
+                  PIN: ${st.pin || st.password || '1234'}<br>
+                  ولي الأمر: ${st.parentPhone || '—'}
+                </div>
+                <div class="advtab-rank">نوع الحساب: ${st.__level} 💳</div>
+              </div>
+              <span class="tag">${st.__status}</span>
+            </div>
+
+            <div class="advtab-studentstats">
+              <div class="box"><strong>${Number(st.pointsPenalty || 0)}</strong><span>عدد الخصومات</span></div>
+              <div class="box"><strong>${Number(st.tasks || 0)}</strong><span>المهام المسلمة</span></div>
+              <div class="box"><strong>${Number(st.balance || 0).toLocaleString('ar-SA')}</strong><span>الرصيد</span></div>
+            </div>
+
+            <div class="advtab-absence">
+              <div class="advtab-absence-head">
+                <strong>شريط الغياب</strong>
+                <span>${Number(st.absences || 0)} غياب</span>
+              </div>
+              <div class="advtab-absence-track">
+                <div class="advtab-absence-fill" style="width:${Math.min((Number(st.absences || 0) / 10) * 100, 100)}%"></div>
+              </div>
+              <div class="advtab-absence-note">يظهر مستوى الغياب من 0 إلى 10 مرات.</div>
+            </div>
+
+            <div class="advtab-actions2">
+              <button class="small-btn primary">دخول الطالب / الطالبة</button>
+              <button class="small-btn">كشف الحساب</button>
+              <button class="small-btn gold">عملية سريعة</button>
+              <button class="small-btn">ملاحظة</button>
+              <button class="small-btn">الحضور</button>
+              <button class="small-btn">المهام</button>
+              <button class="small-btn gold">رسالة ولي الأمر</button>
+              <button class="small-btn primary">مكافأة</button>
+              <button class="small-btn">تعديل الاسم</button>
+              <button class="small-btn">تغيير كلمة المرور</button>
+              <button class="small-btn gold">تجميد الحساب</button>
+              <button class="small-btn">تفعيل الحساب</button>
+              <button class="small-btn">إقفال الحساب</button>
+              <button class="small-btn primary">تقرير PDF</button>
+              <button class="small-btn danger" style="grid-column:1/-1">حذف الطالب / الطالبة</button>
+            </div>
+          </div>
+        `;
+      }).join('') || '<div class="panel">لا يوجد طلاب مطابقون للفلترة.</div>';
+    }
+
+    drawStudents();
+    document.getElementById('advtabSearchFix').oninput = drawStudents;
+    document.getElementById('advtabLevelFix').onchange = drawStudents;
+    document.getElementById('advtabStatusFix').onchange = drawStudents;
+  }
+
+  function hookAdvancedNavigation(){
+    document.querySelectorAll('[data-open]').forEach(function(btn){
+      if(btn.dataset.advRender === '1') return;
+      btn.dataset.advRender = '1';
+      btn.onclick = function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        app.state.advtabSelectedClassId = btn.dataset.open;
+        app.save && app.save();
+        renderAdvancedDetail(btn.dataset.open);
+      };
+    });
+
+    const back = document.getElementById('advtabBackBtn');
+    if(back && !back.dataset.advRender){
+      back.dataset.advRender = '1';
+      back.onclick = function(){
+        app.state.advtabSelectedClassId = '';
+        app.save && app.save();
+        renderAdvancedCards();
+      };
+    }
+  }
+
+  function ensureAdvancedContent(){
+    const advanced = document.getElementById('advtabAdvanced');
+    if(!advanced || advanced.classList.contains('advtab-hidden')) return;
+    const cardsPage = document.getElementById('advtabCardsPage');
+    const detailPage = document.getElementById('advtabDetailPage');
+    if(!cardsPage || !detailPage) return;
+
+    if(app.state.advtabSelectedClassId){
+      renderAdvancedDetail(app.state.advtabSelectedClassId);
+    }else if(!cardsPage.innerHTML.trim()){
+      renderAdvancedCards();
+    }
+    hookAdvancedNavigation();
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    setTimeout(ensureAdvancedContent, 400);
+    setTimeout(ensureAdvancedContent, 1000);
+  });
+
+  const obs = new MutationObserver(function(){
+    ensureAdvancedContent();
+  });
+  obs.observe(document.body, {subtree:true, childList:true});
+
+  const oldRenderAllAdv = app.renderAll.bind(app);
+  app.renderAll = function(){
+    oldRenderAllAdv();
+    setTimeout(ensureAdvancedContent, 80);
+  };
+})();
+</script>
+
 </body>
 </html>
