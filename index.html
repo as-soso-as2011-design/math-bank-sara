@@ -29,7 +29,7 @@
     *{box-sizing:border-box}
     html,body{margin:0;padding:0;background:linear-gradient(180deg,#fbfdfb 0%, #f2f7f3 45%, #edf5ef 100%);color:var(--text);font-family:"SF Pro Display","Segoe UI",Tahoma,Arial,sans-serif}
     button,input,select,textarea{font:inherit}
-    .page{max-width:1500px;margin:0 auto;padding:24px 20px 60px}
+    .page{max-width:1500px;margin:0 auto;padding:24px 20px 60px;visibility:hidden}
     .topbar,.card,.panel,.phone,.section,.modal-body{background:rgba(255,255,255,.82);backdrop-filter: blur(14px);border:1px solid #e7f0ea;box-shadow:var(--shadow)}
     .topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 18px;border-radius:24px;margin-bottom:22px;position:sticky;top:10px;z-index:30}
     .brand{display:flex;align-items:center;gap:14px}
@@ -1753,8 +1753,8 @@
   }
 
   window.prefillTeacherDemo = function(){
-    document.getElementById('teacherUsernameInput').value = localStorage.getItem(USER_KEY) || 'teacher';
-    document.getElementById('teacherPasswordInput').value = localStorage.getItem(PASS_KEY) || '1234';
+    document.getElementById('teacherUsernameInput').value = '';
+    document.getElementById('teacherPasswordInput').value = '';
   }
 
   function setTeacherAuth(state){
@@ -1828,7 +1828,7 @@
       btn.onclick = openTeacherPassModal;
       headerActions.appendChild(btn);
     }
-    setTeacherAuth(localStorage.getItem(AUTH_KEY) === '1');
+    setTeacherAuth(false);
   });
 })();
 </script>
@@ -3949,6 +3949,83 @@ function logoutTeacher(){
       patchNoteButtonStyle();
     }, 700);
   });
+})();
+</script>
+
+
+<script id="class-detail-buttons-fix">
+(function(){
+  function bindClassDetailButtons(){
+    const app = window.app;
+    if(!app) return;
+    const detail = document.getElementById('advtabDetailPage');
+    if(!detail || detail.classList.contains('advtab-hidden')) return;
+
+    const cards = detail.querySelectorAll('.advtab-student');
+    cards.forEach(function(card){
+      const name = card.querySelector('.name') ? card.querySelector('.name').textContent.trim() : '';
+      const student = (app.state.students || []).find(function(s){ return (s.name || '').trim() === name; });
+      if(!student) return;
+
+      const buttons = Array.from(card.querySelectorAll('.advtab-actions2 button'));
+      buttons.forEach(function(btn){
+        if(btn.dataset.fixedBound === '1') return;
+        btn.dataset.fixedBound = '1';
+        const txt = (btn.textContent || '').trim();
+
+        if(txt.includes('دخول الطالب')) btn.onclick = function(){ app.state.currentView='student'; app.state.previewStudentId=student.id; app.save(); app.renderView(); app.renderStudentView(); };
+        else if(txt.includes('كشف الحساب')) btn.onclick = function(){ if(typeof window.openFullStatement === 'function') window.openFullStatement(student); };
+        else if(txt.includes('عملية سريعة')) btn.onclick = function(){ if(typeof window.openQuickAction === 'function') window.openQuickAction(student); };
+        else if(txt === 'ملاحظة') btn.onclick = function(){ if(typeof window.openNote === 'function') window.openNote(student); };
+        else if(txt.includes('الحضور')) btn.onclick = function(){ if(typeof window.openNote === 'function') window.openNote(student); };
+        else if(txt.includes('المهام')) btn.onclick = function(){ if(typeof window.openTasks === 'function') window.openTasks(student); };
+        else if(txt.includes('رسالة ولي الأمر')) btn.onclick = function(){ if(typeof window.openParentMessage === 'function') window.openParentMessage(student); };
+        else if(txt.includes('مكافأة')) btn.onclick = function(){ if(typeof window.openReward === 'function') window.openReward(student); };
+        else if(txt.includes('تعديل الاسم')) btn.onclick = function(){ const newName = prompt('اكتب الاسم الجديد', student.name || ''); if(!newName) return; student.name = newName; if(typeof window.saveRender === 'function') window.saveRender('تم تعديل الاسم'); else { app.save(); app.renderAll(); } };
+        else if(txt.includes('تغيير كلمة المرور')) btn.onclick = function(){ if(typeof window.openPassword === 'function') window.openPassword(student); };
+        else if(txt.includes('تجميد الحساب')) btn.onclick = function(){ if(typeof window.openStatusReason === 'function' && window.FREEZE_REASONS) window.openStatusReason(student,'تجميد الحساب','مجمد',window.FREEZE_REASONS); };
+        else if(txt.includes('تفعيل الحساب')) btn.onclick = function(){ if(typeof window.openStatusReason === 'function') window.openStatusReason(student,'تفعيل الحساب','مفعل',['إعادة تفعيل بعد مراجعة','انتهاء سبب التجميد','تحسن السلوك','طلب من الإدارة','أخرى']); };
+        else if(txt.includes('إقفال الحساب')) btn.onclick = function(){ if(typeof window.openStatusReason === 'function' && window.CLOSE_REASONS) window.openStatusReason(student,'إقفال الحساب','مغلق',window.CLOSE_REASONS); };
+        else if(txt.includes('تقرير PDF')) btn.onclick = function(){ if(typeof window.openStudentPdf === 'function') window.openStudentPdf(student); };
+        else if(txt.includes('حذف الطالب')) btn.onclick = function(){ if(confirm('حذف ' + student.name + '؟')){ app.state.students = (app.state.students || []).filter(function(s){ return s.id !== student.id; }); if(typeof window.saveRender === 'function') window.saveRender('تم حذف الطالب / الطالبة'); else { app.save(); app.renderAll(); } } };
+        else if(txt.includes('إرفاق صورة / فيديو')) btn.onclick = function(){ if(typeof window.openAttachmentModal === 'function') window.openAttachmentModal(student); };
+      });
+    });
+
+    const toolbarBtns = Array.from(detail.querySelectorAll('.advtab-toolbar button'));
+    toolbarBtns.forEach(function(btn){
+      if(btn.dataset.fixedBound === '1') return;
+      btn.dataset.fixedBound = '1';
+      const txt = (btn.textContent || '').trim();
+      if(txt.includes('إيداع للكل')) btn.onclick = function(){ if(typeof window.openBulkOperation === 'function') window.openBulkOperation('deposit'); };
+      else if(txt.includes('رسالة جماعية')) btn.onclick = function(){ if(typeof window.openClassMessage === 'function') window.openClassMessage(); };
+      else if(txt.includes('تقرير PDF')) btn.onclick = function(){ if(typeof window.classPdf === 'function') window.classPdf(); };
+      else if(txt.includes('سحب من الكل')) btn.onclick = function(){ if(typeof window.openBulkOperation === 'function') window.openBulkOperation('withdraw'); };
+      else if(txt.includes('حذف الفصل')) btn.onclick = function(){
+        const cid = app.state.advtabSelectedClassId;
+        const cls = (app.state.classes || []).find(function(c){ return c.id === cid; });
+        if(cls && confirm('حذف الفصل ' + cls.name + '؟')){
+          app.state.students = (app.state.students || []).filter(function(s){ return s.classId !== cid; });
+          app.state.classes = (app.state.classes || []).filter(function(c){ return c.id !== cid; });
+          app.state.selectedClassId = '';
+          app.state.advtabSelectedClassId = '';
+          app.save(); app.renderAll();
+        }
+      };
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    setTimeout(bindClassDetailButtons, 300);
+    setTimeout(bindClassDetailButtons, 900);
+  });
+
+  const obs = new MutationObserver(function(){ bindClassDetailButtons(); });
+  obs.observe(document.body, {subtree:true, childList:true});
+
+  // expose a couple functions for other patches
+  if(window.openFullStatement) window.openFullStatement = window.openFullStatement;
+  if(window.openAttachmentModal) window.openAttachmentModal = window.openAttachmentModal;
 })();
 </script>
 
