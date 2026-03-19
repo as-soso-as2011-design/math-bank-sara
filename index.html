@@ -4742,35 +4742,38 @@ function logoutTeacher(){
 </script>
 
 
-<script id="advanced-button-direct-open-fix">
+<script id="advanced-button-direct-open-fix-final">
 (function(){
   const app = window.app;
   if(!app) return;
 
-  function renderAdvancedNow(){
-    var basic = document.getElementById('advtabBasic');
-    var advanced = document.getElementById('advtabAdvanced');
-    var cardsPage = document.getElementById('advtabCardsPage');
-    var detailPage = document.getElementById('advtabDetailPage');
-    var subtabs = document.querySelector('.advtab-subtabs');
+  function renderAdvancedCardsOnly(){
+    const basic = document.getElementById('advtabBasic');
+    const advanced = document.getElementById('advtabAdvanced');
+    const cardsPage = document.getElementById('advtabCardsPage');
+    const detailPage = document.getElementById('advtabDetailPage');
+    const subtabs = document.querySelector('.advtab-subtabs');
     if(!basic || !advanced || !cardsPage || !detailPage || !subtabs) return;
 
     basic.classList.add('advtab-hidden');
     advanced.classList.remove('advtab-hidden');
+    detailPage.classList.add('advtab-hidden');
+    cardsPage.classList.remove('advtab-hidden');
+
     subtabs.querySelectorAll('[data-mode]').forEach(function(btn){
       btn.classList.toggle('active', btn.getAttribute('data-mode') === 'advanced');
     });
 
-    var classes = app.state && app.state.classes ? app.state.classes : [];
-    detailPage.classList.add('advtab-hidden');
-    cardsPage.classList.remove('advtab-hidden');
+    const classes = app.state && Array.isArray(app.state.classes) ? app.state.classes : [];
+    const students = app.state && Array.isArray(app.state.students) ? app.state.students : [];
+
     cardsPage.innerHTML = '<div class="advtab-grid">' + (
       classes.length ? classes.map(function(cls){
-        var rows = (app.state.students || []).filter(function(s){ return s.classId === cls.id; });
-        var total = rows.reduce(function(sum,s){ return sum + Number(s.balance || 0); }, 0);
-        var near = rows.filter(function(s){ return Number(s.balance || 0) >= 9000; }).length;
-        var pending = rows.filter(function(s){ return Number(s.tasks || 0) === 0; }).length;
-        var active = rows.filter(function(s){ return (s.status || s.statusMode || 'مفعل') === 'مفعل'; }).length;
+        const rows = students.filter(function(s){ return s.classId === cls.id; });
+        const total = rows.reduce(function(sum,s){ return sum + Number(s.balance || 0); }, 0);
+        const near = rows.filter(function(s){ return Number(s.balance || 0) >= 9000; }).length;
+        const pending = rows.filter(function(s){ return Number(s.tasks || 0) === 0; }).length;
+        const active = rows.filter(function(s){ return (s.status || s.statusMode || 'مفعل') === 'مفعل'; }).length;
         return '<div class="advtab-card">'
           + '<div class="head"><span class="tag">' + active + ' نشط</span><div><h4>' + cls.name + '</h4><div class="sub">عدد الطلاب / الطالبات في الفصل: ' + rows.length + '</div></div></div>'
           + '<div class="advtab-stats">'
@@ -4784,56 +4787,55 @@ function logoutTeacher(){
           + '<button class="small-btn gold" data-msg="' + cls.id + '">إرسال رسالة جماعية لولي الأمر</button>'
           + '<button class="small-btn primary" data-open="' + cls.id + '">دخول الفصل</button>'
           + '<button class="small-btn class-honor-btn" data-honor="' + cls.id + '">لوحة الشرف</button>'
-          + '</div></div>';
+          + '</div>'
+          + '</div>';
       }).join('') : '<div class="advtab-card"><div class="head"><div><h4>لا توجد فصول مضافة</h4><div class="sub">أضيفي فصلًا من قسم الفصول والطلاب أولًا.</div></div></div></div>'
     ) + '</div>';
+
+    if(app.state) app.state.advtabMode = 'advanced';
+    if(app.save) app.save();
   }
 
   function bindAdvancedTabButton(){
-    var btn = document.querySelector('.advtab-subtabs [data-mode="advanced"]');
-    if(!btn || btn.dataset.directOpenBound === '1') return;
-    btn.dataset.directOpenBound = '1';
-    btn.onclick = function(e){
-      e.preventDefault();
-      e.stopPropagation();
-      renderAdvancedNow();
-    };
-  }
+    const advBtn = document.querySelector('.advtab-subtabs [data-mode="advanced"]');
+    const basicBtn = document.querySelector('.advtab-subtabs [data-mode="basic"]');
+    const basic = document.getElementById('advtabBasic');
+    const advanced = document.getElementById('advtabAdvanced');
 
-  function bindBasicTabButton(){
-    var btn = document.querySelector('.advtab-subtabs [data-mode="basic"]');
-    if(!btn || btn.dataset.directOpenBound === '1') return;
-    btn.dataset.directOpenBound = '1';
-    btn.onclick = function(e){
-      e.preventDefault();
-      e.stopPropagation();
-      var basic = document.getElementById('advtabBasic');
-      var advanced = document.getElementById('advtabAdvanced');
-      var subtabs = document.querySelector('.advtab-subtabs');
-      if(basic) basic.classList.remove('advtab-hidden');
-      if(advanced) advanced.classList.add('advtab-hidden');
-      if(subtabs){
-        subtabs.querySelectorAll('[data-mode]').forEach(function(b){
-          b.classList.toggle('active', b.getAttribute('data-mode') === 'basic');
+    if(advBtn && !advBtn.dataset.finalBound){
+      advBtn.dataset.finalBound = '1';
+      advBtn.onclick = function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        renderAdvancedCardsOnly();
+      };
+    }
+
+    if(basicBtn && !basicBtn.dataset.finalBound){
+      basicBtn.dataset.finalBound = '1';
+      basicBtn.onclick = function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        if(basic) basic.classList.remove('advtab-hidden');
+        if(advanced) advanced.classList.add('advtab-hidden');
+        document.querySelectorAll('.advtab-subtabs [data-mode]').forEach(function(btn){
+          btn.classList.toggle('active', btn.getAttribute('data-mode') === 'basic');
         });
-      }
-    };
-  }
-
-  function init(){
-    bindAdvancedTabButton();
-    bindBasicTabButton();
+        if(app.state) app.state.advtabMode = 'basic';
+        if(app.save) app.save();
+      };
+    }
   }
 
   document.addEventListener('DOMContentLoaded', function(){
-    setTimeout(init, 300);
-    setTimeout(init, 1000);
+    setTimeout(bindAdvancedTabButton, 300);
+    setTimeout(bindAdvancedTabButton, 900);
   });
 
-  var obs = new MutationObserver(function(){ init(); });
+  const obs = new MutationObserver(function(){ bindAdvancedTabButton(); });
   obs.observe(document.body, {subtree:true, childList:true});
 
-  window.renderAdvancedNow = renderAdvancedNow;
+  window.renderAdvancedNow = renderAdvancedCardsOnly;
 })();
 </script>
 
