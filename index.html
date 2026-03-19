@@ -664,6 +664,33 @@
 .attach-btn{background:linear-gradient(135deg,#4f8b67,#29543d)!important;color:#fff!important;border:none!important}
 </style>
 
+
+<style id="login-interaction-fix-style">
+.login-gate,.login-card,.login-form,.login-field,.login-input-wrap,.login-actions{
+  pointer-events:auto !important;
+}
+.login-gate{
+  z-index:2147483000 !important;
+}
+.login-card{
+  position:relative !important;
+  z-index:2147483001 !important;
+}
+.login-input,.login-btn,.eye-btn{
+  pointer-events:auto !important;
+  position:relative !important;
+  z-index:2147483002 !important;
+  -webkit-user-select:text !important;
+  user-select:text !important;
+}
+.login-input{
+  -webkit-appearance:none !important;
+  appearance:none !important;
+  background:#fbfdfb !important;
+  color:#2f4d39 !important;
+}
+</style>
+
 </head>
 <body>
 
@@ -4738,6 +4765,100 @@ function logoutTeacher(){
   document.addEventListener('DOMContentLoaded', function(){ setTimeout(initFix, 300); setTimeout(initFix, 900); });
   const obs = new MutationObserver(function(){ initFix(); });
   obs.observe(document.body, {subtree:true, childList:true});
+})();
+</script>
+
+
+<script id="login-interaction-fix-script">
+(function(){
+  function fixLoginUI(){
+    var gate = document.getElementById('teacherLoginGate');
+    var page = document.querySelector('.page');
+    var user = document.getElementById('teacherUsernameInput');
+    var pass = document.getElementById('teacherPasswordInput');
+    var form = gate ? gate.querySelector('form') : null;
+    var loginBtn = form ? form.querySelector('.login-btn.primary') : null;
+
+    if(gate){
+      gate.style.display = 'flex';
+      gate.style.pointerEvents = 'auto';
+      gate.style.visibility = 'visible';
+      gate.style.opacity = '1';
+    }
+    if(page){
+      page.style.visibility = 'hidden';
+      page.style.pointerEvents = 'none';
+    }
+    [user, pass].forEach(function(el){
+      if(!el) return;
+      el.disabled = false;
+      el.readOnly = false;
+      el.style.pointerEvents = 'auto';
+      el.style.userSelect = 'text';
+      el.removeAttribute('disabled');
+      el.removeAttribute('readonly');
+    });
+
+    if(form && !form.dataset.loginFixed){
+      form.dataset.loginFixed = '1';
+      form.addEventListener('submit', function(e){
+        e.preventDefault();
+        if(typeof window.teacherLogin === 'function') window.teacherLogin();
+      });
+    }
+
+    if(loginBtn && !loginBtn.dataset.loginFixed){
+      loginBtn.dataset.loginFixed = '1';
+      loginBtn.onclick = function(e){
+        e.preventDefault();
+        if(typeof window.teacherLogin === 'function') window.teacherLogin();
+      };
+    }
+
+    if(user && !user.dataset.focusedOnce){
+      user.dataset.focusedOnce = '1';
+      setTimeout(function(){ try{ user.focus(); }catch(e){} }, 80);
+    }
+  }
+
+  function patchTeacherLogin(){
+    if(typeof window.teacherLogin !== 'function') return;
+    var old = window.teacherLogin;
+    window.teacherLogin = function(){
+      var gate = document.getElementById('teacherLoginGate');
+      var page = document.querySelector('.page');
+      var err = document.getElementById('teacherLoginError');
+      var user = document.getElementById('teacherUsernameInput');
+      var pass = document.getElementById('teacherPasswordInput');
+      var u = (user && user.value || '').trim();
+      var p = (pass && pass.value || '').trim();
+      var su = localStorage.getItem('masraf_teacher_username') || 'teacher';
+      var sp = localStorage.getItem('masraf_teacher_password') || '1234';
+      if(u === su && p === sp){
+        if(err) err.style.display = 'none';
+        localStorage.setItem('masraf_teacher_auth','1');
+        if(gate) gate.style.display = 'none';
+        if(page){
+          page.style.visibility = 'visible';
+          page.style.pointerEvents = 'auto';
+        }
+        return;
+      }
+      if(err) err.style.display = 'block';
+    };
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    fixLoginUI();
+    setTimeout(patchTeacherLogin, 50);
+    setTimeout(fixLoginUI, 250);
+    setTimeout(fixLoginUI, 900);
+  });
+
+  window.addEventListener('load', function(){
+    patchTeacherLogin();
+    fixLoginUI();
+  });
 })();
 </script>
 
