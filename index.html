@@ -664,33 +664,6 @@
 .attach-btn{background:linear-gradient(135deg,#4f8b67,#29543d)!important;color:#fff!important;border:none!important}
 </style>
 
-
-<style id="login-interaction-fix-style">
-.login-gate,.login-card,.login-form,.login-field,.login-input-wrap,.login-actions{
-  pointer-events:auto !important;
-}
-.login-gate{
-  z-index:2147483000 !important;
-}
-.login-card{
-  position:relative !important;
-  z-index:2147483001 !important;
-}
-.login-input,.login-btn,.eye-btn{
-  pointer-events:auto !important;
-  position:relative !important;
-  z-index:2147483002 !important;
-  -webkit-user-select:text !important;
-  user-select:text !important;
-}
-.login-input{
-  -webkit-appearance:none !important;
-  appearance:none !important;
-  background:#fbfdfb !important;
-  color:#2f4d39 !important;
-}
-</style>
-
 </head>
 <body>
 
@@ -4769,96 +4742,98 @@ function logoutTeacher(){
 </script>
 
 
-<script id="login-interaction-fix-script">
+<script id="advanced-button-direct-open-fix">
 (function(){
-  function fixLoginUI(){
-    var gate = document.getElementById('teacherLoginGate');
-    var page = document.querySelector('.page');
-    var user = document.getElementById('teacherUsernameInput');
-    var pass = document.getElementById('teacherPasswordInput');
-    var form = gate ? gate.querySelector('form') : null;
-    var loginBtn = form ? form.querySelector('.login-btn.primary') : null;
+  const app = window.app;
+  if(!app) return;
 
-    if(gate){
-      gate.style.display = 'flex';
-      gate.style.pointerEvents = 'auto';
-      gate.style.visibility = 'visible';
-      gate.style.opacity = '1';
-    }
-    if(page){
-      page.style.visibility = 'hidden';
-      page.style.pointerEvents = 'none';
-    }
-    [user, pass].forEach(function(el){
-      if(!el) return;
-      el.disabled = false;
-      el.readOnly = false;
-      el.style.pointerEvents = 'auto';
-      el.style.userSelect = 'text';
-      el.removeAttribute('disabled');
-      el.removeAttribute('readonly');
+  function renderAdvancedNow(){
+    var basic = document.getElementById('advtabBasic');
+    var advanced = document.getElementById('advtabAdvanced');
+    var cardsPage = document.getElementById('advtabCardsPage');
+    var detailPage = document.getElementById('advtabDetailPage');
+    var subtabs = document.querySelector('.advtab-subtabs');
+    if(!basic || !advanced || !cardsPage || !detailPage || !subtabs) return;
+
+    basic.classList.add('advtab-hidden');
+    advanced.classList.remove('advtab-hidden');
+    subtabs.querySelectorAll('[data-mode]').forEach(function(btn){
+      btn.classList.toggle('active', btn.getAttribute('data-mode') === 'advanced');
     });
 
-    if(form && !form.dataset.loginFixed){
-      form.dataset.loginFixed = '1';
-      form.addEventListener('submit', function(e){
-        e.preventDefault();
-        if(typeof window.teacherLogin === 'function') window.teacherLogin();
-      });
-    }
-
-    if(loginBtn && !loginBtn.dataset.loginFixed){
-      loginBtn.dataset.loginFixed = '1';
-      loginBtn.onclick = function(e){
-        e.preventDefault();
-        if(typeof window.teacherLogin === 'function') window.teacherLogin();
-      };
-    }
-
-    if(user && !user.dataset.focusedOnce){
-      user.dataset.focusedOnce = '1';
-      setTimeout(function(){ try{ user.focus(); }catch(e){} }, 80);
-    }
+    var classes = app.state && app.state.classes ? app.state.classes : [];
+    detailPage.classList.add('advtab-hidden');
+    cardsPage.classList.remove('advtab-hidden');
+    cardsPage.innerHTML = '<div class="advtab-grid">' + (
+      classes.length ? classes.map(function(cls){
+        var rows = (app.state.students || []).filter(function(s){ return s.classId === cls.id; });
+        var total = rows.reduce(function(sum,s){ return sum + Number(s.balance || 0); }, 0);
+        var near = rows.filter(function(s){ return Number(s.balance || 0) >= 9000; }).length;
+        var pending = rows.filter(function(s){ return Number(s.tasks || 0) === 0; }).length;
+        var active = rows.filter(function(s){ return (s.status || s.statusMode || 'مفعل') === 'مفعل'; }).length;
+        return '<div class="advtab-card">'
+          + '<div class="head"><span class="tag">' + active + ' نشط</span><div><h4>' + cls.name + '</h4><div class="sub">عدد الطلاب / الطالبات في الفصل: ' + rows.length + '</div></div></div>'
+          + '<div class="advtab-stats">'
+          + '<div class="box"><strong>' + Number(total).toLocaleString("ar-SA") + '</strong><span>إجمالي الأرصدة</span></div>'
+          + '<div class="box"><strong>' + rows.length + '</strong><span>عدد الطلاب / الطالبات</span></div>'
+          + '<div class="box"><strong>' + near + '</strong><span>قريبون من الترقية</span></div>'
+          + '<div class="box"><strong>' + pending + '</strong><span>مهام غير مسلمة</span></div>'
+          + '</div>'
+          + '<div class="advtab-actions">'
+          + '<button class="small-btn danger" data-del="' + cls.id + '">حذف الفصل</button>'
+          + '<button class="small-btn gold" data-msg="' + cls.id + '">إرسال رسالة جماعية لولي الأمر</button>'
+          + '<button class="small-btn primary" data-open="' + cls.id + '">دخول الفصل</button>'
+          + '<button class="small-btn class-honor-btn" data-honor="' + cls.id + '">لوحة الشرف</button>'
+          + '</div></div>';
+      }).join('') : '<div class="advtab-card"><div class="head"><div><h4>لا توجد فصول مضافة</h4><div class="sub">أضيفي فصلًا من قسم الفصول والطلاب أولًا.</div></div></div></div>'
+    ) + '</div>';
   }
 
-  function patchTeacherLogin(){
-    if(typeof window.teacherLogin !== 'function') return;
-    var old = window.teacherLogin;
-    window.teacherLogin = function(){
-      var gate = document.getElementById('teacherLoginGate');
-      var page = document.querySelector('.page');
-      var err = document.getElementById('teacherLoginError');
-      var user = document.getElementById('teacherUsernameInput');
-      var pass = document.getElementById('teacherPasswordInput');
-      var u = (user && user.value || '').trim();
-      var p = (pass && pass.value || '').trim();
-      var su = localStorage.getItem('masraf_teacher_username') || 'teacher';
-      var sp = localStorage.getItem('masraf_teacher_password') || '1234';
-      if(u === su && p === sp){
-        if(err) err.style.display = 'none';
-        localStorage.setItem('masraf_teacher_auth','1');
-        if(gate) gate.style.display = 'none';
-        if(page){
-          page.style.visibility = 'visible';
-          page.style.pointerEvents = 'auto';
-        }
-        return;
-      }
-      if(err) err.style.display = 'block';
+  function bindAdvancedTabButton(){
+    var btn = document.querySelector('.advtab-subtabs [data-mode="advanced"]');
+    if(!btn || btn.dataset.directOpenBound === '1') return;
+    btn.dataset.directOpenBound = '1';
+    btn.onclick = function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      renderAdvancedNow();
     };
   }
 
+  function bindBasicTabButton(){
+    var btn = document.querySelector('.advtab-subtabs [data-mode="basic"]');
+    if(!btn || btn.dataset.directOpenBound === '1') return;
+    btn.dataset.directOpenBound = '1';
+    btn.onclick = function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      var basic = document.getElementById('advtabBasic');
+      var advanced = document.getElementById('advtabAdvanced');
+      var subtabs = document.querySelector('.advtab-subtabs');
+      if(basic) basic.classList.remove('advtab-hidden');
+      if(advanced) advanced.classList.add('advtab-hidden');
+      if(subtabs){
+        subtabs.querySelectorAll('[data-mode]').forEach(function(b){
+          b.classList.toggle('active', b.getAttribute('data-mode') === 'basic');
+        });
+      }
+    };
+  }
+
+  function init(){
+    bindAdvancedTabButton();
+    bindBasicTabButton();
+  }
+
   document.addEventListener('DOMContentLoaded', function(){
-    fixLoginUI();
-    setTimeout(patchTeacherLogin, 50);
-    setTimeout(fixLoginUI, 250);
-    setTimeout(fixLoginUI, 900);
+    setTimeout(init, 300);
+    setTimeout(init, 1000);
   });
 
-  window.addEventListener('load', function(){
-    patchTeacherLogin();
-    fixLoginUI();
-  });
+  var obs = new MutationObserver(function(){ init(); });
+  obs.observe(document.body, {subtree:true, childList:true});
+
+  window.renderAdvancedNow = renderAdvancedNow;
 })();
 </script>
 
