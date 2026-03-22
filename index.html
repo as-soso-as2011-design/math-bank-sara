@@ -1982,6 +1982,25 @@ function logoutTeacher(){
       `;
       tab.appendChild(advanced);
 
+      function safeRenderAdvanced(){
+        try{
+          renderAdvanced();
+        }catch(err){
+          console.error('Advanced tab render error:', err);
+          advanced.innerHTML = `
+            <div class="advtab-detail">
+              <div class="empty">
+                تعذر فتح لوحة التحكم المتقدمة حاليًا.<br>
+                تم منع الخطأ حتى لا تتعطل الأزرار الأخرى.
+              </div>
+            </div>
+          `;
+          advanced.classList.remove('advtab-hidden');
+          cardsPage && cardsPage.classList.add('advtab-hidden');
+          if(app && typeof app.toast === 'function') app.toast('تعذر فتح لوحة التحكم المتقدمة');
+        }
+      }
+
       subtabs.querySelectorAll('[data-mode]').forEach(btn=>{
         btn.onclick = function(){
           subtabs.querySelectorAll('.small-btn').forEach(b=>b.classList.remove('active'));
@@ -1989,7 +2008,7 @@ function logoutTeacher(){
           const mode = this.getAttribute('data-mode');
           basic.classList.toggle('advtab-hidden', mode !== 'basic');
           advanced.classList.toggle('advtab-hidden', mode !== 'advanced');
-          if (mode === 'advanced') renderAdvanced();
+          if (mode === 'advanced') safeRenderAdvanced();
         };
       });
 
@@ -2016,7 +2035,9 @@ function logoutTeacher(){
       function renderAdvanced(){
         const cardsPage = document.getElementById('advtabCardsPage');
         const detailPage = document.getElementById('advtabDetailPage');
-        const classes = app.state.classes || [];
+        const classes = Array.isArray(app?.state?.classes) ? app.state.classes.filter(Boolean) : [];
+
+        if(!cardsPage || !detailPage) return;
 
         if (!app.state.advtabSelectedClassId) {
           detailPage.classList.add('advtab-hidden');
@@ -2191,7 +2212,7 @@ function logoutTeacher(){
       if(oldRenderAll){
         app.renderAll = function(){
           oldRenderAll();
-          if(!advanced.classList.contains('advtab-hidden')) renderAdvanced();
+          if(!advanced.classList.contains('advtab-hidden')) safeRenderAdvanced();
         };
       }
     }, 150);
