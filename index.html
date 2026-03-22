@@ -1718,150 +1718,7 @@
             .foot{display:flex;justify-content:space-between;gap:12px;margin-top:40px;font-size:22px;font-weight:700}
           
 .vip-podium-avatar{display:none!important;}
-</style></head><body>${cards}<img src=x onerror="window.print();setTimeout(()=>window.close(),300);">
-<script id="final-stability-patch">
-(function(){
-  function qs(s,r){return (r||document).querySelector(s)}
-  function qsa(s,r){return Array.from((r||document).querySelectorAll(s))}
-  function safeSave(){ try{ window.app && window.app.save && window.app.save(); }catch(e){} }
-  function safeRender(){ try{ window.app && window.app.renderAll && window.app.renderAll(); }catch(e){} }
-  function getApp(){ return window.app || null; }
-
-  function renderAdvancedCards(){
-    var app = getApp();
-    var cardsPage = document.getElementById('advtabCardsPage');
-    var detailPage = document.getElementById('advtabDetailPage');
-    var advanced = document.getElementById('advtabAdvanced');
-    var basic = document.getElementById('advtabBasic');
-    if(!app || !cardsPage || !detailPage || !advanced) return;
-    if(basic) basic.classList.add('advtab-hidden');
-    advanced.classList.remove('advtab-hidden');
-    detailPage.classList.add('advtab-hidden');
-    cardsPage.classList.remove('advtab-hidden');
-    qsa('.advtab-subtabs [data-mode]').forEach(function(btn){
-      btn.classList.toggle('active', btn.getAttribute('data-mode') === 'advanced');
-    });
-    var classes = Array.isArray(app.state && app.state.classes) ? app.state.classes : [];
-    var students = Array.isArray(app.state && app.state.students) ? app.state.students : [];
-    cardsPage.innerHTML = '<div class="advtab-grid">' + (
-      classes.length ? classes.map(function(cls){
-        var rows = students.filter(function(s){ return s.classId === cls.id; });
-        var total = rows.reduce(function(sum,s){ return sum + Number(s.balance || 0); }, 0);
-        var active = rows.filter(function(s){ return (s.status || s.statusMode || 'مفعل') === 'مفعل'; }).length;
-        var near = rows.filter(function(s){ return Number(s.balance || 0) >= 9000; }).length;
-        var pending = rows.filter(function(s){ return Number((s.tasksMeta && s.tasksMeta.pending) ?? Math.max(0, Number(s.tasksMeta && s.tasksMeta.total || 0) - Number(s.tasksMeta && s.tasksMeta.submitted || s.tasks || 0)) || 0) > 0; }).length;
-        return '<div class="advtab-card">'
-          + '<div class="head"><span class="tag">' + active + ' نشط</span><div><h4>' + (cls.name || 'فصل') + '</h4><div class="sub">عدد الطلاب / الطالبات في الفصل: ' + rows.length + '</div></div></div>'
-          + '<div class="advtab-stats">'
-          + '<div class="box"><strong>' + Number(total).toLocaleString('ar-SA') + '</strong><span>إجمالي الأرصدة</span></div>'
-          + '<div class="box"><strong>' + rows.length + '</strong><span>عدد الطلاب / الطالبات</span></div>'
-          + '<div class="box"><strong>' + near + '</strong><span>قريبون من الترقية</span></div>'
-          + '<div class="box"><strong>' + pending + '</strong><span>مهام غير مسلمة</span></div>'
-          + '</div>'
-          + '<div class="advtab-actions">'
-          + '<button class="small-btn danger" data-del="' + cls.id + '">حذف الفصل</button>'
-          + '<button class="small-btn gold" data-msg="' + cls.id + '">إرسال رسالة جماعية لولي الأمر</button>'
-          + '<button class="small-btn primary" data-open="' + cls.id + '">دخول الفصل</button>'
-          + '<button class="small-btn class-honor-btn" data-honor="' + cls.id + '">لوحة الشرف</button>'
-          + '</div></div>';
-      }).join('') : '<div class="advtab-card"><div class="head"><div><h4>لا توجد فصول مضافة</h4><div class="sub">أضيفي فصلًا من قسم الفصول والطلاب أولًا.</div></div></div></div>'
-    ) + '</div>';
-    try{ app.state.advtabMode = 'advanced'; }catch(e){}
-    safeSave();
-  }
-
-  function openAdvancedClass(classId){
-    var app = getApp();
-    if(!app) return;
-    try{ app.state.advtabSelectedClassId = classId; }catch(e){}
-    safeSave();
-    if(typeof window.renderAdvancedDetail === 'function'){
-      window.renderAdvancedDetail(classId);
-      return;
-    }
-    safeRender();
-  }
-
-  function bindButtons(){
-    var form = qs('#teacherLoginGate form.login-form');
-    var loginBtn = qs('#teacherLoginGate .login-btn.primary');
-    if(form && !form.dataset.fixedSubmit){
-      form.dataset.fixedSubmit='1';
-      form.addEventListener('submit', function(e){ e.preventDefault(); if(typeof window.teacherLogin==='function') window.teacherLogin(); });
-    }
-    if(loginBtn && !loginBtn.dataset.fixedClick){
-      loginBtn.dataset.fixedClick='1';
-      loginBtn.addEventListener('click', function(e){ e.preventDefault(); if(typeof window.teacherLogin==='function') window.teacherLogin(); });
-    }
-    qsa('.advtab-subtabs [data-mode="advanced"]').forEach(function(btn){
-      if(btn.dataset.fixedClick) return;
-      btn.dataset.fixedClick='1';
-      btn.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); renderAdvancedCards(); });
-    });
-    qsa('.advtab-subtabs [data-mode="basic"]').forEach(function(btn){
-      if(btn.dataset.fixedClick) return;
-      btn.dataset.fixedClick='1';
-      btn.addEventListener('click', function(e){
-        e.preventDefault(); e.stopPropagation();
-        var basic = document.getElementById('advtabBasic');
-        var advanced = document.getElementById('advtabAdvanced');
-        if(basic) basic.classList.remove('advtab-hidden');
-        if(advanced) advanced.classList.add('advtab-hidden');
-        qsa('.advtab-subtabs [data-mode]').forEach(function(x){ x.classList.toggle('active', x.getAttribute('data-mode') === 'basic'); });
-      });
-    });
-    var back = document.getElementById('advtabBackBtn');
-    if(back && !back.dataset.fixedClick){
-      back.dataset.fixedClick='1';
-      back.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); renderAdvancedCards(); });
-    }
-  }
-
-  document.addEventListener('click', function(e){
-    var btn = e.target.closest('[data-open],[data-del],[data-msg],[data-honor]');
-    if(!btn) return;
-    var app = getApp();
-    if(!app) return;
-    if(btn.hasAttribute('data-open')){
-      e.preventDefault(); e.stopPropagation();
-      openAdvancedClass(btn.getAttribute('data-open'));
-    } else if(btn.hasAttribute('data-del')){
-      e.preventDefault(); e.stopPropagation();
-      if(typeof window.deleteClassById === 'function') window.deleteClassById(btn.getAttribute('data-del'));
-    } else if(btn.hasAttribute('data-msg')){
-      e.preventDefault(); e.stopPropagation();
-      if(typeof window.open === 'function' && typeof window.classNameById === 'function'){
-        var txt = 'رسالة جماعية من مصرف التعليم للفصل ' + window.classNameById(btn.getAttribute('data-msg'));
-        window.open('https://wa.me/?text=' + encodeURIComponent(txt), '_blank');
-      }
-    } else if(btn.hasAttribute('data-honor')){
-      e.preventDefault(); e.stopPropagation();
-      try{ app.state.advtabHonorClassId = btn.getAttribute('data-honor'); safeSave(); safeRender(); }catch(err){}
-    }
-  }, true);
-
-  function hideCodeLeak(){
-    // remove accidental JS text nodes shown at page bottom in broken builds
-    Array.from(document.body.children).forEach(function(el){
-      if(!(el instanceof HTMLElement)) return;
-      if(el.tagName === 'SCRIPT' || el.tagName === 'STYLE') return;
-      var txt = (el.innerText || '').trim();
-      if(!txt) return;
-      var suspicious = txt.includes('window.app.init()') || txt.includes('toast(text)') || txt.includes('w.document.close();') || txt.includes('this.state.vipHonor.lastPdfRunKey');
-      if(suspicious && txt.length < 4000){
-        el.remove();
-      }
-    });
-  }
-
-  function boot(){ bindButtons(); hideCodeLeak(); }
-  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
-  else boot();
-  new MutationObserver(function(){ boot(); }).observe(document.documentElement, {subtree:true, childList:true});
-})();
-</script>
-
-</body></html>
+</style></head><body>${cards}<img src=x onerror="window.print();setTimeout(()=>window.close(),300);"></body></html>
         `);
         w.document.close();
         this.state.vipHonor.lastPdfRunKey = this.state.vipHonor.currentWeekKey || this.vipWeekKey();
@@ -2560,150 +2417,7 @@ function logoutTeacher(){
             <tbody>${rows || '<tr><td colspan="5">لا يوجد طلاب</td></tr>'}</tbody>
           </table>
           <img src=x onerror="window.print()">
-        
-<script id="final-stability-patch">
-(function(){
-  function qs(s,r){return (r||document).querySelector(s)}
-  function qsa(s,r){return Array.from((r||document).querySelectorAll(s))}
-  function safeSave(){ try{ window.app && window.app.save && window.app.save(); }catch(e){} }
-  function safeRender(){ try{ window.app && window.app.renderAll && window.app.renderAll(); }catch(e){} }
-  function getApp(){ return window.app || null; }
-
-  function renderAdvancedCards(){
-    var app = getApp();
-    var cardsPage = document.getElementById('advtabCardsPage');
-    var detailPage = document.getElementById('advtabDetailPage');
-    var advanced = document.getElementById('advtabAdvanced');
-    var basic = document.getElementById('advtabBasic');
-    if(!app || !cardsPage || !detailPage || !advanced) return;
-    if(basic) basic.classList.add('advtab-hidden');
-    advanced.classList.remove('advtab-hidden');
-    detailPage.classList.add('advtab-hidden');
-    cardsPage.classList.remove('advtab-hidden');
-    qsa('.advtab-subtabs [data-mode]').forEach(function(btn){
-      btn.classList.toggle('active', btn.getAttribute('data-mode') === 'advanced');
-    });
-    var classes = Array.isArray(app.state && app.state.classes) ? app.state.classes : [];
-    var students = Array.isArray(app.state && app.state.students) ? app.state.students : [];
-    cardsPage.innerHTML = '<div class="advtab-grid">' + (
-      classes.length ? classes.map(function(cls){
-        var rows = students.filter(function(s){ return s.classId === cls.id; });
-        var total = rows.reduce(function(sum,s){ return sum + Number(s.balance || 0); }, 0);
-        var active = rows.filter(function(s){ return (s.status || s.statusMode || 'مفعل') === 'مفعل'; }).length;
-        var near = rows.filter(function(s){ return Number(s.balance || 0) >= 9000; }).length;
-        var pending = rows.filter(function(s){ return Number((s.tasksMeta && s.tasksMeta.pending) ?? Math.max(0, Number(s.tasksMeta && s.tasksMeta.total || 0) - Number(s.tasksMeta && s.tasksMeta.submitted || s.tasks || 0)) || 0) > 0; }).length;
-        return '<div class="advtab-card">'
-          + '<div class="head"><span class="tag">' + active + ' نشط</span><div><h4>' + (cls.name || 'فصل') + '</h4><div class="sub">عدد الطلاب / الطالبات في الفصل: ' + rows.length + '</div></div></div>'
-          + '<div class="advtab-stats">'
-          + '<div class="box"><strong>' + Number(total).toLocaleString('ar-SA') + '</strong><span>إجمالي الأرصدة</span></div>'
-          + '<div class="box"><strong>' + rows.length + '</strong><span>عدد الطلاب / الطالبات</span></div>'
-          + '<div class="box"><strong>' + near + '</strong><span>قريبون من الترقية</span></div>'
-          + '<div class="box"><strong>' + pending + '</strong><span>مهام غير مسلمة</span></div>'
-          + '</div>'
-          + '<div class="advtab-actions">'
-          + '<button class="small-btn danger" data-del="' + cls.id + '">حذف الفصل</button>'
-          + '<button class="small-btn gold" data-msg="' + cls.id + '">إرسال رسالة جماعية لولي الأمر</button>'
-          + '<button class="small-btn primary" data-open="' + cls.id + '">دخول الفصل</button>'
-          + '<button class="small-btn class-honor-btn" data-honor="' + cls.id + '">لوحة الشرف</button>'
-          + '</div></div>';
-      }).join('') : '<div class="advtab-card"><div class="head"><div><h4>لا توجد فصول مضافة</h4><div class="sub">أضيفي فصلًا من قسم الفصول والطلاب أولًا.</div></div></div></div>'
-    ) + '</div>';
-    try{ app.state.advtabMode = 'advanced'; }catch(e){}
-    safeSave();
-  }
-
-  function openAdvancedClass(classId){
-    var app = getApp();
-    if(!app) return;
-    try{ app.state.advtabSelectedClassId = classId; }catch(e){}
-    safeSave();
-    if(typeof window.renderAdvancedDetail === 'function'){
-      window.renderAdvancedDetail(classId);
-      return;
-    }
-    safeRender();
-  }
-
-  function bindButtons(){
-    var form = qs('#teacherLoginGate form.login-form');
-    var loginBtn = qs('#teacherLoginGate .login-btn.primary');
-    if(form && !form.dataset.fixedSubmit){
-      form.dataset.fixedSubmit='1';
-      form.addEventListener('submit', function(e){ e.preventDefault(); if(typeof window.teacherLogin==='function') window.teacherLogin(); });
-    }
-    if(loginBtn && !loginBtn.dataset.fixedClick){
-      loginBtn.dataset.fixedClick='1';
-      loginBtn.addEventListener('click', function(e){ e.preventDefault(); if(typeof window.teacherLogin==='function') window.teacherLogin(); });
-    }
-    qsa('.advtab-subtabs [data-mode="advanced"]').forEach(function(btn){
-      if(btn.dataset.fixedClick) return;
-      btn.dataset.fixedClick='1';
-      btn.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); renderAdvancedCards(); });
-    });
-    qsa('.advtab-subtabs [data-mode="basic"]').forEach(function(btn){
-      if(btn.dataset.fixedClick) return;
-      btn.dataset.fixedClick='1';
-      btn.addEventListener('click', function(e){
-        e.preventDefault(); e.stopPropagation();
-        var basic = document.getElementById('advtabBasic');
-        var advanced = document.getElementById('advtabAdvanced');
-        if(basic) basic.classList.remove('advtab-hidden');
-        if(advanced) advanced.classList.add('advtab-hidden');
-        qsa('.advtab-subtabs [data-mode]').forEach(function(x){ x.classList.toggle('active', x.getAttribute('data-mode') === 'basic'); });
-      });
-    });
-    var back = document.getElementById('advtabBackBtn');
-    if(back && !back.dataset.fixedClick){
-      back.dataset.fixedClick='1';
-      back.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); renderAdvancedCards(); });
-    }
-  }
-
-  document.addEventListener('click', function(e){
-    var btn = e.target.closest('[data-open],[data-del],[data-msg],[data-honor]');
-    if(!btn) return;
-    var app = getApp();
-    if(!app) return;
-    if(btn.hasAttribute('data-open')){
-      e.preventDefault(); e.stopPropagation();
-      openAdvancedClass(btn.getAttribute('data-open'));
-    } else if(btn.hasAttribute('data-del')){
-      e.preventDefault(); e.stopPropagation();
-      if(typeof window.deleteClassById === 'function') window.deleteClassById(btn.getAttribute('data-del'));
-    } else if(btn.hasAttribute('data-msg')){
-      e.preventDefault(); e.stopPropagation();
-      if(typeof window.open === 'function' && typeof window.classNameById === 'function'){
-        var txt = 'رسالة جماعية من مصرف التعليم للفصل ' + window.classNameById(btn.getAttribute('data-msg'));
-        window.open('https://wa.me/?text=' + encodeURIComponent(txt), '_blank');
-      }
-    } else if(btn.hasAttribute('data-honor')){
-      e.preventDefault(); e.stopPropagation();
-      try{ app.state.advtabHonorClassId = btn.getAttribute('data-honor'); safeSave(); safeRender(); }catch(err){}
-    }
-  }, true);
-
-  function hideCodeLeak(){
-    // remove accidental JS text nodes shown at page bottom in broken builds
-    Array.from(document.body.children).forEach(function(el){
-      if(!(el instanceof HTMLElement)) return;
-      if(el.tagName === 'SCRIPT' || el.tagName === 'STYLE') return;
-      var txt = (el.innerText || '').trim();
-      if(!txt) return;
-      var suspicious = txt.includes('window.app.init()') || txt.includes('toast(text)') || txt.includes('w.document.close();') || txt.includes('this.state.vipHonor.lastPdfRunKey');
-      if(suspicious && txt.length < 4000){
-        el.remove();
-      }
-    });
-  }
-
-  function boot(){ bindButtons(); hideCodeLeak(); }
-  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
-  else boot();
-  new MutationObserver(function(){ boot(); }).observe(document.documentElement, {subtree:true, childList:true});
-})();
-</script>
-
-</body>
+        </body>
         </html>
       `);
       w.document.close();
@@ -2929,150 +2643,7 @@ function logoutTeacher(){
             <tbody>${txRows || '<tr><td colspan="3">لا توجد عمليات</td></tr>'}</tbody>
           </table>
           <img src=x onerror="window.print()">
-        
-<script id="final-stability-patch">
-(function(){
-  function qs(s,r){return (r||document).querySelector(s)}
-  function qsa(s,r){return Array.from((r||document).querySelectorAll(s))}
-  function safeSave(){ try{ window.app && window.app.save && window.app.save(); }catch(e){} }
-  function safeRender(){ try{ window.app && window.app.renderAll && window.app.renderAll(); }catch(e){} }
-  function getApp(){ return window.app || null; }
-
-  function renderAdvancedCards(){
-    var app = getApp();
-    var cardsPage = document.getElementById('advtabCardsPage');
-    var detailPage = document.getElementById('advtabDetailPage');
-    var advanced = document.getElementById('advtabAdvanced');
-    var basic = document.getElementById('advtabBasic');
-    if(!app || !cardsPage || !detailPage || !advanced) return;
-    if(basic) basic.classList.add('advtab-hidden');
-    advanced.classList.remove('advtab-hidden');
-    detailPage.classList.add('advtab-hidden');
-    cardsPage.classList.remove('advtab-hidden');
-    qsa('.advtab-subtabs [data-mode]').forEach(function(btn){
-      btn.classList.toggle('active', btn.getAttribute('data-mode') === 'advanced');
-    });
-    var classes = Array.isArray(app.state && app.state.classes) ? app.state.classes : [];
-    var students = Array.isArray(app.state && app.state.students) ? app.state.students : [];
-    cardsPage.innerHTML = '<div class="advtab-grid">' + (
-      classes.length ? classes.map(function(cls){
-        var rows = students.filter(function(s){ return s.classId === cls.id; });
-        var total = rows.reduce(function(sum,s){ return sum + Number(s.balance || 0); }, 0);
-        var active = rows.filter(function(s){ return (s.status || s.statusMode || 'مفعل') === 'مفعل'; }).length;
-        var near = rows.filter(function(s){ return Number(s.balance || 0) >= 9000; }).length;
-        var pending = rows.filter(function(s){ return Number((s.tasksMeta && s.tasksMeta.pending) ?? Math.max(0, Number(s.tasksMeta && s.tasksMeta.total || 0) - Number(s.tasksMeta && s.tasksMeta.submitted || s.tasks || 0)) || 0) > 0; }).length;
-        return '<div class="advtab-card">'
-          + '<div class="head"><span class="tag">' + active + ' نشط</span><div><h4>' + (cls.name || 'فصل') + '</h4><div class="sub">عدد الطلاب / الطالبات في الفصل: ' + rows.length + '</div></div></div>'
-          + '<div class="advtab-stats">'
-          + '<div class="box"><strong>' + Number(total).toLocaleString('ar-SA') + '</strong><span>إجمالي الأرصدة</span></div>'
-          + '<div class="box"><strong>' + rows.length + '</strong><span>عدد الطلاب / الطالبات</span></div>'
-          + '<div class="box"><strong>' + near + '</strong><span>قريبون من الترقية</span></div>'
-          + '<div class="box"><strong>' + pending + '</strong><span>مهام غير مسلمة</span></div>'
-          + '</div>'
-          + '<div class="advtab-actions">'
-          + '<button class="small-btn danger" data-del="' + cls.id + '">حذف الفصل</button>'
-          + '<button class="small-btn gold" data-msg="' + cls.id + '">إرسال رسالة جماعية لولي الأمر</button>'
-          + '<button class="small-btn primary" data-open="' + cls.id + '">دخول الفصل</button>'
-          + '<button class="small-btn class-honor-btn" data-honor="' + cls.id + '">لوحة الشرف</button>'
-          + '</div></div>';
-      }).join('') : '<div class="advtab-card"><div class="head"><div><h4>لا توجد فصول مضافة</h4><div class="sub">أضيفي فصلًا من قسم الفصول والطلاب أولًا.</div></div></div></div>'
-    ) + '</div>';
-    try{ app.state.advtabMode = 'advanced'; }catch(e){}
-    safeSave();
-  }
-
-  function openAdvancedClass(classId){
-    var app = getApp();
-    if(!app) return;
-    try{ app.state.advtabSelectedClassId = classId; }catch(e){}
-    safeSave();
-    if(typeof window.renderAdvancedDetail === 'function'){
-      window.renderAdvancedDetail(classId);
-      return;
-    }
-    safeRender();
-  }
-
-  function bindButtons(){
-    var form = qs('#teacherLoginGate form.login-form');
-    var loginBtn = qs('#teacherLoginGate .login-btn.primary');
-    if(form && !form.dataset.fixedSubmit){
-      form.dataset.fixedSubmit='1';
-      form.addEventListener('submit', function(e){ e.preventDefault(); if(typeof window.teacherLogin==='function') window.teacherLogin(); });
-    }
-    if(loginBtn && !loginBtn.dataset.fixedClick){
-      loginBtn.dataset.fixedClick='1';
-      loginBtn.addEventListener('click', function(e){ e.preventDefault(); if(typeof window.teacherLogin==='function') window.teacherLogin(); });
-    }
-    qsa('.advtab-subtabs [data-mode="advanced"]').forEach(function(btn){
-      if(btn.dataset.fixedClick) return;
-      btn.dataset.fixedClick='1';
-      btn.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); renderAdvancedCards(); });
-    });
-    qsa('.advtab-subtabs [data-mode="basic"]').forEach(function(btn){
-      if(btn.dataset.fixedClick) return;
-      btn.dataset.fixedClick='1';
-      btn.addEventListener('click', function(e){
-        e.preventDefault(); e.stopPropagation();
-        var basic = document.getElementById('advtabBasic');
-        var advanced = document.getElementById('advtabAdvanced');
-        if(basic) basic.classList.remove('advtab-hidden');
-        if(advanced) advanced.classList.add('advtab-hidden');
-        qsa('.advtab-subtabs [data-mode]').forEach(function(x){ x.classList.toggle('active', x.getAttribute('data-mode') === 'basic'); });
-      });
-    });
-    var back = document.getElementById('advtabBackBtn');
-    if(back && !back.dataset.fixedClick){
-      back.dataset.fixedClick='1';
-      back.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); renderAdvancedCards(); });
-    }
-  }
-
-  document.addEventListener('click', function(e){
-    var btn = e.target.closest('[data-open],[data-del],[data-msg],[data-honor]');
-    if(!btn) return;
-    var app = getApp();
-    if(!app) return;
-    if(btn.hasAttribute('data-open')){
-      e.preventDefault(); e.stopPropagation();
-      openAdvancedClass(btn.getAttribute('data-open'));
-    } else if(btn.hasAttribute('data-del')){
-      e.preventDefault(); e.stopPropagation();
-      if(typeof window.deleteClassById === 'function') window.deleteClassById(btn.getAttribute('data-del'));
-    } else if(btn.hasAttribute('data-msg')){
-      e.preventDefault(); e.stopPropagation();
-      if(typeof window.open === 'function' && typeof window.classNameById === 'function'){
-        var txt = 'رسالة جماعية من مصرف التعليم للفصل ' + window.classNameById(btn.getAttribute('data-msg'));
-        window.open('https://wa.me/?text=' + encodeURIComponent(txt), '_blank');
-      }
-    } else if(btn.hasAttribute('data-honor')){
-      e.preventDefault(); e.stopPropagation();
-      try{ app.state.advtabHonorClassId = btn.getAttribute('data-honor'); safeSave(); safeRender(); }catch(err){}
-    }
-  }, true);
-
-  function hideCodeLeak(){
-    // remove accidental JS text nodes shown at page bottom in broken builds
-    Array.from(document.body.children).forEach(function(el){
-      if(!(el instanceof HTMLElement)) return;
-      if(el.tagName === 'SCRIPT' || el.tagName === 'STYLE') return;
-      var txt = (el.innerText || '').trim();
-      if(!txt) return;
-      var suspicious = txt.includes('window.app.init()') || txt.includes('toast(text)') || txt.includes('w.document.close();') || txt.includes('this.state.vipHonor.lastPdfRunKey');
-      if(suspicious && txt.length < 4000){
-        el.remove();
-      }
-    });
-  }
-
-  function boot(){ bindButtons(); hideCodeLeak(); }
-  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
-  else boot();
-  new MutationObserver(function(){ boot(); }).observe(document.documentElement, {subtree:true, childList:true});
-})();
-</script>
-
-</body>
+        </body>
         </html>
       `);
       w.document.close();
@@ -3564,150 +3135,7 @@ function logoutTeacher(){
       <table><thead><tr><th>اسم الطالب</th><th>المستوى</th><th>رقم ولي الأمر</th><th>الرقم السري</th><th>اسم المستخدم</th><th>الصف</th><th>اسم المعلمة</th></tr></thead><tbody>${tableRows}</tbody></table>
       ${signArea()}
       <script>window.onload=function(){window.print();setTimeout(function(){window.close()},300)}<\/script>
-      
-<script id="final-stability-patch">
-(function(){
-  function qs(s,r){return (r||document).querySelector(s)}
-  function qsa(s,r){return Array.from((r||document).querySelectorAll(s))}
-  function safeSave(){ try{ window.app && window.app.save && window.app.save(); }catch(e){} }
-  function safeRender(){ try{ window.app && window.app.renderAll && window.app.renderAll(); }catch(e){} }
-  function getApp(){ return window.app || null; }
-
-  function renderAdvancedCards(){
-    var app = getApp();
-    var cardsPage = document.getElementById('advtabCardsPage');
-    var detailPage = document.getElementById('advtabDetailPage');
-    var advanced = document.getElementById('advtabAdvanced');
-    var basic = document.getElementById('advtabBasic');
-    if(!app || !cardsPage || !detailPage || !advanced) return;
-    if(basic) basic.classList.add('advtab-hidden');
-    advanced.classList.remove('advtab-hidden');
-    detailPage.classList.add('advtab-hidden');
-    cardsPage.classList.remove('advtab-hidden');
-    qsa('.advtab-subtabs [data-mode]').forEach(function(btn){
-      btn.classList.toggle('active', btn.getAttribute('data-mode') === 'advanced');
-    });
-    var classes = Array.isArray(app.state && app.state.classes) ? app.state.classes : [];
-    var students = Array.isArray(app.state && app.state.students) ? app.state.students : [];
-    cardsPage.innerHTML = '<div class="advtab-grid">' + (
-      classes.length ? classes.map(function(cls){
-        var rows = students.filter(function(s){ return s.classId === cls.id; });
-        var total = rows.reduce(function(sum,s){ return sum + Number(s.balance || 0); }, 0);
-        var active = rows.filter(function(s){ return (s.status || s.statusMode || 'مفعل') === 'مفعل'; }).length;
-        var near = rows.filter(function(s){ return Number(s.balance || 0) >= 9000; }).length;
-        var pending = rows.filter(function(s){ return Number((s.tasksMeta && s.tasksMeta.pending) ?? Math.max(0, Number(s.tasksMeta && s.tasksMeta.total || 0) - Number(s.tasksMeta && s.tasksMeta.submitted || s.tasks || 0)) || 0) > 0; }).length;
-        return '<div class="advtab-card">'
-          + '<div class="head"><span class="tag">' + active + ' نشط</span><div><h4>' + (cls.name || 'فصل') + '</h4><div class="sub">عدد الطلاب / الطالبات في الفصل: ' + rows.length + '</div></div></div>'
-          + '<div class="advtab-stats">'
-          + '<div class="box"><strong>' + Number(total).toLocaleString('ar-SA') + '</strong><span>إجمالي الأرصدة</span></div>'
-          + '<div class="box"><strong>' + rows.length + '</strong><span>عدد الطلاب / الطالبات</span></div>'
-          + '<div class="box"><strong>' + near + '</strong><span>قريبون من الترقية</span></div>'
-          + '<div class="box"><strong>' + pending + '</strong><span>مهام غير مسلمة</span></div>'
-          + '</div>'
-          + '<div class="advtab-actions">'
-          + '<button class="small-btn danger" data-del="' + cls.id + '">حذف الفصل</button>'
-          + '<button class="small-btn gold" data-msg="' + cls.id + '">إرسال رسالة جماعية لولي الأمر</button>'
-          + '<button class="small-btn primary" data-open="' + cls.id + '">دخول الفصل</button>'
-          + '<button class="small-btn class-honor-btn" data-honor="' + cls.id + '">لوحة الشرف</button>'
-          + '</div></div>';
-      }).join('') : '<div class="advtab-card"><div class="head"><div><h4>لا توجد فصول مضافة</h4><div class="sub">أضيفي فصلًا من قسم الفصول والطلاب أولًا.</div></div></div></div>'
-    ) + '</div>';
-    try{ app.state.advtabMode = 'advanced'; }catch(e){}
-    safeSave();
-  }
-
-  function openAdvancedClass(classId){
-    var app = getApp();
-    if(!app) return;
-    try{ app.state.advtabSelectedClassId = classId; }catch(e){}
-    safeSave();
-    if(typeof window.renderAdvancedDetail === 'function'){
-      window.renderAdvancedDetail(classId);
-      return;
-    }
-    safeRender();
-  }
-
-  function bindButtons(){
-    var form = qs('#teacherLoginGate form.login-form');
-    var loginBtn = qs('#teacherLoginGate .login-btn.primary');
-    if(form && !form.dataset.fixedSubmit){
-      form.dataset.fixedSubmit='1';
-      form.addEventListener('submit', function(e){ e.preventDefault(); if(typeof window.teacherLogin==='function') window.teacherLogin(); });
-    }
-    if(loginBtn && !loginBtn.dataset.fixedClick){
-      loginBtn.dataset.fixedClick='1';
-      loginBtn.addEventListener('click', function(e){ e.preventDefault(); if(typeof window.teacherLogin==='function') window.teacherLogin(); });
-    }
-    qsa('.advtab-subtabs [data-mode="advanced"]').forEach(function(btn){
-      if(btn.dataset.fixedClick) return;
-      btn.dataset.fixedClick='1';
-      btn.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); renderAdvancedCards(); });
-    });
-    qsa('.advtab-subtabs [data-mode="basic"]').forEach(function(btn){
-      if(btn.dataset.fixedClick) return;
-      btn.dataset.fixedClick='1';
-      btn.addEventListener('click', function(e){
-        e.preventDefault(); e.stopPropagation();
-        var basic = document.getElementById('advtabBasic');
-        var advanced = document.getElementById('advtabAdvanced');
-        if(basic) basic.classList.remove('advtab-hidden');
-        if(advanced) advanced.classList.add('advtab-hidden');
-        qsa('.advtab-subtabs [data-mode]').forEach(function(x){ x.classList.toggle('active', x.getAttribute('data-mode') === 'basic'); });
-      });
-    });
-    var back = document.getElementById('advtabBackBtn');
-    if(back && !back.dataset.fixedClick){
-      back.dataset.fixedClick='1';
-      back.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); renderAdvancedCards(); });
-    }
-  }
-
-  document.addEventListener('click', function(e){
-    var btn = e.target.closest('[data-open],[data-del],[data-msg],[data-honor]');
-    if(!btn) return;
-    var app = getApp();
-    if(!app) return;
-    if(btn.hasAttribute('data-open')){
-      e.preventDefault(); e.stopPropagation();
-      openAdvancedClass(btn.getAttribute('data-open'));
-    } else if(btn.hasAttribute('data-del')){
-      e.preventDefault(); e.stopPropagation();
-      if(typeof window.deleteClassById === 'function') window.deleteClassById(btn.getAttribute('data-del'));
-    } else if(btn.hasAttribute('data-msg')){
-      e.preventDefault(); e.stopPropagation();
-      if(typeof window.open === 'function' && typeof window.classNameById === 'function'){
-        var txt = 'رسالة جماعية من مصرف التعليم للفصل ' + window.classNameById(btn.getAttribute('data-msg'));
-        window.open('https://wa.me/?text=' + encodeURIComponent(txt), '_blank');
-      }
-    } else if(btn.hasAttribute('data-honor')){
-      e.preventDefault(); e.stopPropagation();
-      try{ app.state.advtabHonorClassId = btn.getAttribute('data-honor'); safeSave(); safeRender(); }catch(err){}
-    }
-  }, true);
-
-  function hideCodeLeak(){
-    // remove accidental JS text nodes shown at page bottom in broken builds
-    Array.from(document.body.children).forEach(function(el){
-      if(!(el instanceof HTMLElement)) return;
-      if(el.tagName === 'SCRIPT' || el.tagName === 'STYLE') return;
-      var txt = (el.innerText || '').trim();
-      if(!txt) return;
-      var suspicious = txt.includes('window.app.init()') || txt.includes('toast(text)') || txt.includes('w.document.close();') || txt.includes('this.state.vipHonor.lastPdfRunKey');
-      if(suspicious && txt.length < 4000){
-        el.remove();
-      }
-    });
-  }
-
-  function boot(){ bindButtons(); hideCodeLeak(); }
-  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
-  else boot();
-  new MutationObserver(function(){ boot(); }).observe(document.documentElement, {subtree:true, childList:true});
-})();
-</script>
-
-</body></html>`);
+      </body></html>`);
     w.document.close();
     app.toast('تم تجهيز طباعة قائمة الطلاب PDF');
   }
@@ -3745,150 +3173,7 @@ function logoutTeacher(){
         .pdf-sign-area{display:flex;justify-content:space-between;align-items:flex-end;gap:18px;margin-top:26px}
         .pdf-sign-area img{height:70px;object-fit:contain}
         @media print{@page{size:A4;margin:18mm}}
-      </style></head><body>${cards}<script>window.onload=function(){window.print()}<\/script>
-<script id="final-stability-patch">
-(function(){
-  function qs(s,r){return (r||document).querySelector(s)}
-  function qsa(s,r){return Array.from((r||document).querySelectorAll(s))}
-  function safeSave(){ try{ window.app && window.app.save && window.app.save(); }catch(e){} }
-  function safeRender(){ try{ window.app && window.app.renderAll && window.app.renderAll(); }catch(e){} }
-  function getApp(){ return window.app || null; }
-
-  function renderAdvancedCards(){
-    var app = getApp();
-    var cardsPage = document.getElementById('advtabCardsPage');
-    var detailPage = document.getElementById('advtabDetailPage');
-    var advanced = document.getElementById('advtabAdvanced');
-    var basic = document.getElementById('advtabBasic');
-    if(!app || !cardsPage || !detailPage || !advanced) return;
-    if(basic) basic.classList.add('advtab-hidden');
-    advanced.classList.remove('advtab-hidden');
-    detailPage.classList.add('advtab-hidden');
-    cardsPage.classList.remove('advtab-hidden');
-    qsa('.advtab-subtabs [data-mode]').forEach(function(btn){
-      btn.classList.toggle('active', btn.getAttribute('data-mode') === 'advanced');
-    });
-    var classes = Array.isArray(app.state && app.state.classes) ? app.state.classes : [];
-    var students = Array.isArray(app.state && app.state.students) ? app.state.students : [];
-    cardsPage.innerHTML = '<div class="advtab-grid">' + (
-      classes.length ? classes.map(function(cls){
-        var rows = students.filter(function(s){ return s.classId === cls.id; });
-        var total = rows.reduce(function(sum,s){ return sum + Number(s.balance || 0); }, 0);
-        var active = rows.filter(function(s){ return (s.status || s.statusMode || 'مفعل') === 'مفعل'; }).length;
-        var near = rows.filter(function(s){ return Number(s.balance || 0) >= 9000; }).length;
-        var pending = rows.filter(function(s){ return Number((s.tasksMeta && s.tasksMeta.pending) ?? Math.max(0, Number(s.tasksMeta && s.tasksMeta.total || 0) - Number(s.tasksMeta && s.tasksMeta.submitted || s.tasks || 0)) || 0) > 0; }).length;
-        return '<div class="advtab-card">'
-          + '<div class="head"><span class="tag">' + active + ' نشط</span><div><h4>' + (cls.name || 'فصل') + '</h4><div class="sub">عدد الطلاب / الطالبات في الفصل: ' + rows.length + '</div></div></div>'
-          + '<div class="advtab-stats">'
-          + '<div class="box"><strong>' + Number(total).toLocaleString('ar-SA') + '</strong><span>إجمالي الأرصدة</span></div>'
-          + '<div class="box"><strong>' + rows.length + '</strong><span>عدد الطلاب / الطالبات</span></div>'
-          + '<div class="box"><strong>' + near + '</strong><span>قريبون من الترقية</span></div>'
-          + '<div class="box"><strong>' + pending + '</strong><span>مهام غير مسلمة</span></div>'
-          + '</div>'
-          + '<div class="advtab-actions">'
-          + '<button class="small-btn danger" data-del="' + cls.id + '">حذف الفصل</button>'
-          + '<button class="small-btn gold" data-msg="' + cls.id + '">إرسال رسالة جماعية لولي الأمر</button>'
-          + '<button class="small-btn primary" data-open="' + cls.id + '">دخول الفصل</button>'
-          + '<button class="small-btn class-honor-btn" data-honor="' + cls.id + '">لوحة الشرف</button>'
-          + '</div></div>';
-      }).join('') : '<div class="advtab-card"><div class="head"><div><h4>لا توجد فصول مضافة</h4><div class="sub">أضيفي فصلًا من قسم الفصول والطلاب أولًا.</div></div></div></div>'
-    ) + '</div>';
-    try{ app.state.advtabMode = 'advanced'; }catch(e){}
-    safeSave();
-  }
-
-  function openAdvancedClass(classId){
-    var app = getApp();
-    if(!app) return;
-    try{ app.state.advtabSelectedClassId = classId; }catch(e){}
-    safeSave();
-    if(typeof window.renderAdvancedDetail === 'function'){
-      window.renderAdvancedDetail(classId);
-      return;
-    }
-    safeRender();
-  }
-
-  function bindButtons(){
-    var form = qs('#teacherLoginGate form.login-form');
-    var loginBtn = qs('#teacherLoginGate .login-btn.primary');
-    if(form && !form.dataset.fixedSubmit){
-      form.dataset.fixedSubmit='1';
-      form.addEventListener('submit', function(e){ e.preventDefault(); if(typeof window.teacherLogin==='function') window.teacherLogin(); });
-    }
-    if(loginBtn && !loginBtn.dataset.fixedClick){
-      loginBtn.dataset.fixedClick='1';
-      loginBtn.addEventListener('click', function(e){ e.preventDefault(); if(typeof window.teacherLogin==='function') window.teacherLogin(); });
-    }
-    qsa('.advtab-subtabs [data-mode="advanced"]').forEach(function(btn){
-      if(btn.dataset.fixedClick) return;
-      btn.dataset.fixedClick='1';
-      btn.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); renderAdvancedCards(); });
-    });
-    qsa('.advtab-subtabs [data-mode="basic"]').forEach(function(btn){
-      if(btn.dataset.fixedClick) return;
-      btn.dataset.fixedClick='1';
-      btn.addEventListener('click', function(e){
-        e.preventDefault(); e.stopPropagation();
-        var basic = document.getElementById('advtabBasic');
-        var advanced = document.getElementById('advtabAdvanced');
-        if(basic) basic.classList.remove('advtab-hidden');
-        if(advanced) advanced.classList.add('advtab-hidden');
-        qsa('.advtab-subtabs [data-mode]').forEach(function(x){ x.classList.toggle('active', x.getAttribute('data-mode') === 'basic'); });
-      });
-    });
-    var back = document.getElementById('advtabBackBtn');
-    if(back && !back.dataset.fixedClick){
-      back.dataset.fixedClick='1';
-      back.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); renderAdvancedCards(); });
-    }
-  }
-
-  document.addEventListener('click', function(e){
-    var btn = e.target.closest('[data-open],[data-del],[data-msg],[data-honor]');
-    if(!btn) return;
-    var app = getApp();
-    if(!app) return;
-    if(btn.hasAttribute('data-open')){
-      e.preventDefault(); e.stopPropagation();
-      openAdvancedClass(btn.getAttribute('data-open'));
-    } else if(btn.hasAttribute('data-del')){
-      e.preventDefault(); e.stopPropagation();
-      if(typeof window.deleteClassById === 'function') window.deleteClassById(btn.getAttribute('data-del'));
-    } else if(btn.hasAttribute('data-msg')){
-      e.preventDefault(); e.stopPropagation();
-      if(typeof window.open === 'function' && typeof window.classNameById === 'function'){
-        var txt = 'رسالة جماعية من مصرف التعليم للفصل ' + window.classNameById(btn.getAttribute('data-msg'));
-        window.open('https://wa.me/?text=' + encodeURIComponent(txt), '_blank');
-      }
-    } else if(btn.hasAttribute('data-honor')){
-      e.preventDefault(); e.stopPropagation();
-      try{ app.state.advtabHonorClassId = btn.getAttribute('data-honor'); safeSave(); safeRender(); }catch(err){}
-    }
-  }, true);
-
-  function hideCodeLeak(){
-    // remove accidental JS text nodes shown at page bottom in broken builds
-    Array.from(document.body.children).forEach(function(el){
-      if(!(el instanceof HTMLElement)) return;
-      if(el.tagName === 'SCRIPT' || el.tagName === 'STYLE') return;
-      var txt = (el.innerText || '').trim();
-      if(!txt) return;
-      var suspicious = txt.includes('window.app.init()') || txt.includes('toast(text)') || txt.includes('w.document.close();') || txt.includes('this.state.vipHonor.lastPdfRunKey');
-      if(suspicious && txt.length < 4000){
-        el.remove();
-      }
-    });
-  }
-
-  function boot(){ bindButtons(); hideCodeLeak(); }
-  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
-  else boot();
-  new MutationObserver(function(){ boot(); }).observe(document.documentElement, {subtree:true, childList:true});
-})();
-</script>
-
-</body></html>`);
+      </style></head><body>${cards}<script>window.onload=function(){window.print()}<\/script></body></html>`);
       w.document.close();
       this.toast('تم توليد شهادات PDF للمراكز الأولى');
     };
@@ -4233,150 +3518,7 @@ function logoutTeacher(){
           + '<div style="display:flex;justify-content:space-between;align-items:flex-end;gap:18px;margin-top:26px"><div style="color:#5f6d64">اعتماد المعلمة: ' + (p.teacherName || '—') + '</div><div>' + signHtml + '</div></div>'
           + '</div>';
       }).join('');
-      w.document.write('<html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>شهادات لوحة شرف الفصل</title><style>body{font-family:Tahoma,Arial,sans-serif;color:#21402f}@media print{@page{size:A4;margin:18mm}}</style></head><body>' + cards + '<script>window.onload=function(){window.print()}<\/script>
-<script id="final-stability-patch">
-(function(){
-  function qs(s,r){return (r||document).querySelector(s)}
-  function qsa(s,r){return Array.from((r||document).querySelectorAll(s))}
-  function safeSave(){ try{ window.app && window.app.save && window.app.save(); }catch(e){} }
-  function safeRender(){ try{ window.app && window.app.renderAll && window.app.renderAll(); }catch(e){} }
-  function getApp(){ return window.app || null; }
-
-  function renderAdvancedCards(){
-    var app = getApp();
-    var cardsPage = document.getElementById('advtabCardsPage');
-    var detailPage = document.getElementById('advtabDetailPage');
-    var advanced = document.getElementById('advtabAdvanced');
-    var basic = document.getElementById('advtabBasic');
-    if(!app || !cardsPage || !detailPage || !advanced) return;
-    if(basic) basic.classList.add('advtab-hidden');
-    advanced.classList.remove('advtab-hidden');
-    detailPage.classList.add('advtab-hidden');
-    cardsPage.classList.remove('advtab-hidden');
-    qsa('.advtab-subtabs [data-mode]').forEach(function(btn){
-      btn.classList.toggle('active', btn.getAttribute('data-mode') === 'advanced');
-    });
-    var classes = Array.isArray(app.state && app.state.classes) ? app.state.classes : [];
-    var students = Array.isArray(app.state && app.state.students) ? app.state.students : [];
-    cardsPage.innerHTML = '<div class="advtab-grid">' + (
-      classes.length ? classes.map(function(cls){
-        var rows = students.filter(function(s){ return s.classId === cls.id; });
-        var total = rows.reduce(function(sum,s){ return sum + Number(s.balance || 0); }, 0);
-        var active = rows.filter(function(s){ return (s.status || s.statusMode || 'مفعل') === 'مفعل'; }).length;
-        var near = rows.filter(function(s){ return Number(s.balance || 0) >= 9000; }).length;
-        var pending = rows.filter(function(s){ return Number((s.tasksMeta && s.tasksMeta.pending) ?? Math.max(0, Number(s.tasksMeta && s.tasksMeta.total || 0) - Number(s.tasksMeta && s.tasksMeta.submitted || s.tasks || 0)) || 0) > 0; }).length;
-        return '<div class="advtab-card">'
-          + '<div class="head"><span class="tag">' + active + ' نشط</span><div><h4>' + (cls.name || 'فصل') + '</h4><div class="sub">عدد الطلاب / الطالبات في الفصل: ' + rows.length + '</div></div></div>'
-          + '<div class="advtab-stats">'
-          + '<div class="box"><strong>' + Number(total).toLocaleString('ar-SA') + '</strong><span>إجمالي الأرصدة</span></div>'
-          + '<div class="box"><strong>' + rows.length + '</strong><span>عدد الطلاب / الطالبات</span></div>'
-          + '<div class="box"><strong>' + near + '</strong><span>قريبون من الترقية</span></div>'
-          + '<div class="box"><strong>' + pending + '</strong><span>مهام غير مسلمة</span></div>'
-          + '</div>'
-          + '<div class="advtab-actions">'
-          + '<button class="small-btn danger" data-del="' + cls.id + '">حذف الفصل</button>'
-          + '<button class="small-btn gold" data-msg="' + cls.id + '">إرسال رسالة جماعية لولي الأمر</button>'
-          + '<button class="small-btn primary" data-open="' + cls.id + '">دخول الفصل</button>'
-          + '<button class="small-btn class-honor-btn" data-honor="' + cls.id + '">لوحة الشرف</button>'
-          + '</div></div>';
-      }).join('') : '<div class="advtab-card"><div class="head"><div><h4>لا توجد فصول مضافة</h4><div class="sub">أضيفي فصلًا من قسم الفصول والطلاب أولًا.</div></div></div></div>'
-    ) + '</div>';
-    try{ app.state.advtabMode = 'advanced'; }catch(e){}
-    safeSave();
-  }
-
-  function openAdvancedClass(classId){
-    var app = getApp();
-    if(!app) return;
-    try{ app.state.advtabSelectedClassId = classId; }catch(e){}
-    safeSave();
-    if(typeof window.renderAdvancedDetail === 'function'){
-      window.renderAdvancedDetail(classId);
-      return;
-    }
-    safeRender();
-  }
-
-  function bindButtons(){
-    var form = qs('#teacherLoginGate form.login-form');
-    var loginBtn = qs('#teacherLoginGate .login-btn.primary');
-    if(form && !form.dataset.fixedSubmit){
-      form.dataset.fixedSubmit='1';
-      form.addEventListener('submit', function(e){ e.preventDefault(); if(typeof window.teacherLogin==='function') window.teacherLogin(); });
-    }
-    if(loginBtn && !loginBtn.dataset.fixedClick){
-      loginBtn.dataset.fixedClick='1';
-      loginBtn.addEventListener('click', function(e){ e.preventDefault(); if(typeof window.teacherLogin==='function') window.teacherLogin(); });
-    }
-    qsa('.advtab-subtabs [data-mode="advanced"]').forEach(function(btn){
-      if(btn.dataset.fixedClick) return;
-      btn.dataset.fixedClick='1';
-      btn.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); renderAdvancedCards(); });
-    });
-    qsa('.advtab-subtabs [data-mode="basic"]').forEach(function(btn){
-      if(btn.dataset.fixedClick) return;
-      btn.dataset.fixedClick='1';
-      btn.addEventListener('click', function(e){
-        e.preventDefault(); e.stopPropagation();
-        var basic = document.getElementById('advtabBasic');
-        var advanced = document.getElementById('advtabAdvanced');
-        if(basic) basic.classList.remove('advtab-hidden');
-        if(advanced) advanced.classList.add('advtab-hidden');
-        qsa('.advtab-subtabs [data-mode]').forEach(function(x){ x.classList.toggle('active', x.getAttribute('data-mode') === 'basic'); });
-      });
-    });
-    var back = document.getElementById('advtabBackBtn');
-    if(back && !back.dataset.fixedClick){
-      back.dataset.fixedClick='1';
-      back.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); renderAdvancedCards(); });
-    }
-  }
-
-  document.addEventListener('click', function(e){
-    var btn = e.target.closest('[data-open],[data-del],[data-msg],[data-honor]');
-    if(!btn) return;
-    var app = getApp();
-    if(!app) return;
-    if(btn.hasAttribute('data-open')){
-      e.preventDefault(); e.stopPropagation();
-      openAdvancedClass(btn.getAttribute('data-open'));
-    } else if(btn.hasAttribute('data-del')){
-      e.preventDefault(); e.stopPropagation();
-      if(typeof window.deleteClassById === 'function') window.deleteClassById(btn.getAttribute('data-del'));
-    } else if(btn.hasAttribute('data-msg')){
-      e.preventDefault(); e.stopPropagation();
-      if(typeof window.open === 'function' && typeof window.classNameById === 'function'){
-        var txt = 'رسالة جماعية من مصرف التعليم للفصل ' + window.classNameById(btn.getAttribute('data-msg'));
-        window.open('https://wa.me/?text=' + encodeURIComponent(txt), '_blank');
-      }
-    } else if(btn.hasAttribute('data-honor')){
-      e.preventDefault(); e.stopPropagation();
-      try{ app.state.advtabHonorClassId = btn.getAttribute('data-honor'); safeSave(); safeRender(); }catch(err){}
-    }
-  }, true);
-
-  function hideCodeLeak(){
-    // remove accidental JS text nodes shown at page bottom in broken builds
-    Array.from(document.body.children).forEach(function(el){
-      if(!(el instanceof HTMLElement)) return;
-      if(el.tagName === 'SCRIPT' || el.tagName === 'STYLE') return;
-      var txt = (el.innerText || '').trim();
-      if(!txt) return;
-      var suspicious = txt.includes('window.app.init()') || txt.includes('toast(text)') || txt.includes('w.document.close();') || txt.includes('this.state.vipHonor.lastPdfRunKey');
-      if(suspicious && txt.length < 4000){
-        el.remove();
-      }
-    });
-  }
-
-  function boot(){ bindButtons(); hideCodeLeak(); }
-  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
-  else boot();
-  new MutationObserver(function(){ boot(); }).observe(document.documentElement, {subtree:true, childList:true});
-})();
-</script>
-
-</body></html>');
+      w.document.write('<html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>شهادات لوحة شرف الفصل</title><style>body{font-family:Tahoma,Arial,sans-serif;color:#21402f}@media print{@page{size:A4;margin:18mm}}</style></head><body>' + cards + '<script>window.onload=function(){window.print()}<\/script></body></html>');
       w.document.close();
       app.toast && app.toast('تم توليد شهادة PDF تلقائيًا');
     }
@@ -4669,150 +3811,7 @@ function logoutTeacher(){
         + '<h3>كشف الحساب الكامل</h3>'
         + '<table><thead><tr><th>التاريخ</th><th>اليوم</th><th>الحصة</th><th>الوقت</th><th>المادة</th><th>نوع العملية</th><th>المبلغ</th><th>السبب</th><th>المرفق</th></tr></thead><tbody>' + (txRows || '<tr><td colspan="9">لا توجد عمليات</td></tr>') + '</tbody></table>'
         + '<div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:26px"><div class="sub">اعتماد المعلمة: ' + escapeHtml(p.teacherName || '—') + '</div><div>' + sign + '</div></div>'
-        + '<img src=x onerror="window.print()">
-<script id="final-stability-patch">
-(function(){
-  function qs(s,r){return (r||document).querySelector(s)}
-  function qsa(s,r){return Array.from((r||document).querySelectorAll(s))}
-  function safeSave(){ try{ window.app && window.app.save && window.app.save(); }catch(e){} }
-  function safeRender(){ try{ window.app && window.app.renderAll && window.app.renderAll(); }catch(e){} }
-  function getApp(){ return window.app || null; }
-
-  function renderAdvancedCards(){
-    var app = getApp();
-    var cardsPage = document.getElementById('advtabCardsPage');
-    var detailPage = document.getElementById('advtabDetailPage');
-    var advanced = document.getElementById('advtabAdvanced');
-    var basic = document.getElementById('advtabBasic');
-    if(!app || !cardsPage || !detailPage || !advanced) return;
-    if(basic) basic.classList.add('advtab-hidden');
-    advanced.classList.remove('advtab-hidden');
-    detailPage.classList.add('advtab-hidden');
-    cardsPage.classList.remove('advtab-hidden');
-    qsa('.advtab-subtabs [data-mode]').forEach(function(btn){
-      btn.classList.toggle('active', btn.getAttribute('data-mode') === 'advanced');
-    });
-    var classes = Array.isArray(app.state && app.state.classes) ? app.state.classes : [];
-    var students = Array.isArray(app.state && app.state.students) ? app.state.students : [];
-    cardsPage.innerHTML = '<div class="advtab-grid">' + (
-      classes.length ? classes.map(function(cls){
-        var rows = students.filter(function(s){ return s.classId === cls.id; });
-        var total = rows.reduce(function(sum,s){ return sum + Number(s.balance || 0); }, 0);
-        var active = rows.filter(function(s){ return (s.status || s.statusMode || 'مفعل') === 'مفعل'; }).length;
-        var near = rows.filter(function(s){ return Number(s.balance || 0) >= 9000; }).length;
-        var pending = rows.filter(function(s){ return Number((s.tasksMeta && s.tasksMeta.pending) ?? Math.max(0, Number(s.tasksMeta && s.tasksMeta.total || 0) - Number(s.tasksMeta && s.tasksMeta.submitted || s.tasks || 0)) || 0) > 0; }).length;
-        return '<div class="advtab-card">'
-          + '<div class="head"><span class="tag">' + active + ' نشط</span><div><h4>' + (cls.name || 'فصل') + '</h4><div class="sub">عدد الطلاب / الطالبات في الفصل: ' + rows.length + '</div></div></div>'
-          + '<div class="advtab-stats">'
-          + '<div class="box"><strong>' + Number(total).toLocaleString('ar-SA') + '</strong><span>إجمالي الأرصدة</span></div>'
-          + '<div class="box"><strong>' + rows.length + '</strong><span>عدد الطلاب / الطالبات</span></div>'
-          + '<div class="box"><strong>' + near + '</strong><span>قريبون من الترقية</span></div>'
-          + '<div class="box"><strong>' + pending + '</strong><span>مهام غير مسلمة</span></div>'
-          + '</div>'
-          + '<div class="advtab-actions">'
-          + '<button class="small-btn danger" data-del="' + cls.id + '">حذف الفصل</button>'
-          + '<button class="small-btn gold" data-msg="' + cls.id + '">إرسال رسالة جماعية لولي الأمر</button>'
-          + '<button class="small-btn primary" data-open="' + cls.id + '">دخول الفصل</button>'
-          + '<button class="small-btn class-honor-btn" data-honor="' + cls.id + '">لوحة الشرف</button>'
-          + '</div></div>';
-      }).join('') : '<div class="advtab-card"><div class="head"><div><h4>لا توجد فصول مضافة</h4><div class="sub">أضيفي فصلًا من قسم الفصول والطلاب أولًا.</div></div></div></div>'
-    ) + '</div>';
-    try{ app.state.advtabMode = 'advanced'; }catch(e){}
-    safeSave();
-  }
-
-  function openAdvancedClass(classId){
-    var app = getApp();
-    if(!app) return;
-    try{ app.state.advtabSelectedClassId = classId; }catch(e){}
-    safeSave();
-    if(typeof window.renderAdvancedDetail === 'function'){
-      window.renderAdvancedDetail(classId);
-      return;
-    }
-    safeRender();
-  }
-
-  function bindButtons(){
-    var form = qs('#teacherLoginGate form.login-form');
-    var loginBtn = qs('#teacherLoginGate .login-btn.primary');
-    if(form && !form.dataset.fixedSubmit){
-      form.dataset.fixedSubmit='1';
-      form.addEventListener('submit', function(e){ e.preventDefault(); if(typeof window.teacherLogin==='function') window.teacherLogin(); });
-    }
-    if(loginBtn && !loginBtn.dataset.fixedClick){
-      loginBtn.dataset.fixedClick='1';
-      loginBtn.addEventListener('click', function(e){ e.preventDefault(); if(typeof window.teacherLogin==='function') window.teacherLogin(); });
-    }
-    qsa('.advtab-subtabs [data-mode="advanced"]').forEach(function(btn){
-      if(btn.dataset.fixedClick) return;
-      btn.dataset.fixedClick='1';
-      btn.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); renderAdvancedCards(); });
-    });
-    qsa('.advtab-subtabs [data-mode="basic"]').forEach(function(btn){
-      if(btn.dataset.fixedClick) return;
-      btn.dataset.fixedClick='1';
-      btn.addEventListener('click', function(e){
-        e.preventDefault(); e.stopPropagation();
-        var basic = document.getElementById('advtabBasic');
-        var advanced = document.getElementById('advtabAdvanced');
-        if(basic) basic.classList.remove('advtab-hidden');
-        if(advanced) advanced.classList.add('advtab-hidden');
-        qsa('.advtab-subtabs [data-mode]').forEach(function(x){ x.classList.toggle('active', x.getAttribute('data-mode') === 'basic'); });
-      });
-    });
-    var back = document.getElementById('advtabBackBtn');
-    if(back && !back.dataset.fixedClick){
-      back.dataset.fixedClick='1';
-      back.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); renderAdvancedCards(); });
-    }
-  }
-
-  document.addEventListener('click', function(e){
-    var btn = e.target.closest('[data-open],[data-del],[data-msg],[data-honor]');
-    if(!btn) return;
-    var app = getApp();
-    if(!app) return;
-    if(btn.hasAttribute('data-open')){
-      e.preventDefault(); e.stopPropagation();
-      openAdvancedClass(btn.getAttribute('data-open'));
-    } else if(btn.hasAttribute('data-del')){
-      e.preventDefault(); e.stopPropagation();
-      if(typeof window.deleteClassById === 'function') window.deleteClassById(btn.getAttribute('data-del'));
-    } else if(btn.hasAttribute('data-msg')){
-      e.preventDefault(); e.stopPropagation();
-      if(typeof window.open === 'function' && typeof window.classNameById === 'function'){
-        var txt = 'رسالة جماعية من مصرف التعليم للفصل ' + window.classNameById(btn.getAttribute('data-msg'));
-        window.open('https://wa.me/?text=' + encodeURIComponent(txt), '_blank');
-      }
-    } else if(btn.hasAttribute('data-honor')){
-      e.preventDefault(); e.stopPropagation();
-      try{ app.state.advtabHonorClassId = btn.getAttribute('data-honor'); safeSave(); safeRender(); }catch(err){}
-    }
-  }, true);
-
-  function hideCodeLeak(){
-    // remove accidental JS text nodes shown at page bottom in broken builds
-    Array.from(document.body.children).forEach(function(el){
-      if(!(el instanceof HTMLElement)) return;
-      if(el.tagName === 'SCRIPT' || el.tagName === 'STYLE') return;
-      var txt = (el.innerText || '').trim();
-      if(!txt) return;
-      var suspicious = txt.includes('window.app.init()') || txt.includes('toast(text)') || txt.includes('w.document.close();') || txt.includes('this.state.vipHonor.lastPdfRunKey');
-      if(suspicious && txt.length < 4000){
-        el.remove();
-      }
-    });
-  }
-
-  function boot(){ bindButtons(); hideCodeLeak(); }
-  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
-  else boot();
-  new MutationObserver(function(){ boot(); }).observe(document.documentElement, {subtree:true, childList:true});
-})();
-</script>
-
-</body></html>');
+        + '<img src=x onerror="window.print()"></body></html>');
       w.document.close();
     };
   }
@@ -5084,150 +4083,7 @@ function logoutTeacher(){
     }).join('');
     const w = window.open('', '_blank');
     if(!w) return;
-    w.document.write('<html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>كشف الحساب</title><style>body{font-family:Tahoma;padding:24px}table{width:100%;border-collapse:collapse;margin-top:12px}th,td{border:1px solid #dfe9e2;padding:10px;text-align:right}th{background:#f5faf6}a{color:#29543d;font-weight:700;text-decoration:none}</style></head><body><h2>كشف الحساب الكامل — ' + student.name + '</h2><table><thead><tr><th>التاريخ</th><th>اليوم</th><th>الحصة</th><th>الوقت</th><th>المادة</th><th>نوع العملية</th><th>المبلغ</th><th>السبب</th><th>المرفق</th></tr></thead><tbody>' + (rows || '<tr><td colspan="9">لا توجد عمليات</td></tr>') + '</tbody></table>
-<script id="final-stability-patch">
-(function(){
-  function qs(s,r){return (r||document).querySelector(s)}
-  function qsa(s,r){return Array.from((r||document).querySelectorAll(s))}
-  function safeSave(){ try{ window.app && window.app.save && window.app.save(); }catch(e){} }
-  function safeRender(){ try{ window.app && window.app.renderAll && window.app.renderAll(); }catch(e){} }
-  function getApp(){ return window.app || null; }
-
-  function renderAdvancedCards(){
-    var app = getApp();
-    var cardsPage = document.getElementById('advtabCardsPage');
-    var detailPage = document.getElementById('advtabDetailPage');
-    var advanced = document.getElementById('advtabAdvanced');
-    var basic = document.getElementById('advtabBasic');
-    if(!app || !cardsPage || !detailPage || !advanced) return;
-    if(basic) basic.classList.add('advtab-hidden');
-    advanced.classList.remove('advtab-hidden');
-    detailPage.classList.add('advtab-hidden');
-    cardsPage.classList.remove('advtab-hidden');
-    qsa('.advtab-subtabs [data-mode]').forEach(function(btn){
-      btn.classList.toggle('active', btn.getAttribute('data-mode') === 'advanced');
-    });
-    var classes = Array.isArray(app.state && app.state.classes) ? app.state.classes : [];
-    var students = Array.isArray(app.state && app.state.students) ? app.state.students : [];
-    cardsPage.innerHTML = '<div class="advtab-grid">' + (
-      classes.length ? classes.map(function(cls){
-        var rows = students.filter(function(s){ return s.classId === cls.id; });
-        var total = rows.reduce(function(sum,s){ return sum + Number(s.balance || 0); }, 0);
-        var active = rows.filter(function(s){ return (s.status || s.statusMode || 'مفعل') === 'مفعل'; }).length;
-        var near = rows.filter(function(s){ return Number(s.balance || 0) >= 9000; }).length;
-        var pending = rows.filter(function(s){ return Number((s.tasksMeta && s.tasksMeta.pending) ?? Math.max(0, Number(s.tasksMeta && s.tasksMeta.total || 0) - Number(s.tasksMeta && s.tasksMeta.submitted || s.tasks || 0)) || 0) > 0; }).length;
-        return '<div class="advtab-card">'
-          + '<div class="head"><span class="tag">' + active + ' نشط</span><div><h4>' + (cls.name || 'فصل') + '</h4><div class="sub">عدد الطلاب / الطالبات في الفصل: ' + rows.length + '</div></div></div>'
-          + '<div class="advtab-stats">'
-          + '<div class="box"><strong>' + Number(total).toLocaleString('ar-SA') + '</strong><span>إجمالي الأرصدة</span></div>'
-          + '<div class="box"><strong>' + rows.length + '</strong><span>عدد الطلاب / الطالبات</span></div>'
-          + '<div class="box"><strong>' + near + '</strong><span>قريبون من الترقية</span></div>'
-          + '<div class="box"><strong>' + pending + '</strong><span>مهام غير مسلمة</span></div>'
-          + '</div>'
-          + '<div class="advtab-actions">'
-          + '<button class="small-btn danger" data-del="' + cls.id + '">حذف الفصل</button>'
-          + '<button class="small-btn gold" data-msg="' + cls.id + '">إرسال رسالة جماعية لولي الأمر</button>'
-          + '<button class="small-btn primary" data-open="' + cls.id + '">دخول الفصل</button>'
-          + '<button class="small-btn class-honor-btn" data-honor="' + cls.id + '">لوحة الشرف</button>'
-          + '</div></div>';
-      }).join('') : '<div class="advtab-card"><div class="head"><div><h4>لا توجد فصول مضافة</h4><div class="sub">أضيفي فصلًا من قسم الفصول والطلاب أولًا.</div></div></div></div>'
-    ) + '</div>';
-    try{ app.state.advtabMode = 'advanced'; }catch(e){}
-    safeSave();
-  }
-
-  function openAdvancedClass(classId){
-    var app = getApp();
-    if(!app) return;
-    try{ app.state.advtabSelectedClassId = classId; }catch(e){}
-    safeSave();
-    if(typeof window.renderAdvancedDetail === 'function'){
-      window.renderAdvancedDetail(classId);
-      return;
-    }
-    safeRender();
-  }
-
-  function bindButtons(){
-    var form = qs('#teacherLoginGate form.login-form');
-    var loginBtn = qs('#teacherLoginGate .login-btn.primary');
-    if(form && !form.dataset.fixedSubmit){
-      form.dataset.fixedSubmit='1';
-      form.addEventListener('submit', function(e){ e.preventDefault(); if(typeof window.teacherLogin==='function') window.teacherLogin(); });
-    }
-    if(loginBtn && !loginBtn.dataset.fixedClick){
-      loginBtn.dataset.fixedClick='1';
-      loginBtn.addEventListener('click', function(e){ e.preventDefault(); if(typeof window.teacherLogin==='function') window.teacherLogin(); });
-    }
-    qsa('.advtab-subtabs [data-mode="advanced"]').forEach(function(btn){
-      if(btn.dataset.fixedClick) return;
-      btn.dataset.fixedClick='1';
-      btn.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); renderAdvancedCards(); });
-    });
-    qsa('.advtab-subtabs [data-mode="basic"]').forEach(function(btn){
-      if(btn.dataset.fixedClick) return;
-      btn.dataset.fixedClick='1';
-      btn.addEventListener('click', function(e){
-        e.preventDefault(); e.stopPropagation();
-        var basic = document.getElementById('advtabBasic');
-        var advanced = document.getElementById('advtabAdvanced');
-        if(basic) basic.classList.remove('advtab-hidden');
-        if(advanced) advanced.classList.add('advtab-hidden');
-        qsa('.advtab-subtabs [data-mode]').forEach(function(x){ x.classList.toggle('active', x.getAttribute('data-mode') === 'basic'); });
-      });
-    });
-    var back = document.getElementById('advtabBackBtn');
-    if(back && !back.dataset.fixedClick){
-      back.dataset.fixedClick='1';
-      back.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); renderAdvancedCards(); });
-    }
-  }
-
-  document.addEventListener('click', function(e){
-    var btn = e.target.closest('[data-open],[data-del],[data-msg],[data-honor]');
-    if(!btn) return;
-    var app = getApp();
-    if(!app) return;
-    if(btn.hasAttribute('data-open')){
-      e.preventDefault(); e.stopPropagation();
-      openAdvancedClass(btn.getAttribute('data-open'));
-    } else if(btn.hasAttribute('data-del')){
-      e.preventDefault(); e.stopPropagation();
-      if(typeof window.deleteClassById === 'function') window.deleteClassById(btn.getAttribute('data-del'));
-    } else if(btn.hasAttribute('data-msg')){
-      e.preventDefault(); e.stopPropagation();
-      if(typeof window.open === 'function' && typeof window.classNameById === 'function'){
-        var txt = 'رسالة جماعية من مصرف التعليم للفصل ' + window.classNameById(btn.getAttribute('data-msg'));
-        window.open('https://wa.me/?text=' + encodeURIComponent(txt), '_blank');
-      }
-    } else if(btn.hasAttribute('data-honor')){
-      e.preventDefault(); e.stopPropagation();
-      try{ app.state.advtabHonorClassId = btn.getAttribute('data-honor'); safeSave(); safeRender(); }catch(err){}
-    }
-  }, true);
-
-  function hideCodeLeak(){
-    // remove accidental JS text nodes shown at page bottom in broken builds
-    Array.from(document.body.children).forEach(function(el){
-      if(!(el instanceof HTMLElement)) return;
-      if(el.tagName === 'SCRIPT' || el.tagName === 'STYLE') return;
-      var txt = (el.innerText || '').trim();
-      if(!txt) return;
-      var suspicious = txt.includes('window.app.init()') || txt.includes('toast(text)') || txt.includes('w.document.close();') || txt.includes('this.state.vipHonor.lastPdfRunKey');
-      if(suspicious && txt.length < 4000){
-        el.remove();
-      }
-    });
-  }
-
-  function boot(){ bindButtons(); hideCodeLeak(); }
-  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
-  else boot();
-  new MutationObserver(function(){ boot(); }).observe(document.documentElement, {subtree:true, childList:true});
-})();
-</script>
-
-</body></html>');
+    w.document.write('<html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>كشف الحساب</title><style>body{font-family:Tahoma;padding:24px}table{width:100%;border-collapse:collapse;margin-top:12px}th,td{border:1px solid #dfe9e2;padding:10px;text-align:right}th{background:#f5faf6}a{color:#29543d;font-weight:700;text-decoration:none}</style></head><body><h2>كشف الحساب الكامل — ' + student.name + '</h2><table><thead><tr><th>التاريخ</th><th>اليوم</th><th>الحصة</th><th>الوقت</th><th>المادة</th><th>نوع العملية</th><th>المبلغ</th><th>السبب</th><th>المرفق</th></tr></thead><tbody>' + (rows || '<tr><td colspan="9">لا توجد عمليات</td></tr>') + '</tbody></table></body></html>');
     w.document.close();
   }
   window.openFullStatement = openFullStatementFixed;
@@ -5368,150 +4224,7 @@ function logoutTeacher(){
     const rows = currentClassStudents().map(s => '<tr><td>' + s.name + '</td><td>' + (s.code || '—') + '</td><td>' + Number(s.balance||0).toLocaleString('ar-SA') + '</td><td>' + (s.parentPhone || '—') + '</td></tr>').join('');
     const w = window.open('', '_blank');
     if(!w) return;
-    w.document.write('<html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>تقرير الفصل</title><style>body{font-family:Tahoma;padding:24px}table{width:100%;border-collapse:collapse;margin-top:12px}th,td{border:1px solid #dfe9e2;padding:10px;text-align:right}th{background:#f5faf6}</style></head><body><h2>تقرير ' + classNameById(app.state.advtabSelectedClassId) + '</h2><table><thead><tr><th>الاسم</th><th>رقم الحساب</th><th>الرصيد</th><th>ولي الأمر</th></tr></thead><tbody>' + (rows || '<tr><td colspan="4">لا توجد بيانات</td></tr>') + '</tbody></table>
-<script id="final-stability-patch">
-(function(){
-  function qs(s,r){return (r||document).querySelector(s)}
-  function qsa(s,r){return Array.from((r||document).querySelectorAll(s))}
-  function safeSave(){ try{ window.app && window.app.save && window.app.save(); }catch(e){} }
-  function safeRender(){ try{ window.app && window.app.renderAll && window.app.renderAll(); }catch(e){} }
-  function getApp(){ return window.app || null; }
-
-  function renderAdvancedCards(){
-    var app = getApp();
-    var cardsPage = document.getElementById('advtabCardsPage');
-    var detailPage = document.getElementById('advtabDetailPage');
-    var advanced = document.getElementById('advtabAdvanced');
-    var basic = document.getElementById('advtabBasic');
-    if(!app || !cardsPage || !detailPage || !advanced) return;
-    if(basic) basic.classList.add('advtab-hidden');
-    advanced.classList.remove('advtab-hidden');
-    detailPage.classList.add('advtab-hidden');
-    cardsPage.classList.remove('advtab-hidden');
-    qsa('.advtab-subtabs [data-mode]').forEach(function(btn){
-      btn.classList.toggle('active', btn.getAttribute('data-mode') === 'advanced');
-    });
-    var classes = Array.isArray(app.state && app.state.classes) ? app.state.classes : [];
-    var students = Array.isArray(app.state && app.state.students) ? app.state.students : [];
-    cardsPage.innerHTML = '<div class="advtab-grid">' + (
-      classes.length ? classes.map(function(cls){
-        var rows = students.filter(function(s){ return s.classId === cls.id; });
-        var total = rows.reduce(function(sum,s){ return sum + Number(s.balance || 0); }, 0);
-        var active = rows.filter(function(s){ return (s.status || s.statusMode || 'مفعل') === 'مفعل'; }).length;
-        var near = rows.filter(function(s){ return Number(s.balance || 0) >= 9000; }).length;
-        var pending = rows.filter(function(s){ return Number((s.tasksMeta && s.tasksMeta.pending) ?? Math.max(0, Number(s.tasksMeta && s.tasksMeta.total || 0) - Number(s.tasksMeta && s.tasksMeta.submitted || s.tasks || 0)) || 0) > 0; }).length;
-        return '<div class="advtab-card">'
-          + '<div class="head"><span class="tag">' + active + ' نشط</span><div><h4>' + (cls.name || 'فصل') + '</h4><div class="sub">عدد الطلاب / الطالبات في الفصل: ' + rows.length + '</div></div></div>'
-          + '<div class="advtab-stats">'
-          + '<div class="box"><strong>' + Number(total).toLocaleString('ar-SA') + '</strong><span>إجمالي الأرصدة</span></div>'
-          + '<div class="box"><strong>' + rows.length + '</strong><span>عدد الطلاب / الطالبات</span></div>'
-          + '<div class="box"><strong>' + near + '</strong><span>قريبون من الترقية</span></div>'
-          + '<div class="box"><strong>' + pending + '</strong><span>مهام غير مسلمة</span></div>'
-          + '</div>'
-          + '<div class="advtab-actions">'
-          + '<button class="small-btn danger" data-del="' + cls.id + '">حذف الفصل</button>'
-          + '<button class="small-btn gold" data-msg="' + cls.id + '">إرسال رسالة جماعية لولي الأمر</button>'
-          + '<button class="small-btn primary" data-open="' + cls.id + '">دخول الفصل</button>'
-          + '<button class="small-btn class-honor-btn" data-honor="' + cls.id + '">لوحة الشرف</button>'
-          + '</div></div>';
-      }).join('') : '<div class="advtab-card"><div class="head"><div><h4>لا توجد فصول مضافة</h4><div class="sub">أضيفي فصلًا من قسم الفصول والطلاب أولًا.</div></div></div></div>'
-    ) + '</div>';
-    try{ app.state.advtabMode = 'advanced'; }catch(e){}
-    safeSave();
-  }
-
-  function openAdvancedClass(classId){
-    var app = getApp();
-    if(!app) return;
-    try{ app.state.advtabSelectedClassId = classId; }catch(e){}
-    safeSave();
-    if(typeof window.renderAdvancedDetail === 'function'){
-      window.renderAdvancedDetail(classId);
-      return;
-    }
-    safeRender();
-  }
-
-  function bindButtons(){
-    var form = qs('#teacherLoginGate form.login-form');
-    var loginBtn = qs('#teacherLoginGate .login-btn.primary');
-    if(form && !form.dataset.fixedSubmit){
-      form.dataset.fixedSubmit='1';
-      form.addEventListener('submit', function(e){ e.preventDefault(); if(typeof window.teacherLogin==='function') window.teacherLogin(); });
-    }
-    if(loginBtn && !loginBtn.dataset.fixedClick){
-      loginBtn.dataset.fixedClick='1';
-      loginBtn.addEventListener('click', function(e){ e.preventDefault(); if(typeof window.teacherLogin==='function') window.teacherLogin(); });
-    }
-    qsa('.advtab-subtabs [data-mode="advanced"]').forEach(function(btn){
-      if(btn.dataset.fixedClick) return;
-      btn.dataset.fixedClick='1';
-      btn.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); renderAdvancedCards(); });
-    });
-    qsa('.advtab-subtabs [data-mode="basic"]').forEach(function(btn){
-      if(btn.dataset.fixedClick) return;
-      btn.dataset.fixedClick='1';
-      btn.addEventListener('click', function(e){
-        e.preventDefault(); e.stopPropagation();
-        var basic = document.getElementById('advtabBasic');
-        var advanced = document.getElementById('advtabAdvanced');
-        if(basic) basic.classList.remove('advtab-hidden');
-        if(advanced) advanced.classList.add('advtab-hidden');
-        qsa('.advtab-subtabs [data-mode]').forEach(function(x){ x.classList.toggle('active', x.getAttribute('data-mode') === 'basic'); });
-      });
-    });
-    var back = document.getElementById('advtabBackBtn');
-    if(back && !back.dataset.fixedClick){
-      back.dataset.fixedClick='1';
-      back.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); renderAdvancedCards(); });
-    }
-  }
-
-  document.addEventListener('click', function(e){
-    var btn = e.target.closest('[data-open],[data-del],[data-msg],[data-honor]');
-    if(!btn) return;
-    var app = getApp();
-    if(!app) return;
-    if(btn.hasAttribute('data-open')){
-      e.preventDefault(); e.stopPropagation();
-      openAdvancedClass(btn.getAttribute('data-open'));
-    } else if(btn.hasAttribute('data-del')){
-      e.preventDefault(); e.stopPropagation();
-      if(typeof window.deleteClassById === 'function') window.deleteClassById(btn.getAttribute('data-del'));
-    } else if(btn.hasAttribute('data-msg')){
-      e.preventDefault(); e.stopPropagation();
-      if(typeof window.open === 'function' && typeof window.classNameById === 'function'){
-        var txt = 'رسالة جماعية من مصرف التعليم للفصل ' + window.classNameById(btn.getAttribute('data-msg'));
-        window.open('https://wa.me/?text=' + encodeURIComponent(txt), '_blank');
-      }
-    } else if(btn.hasAttribute('data-honor')){
-      e.preventDefault(); e.stopPropagation();
-      try{ app.state.advtabHonorClassId = btn.getAttribute('data-honor'); safeSave(); safeRender(); }catch(err){}
-    }
-  }, true);
-
-  function hideCodeLeak(){
-    // remove accidental JS text nodes shown at page bottom in broken builds
-    Array.from(document.body.children).forEach(function(el){
-      if(!(el instanceof HTMLElement)) return;
-      if(el.tagName === 'SCRIPT' || el.tagName === 'STYLE') return;
-      var txt = (el.innerText || '').trim();
-      if(!txt) return;
-      var suspicious = txt.includes('window.app.init()') || txt.includes('toast(text)') || txt.includes('w.document.close();') || txt.includes('this.state.vipHonor.lastPdfRunKey');
-      if(suspicious && txt.length < 4000){
-        el.remove();
-      }
-    });
-  }
-
-  function boot(){ bindButtons(); hideCodeLeak(); }
-  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
-  else boot();
-  new MutationObserver(function(){ boot(); }).observe(document.documentElement, {subtree:true, childList:true});
-})();
-</script>
-
-</body></html>');
+    w.document.write('<html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>تقرير الفصل</title><style>body{font-family:Tahoma;padding:24px}table{width:100%;border-collapse:collapse;margin-top:12px}th,td{border:1px solid #dfe9e2;padding:10px;text-align:right}th{background:#f5faf6}</style></head><body><h2>تقرير ' + classNameById(app.state.advtabSelectedClassId) + '</h2><table><thead><tr><th>الاسم</th><th>رقم الحساب</th><th>الرصيد</th><th>ولي الأمر</th></tr></thead><tbody>' + (rows || '<tr><td colspan="4">لا توجد بيانات</td></tr>') + '</tbody></table></body></html>');
     w.document.close();
   }
 
@@ -5926,42 +4639,145 @@ function logoutTeacher(){
 </script>
 
 
-
-<script id="final-stability-patch">
+<script id="advanced-panel-direct-render-fix">
 (function(){
-  function qs(s,r){return (r||document).querySelector(s)}
-  function qsa(s,r){return Array.from((r||document).querySelectorAll(s))}
-  function safeSave(){ try{ window.app && window.app.save && window.app.save(); }catch(e){} }
-  function safeRender(){ try{ window.app && window.app.renderAll && window.app.renderAll(); }catch(e){} }
-  function getApp(){ return window.app || null; }
+  const app = window.app;
+  if(!app) return;
 
-  function renderAdvancedCards(){
-    var app = getApp();
-    var cardsPage = document.getElementById('advtabCardsPage');
-    var detailPage = document.getElementById('advtabDetailPage');
-    var advanced = document.getElementById('advtabAdvanced');
-    var basic = document.getElementById('advtabBasic');
-    if(!app || !cardsPage || !detailPage || !advanced) return;
-    if(basic) basic.classList.add('advtab-hidden');
+  function getStatus(s){ return s.status || s.statusMode || 'مفعل'; }
+  function getLevel(s, i){ return s.level || s.accountLevel || ['برونزي','فضي','ذهبي','ماسي'][i % 4]; }
+  function studentsFor(classId){ return (app.state.students || []).filter(function(s){ return s.classId === classId; }); }
+  function classStats(classId){
+    const rows = studentsFor(classId);
+    return {
+      count: rows.length,
+      total: rows.reduce(function(sum,s){ return sum + Number(s.balance || 0); }, 0),
+      near: rows.filter(function(s){ return Number(s.balance || 0) >= 9000; }).length,
+      pending: rows.filter(function(s){ return Number(s.tasks || 0) === 0; }).length,
+      active: rows.filter(function(s){ return getStatus(s) === 'مفعل'; }).length
+    };
+  }
+
+  function renderCards(){
+    const cardsPage = document.getElementById('advtabCardsPage');
+    const detailPage = document.getElementById('advtabDetailPage');
+    if(!cardsPage || !detailPage) return;
+    const classes = app.state.classes || [];
+    detailPage.classList.add('advtab-hidden');
+    cardsPage.classList.remove('advtab-hidden');
+    cardsPage.innerHTML = `
+      <div class="advtab-grid">
+        ${classes.length ? classes.map(function(cls){
+          const st = classStats(cls.id);
+          return `
+            <div class="advtab-card">
+              <div class="head">
+                <span class="tag">${st.active} نشط</span>
+                <div>
+                  <h4>${cls.name}</h4>
+                  <div class="sub">عدد الطلاب / الطالبات في الفصل: ${st.count}</div>
+                </div>
+              </div>
+              <div class="advtab-stats">
+                <div class="box"><strong>${Number(st.total).toLocaleString('ar-SA')}</strong><span>إجمالي الأرصدة</span></div>
+                <div class="box"><strong>${st.count}</strong><span>عدد الطلاب / الطالبات</span></div>
+                <div class="box"><strong>${st.near}</strong><span>قريبون من الترقية</span></div>
+                <div class="box"><strong>${st.pending}</strong><span>مهام غير مسلمة</span></div>
+              </div>
+              <div class="advtab-actions">
+                <button class="small-btn danger" data-del="${cls.id}">حذف الفصل</button>
+                <button class="small-btn gold" data-msg="${cls.id}">إرسال رسالة جماعية لولي الأمر</button>
+                <button class="small-btn primary" data-open="${cls.id}">دخول الفصل</button>
+                <button class="small-btn class-honor-btn" data-honor="${cls.id}">لوحة الشرف</button>
+              </div>
+            </div>
+          `;
+        }).join('') : '<div class="advtab-card"><div class="head"><div><h4>لا توجد فصول مضافة</h4><div class="sub">أضيفي فصلًا من قسم الفصول والطلاب أولًا.</div></div></div></div>'}
+      </div>
+    `;
+  }
+
+  function bindAdvancedButton(){
+    const btn = document.querySelector('.advtab-subtabs [data-mode="advanced"]');
+    const basicBtn = document.querySelector('.advtab-subtabs [data-mode="basic"]');
+    const basic = document.getElementById('advtabBasic');
+    const advanced = document.getElementById('advtabAdvanced');
+    if(btn && !btn.dataset.directBound){
+      btn.dataset.directBound = '1';
+      btn.onclick = function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        if(basic) basic.classList.add('advtab-hidden');
+        if(advanced) advanced.classList.remove('advtab-hidden');
+        if(basicBtn) basicBtn.classList.remove('active');
+        btn.classList.add('active');
+        renderCards();
+      };
+    }
+    if(basicBtn && !basicBtn.dataset.directBound){
+      basicBtn.dataset.directBound = '1';
+      basicBtn.onclick = function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        if(basic) basic.classList.remove('advtab-hidden');
+        if(advanced) advanced.classList.add('advtab-hidden');
+        if(btn) btn.classList.remove('active');
+        basicBtn.classList.add('active');
+      };
+    }
+  }
+
+  function initFix(){
+    bindAdvancedButton();
+    const advanced = document.getElementById('advtabAdvanced');
+    if(advanced && !advanced.classList.contains('advtab-hidden') && !document.getElementById('advtabCardsPage')?.innerHTML.trim()){
+      renderCards();
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){ setTimeout(initFix, 300); setTimeout(initFix, 900); });
+  const obs = new MutationObserver(function(){ initFix(); });
+  obs.observe(document.body, {subtree:true, childList:true});
+})();
+</script>
+
+
+<script id="advanced-button-direct-open-fix-final">
+(function(){
+  const app = window.app;
+  if(!app) return;
+
+  function renderAdvancedCardsOnly(){
+    const basic = document.getElementById('advtabBasic');
+    const advanced = document.getElementById('advtabAdvanced');
+    const cardsPage = document.getElementById('advtabCardsPage');
+    const detailPage = document.getElementById('advtabDetailPage');
+    const subtabs = document.querySelector('.advtab-subtabs');
+    if(!basic || !advanced || !cardsPage || !detailPage || !subtabs) return;
+
+    basic.classList.add('advtab-hidden');
     advanced.classList.remove('advtab-hidden');
     detailPage.classList.add('advtab-hidden');
     cardsPage.classList.remove('advtab-hidden');
-    qsa('.advtab-subtabs [data-mode]').forEach(function(btn){
+
+    subtabs.querySelectorAll('[data-mode]').forEach(function(btn){
       btn.classList.toggle('active', btn.getAttribute('data-mode') === 'advanced');
     });
-    var classes = Array.isArray(app.state && app.state.classes) ? app.state.classes : [];
-    var students = Array.isArray(app.state && app.state.students) ? app.state.students : [];
+
+    const classes = app.state && Array.isArray(app.state.classes) ? app.state.classes : [];
+    const students = app.state && Array.isArray(app.state.students) ? app.state.students : [];
+
     cardsPage.innerHTML = '<div class="advtab-grid">' + (
       classes.length ? classes.map(function(cls){
-        var rows = students.filter(function(s){ return s.classId === cls.id; });
-        var total = rows.reduce(function(sum,s){ return sum + Number(s.balance || 0); }, 0);
-        var active = rows.filter(function(s){ return (s.status || s.statusMode || 'مفعل') === 'مفعل'; }).length;
-        var near = rows.filter(function(s){ return Number(s.balance || 0) >= 9000; }).length;
-        var pending = rows.filter(function(s){ return Number((s.tasksMeta && s.tasksMeta.pending) ?? Math.max(0, Number(s.tasksMeta && s.tasksMeta.total || 0) - Number(s.tasksMeta && s.tasksMeta.submitted || s.tasks || 0)) || 0) > 0; }).length;
+        const rows = students.filter(function(s){ return s.classId === cls.id; });
+        const total = rows.reduce(function(sum,s){ return sum + Number(s.balance || 0); }, 0);
+        const near = rows.filter(function(s){ return Number(s.balance || 0) >= 9000; }).length;
+        const pending = rows.filter(function(s){ return Number(s.tasks || 0) === 0; }).length;
+        const active = rows.filter(function(s){ return (s.status || s.statusMode || 'مفعل') === 'مفعل'; }).length;
         return '<div class="advtab-card">'
-          + '<div class="head"><span class="tag">' + active + ' نشط</span><div><h4>' + (cls.name || 'فصل') + '</h4><div class="sub">عدد الطلاب / الطالبات في الفصل: ' + rows.length + '</div></div></div>'
+          + '<div class="head"><span class="tag">' + active + ' نشط</span><div><h4>' + cls.name + '</h4><div class="sub">عدد الطلاب / الطالبات في الفصل: ' + rows.length + '</div></div></div>'
           + '<div class="advtab-stats">'
-          + '<div class="box"><strong>' + Number(total).toLocaleString('ar-SA') + '</strong><span>إجمالي الأرصدة</span></div>'
+          + '<div class="box"><strong>' + Number(total).toLocaleString("ar-SA") + '</strong><span>إجمالي الأرصدة</span></div>'
           + '<div class="box"><strong>' + rows.length + '</strong><span>عدد الطلاب / الطالبات</span></div>'
           + '<div class="box"><strong>' + near + '</strong><span>قريبون من الترقية</span></div>'
           + '<div class="box"><strong>' + pending + '</strong><span>مهام غير مسلمة</span></div>'
@@ -5971,101 +4787,55 @@ function logoutTeacher(){
           + '<button class="small-btn gold" data-msg="' + cls.id + '">إرسال رسالة جماعية لولي الأمر</button>'
           + '<button class="small-btn primary" data-open="' + cls.id + '">دخول الفصل</button>'
           + '<button class="small-btn class-honor-btn" data-honor="' + cls.id + '">لوحة الشرف</button>'
-          + '</div></div>';
+          + '</div>'
+          + '</div>';
       }).join('') : '<div class="advtab-card"><div class="head"><div><h4>لا توجد فصول مضافة</h4><div class="sub">أضيفي فصلًا من قسم الفصول والطلاب أولًا.</div></div></div></div>'
     ) + '</div>';
-    try{ app.state.advtabMode = 'advanced'; }catch(e){}
-    safeSave();
+
+    if(app.state) app.state.advtabMode = 'advanced';
+    if(app.save) app.save();
   }
 
-  function openAdvancedClass(classId){
-    var app = getApp();
-    if(!app) return;
-    try{ app.state.advtabSelectedClassId = classId; }catch(e){}
-    safeSave();
-    if(typeof window.renderAdvancedDetail === 'function'){
-      window.renderAdvancedDetail(classId);
-      return;
-    }
-    safeRender();
-  }
+  function bindAdvancedTabButton(){
+    const advBtn = document.querySelector('.advtab-subtabs [data-mode="advanced"]');
+    const basicBtn = document.querySelector('.advtab-subtabs [data-mode="basic"]');
+    const basic = document.getElementById('advtabBasic');
+    const advanced = document.getElementById('advtabAdvanced');
 
-  function bindButtons(){
-    var form = qs('#teacherLoginGate form.login-form');
-    var loginBtn = qs('#teacherLoginGate .login-btn.primary');
-    if(form && !form.dataset.fixedSubmit){
-      form.dataset.fixedSubmit='1';
-      form.addEventListener('submit', function(e){ e.preventDefault(); if(typeof window.teacherLogin==='function') window.teacherLogin(); });
+    if(advBtn && !advBtn.dataset.finalBound){
+      advBtn.dataset.finalBound = '1';
+      advBtn.onclick = function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        renderAdvancedCardsOnly();
+      };
     }
-    if(loginBtn && !loginBtn.dataset.fixedClick){
-      loginBtn.dataset.fixedClick='1';
-      loginBtn.addEventListener('click', function(e){ e.preventDefault(); if(typeof window.teacherLogin==='function') window.teacherLogin(); });
-    }
-    qsa('.advtab-subtabs [data-mode="advanced"]').forEach(function(btn){
-      if(btn.dataset.fixedClick) return;
-      btn.dataset.fixedClick='1';
-      btn.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); renderAdvancedCards(); });
-    });
-    qsa('.advtab-subtabs [data-mode="basic"]').forEach(function(btn){
-      if(btn.dataset.fixedClick) return;
-      btn.dataset.fixedClick='1';
-      btn.addEventListener('click', function(e){
-        e.preventDefault(); e.stopPropagation();
-        var basic = document.getElementById('advtabBasic');
-        var advanced = document.getElementById('advtabAdvanced');
+
+    if(basicBtn && !basicBtn.dataset.finalBound){
+      basicBtn.dataset.finalBound = '1';
+      basicBtn.onclick = function(e){
+        e.preventDefault();
+        e.stopPropagation();
         if(basic) basic.classList.remove('advtab-hidden');
         if(advanced) advanced.classList.add('advtab-hidden');
-        qsa('.advtab-subtabs [data-mode]').forEach(function(x){ x.classList.toggle('active', x.getAttribute('data-mode') === 'basic'); });
-      });
-    });
-    var back = document.getElementById('advtabBackBtn');
-    if(back && !back.dataset.fixedClick){
-      back.dataset.fixedClick='1';
-      back.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); renderAdvancedCards(); });
+        document.querySelectorAll('.advtab-subtabs [data-mode]').forEach(function(btn){
+          btn.classList.toggle('active', btn.getAttribute('data-mode') === 'basic');
+        });
+        if(app.state) app.state.advtabMode = 'basic';
+        if(app.save) app.save();
+      };
     }
   }
 
-  document.addEventListener('click', function(e){
-    var btn = e.target.closest('[data-open],[data-del],[data-msg],[data-honor]');
-    if(!btn) return;
-    var app = getApp();
-    if(!app) return;
-    if(btn.hasAttribute('data-open')){
-      e.preventDefault(); e.stopPropagation();
-      openAdvancedClass(btn.getAttribute('data-open'));
-    } else if(btn.hasAttribute('data-del')){
-      e.preventDefault(); e.stopPropagation();
-      if(typeof window.deleteClassById === 'function') window.deleteClassById(btn.getAttribute('data-del'));
-    } else if(btn.hasAttribute('data-msg')){
-      e.preventDefault(); e.stopPropagation();
-      if(typeof window.open === 'function' && typeof window.classNameById === 'function'){
-        var txt = 'رسالة جماعية من مصرف التعليم للفصل ' + window.classNameById(btn.getAttribute('data-msg'));
-        window.open('https://wa.me/?text=' + encodeURIComponent(txt), '_blank');
-      }
-    } else if(btn.hasAttribute('data-honor')){
-      e.preventDefault(); e.stopPropagation();
-      try{ app.state.advtabHonorClassId = btn.getAttribute('data-honor'); safeSave(); safeRender(); }catch(err){}
-    }
-  }, true);
+  document.addEventListener('DOMContentLoaded', function(){
+    setTimeout(bindAdvancedTabButton, 300);
+    setTimeout(bindAdvancedTabButton, 900);
+  });
 
-  function hideCodeLeak(){
-    // remove accidental JS text nodes shown at page bottom in broken builds
-    Array.from(document.body.children).forEach(function(el){
-      if(!(el instanceof HTMLElement)) return;
-      if(el.tagName === 'SCRIPT' || el.tagName === 'STYLE') return;
-      var txt = (el.innerText || '').trim();
-      if(!txt) return;
-      var suspicious = txt.includes('window.app.init()') || txt.includes('toast(text)') || txt.includes('w.document.close();') || txt.includes('this.state.vipHonor.lastPdfRunKey');
-      if(suspicious && txt.length < 4000){
-        el.remove();
-      }
-    });
-  }
+  const obs = new MutationObserver(function(){ bindAdvancedTabButton(); });
+  obs.observe(document.body, {subtree:true, childList:true});
 
-  function boot(){ bindButtons(); hideCodeLeak(); }
-  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
-  else boot();
-  new MutationObserver(function(){ boot(); }).observe(document.documentElement, {subtree:true, childList:true});
+  window.renderAdvancedNow = renderAdvancedCardsOnly;
 })();
 </script>
 
