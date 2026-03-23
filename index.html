@@ -1740,6 +1740,156 @@
 .vip-podium-avatar{display:none!important;}
 </style></head><body>${cards}<img src=x onerror="window.print();setTimeout(()=>window.close(),300);">
 
+
+<style id="final-tabs-fix-style">
+.teacher-bottom-tabs{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:18px;padding-top:12px;border-top:1px solid #e7efe9}
+.teacher-bottom-tabs button{border:none;padding:12px 18px;border-radius:999px;background:var(--soft);color:var(--green-3);font-weight:800;cursor:pointer}
+.teacher-bottom-tabs button.active{background:linear-gradient(135deg,var(--green-2),var(--green));color:#fff}
+.teacher-merged-block{margin-top:18px}
+.teacher-merged-block h4{margin:0 0 12px}
+</style>
+
+<script id="final-tabs-fix-script">
+(function(){
+  function blockTitle(el){
+    if(!el) return '';
+    var h=el.querySelector('h4');
+    return h ? h.textContent.trim() : '';
+  }
+  function takeContent(source, title, note){
+    if(!source) return null;
+    var wrap = document.createElement('div');
+    wrap.className='panel teacher-merged-block';
+    wrap.setAttribute('data-merged-title', title);
+    wrap.innerHTML='<div class="split"><h4>'+title+'</h4>'+(note?'<span class="tag">'+note+'</span>':'')+'</div>';
+    while(source.firstChild) wrap.appendChild(source.firstChild);
+    return wrap;
+  }
+  function findMovedBlock(scope, wanted){
+    if(!scope) return null;
+    return Array.from(scope.querySelectorAll('.panel')).find(function(p){
+      var h=p.querySelector('h4');
+      return h && h.textContent.trim()===wanted;
+    }) || null;
+  }
+  function clearMerged(scope, titles){
+    if(!scope) return;
+    Array.from(scope.querySelectorAll('.panel')).forEach(function(p){
+      var h=p.querySelector('h4');
+      if(h && titles.includes(h.textContent.trim())) p.remove();
+    });
+  }
+  function rebuildUpperTabs(){
+    var tabs=document.getElementById('teacherMainTabs');
+    if(!tabs) return;
+    tabs.innerHTML='';
+    [['overview','الرئيسية'],['operations','الكشف'],['follow','المتابعة'],['messages','التواصل'],['settings','الإعدادات']].forEach(function(item){
+      var btn=document.createElement('button');
+      btn.dataset.tab=item[0];
+      btn.textContent=item[1];
+      if(window.app && window.app.state.selectedTab===item[0]) btn.classList.add('active');
+      btn.onclick=function(){ if(window.app){ window.app.switchTab(item[0]); syncBottom(); } };
+      tabs.appendChild(btn);
+    });
+  }
+  function buildBottomTabs(){
+    var section=document.getElementById('teacherSection');
+    if(!section) return;
+    var old=document.getElementById('teacherBottomTabs');
+    if(old) old.remove();
+    var wrap=document.createElement('div');
+    wrap.className='teacher-bottom-tabs';
+    wrap.id='teacherBottomTabs';
+    wrap.innerHTML='
+      <button data-low="overview">الرئيسية</button>
+      <button data-low="classes">الفصول والطلاب</button>
+      <button data-low="messages">الرسائل</button>';
+    section.appendChild(wrap);
+    wrap.querySelectorAll('button').forEach(function(btn){
+      btn.onclick=function(){ if(window.app){ window.app.switchTab(btn.dataset.low); syncBottom(); } };
+    });
+    syncBottom();
+  }
+  function syncBottom(){
+    var wrap=document.getElementById('teacherBottomTabs');
+    if(!wrap || !window.app) return;
+    wrap.querySelectorAll('button').forEach(function(btn){
+      btn.classList.toggle('active', btn.dataset.low===window.app.state.selectedTab);
+    });
+  }
+  function movePanels(){
+    var overview=document.getElementById('tab-overview');
+    var follow=document.getElementById('tab-follow');
+    var settings=document.getElementById('tab-settings');
+    var roulette=document.getElementById('tab-roulette');
+    var tasks=document.getElementById('tab-tasks');
+    var vip=document.getElementById('tab-vip');
+    var uploads=document.getElementById('tab-uploads');
+    if(!overview||!follow||!settings) return;
+
+    clearMerged(overview,['الروليت']);
+    clearMerged(follow,['الطلاب والفصول','المهام الأدائية','لوحة الشرف VIP']);
+    clearMerged(settings,['رفع الملفات','الإعدادات العامة']);
+
+    var rouletteBlock = findMovedBlock(overview,'الروليت');
+    if(!rouletteBlock && roulette && roulette.children.length){
+      rouletteBlock = takeContent(roulette,'الروليت','داخل الرئيسية');
+    }
+    if(rouletteBlock) overview.appendChild(rouletteBlock);
+    if(roulette) roulette.classList.add('hide');
+
+    var tasksBlock = findMovedBlock(follow,'المهام الأدائية');
+    if(!tasksBlock && tasks && tasks.children.length){
+      tasksBlock = takeContent(tasks,'المهام الأدائية','داخل المتابعة');
+    }
+    var vipBlock = findMovedBlock(follow,'لوحة الشرف VIP');
+    if(!vipBlock && vip && vip.children.length){
+      vipBlock = takeContent(vip,'لوحة الشرف VIP','داخل المتابعة');
+    }
+    follow.innerHTML='';
+    if(tasksBlock) follow.appendChild(tasksBlock);
+    if(vipBlock) follow.appendChild(vipBlock);
+    if(tasks) tasks.classList.add('hide');
+    if(vip) vip.classList.add('hide');
+
+    var uploadsBlock = document.getElementById('settingsUploadsHost');
+    if(!uploadsBlock && uploads && uploads.children.length){
+      uploadsBlock = takeContent(uploads,'رفع الملفات','داخل الإعدادات');
+      uploadsBlock.id='settingsUploadsHost';
+    }
+    settings.innerHTML='';
+    if(uploadsBlock) settings.appendChild(uploadsBlock);
+    if(uploads) uploads.classList.add('hide');
+  }
+  function patchRenderTabs(){
+    if(!window.app || window.app.__finalTabsFixed) return;
+    var old=window.app.renderTabs.bind(window.app);
+    window.app.renderTabs=function(){
+      old();
+      rebuildUpperTabs();
+      syncBottom();
+    };
+    window.app.__finalTabsFixed=true;
+  }
+  function run(){
+    if(!window.app || !document.getElementById('teacherSection')) return false;
+    movePanels();
+    rebuildUpperTabs();
+    buildBottomTabs();
+    patchRenderTabs();
+    syncBottom();
+    return true;
+  }
+  document.addEventListener('DOMContentLoaded', function(){
+    var tries=0;
+    var timer=setInterval(function(){
+      tries++;
+      if(run() || tries>20) clearInterval(timer);
+    }, 400);
+  });
+})();
+</script>
+
 </body></html>
         `);
         w.document.close();
@@ -2441,6 +2591,156 @@ function logoutTeacher(){
           <img src=x onerror="window.print()">
         
 
+
+<style id="final-tabs-fix-style">
+.teacher-bottom-tabs{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:18px;padding-top:12px;border-top:1px solid #e7efe9}
+.teacher-bottom-tabs button{border:none;padding:12px 18px;border-radius:999px;background:var(--soft);color:var(--green-3);font-weight:800;cursor:pointer}
+.teacher-bottom-tabs button.active{background:linear-gradient(135deg,var(--green-2),var(--green));color:#fff}
+.teacher-merged-block{margin-top:18px}
+.teacher-merged-block h4{margin:0 0 12px}
+</style>
+
+<script id="final-tabs-fix-script">
+(function(){
+  function blockTitle(el){
+    if(!el) return '';
+    var h=el.querySelector('h4');
+    return h ? h.textContent.trim() : '';
+  }
+  function takeContent(source, title, note){
+    if(!source) return null;
+    var wrap = document.createElement('div');
+    wrap.className='panel teacher-merged-block';
+    wrap.setAttribute('data-merged-title', title);
+    wrap.innerHTML='<div class="split"><h4>'+title+'</h4>'+(note?'<span class="tag">'+note+'</span>':'')+'</div>';
+    while(source.firstChild) wrap.appendChild(source.firstChild);
+    return wrap;
+  }
+  function findMovedBlock(scope, wanted){
+    if(!scope) return null;
+    return Array.from(scope.querySelectorAll('.panel')).find(function(p){
+      var h=p.querySelector('h4');
+      return h && h.textContent.trim()===wanted;
+    }) || null;
+  }
+  function clearMerged(scope, titles){
+    if(!scope) return;
+    Array.from(scope.querySelectorAll('.panel')).forEach(function(p){
+      var h=p.querySelector('h4');
+      if(h && titles.includes(h.textContent.trim())) p.remove();
+    });
+  }
+  function rebuildUpperTabs(){
+    var tabs=document.getElementById('teacherMainTabs');
+    if(!tabs) return;
+    tabs.innerHTML='';
+    [['overview','الرئيسية'],['operations','الكشف'],['follow','المتابعة'],['messages','التواصل'],['settings','الإعدادات']].forEach(function(item){
+      var btn=document.createElement('button');
+      btn.dataset.tab=item[0];
+      btn.textContent=item[1];
+      if(window.app && window.app.state.selectedTab===item[0]) btn.classList.add('active');
+      btn.onclick=function(){ if(window.app){ window.app.switchTab(item[0]); syncBottom(); } };
+      tabs.appendChild(btn);
+    });
+  }
+  function buildBottomTabs(){
+    var section=document.getElementById('teacherSection');
+    if(!section) return;
+    var old=document.getElementById('teacherBottomTabs');
+    if(old) old.remove();
+    var wrap=document.createElement('div');
+    wrap.className='teacher-bottom-tabs';
+    wrap.id='teacherBottomTabs';
+    wrap.innerHTML='
+      <button data-low="overview">الرئيسية</button>
+      <button data-low="classes">الفصول والطلاب</button>
+      <button data-low="messages">الرسائل</button>';
+    section.appendChild(wrap);
+    wrap.querySelectorAll('button').forEach(function(btn){
+      btn.onclick=function(){ if(window.app){ window.app.switchTab(btn.dataset.low); syncBottom(); } };
+    });
+    syncBottom();
+  }
+  function syncBottom(){
+    var wrap=document.getElementById('teacherBottomTabs');
+    if(!wrap || !window.app) return;
+    wrap.querySelectorAll('button').forEach(function(btn){
+      btn.classList.toggle('active', btn.dataset.low===window.app.state.selectedTab);
+    });
+  }
+  function movePanels(){
+    var overview=document.getElementById('tab-overview');
+    var follow=document.getElementById('tab-follow');
+    var settings=document.getElementById('tab-settings');
+    var roulette=document.getElementById('tab-roulette');
+    var tasks=document.getElementById('tab-tasks');
+    var vip=document.getElementById('tab-vip');
+    var uploads=document.getElementById('tab-uploads');
+    if(!overview||!follow||!settings) return;
+
+    clearMerged(overview,['الروليت']);
+    clearMerged(follow,['الطلاب والفصول','المهام الأدائية','لوحة الشرف VIP']);
+    clearMerged(settings,['رفع الملفات','الإعدادات العامة']);
+
+    var rouletteBlock = findMovedBlock(overview,'الروليت');
+    if(!rouletteBlock && roulette && roulette.children.length){
+      rouletteBlock = takeContent(roulette,'الروليت','داخل الرئيسية');
+    }
+    if(rouletteBlock) overview.appendChild(rouletteBlock);
+    if(roulette) roulette.classList.add('hide');
+
+    var tasksBlock = findMovedBlock(follow,'المهام الأدائية');
+    if(!tasksBlock && tasks && tasks.children.length){
+      tasksBlock = takeContent(tasks,'المهام الأدائية','داخل المتابعة');
+    }
+    var vipBlock = findMovedBlock(follow,'لوحة الشرف VIP');
+    if(!vipBlock && vip && vip.children.length){
+      vipBlock = takeContent(vip,'لوحة الشرف VIP','داخل المتابعة');
+    }
+    follow.innerHTML='';
+    if(tasksBlock) follow.appendChild(tasksBlock);
+    if(vipBlock) follow.appendChild(vipBlock);
+    if(tasks) tasks.classList.add('hide');
+    if(vip) vip.classList.add('hide');
+
+    var uploadsBlock = document.getElementById('settingsUploadsHost');
+    if(!uploadsBlock && uploads && uploads.children.length){
+      uploadsBlock = takeContent(uploads,'رفع الملفات','داخل الإعدادات');
+      uploadsBlock.id='settingsUploadsHost';
+    }
+    settings.innerHTML='';
+    if(uploadsBlock) settings.appendChild(uploadsBlock);
+    if(uploads) uploads.classList.add('hide');
+  }
+  function patchRenderTabs(){
+    if(!window.app || window.app.__finalTabsFixed) return;
+    var old=window.app.renderTabs.bind(window.app);
+    window.app.renderTabs=function(){
+      old();
+      rebuildUpperTabs();
+      syncBottom();
+    };
+    window.app.__finalTabsFixed=true;
+  }
+  function run(){
+    if(!window.app || !document.getElementById('teacherSection')) return false;
+    movePanels();
+    rebuildUpperTabs();
+    buildBottomTabs();
+    patchRenderTabs();
+    syncBottom();
+    return true;
+  }
+  document.addEventListener('DOMContentLoaded', function(){
+    var tries=0;
+    var timer=setInterval(function(){
+      tries++;
+      if(run() || tries>20) clearInterval(timer);
+    }, 400);
+  });
+})();
+</script>
+
 </body>
         </html>
       `);
@@ -2668,6 +2968,156 @@ function logoutTeacher(){
           </table>
           <img src=x onerror="window.print()">
         
+
+
+<style id="final-tabs-fix-style">
+.teacher-bottom-tabs{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:18px;padding-top:12px;border-top:1px solid #e7efe9}
+.teacher-bottom-tabs button{border:none;padding:12px 18px;border-radius:999px;background:var(--soft);color:var(--green-3);font-weight:800;cursor:pointer}
+.teacher-bottom-tabs button.active{background:linear-gradient(135deg,var(--green-2),var(--green));color:#fff}
+.teacher-merged-block{margin-top:18px}
+.teacher-merged-block h4{margin:0 0 12px}
+</style>
+
+<script id="final-tabs-fix-script">
+(function(){
+  function blockTitle(el){
+    if(!el) return '';
+    var h=el.querySelector('h4');
+    return h ? h.textContent.trim() : '';
+  }
+  function takeContent(source, title, note){
+    if(!source) return null;
+    var wrap = document.createElement('div');
+    wrap.className='panel teacher-merged-block';
+    wrap.setAttribute('data-merged-title', title);
+    wrap.innerHTML='<div class="split"><h4>'+title+'</h4>'+(note?'<span class="tag">'+note+'</span>':'')+'</div>';
+    while(source.firstChild) wrap.appendChild(source.firstChild);
+    return wrap;
+  }
+  function findMovedBlock(scope, wanted){
+    if(!scope) return null;
+    return Array.from(scope.querySelectorAll('.panel')).find(function(p){
+      var h=p.querySelector('h4');
+      return h && h.textContent.trim()===wanted;
+    }) || null;
+  }
+  function clearMerged(scope, titles){
+    if(!scope) return;
+    Array.from(scope.querySelectorAll('.panel')).forEach(function(p){
+      var h=p.querySelector('h4');
+      if(h && titles.includes(h.textContent.trim())) p.remove();
+    });
+  }
+  function rebuildUpperTabs(){
+    var tabs=document.getElementById('teacherMainTabs');
+    if(!tabs) return;
+    tabs.innerHTML='';
+    [['overview','الرئيسية'],['operations','الكشف'],['follow','المتابعة'],['messages','التواصل'],['settings','الإعدادات']].forEach(function(item){
+      var btn=document.createElement('button');
+      btn.dataset.tab=item[0];
+      btn.textContent=item[1];
+      if(window.app && window.app.state.selectedTab===item[0]) btn.classList.add('active');
+      btn.onclick=function(){ if(window.app){ window.app.switchTab(item[0]); syncBottom(); } };
+      tabs.appendChild(btn);
+    });
+  }
+  function buildBottomTabs(){
+    var section=document.getElementById('teacherSection');
+    if(!section) return;
+    var old=document.getElementById('teacherBottomTabs');
+    if(old) old.remove();
+    var wrap=document.createElement('div');
+    wrap.className='teacher-bottom-tabs';
+    wrap.id='teacherBottomTabs';
+    wrap.innerHTML='
+      <button data-low="overview">الرئيسية</button>
+      <button data-low="classes">الفصول والطلاب</button>
+      <button data-low="messages">الرسائل</button>';
+    section.appendChild(wrap);
+    wrap.querySelectorAll('button').forEach(function(btn){
+      btn.onclick=function(){ if(window.app){ window.app.switchTab(btn.dataset.low); syncBottom(); } };
+    });
+    syncBottom();
+  }
+  function syncBottom(){
+    var wrap=document.getElementById('teacherBottomTabs');
+    if(!wrap || !window.app) return;
+    wrap.querySelectorAll('button').forEach(function(btn){
+      btn.classList.toggle('active', btn.dataset.low===window.app.state.selectedTab);
+    });
+  }
+  function movePanels(){
+    var overview=document.getElementById('tab-overview');
+    var follow=document.getElementById('tab-follow');
+    var settings=document.getElementById('tab-settings');
+    var roulette=document.getElementById('tab-roulette');
+    var tasks=document.getElementById('tab-tasks');
+    var vip=document.getElementById('tab-vip');
+    var uploads=document.getElementById('tab-uploads');
+    if(!overview||!follow||!settings) return;
+
+    clearMerged(overview,['الروليت']);
+    clearMerged(follow,['الطلاب والفصول','المهام الأدائية','لوحة الشرف VIP']);
+    clearMerged(settings,['رفع الملفات','الإعدادات العامة']);
+
+    var rouletteBlock = findMovedBlock(overview,'الروليت');
+    if(!rouletteBlock && roulette && roulette.children.length){
+      rouletteBlock = takeContent(roulette,'الروليت','داخل الرئيسية');
+    }
+    if(rouletteBlock) overview.appendChild(rouletteBlock);
+    if(roulette) roulette.classList.add('hide');
+
+    var tasksBlock = findMovedBlock(follow,'المهام الأدائية');
+    if(!tasksBlock && tasks && tasks.children.length){
+      tasksBlock = takeContent(tasks,'المهام الأدائية','داخل المتابعة');
+    }
+    var vipBlock = findMovedBlock(follow,'لوحة الشرف VIP');
+    if(!vipBlock && vip && vip.children.length){
+      vipBlock = takeContent(vip,'لوحة الشرف VIP','داخل المتابعة');
+    }
+    follow.innerHTML='';
+    if(tasksBlock) follow.appendChild(tasksBlock);
+    if(vipBlock) follow.appendChild(vipBlock);
+    if(tasks) tasks.classList.add('hide');
+    if(vip) vip.classList.add('hide');
+
+    var uploadsBlock = document.getElementById('settingsUploadsHost');
+    if(!uploadsBlock && uploads && uploads.children.length){
+      uploadsBlock = takeContent(uploads,'رفع الملفات','داخل الإعدادات');
+      uploadsBlock.id='settingsUploadsHost';
+    }
+    settings.innerHTML='';
+    if(uploadsBlock) settings.appendChild(uploadsBlock);
+    if(uploads) uploads.classList.add('hide');
+  }
+  function patchRenderTabs(){
+    if(!window.app || window.app.__finalTabsFixed) return;
+    var old=window.app.renderTabs.bind(window.app);
+    window.app.renderTabs=function(){
+      old();
+      rebuildUpperTabs();
+      syncBottom();
+    };
+    window.app.__finalTabsFixed=true;
+  }
+  function run(){
+    if(!window.app || !document.getElementById('teacherSection')) return false;
+    movePanels();
+    rebuildUpperTabs();
+    buildBottomTabs();
+    patchRenderTabs();
+    syncBottom();
+    return true;
+  }
+  document.addEventListener('DOMContentLoaded', function(){
+    var tries=0;
+    var timer=setInterval(function(){
+      tries++;
+      if(run() || tries>20) clearInterval(timer);
+    }, 400);
+  });
+})();
+</script>
 
 </body>
         </html>
@@ -3163,6 +3613,156 @@ function logoutTeacher(){
       <scr'+'ipt>window.onload=function(){window.print();setTimeout(function(){window.close()},300)}<\/scr'+'ipt>
       
 
+
+<style id="final-tabs-fix-style">
+.teacher-bottom-tabs{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:18px;padding-top:12px;border-top:1px solid #e7efe9}
+.teacher-bottom-tabs button{border:none;padding:12px 18px;border-radius:999px;background:var(--soft);color:var(--green-3);font-weight:800;cursor:pointer}
+.teacher-bottom-tabs button.active{background:linear-gradient(135deg,var(--green-2),var(--green));color:#fff}
+.teacher-merged-block{margin-top:18px}
+.teacher-merged-block h4{margin:0 0 12px}
+</style>
+
+<script id="final-tabs-fix-script">
+(function(){
+  function blockTitle(el){
+    if(!el) return '';
+    var h=el.querySelector('h4');
+    return h ? h.textContent.trim() : '';
+  }
+  function takeContent(source, title, note){
+    if(!source) return null;
+    var wrap = document.createElement('div');
+    wrap.className='panel teacher-merged-block';
+    wrap.setAttribute('data-merged-title', title);
+    wrap.innerHTML='<div class="split"><h4>'+title+'</h4>'+(note?'<span class="tag">'+note+'</span>':'')+'</div>';
+    while(source.firstChild) wrap.appendChild(source.firstChild);
+    return wrap;
+  }
+  function findMovedBlock(scope, wanted){
+    if(!scope) return null;
+    return Array.from(scope.querySelectorAll('.panel')).find(function(p){
+      var h=p.querySelector('h4');
+      return h && h.textContent.trim()===wanted;
+    }) || null;
+  }
+  function clearMerged(scope, titles){
+    if(!scope) return;
+    Array.from(scope.querySelectorAll('.panel')).forEach(function(p){
+      var h=p.querySelector('h4');
+      if(h && titles.includes(h.textContent.trim())) p.remove();
+    });
+  }
+  function rebuildUpperTabs(){
+    var tabs=document.getElementById('teacherMainTabs');
+    if(!tabs) return;
+    tabs.innerHTML='';
+    [['overview','الرئيسية'],['operations','الكشف'],['follow','المتابعة'],['messages','التواصل'],['settings','الإعدادات']].forEach(function(item){
+      var btn=document.createElement('button');
+      btn.dataset.tab=item[0];
+      btn.textContent=item[1];
+      if(window.app && window.app.state.selectedTab===item[0]) btn.classList.add('active');
+      btn.onclick=function(){ if(window.app){ window.app.switchTab(item[0]); syncBottom(); } };
+      tabs.appendChild(btn);
+    });
+  }
+  function buildBottomTabs(){
+    var section=document.getElementById('teacherSection');
+    if(!section) return;
+    var old=document.getElementById('teacherBottomTabs');
+    if(old) old.remove();
+    var wrap=document.createElement('div');
+    wrap.className='teacher-bottom-tabs';
+    wrap.id='teacherBottomTabs';
+    wrap.innerHTML='
+      <button data-low="overview">الرئيسية</button>
+      <button data-low="classes">الفصول والطلاب</button>
+      <button data-low="messages">الرسائل</button>';
+    section.appendChild(wrap);
+    wrap.querySelectorAll('button').forEach(function(btn){
+      btn.onclick=function(){ if(window.app){ window.app.switchTab(btn.dataset.low); syncBottom(); } };
+    });
+    syncBottom();
+  }
+  function syncBottom(){
+    var wrap=document.getElementById('teacherBottomTabs');
+    if(!wrap || !window.app) return;
+    wrap.querySelectorAll('button').forEach(function(btn){
+      btn.classList.toggle('active', btn.dataset.low===window.app.state.selectedTab);
+    });
+  }
+  function movePanels(){
+    var overview=document.getElementById('tab-overview');
+    var follow=document.getElementById('tab-follow');
+    var settings=document.getElementById('tab-settings');
+    var roulette=document.getElementById('tab-roulette');
+    var tasks=document.getElementById('tab-tasks');
+    var vip=document.getElementById('tab-vip');
+    var uploads=document.getElementById('tab-uploads');
+    if(!overview||!follow||!settings) return;
+
+    clearMerged(overview,['الروليت']);
+    clearMerged(follow,['الطلاب والفصول','المهام الأدائية','لوحة الشرف VIP']);
+    clearMerged(settings,['رفع الملفات','الإعدادات العامة']);
+
+    var rouletteBlock = findMovedBlock(overview,'الروليت');
+    if(!rouletteBlock && roulette && roulette.children.length){
+      rouletteBlock = takeContent(roulette,'الروليت','داخل الرئيسية');
+    }
+    if(rouletteBlock) overview.appendChild(rouletteBlock);
+    if(roulette) roulette.classList.add('hide');
+
+    var tasksBlock = findMovedBlock(follow,'المهام الأدائية');
+    if(!tasksBlock && tasks && tasks.children.length){
+      tasksBlock = takeContent(tasks,'المهام الأدائية','داخل المتابعة');
+    }
+    var vipBlock = findMovedBlock(follow,'لوحة الشرف VIP');
+    if(!vipBlock && vip && vip.children.length){
+      vipBlock = takeContent(vip,'لوحة الشرف VIP','داخل المتابعة');
+    }
+    follow.innerHTML='';
+    if(tasksBlock) follow.appendChild(tasksBlock);
+    if(vipBlock) follow.appendChild(vipBlock);
+    if(tasks) tasks.classList.add('hide');
+    if(vip) vip.classList.add('hide');
+
+    var uploadsBlock = document.getElementById('settingsUploadsHost');
+    if(!uploadsBlock && uploads && uploads.children.length){
+      uploadsBlock = takeContent(uploads,'رفع الملفات','داخل الإعدادات');
+      uploadsBlock.id='settingsUploadsHost';
+    }
+    settings.innerHTML='';
+    if(uploadsBlock) settings.appendChild(uploadsBlock);
+    if(uploads) uploads.classList.add('hide');
+  }
+  function patchRenderTabs(){
+    if(!window.app || window.app.__finalTabsFixed) return;
+    var old=window.app.renderTabs.bind(window.app);
+    window.app.renderTabs=function(){
+      old();
+      rebuildUpperTabs();
+      syncBottom();
+    };
+    window.app.__finalTabsFixed=true;
+  }
+  function run(){
+    if(!window.app || !document.getElementById('teacherSection')) return false;
+    movePanels();
+    rebuildUpperTabs();
+    buildBottomTabs();
+    patchRenderTabs();
+    syncBottom();
+    return true;
+  }
+  document.addEventListener('DOMContentLoaded', function(){
+    var tries=0;
+    var timer=setInterval(function(){
+      tries++;
+      if(run() || tries>20) clearInterval(timer);
+    }, 400);
+  });
+})();
+</script>
+
 </body></html>`);
     w.document.close();
     app.toast('تم تجهيز طباعة قائمة الطلاب PDF');
@@ -3202,6 +3802,156 @@ function logoutTeacher(){
         .pdf-sign-area img{height:70px;object-fit:contain}
         @media print{@page{size:A4;margin:18mm}}
       </style></head><body>${cards}<scr'+'ipt>window.onload=function(){window.print()}<\/scr'+'ipt>
+
+
+<style id="final-tabs-fix-style">
+.teacher-bottom-tabs{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:18px;padding-top:12px;border-top:1px solid #e7efe9}
+.teacher-bottom-tabs button{border:none;padding:12px 18px;border-radius:999px;background:var(--soft);color:var(--green-3);font-weight:800;cursor:pointer}
+.teacher-bottom-tabs button.active{background:linear-gradient(135deg,var(--green-2),var(--green));color:#fff}
+.teacher-merged-block{margin-top:18px}
+.teacher-merged-block h4{margin:0 0 12px}
+</style>
+
+<script id="final-tabs-fix-script">
+(function(){
+  function blockTitle(el){
+    if(!el) return '';
+    var h=el.querySelector('h4');
+    return h ? h.textContent.trim() : '';
+  }
+  function takeContent(source, title, note){
+    if(!source) return null;
+    var wrap = document.createElement('div');
+    wrap.className='panel teacher-merged-block';
+    wrap.setAttribute('data-merged-title', title);
+    wrap.innerHTML='<div class="split"><h4>'+title+'</h4>'+(note?'<span class="tag">'+note+'</span>':'')+'</div>';
+    while(source.firstChild) wrap.appendChild(source.firstChild);
+    return wrap;
+  }
+  function findMovedBlock(scope, wanted){
+    if(!scope) return null;
+    return Array.from(scope.querySelectorAll('.panel')).find(function(p){
+      var h=p.querySelector('h4');
+      return h && h.textContent.trim()===wanted;
+    }) || null;
+  }
+  function clearMerged(scope, titles){
+    if(!scope) return;
+    Array.from(scope.querySelectorAll('.panel')).forEach(function(p){
+      var h=p.querySelector('h4');
+      if(h && titles.includes(h.textContent.trim())) p.remove();
+    });
+  }
+  function rebuildUpperTabs(){
+    var tabs=document.getElementById('teacherMainTabs');
+    if(!tabs) return;
+    tabs.innerHTML='';
+    [['overview','الرئيسية'],['operations','الكشف'],['follow','المتابعة'],['messages','التواصل'],['settings','الإعدادات']].forEach(function(item){
+      var btn=document.createElement('button');
+      btn.dataset.tab=item[0];
+      btn.textContent=item[1];
+      if(window.app && window.app.state.selectedTab===item[0]) btn.classList.add('active');
+      btn.onclick=function(){ if(window.app){ window.app.switchTab(item[0]); syncBottom(); } };
+      tabs.appendChild(btn);
+    });
+  }
+  function buildBottomTabs(){
+    var section=document.getElementById('teacherSection');
+    if(!section) return;
+    var old=document.getElementById('teacherBottomTabs');
+    if(old) old.remove();
+    var wrap=document.createElement('div');
+    wrap.className='teacher-bottom-tabs';
+    wrap.id='teacherBottomTabs';
+    wrap.innerHTML='
+      <button data-low="overview">الرئيسية</button>
+      <button data-low="classes">الفصول والطلاب</button>
+      <button data-low="messages">الرسائل</button>';
+    section.appendChild(wrap);
+    wrap.querySelectorAll('button').forEach(function(btn){
+      btn.onclick=function(){ if(window.app){ window.app.switchTab(btn.dataset.low); syncBottom(); } };
+    });
+    syncBottom();
+  }
+  function syncBottom(){
+    var wrap=document.getElementById('teacherBottomTabs');
+    if(!wrap || !window.app) return;
+    wrap.querySelectorAll('button').forEach(function(btn){
+      btn.classList.toggle('active', btn.dataset.low===window.app.state.selectedTab);
+    });
+  }
+  function movePanels(){
+    var overview=document.getElementById('tab-overview');
+    var follow=document.getElementById('tab-follow');
+    var settings=document.getElementById('tab-settings');
+    var roulette=document.getElementById('tab-roulette');
+    var tasks=document.getElementById('tab-tasks');
+    var vip=document.getElementById('tab-vip');
+    var uploads=document.getElementById('tab-uploads');
+    if(!overview||!follow||!settings) return;
+
+    clearMerged(overview,['الروليت']);
+    clearMerged(follow,['الطلاب والفصول','المهام الأدائية','لوحة الشرف VIP']);
+    clearMerged(settings,['رفع الملفات','الإعدادات العامة']);
+
+    var rouletteBlock = findMovedBlock(overview,'الروليت');
+    if(!rouletteBlock && roulette && roulette.children.length){
+      rouletteBlock = takeContent(roulette,'الروليت','داخل الرئيسية');
+    }
+    if(rouletteBlock) overview.appendChild(rouletteBlock);
+    if(roulette) roulette.classList.add('hide');
+
+    var tasksBlock = findMovedBlock(follow,'المهام الأدائية');
+    if(!tasksBlock && tasks && tasks.children.length){
+      tasksBlock = takeContent(tasks,'المهام الأدائية','داخل المتابعة');
+    }
+    var vipBlock = findMovedBlock(follow,'لوحة الشرف VIP');
+    if(!vipBlock && vip && vip.children.length){
+      vipBlock = takeContent(vip,'لوحة الشرف VIP','داخل المتابعة');
+    }
+    follow.innerHTML='';
+    if(tasksBlock) follow.appendChild(tasksBlock);
+    if(vipBlock) follow.appendChild(vipBlock);
+    if(tasks) tasks.classList.add('hide');
+    if(vip) vip.classList.add('hide');
+
+    var uploadsBlock = document.getElementById('settingsUploadsHost');
+    if(!uploadsBlock && uploads && uploads.children.length){
+      uploadsBlock = takeContent(uploads,'رفع الملفات','داخل الإعدادات');
+      uploadsBlock.id='settingsUploadsHost';
+    }
+    settings.innerHTML='';
+    if(uploadsBlock) settings.appendChild(uploadsBlock);
+    if(uploads) uploads.classList.add('hide');
+  }
+  function patchRenderTabs(){
+    if(!window.app || window.app.__finalTabsFixed) return;
+    var old=window.app.renderTabs.bind(window.app);
+    window.app.renderTabs=function(){
+      old();
+      rebuildUpperTabs();
+      syncBottom();
+    };
+    window.app.__finalTabsFixed=true;
+  }
+  function run(){
+    if(!window.app || !document.getElementById('teacherSection')) return false;
+    movePanels();
+    rebuildUpperTabs();
+    buildBottomTabs();
+    patchRenderTabs();
+    syncBottom();
+    return true;
+  }
+  document.addEventListener('DOMContentLoaded', function(){
+    var tries=0;
+    var timer=setInterval(function(){
+      tries++;
+      if(run() || tries>20) clearInterval(timer);
+    }, 400);
+  });
+})();
+</script>
 
 </body></html>`);
       w.document.close();
@@ -3550,6 +4300,156 @@ function logoutTeacher(){
       }).join('');
       w.document.write('<html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>شهادات لوحة شرف الفصل</title><style>body{font-family:Tahoma,Arial,sans-serif;color:#21402f}@media print{@page{size:A4;margin:18mm}}</style></head><body>' + cards + '<scr'+'ipt>window.onload=function(){window.print()}<\/scr'+'ipt>
 
+
+<style id="final-tabs-fix-style">
+.teacher-bottom-tabs{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:18px;padding-top:12px;border-top:1px solid #e7efe9}
+.teacher-bottom-tabs button{border:none;padding:12px 18px;border-radius:999px;background:var(--soft);color:var(--green-3);font-weight:800;cursor:pointer}
+.teacher-bottom-tabs button.active{background:linear-gradient(135deg,var(--green-2),var(--green));color:#fff}
+.teacher-merged-block{margin-top:18px}
+.teacher-merged-block h4{margin:0 0 12px}
+</style>
+
+<script id="final-tabs-fix-script">
+(function(){
+  function blockTitle(el){
+    if(!el) return '';
+    var h=el.querySelector('h4');
+    return h ? h.textContent.trim() : '';
+  }
+  function takeContent(source, title, note){
+    if(!source) return null;
+    var wrap = document.createElement('div');
+    wrap.className='panel teacher-merged-block';
+    wrap.setAttribute('data-merged-title', title);
+    wrap.innerHTML='<div class="split"><h4>'+title+'</h4>'+(note?'<span class="tag">'+note+'</span>':'')+'</div>';
+    while(source.firstChild) wrap.appendChild(source.firstChild);
+    return wrap;
+  }
+  function findMovedBlock(scope, wanted){
+    if(!scope) return null;
+    return Array.from(scope.querySelectorAll('.panel')).find(function(p){
+      var h=p.querySelector('h4');
+      return h && h.textContent.trim()===wanted;
+    }) || null;
+  }
+  function clearMerged(scope, titles){
+    if(!scope) return;
+    Array.from(scope.querySelectorAll('.panel')).forEach(function(p){
+      var h=p.querySelector('h4');
+      if(h && titles.includes(h.textContent.trim())) p.remove();
+    });
+  }
+  function rebuildUpperTabs(){
+    var tabs=document.getElementById('teacherMainTabs');
+    if(!tabs) return;
+    tabs.innerHTML='';
+    [['overview','الرئيسية'],['operations','الكشف'],['follow','المتابعة'],['messages','التواصل'],['settings','الإعدادات']].forEach(function(item){
+      var btn=document.createElement('button');
+      btn.dataset.tab=item[0];
+      btn.textContent=item[1];
+      if(window.app && window.app.state.selectedTab===item[0]) btn.classList.add('active');
+      btn.onclick=function(){ if(window.app){ window.app.switchTab(item[0]); syncBottom(); } };
+      tabs.appendChild(btn);
+    });
+  }
+  function buildBottomTabs(){
+    var section=document.getElementById('teacherSection');
+    if(!section) return;
+    var old=document.getElementById('teacherBottomTabs');
+    if(old) old.remove();
+    var wrap=document.createElement('div');
+    wrap.className='teacher-bottom-tabs';
+    wrap.id='teacherBottomTabs';
+    wrap.innerHTML='
+      <button data-low="overview">الرئيسية</button>
+      <button data-low="classes">الفصول والطلاب</button>
+      <button data-low="messages">الرسائل</button>';
+    section.appendChild(wrap);
+    wrap.querySelectorAll('button').forEach(function(btn){
+      btn.onclick=function(){ if(window.app){ window.app.switchTab(btn.dataset.low); syncBottom(); } };
+    });
+    syncBottom();
+  }
+  function syncBottom(){
+    var wrap=document.getElementById('teacherBottomTabs');
+    if(!wrap || !window.app) return;
+    wrap.querySelectorAll('button').forEach(function(btn){
+      btn.classList.toggle('active', btn.dataset.low===window.app.state.selectedTab);
+    });
+  }
+  function movePanels(){
+    var overview=document.getElementById('tab-overview');
+    var follow=document.getElementById('tab-follow');
+    var settings=document.getElementById('tab-settings');
+    var roulette=document.getElementById('tab-roulette');
+    var tasks=document.getElementById('tab-tasks');
+    var vip=document.getElementById('tab-vip');
+    var uploads=document.getElementById('tab-uploads');
+    if(!overview||!follow||!settings) return;
+
+    clearMerged(overview,['الروليت']);
+    clearMerged(follow,['الطلاب والفصول','المهام الأدائية','لوحة الشرف VIP']);
+    clearMerged(settings,['رفع الملفات','الإعدادات العامة']);
+
+    var rouletteBlock = findMovedBlock(overview,'الروليت');
+    if(!rouletteBlock && roulette && roulette.children.length){
+      rouletteBlock = takeContent(roulette,'الروليت','داخل الرئيسية');
+    }
+    if(rouletteBlock) overview.appendChild(rouletteBlock);
+    if(roulette) roulette.classList.add('hide');
+
+    var tasksBlock = findMovedBlock(follow,'المهام الأدائية');
+    if(!tasksBlock && tasks && tasks.children.length){
+      tasksBlock = takeContent(tasks,'المهام الأدائية','داخل المتابعة');
+    }
+    var vipBlock = findMovedBlock(follow,'لوحة الشرف VIP');
+    if(!vipBlock && vip && vip.children.length){
+      vipBlock = takeContent(vip,'لوحة الشرف VIP','داخل المتابعة');
+    }
+    follow.innerHTML='';
+    if(tasksBlock) follow.appendChild(tasksBlock);
+    if(vipBlock) follow.appendChild(vipBlock);
+    if(tasks) tasks.classList.add('hide');
+    if(vip) vip.classList.add('hide');
+
+    var uploadsBlock = document.getElementById('settingsUploadsHost');
+    if(!uploadsBlock && uploads && uploads.children.length){
+      uploadsBlock = takeContent(uploads,'رفع الملفات','داخل الإعدادات');
+      uploadsBlock.id='settingsUploadsHost';
+    }
+    settings.innerHTML='';
+    if(uploadsBlock) settings.appendChild(uploadsBlock);
+    if(uploads) uploads.classList.add('hide');
+  }
+  function patchRenderTabs(){
+    if(!window.app || window.app.__finalTabsFixed) return;
+    var old=window.app.renderTabs.bind(window.app);
+    window.app.renderTabs=function(){
+      old();
+      rebuildUpperTabs();
+      syncBottom();
+    };
+    window.app.__finalTabsFixed=true;
+  }
+  function run(){
+    if(!window.app || !document.getElementById('teacherSection')) return false;
+    movePanels();
+    rebuildUpperTabs();
+    buildBottomTabs();
+    patchRenderTabs();
+    syncBottom();
+    return true;
+  }
+  document.addEventListener('DOMContentLoaded', function(){
+    var tries=0;
+    var timer=setInterval(function(){
+      tries++;
+      if(run() || tries>20) clearInterval(timer);
+    }, 400);
+  });
+})();
+</script>
+
 </body></html>');
       w.document.close();
       app.toast && app.toast('تم توليد شهادة PDF تلقائيًا');
@@ -3844,6 +4744,156 @@ function logoutTeacher(){
         + '<table><thead><tr><th>التاريخ</th><th>اليوم</th><th>الحصة</th><th>الوقت</th><th>المادة</th><th>نوع العملية</th><th>المبلغ</th><th>السبب</th><th>المرفق</th></tr></thead><tbody>' + (txRows || '<tr><td colspan="9">لا توجد عمليات</td></tr>') + '</tbody></table>'
         + '<div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:26px"><div class="sub">اعتماد المعلمة: ' + escapeHtml(p.teacherName || '—') + '</div><div>' + sign + '</div></div>'
         + '<img src=x onerror="window.print()">
+
+
+<style id="final-tabs-fix-style">
+.teacher-bottom-tabs{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:18px;padding-top:12px;border-top:1px solid #e7efe9}
+.teacher-bottom-tabs button{border:none;padding:12px 18px;border-radius:999px;background:var(--soft);color:var(--green-3);font-weight:800;cursor:pointer}
+.teacher-bottom-tabs button.active{background:linear-gradient(135deg,var(--green-2),var(--green));color:#fff}
+.teacher-merged-block{margin-top:18px}
+.teacher-merged-block h4{margin:0 0 12px}
+</style>
+
+<script id="final-tabs-fix-script">
+(function(){
+  function blockTitle(el){
+    if(!el) return '';
+    var h=el.querySelector('h4');
+    return h ? h.textContent.trim() : '';
+  }
+  function takeContent(source, title, note){
+    if(!source) return null;
+    var wrap = document.createElement('div');
+    wrap.className='panel teacher-merged-block';
+    wrap.setAttribute('data-merged-title', title);
+    wrap.innerHTML='<div class="split"><h4>'+title+'</h4>'+(note?'<span class="tag">'+note+'</span>':'')+'</div>';
+    while(source.firstChild) wrap.appendChild(source.firstChild);
+    return wrap;
+  }
+  function findMovedBlock(scope, wanted){
+    if(!scope) return null;
+    return Array.from(scope.querySelectorAll('.panel')).find(function(p){
+      var h=p.querySelector('h4');
+      return h && h.textContent.trim()===wanted;
+    }) || null;
+  }
+  function clearMerged(scope, titles){
+    if(!scope) return;
+    Array.from(scope.querySelectorAll('.panel')).forEach(function(p){
+      var h=p.querySelector('h4');
+      if(h && titles.includes(h.textContent.trim())) p.remove();
+    });
+  }
+  function rebuildUpperTabs(){
+    var tabs=document.getElementById('teacherMainTabs');
+    if(!tabs) return;
+    tabs.innerHTML='';
+    [['overview','الرئيسية'],['operations','الكشف'],['follow','المتابعة'],['messages','التواصل'],['settings','الإعدادات']].forEach(function(item){
+      var btn=document.createElement('button');
+      btn.dataset.tab=item[0];
+      btn.textContent=item[1];
+      if(window.app && window.app.state.selectedTab===item[0]) btn.classList.add('active');
+      btn.onclick=function(){ if(window.app){ window.app.switchTab(item[0]); syncBottom(); } };
+      tabs.appendChild(btn);
+    });
+  }
+  function buildBottomTabs(){
+    var section=document.getElementById('teacherSection');
+    if(!section) return;
+    var old=document.getElementById('teacherBottomTabs');
+    if(old) old.remove();
+    var wrap=document.createElement('div');
+    wrap.className='teacher-bottom-tabs';
+    wrap.id='teacherBottomTabs';
+    wrap.innerHTML='
+      <button data-low="overview">الرئيسية</button>
+      <button data-low="classes">الفصول والطلاب</button>
+      <button data-low="messages">الرسائل</button>';
+    section.appendChild(wrap);
+    wrap.querySelectorAll('button').forEach(function(btn){
+      btn.onclick=function(){ if(window.app){ window.app.switchTab(btn.dataset.low); syncBottom(); } };
+    });
+    syncBottom();
+  }
+  function syncBottom(){
+    var wrap=document.getElementById('teacherBottomTabs');
+    if(!wrap || !window.app) return;
+    wrap.querySelectorAll('button').forEach(function(btn){
+      btn.classList.toggle('active', btn.dataset.low===window.app.state.selectedTab);
+    });
+  }
+  function movePanels(){
+    var overview=document.getElementById('tab-overview');
+    var follow=document.getElementById('tab-follow');
+    var settings=document.getElementById('tab-settings');
+    var roulette=document.getElementById('tab-roulette');
+    var tasks=document.getElementById('tab-tasks');
+    var vip=document.getElementById('tab-vip');
+    var uploads=document.getElementById('tab-uploads');
+    if(!overview||!follow||!settings) return;
+
+    clearMerged(overview,['الروليت']);
+    clearMerged(follow,['الطلاب والفصول','المهام الأدائية','لوحة الشرف VIP']);
+    clearMerged(settings,['رفع الملفات','الإعدادات العامة']);
+
+    var rouletteBlock = findMovedBlock(overview,'الروليت');
+    if(!rouletteBlock && roulette && roulette.children.length){
+      rouletteBlock = takeContent(roulette,'الروليت','داخل الرئيسية');
+    }
+    if(rouletteBlock) overview.appendChild(rouletteBlock);
+    if(roulette) roulette.classList.add('hide');
+
+    var tasksBlock = findMovedBlock(follow,'المهام الأدائية');
+    if(!tasksBlock && tasks && tasks.children.length){
+      tasksBlock = takeContent(tasks,'المهام الأدائية','داخل المتابعة');
+    }
+    var vipBlock = findMovedBlock(follow,'لوحة الشرف VIP');
+    if(!vipBlock && vip && vip.children.length){
+      vipBlock = takeContent(vip,'لوحة الشرف VIP','داخل المتابعة');
+    }
+    follow.innerHTML='';
+    if(tasksBlock) follow.appendChild(tasksBlock);
+    if(vipBlock) follow.appendChild(vipBlock);
+    if(tasks) tasks.classList.add('hide');
+    if(vip) vip.classList.add('hide');
+
+    var uploadsBlock = document.getElementById('settingsUploadsHost');
+    if(!uploadsBlock && uploads && uploads.children.length){
+      uploadsBlock = takeContent(uploads,'رفع الملفات','داخل الإعدادات');
+      uploadsBlock.id='settingsUploadsHost';
+    }
+    settings.innerHTML='';
+    if(uploadsBlock) settings.appendChild(uploadsBlock);
+    if(uploads) uploads.classList.add('hide');
+  }
+  function patchRenderTabs(){
+    if(!window.app || window.app.__finalTabsFixed) return;
+    var old=window.app.renderTabs.bind(window.app);
+    window.app.renderTabs=function(){
+      old();
+      rebuildUpperTabs();
+      syncBottom();
+    };
+    window.app.__finalTabsFixed=true;
+  }
+  function run(){
+    if(!window.app || !document.getElementById('teacherSection')) return false;
+    movePanels();
+    rebuildUpperTabs();
+    buildBottomTabs();
+    patchRenderTabs();
+    syncBottom();
+    return true;
+  }
+  document.addEventListener('DOMContentLoaded', function(){
+    var tries=0;
+    var timer=setInterval(function(){
+      tries++;
+      if(run() || tries>20) clearInterval(timer);
+    }, 400);
+  });
+})();
+</script>
 
 </body></html>');
       w.document.close();
@@ -4158,11 +5208,6 @@ function logoutTeacher(){
 
 
 
-<style id="teacher-shortcuts-style">
-#teacherQuickTabs{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
-#teacherQuickTabs .small-btn{padding:12px 18px;border-radius:999px;font-weight:800;background:var(--soft);color:var(--green-3);border:1px solid #dfe9e2}
-#teacherQuickTabs .small-btn.active{background:linear-gradient(135deg,var(--green-2),var(--green));color:#fff;border-color:transparent}
-</style>
 <script id="teacher-tabs-merge-layout">
 (function(){
   function moveChildren(from, to){
@@ -4176,7 +5221,7 @@ function logoutTeacher(){
     wrap.innerHTML = '<div class="split"><h4>' + title + '</h4>' + (note ? '<span class="tag">' + note + '</span>' : '') + '</div>';
     return wrap;
   }
-  function rebuildMainTabs(){
+  function rebuildTabs(){
     var tabs = document.getElementById('teacherMainTabs');
     if(!tabs) return;
     tabs.innerHTML = '';
@@ -4186,33 +5231,14 @@ function logoutTeacher(){
       ['follow','المتابعة'],
       ['messages','التواصل'],
       ['settings','الإعدادات']
-    ].forEach(function(item){
+    ].forEach(function(item, idx){
       var btn = document.createElement('button');
       btn.dataset.tab = item[0];
       btn.textContent = item[1];
+      if(idx === 0) btn.classList.add('active');
       btn.onclick = function(){ if(window.app) window.app.switchTab(item[0]); };
       tabs.appendChild(btn);
     });
-  }
-  function ensureQuickTabs(){
-    var head = document.querySelector('#teacherSection .section-head');
-    if(!head || document.getElementById('teacherQuickTabs')) return;
-    var quick = document.createElement('div');
-    quick.id = 'teacherQuickTabs';
-    [
-      ['overview','الرئيسية'],
-      ['classes','الفصول والطلاب'],
-      ['messages','الرسائل']
-    ].forEach(function(item){
-      var btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'small-btn';
-      btn.dataset.quickTab = item[0];
-      btn.textContent = item[1];
-      btn.onclick = function(){ if(window.app) window.app.switchTab(item[0]); };
-      quick.appendChild(btn);
-    });
-    head.insertAdjacentElement('afterend', quick);
   }
   function moveUploadsIntoSettings(){
     var uploads = document.getElementById('tab-uploads');
@@ -4234,12 +5260,13 @@ function logoutTeacher(){
     var overview = document.getElementById('tab-overview');
     var follow = document.getElementById('tab-follow');
     var settings = document.getElementById('tab-settings');
+    var classes = document.getElementById('tab-classes');
     var tasks = document.getElementById('tab-tasks');
     var roulette = document.getElementById('tab-roulette');
     var vip = document.getElementById('tab-vip');
-    if(!overview || !follow || !settings || !tasks || !roulette || !vip) return;
-    rebuildMainTabs();
-    ensureQuickTabs();
+    var messages = document.getElementById('tab-messages');
+    if(!overview || !follow || !settings || !classes || !tasks || !roulette || !vip || !messages) return;
+    rebuildTabs();
     if(!overview.dataset.mergedMain){
       var wrap = makeBlock('الروليت', 'مركز الحصة');
       moveChildren(roulette, wrap);
@@ -4248,6 +5275,9 @@ function logoutTeacher(){
       roulette.classList.add('hide');
     }
     if(!follow.dataset.mergedMain){
+      var classesWrap = makeBlock('الطلاب والفصول', 'المتابعة اليومية');
+      moveChildren(classes, classesWrap);
+      follow.appendChild(classesWrap);
       var tasksWrap = makeBlock('المهام الأدائية', 'نتيجة الأداء');
       moveChildren(tasks, tasksWrap);
       follow.appendChild(tasksWrap);
@@ -4255,6 +5285,7 @@ function logoutTeacher(){
       moveChildren(vip, vipWrap);
       follow.appendChild(vipWrap);
       follow.dataset.mergedMain = '1';
+      classes.classList.add('hide');
       tasks.classList.add('hide');
       vip.classList.add('hide');
     }
@@ -4263,52 +5294,176 @@ function logoutTeacher(){
       settings.dataset.bootstrap = '1';
     }
     moveUploadsIntoSettings();
-  }
-  function syncTabButtons(){
-    if(!window.app || !window.app.state) return;
-    document.querySelectorAll('#teacherMainTabs button').forEach(function(btn){
-      btn.classList.toggle('active', btn.dataset.tab === window.app.state.selectedTab);
-      btn.onclick = function(){ window.app.switchTab(btn.dataset.tab); };
-    });
-    document.querySelectorAll('#teacherQuickTabs [data-quick-tab]').forEach(function(btn){
-      btn.classList.toggle('active', btn.dataset.quickTab === window.app.state.selectedTab);
-      btn.onclick = function(){ window.app.switchTab(btn.dataset.quickTab); };
-    });
+    if(window.app && !window.app.__mergedTabPatch){
+      var oldRenderTabs = window.app.renderTabs.bind(window.app);
+      window.app.renderTabs = function(){
+        oldRenderTabs();
+        rebuildTabs();
+        moveUploadsIntoSettings();
+        document.querySelectorAll('#teacherMainTabs button').forEach(function(btn){
+          btn.classList.toggle('active', btn.dataset.tab === window.app.state.selectedTab);
+          btn.onclick = function(){ window.app.switchTab(btn.dataset.tab); };
+        });
+      };
+      window.app.__mergedTabPatch = true;
+    }
   }
   document.addEventListener('DOMContentLoaded', function(){
-    setTimeout(function(){ mergeLayout(); syncTabButtons(); }, 500);
-    setTimeout(function(){ moveUploadsIntoSettings(); syncTabButtons(); }, 1500);
-    setTimeout(function(){ moveUploadsIntoSettings(); syncTabButtons(); }, 2600);
+    setTimeout(mergeLayout, 500);
+    setTimeout(moveUploadsIntoSettings, 1500);
+    setTimeout(moveUploadsIntoSettings, 2600);
   });
-  if(window.app && !window.app.__mergedTabPatch){
-    var oldRenderTabs = window.app.renderTabs.bind(window.app);
-    window.app.renderTabs = function(){
-      oldRenderTabs();
-      rebuildMainTabs();
-      ensureQuickTabs();
-      moveUploadsIntoSettings();
-      syncTabButtons();
-    };
-    window.app.__mergedTabPatch = true;
-  } else {
-    document.addEventListener('DOMContentLoaded', function(){
-      var wait = setInterval(function(){
-        if(!window.app || window.app.__mergedTabPatch) return;
-        clearInterval(wait);
-        var oldRenderTabs = window.app.renderTabs.bind(window.app);
-        window.app.renderTabs = function(){
-          oldRenderTabs();
-          rebuildMainTabs();
-          ensureQuickTabs();
-          moveUploadsIntoSettings();
-          syncTabButtons();
-        };
-        window.app.__mergedTabPatch = true;
-        syncTabButtons();
-      }, 200);
-    });
-  }
 })();
 </script>
+
+<style id="final-tabs-fix-style">
+.teacher-bottom-tabs{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:18px;padding-top:12px;border-top:1px solid #e7efe9}
+.teacher-bottom-tabs button{border:none;padding:12px 18px;border-radius:999px;background:var(--soft);color:var(--green-3);font-weight:800;cursor:pointer}
+.teacher-bottom-tabs button.active{background:linear-gradient(135deg,var(--green-2),var(--green));color:#fff}
+.teacher-merged-block{margin-top:18px}
+.teacher-merged-block h4{margin:0 0 12px}
+</style>
+
+<script id="final-tabs-fix-script">
+(function(){
+  function blockTitle(el){
+    if(!el) return '';
+    var h=el.querySelector('h4');
+    return h ? h.textContent.trim() : '';
+  }
+  function takeContent(source, title, note){
+    if(!source) return null;
+    var wrap = document.createElement('div');
+    wrap.className='panel teacher-merged-block';
+    wrap.setAttribute('data-merged-title', title);
+    wrap.innerHTML='<div class="split"><h4>'+title+'</h4>'+(note?'<span class="tag">'+note+'</span>':'')+'</div>';
+    while(source.firstChild) wrap.appendChild(source.firstChild);
+    return wrap;
+  }
+  function findMovedBlock(scope, wanted){
+    if(!scope) return null;
+    return Array.from(scope.querySelectorAll('.panel')).find(function(p){
+      var h=p.querySelector('h4');
+      return h && h.textContent.trim()===wanted;
+    }) || null;
+  }
+  function clearMerged(scope, titles){
+    if(!scope) return;
+    Array.from(scope.querySelectorAll('.panel')).forEach(function(p){
+      var h=p.querySelector('h4');
+      if(h && titles.includes(h.textContent.trim())) p.remove();
+    });
+  }
+  function rebuildUpperTabs(){
+    var tabs=document.getElementById('teacherMainTabs');
+    if(!tabs) return;
+    tabs.innerHTML='';
+    [['overview','الرئيسية'],['operations','الكشف'],['follow','المتابعة'],['messages','التواصل'],['settings','الإعدادات']].forEach(function(item){
+      var btn=document.createElement('button');
+      btn.dataset.tab=item[0];
+      btn.textContent=item[1];
+      if(window.app && window.app.state.selectedTab===item[0]) btn.classList.add('active');
+      btn.onclick=function(){ if(window.app){ window.app.switchTab(item[0]); syncBottom(); } };
+      tabs.appendChild(btn);
+    });
+  }
+  function buildBottomTabs(){
+    var section=document.getElementById('teacherSection');
+    if(!section) return;
+    var old=document.getElementById('teacherBottomTabs');
+    if(old) old.remove();
+    var wrap=document.createElement('div');
+    wrap.className='teacher-bottom-tabs';
+    wrap.id='teacherBottomTabs';
+    wrap.innerHTML='
+      <button data-low="overview">الرئيسية</button>
+      <button data-low="classes">الفصول والطلاب</button>
+      <button data-low="messages">الرسائل</button>';
+    section.appendChild(wrap);
+    wrap.querySelectorAll('button').forEach(function(btn){
+      btn.onclick=function(){ if(window.app){ window.app.switchTab(btn.dataset.low); syncBottom(); } };
+    });
+    syncBottom();
+  }
+  function syncBottom(){
+    var wrap=document.getElementById('teacherBottomTabs');
+    if(!wrap || !window.app) return;
+    wrap.querySelectorAll('button').forEach(function(btn){
+      btn.classList.toggle('active', btn.dataset.low===window.app.state.selectedTab);
+    });
+  }
+  function movePanels(){
+    var overview=document.getElementById('tab-overview');
+    var follow=document.getElementById('tab-follow');
+    var settings=document.getElementById('tab-settings');
+    var roulette=document.getElementById('tab-roulette');
+    var tasks=document.getElementById('tab-tasks');
+    var vip=document.getElementById('tab-vip');
+    var uploads=document.getElementById('tab-uploads');
+    if(!overview||!follow||!settings) return;
+
+    clearMerged(overview,['الروليت']);
+    clearMerged(follow,['الطلاب والفصول','المهام الأدائية','لوحة الشرف VIP']);
+    clearMerged(settings,['رفع الملفات','الإعدادات العامة']);
+
+    var rouletteBlock = findMovedBlock(overview,'الروليت');
+    if(!rouletteBlock && roulette && roulette.children.length){
+      rouletteBlock = takeContent(roulette,'الروليت','داخل الرئيسية');
+    }
+    if(rouletteBlock) overview.appendChild(rouletteBlock);
+    if(roulette) roulette.classList.add('hide');
+
+    var tasksBlock = findMovedBlock(follow,'المهام الأدائية');
+    if(!tasksBlock && tasks && tasks.children.length){
+      tasksBlock = takeContent(tasks,'المهام الأدائية','داخل المتابعة');
+    }
+    var vipBlock = findMovedBlock(follow,'لوحة الشرف VIP');
+    if(!vipBlock && vip && vip.children.length){
+      vipBlock = takeContent(vip,'لوحة الشرف VIP','داخل المتابعة');
+    }
+    follow.innerHTML='';
+    if(tasksBlock) follow.appendChild(tasksBlock);
+    if(vipBlock) follow.appendChild(vipBlock);
+    if(tasks) tasks.classList.add('hide');
+    if(vip) vip.classList.add('hide');
+
+    var uploadsBlock = document.getElementById('settingsUploadsHost');
+    if(!uploadsBlock && uploads && uploads.children.length){
+      uploadsBlock = takeContent(uploads,'رفع الملفات','داخل الإعدادات');
+      uploadsBlock.id='settingsUploadsHost';
+    }
+    settings.innerHTML='';
+    if(uploadsBlock) settings.appendChild(uploadsBlock);
+    if(uploads) uploads.classList.add('hide');
+  }
+  function patchRenderTabs(){
+    if(!window.app || window.app.__finalTabsFixed) return;
+    var old=window.app.renderTabs.bind(window.app);
+    window.app.renderTabs=function(){
+      old();
+      rebuildUpperTabs();
+      syncBottom();
+    };
+    window.app.__finalTabsFixed=true;
+  }
+  function run(){
+    if(!window.app || !document.getElementById('teacherSection')) return false;
+    movePanels();
+    rebuildUpperTabs();
+    buildBottomTabs();
+    patchRenderTabs();
+    syncBottom();
+    return true;
+  }
+  document.addEventListener('DOMContentLoaded', function(){
+    var tries=0;
+    var timer=setInterval(function(){
+      tries++;
+      if(run() || tries>20) clearInterval(timer);
+    }, 400);
+  });
+})();
+</script>
+
 </body>
 </html>
