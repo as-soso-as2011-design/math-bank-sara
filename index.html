@@ -1907,8 +1907,7 @@
 })();
 </script>
 
-</bo'+'dy></ht'+'ml>
-        `);
+`);
         w.document.close();
         this.state.vipHonor.lastPdfRunKey = this.state.vipHonor.currentWeekKey || this.vipWeekKey();
         this.save();
@@ -2787,9 +2786,7 @@ function logoutTeacher(){
 })();
 </script>
 
-</bo'+'dy>
-        </ht'+'ml>
-      `);
+`);
       w.document.close();
     }
 
@@ -3194,9 +3191,7 @@ function logoutTeacher(){
 })();
 </script>
 
-</bo'+'dy>
-        </ht'+'ml>
-      `);
+`);
       w.document.close();
     }
 
@@ -3867,7 +3862,7 @@ function logoutTeacher(){
 })();
 </script>
 
-</bo'+'dy></ht'+'ml>`);
+`);
     w.document.close();
     app.toast('تم تجهيز طباعة قائمة الطلاب PDF');
   }
@@ -4086,7 +4081,7 @@ function logoutTeacher(){
 })();
 </script>
 
-</bo'+'dy></ht'+'ml>`);
+`);
       w.document.close();
       this.toast('تم توليد شهادات PDF للمراكز الأولى');
     };
@@ -4612,7 +4607,7 @@ function logoutTeacher(){
 })();
 </script>
 
-</bo'+'dy></ht'+'ml>');
+`);
       w.document.close();
       app.toast && app.toast('تم توليد شهادة PDF تلقائيًا');
     }
@@ -5086,7 +5081,7 @@ function logoutTeacher(){
 })();
 </script>
 
-</bo'+'dy></ht'+'ml>');
+`);
       w.document.close();
     };
   }
@@ -5538,6 +5533,64 @@ function logoutTeacher(){
       setTimeout(buildMergedSections, 600);
     };
   }
+})();
+</script>
+
+
+<script id="final-root-fix-20260323">
+(function(){
+  function onReady(fn){
+    if(document.readyState !== 'loading') fn();
+    else document.addEventListener('DOMContentLoaded', fn);
+  }
+
+  function removeBrokenVisibleText(){
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    const bad = [];
+    while(walker.nextNode()){
+      const n = walker.currentNode;
+      const v = (n.nodeValue || '').trim();
+      if(!v) continue;
+      if(v.includes("</bo'+'dy>") || v.includes("</ht'+'ml>") || v.includes("</bo'+'dy>") || v.includes("</ht'+'ml>")) bad.push(n);
+    }
+    bad.forEach(n => n.nodeValue = '');
+  }
+
+  function ensureTeacherPageState(){
+    const gate = document.getElementById('teacherLoginGate');
+    const page = document.querySelector('.page');
+    const auth = localStorage.getItem('masraf_teacher_auth') === '1';
+    if(gate) gate.style.display = auth ? 'none' : 'flex';
+    if(page) page.style.visibility = auth ? 'visible' : 'hidden';
+  }
+
+  function hardenAdvancedButtons(){
+    document.addEventListener('click', function(e){
+      const btn = e.target.closest('#tab-classes [data-mode]');
+      if(!btn) return;
+      const mode = btn.getAttribute('data-mode');
+      if(mode !== 'basic' && mode !== 'advanced') return;
+      const basic = document.getElementById('advtabBasic');
+      const advanced = document.getElementById('advtabAdvanced');
+      if(!basic || !advanced) return;
+      e.preventDefault();
+      e.stopPropagation();
+      document.querySelectorAll('#tab-classes [data-mode]').forEach(function(b){
+        b.classList.toggle('active', b.getAttribute('data-mode') === mode);
+      });
+      basic.classList.toggle('advtab-hidden', mode !== 'basic');
+      advanced.classList.toggle('advtab-hidden', mode !== 'advanced');
+      if(mode === 'advanced' && typeof window.renderAdvancedHonorButtons === 'function') {
+        try { window.renderAdvancedHonorButtons(); } catch(err) { console.error(err); }
+      }
+    }, true);
+  }
+
+  onReady(function(){
+    removeBrokenVisibleText();
+    ensureTeacherPageState();
+    hardenAdvancedButtons();
+  });
 })();
 </script>
 
