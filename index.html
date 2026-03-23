@@ -2027,6 +2027,51 @@ function logoutTeacher(){
         if (!app.state.advtabSelectedClassId) {
           detailPage.classList.add('advtab-hidden');
           cardsPage.classList.remove('advtab-hidden');
+          if(!classes.length){
+            cardsPage.innerHTML = `
+              <div class="advtab-detail">
+                <div class="advtab-detailhead">
+                  <div>
+                    <h3>لوحة تحكم متقدمة</h3>
+                    <p>لا توجد فصول مضافة بعد. أضيفي فصلًا وطالبًا/طالبة من تبويب <strong>الفصول والطلاب</strong> ليظهر هنا التحكم الكامل.</p>
+                  </div>
+                </div>
+                <div class="advtab-summary">
+                  <div class="box"><strong>0</strong><span>عدد الفصول</span></div>
+                  <div class="box"><strong>0</strong><span>عدد الطلاب / الطالبات</span></div>
+                  <div class="box"><strong>جاهز</strong><span>بعد إضافة أول فصل</span></div>
+                </div>
+                <div class="advtab-toolbar">
+                  <button class="small-btn primary" id="advtabGoBasicBtn">الانتقال إلى الفصول والطلاب</button>
+                  <button class="small-btn gold" id="advtabSeedDemoBtn">إضافة بيانات تجريبية</button>
+                </div>
+              </div>
+            `;
+            var goBasicBtn = document.getElementById('advtabGoBasicBtn');
+            if(goBasicBtn){
+              goBasicBtn.onclick = function(){
+                var basicBtn = subtabs.querySelector('[data-mode="basic"]');
+                basicBtn && basicBtn.click();
+              };
+            }
+            var seedDemoBtn = document.getElementById('advtabSeedDemoBtn');
+            if(seedDemoBtn){
+              seedDemoBtn.onclick = function(){
+                var cid = 'class_' + Date.now();
+                app.state.classes = Array.isArray(app.state.classes) ? app.state.classes : [];
+                app.state.students = Array.isArray(app.state.students) ? app.state.students : [];
+                app.state.classes.push({id:cid,name:'الفصل التجريبي',meta:'متابعة عامة'});
+                app.state.students.push(
+                  {id:'st_'+Date.now()+'_1',classId:cid,name:'الطالبة الأولى',parentPhone:'0500000001',balance:1200,tasks:2,absences:1,status:'مفعل',pin:'1234'},
+                  {id:'st_'+Date.now()+'_2',classId:cid,name:'الطالبة الثانية',parentPhone:'0500000002',balance:850,tasks:1,absences:0,status:'مفعل',pin:'1234'}
+                );
+                if(typeof app.save === 'function') app.save();
+                renderAdvanced();
+                if(typeof app.renderAll === 'function') app.renderAll();
+              };
+            }
+            return;
+          }
           cardsPage.innerHTML = `
             <div class="advtab-grid">
               ${classes.map(cls=>{
@@ -4178,8 +4223,9 @@ function logoutTeacher(){
     var roulette = document.getElementById('tab-roulette');
     var messages = document.getElementById('tab-messages');
     var vip = document.getElementById('tab-vip');
+    var tasks = document.getElementById('tab-tasks');
     var uploads = document.getElementById('tab-uploads');
-    if(!overview || !roulette || !messages || !vip) return;
+    if(!overview || !roulette || !messages || !vip || !tasks) return;
 
     var opBtn = document.querySelector('#teacherSection .tabs [data-tab="operations"]');
     if(opBtn) opBtn.textContent = 'الكشف';
@@ -4187,7 +4233,7 @@ function logoutTeacher(){
     var followBtn = ensureButton('follow', 'المتابعة', '[data-tab="tasks"]');
     var settingsBtn = ensureButton('settings', 'الإعدادات', '[data-tab="follow"]');
 
-    ['roulette','messages','vip','uploads'].forEach(function(id){
+    ['roulette','tasks','messages','vip','uploads'].forEach(function(id){
       var oldBtn = document.querySelector('#teacherSection .tabs [data-tab="' + id + '"]');
       if(oldBtn) oldBtn.style.display = 'none';
     });
@@ -4206,21 +4252,26 @@ function logoutTeacher(){
     if(!follow.querySelector('#merged-follow-holder-clean')){
       follow.innerHTML =
         '<div class="merged-stack">' +
+          '<div class="merged-block"><h4>المهام الأدائية</h4><div class="merged-note">متابعة المهام والتسليم داخل الفصل.</div><div id="merged-tasks-holder-clean"></div></div>' +
           '<div class="merged-block"><h4>الرسائل</h4><div class="merged-note">نفس محتوى الرسائل دون تغيير.</div><div id="merged-messages-holder-clean"></div></div>' +
           '<div class="merged-block"><h4>لوحة الشرف VIP</h4><div class="merged-note">نفس محتوى لوحة الشرف دون تغيير.</div><div id="merged-vip-holder-clean"></div></div>' +
         '</div>';
     }
 
     if(!settings.querySelector('#merged-settings-holder-clean')){
-      settings.innerHTML = '<div class="merged-block"><h4>رفع الملفات</h4><div class="merged-note">نفس محتوى رفع الملفات دون تغيير.</div><div id="merged-settings-holder-clean"></div></div>';
+      settings.innerHTML = '<div class="merged-stack">'
+        + '<div class="merged-block"><h4>رفع الملفات</h4><div class="merged-note">مرفقات وتقارير وشعارات النظام.</div><div id="merged-settings-holder-clean"></div></div>'
+        + '<div class="merged-block"><h4>إعدادات سريعة</h4><div class="merged-note">في حال لم يكن هناك قسم رفع ملفات، ستظهر هنا رسالة تنظيمية بدل الفراغ.</div><div id="merged-settings-fallback-clean" class="note-box">يمكنك لاحقًا ربط هذا القسم برفع الشعار، التوقيع، وصور الشهادات.</div></div>'
+        + '</div>';
     }
 
     moveChildren(roulette, document.getElementById('merged-roulette-holder-clean'));
+    moveChildren(tasks, document.getElementById('merged-tasks-holder-clean'));
     moveChildren(messages, document.getElementById('merged-messages-holder-clean'));
     moveChildren(vip, document.getElementById('merged-vip-holder-clean'));
     if(uploads) moveChildren(uploads, document.getElementById('merged-settings-holder-clean'));
 
-    [roulette, messages, vip, uploads].forEach(function(panel){
+    [roulette, tasks, messages, vip, uploads].forEach(function(panel){
       if(panel){
         panel.classList.add('hide');
         panel.style.display = 'none';
