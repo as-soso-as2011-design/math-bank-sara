@@ -1739,6 +1739,48 @@
 .vip-podium-avatar{display:none!important;}
 </style></head><body>${cards}<img src=x onerror="window.print();setTimeout(()=>window.close(),300);">
 
+
+<script>
+(function(){
+  function byId(id){ return document.getElementById(id); }
+
+  function setActiveNav(tab){
+    document.querySelectorAll('.phone-nav [data-tab]').forEach(function(el){
+      el.classList.toggle('active', el.getAttribute('data-tab') === tab);
+    });
+    document.querySelectorAll('.bottom-nav button').forEach(function(btn){
+      var txt = (btn.textContent || '').trim();
+      var map = {'المتابعة':'follow','التواصل':'messages','الإعدادات':'settings','الرئيسية':'home'};
+      btn.classList.toggle('active', map[txt] === tab);
+    });
+  }
+
+  window.switchPhoneTab = function(tab){
+    var ids = ['homeTab','followTab','messagesTab','settingsTab','home','follow','messages','settings'];
+    ids.forEach(function(id){
+      var el = byId(id);
+      if(el){ el.style.display = 'none'; }
+    });
+
+    var target = byId(tab + 'Tab') || byId(tab);
+    if(target){ target.style.display = 'block'; }
+
+    setActiveNav(tab);
+  };
+
+  document.addEventListener('DOMContentLoaded', function(){
+    document.querySelectorAll('.phone-nav [data-tab]').forEach(function(el){
+      el.style.cursor = 'pointer';
+      el.addEventListener('click', function(){
+        switchPhoneTab(el.getAttribute('data-tab'));
+      });
+    });
+    var defaultTab = 'follow';
+    switchPhoneTab(defaultTab);
+  });
+})();
+</script>
+
 </body></html>
         `);
         w.document.close();
@@ -2429,6 +2471,48 @@ function logoutTeacher(){
           <img src=x onerror="window.print()">
         
 
+
+<script>
+(function(){
+  function byId(id){ return document.getElementById(id); }
+
+  function setActiveNav(tab){
+    document.querySelectorAll('.phone-nav [data-tab]').forEach(function(el){
+      el.classList.toggle('active', el.getAttribute('data-tab') === tab);
+    });
+    document.querySelectorAll('.bottom-nav button').forEach(function(btn){
+      var txt = (btn.textContent || '').trim();
+      var map = {'المتابعة':'follow','التواصل':'messages','الإعدادات':'settings','الرئيسية':'home'};
+      btn.classList.toggle('active', map[txt] === tab);
+    });
+  }
+
+  window.switchPhoneTab = function(tab){
+    var ids = ['homeTab','followTab','messagesTab','settingsTab','home','follow','messages','settings'];
+    ids.forEach(function(id){
+      var el = byId(id);
+      if(el){ el.style.display = 'none'; }
+    });
+
+    var target = byId(tab + 'Tab') || byId(tab);
+    if(target){ target.style.display = 'block'; }
+
+    setActiveNav(tab);
+  };
+
+  document.addEventListener('DOMContentLoaded', function(){
+    document.querySelectorAll('.phone-nav [data-tab]').forEach(function(el){
+      el.style.cursor = 'pointer';
+      el.addEventListener('click', function(){
+        switchPhoneTab(el.getAttribute('data-tab'));
+      });
+    });
+    var defaultTab = 'follow';
+    switchPhoneTab(defaultTab);
+  });
+})();
+</script>
+
 </body>
         </html>
       `);
@@ -2656,6 +2740,48 @@ function logoutTeacher(){
           </table>
           <img src=x onerror="window.print()">
         
+
+
+<script>
+(function(){
+  function byId(id){ return document.getElementById(id); }
+
+  function setActiveNav(tab){
+    document.querySelectorAll('.phone-nav [data-tab]').forEach(function(el){
+      el.classList.toggle('active', el.getAttribute('data-tab') === tab);
+    });
+    document.querySelectorAll('.bottom-nav button').forEach(function(btn){
+      var txt = (btn.textContent || '').trim();
+      var map = {'المتابعة':'follow','التواصل':'messages','الإعدادات':'settings','الرئيسية':'home'};
+      btn.classList.toggle('active', map[txt] === tab);
+    });
+  }
+
+  window.switchPhoneTab = function(tab){
+    var ids = ['homeTab','followTab','messagesTab','settingsTab','home','follow','messages','settings'];
+    ids.forEach(function(id){
+      var el = byId(id);
+      if(el){ el.style.display = 'none'; }
+    });
+
+    var target = byId(tab + 'Tab') || byId(tab);
+    if(target){ target.style.display = 'block'; }
+
+    setActiveNav(tab);
+  };
+
+  document.addEventListener('DOMContentLoaded', function(){
+    document.querySelectorAll('.phone-nav [data-tab]').forEach(function(el){
+      el.style.cursor = 'pointer';
+      el.addEventListener('click', function(){
+        switchPhoneTab(el.getAttribute('data-tab'));
+      });
+    });
+    var defaultTab = 'follow';
+    switchPhoneTab(defaultTab);
+  });
+})();
+</script>
 
 </body>
         </html>
@@ -3149,6 +3275,48 @@ function logoutTeacher(){
       <scr'+'ipt>window.onload=function(){window.print();setTimeout(function(){window.close()},300)}<\/scr'+'ipt>
       
 
+
+<script>
+(function(){
+  function byId(id){ return document.getElementById(id); }
+
+  function setActiveNav(tab){
+    document.querySelectorAll('.phone-nav [data-tab]').forEach(function(el){
+      el.classList.toggle('active', el.getAttribute('data-tab') === tab);
+    });
+    document.querySelectorAll('.bottom-nav button').forEach(function(btn){
+      var txt = (btn.textContent || '').trim();
+      var map = {'المتابعة':'follow','التواصل':'messages','الإعدادات':'settings','الرئيسية':'home'};
+      btn.classList.toggle('active', map[txt] === tab);
+    });
+  }
+
+  window.switchPhoneTab = function(tab){
+    var ids = ['homeTab','followTab','messagesTab','settingsTab','home','follow','messages','settings'];
+    ids.forEach(function(id){
+      var el = byId(id);
+      if(el){ el.style.display = 'none'; }
+    });
+
+    var target = byId(tab + 'Tab') || byId(tab);
+    if(target){ target.style.display = 'block'; }
+
+    setActiveNav(tab);
+  };
+
+  document.addEventListener('DOMContentLoaded', function(){
+    document.querySelectorAll('.phone-nav [data-tab]').forEach(function(el){
+      el.style.cursor = 'pointer';
+      el.addEventListener('click', function(){
+        switchPhoneTab(el.getAttribute('data-tab'));
+      });
+    });
+    var defaultTab = 'follow';
+    switchPhoneTab(defaultTab);
+  });
+})();
+</script>
+
 </body></html>`);
     w.document.close();
     app.toast('تم تجهيز طباعة قائمة الطلاب PDF');
@@ -3188,6 +3356,48 @@ function logoutTeacher(){
         .pdf-sign-area img{height:70px;object-fit:contain}
         @media print{@page{size:A4;margin:18mm}}
       </style></head><body>${cards}<scr'+'ipt>window.onload=function(){window.print()}<\/scr'+'ipt>
+
+
+<script>
+(function(){
+  function byId(id){ return document.getElementById(id); }
+
+  function setActiveNav(tab){
+    document.querySelectorAll('.phone-nav [data-tab]').forEach(function(el){
+      el.classList.toggle('active', el.getAttribute('data-tab') === tab);
+    });
+    document.querySelectorAll('.bottom-nav button').forEach(function(btn){
+      var txt = (btn.textContent || '').trim();
+      var map = {'المتابعة':'follow','التواصل':'messages','الإعدادات':'settings','الرئيسية':'home'};
+      btn.classList.toggle('active', map[txt] === tab);
+    });
+  }
+
+  window.switchPhoneTab = function(tab){
+    var ids = ['homeTab','followTab','messagesTab','settingsTab','home','follow','messages','settings'];
+    ids.forEach(function(id){
+      var el = byId(id);
+      if(el){ el.style.display = 'none'; }
+    });
+
+    var target = byId(tab + 'Tab') || byId(tab);
+    if(target){ target.style.display = 'block'; }
+
+    setActiveNav(tab);
+  };
+
+  document.addEventListener('DOMContentLoaded', function(){
+    document.querySelectorAll('.phone-nav [data-tab]').forEach(function(el){
+      el.style.cursor = 'pointer';
+      el.addEventListener('click', function(){
+        switchPhoneTab(el.getAttribute('data-tab'));
+      });
+    });
+    var defaultTab = 'follow';
+    switchPhoneTab(defaultTab);
+  });
+})();
+</script>
 
 </body></html>`);
       w.document.close();
@@ -3530,7 +3740,49 @@ function logoutTeacher(){
           + '<div style="display:flex;justify-content:space-between;align-items:flex-end;gap:18px;margin-top:26px"><div style="color:#5f6d64">اعتماد المعلمة: ' + (p.teacherName || '—') + '</div><div>' + signHtml + '</div></div>'
           + '</div>';
       }).join('');
-      w.document.write('<html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>شهادات لوحة شرف الفصل</title><style>body{font-family:Tahoma,Arial,sans-serif;color:#21402f}@media print{@page{size:A4;margin:18mm}}</style></head><body>' + cards + '<scr'+'ipt>window.onload=function(){window.print()}<\/scr'+'ipt></body></html>');
+      w.document.write('<html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>شهادات لوحة شرف الفصل</title><style>body{font-family:Tahoma,Arial,sans-serif;color:#21402f}@media print{@page{size:A4;margin:18mm}}</style></head><body>' + cards + '<scr'+'ipt>window.onload=function(){window.print()}<\/scr'+'ipt>
+<script>
+(function(){
+  function byId(id){ return document.getElementById(id); }
+
+  function setActiveNav(tab){
+    document.querySelectorAll('.phone-nav [data-tab]').forEach(function(el){
+      el.classList.toggle('active', el.getAttribute('data-tab') === tab);
+    });
+    document.querySelectorAll('.bottom-nav button').forEach(function(btn){
+      var txt = (btn.textContent || '').trim();
+      var map = {'المتابعة':'follow','التواصل':'messages','الإعدادات':'settings','الرئيسية':'home'};
+      btn.classList.toggle('active', map[txt] === tab);
+    });
+  }
+
+  window.switchPhoneTab = function(tab){
+    var ids = ['homeTab','followTab','messagesTab','settingsTab','home','follow','messages','settings'];
+    ids.forEach(function(id){
+      var el = byId(id);
+      if(el){ el.style.display = 'none'; }
+    });
+
+    var target = byId(tab + 'Tab') || byId(tab);
+    if(target){ target.style.display = 'block'; }
+
+    setActiveNav(tab);
+  };
+
+  document.addEventListener('DOMContentLoaded', function(){
+    document.querySelectorAll('.phone-nav [data-tab]').forEach(function(el){
+      el.style.cursor = 'pointer';
+      el.addEventListener('click', function(){
+        switchPhoneTab(el.getAttribute('data-tab'));
+      });
+    });
+    var defaultTab = 'follow';
+    switchPhoneTab(defaultTab);
+  });
+})();
+</script>
+
+</body></html>');
       w.document.close();
       app.toast && app.toast('تم توليد شهادة PDF تلقائيًا');
     }
@@ -3819,7 +4071,49 @@ function logoutTeacher(){
         + '<h3>كشف الحساب الكامل</h3>'
         + '<table><thead><tr><th>التاريخ</th><th>اليوم</th><th>الحصة</th><th>الوقت</th><th>المادة</th><th>نوع العملية</th><th>المبلغ</th><th>السبب</th><th>المرفق</th></tr></thead><tbody>' + (txRows || '<tr><td colspan="9">لا توجد عمليات</td></tr>') + '</tbody></table>'
         + '<div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:26px"><div class="sub">اعتماد المعلمة: ' + escapeHtml(p.teacherName || '—') + '</div><div>' + sign + '</div></div>'
-        + '<img src=x onerror="window.print()"></body></html>');
+        + '<img src=x onerror="window.print()">
+<script>
+(function(){
+  function byId(id){ return document.getElementById(id); }
+
+  function setActiveNav(tab){
+    document.querySelectorAll('.phone-nav [data-tab]').forEach(function(el){
+      el.classList.toggle('active', el.getAttribute('data-tab') === tab);
+    });
+    document.querySelectorAll('.bottom-nav button').forEach(function(btn){
+      var txt = (btn.textContent || '').trim();
+      var map = {'المتابعة':'follow','التواصل':'messages','الإعدادات':'settings','الرئيسية':'home'};
+      btn.classList.toggle('active', map[txt] === tab);
+    });
+  }
+
+  window.switchPhoneTab = function(tab){
+    var ids = ['homeTab','followTab','messagesTab','settingsTab','home','follow','messages','settings'];
+    ids.forEach(function(id){
+      var el = byId(id);
+      if(el){ el.style.display = 'none'; }
+    });
+
+    var target = byId(tab + 'Tab') || byId(tab);
+    if(target){ target.style.display = 'block'; }
+
+    setActiveNav(tab);
+  };
+
+  document.addEventListener('DOMContentLoaded', function(){
+    document.querySelectorAll('.phone-nav [data-tab]').forEach(function(el){
+      el.style.cursor = 'pointer';
+      el.addEventListener('click', function(){
+        switchPhoneTab(el.getAttribute('data-tab'));
+      });
+    });
+    var defaultTab = 'follow';
+    switchPhoneTab(defaultTab);
+  });
+})();
+</script>
+
+</body></html>');
       w.document.close();
     };
   }
@@ -4292,5 +4586,47 @@ function logoutTeacher(){
   }
 })();
 </script>
+
+<script>
+(function(){
+  function byId(id){ return document.getElementById(id); }
+
+  function setActiveNav(tab){
+    document.querySelectorAll('.phone-nav [data-tab]').forEach(function(el){
+      el.classList.toggle('active', el.getAttribute('data-tab') === tab);
+    });
+    document.querySelectorAll('.bottom-nav button').forEach(function(btn){
+      var txt = (btn.textContent || '').trim();
+      var map = {'المتابعة':'follow','التواصل':'messages','الإعدادات':'settings','الرئيسية':'home'};
+      btn.classList.toggle('active', map[txt] === tab);
+    });
+  }
+
+  window.switchPhoneTab = function(tab){
+    var ids = ['homeTab','followTab','messagesTab','settingsTab','home','follow','messages','settings'];
+    ids.forEach(function(id){
+      var el = byId(id);
+      if(el){ el.style.display = 'none'; }
+    });
+
+    var target = byId(tab + 'Tab') || byId(tab);
+    if(target){ target.style.display = 'block'; }
+
+    setActiveNav(tab);
+  };
+
+  document.addEventListener('DOMContentLoaded', function(){
+    document.querySelectorAll('.phone-nav [data-tab]').forEach(function(el){
+      el.style.cursor = 'pointer';
+      el.addEventListener('click', function(){
+        switchPhoneTab(el.getAttribute('data-tab'));
+      });
+    });
+    var defaultTab = 'follow';
+    switchPhoneTab(defaultTab);
+  });
+})();
+</script>
+
 </body>
 </html>
