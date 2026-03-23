@@ -112,7 +112,7 @@
     .phone-hero{margin:0 14px 14px;padding:18px;border-radius:24px;background:linear-gradient(180deg,#eaf4ec,#dbeee2);box-shadow:var(--shadow)}
     .phone-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 14px 14px}
     .mini-card{background:#fff;border:1px solid #e6eee8;border-radius:22px;padding:16px;min-height:104px;box-shadow:var(--shadow)}
-    .phone-nav{margin-top:auto;background:#fff;border-top:1px solid #e6eee8;display:grid;grid-template-columns:repeat(4,1fr);padding:12px 8px;gap:8px}
+    .phone-nav{margin-top:auto;background:#fff;border-top:1px solid #e6eee8;display:grid;grid-template-columns:repeat(5,1fr);padding:12px 8px;gap:8px}
     .phone-nav div{text-align:center;color:#5c7164;font-weight:800;font-size:12px}
     .balance{font-size:44px;font-weight:900;letter-spacing:-1px;margin:0;color:var(--green-3)}
     .hide{display:none !important}
@@ -787,7 +787,7 @@
             <div class="mini-card">🎡<strong id="heroRewardCount">0 جوائز روليت</strong></div>
           </div>
           <div class="list" id="heroRecentList"></div>
-          <div class="phone-nav" id="miniPhoneNav"><div data-mini-page="home">الرئيسية</div><div data-mini-page="statement">الكشف</div><div data-mini-page="follow">المتابعة</div><div data-mini-page="settings">الإعدادات</div></div>
+          <div class="phone-nav" id="miniPhoneNav"><div data-mini-page="home">الرئيسية</div><div data-mini-page="statement">الكشف</div><div data-mini-page="follow">المتابعة</div><div data-mini-page="messages">التواصل</div><div data-mini-page="settings">الإعدادات</div></div>
         </div>
       </div>
     </section>
@@ -795,14 +795,12 @@
     <section class="section" id="teacherSection">
       <div class="section-head">
         <h3>لوحة المعلمة</h3>
-        <div class="tabs">
+        <div class="tabs" id="teacherMainTabs">
           <button class="active" data-tab="overview">الرئيسية</button>
-          <button data-tab="classes">الفصول والطلاب</button>
-          <button data-tab="operations">العمليات</button>
-          <button data-tab="tasks">المهام الأدائية</button>
-          <button data-tab="roulette">الروليت</button>
-          <button data-tab="messages">الرسائل</button>
-          <button data-tab="vip">لوحة الشرف VIP</button>
+          <button data-tab="operations">الكشف</button>
+          <button data-tab="follow">المتابعة</button>
+          <button data-tab="messages">التواصل</button>
+          <button data-tab="settings">الإعدادات</button>
         </div>
       </div>
 
@@ -825,6 +823,10 @@
           </div>
         </div>
       </div>
+
+      <div class="tab-panel hide" id="tab-follow"></div>
+
+      <div class="tab-panel hide" id="tab-settings"></div>
 
       <div class="tab-panel hide" id="tab-classes">
         <div class="grid-2">
@@ -1736,7 +1738,9 @@
             .foot{display:flex;justify-content:space-between;gap:12px;margin-top:40px;font-size:22px;font-weight:700}
           
 .vip-podium-avatar{display:none!important;}
-</style></head><body>${cards}<img src=x onerror="window.print();setTimeout(()=>window.close(),300);"></body></html>
+</style></head><body>${cards}<img src=x onerror="window.print();setTimeout(()=>window.close(),300);">
+
+</body></html>
         `);
         w.document.close();
         this.state.vipHonor.lastPdfRunKey = this.state.vipHonor.currentWeekKey || this.vipWeekKey();
@@ -2435,7 +2439,9 @@ function logoutTeacher(){
             <tbody>${rows || '<tr><td colspan="5">لا يوجد طلاب</td></tr>'}</tbody>
           </table>
           <img src=x onerror="window.print()">
-        </body>
+        
+
+</body>
         </html>
       `);
       w.document.close();
@@ -2661,7 +2667,9 @@ function logoutTeacher(){
             <tbody>${txRows || '<tr><td colspan="3">لا توجد عمليات</td></tr>'}</tbody>
           </table>
           <img src=x onerror="window.print()">
-        </body>
+        
+
+</body>
         </html>
       `);
       w.document.close();
@@ -3153,7 +3161,9 @@ function logoutTeacher(){
       <table><thead><tr><th>اسم الطالب</th><th>المستوى</th><th>رقم ولي الأمر</th><th>الرقم السري</th><th>اسم المستخدم</th><th>الصف</th><th>اسم المعلمة</th></tr></thead><tbody>${tableRows}</tbody></table>
       ${signArea()}
       <scr'+'ipt>window.onload=function(){window.print();setTimeout(function(){window.close()},300)}<\/scr'+'ipt>
-      </body></html>`);
+      
+
+</body></html>`);
     w.document.close();
     app.toast('تم تجهيز طباعة قائمة الطلاب PDF');
   }
@@ -3191,7 +3201,9 @@ function logoutTeacher(){
         .pdf-sign-area{display:flex;justify-content:space-between;align-items:flex-end;gap:18px;margin-top:26px}
         .pdf-sign-area img{height:70px;object-fit:contain}
         @media print{@page{size:A4;margin:18mm}}
-      </style></head><body>${cards}<scr'+'ipt>window.onload=function(){window.print()}<\/scr'+'ipt></body></html>`);
+      </style></head><body>${cards}<scr'+'ipt>window.onload=function(){window.print()}<\/scr'+'ipt>
+
+</body></html>`);
       w.document.close();
       this.toast('تم توليد شهادات PDF للمراكز الأولى');
     };
@@ -3536,7 +3548,9 @@ function logoutTeacher(){
           + '<div style="display:flex;justify-content:space-between;align-items:flex-end;gap:18px;margin-top:26px"><div style="color:#5f6d64">اعتماد المعلمة: ' + (p.teacherName || '—') + '</div><div>' + signHtml + '</div></div>'
           + '</div>';
       }).join('');
-      w.document.write('<html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>شهادات لوحة شرف الفصل</title><style>body{font-family:Tahoma,Arial,sans-serif;color:#21402f}@media print{@page{size:A4;margin:18mm}}</style></head><body>' + cards + '<scr'+'ipt>window.onload=function(){window.print()}<\/scr'+'ipt></body></html>');
+      w.document.write('<html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>شهادات لوحة شرف الفصل</title><style>body{font-family:Tahoma,Arial,sans-serif;color:#21402f}@media print{@page{size:A4;margin:18mm}}</style></head><body>' + cards + '<scr'+'ipt>window.onload=function(){window.print()}<\/scr'+'ipt>
+
+</body></html>');
       w.document.close();
       app.toast && app.toast('تم توليد شهادة PDF تلقائيًا');
     }
@@ -3829,7 +3843,9 @@ function logoutTeacher(){
         + '<h3>كشف الحساب الكامل</h3>'
         + '<table><thead><tr><th>التاريخ</th><th>اليوم</th><th>الحصة</th><th>الوقت</th><th>المادة</th><th>نوع العملية</th><th>المبلغ</th><th>السبب</th><th>المرفق</th></tr></thead><tbody>' + (txRows || '<tr><td colspan="9">لا توجد عمليات</td></tr>') + '</tbody></table>'
         + '<div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:26px"><div class="sub">اعتماد المعلمة: ' + escapeHtml(p.teacherName || '—') + '</div><div>' + sign + '</div></div>'
-        + '<img src=x onerror="window.print()"></body></html>');
+        + '<img src=x onerror="window.print()">
+
+</body></html>');
       w.document.close();
     };
   }
@@ -4000,6 +4016,10 @@ function logoutTeacher(){
       </div>
     </div>
 
+    <div id="miniPage-messages" class="mini-page-card hide">
+      <div class="mini-page-list" id="miniMessagesList"></div>
+    </div>
+
     <div id="miniPage-settings" class="mini-page-card hide">
       <div class="mini-page-list">
         <div class="mini-page-row"><span>اسم المدرسة</span><strong id="miniSchoolName">—</strong></div>
@@ -4067,13 +4087,29 @@ function logoutTeacher(){
         });
       }
     }
+
+    var messagesBox = byId('miniMessagesList');
+    if(messagesBox){
+      messagesBox.innerHTML = '';
+      var msgs = Array.isArray(app.state.messages) ? app.state.messages.slice(0, 6) : [];
+      if(!msgs.length){
+        messagesBox.innerHTML = '<div class="empty">لا توجد رسائل بعد.</div>';
+      } else {
+        msgs.forEach(function(msg){
+          var row = document.createElement('div');
+          row.className = 'mini-page-row';
+          row.innerHTML = '<div><strong>' + (msg.title || 'رسالة') + '</strong><div class="tiny">' + (msg.body || '—') + '</div></div><div>' + (msg.channel || '—') + '</div>';
+          messagesBox.appendChild(row);
+        });
+      }
+    }
   }
 
   window.openMiniPage = function(page){
     fillMiniPages();
     var overlay = byId('miniPagesOverlay');
     if(overlay) overlay.classList.add('show');
-    ['home','statement','follow','settings'].forEach(function(id){
+    ['home','statement','follow','messages','settings'].forEach(function(id){
       var el = byId('miniPage-' + id);
       if(el) el.classList.toggle('hide', id !== page);
     });
@@ -4083,6 +4119,7 @@ function logoutTeacher(){
       if(page === 'home') title.textContent = 'الرئيسية';
       else if(page === 'statement') title.textContent = 'الكشف';
       else if(page === 'follow') title.textContent = 'المتابعة';
+      else if(page === 'messages') title.textContent = 'التواصل';
       else title.textContent = 'الإعدادات';
     }
   };
@@ -4118,5 +4155,160 @@ function logoutTeacher(){
 })();
 </script>
 
+
+
+
+<style id="teacher-shortcuts-style">
+#teacherQuickTabs{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+#teacherQuickTabs .small-btn{padding:12px 18px;border-radius:999px;font-weight:800;background:var(--soft);color:var(--green-3);border:1px solid #dfe9e2}
+#teacherQuickTabs .small-btn.active{background:linear-gradient(135deg,var(--green-2),var(--green));color:#fff;border-color:transparent}
+</style>
+<script id="teacher-tabs-merge-layout">
+(function(){
+  function moveChildren(from, to){
+    if(!from || !to) return;
+    while(from.firstChild) to.appendChild(from.firstChild);
+  }
+  function makeBlock(title, note){
+    var wrap = document.createElement('div');
+    wrap.className = 'panel';
+    wrap.style.marginTop = '18px';
+    wrap.innerHTML = '<div class="split"><h4>' + title + '</h4>' + (note ? '<span class="tag">' + note + '</span>' : '') + '</div>';
+    return wrap;
+  }
+  function rebuildMainTabs(){
+    var tabs = document.getElementById('teacherMainTabs');
+    if(!tabs) return;
+    tabs.innerHTML = '';
+    [
+      ['overview','الرئيسية'],
+      ['operations','الكشف'],
+      ['follow','المتابعة'],
+      ['messages','التواصل'],
+      ['settings','الإعدادات']
+    ].forEach(function(item){
+      var btn = document.createElement('button');
+      btn.dataset.tab = item[0];
+      btn.textContent = item[1];
+      btn.onclick = function(){ if(window.app) window.app.switchTab(item[0]); };
+      tabs.appendChild(btn);
+    });
+  }
+  function ensureQuickTabs(){
+    var head = document.querySelector('#teacherSection .section-head');
+    if(!head || document.getElementById('teacherQuickTabs')) return;
+    var quick = document.createElement('div');
+    quick.id = 'teacherQuickTabs';
+    [
+      ['overview','الرئيسية'],
+      ['classes','الفصول والطلاب'],
+      ['messages','الرسائل']
+    ].forEach(function(item){
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'small-btn';
+      btn.dataset.quickTab = item[0];
+      btn.textContent = item[1];
+      btn.onclick = function(){ if(window.app) window.app.switchTab(item[0]); };
+      quick.appendChild(btn);
+    });
+    head.insertAdjacentElement('afterend', quick);
+  }
+  function moveUploadsIntoSettings(){
+    var uploads = document.getElementById('tab-uploads');
+    var settings = document.getElementById('tab-settings');
+    if(!uploads || !settings || uploads.dataset.movedSettings === '1') return;
+    var host = document.getElementById('settingsUploadsHost');
+    if(!host){
+      host = makeBlock('رفع الملفات', 'الإعدادات العامة');
+      host.id = 'settingsUploadsHost';
+      settings.appendChild(host);
+    }
+    moveChildren(uploads, host);
+    uploads.dataset.movedSettings = '1';
+    uploads.classList.add('hide');
+    var btn = document.querySelector('#teacherSection .tabs [data-tab="uploads"]');
+    if(btn) btn.remove();
+  }
+  function mergeLayout(){
+    var overview = document.getElementById('tab-overview');
+    var follow = document.getElementById('tab-follow');
+    var settings = document.getElementById('tab-settings');
+    var tasks = document.getElementById('tab-tasks');
+    var roulette = document.getElementById('tab-roulette');
+    var vip = document.getElementById('tab-vip');
+    if(!overview || !follow || !settings || !tasks || !roulette || !vip) return;
+    rebuildMainTabs();
+    ensureQuickTabs();
+    if(!overview.dataset.mergedMain){
+      var wrap = makeBlock('الروليت', 'مركز الحصة');
+      moveChildren(roulette, wrap);
+      overview.appendChild(wrap);
+      overview.dataset.mergedMain = '1';
+      roulette.classList.add('hide');
+    }
+    if(!follow.dataset.mergedMain){
+      var tasksWrap = makeBlock('المهام الأدائية', 'نتيجة الأداء');
+      moveChildren(tasks, tasksWrap);
+      follow.appendChild(tasksWrap);
+      var vipWrap = makeBlock('لوحة الشرف VIP', 'الأداء الأسبوعي');
+      moveChildren(vip, vipWrap);
+      follow.appendChild(vipWrap);
+      follow.dataset.mergedMain = '1';
+      tasks.classList.add('hide');
+      vip.classList.add('hide');
+    }
+    if(!settings.dataset.bootstrap){
+      settings.innerHTML = '<div class="panel"><div class="split"><h4>الإعدادات العامة</h4><span class="tag">النظام الخلفي</span></div><div class="note-box" style="margin-top:12px">تجدين هنا بيانات المدرسة والمعلمة والمادة ورفع الملفات وكل ما يخص التجهيز العام للنظام.</div></div>';
+      settings.dataset.bootstrap = '1';
+    }
+    moveUploadsIntoSettings();
+  }
+  function syncTabButtons(){
+    if(!window.app || !window.app.state) return;
+    document.querySelectorAll('#teacherMainTabs button').forEach(function(btn){
+      btn.classList.toggle('active', btn.dataset.tab === window.app.state.selectedTab);
+      btn.onclick = function(){ window.app.switchTab(btn.dataset.tab); };
+    });
+    document.querySelectorAll('#teacherQuickTabs [data-quick-tab]').forEach(function(btn){
+      btn.classList.toggle('active', btn.dataset.quickTab === window.app.state.selectedTab);
+      btn.onclick = function(){ window.app.switchTab(btn.dataset.quickTab); };
+    });
+  }
+  document.addEventListener('DOMContentLoaded', function(){
+    setTimeout(function(){ mergeLayout(); syncTabButtons(); }, 500);
+    setTimeout(function(){ moveUploadsIntoSettings(); syncTabButtons(); }, 1500);
+    setTimeout(function(){ moveUploadsIntoSettings(); syncTabButtons(); }, 2600);
+  });
+  if(window.app && !window.app.__mergedTabPatch){
+    var oldRenderTabs = window.app.renderTabs.bind(window.app);
+    window.app.renderTabs = function(){
+      oldRenderTabs();
+      rebuildMainTabs();
+      ensureQuickTabs();
+      moveUploadsIntoSettings();
+      syncTabButtons();
+    };
+    window.app.__mergedTabPatch = true;
+  } else {
+    document.addEventListener('DOMContentLoaded', function(){
+      var wait = setInterval(function(){
+        if(!window.app || window.app.__mergedTabPatch) return;
+        clearInterval(wait);
+        var oldRenderTabs = window.app.renderTabs.bind(window.app);
+        window.app.renderTabs = function(){
+          oldRenderTabs();
+          rebuildMainTabs();
+          ensureQuickTabs();
+          moveUploadsIntoSettings();
+          syncTabButtons();
+        };
+        window.app.__mergedTabPatch = true;
+        syncTabButtons();
+      }, 200);
+    });
+  }
+})();
+</script>
 </body>
 </html>
