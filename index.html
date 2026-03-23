@@ -5409,7 +5409,7 @@ function logoutTeacher(){
 </script>
 
 
-<script id="teacher-merge-tabs-script">
+<script id="teacher-merge-tabs-script-clean">
 (function(){
   function moveChildren(from, to){
     if(!from || !to || from.dataset.moved === '1') return;
@@ -5448,56 +5448,51 @@ function logoutTeacher(){
 
   function buildMergedSections(){
     var overview = document.getElementById('tab-overview');
-    var operations = document.getElementById('tab-operations');
     var roulette = document.getElementById('tab-roulette');
     var messages = document.getElementById('tab-messages');
     var vip = document.getElementById('tab-vip');
     var uploads = document.getElementById('tab-uploads');
+    if(!overview || !roulette || !messages || !vip) return;
 
-    if(!overview || !operations || !roulette || !messages || !vip) return;
-
-    // Rename main tabs
     var opBtn = document.querySelector('#teacherSection .tabs [data-tab="operations"]');
     if(opBtn) opBtn.textContent = 'الكشف';
 
     var followBtn = ensureButton('follow', 'المتابعة', '[data-tab="tasks"]');
     var settingsBtn = ensureButton('settings', 'الإعدادات', '[data-tab="follow"]');
 
-    // Hide old top-level buttons after merging
     ['roulette','messages','vip','uploads'].forEach(function(id){
       var oldBtn = document.querySelector('#teacherSection .tabs [data-tab="' + id + '"]');
       if(oldBtn) oldBtn.style.display = 'none';
     });
 
-    // Create/prepare merged panels
     var follow = ensurePanel('follow');
     var settings = ensurePanel('settings');
     if(!follow || !settings) return;
 
-    if(!overview.querySelector('#merged-roulette-holder')){
+    if(!overview.querySelector('#merged-roulette-holder-clean')){
       var wrap = document.createElement('div');
       wrap.className = 'merged-block';
-      wrap.innerHTML = '<h4>الروليت</h4><div class="merged-note">تم دمج نفس محتوى الروليت هنا دون تغيير.</div><div id="merged-roulette-holder" class="merged-stack"></div>';
+      wrap.innerHTML = '<h4>الروليت</h4><div class="merged-note">نفس محتوى الروليت دون تغيير.</div><div id="merged-roulette-holder-clean" class="merged-stack"></div>';
       overview.appendChild(wrap);
     }
 
-    if(!follow.querySelector('#merged-follow-holder')){
-      follow.innerHTML = '<div class="merged-stack"><div class="merged-block"><h4>الرسائل</h4><div class="merged-note">نفس محتوى الرسائل كما هو بدون تغيير.</div><div id="merged-messages-holder"></div></div><div class="merged-block"><h4>لوحة الشرف VIP</h4><div class="merged-note">نفس محتوى لوحة الشرف كما هو بدون تغيير.</div><div id="merged-vip-holder"></div></div></div>';
+    if(!follow.querySelector('#merged-follow-holder-clean')){
+      follow.innerHTML =
+        '<div class="merged-stack">' +
+          '<div class="merged-block"><h4>الرسائل</h4><div class="merged-note">نفس محتوى الرسائل دون تغيير.</div><div id="merged-messages-holder-clean"></div></div>' +
+          '<div class="merged-block"><h4>لوحة الشرف VIP</h4><div class="merged-note">نفس محتوى لوحة الشرف دون تغيير.</div><div id="merged-vip-holder-clean"></div></div>' +
+        '</div>';
     }
 
-    if(!settings.querySelector('#merged-settings-holder')){
-      settings.innerHTML = '<div class="merged-block"><h4>رفع الملفات</h4><div class="merged-note">نفس محتوى رفع الملفات كما هو بدون تغيير.</div><div id="merged-settings-holder"></div></div>';
+    if(!settings.querySelector('#merged-settings-holder-clean')){
+      settings.innerHTML = '<div class="merged-block"><h4>رفع الملفات</h4><div class="merged-note">نفس محتوى رفع الملفات دون تغيير.</div><div id="merged-settings-holder-clean"></div></div>';
     }
 
-    moveChildren(roulette, document.getElementById('merged-roulette-holder'));
-    moveChildren(messages, document.getElementById('merged-messages-holder'));
-    moveChildren(vip, document.getElementById('merged-vip-holder'));
+    moveChildren(roulette, document.getElementById('merged-roulette-holder-clean'));
+    moveChildren(messages, document.getElementById('merged-messages-holder-clean'));
+    moveChildren(vip, document.getElementById('merged-vip-holder-clean'));
+    if(uploads) moveChildren(uploads, document.getElementById('merged-settings-holder-clean'));
 
-    if(uploads){
-      moveChildren(uploads, document.getElementById('merged-settings-holder'));
-    }
-
-    // Keep old panels hidden and empty
     [roulette, messages, vip, uploads].forEach(function(panel){
       if(panel){
         panel.classList.add('hide');
@@ -5505,7 +5500,6 @@ function logoutTeacher(){
       }
     });
 
-    // Make sure new buttons participate in tab switching
     [followBtn, settingsBtn].forEach(function(btn){
       if(btn && !btn.dataset.mergeBound){
         btn.dataset.mergeBound = '1';
@@ -5518,30 +5512,30 @@ function logoutTeacher(){
     });
   }
 
-  function waitForUploadsAndBuild(){
+  function boot(){
     buildMergedSections();
     var tries = 0;
     var timer = setInterval(function(){
       tries += 1;
       buildMergedSections();
-      if(document.getElementById('tab-uploads') || tries > 40){
-        buildMergedSections();
+      if((document.getElementById('tab-uploads') && document.getElementById('tab-vip')) || tries > 40){
         clearInterval(timer);
+        buildMergedSections();
       }
     }, 250);
   }
 
   document.addEventListener('DOMContentLoaded', function(){
-    setTimeout(waitForUploadsAndBuild, 300);
+    setTimeout(boot, 300);
     setTimeout(buildMergedSections, 1200);
   });
 
   if(window.app && typeof window.app.renderAll === 'function'){
-    var oldRenderAllMerge = window.app.renderAll.bind(window.app);
+    var oldRenderAll = window.app.renderAll.bind(window.app);
     window.app.renderAll = function(){
-      oldRenderAllMerge();
-      setTimeout(buildMergedSections, 100);
-      setTimeout(buildMergedSections, 500);
+      oldRenderAll();
+      setTimeout(buildMergedSections, 120);
+      setTimeout(buildMergedSections, 600);
     };
   }
 })();
