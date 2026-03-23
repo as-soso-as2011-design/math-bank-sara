@@ -664,6 +664,24 @@
 .attach-btn{background:linear-gradient(135deg,#4f8b67,#29543d)!important;color:#fff!important;border:none!important}
 </style>
 
+
+<style id="mini-pages-style">
+.mini-page-overlay{position:fixed;inset:0;z-index:12000;display:none;background:linear-gradient(180deg,#fbfdfb 0%, #f2f7f3 45%, #edf5ef 100%);overflow:auto}
+.mini-page-overlay.show{display:block}
+.mini-page-shell{max-width:900px;margin:0 auto;padding:18px 14px 30px}
+.mini-page-head{display:flex;align-items:center;justify-content:space-between;gap:12px;background:rgba(255,255,255,.92);border:1px solid #e7f0ea;box-shadow:var(--shadow);border-radius:22px;padding:14px 16px;position:sticky;top:10px;z-index:2}
+.mini-back-btn{border:none;background:var(--soft);color:var(--green-3);font-weight:900;border-radius:14px;padding:11px 15px;cursor:pointer}
+.mini-page-card{margin-top:16px;background:#fff;border:1px solid #e6eee8;border-radius:24px;padding:18px;box-shadow:var(--shadow)}
+.mini-page-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.mini-page-stat{background:#fbfdfb;border:1px solid #e6eee8;border-radius:18px;padding:14px}
+.mini-page-stat strong{display:block;font-size:1.6rem;color:var(--green-3);margin-top:6px}
+.mini-page-list{display:grid;gap:10px}
+.mini-page-row{display:flex;align-items:center;justify-content:space-between;gap:10px;background:#fbfdfb;border:1px solid #e6eee8;border-radius:16px;padding:12px 14px}
+#miniPhoneNav div{cursor:pointer;border-radius:12px;padding:6px 4px}
+#miniPhoneNav div.active{background:linear-gradient(135deg,var(--green-2),var(--green));color:#fff}
+@media (max-width:700px){.mini-page-grid{grid-template-columns:1fr}}
+</style>
+
 </head>
 <body>
 
@@ -769,7 +787,7 @@
             <div class="mini-card">🎡<strong id="heroRewardCount">0 جوائز روليت</strong></div>
           </div>
           <div class="list" id="heroRecentList"></div>
-          <div class="phone-nav"><div>الرئيسية</div><div>الكشف</div><div>الطلاب</div><div>الإعدادات</div></div>
+          <div class="phone-nav" id="miniPhoneNav"><div data-mini-page="home">الرئيسية</div><div data-mini-page="statement">الكشف</div><div data-mini-page="follow">المتابعة</div><div data-mini-page="settings">الإعدادات</div></div>
         </div>
       </div>
     </section>
@@ -1718,188 +1736,7 @@
             .foot{display:flex;justify-content:space-between;gap:12px;margin-top:40px;font-size:22px;font-weight:700}
           
 .vip-podium-avatar{display:none!important;}
-</style></head><body>${cards}<img src=x onerror="window.print();setTimeout(()=>window.close(),300);">
-<script id="advanced-button-hard-fix-v3">
-(function(){
-  function whenReady(fn){
-    if(document.readyState !== 'loading') fn();
-    else document.addEventListener('DOMContentLoaded', fn);
-  }
-
-  function ensureStructure(){
-    const tab = document.getElementById('tab-classes');
-    if(!tab) return null;
-
-    let subtabs = tab.querySelector('.advtab-subtabs');
-    let basic = document.getElementById('advtabBasic');
-    let advanced = document.getElementById('advtabAdvanced');
-
-    if(!subtabs){
-      subtabs = document.createElement('div');
-      subtabs.className = 'advtab-subtabs';
-      subtabs.innerHTML = '<button class="small-btn active" data-mode="basic">الفصول والطلاب</button><button class="small-btn" data-mode="advanced">لوحة تحكم متقدمة</button>';
-      tab.insertBefore(subtabs, tab.firstChild);
-    }
-
-    if(!basic || !advanced){
-      const nodes = Array.from(tab.childNodes).filter(function(n){
-        return n !== subtabs && !(n.id === 'advtabBasic') && !(n.id === 'advtabAdvanced');
-      });
-
-      if(!basic){
-        basic = document.createElement('div');
-        basic.id = 'advtabBasic';
-        nodes.forEach(function(n){ basic.appendChild(n); });
-        tab.appendChild(basic);
-      }
-
-      if(!advanced){
-        advanced = document.createElement('div');
-        advanced.id = 'advtabAdvanced';
-        advanced.className = 'advtab-hidden';
-        advanced.innerHTML = '<div id="advtabCardsPage"></div><div id="advtabDetailPage" class="advtab-hidden"></div>';
-        tab.appendChild(advanced);
-      }
-    }
-
-    return {tab:tab, subtabs:subtabs, basic:basic, advanced:advanced};
-  }
-
-  function appRef(){ return window.app || null; }
-
-  function studentsFor(classId){
-    const app = appRef();
-    return ((app && app.state && app.state.students) || []).filter(function(s){ return s.classId === classId; });
-  }
-
-  function classStats(classId){
-    const rows = studentsFor(classId);
-    return {
-      count: rows.length,
-      total: rows.reduce(function(sum, s){ return sum + Number(s.balance || 0); }, 0),
-      active: rows.filter(function(s){ return (s.status || s.statusMode || 'مفعل') === 'مفعل'; }).length
-    };
-  }
-
-  function renderFallbackAdvanced(){
-    const app = appRef();
-    const cardsPage = document.getElementById('advtabCardsPage');
-    const detailPage = document.getElementById('advtabDetailPage');
-    if(!app || !app.state || !cardsPage || !detailPage) return;
-
-    const classes = app.state.classes || [];
-    app.state.advtabSelectedClassId = app.state.advtabSelectedClassId || '';
-
-    if(!app.state.advtabSelectedClassId){
-      detailPage.classList.add('advtab-hidden');
-      cardsPage.classList.remove('advtab-hidden');
-      cardsPage.innerHTML = '<div class="advtab-grid">' + (classes.length ? classes.map(function(cls){
-        const st = classStats(cls.id);
-        return '<div class="advtab-card">'
-          + '<div class="head"><span class="tag">' + st.active + ' نشط</span><div><h4>' + cls.name + '</h4><div class="sub">عدد الطلاب / الطالبات: ' + st.count + '</div></div></div>'
-          + '<div class="advtab-stats">'
-          + '<div class="box"><strong>' + Number(st.total || 0).toLocaleString('ar-SA') + '</strong><span>إجمالي الأرصدة</span></div>'
-          + '<div class="box"><strong>' + st.count + '</strong><span>عدد الطلاب / الطالبات</span></div>'
-          + '</div>'
-          + '<div class="advtab-actions"><button class="small-btn primary" data-hard-open="' + cls.id + '">دخول الفصل</button></div>'
-          + '</div>';
-      }).join('') : '<div class="empty">لا توجد فصول بعد.</div>') + '</div>';
-
-      cardsPage.querySelectorAll('[data-hard-open]').forEach(function(btn){
-        btn.onclick = function(){
-          app.state.advtabSelectedClassId = btn.getAttribute('data-hard-open') || '';
-          if(typeof app.save === 'function') app.save();
-          renderFallbackAdvanced();
-        };
-      });
-      return;
-    }
-
-    const cls = classes.find(function(c){ return c.id === app.state.advtabSelectedClassId; });
-    if(!cls){
-      app.state.advtabSelectedClassId = '';
-      renderFallbackAdvanced();
-      return;
-    }
-
-    const rows = studentsFor(cls.id);
-    const stats = classStats(cls.id);
-    cardsPage.classList.add('advtab-hidden');
-    detailPage.classList.remove('advtab-hidden');
-    detailPage.innerHTML = '<div class="advtab-detail">'
-      + '<div class="advtab-detailhead"><div><h3>' + cls.name + '</h3><p>لوحة تحكم متقدمة للفصل.</p></div><button class="small-btn" id="advtabBackBtnHard">رجوع إلى بطاقات الفصول</button></div>'
-      + '<div class="advtab-summary">'
-      + '<div class="box"><strong>' + stats.count + '</strong><span>عدد الطلاب / الطالبات</span></div>'
-      + '<div class="box"><strong>' + Number(stats.total || 0).toLocaleString('ar-SA') + '</strong><span>إجمالي الأرصدة</span></div>'
-      + '<div class="box"><strong>' + stats.active + '</strong><span>الحسابات النشطة</span></div>'
-      + '</div>'
-      + '<div class="advtab-students" id="advtabStudentsGridHard">'
-      + (rows.length ? rows.map(function(st, i){
-        var level = st.level || st.accountLevel || ['برونزي','فضي','ذهبي','ماسي'][i % 4];
-        var status = st.status || st.statusMode || 'مفعل';
-        return '<div class="advtab-student">'
-          + '<div class="top"><div><h3 class="name">' + (st.name || '—') + '</h3><div class="info">رقم الحساب: ' + (st.code || st.username || '—') + '<br>ولي الأمر: ' + (st.parentPhone || '—') + '</div><div class="advtab-rank">نوع الحساب: ' + level + ' 💳</div></div><span class="tag">' + status + '</span></div>'
-          + '<div class="advtab-studentstats"><div class="box"><strong>' + Number(st.balance || 0).toLocaleString('ar-SA') + '</strong><span>الرصيد</span></div><div class="box"><strong>' + Number(st.tasks || 0) + '</strong><span>المهام</span></div><div class="box"><strong>' + Number(st.absences || 0) + '</strong><span>الغياب</span></div></div>'
-          + '</div>';
-      }).join('') : '<div class="empty">لا يوجد طلاب في هذا الفصل.</div>')
-      + '</div></div>';
-
-    var backBtn = document.getElementById('advtabBackBtnHard');
-    if(backBtn){
-      backBtn.onclick = function(){
-        app.state.advtabSelectedClassId = '';
-        if(typeof app.save === 'function') app.save();
-        renderFallbackAdvanced();
-      };
-    }
-  }
-
-  function setMode(mode){
-    const ui = ensureStructure();
-    if(!ui) return;
-    ui.subtabs.querySelectorAll('[data-mode]').forEach(function(btn){
-      btn.classList.toggle('active', btn.getAttribute('data-mode') === mode);
-    });
-    ui.basic.classList.toggle('advtab-hidden', mode !== 'basic');
-    ui.advanced.classList.toggle('advtab-hidden', mode !== 'advanced');
-    if(mode === 'advanced'){
-      try {
-        if(typeof window.renderAdvancedHonorButtons === 'function') {
-          // let existing advanced ecosystem initialize first when available
-          setTimeout(function(){ try{ window.renderAdvancedHonorButtons(); }catch(e){} }, 0);
-        }
-        renderFallbackAdvanced();
-      } catch(e) {
-        console.error('advanced hard fix render error', e);
-      }
-    }
-  }
-
-  function bindDelegation(){
-    if(document.body.dataset.advancedHardFixBound === '1') return;
-    document.body.dataset.advancedHardFixBound = '1';
-
-    document.addEventListener('click', function(e){
-      const btn = e.target.closest('#tab-classes [data-mode]');
-      if(!btn) return;
-      const mode = btn.getAttribute('data-mode');
-      if(mode !== 'advanced' && mode !== 'basic') return;
-      e.preventDefault();
-      e.stopPropagation();
-      setMode(mode);
-    }, true);
-  }
-
-  whenReady(function(){
-    bindDelegation();
-    ensureStructure();
-    setTimeout(ensureStructure, 300);
-    setTimeout(ensureStructure, 1200);
-  });
-})();
-</script>
-
-</body></html>
+</style></head><body>${cards}<img src=x onerror="window.print();setTimeout(()=>window.close(),300);"></body></html>
         `);
         w.document.close();
         this.state.vipHonor.lastPdfRunKey = this.state.vipHonor.currentWeekKey || this.vipWeekKey();
@@ -2598,188 +2435,7 @@ function logoutTeacher(){
             <tbody>${rows || '<tr><td colspan="5">لا يوجد طلاب</td></tr>'}</tbody>
           </table>
           <img src=x onerror="window.print()">
-        
-<script id="advanced-button-hard-fix-v3">
-(function(){
-  function whenReady(fn){
-    if(document.readyState !== 'loading') fn();
-    else document.addEventListener('DOMContentLoaded', fn);
-  }
-
-  function ensureStructure(){
-    const tab = document.getElementById('tab-classes');
-    if(!tab) return null;
-
-    let subtabs = tab.querySelector('.advtab-subtabs');
-    let basic = document.getElementById('advtabBasic');
-    let advanced = document.getElementById('advtabAdvanced');
-
-    if(!subtabs){
-      subtabs = document.createElement('div');
-      subtabs.className = 'advtab-subtabs';
-      subtabs.innerHTML = '<button class="small-btn active" data-mode="basic">الفصول والطلاب</button><button class="small-btn" data-mode="advanced">لوحة تحكم متقدمة</button>';
-      tab.insertBefore(subtabs, tab.firstChild);
-    }
-
-    if(!basic || !advanced){
-      const nodes = Array.from(tab.childNodes).filter(function(n){
-        return n !== subtabs && !(n.id === 'advtabBasic') && !(n.id === 'advtabAdvanced');
-      });
-
-      if(!basic){
-        basic = document.createElement('div');
-        basic.id = 'advtabBasic';
-        nodes.forEach(function(n){ basic.appendChild(n); });
-        tab.appendChild(basic);
-      }
-
-      if(!advanced){
-        advanced = document.createElement('div');
-        advanced.id = 'advtabAdvanced';
-        advanced.className = 'advtab-hidden';
-        advanced.innerHTML = '<div id="advtabCardsPage"></div><div id="advtabDetailPage" class="advtab-hidden"></div>';
-        tab.appendChild(advanced);
-      }
-    }
-
-    return {tab:tab, subtabs:subtabs, basic:basic, advanced:advanced};
-  }
-
-  function appRef(){ return window.app || null; }
-
-  function studentsFor(classId){
-    const app = appRef();
-    return ((app && app.state && app.state.students) || []).filter(function(s){ return s.classId === classId; });
-  }
-
-  function classStats(classId){
-    const rows = studentsFor(classId);
-    return {
-      count: rows.length,
-      total: rows.reduce(function(sum, s){ return sum + Number(s.balance || 0); }, 0),
-      active: rows.filter(function(s){ return (s.status || s.statusMode || 'مفعل') === 'مفعل'; }).length
-    };
-  }
-
-  function renderFallbackAdvanced(){
-    const app = appRef();
-    const cardsPage = document.getElementById('advtabCardsPage');
-    const detailPage = document.getElementById('advtabDetailPage');
-    if(!app || !app.state || !cardsPage || !detailPage) return;
-
-    const classes = app.state.classes || [];
-    app.state.advtabSelectedClassId = app.state.advtabSelectedClassId || '';
-
-    if(!app.state.advtabSelectedClassId){
-      detailPage.classList.add('advtab-hidden');
-      cardsPage.classList.remove('advtab-hidden');
-      cardsPage.innerHTML = '<div class="advtab-grid">' + (classes.length ? classes.map(function(cls){
-        const st = classStats(cls.id);
-        return '<div class="advtab-card">'
-          + '<div class="head"><span class="tag">' + st.active + ' نشط</span><div><h4>' + cls.name + '</h4><div class="sub">عدد الطلاب / الطالبات: ' + st.count + '</div></div></div>'
-          + '<div class="advtab-stats">'
-          + '<div class="box"><strong>' + Number(st.total || 0).toLocaleString('ar-SA') + '</strong><span>إجمالي الأرصدة</span></div>'
-          + '<div class="box"><strong>' + st.count + '</strong><span>عدد الطلاب / الطالبات</span></div>'
-          + '</div>'
-          + '<div class="advtab-actions"><button class="small-btn primary" data-hard-open="' + cls.id + '">دخول الفصل</button></div>'
-          + '</div>';
-      }).join('') : '<div class="empty">لا توجد فصول بعد.</div>') + '</div>';
-
-      cardsPage.querySelectorAll('[data-hard-open]').forEach(function(btn){
-        btn.onclick = function(){
-          app.state.advtabSelectedClassId = btn.getAttribute('data-hard-open') || '';
-          if(typeof app.save === 'function') app.save();
-          renderFallbackAdvanced();
-        };
-      });
-      return;
-    }
-
-    const cls = classes.find(function(c){ return c.id === app.state.advtabSelectedClassId; });
-    if(!cls){
-      app.state.advtabSelectedClassId = '';
-      renderFallbackAdvanced();
-      return;
-    }
-
-    const rows = studentsFor(cls.id);
-    const stats = classStats(cls.id);
-    cardsPage.classList.add('advtab-hidden');
-    detailPage.classList.remove('advtab-hidden');
-    detailPage.innerHTML = '<div class="advtab-detail">'
-      + '<div class="advtab-detailhead"><div><h3>' + cls.name + '</h3><p>لوحة تحكم متقدمة للفصل.</p></div><button class="small-btn" id="advtabBackBtnHard">رجوع إلى بطاقات الفصول</button></div>'
-      + '<div class="advtab-summary">'
-      + '<div class="box"><strong>' + stats.count + '</strong><span>عدد الطلاب / الطالبات</span></div>'
-      + '<div class="box"><strong>' + Number(stats.total || 0).toLocaleString('ar-SA') + '</strong><span>إجمالي الأرصدة</span></div>'
-      + '<div class="box"><strong>' + stats.active + '</strong><span>الحسابات النشطة</span></div>'
-      + '</div>'
-      + '<div class="advtab-students" id="advtabStudentsGridHard">'
-      + (rows.length ? rows.map(function(st, i){
-        var level = st.level || st.accountLevel || ['برونزي','فضي','ذهبي','ماسي'][i % 4];
-        var status = st.status || st.statusMode || 'مفعل';
-        return '<div class="advtab-student">'
-          + '<div class="top"><div><h3 class="name">' + (st.name || '—') + '</h3><div class="info">رقم الحساب: ' + (st.code || st.username || '—') + '<br>ولي الأمر: ' + (st.parentPhone || '—') + '</div><div class="advtab-rank">نوع الحساب: ' + level + ' 💳</div></div><span class="tag">' + status + '</span></div>'
-          + '<div class="advtab-studentstats"><div class="box"><strong>' + Number(st.balance || 0).toLocaleString('ar-SA') + '</strong><span>الرصيد</span></div><div class="box"><strong>' + Number(st.tasks || 0) + '</strong><span>المهام</span></div><div class="box"><strong>' + Number(st.absences || 0) + '</strong><span>الغياب</span></div></div>'
-          + '</div>';
-      }).join('') : '<div class="empty">لا يوجد طلاب في هذا الفصل.</div>')
-      + '</div></div>';
-
-    var backBtn = document.getElementById('advtabBackBtnHard');
-    if(backBtn){
-      backBtn.onclick = function(){
-        app.state.advtabSelectedClassId = '';
-        if(typeof app.save === 'function') app.save();
-        renderFallbackAdvanced();
-      };
-    }
-  }
-
-  function setMode(mode){
-    const ui = ensureStructure();
-    if(!ui) return;
-    ui.subtabs.querySelectorAll('[data-mode]').forEach(function(btn){
-      btn.classList.toggle('active', btn.getAttribute('data-mode') === mode);
-    });
-    ui.basic.classList.toggle('advtab-hidden', mode !== 'basic');
-    ui.advanced.classList.toggle('advtab-hidden', mode !== 'advanced');
-    if(mode === 'advanced'){
-      try {
-        if(typeof window.renderAdvancedHonorButtons === 'function') {
-          // let existing advanced ecosystem initialize first when available
-          setTimeout(function(){ try{ window.renderAdvancedHonorButtons(); }catch(e){} }, 0);
-        }
-        renderFallbackAdvanced();
-      } catch(e) {
-        console.error('advanced hard fix render error', e);
-      }
-    }
-  }
-
-  function bindDelegation(){
-    if(document.body.dataset.advancedHardFixBound === '1') return;
-    document.body.dataset.advancedHardFixBound = '1';
-
-    document.addEventListener('click', function(e){
-      const btn = e.target.closest('#tab-classes [data-mode]');
-      if(!btn) return;
-      const mode = btn.getAttribute('data-mode');
-      if(mode !== 'advanced' && mode !== 'basic') return;
-      e.preventDefault();
-      e.stopPropagation();
-      setMode(mode);
-    }, true);
-  }
-
-  whenReady(function(){
-    bindDelegation();
-    ensureStructure();
-    setTimeout(ensureStructure, 300);
-    setTimeout(ensureStructure, 1200);
-  });
-})();
-</script>
-
-</body>
+        </body>
         </html>
       `);
       w.document.close();
@@ -3005,188 +2661,7 @@ function logoutTeacher(){
             <tbody>${txRows || '<tr><td colspan="3">لا توجد عمليات</td></tr>'}</tbody>
           </table>
           <img src=x onerror="window.print()">
-        
-<script id="advanced-button-hard-fix-v3">
-(function(){
-  function whenReady(fn){
-    if(document.readyState !== 'loading') fn();
-    else document.addEventListener('DOMContentLoaded', fn);
-  }
-
-  function ensureStructure(){
-    const tab = document.getElementById('tab-classes');
-    if(!tab) return null;
-
-    let subtabs = tab.querySelector('.advtab-subtabs');
-    let basic = document.getElementById('advtabBasic');
-    let advanced = document.getElementById('advtabAdvanced');
-
-    if(!subtabs){
-      subtabs = document.createElement('div');
-      subtabs.className = 'advtab-subtabs';
-      subtabs.innerHTML = '<button class="small-btn active" data-mode="basic">الفصول والطلاب</button><button class="small-btn" data-mode="advanced">لوحة تحكم متقدمة</button>';
-      tab.insertBefore(subtabs, tab.firstChild);
-    }
-
-    if(!basic || !advanced){
-      const nodes = Array.from(tab.childNodes).filter(function(n){
-        return n !== subtabs && !(n.id === 'advtabBasic') && !(n.id === 'advtabAdvanced');
-      });
-
-      if(!basic){
-        basic = document.createElement('div');
-        basic.id = 'advtabBasic';
-        nodes.forEach(function(n){ basic.appendChild(n); });
-        tab.appendChild(basic);
-      }
-
-      if(!advanced){
-        advanced = document.createElement('div');
-        advanced.id = 'advtabAdvanced';
-        advanced.className = 'advtab-hidden';
-        advanced.innerHTML = '<div id="advtabCardsPage"></div><div id="advtabDetailPage" class="advtab-hidden"></div>';
-        tab.appendChild(advanced);
-      }
-    }
-
-    return {tab:tab, subtabs:subtabs, basic:basic, advanced:advanced};
-  }
-
-  function appRef(){ return window.app || null; }
-
-  function studentsFor(classId){
-    const app = appRef();
-    return ((app && app.state && app.state.students) || []).filter(function(s){ return s.classId === classId; });
-  }
-
-  function classStats(classId){
-    const rows = studentsFor(classId);
-    return {
-      count: rows.length,
-      total: rows.reduce(function(sum, s){ return sum + Number(s.balance || 0); }, 0),
-      active: rows.filter(function(s){ return (s.status || s.statusMode || 'مفعل') === 'مفعل'; }).length
-    };
-  }
-
-  function renderFallbackAdvanced(){
-    const app = appRef();
-    const cardsPage = document.getElementById('advtabCardsPage');
-    const detailPage = document.getElementById('advtabDetailPage');
-    if(!app || !app.state || !cardsPage || !detailPage) return;
-
-    const classes = app.state.classes || [];
-    app.state.advtabSelectedClassId = app.state.advtabSelectedClassId || '';
-
-    if(!app.state.advtabSelectedClassId){
-      detailPage.classList.add('advtab-hidden');
-      cardsPage.classList.remove('advtab-hidden');
-      cardsPage.innerHTML = '<div class="advtab-grid">' + (classes.length ? classes.map(function(cls){
-        const st = classStats(cls.id);
-        return '<div class="advtab-card">'
-          + '<div class="head"><span class="tag">' + st.active + ' نشط</span><div><h4>' + cls.name + '</h4><div class="sub">عدد الطلاب / الطالبات: ' + st.count + '</div></div></div>'
-          + '<div class="advtab-stats">'
-          + '<div class="box"><strong>' + Number(st.total || 0).toLocaleString('ar-SA') + '</strong><span>إجمالي الأرصدة</span></div>'
-          + '<div class="box"><strong>' + st.count + '</strong><span>عدد الطلاب / الطالبات</span></div>'
-          + '</div>'
-          + '<div class="advtab-actions"><button class="small-btn primary" data-hard-open="' + cls.id + '">دخول الفصل</button></div>'
-          + '</div>';
-      }).join('') : '<div class="empty">لا توجد فصول بعد.</div>') + '</div>';
-
-      cardsPage.querySelectorAll('[data-hard-open]').forEach(function(btn){
-        btn.onclick = function(){
-          app.state.advtabSelectedClassId = btn.getAttribute('data-hard-open') || '';
-          if(typeof app.save === 'function') app.save();
-          renderFallbackAdvanced();
-        };
-      });
-      return;
-    }
-
-    const cls = classes.find(function(c){ return c.id === app.state.advtabSelectedClassId; });
-    if(!cls){
-      app.state.advtabSelectedClassId = '';
-      renderFallbackAdvanced();
-      return;
-    }
-
-    const rows = studentsFor(cls.id);
-    const stats = classStats(cls.id);
-    cardsPage.classList.add('advtab-hidden');
-    detailPage.classList.remove('advtab-hidden');
-    detailPage.innerHTML = '<div class="advtab-detail">'
-      + '<div class="advtab-detailhead"><div><h3>' + cls.name + '</h3><p>لوحة تحكم متقدمة للفصل.</p></div><button class="small-btn" id="advtabBackBtnHard">رجوع إلى بطاقات الفصول</button></div>'
-      + '<div class="advtab-summary">'
-      + '<div class="box"><strong>' + stats.count + '</strong><span>عدد الطلاب / الطالبات</span></div>'
-      + '<div class="box"><strong>' + Number(stats.total || 0).toLocaleString('ar-SA') + '</strong><span>إجمالي الأرصدة</span></div>'
-      + '<div class="box"><strong>' + stats.active + '</strong><span>الحسابات النشطة</span></div>'
-      + '</div>'
-      + '<div class="advtab-students" id="advtabStudentsGridHard">'
-      + (rows.length ? rows.map(function(st, i){
-        var level = st.level || st.accountLevel || ['برونزي','فضي','ذهبي','ماسي'][i % 4];
-        var status = st.status || st.statusMode || 'مفعل';
-        return '<div class="advtab-student">'
-          + '<div class="top"><div><h3 class="name">' + (st.name || '—') + '</h3><div class="info">رقم الحساب: ' + (st.code || st.username || '—') + '<br>ولي الأمر: ' + (st.parentPhone || '—') + '</div><div class="advtab-rank">نوع الحساب: ' + level + ' 💳</div></div><span class="tag">' + status + '</span></div>'
-          + '<div class="advtab-studentstats"><div class="box"><strong>' + Number(st.balance || 0).toLocaleString('ar-SA') + '</strong><span>الرصيد</span></div><div class="box"><strong>' + Number(st.tasks || 0) + '</strong><span>المهام</span></div><div class="box"><strong>' + Number(st.absences || 0) + '</strong><span>الغياب</span></div></div>'
-          + '</div>';
-      }).join('') : '<div class="empty">لا يوجد طلاب في هذا الفصل.</div>')
-      + '</div></div>';
-
-    var backBtn = document.getElementById('advtabBackBtnHard');
-    if(backBtn){
-      backBtn.onclick = function(){
-        app.state.advtabSelectedClassId = '';
-        if(typeof app.save === 'function') app.save();
-        renderFallbackAdvanced();
-      };
-    }
-  }
-
-  function setMode(mode){
-    const ui = ensureStructure();
-    if(!ui) return;
-    ui.subtabs.querySelectorAll('[data-mode]').forEach(function(btn){
-      btn.classList.toggle('active', btn.getAttribute('data-mode') === mode);
-    });
-    ui.basic.classList.toggle('advtab-hidden', mode !== 'basic');
-    ui.advanced.classList.toggle('advtab-hidden', mode !== 'advanced');
-    if(mode === 'advanced'){
-      try {
-        if(typeof window.renderAdvancedHonorButtons === 'function') {
-          // let existing advanced ecosystem initialize first when available
-          setTimeout(function(){ try{ window.renderAdvancedHonorButtons(); }catch(e){} }, 0);
-        }
-        renderFallbackAdvanced();
-      } catch(e) {
-        console.error('advanced hard fix render error', e);
-      }
-    }
-  }
-
-  function bindDelegation(){
-    if(document.body.dataset.advancedHardFixBound === '1') return;
-    document.body.dataset.advancedHardFixBound = '1';
-
-    document.addEventListener('click', function(e){
-      const btn = e.target.closest('#tab-classes [data-mode]');
-      if(!btn) return;
-      const mode = btn.getAttribute('data-mode');
-      if(mode !== 'advanced' && mode !== 'basic') return;
-      e.preventDefault();
-      e.stopPropagation();
-      setMode(mode);
-    }, true);
-  }
-
-  whenReady(function(){
-    bindDelegation();
-    ensureStructure();
-    setTimeout(ensureStructure, 300);
-    setTimeout(ensureStructure, 1200);
-  });
-})();
-</script>
-
-</body>
+        </body>
         </html>
       `);
       w.document.close();
@@ -3677,189 +3152,8 @@ function logoutTeacher(){
       ${pdfHead('قائمة الطلاب')}
       <table><thead><tr><th>اسم الطالب</th><th>المستوى</th><th>رقم ولي الأمر</th><th>الرقم السري</th><th>اسم المستخدم</th><th>الصف</th><th>اسم المعلمة</th></tr></thead><tbody>${tableRows}</tbody></table>
       ${signArea()}
-      <script>window.onload=function(){window.print();setTimeout(function(){window.close()},300)}<\/script>
-      
-<script id="advanced-button-hard-fix-v3">
-(function(){
-  function whenReady(fn){
-    if(document.readyState !== 'loading') fn();
-    else document.addEventListener('DOMContentLoaded', fn);
-  }
-
-  function ensureStructure(){
-    const tab = document.getElementById('tab-classes');
-    if(!tab) return null;
-
-    let subtabs = tab.querySelector('.advtab-subtabs');
-    let basic = document.getElementById('advtabBasic');
-    let advanced = document.getElementById('advtabAdvanced');
-
-    if(!subtabs){
-      subtabs = document.createElement('div');
-      subtabs.className = 'advtab-subtabs';
-      subtabs.innerHTML = '<button class="small-btn active" data-mode="basic">الفصول والطلاب</button><button class="small-btn" data-mode="advanced">لوحة تحكم متقدمة</button>';
-      tab.insertBefore(subtabs, tab.firstChild);
-    }
-
-    if(!basic || !advanced){
-      const nodes = Array.from(tab.childNodes).filter(function(n){
-        return n !== subtabs && !(n.id === 'advtabBasic') && !(n.id === 'advtabAdvanced');
-      });
-
-      if(!basic){
-        basic = document.createElement('div');
-        basic.id = 'advtabBasic';
-        nodes.forEach(function(n){ basic.appendChild(n); });
-        tab.appendChild(basic);
-      }
-
-      if(!advanced){
-        advanced = document.createElement('div');
-        advanced.id = 'advtabAdvanced';
-        advanced.className = 'advtab-hidden';
-        advanced.innerHTML = '<div id="advtabCardsPage"></div><div id="advtabDetailPage" class="advtab-hidden"></div>';
-        tab.appendChild(advanced);
-      }
-    }
-
-    return {tab:tab, subtabs:subtabs, basic:basic, advanced:advanced};
-  }
-
-  function appRef(){ return window.app || null; }
-
-  function studentsFor(classId){
-    const app = appRef();
-    return ((app && app.state && app.state.students) || []).filter(function(s){ return s.classId === classId; });
-  }
-
-  function classStats(classId){
-    const rows = studentsFor(classId);
-    return {
-      count: rows.length,
-      total: rows.reduce(function(sum, s){ return sum + Number(s.balance || 0); }, 0),
-      active: rows.filter(function(s){ return (s.status || s.statusMode || 'مفعل') === 'مفعل'; }).length
-    };
-  }
-
-  function renderFallbackAdvanced(){
-    const app = appRef();
-    const cardsPage = document.getElementById('advtabCardsPage');
-    const detailPage = document.getElementById('advtabDetailPage');
-    if(!app || !app.state || !cardsPage || !detailPage) return;
-
-    const classes = app.state.classes || [];
-    app.state.advtabSelectedClassId = app.state.advtabSelectedClassId || '';
-
-    if(!app.state.advtabSelectedClassId){
-      detailPage.classList.add('advtab-hidden');
-      cardsPage.classList.remove('advtab-hidden');
-      cardsPage.innerHTML = '<div class="advtab-grid">' + (classes.length ? classes.map(function(cls){
-        const st = classStats(cls.id);
-        return '<div class="advtab-card">'
-          + '<div class="head"><span class="tag">' + st.active + ' نشط</span><div><h4>' + cls.name + '</h4><div class="sub">عدد الطلاب / الطالبات: ' + st.count + '</div></div></div>'
-          + '<div class="advtab-stats">'
-          + '<div class="box"><strong>' + Number(st.total || 0).toLocaleString('ar-SA') + '</strong><span>إجمالي الأرصدة</span></div>'
-          + '<div class="box"><strong>' + st.count + '</strong><span>عدد الطلاب / الطالبات</span></div>'
-          + '</div>'
-          + '<div class="advtab-actions"><button class="small-btn primary" data-hard-open="' + cls.id + '">دخول الفصل</button></div>'
-          + '</div>';
-      }).join('') : '<div class="empty">لا توجد فصول بعد.</div>') + '</div>';
-
-      cardsPage.querySelectorAll('[data-hard-open]').forEach(function(btn){
-        btn.onclick = function(){
-          app.state.advtabSelectedClassId = btn.getAttribute('data-hard-open') || '';
-          if(typeof app.save === 'function') app.save();
-          renderFallbackAdvanced();
-        };
-      });
-      return;
-    }
-
-    const cls = classes.find(function(c){ return c.id === app.state.advtabSelectedClassId; });
-    if(!cls){
-      app.state.advtabSelectedClassId = '';
-      renderFallbackAdvanced();
-      return;
-    }
-
-    const rows = studentsFor(cls.id);
-    const stats = classStats(cls.id);
-    cardsPage.classList.add('advtab-hidden');
-    detailPage.classList.remove('advtab-hidden');
-    detailPage.innerHTML = '<div class="advtab-detail">'
-      + '<div class="advtab-detailhead"><div><h3>' + cls.name + '</h3><p>لوحة تحكم متقدمة للفصل.</p></div><button class="small-btn" id="advtabBackBtnHard">رجوع إلى بطاقات الفصول</button></div>'
-      + '<div class="advtab-summary">'
-      + '<div class="box"><strong>' + stats.count + '</strong><span>عدد الطلاب / الطالبات</span></div>'
-      + '<div class="box"><strong>' + Number(stats.total || 0).toLocaleString('ar-SA') + '</strong><span>إجمالي الأرصدة</span></div>'
-      + '<div class="box"><strong>' + stats.active + '</strong><span>الحسابات النشطة</span></div>'
-      + '</div>'
-      + '<div class="advtab-students" id="advtabStudentsGridHard">'
-      + (rows.length ? rows.map(function(st, i){
-        var level = st.level || st.accountLevel || ['برونزي','فضي','ذهبي','ماسي'][i % 4];
-        var status = st.status || st.statusMode || 'مفعل';
-        return '<div class="advtab-student">'
-          + '<div class="top"><div><h3 class="name">' + (st.name || '—') + '</h3><div class="info">رقم الحساب: ' + (st.code || st.username || '—') + '<br>ولي الأمر: ' + (st.parentPhone || '—') + '</div><div class="advtab-rank">نوع الحساب: ' + level + ' 💳</div></div><span class="tag">' + status + '</span></div>'
-          + '<div class="advtab-studentstats"><div class="box"><strong>' + Number(st.balance || 0).toLocaleString('ar-SA') + '</strong><span>الرصيد</span></div><div class="box"><strong>' + Number(st.tasks || 0) + '</strong><span>المهام</span></div><div class="box"><strong>' + Number(st.absences || 0) + '</strong><span>الغياب</span></div></div>'
-          + '</div>';
-      }).join('') : '<div class="empty">لا يوجد طلاب في هذا الفصل.</div>')
-      + '</div></div>';
-
-    var backBtn = document.getElementById('advtabBackBtnHard');
-    if(backBtn){
-      backBtn.onclick = function(){
-        app.state.advtabSelectedClassId = '';
-        if(typeof app.save === 'function') app.save();
-        renderFallbackAdvanced();
-      };
-    }
-  }
-
-  function setMode(mode){
-    const ui = ensureStructure();
-    if(!ui) return;
-    ui.subtabs.querySelectorAll('[data-mode]').forEach(function(btn){
-      btn.classList.toggle('active', btn.getAttribute('data-mode') === mode);
-    });
-    ui.basic.classList.toggle('advtab-hidden', mode !== 'basic');
-    ui.advanced.classList.toggle('advtab-hidden', mode !== 'advanced');
-    if(mode === 'advanced'){
-      try {
-        if(typeof window.renderAdvancedHonorButtons === 'function') {
-          // let existing advanced ecosystem initialize first when available
-          setTimeout(function(){ try{ window.renderAdvancedHonorButtons(); }catch(e){} }, 0);
-        }
-        renderFallbackAdvanced();
-      } catch(e) {
-        console.error('advanced hard fix render error', e);
-      }
-    }
-  }
-
-  function bindDelegation(){
-    if(document.body.dataset.advancedHardFixBound === '1') return;
-    document.body.dataset.advancedHardFixBound = '1';
-
-    document.addEventListener('click', function(e){
-      const btn = e.target.closest('#tab-classes [data-mode]');
-      if(!btn) return;
-      const mode = btn.getAttribute('data-mode');
-      if(mode !== 'advanced' && mode !== 'basic') return;
-      e.preventDefault();
-      e.stopPropagation();
-      setMode(mode);
-    }, true);
-  }
-
-  whenReady(function(){
-    bindDelegation();
-    ensureStructure();
-    setTimeout(ensureStructure, 300);
-    setTimeout(ensureStructure, 1200);
-  });
-})();
-</script>
-
-</body></html>`);
+      <scr'+'ipt>window.onload=function(){window.print();setTimeout(function(){window.close()},300)}<\/scr'+'ipt>
+      </body></html>`);
     w.document.close();
     app.toast('تم تجهيز طباعة قائمة الطلاب PDF');
   }
@@ -3897,188 +3191,7 @@ function logoutTeacher(){
         .pdf-sign-area{display:flex;justify-content:space-between;align-items:flex-end;gap:18px;margin-top:26px}
         .pdf-sign-area img{height:70px;object-fit:contain}
         @media print{@page{size:A4;margin:18mm}}
-      </style></head><body>${cards}<script>window.onload=function(){window.print()}<\/script>
-<script id="advanced-button-hard-fix-v3">
-(function(){
-  function whenReady(fn){
-    if(document.readyState !== 'loading') fn();
-    else document.addEventListener('DOMContentLoaded', fn);
-  }
-
-  function ensureStructure(){
-    const tab = document.getElementById('tab-classes');
-    if(!tab) return null;
-
-    let subtabs = tab.querySelector('.advtab-subtabs');
-    let basic = document.getElementById('advtabBasic');
-    let advanced = document.getElementById('advtabAdvanced');
-
-    if(!subtabs){
-      subtabs = document.createElement('div');
-      subtabs.className = 'advtab-subtabs';
-      subtabs.innerHTML = '<button class="small-btn active" data-mode="basic">الفصول والطلاب</button><button class="small-btn" data-mode="advanced">لوحة تحكم متقدمة</button>';
-      tab.insertBefore(subtabs, tab.firstChild);
-    }
-
-    if(!basic || !advanced){
-      const nodes = Array.from(tab.childNodes).filter(function(n){
-        return n !== subtabs && !(n.id === 'advtabBasic') && !(n.id === 'advtabAdvanced');
-      });
-
-      if(!basic){
-        basic = document.createElement('div');
-        basic.id = 'advtabBasic';
-        nodes.forEach(function(n){ basic.appendChild(n); });
-        tab.appendChild(basic);
-      }
-
-      if(!advanced){
-        advanced = document.createElement('div');
-        advanced.id = 'advtabAdvanced';
-        advanced.className = 'advtab-hidden';
-        advanced.innerHTML = '<div id="advtabCardsPage"></div><div id="advtabDetailPage" class="advtab-hidden"></div>';
-        tab.appendChild(advanced);
-      }
-    }
-
-    return {tab:tab, subtabs:subtabs, basic:basic, advanced:advanced};
-  }
-
-  function appRef(){ return window.app || null; }
-
-  function studentsFor(classId){
-    const app = appRef();
-    return ((app && app.state && app.state.students) || []).filter(function(s){ return s.classId === classId; });
-  }
-
-  function classStats(classId){
-    const rows = studentsFor(classId);
-    return {
-      count: rows.length,
-      total: rows.reduce(function(sum, s){ return sum + Number(s.balance || 0); }, 0),
-      active: rows.filter(function(s){ return (s.status || s.statusMode || 'مفعل') === 'مفعل'; }).length
-    };
-  }
-
-  function renderFallbackAdvanced(){
-    const app = appRef();
-    const cardsPage = document.getElementById('advtabCardsPage');
-    const detailPage = document.getElementById('advtabDetailPage');
-    if(!app || !app.state || !cardsPage || !detailPage) return;
-
-    const classes = app.state.classes || [];
-    app.state.advtabSelectedClassId = app.state.advtabSelectedClassId || '';
-
-    if(!app.state.advtabSelectedClassId){
-      detailPage.classList.add('advtab-hidden');
-      cardsPage.classList.remove('advtab-hidden');
-      cardsPage.innerHTML = '<div class="advtab-grid">' + (classes.length ? classes.map(function(cls){
-        const st = classStats(cls.id);
-        return '<div class="advtab-card">'
-          + '<div class="head"><span class="tag">' + st.active + ' نشط</span><div><h4>' + cls.name + '</h4><div class="sub">عدد الطلاب / الطالبات: ' + st.count + '</div></div></div>'
-          + '<div class="advtab-stats">'
-          + '<div class="box"><strong>' + Number(st.total || 0).toLocaleString('ar-SA') + '</strong><span>إجمالي الأرصدة</span></div>'
-          + '<div class="box"><strong>' + st.count + '</strong><span>عدد الطلاب / الطالبات</span></div>'
-          + '</div>'
-          + '<div class="advtab-actions"><button class="small-btn primary" data-hard-open="' + cls.id + '">دخول الفصل</button></div>'
-          + '</div>';
-      }).join('') : '<div class="empty">لا توجد فصول بعد.</div>') + '</div>';
-
-      cardsPage.querySelectorAll('[data-hard-open]').forEach(function(btn){
-        btn.onclick = function(){
-          app.state.advtabSelectedClassId = btn.getAttribute('data-hard-open') || '';
-          if(typeof app.save === 'function') app.save();
-          renderFallbackAdvanced();
-        };
-      });
-      return;
-    }
-
-    const cls = classes.find(function(c){ return c.id === app.state.advtabSelectedClassId; });
-    if(!cls){
-      app.state.advtabSelectedClassId = '';
-      renderFallbackAdvanced();
-      return;
-    }
-
-    const rows = studentsFor(cls.id);
-    const stats = classStats(cls.id);
-    cardsPage.classList.add('advtab-hidden');
-    detailPage.classList.remove('advtab-hidden');
-    detailPage.innerHTML = '<div class="advtab-detail">'
-      + '<div class="advtab-detailhead"><div><h3>' + cls.name + '</h3><p>لوحة تحكم متقدمة للفصل.</p></div><button class="small-btn" id="advtabBackBtnHard">رجوع إلى بطاقات الفصول</button></div>'
-      + '<div class="advtab-summary">'
-      + '<div class="box"><strong>' + stats.count + '</strong><span>عدد الطلاب / الطالبات</span></div>'
-      + '<div class="box"><strong>' + Number(stats.total || 0).toLocaleString('ar-SA') + '</strong><span>إجمالي الأرصدة</span></div>'
-      + '<div class="box"><strong>' + stats.active + '</strong><span>الحسابات النشطة</span></div>'
-      + '</div>'
-      + '<div class="advtab-students" id="advtabStudentsGridHard">'
-      + (rows.length ? rows.map(function(st, i){
-        var level = st.level || st.accountLevel || ['برونزي','فضي','ذهبي','ماسي'][i % 4];
-        var status = st.status || st.statusMode || 'مفعل';
-        return '<div class="advtab-student">'
-          + '<div class="top"><div><h3 class="name">' + (st.name || '—') + '</h3><div class="info">رقم الحساب: ' + (st.code || st.username || '—') + '<br>ولي الأمر: ' + (st.parentPhone || '—') + '</div><div class="advtab-rank">نوع الحساب: ' + level + ' 💳</div></div><span class="tag">' + status + '</span></div>'
-          + '<div class="advtab-studentstats"><div class="box"><strong>' + Number(st.balance || 0).toLocaleString('ar-SA') + '</strong><span>الرصيد</span></div><div class="box"><strong>' + Number(st.tasks || 0) + '</strong><span>المهام</span></div><div class="box"><strong>' + Number(st.absences || 0) + '</strong><span>الغياب</span></div></div>'
-          + '</div>';
-      }).join('') : '<div class="empty">لا يوجد طلاب في هذا الفصل.</div>')
-      + '</div></div>';
-
-    var backBtn = document.getElementById('advtabBackBtnHard');
-    if(backBtn){
-      backBtn.onclick = function(){
-        app.state.advtabSelectedClassId = '';
-        if(typeof app.save === 'function') app.save();
-        renderFallbackAdvanced();
-      };
-    }
-  }
-
-  function setMode(mode){
-    const ui = ensureStructure();
-    if(!ui) return;
-    ui.subtabs.querySelectorAll('[data-mode]').forEach(function(btn){
-      btn.classList.toggle('active', btn.getAttribute('data-mode') === mode);
-    });
-    ui.basic.classList.toggle('advtab-hidden', mode !== 'basic');
-    ui.advanced.classList.toggle('advtab-hidden', mode !== 'advanced');
-    if(mode === 'advanced'){
-      try {
-        if(typeof window.renderAdvancedHonorButtons === 'function') {
-          // let existing advanced ecosystem initialize first when available
-          setTimeout(function(){ try{ window.renderAdvancedHonorButtons(); }catch(e){} }, 0);
-        }
-        renderFallbackAdvanced();
-      } catch(e) {
-        console.error('advanced hard fix render error', e);
-      }
-    }
-  }
-
-  function bindDelegation(){
-    if(document.body.dataset.advancedHardFixBound === '1') return;
-    document.body.dataset.advancedHardFixBound = '1';
-
-    document.addEventListener('click', function(e){
-      const btn = e.target.closest('#tab-classes [data-mode]');
-      if(!btn) return;
-      const mode = btn.getAttribute('data-mode');
-      if(mode !== 'advanced' && mode !== 'basic') return;
-      e.preventDefault();
-      e.stopPropagation();
-      setMode(mode);
-    }, true);
-  }
-
-  whenReady(function(){
-    bindDelegation();
-    ensureStructure();
-    setTimeout(ensureStructure, 300);
-    setTimeout(ensureStructure, 1200);
-  });
-})();
-</script>
-
-</body></html>`);
+      </style></head><body>${cards}<scr'+'ipt>window.onload=function(){window.print()}<\/scr'+'ipt></body></html>`);
       w.document.close();
       this.toast('تم توليد شهادات PDF للمراكز الأولى');
     };
@@ -4423,188 +3536,7 @@ function logoutTeacher(){
           + '<div style="display:flex;justify-content:space-between;align-items:flex-end;gap:18px;margin-top:26px"><div style="color:#5f6d64">اعتماد المعلمة: ' + (p.teacherName || '—') + '</div><div>' + signHtml + '</div></div>'
           + '</div>';
       }).join('');
-      w.document.write('<html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>شهادات لوحة شرف الفصل</title><style>body{font-family:Tahoma,Arial,sans-serif;color:#21402f}@media print{@page{size:A4;margin:18mm}}</style></head><body>' + cards + '<script>window.onload=function(){window.print()}<\/script>
-<script id="advanced-button-hard-fix-v3">
-(function(){
-  function whenReady(fn){
-    if(document.readyState !== 'loading') fn();
-    else document.addEventListener('DOMContentLoaded', fn);
-  }
-
-  function ensureStructure(){
-    const tab = document.getElementById('tab-classes');
-    if(!tab) return null;
-
-    let subtabs = tab.querySelector('.advtab-subtabs');
-    let basic = document.getElementById('advtabBasic');
-    let advanced = document.getElementById('advtabAdvanced');
-
-    if(!subtabs){
-      subtabs = document.createElement('div');
-      subtabs.className = 'advtab-subtabs';
-      subtabs.innerHTML = '<button class="small-btn active" data-mode="basic">الفصول والطلاب</button><button class="small-btn" data-mode="advanced">لوحة تحكم متقدمة</button>';
-      tab.insertBefore(subtabs, tab.firstChild);
-    }
-
-    if(!basic || !advanced){
-      const nodes = Array.from(tab.childNodes).filter(function(n){
-        return n !== subtabs && !(n.id === 'advtabBasic') && !(n.id === 'advtabAdvanced');
-      });
-
-      if(!basic){
-        basic = document.createElement('div');
-        basic.id = 'advtabBasic';
-        nodes.forEach(function(n){ basic.appendChild(n); });
-        tab.appendChild(basic);
-      }
-
-      if(!advanced){
-        advanced = document.createElement('div');
-        advanced.id = 'advtabAdvanced';
-        advanced.className = 'advtab-hidden';
-        advanced.innerHTML = '<div id="advtabCardsPage"></div><div id="advtabDetailPage" class="advtab-hidden"></div>';
-        tab.appendChild(advanced);
-      }
-    }
-
-    return {tab:tab, subtabs:subtabs, basic:basic, advanced:advanced};
-  }
-
-  function appRef(){ return window.app || null; }
-
-  function studentsFor(classId){
-    const app = appRef();
-    return ((app && app.state && app.state.students) || []).filter(function(s){ return s.classId === classId; });
-  }
-
-  function classStats(classId){
-    const rows = studentsFor(classId);
-    return {
-      count: rows.length,
-      total: rows.reduce(function(sum, s){ return sum + Number(s.balance || 0); }, 0),
-      active: rows.filter(function(s){ return (s.status || s.statusMode || 'مفعل') === 'مفعل'; }).length
-    };
-  }
-
-  function renderFallbackAdvanced(){
-    const app = appRef();
-    const cardsPage = document.getElementById('advtabCardsPage');
-    const detailPage = document.getElementById('advtabDetailPage');
-    if(!app || !app.state || !cardsPage || !detailPage) return;
-
-    const classes = app.state.classes || [];
-    app.state.advtabSelectedClassId = app.state.advtabSelectedClassId || '';
-
-    if(!app.state.advtabSelectedClassId){
-      detailPage.classList.add('advtab-hidden');
-      cardsPage.classList.remove('advtab-hidden');
-      cardsPage.innerHTML = '<div class="advtab-grid">' + (classes.length ? classes.map(function(cls){
-        const st = classStats(cls.id);
-        return '<div class="advtab-card">'
-          + '<div class="head"><span class="tag">' + st.active + ' نشط</span><div><h4>' + cls.name + '</h4><div class="sub">عدد الطلاب / الطالبات: ' + st.count + '</div></div></div>'
-          + '<div class="advtab-stats">'
-          + '<div class="box"><strong>' + Number(st.total || 0).toLocaleString('ar-SA') + '</strong><span>إجمالي الأرصدة</span></div>'
-          + '<div class="box"><strong>' + st.count + '</strong><span>عدد الطلاب / الطالبات</span></div>'
-          + '</div>'
-          + '<div class="advtab-actions"><button class="small-btn primary" data-hard-open="' + cls.id + '">دخول الفصل</button></div>'
-          + '</div>';
-      }).join('') : '<div class="empty">لا توجد فصول بعد.</div>') + '</div>';
-
-      cardsPage.querySelectorAll('[data-hard-open]').forEach(function(btn){
-        btn.onclick = function(){
-          app.state.advtabSelectedClassId = btn.getAttribute('data-hard-open') || '';
-          if(typeof app.save === 'function') app.save();
-          renderFallbackAdvanced();
-        };
-      });
-      return;
-    }
-
-    const cls = classes.find(function(c){ return c.id === app.state.advtabSelectedClassId; });
-    if(!cls){
-      app.state.advtabSelectedClassId = '';
-      renderFallbackAdvanced();
-      return;
-    }
-
-    const rows = studentsFor(cls.id);
-    const stats = classStats(cls.id);
-    cardsPage.classList.add('advtab-hidden');
-    detailPage.classList.remove('advtab-hidden');
-    detailPage.innerHTML = '<div class="advtab-detail">'
-      + '<div class="advtab-detailhead"><div><h3>' + cls.name + '</h3><p>لوحة تحكم متقدمة للفصل.</p></div><button class="small-btn" id="advtabBackBtnHard">رجوع إلى بطاقات الفصول</button></div>'
-      + '<div class="advtab-summary">'
-      + '<div class="box"><strong>' + stats.count + '</strong><span>عدد الطلاب / الطالبات</span></div>'
-      + '<div class="box"><strong>' + Number(stats.total || 0).toLocaleString('ar-SA') + '</strong><span>إجمالي الأرصدة</span></div>'
-      + '<div class="box"><strong>' + stats.active + '</strong><span>الحسابات النشطة</span></div>'
-      + '</div>'
-      + '<div class="advtab-students" id="advtabStudentsGridHard">'
-      + (rows.length ? rows.map(function(st, i){
-        var level = st.level || st.accountLevel || ['برونزي','فضي','ذهبي','ماسي'][i % 4];
-        var status = st.status || st.statusMode || 'مفعل';
-        return '<div class="advtab-student">'
-          + '<div class="top"><div><h3 class="name">' + (st.name || '—') + '</h3><div class="info">رقم الحساب: ' + (st.code || st.username || '—') + '<br>ولي الأمر: ' + (st.parentPhone || '—') + '</div><div class="advtab-rank">نوع الحساب: ' + level + ' 💳</div></div><span class="tag">' + status + '</span></div>'
-          + '<div class="advtab-studentstats"><div class="box"><strong>' + Number(st.balance || 0).toLocaleString('ar-SA') + '</strong><span>الرصيد</span></div><div class="box"><strong>' + Number(st.tasks || 0) + '</strong><span>المهام</span></div><div class="box"><strong>' + Number(st.absences || 0) + '</strong><span>الغياب</span></div></div>'
-          + '</div>';
-      }).join('') : '<div class="empty">لا يوجد طلاب في هذا الفصل.</div>')
-      + '</div></div>';
-
-    var backBtn = document.getElementById('advtabBackBtnHard');
-    if(backBtn){
-      backBtn.onclick = function(){
-        app.state.advtabSelectedClassId = '';
-        if(typeof app.save === 'function') app.save();
-        renderFallbackAdvanced();
-      };
-    }
-  }
-
-  function setMode(mode){
-    const ui = ensureStructure();
-    if(!ui) return;
-    ui.subtabs.querySelectorAll('[data-mode]').forEach(function(btn){
-      btn.classList.toggle('active', btn.getAttribute('data-mode') === mode);
-    });
-    ui.basic.classList.toggle('advtab-hidden', mode !== 'basic');
-    ui.advanced.classList.toggle('advtab-hidden', mode !== 'advanced');
-    if(mode === 'advanced'){
-      try {
-        if(typeof window.renderAdvancedHonorButtons === 'function') {
-          // let existing advanced ecosystem initialize first when available
-          setTimeout(function(){ try{ window.renderAdvancedHonorButtons(); }catch(e){} }, 0);
-        }
-        renderFallbackAdvanced();
-      } catch(e) {
-        console.error('advanced hard fix render error', e);
-      }
-    }
-  }
-
-  function bindDelegation(){
-    if(document.body.dataset.advancedHardFixBound === '1') return;
-    document.body.dataset.advancedHardFixBound = '1';
-
-    document.addEventListener('click', function(e){
-      const btn = e.target.closest('#tab-classes [data-mode]');
-      if(!btn) return;
-      const mode = btn.getAttribute('data-mode');
-      if(mode !== 'advanced' && mode !== 'basic') return;
-      e.preventDefault();
-      e.stopPropagation();
-      setMode(mode);
-    }, true);
-  }
-
-  whenReady(function(){
-    bindDelegation();
-    ensureStructure();
-    setTimeout(ensureStructure, 300);
-    setTimeout(ensureStructure, 1200);
-  });
-})();
-</script>
-
-</body></html>');
+      w.document.write('<html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>شهادات لوحة شرف الفصل</title><style>body{font-family:Tahoma,Arial,sans-serif;color:#21402f}@media print{@page{size:A4;margin:18mm}}</style></head><body>' + cards + '<scr'+'ipt>window.onload=function(){window.print()}<\/scr'+'ipt></body></html>');
       w.document.close();
       app.toast && app.toast('تم توليد شهادة PDF تلقائيًا');
     }
@@ -4897,188 +3829,7 @@ function logoutTeacher(){
         + '<h3>كشف الحساب الكامل</h3>'
         + '<table><thead><tr><th>التاريخ</th><th>اليوم</th><th>الحصة</th><th>الوقت</th><th>المادة</th><th>نوع العملية</th><th>المبلغ</th><th>السبب</th><th>المرفق</th></tr></thead><tbody>' + (txRows || '<tr><td colspan="9">لا توجد عمليات</td></tr>') + '</tbody></table>'
         + '<div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:26px"><div class="sub">اعتماد المعلمة: ' + escapeHtml(p.teacherName || '—') + '</div><div>' + sign + '</div></div>'
-        + '<img src=x onerror="window.print()">
-<script id="advanced-button-hard-fix-v3">
-(function(){
-  function whenReady(fn){
-    if(document.readyState !== 'loading') fn();
-    else document.addEventListener('DOMContentLoaded', fn);
-  }
-
-  function ensureStructure(){
-    const tab = document.getElementById('tab-classes');
-    if(!tab) return null;
-
-    let subtabs = tab.querySelector('.advtab-subtabs');
-    let basic = document.getElementById('advtabBasic');
-    let advanced = document.getElementById('advtabAdvanced');
-
-    if(!subtabs){
-      subtabs = document.createElement('div');
-      subtabs.className = 'advtab-subtabs';
-      subtabs.innerHTML = '<button class="small-btn active" data-mode="basic">الفصول والطلاب</button><button class="small-btn" data-mode="advanced">لوحة تحكم متقدمة</button>';
-      tab.insertBefore(subtabs, tab.firstChild);
-    }
-
-    if(!basic || !advanced){
-      const nodes = Array.from(tab.childNodes).filter(function(n){
-        return n !== subtabs && !(n.id === 'advtabBasic') && !(n.id === 'advtabAdvanced');
-      });
-
-      if(!basic){
-        basic = document.createElement('div');
-        basic.id = 'advtabBasic';
-        nodes.forEach(function(n){ basic.appendChild(n); });
-        tab.appendChild(basic);
-      }
-
-      if(!advanced){
-        advanced = document.createElement('div');
-        advanced.id = 'advtabAdvanced';
-        advanced.className = 'advtab-hidden';
-        advanced.innerHTML = '<div id="advtabCardsPage"></div><div id="advtabDetailPage" class="advtab-hidden"></div>';
-        tab.appendChild(advanced);
-      }
-    }
-
-    return {tab:tab, subtabs:subtabs, basic:basic, advanced:advanced};
-  }
-
-  function appRef(){ return window.app || null; }
-
-  function studentsFor(classId){
-    const app = appRef();
-    return ((app && app.state && app.state.students) || []).filter(function(s){ return s.classId === classId; });
-  }
-
-  function classStats(classId){
-    const rows = studentsFor(classId);
-    return {
-      count: rows.length,
-      total: rows.reduce(function(sum, s){ return sum + Number(s.balance || 0); }, 0),
-      active: rows.filter(function(s){ return (s.status || s.statusMode || 'مفعل') === 'مفعل'; }).length
-    };
-  }
-
-  function renderFallbackAdvanced(){
-    const app = appRef();
-    const cardsPage = document.getElementById('advtabCardsPage');
-    const detailPage = document.getElementById('advtabDetailPage');
-    if(!app || !app.state || !cardsPage || !detailPage) return;
-
-    const classes = app.state.classes || [];
-    app.state.advtabSelectedClassId = app.state.advtabSelectedClassId || '';
-
-    if(!app.state.advtabSelectedClassId){
-      detailPage.classList.add('advtab-hidden');
-      cardsPage.classList.remove('advtab-hidden');
-      cardsPage.innerHTML = '<div class="advtab-grid">' + (classes.length ? classes.map(function(cls){
-        const st = classStats(cls.id);
-        return '<div class="advtab-card">'
-          + '<div class="head"><span class="tag">' + st.active + ' نشط</span><div><h4>' + cls.name + '</h4><div class="sub">عدد الطلاب / الطالبات: ' + st.count + '</div></div></div>'
-          + '<div class="advtab-stats">'
-          + '<div class="box"><strong>' + Number(st.total || 0).toLocaleString('ar-SA') + '</strong><span>إجمالي الأرصدة</span></div>'
-          + '<div class="box"><strong>' + st.count + '</strong><span>عدد الطلاب / الطالبات</span></div>'
-          + '</div>'
-          + '<div class="advtab-actions"><button class="small-btn primary" data-hard-open="' + cls.id + '">دخول الفصل</button></div>'
-          + '</div>';
-      }).join('') : '<div class="empty">لا توجد فصول بعد.</div>') + '</div>';
-
-      cardsPage.querySelectorAll('[data-hard-open]').forEach(function(btn){
-        btn.onclick = function(){
-          app.state.advtabSelectedClassId = btn.getAttribute('data-hard-open') || '';
-          if(typeof app.save === 'function') app.save();
-          renderFallbackAdvanced();
-        };
-      });
-      return;
-    }
-
-    const cls = classes.find(function(c){ return c.id === app.state.advtabSelectedClassId; });
-    if(!cls){
-      app.state.advtabSelectedClassId = '';
-      renderFallbackAdvanced();
-      return;
-    }
-
-    const rows = studentsFor(cls.id);
-    const stats = classStats(cls.id);
-    cardsPage.classList.add('advtab-hidden');
-    detailPage.classList.remove('advtab-hidden');
-    detailPage.innerHTML = '<div class="advtab-detail">'
-      + '<div class="advtab-detailhead"><div><h3>' + cls.name + '</h3><p>لوحة تحكم متقدمة للفصل.</p></div><button class="small-btn" id="advtabBackBtnHard">رجوع إلى بطاقات الفصول</button></div>'
-      + '<div class="advtab-summary">'
-      + '<div class="box"><strong>' + stats.count + '</strong><span>عدد الطلاب / الطالبات</span></div>'
-      + '<div class="box"><strong>' + Number(stats.total || 0).toLocaleString('ar-SA') + '</strong><span>إجمالي الأرصدة</span></div>'
-      + '<div class="box"><strong>' + stats.active + '</strong><span>الحسابات النشطة</span></div>'
-      + '</div>'
-      + '<div class="advtab-students" id="advtabStudentsGridHard">'
-      + (rows.length ? rows.map(function(st, i){
-        var level = st.level || st.accountLevel || ['برونزي','فضي','ذهبي','ماسي'][i % 4];
-        var status = st.status || st.statusMode || 'مفعل';
-        return '<div class="advtab-student">'
-          + '<div class="top"><div><h3 class="name">' + (st.name || '—') + '</h3><div class="info">رقم الحساب: ' + (st.code || st.username || '—') + '<br>ولي الأمر: ' + (st.parentPhone || '—') + '</div><div class="advtab-rank">نوع الحساب: ' + level + ' 💳</div></div><span class="tag">' + status + '</span></div>'
-          + '<div class="advtab-studentstats"><div class="box"><strong>' + Number(st.balance || 0).toLocaleString('ar-SA') + '</strong><span>الرصيد</span></div><div class="box"><strong>' + Number(st.tasks || 0) + '</strong><span>المهام</span></div><div class="box"><strong>' + Number(st.absences || 0) + '</strong><span>الغياب</span></div></div>'
-          + '</div>';
-      }).join('') : '<div class="empty">لا يوجد طلاب في هذا الفصل.</div>')
-      + '</div></div>';
-
-    var backBtn = document.getElementById('advtabBackBtnHard');
-    if(backBtn){
-      backBtn.onclick = function(){
-        app.state.advtabSelectedClassId = '';
-        if(typeof app.save === 'function') app.save();
-        renderFallbackAdvanced();
-      };
-    }
-  }
-
-  function setMode(mode){
-    const ui = ensureStructure();
-    if(!ui) return;
-    ui.subtabs.querySelectorAll('[data-mode]').forEach(function(btn){
-      btn.classList.toggle('active', btn.getAttribute('data-mode') === mode);
-    });
-    ui.basic.classList.toggle('advtab-hidden', mode !== 'basic');
-    ui.advanced.classList.toggle('advtab-hidden', mode !== 'advanced');
-    if(mode === 'advanced'){
-      try {
-        if(typeof window.renderAdvancedHonorButtons === 'function') {
-          // let existing advanced ecosystem initialize first when available
-          setTimeout(function(){ try{ window.renderAdvancedHonorButtons(); }catch(e){} }, 0);
-        }
-        renderFallbackAdvanced();
-      } catch(e) {
-        console.error('advanced hard fix render error', e);
-      }
-    }
-  }
-
-  function bindDelegation(){
-    if(document.body.dataset.advancedHardFixBound === '1') return;
-    document.body.dataset.advancedHardFixBound = '1';
-
-    document.addEventListener('click', function(e){
-      const btn = e.target.closest('#tab-classes [data-mode]');
-      if(!btn) return;
-      const mode = btn.getAttribute('data-mode');
-      if(mode !== 'advanced' && mode !== 'basic') return;
-      e.preventDefault();
-      e.stopPropagation();
-      setMode(mode);
-    }, true);
-  }
-
-  whenReady(function(){
-    bindDelegation();
-    ensureStructure();
-    setTimeout(ensureStructure, 300);
-    setTimeout(ensureStructure, 1200);
-  });
-})();
-</script>
-
-</body></html>');
+        + '<img src=x onerror="window.print()"></body></html>');
       w.document.close();
     };
   }
@@ -5220,183 +3971,150 @@ function logoutTeacher(){
 </script>
 
 
-<script id="advanced-button-hard-fix-v3">
+<div id="miniPagesOverlay" class="mini-page-overlay">
+  <div class="mini-page-shell">
+    <div class="mini-page-head">
+      <button class="mini-back-btn" onclick="closeMiniPage()">رجوع</button>
+      <h3 id="miniPageTitle" style="margin:0;color:var(--green-3)">الرئيسية</h3>
+    </div>
+
+    <div id="miniPage-home" class="mini-page-card">
+      <div class="mini-page-grid">
+        <div class="mini-page-stat"><div class="tiny">عدد الطلاب والطالبات</div><strong id="miniHomeStudents">0</strong></div>
+        <div class="mini-page-stat"><div class="tiny">عدد الفصول</div><strong id="miniHomeClasses">0</strong></div>
+        <div class="mini-page-stat"><div class="tiny">إجمالي الأرصدة</div><strong id="miniHomeBalance">0</strong></div>
+        <div class="mini-page-stat"><div class="tiny">عدد العمليات</div><strong id="miniHomeOps">0</strong></div>
+      </div>
+    </div>
+
+    <div id="miniPage-statement" class="mini-page-card hide">
+      <div class="mini-page-list" id="miniStatementList"></div>
+    </div>
+
+    <div id="miniPage-follow" class="mini-page-card hide">
+      <div class="mini-page-grid">
+        <div class="mini-page-stat"><div class="tiny">القريبون من الترقية</div><strong id="miniFollowNear">0</strong></div>
+        <div class="mini-page-stat"><div class="tiny">منخفضو الرصيد</div><strong id="miniFollowLow">0</strong></div>
+        <div class="mini-page-stat"><div class="tiny">المهام غير المسلمة</div><strong id="miniFollowTasks">0</strong></div>
+        <div class="mini-page-stat"><div class="tiny">الحسابات غير المفعلة</div><strong id="miniFollowInactive">0</strong></div>
+      </div>
+    </div>
+
+    <div id="miniPage-settings" class="mini-page-card hide">
+      <div class="mini-page-list">
+        <div class="mini-page-row"><span>اسم المدرسة</span><strong id="miniSchoolName">—</strong></div>
+        <div class="mini-page-row"><span>اسم المعلمة</span><strong id="miniTeacherName">—</strong></div>
+        <div class="mini-page-row"><span>المادة</span><strong id="miniSubject">—</strong></div>
+        <div class="mini-page-row"><span>الفصل الدراسي</span><strong id="miniSemester">—</strong></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script id="mini-pages-script">
 (function(){
-  function whenReady(fn){
-    if(document.readyState !== 'loading') fn();
-    else document.addEventListener('DOMContentLoaded', fn);
+  function byId(id){ return document.getElementById(id); }
+  function getApp(){ return window.app || null; }
+  function setText(id, value){ var el = byId(id); if(el) el.textContent = value; }
+
+  function setActiveNav(page){
+    var btns = document.querySelectorAll('#miniPhoneNav [data-mini-page]');
+    btns.forEach(function(btn){ btn.classList.toggle('active', btn.getAttribute('data-mini-page') === page); });
   }
 
-  function ensureStructure(){
-    const tab = document.getElementById('tab-classes');
-    if(!tab) return null;
+  function fillMiniPages(){
+    var app = getApp();
+    if(!app || !app.state) return;
+    var students = Array.isArray(app.state.students) ? app.state.students : [];
+    var classes = Array.isArray(app.state.classes) ? app.state.classes : [];
+    var txs = Array.isArray(app.state.transactions) ? app.state.transactions : [];
+    var profile = app.state.pdfProfile || {};
+    var totalBalance = 0;
+    students.forEach(function(s){ totalBalance += Number(s.balance || 0); });
+    var near = students.filter(function(s){ return Number(s.balance || 0) >= 9000; }).length;
+    var low = students.filter(function(s){ return Number(s.balance || 0) < 1000; }).length;
+    var tasks = students.filter(function(s){ return Number(s.tasks || 0) === 0; }).length;
+    var inactive = students.filter(function(s){ var st = s.status || s.statusMode || 'مفعل'; return st !== 'مفعل'; }).length;
 
-    let subtabs = tab.querySelector('.advtab-subtabs');
-    let basic = document.getElementById('advtabBasic');
-    let advanced = document.getElementById('advtabAdvanced');
+    setText('miniHomeStudents', students.length.toLocaleString('ar-SA'));
+    setText('miniHomeClasses', classes.length.toLocaleString('ar-SA'));
+    setText('miniHomeBalance', totalBalance.toLocaleString('ar-SA'));
+    setText('miniHomeOps', txs.length.toLocaleString('ar-SA'));
+    setText('miniFollowNear', near.toLocaleString('ar-SA'));
+    setText('miniFollowLow', low.toLocaleString('ar-SA'));
+    setText('miniFollowTasks', tasks.toLocaleString('ar-SA'));
+    setText('miniFollowInactive', inactive.toLocaleString('ar-SA'));
+    setText('miniSchoolName', profile.schoolName || '—');
+    setText('miniTeacherName', profile.teacherName || '—');
+    setText('miniSubject', profile.subject || '—');
+    setText('miniSemester', profile.semester || '—');
 
-    if(!subtabs){
-      subtabs = document.createElement('div');
-      subtabs.className = 'advtab-subtabs';
-      subtabs.innerHTML = '<button class="small-btn active" data-mode="basic">الفصول والطلاب</button><button class="small-btn" data-mode="advanced">لوحة تحكم متقدمة</button>';
-      tab.insertBefore(subtabs, tab.firstChild);
-    }
-
-    if(!basic || !advanced){
-      const nodes = Array.from(tab.childNodes).filter(function(n){
-        return n !== subtabs && !(n.id === 'advtabBasic') && !(n.id === 'advtabAdvanced');
-      });
-
-      if(!basic){
-        basic = document.createElement('div');
-        basic.id = 'advtabBasic';
-        nodes.forEach(function(n){ basic.appendChild(n); });
-        tab.appendChild(basic);
+    var statement = byId('miniStatementList');
+    if(statement){
+      statement.innerHTML = '';
+      var items = txs.slice(0, 6);
+      if(!items.length){
+        statement.innerHTML = '<div class="empty">لا توجد عمليات بعد.</div>';
+      } else {
+        items.forEach(function(tx){
+          var row = document.createElement('div');
+          row.className = 'mini-page-row';
+          var amount = Number(tx.amount || 0).toLocaleString('ar-SA');
+          var label = tx.type || 'عملية';
+          var reason = tx.reason || 'بدون سبب';
+          row.innerHTML = '<div><strong>' + label + '</strong><div class="tiny">' + reason + '</div></div><div>' + amount + '</div>';
+          statement.appendChild(row);
+        });
       }
-
-      if(!advanced){
-        advanced = document.createElement('div');
-        advanced.id = 'advtabAdvanced';
-        advanced.className = 'advtab-hidden';
-        advanced.innerHTML = '<div id="advtabCardsPage"></div><div id="advtabDetailPage" class="advtab-hidden"></div>';
-        tab.appendChild(advanced);
-      }
     }
-
-    return {tab:tab, subtabs:subtabs, basic:basic, advanced:advanced};
   }
 
-  function appRef(){ return window.app || null; }
+  window.openMiniPage = function(page){
+    fillMiniPages();
+    var overlay = byId('miniPagesOverlay');
+    if(overlay) overlay.classList.add('show');
+    ['home','statement','follow','settings'].forEach(function(id){
+      var el = byId('miniPage-' + id);
+      if(el) el.classList.toggle('hide', id !== page);
+    });
+    setActiveNav(page);
+    var title = byId('miniPageTitle');
+    if(title){
+      if(page === 'home') title.textContent = 'الرئيسية';
+      else if(page === 'statement') title.textContent = 'الكشف';
+      else if(page === 'follow') title.textContent = 'المتابعة';
+      else title.textContent = 'الإعدادات';
+    }
+  };
 
-  function studentsFor(classId){
-    const app = appRef();
-    return ((app && app.state && app.state.students) || []).filter(function(s){ return s.classId === classId; });
+  window.closeMiniPage = function(){
+    var overlay = byId('miniPagesOverlay');
+    if(overlay) overlay.classList.remove('show');
+    var btns = document.querySelectorAll('#miniPhoneNav [data-mini-page]');
+    btns.forEach(function(btn){ btn.classList.remove('active'); });
+  };
+
+  function bindMiniNav(){
+    var btns = document.querySelectorAll('#miniPhoneNav [data-mini-page]');
+    btns.forEach(function(btn){
+      if(btn.dataset.boundMini === '1') return;
+      btn.dataset.boundMini = '1';
+      btn.onclick = function(){ openMiniPage(btn.getAttribute('data-mini-page')); };
+    });
   }
 
-  function classStats(classId){
-    const rows = studentsFor(classId);
-    return {
-      count: rows.length,
-      total: rows.reduce(function(sum, s){ return sum + Number(s.balance || 0); }, 0),
-      active: rows.filter(function(s){ return (s.status || s.statusMode || 'مفعل') === 'مفعل'; }).length
+  document.addEventListener('DOMContentLoaded', function(){
+    setTimeout(bindMiniNav, 200);
+    setTimeout(fillMiniPages, 600);
+  });
+
+  if(window.app && typeof window.app.renderAll === 'function'){
+    var oldRenderAll = window.app.renderAll.bind(window.app);
+    window.app.renderAll = function(){
+      oldRenderAll();
+      setTimeout(function(){ bindMiniNav(); fillMiniPages(); }, 60);
     };
   }
-
-  function renderFallbackAdvanced(){
-    const app = appRef();
-    const cardsPage = document.getElementById('advtabCardsPage');
-    const detailPage = document.getElementById('advtabDetailPage');
-    if(!app || !app.state || !cardsPage || !detailPage) return;
-
-    const classes = app.state.classes || [];
-    app.state.advtabSelectedClassId = app.state.advtabSelectedClassId || '';
-
-    if(!app.state.advtabSelectedClassId){
-      detailPage.classList.add('advtab-hidden');
-      cardsPage.classList.remove('advtab-hidden');
-      cardsPage.innerHTML = '<div class="advtab-grid">' + (classes.length ? classes.map(function(cls){
-        const st = classStats(cls.id);
-        return '<div class="advtab-card">'
-          + '<div class="head"><span class="tag">' + st.active + ' نشط</span><div><h4>' + cls.name + '</h4><div class="sub">عدد الطلاب / الطالبات: ' + st.count + '</div></div></div>'
-          + '<div class="advtab-stats">'
-          + '<div class="box"><strong>' + Number(st.total || 0).toLocaleString('ar-SA') + '</strong><span>إجمالي الأرصدة</span></div>'
-          + '<div class="box"><strong>' + st.count + '</strong><span>عدد الطلاب / الطالبات</span></div>'
-          + '</div>'
-          + '<div class="advtab-actions"><button class="small-btn primary" data-hard-open="' + cls.id + '">دخول الفصل</button></div>'
-          + '</div>';
-      }).join('') : '<div class="empty">لا توجد فصول بعد.</div>') + '</div>';
-
-      cardsPage.querySelectorAll('[data-hard-open]').forEach(function(btn){
-        btn.onclick = function(){
-          app.state.advtabSelectedClassId = btn.getAttribute('data-hard-open') || '';
-          if(typeof app.save === 'function') app.save();
-          renderFallbackAdvanced();
-        };
-      });
-      return;
-    }
-
-    const cls = classes.find(function(c){ return c.id === app.state.advtabSelectedClassId; });
-    if(!cls){
-      app.state.advtabSelectedClassId = '';
-      renderFallbackAdvanced();
-      return;
-    }
-
-    const rows = studentsFor(cls.id);
-    const stats = classStats(cls.id);
-    cardsPage.classList.add('advtab-hidden');
-    detailPage.classList.remove('advtab-hidden');
-    detailPage.innerHTML = '<div class="advtab-detail">'
-      + '<div class="advtab-detailhead"><div><h3>' + cls.name + '</h3><p>لوحة تحكم متقدمة للفصل.</p></div><button class="small-btn" id="advtabBackBtnHard">رجوع إلى بطاقات الفصول</button></div>'
-      + '<div class="advtab-summary">'
-      + '<div class="box"><strong>' + stats.count + '</strong><span>عدد الطلاب / الطالبات</span></div>'
-      + '<div class="box"><strong>' + Number(stats.total || 0).toLocaleString('ar-SA') + '</strong><span>إجمالي الأرصدة</span></div>'
-      + '<div class="box"><strong>' + stats.active + '</strong><span>الحسابات النشطة</span></div>'
-      + '</div>'
-      + '<div class="advtab-students" id="advtabStudentsGridHard">'
-      + (rows.length ? rows.map(function(st, i){
-        var level = st.level || st.accountLevel || ['برونزي','فضي','ذهبي','ماسي'][i % 4];
-        var status = st.status || st.statusMode || 'مفعل';
-        return '<div class="advtab-student">'
-          + '<div class="top"><div><h3 class="name">' + (st.name || '—') + '</h3><div class="info">رقم الحساب: ' + (st.code || st.username || '—') + '<br>ولي الأمر: ' + (st.parentPhone || '—') + '</div><div class="advtab-rank">نوع الحساب: ' + level + ' 💳</div></div><span class="tag">' + status + '</span></div>'
-          + '<div class="advtab-studentstats"><div class="box"><strong>' + Number(st.balance || 0).toLocaleString('ar-SA') + '</strong><span>الرصيد</span></div><div class="box"><strong>' + Number(st.tasks || 0) + '</strong><span>المهام</span></div><div class="box"><strong>' + Number(st.absences || 0) + '</strong><span>الغياب</span></div></div>'
-          + '</div>';
-      }).join('') : '<div class="empty">لا يوجد طلاب في هذا الفصل.</div>')
-      + '</div></div>';
-
-    var backBtn = document.getElementById('advtabBackBtnHard');
-    if(backBtn){
-      backBtn.onclick = function(){
-        app.state.advtabSelectedClassId = '';
-        if(typeof app.save === 'function') app.save();
-        renderFallbackAdvanced();
-      };
-    }
-  }
-
-  function setMode(mode){
-    const ui = ensureStructure();
-    if(!ui) return;
-    ui.subtabs.querySelectorAll('[data-mode]').forEach(function(btn){
-      btn.classList.toggle('active', btn.getAttribute('data-mode') === mode);
-    });
-    ui.basic.classList.toggle('advtab-hidden', mode !== 'basic');
-    ui.advanced.classList.toggle('advtab-hidden', mode !== 'advanced');
-    if(mode === 'advanced'){
-      try {
-        if(typeof window.renderAdvancedHonorButtons === 'function') {
-          // let existing advanced ecosystem initialize first when available
-          setTimeout(function(){ try{ window.renderAdvancedHonorButtons(); }catch(e){} }, 0);
-        }
-        renderFallbackAdvanced();
-      } catch(e) {
-        console.error('advanced hard fix render error', e);
-      }
-    }
-  }
-
-  function bindDelegation(){
-    if(document.body.dataset.advancedHardFixBound === '1') return;
-    document.body.dataset.advancedHardFixBound = '1';
-
-    document.addEventListener('click', function(e){
-      const btn = e.target.closest('#tab-classes [data-mode]');
-      if(!btn) return;
-      const mode = btn.getAttribute('data-mode');
-      if(mode !== 'advanced' && mode !== 'basic') return;
-      e.preventDefault();
-      e.stopPropagation();
-      setMode(mode);
-    }, true);
-  }
-
-  whenReady(function(){
-    bindDelegation();
-    ensureStructure();
-    setTimeout(ensureStructure, 300);
-    setTimeout(ensureStructure, 1200);
-  });
 })();
 </script>
 
