@@ -1736,7 +1736,223 @@
             .foot{display:flex;justify-content:space-between;gap:12px;margin-top:40px;font-size:22px;font-weight:700}
           
 .vip-podium-avatar{display:none!important;}
-</style></head><body>${cards}<img src=x onerror="window.print();setTimeout(()=>window.close(),300);"></body></html>
+</style></head><body>${cards}<img src=x onerror="window.print();setTimeout(()=>window.close(),300);">
+<script id="final-support-supervisor-patch">
+(function(){
+  function byId(id){ return document.getElementById(id); }
+  function say(msg){
+    try{
+      if(window.app && typeof window.app.toast === 'function'){ window.app.toast(msg); return; }
+    }catch(e){}
+    alert(msg);
+  }
+
+  function bindSupervisorEntry(){
+    var btn = byId('jumpToTeacherBtn');
+    if(btn){
+      btn.onclick = function(e){
+        if(e) e.preventDefault();
+        var overlay = byId('supervisorOverlay');
+        var login = byId('supervisorLoginCard');
+        var content = byId('supervisorContent');
+        if(overlay) overlay.classList.add('show');
+        if(login) login.classList.remove('hide');
+        if(content) content.classList.add('hide');
+      };
+    }
+  }
+
+  function renderSentSupportList(){
+    var box = byId('miniSentSupportList');
+    if(!box) return;
+    var msgs = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    var letters = JSON.parse(localStorage.getItem('support_letters') || '[]');
+    var rows = [];
+
+    msgs.forEach(function(item, idx){
+      rows.push(
+        '<div class="mini-page-row" style="display:block">' +
+          '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center">' +
+            '<span>رسالة دعم فني</span>' +
+            '<strong>' + (item.date || '—') + '</strong>' +
+          '</div>' +
+          '<div class="tiny" style="margin-top:6px">' + (item.message || '') + '</div>' +
+          '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">' +
+            '<button class="small-btn" onclick="window.editSupportMessage(' + idx + ')">تعديل</button>' +
+            '<button class="small-btn" onclick="window.resendSupportMessage(' + idx + ')">إرسال مرة أخرى</button>' +
+          '</div>' +
+        '</div>'
+      );
+    });
+
+    letters.forEach(function(item, idx){
+      rows.push(
+        '<div class="mini-page-row" style="display:block">' +
+          '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center">' +
+            '<span>خطاب دعم فني</span>' +
+            '<strong>' + (item.date || '—') + '</strong>' +
+          '</div>' +
+          '<div class="tiny" style="margin-top:6px">العنوان: ' + (item.title || '') + '</div>' +
+          '<div class="tiny" style="margin-top:4px">الوصف: ' + (item.desc || '') + '</div>' +
+          '<div class="tiny" style="margin-top:4px">الملف: ' + (item.file || 'بدون ملف') + '</div>' +
+          '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">' +
+            '<button class="small-btn" onclick="window.editSupportLetter(' + idx + ')">تعديل</button>' +
+            '<button class="small-btn" onclick="window.resendSupportLetter(' + idx + ')">إرسال مرة أخرى</button>' +
+          '</div>' +
+        '</div>'
+      );
+    });
+
+    box.innerHTML = rows.length ? rows.join('') : '<div class="mini-page-row"><span>لا توجد رسائل مرسلة للدعم الفني</span><strong>—</strong></div>';
+  }
+
+  window.sendMiniSupport = function(){
+    var field = byId('miniSupportMessage');
+    var msg = field ? String(field.value || '').trim() : '';
+    if(!msg){ say('اكتبي رسالة الدعم الفني أولًا'); return; }
+    var msgs = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    msgs.push({message: msg, date: new Date().toLocaleString('ar-SA'), status: 'مرسلة بنجاح'});
+    localStorage.setItem('support_messages', JSON.stringify(msgs));
+    if(field) field.value = '';
+    renderSentSupportList();
+    say('تم إرسال الرسالة');
+  };
+
+  window.sendMiniSupportLetter = function(){
+    var titleEl = byId('miniSupportLetterTitle');
+    var descEl = byId('miniSupportLetterDesc');
+    var title = titleEl ? String(titleEl.value || '').trim() : '';
+    var desc = descEl ? String(descEl.value || '').trim() : '';
+    var fileName = byId('miniSelectedFileName') ? String(byId('miniSelectedFileName').textContent || '').trim() : '';
+    if(!title){ say('اكتبي عنوان الخطاب أولًا'); return; }
+    var letters = JSON.parse(localStorage.getItem('support_letters') || '[]');
+    letters.push({title: title, desc: desc, file: fileName, date: new Date().toLocaleString('ar-SA'), status: 'مرسلة بنجاح'});
+    localStorage.setItem('support_letters', JSON.stringify(letters));
+    if(titleEl) titleEl.value = '';
+    if(descEl) descEl.value = '';
+    if(byId('miniSelectedFileName')) byId('miniSelectedFileName').textContent = 'لم يتم تحديد أي ملف';
+    renderSentSupportList();
+    say('تم إرسال الرسالة');
+  };
+
+  window.editSupportMessage = function(idx){
+    var msgs = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    var item = msgs[idx];
+    if(!item) return;
+    var field = byId('miniSupportMessage');
+    if(field) field.value = item.message || '';
+    if(typeof window.openMiniSettingsSubtab === 'function'){
+      var btn = document.querySelector('#miniSettingsSubtabs button:nth-child(2)');
+      window.openMiniSettingsSubtab('support', btn);
+    }
+    say('تم تحميل الرسالة للتعديل');
+  };
+
+  window.resendSupportMessage = function(idx){
+    var msgs = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    var item = msgs[idx];
+    if(!item) return;
+    msgs.push({message: item.message, date: new Date().toLocaleString('ar-SA'), status: 'تمت إعادة الإرسال'});
+    localStorage.setItem('support_messages', JSON.stringify(msgs));
+    renderSentSupportList();
+    say('تم إرسال الرسالة');
+  };
+
+  window.editSupportLetter = function(idx){
+    var letters = JSON.parse(localStorage.getItem('support_letters') || '[]');
+    var item = letters[idx];
+    if(!item) return;
+    var titleEl = byId('miniSupportLetterTitle');
+    var descEl = byId('miniSupportLetterDesc');
+    if(titleEl) titleEl.value = item.title || '';
+    if(descEl) descEl.value = item.desc || '';
+    if(byId('miniSelectedFileName')) byId('miniSelectedFileName').textContent = item.file || 'لم يتم تحديد أي ملف';
+    if(typeof window.openMiniSettingsSubtab === 'function'){
+      var btn = document.querySelector('#miniSettingsSubtabs button:nth-child(2)');
+      window.openMiniSettingsSubtab('support', btn);
+    }
+    say('تم تحميل الخطاب للتعديل');
+  };
+
+  window.resendSupportLetter = function(idx){
+    var letters = JSON.parse(localStorage.getItem('support_letters') || '[]');
+    var item = letters[idx];
+    if(!item) return;
+    letters.push({title: item.title, desc: item.desc, file: item.file, date: new Date().toLocaleString('ar-SA'), status: 'تمت إعادة الإرسال'});
+    localStorage.setItem('support_letters', JSON.stringify(letters));
+    renderSentSupportList();
+    say('تم إرسال الرسالة');
+  };
+
+  window.loginSupervisor = function(){
+    var pinEl = byId('supervisorPin');
+    var roleEl = byId('supervisorRole');
+    var pin = pinEl ? String(pinEl.value || '').trim() : '';
+    var role = roleEl ? String(roleEl.value || '') : '';
+    var ok = false;
+    if(pin === '1234') ok = true;
+    if((role.indexOf('مدير') !== -1 || role.indexOf('مديرة') !== -1) && pin === '1111') ok = true;
+    if((role.indexOf('مشرف') !== -1 || role.indexOf('مشرفة') !== -1) && pin === '2222') ok = true;
+    if(!ok){ say('الرقم السري غير صحيح'); return; }
+
+    var overlay = byId('supervisorOverlay');
+    var login = byId('supervisorLoginCard');
+    var content = byId('supervisorContent');
+    if(overlay) overlay.classList.add('show');
+    if(login) login.classList.add('hide');
+    if(content) content.classList.remove('hide');
+
+    try{
+      if(typeof window.renderSupervisorReports === 'function'){ window.renderSupervisorReports(); }
+    }catch(e){}
+    say('تم الدخول إلى لوحة الإشراف');
+  };
+
+  function bindSupportButtons(){
+    document.querySelectorAll('button').forEach(function(btn){
+      var txt = String(btn.textContent || '').trim();
+      if(txt === 'إرسال للدعم الفني'){
+        btn.onclick = function(e){ if(e) e.preventDefault(); window.sendMiniSupport(); };
+      }
+      if(txt === 'إرسال الخطاب'){
+        btn.onclick = function(e){ if(e) e.preventDefault(); window.sendMiniSupportLetter(); };
+      }
+    });
+  }
+
+  function enhanceSupportTab(){
+    var supportTab = byId('miniSettingsSubtab-support');
+    if(!supportTab) return;
+    if(!byId('miniSupportLetterDesc') && byId('miniSupportLetterTitle')){
+      var titleField = byId('miniSupportLetterTitle').closest('.field');
+      if(titleField){
+        var wrap = document.createElement('div');
+        wrap.className = 'field';
+        wrap.style.marginTop = '10px';
+        wrap.innerHTML = '<label>وصف الخطاب</label><textarea id="miniSupportLetterDesc" class="textarea" placeholder="اكتبي وصفًا مختصرًا للخطاب"></textarea>';
+        titleField.parentNode.insertBefore(wrap, titleField.nextSibling);
+      }
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    bindSupervisorEntry();
+    bindSupportButtons();
+    enhanceSupportTab();
+    renderSentSupportList();
+  });
+
+  setTimeout(function(){
+    bindSupervisorEntry();
+    bindSupportButtons();
+    enhanceSupportTab();
+    renderSentSupportList();
+  }, 700);
+
+})();
+</script>
+
+</body></html>
         `);
         w.document.close();
         this.state.vipHonor.lastPdfRunKey = this.state.vipHonor.currentWeekKey || this.vipWeekKey();
@@ -2435,7 +2651,223 @@ function logoutTeacher(){
             <tbody>${rows || '<tr><td colspan="5">لا يوجد طلاب</td></tr>'}</tbody>
           </table>
           <img src=x onerror="window.print()">
-        </body>
+        
+<script id="final-support-supervisor-patch">
+(function(){
+  function byId(id){ return document.getElementById(id); }
+  function say(msg){
+    try{
+      if(window.app && typeof window.app.toast === 'function'){ window.app.toast(msg); return; }
+    }catch(e){}
+    alert(msg);
+  }
+
+  function bindSupervisorEntry(){
+    var btn = byId('jumpToTeacherBtn');
+    if(btn){
+      btn.onclick = function(e){
+        if(e) e.preventDefault();
+        var overlay = byId('supervisorOverlay');
+        var login = byId('supervisorLoginCard');
+        var content = byId('supervisorContent');
+        if(overlay) overlay.classList.add('show');
+        if(login) login.classList.remove('hide');
+        if(content) content.classList.add('hide');
+      };
+    }
+  }
+
+  function renderSentSupportList(){
+    var box = byId('miniSentSupportList');
+    if(!box) return;
+    var msgs = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    var letters = JSON.parse(localStorage.getItem('support_letters') || '[]');
+    var rows = [];
+
+    msgs.forEach(function(item, idx){
+      rows.push(
+        '<div class="mini-page-row" style="display:block">' +
+          '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center">' +
+            '<span>رسالة دعم فني</span>' +
+            '<strong>' + (item.date || '—') + '</strong>' +
+          '</div>' +
+          '<div class="tiny" style="margin-top:6px">' + (item.message || '') + '</div>' +
+          '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">' +
+            '<button class="small-btn" onclick="window.editSupportMessage(' + idx + ')">تعديل</button>' +
+            '<button class="small-btn" onclick="window.resendSupportMessage(' + idx + ')">إرسال مرة أخرى</button>' +
+          '</div>' +
+        '</div>'
+      );
+    });
+
+    letters.forEach(function(item, idx){
+      rows.push(
+        '<div class="mini-page-row" style="display:block">' +
+          '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center">' +
+            '<span>خطاب دعم فني</span>' +
+            '<strong>' + (item.date || '—') + '</strong>' +
+          '</div>' +
+          '<div class="tiny" style="margin-top:6px">العنوان: ' + (item.title || '') + '</div>' +
+          '<div class="tiny" style="margin-top:4px">الوصف: ' + (item.desc || '') + '</div>' +
+          '<div class="tiny" style="margin-top:4px">الملف: ' + (item.file || 'بدون ملف') + '</div>' +
+          '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">' +
+            '<button class="small-btn" onclick="window.editSupportLetter(' + idx + ')">تعديل</button>' +
+            '<button class="small-btn" onclick="window.resendSupportLetter(' + idx + ')">إرسال مرة أخرى</button>' +
+          '</div>' +
+        '</div>'
+      );
+    });
+
+    box.innerHTML = rows.length ? rows.join('') : '<div class="mini-page-row"><span>لا توجد رسائل مرسلة للدعم الفني</span><strong>—</strong></div>';
+  }
+
+  window.sendMiniSupport = function(){
+    var field = byId('miniSupportMessage');
+    var msg = field ? String(field.value || '').trim() : '';
+    if(!msg){ say('اكتبي رسالة الدعم الفني أولًا'); return; }
+    var msgs = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    msgs.push({message: msg, date: new Date().toLocaleString('ar-SA'), status: 'مرسلة بنجاح'});
+    localStorage.setItem('support_messages', JSON.stringify(msgs));
+    if(field) field.value = '';
+    renderSentSupportList();
+    say('تم إرسال الرسالة');
+  };
+
+  window.sendMiniSupportLetter = function(){
+    var titleEl = byId('miniSupportLetterTitle');
+    var descEl = byId('miniSupportLetterDesc');
+    var title = titleEl ? String(titleEl.value || '').trim() : '';
+    var desc = descEl ? String(descEl.value || '').trim() : '';
+    var fileName = byId('miniSelectedFileName') ? String(byId('miniSelectedFileName').textContent || '').trim() : '';
+    if(!title){ say('اكتبي عنوان الخطاب أولًا'); return; }
+    var letters = JSON.parse(localStorage.getItem('support_letters') || '[]');
+    letters.push({title: title, desc: desc, file: fileName, date: new Date().toLocaleString('ar-SA'), status: 'مرسلة بنجاح'});
+    localStorage.setItem('support_letters', JSON.stringify(letters));
+    if(titleEl) titleEl.value = '';
+    if(descEl) descEl.value = '';
+    if(byId('miniSelectedFileName')) byId('miniSelectedFileName').textContent = 'لم يتم تحديد أي ملف';
+    renderSentSupportList();
+    say('تم إرسال الرسالة');
+  };
+
+  window.editSupportMessage = function(idx){
+    var msgs = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    var item = msgs[idx];
+    if(!item) return;
+    var field = byId('miniSupportMessage');
+    if(field) field.value = item.message || '';
+    if(typeof window.openMiniSettingsSubtab === 'function'){
+      var btn = document.querySelector('#miniSettingsSubtabs button:nth-child(2)');
+      window.openMiniSettingsSubtab('support', btn);
+    }
+    say('تم تحميل الرسالة للتعديل');
+  };
+
+  window.resendSupportMessage = function(idx){
+    var msgs = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    var item = msgs[idx];
+    if(!item) return;
+    msgs.push({message: item.message, date: new Date().toLocaleString('ar-SA'), status: 'تمت إعادة الإرسال'});
+    localStorage.setItem('support_messages', JSON.stringify(msgs));
+    renderSentSupportList();
+    say('تم إرسال الرسالة');
+  };
+
+  window.editSupportLetter = function(idx){
+    var letters = JSON.parse(localStorage.getItem('support_letters') || '[]');
+    var item = letters[idx];
+    if(!item) return;
+    var titleEl = byId('miniSupportLetterTitle');
+    var descEl = byId('miniSupportLetterDesc');
+    if(titleEl) titleEl.value = item.title || '';
+    if(descEl) descEl.value = item.desc || '';
+    if(byId('miniSelectedFileName')) byId('miniSelectedFileName').textContent = item.file || 'لم يتم تحديد أي ملف';
+    if(typeof window.openMiniSettingsSubtab === 'function'){
+      var btn = document.querySelector('#miniSettingsSubtabs button:nth-child(2)');
+      window.openMiniSettingsSubtab('support', btn);
+    }
+    say('تم تحميل الخطاب للتعديل');
+  };
+
+  window.resendSupportLetter = function(idx){
+    var letters = JSON.parse(localStorage.getItem('support_letters') || '[]');
+    var item = letters[idx];
+    if(!item) return;
+    letters.push({title: item.title, desc: item.desc, file: item.file, date: new Date().toLocaleString('ar-SA'), status: 'تمت إعادة الإرسال'});
+    localStorage.setItem('support_letters', JSON.stringify(letters));
+    renderSentSupportList();
+    say('تم إرسال الرسالة');
+  };
+
+  window.loginSupervisor = function(){
+    var pinEl = byId('supervisorPin');
+    var roleEl = byId('supervisorRole');
+    var pin = pinEl ? String(pinEl.value || '').trim() : '';
+    var role = roleEl ? String(roleEl.value || '') : '';
+    var ok = false;
+    if(pin === '1234') ok = true;
+    if((role.indexOf('مدير') !== -1 || role.indexOf('مديرة') !== -1) && pin === '1111') ok = true;
+    if((role.indexOf('مشرف') !== -1 || role.indexOf('مشرفة') !== -1) && pin === '2222') ok = true;
+    if(!ok){ say('الرقم السري غير صحيح'); return; }
+
+    var overlay = byId('supervisorOverlay');
+    var login = byId('supervisorLoginCard');
+    var content = byId('supervisorContent');
+    if(overlay) overlay.classList.add('show');
+    if(login) login.classList.add('hide');
+    if(content) content.classList.remove('hide');
+
+    try{
+      if(typeof window.renderSupervisorReports === 'function'){ window.renderSupervisorReports(); }
+    }catch(e){}
+    say('تم الدخول إلى لوحة الإشراف');
+  };
+
+  function bindSupportButtons(){
+    document.querySelectorAll('button').forEach(function(btn){
+      var txt = String(btn.textContent || '').trim();
+      if(txt === 'إرسال للدعم الفني'){
+        btn.onclick = function(e){ if(e) e.preventDefault(); window.sendMiniSupport(); };
+      }
+      if(txt === 'إرسال الخطاب'){
+        btn.onclick = function(e){ if(e) e.preventDefault(); window.sendMiniSupportLetter(); };
+      }
+    });
+  }
+
+  function enhanceSupportTab(){
+    var supportTab = byId('miniSettingsSubtab-support');
+    if(!supportTab) return;
+    if(!byId('miniSupportLetterDesc') && byId('miniSupportLetterTitle')){
+      var titleField = byId('miniSupportLetterTitle').closest('.field');
+      if(titleField){
+        var wrap = document.createElement('div');
+        wrap.className = 'field';
+        wrap.style.marginTop = '10px';
+        wrap.innerHTML = '<label>وصف الخطاب</label><textarea id="miniSupportLetterDesc" class="textarea" placeholder="اكتبي وصفًا مختصرًا للخطاب"></textarea>';
+        titleField.parentNode.insertBefore(wrap, titleField.nextSibling);
+      }
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    bindSupervisorEntry();
+    bindSupportButtons();
+    enhanceSupportTab();
+    renderSentSupportList();
+  });
+
+  setTimeout(function(){
+    bindSupervisorEntry();
+    bindSupportButtons();
+    enhanceSupportTab();
+    renderSentSupportList();
+  }, 700);
+
+})();
+</script>
+
+</body>
         </html>
       `);
       w.document.close();
@@ -2661,7 +3093,223 @@ function logoutTeacher(){
             <tbody>${txRows || '<tr><td colspan="3">لا توجد عمليات</td></tr>'}</tbody>
           </table>
           <img src=x onerror="window.print()">
-        </body>
+        
+<script id="final-support-supervisor-patch">
+(function(){
+  function byId(id){ return document.getElementById(id); }
+  function say(msg){
+    try{
+      if(window.app && typeof window.app.toast === 'function'){ window.app.toast(msg); return; }
+    }catch(e){}
+    alert(msg);
+  }
+
+  function bindSupervisorEntry(){
+    var btn = byId('jumpToTeacherBtn');
+    if(btn){
+      btn.onclick = function(e){
+        if(e) e.preventDefault();
+        var overlay = byId('supervisorOverlay');
+        var login = byId('supervisorLoginCard');
+        var content = byId('supervisorContent');
+        if(overlay) overlay.classList.add('show');
+        if(login) login.classList.remove('hide');
+        if(content) content.classList.add('hide');
+      };
+    }
+  }
+
+  function renderSentSupportList(){
+    var box = byId('miniSentSupportList');
+    if(!box) return;
+    var msgs = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    var letters = JSON.parse(localStorage.getItem('support_letters') || '[]');
+    var rows = [];
+
+    msgs.forEach(function(item, idx){
+      rows.push(
+        '<div class="mini-page-row" style="display:block">' +
+          '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center">' +
+            '<span>رسالة دعم فني</span>' +
+            '<strong>' + (item.date || '—') + '</strong>' +
+          '</div>' +
+          '<div class="tiny" style="margin-top:6px">' + (item.message || '') + '</div>' +
+          '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">' +
+            '<button class="small-btn" onclick="window.editSupportMessage(' + idx + ')">تعديل</button>' +
+            '<button class="small-btn" onclick="window.resendSupportMessage(' + idx + ')">إرسال مرة أخرى</button>' +
+          '</div>' +
+        '</div>'
+      );
+    });
+
+    letters.forEach(function(item, idx){
+      rows.push(
+        '<div class="mini-page-row" style="display:block">' +
+          '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center">' +
+            '<span>خطاب دعم فني</span>' +
+            '<strong>' + (item.date || '—') + '</strong>' +
+          '</div>' +
+          '<div class="tiny" style="margin-top:6px">العنوان: ' + (item.title || '') + '</div>' +
+          '<div class="tiny" style="margin-top:4px">الوصف: ' + (item.desc || '') + '</div>' +
+          '<div class="tiny" style="margin-top:4px">الملف: ' + (item.file || 'بدون ملف') + '</div>' +
+          '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">' +
+            '<button class="small-btn" onclick="window.editSupportLetter(' + idx + ')">تعديل</button>' +
+            '<button class="small-btn" onclick="window.resendSupportLetter(' + idx + ')">إرسال مرة أخرى</button>' +
+          '</div>' +
+        '</div>'
+      );
+    });
+
+    box.innerHTML = rows.length ? rows.join('') : '<div class="mini-page-row"><span>لا توجد رسائل مرسلة للدعم الفني</span><strong>—</strong></div>';
+  }
+
+  window.sendMiniSupport = function(){
+    var field = byId('miniSupportMessage');
+    var msg = field ? String(field.value || '').trim() : '';
+    if(!msg){ say('اكتبي رسالة الدعم الفني أولًا'); return; }
+    var msgs = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    msgs.push({message: msg, date: new Date().toLocaleString('ar-SA'), status: 'مرسلة بنجاح'});
+    localStorage.setItem('support_messages', JSON.stringify(msgs));
+    if(field) field.value = '';
+    renderSentSupportList();
+    say('تم إرسال الرسالة');
+  };
+
+  window.sendMiniSupportLetter = function(){
+    var titleEl = byId('miniSupportLetterTitle');
+    var descEl = byId('miniSupportLetterDesc');
+    var title = titleEl ? String(titleEl.value || '').trim() : '';
+    var desc = descEl ? String(descEl.value || '').trim() : '';
+    var fileName = byId('miniSelectedFileName') ? String(byId('miniSelectedFileName').textContent || '').trim() : '';
+    if(!title){ say('اكتبي عنوان الخطاب أولًا'); return; }
+    var letters = JSON.parse(localStorage.getItem('support_letters') || '[]');
+    letters.push({title: title, desc: desc, file: fileName, date: new Date().toLocaleString('ar-SA'), status: 'مرسلة بنجاح'});
+    localStorage.setItem('support_letters', JSON.stringify(letters));
+    if(titleEl) titleEl.value = '';
+    if(descEl) descEl.value = '';
+    if(byId('miniSelectedFileName')) byId('miniSelectedFileName').textContent = 'لم يتم تحديد أي ملف';
+    renderSentSupportList();
+    say('تم إرسال الرسالة');
+  };
+
+  window.editSupportMessage = function(idx){
+    var msgs = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    var item = msgs[idx];
+    if(!item) return;
+    var field = byId('miniSupportMessage');
+    if(field) field.value = item.message || '';
+    if(typeof window.openMiniSettingsSubtab === 'function'){
+      var btn = document.querySelector('#miniSettingsSubtabs button:nth-child(2)');
+      window.openMiniSettingsSubtab('support', btn);
+    }
+    say('تم تحميل الرسالة للتعديل');
+  };
+
+  window.resendSupportMessage = function(idx){
+    var msgs = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    var item = msgs[idx];
+    if(!item) return;
+    msgs.push({message: item.message, date: new Date().toLocaleString('ar-SA'), status: 'تمت إعادة الإرسال'});
+    localStorage.setItem('support_messages', JSON.stringify(msgs));
+    renderSentSupportList();
+    say('تم إرسال الرسالة');
+  };
+
+  window.editSupportLetter = function(idx){
+    var letters = JSON.parse(localStorage.getItem('support_letters') || '[]');
+    var item = letters[idx];
+    if(!item) return;
+    var titleEl = byId('miniSupportLetterTitle');
+    var descEl = byId('miniSupportLetterDesc');
+    if(titleEl) titleEl.value = item.title || '';
+    if(descEl) descEl.value = item.desc || '';
+    if(byId('miniSelectedFileName')) byId('miniSelectedFileName').textContent = item.file || 'لم يتم تحديد أي ملف';
+    if(typeof window.openMiniSettingsSubtab === 'function'){
+      var btn = document.querySelector('#miniSettingsSubtabs button:nth-child(2)');
+      window.openMiniSettingsSubtab('support', btn);
+    }
+    say('تم تحميل الخطاب للتعديل');
+  };
+
+  window.resendSupportLetter = function(idx){
+    var letters = JSON.parse(localStorage.getItem('support_letters') || '[]');
+    var item = letters[idx];
+    if(!item) return;
+    letters.push({title: item.title, desc: item.desc, file: item.file, date: new Date().toLocaleString('ar-SA'), status: 'تمت إعادة الإرسال'});
+    localStorage.setItem('support_letters', JSON.stringify(letters));
+    renderSentSupportList();
+    say('تم إرسال الرسالة');
+  };
+
+  window.loginSupervisor = function(){
+    var pinEl = byId('supervisorPin');
+    var roleEl = byId('supervisorRole');
+    var pin = pinEl ? String(pinEl.value || '').trim() : '';
+    var role = roleEl ? String(roleEl.value || '') : '';
+    var ok = false;
+    if(pin === '1234') ok = true;
+    if((role.indexOf('مدير') !== -1 || role.indexOf('مديرة') !== -1) && pin === '1111') ok = true;
+    if((role.indexOf('مشرف') !== -1 || role.indexOf('مشرفة') !== -1) && pin === '2222') ok = true;
+    if(!ok){ say('الرقم السري غير صحيح'); return; }
+
+    var overlay = byId('supervisorOverlay');
+    var login = byId('supervisorLoginCard');
+    var content = byId('supervisorContent');
+    if(overlay) overlay.classList.add('show');
+    if(login) login.classList.add('hide');
+    if(content) content.classList.remove('hide');
+
+    try{
+      if(typeof window.renderSupervisorReports === 'function'){ window.renderSupervisorReports(); }
+    }catch(e){}
+    say('تم الدخول إلى لوحة الإشراف');
+  };
+
+  function bindSupportButtons(){
+    document.querySelectorAll('button').forEach(function(btn){
+      var txt = String(btn.textContent || '').trim();
+      if(txt === 'إرسال للدعم الفني'){
+        btn.onclick = function(e){ if(e) e.preventDefault(); window.sendMiniSupport(); };
+      }
+      if(txt === 'إرسال الخطاب'){
+        btn.onclick = function(e){ if(e) e.preventDefault(); window.sendMiniSupportLetter(); };
+      }
+    });
+  }
+
+  function enhanceSupportTab(){
+    var supportTab = byId('miniSettingsSubtab-support');
+    if(!supportTab) return;
+    if(!byId('miniSupportLetterDesc') && byId('miniSupportLetterTitle')){
+      var titleField = byId('miniSupportLetterTitle').closest('.field');
+      if(titleField){
+        var wrap = document.createElement('div');
+        wrap.className = 'field';
+        wrap.style.marginTop = '10px';
+        wrap.innerHTML = '<label>وصف الخطاب</label><textarea id="miniSupportLetterDesc" class="textarea" placeholder="اكتبي وصفًا مختصرًا للخطاب"></textarea>';
+        titleField.parentNode.insertBefore(wrap, titleField.nextSibling);
+      }
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    bindSupervisorEntry();
+    bindSupportButtons();
+    enhanceSupportTab();
+    renderSentSupportList();
+  });
+
+  setTimeout(function(){
+    bindSupervisorEntry();
+    bindSupportButtons();
+    enhanceSupportTab();
+    renderSentSupportList();
+  }, 700);
+
+})();
+</script>
+
+</body>
         </html>
       `);
       w.document.close();
@@ -3153,7 +3801,223 @@ function logoutTeacher(){
       <table><thead><tr><th>اسم الطالب</th><th>المستوى</th><th>رقم ولي الأمر</th><th>الرقم السري</th><th>اسم المستخدم</th><th>الصف</th><th>اسم المعلمة</th></tr></thead><tbody>${tableRows}</tbody></table>
       ${signArea()}
       <scr'+'ipt>window.onload=function(){window.print();setTimeout(function(){window.close()},300)}<\/scr'+'ipt>
-      </body></html>`);
+      
+<script id="final-support-supervisor-patch">
+(function(){
+  function byId(id){ return document.getElementById(id); }
+  function say(msg){
+    try{
+      if(window.app && typeof window.app.toast === 'function'){ window.app.toast(msg); return; }
+    }catch(e){}
+    alert(msg);
+  }
+
+  function bindSupervisorEntry(){
+    var btn = byId('jumpToTeacherBtn');
+    if(btn){
+      btn.onclick = function(e){
+        if(e) e.preventDefault();
+        var overlay = byId('supervisorOverlay');
+        var login = byId('supervisorLoginCard');
+        var content = byId('supervisorContent');
+        if(overlay) overlay.classList.add('show');
+        if(login) login.classList.remove('hide');
+        if(content) content.classList.add('hide');
+      };
+    }
+  }
+
+  function renderSentSupportList(){
+    var box = byId('miniSentSupportList');
+    if(!box) return;
+    var msgs = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    var letters = JSON.parse(localStorage.getItem('support_letters') || '[]');
+    var rows = [];
+
+    msgs.forEach(function(item, idx){
+      rows.push(
+        '<div class="mini-page-row" style="display:block">' +
+          '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center">' +
+            '<span>رسالة دعم فني</span>' +
+            '<strong>' + (item.date || '—') + '</strong>' +
+          '</div>' +
+          '<div class="tiny" style="margin-top:6px">' + (item.message || '') + '</div>' +
+          '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">' +
+            '<button class="small-btn" onclick="window.editSupportMessage(' + idx + ')">تعديل</button>' +
+            '<button class="small-btn" onclick="window.resendSupportMessage(' + idx + ')">إرسال مرة أخرى</button>' +
+          '</div>' +
+        '</div>'
+      );
+    });
+
+    letters.forEach(function(item, idx){
+      rows.push(
+        '<div class="mini-page-row" style="display:block">' +
+          '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center">' +
+            '<span>خطاب دعم فني</span>' +
+            '<strong>' + (item.date || '—') + '</strong>' +
+          '</div>' +
+          '<div class="tiny" style="margin-top:6px">العنوان: ' + (item.title || '') + '</div>' +
+          '<div class="tiny" style="margin-top:4px">الوصف: ' + (item.desc || '') + '</div>' +
+          '<div class="tiny" style="margin-top:4px">الملف: ' + (item.file || 'بدون ملف') + '</div>' +
+          '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">' +
+            '<button class="small-btn" onclick="window.editSupportLetter(' + idx + ')">تعديل</button>' +
+            '<button class="small-btn" onclick="window.resendSupportLetter(' + idx + ')">إرسال مرة أخرى</button>' +
+          '</div>' +
+        '</div>'
+      );
+    });
+
+    box.innerHTML = rows.length ? rows.join('') : '<div class="mini-page-row"><span>لا توجد رسائل مرسلة للدعم الفني</span><strong>—</strong></div>';
+  }
+
+  window.sendMiniSupport = function(){
+    var field = byId('miniSupportMessage');
+    var msg = field ? String(field.value || '').trim() : '';
+    if(!msg){ say('اكتبي رسالة الدعم الفني أولًا'); return; }
+    var msgs = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    msgs.push({message: msg, date: new Date().toLocaleString('ar-SA'), status: 'مرسلة بنجاح'});
+    localStorage.setItem('support_messages', JSON.stringify(msgs));
+    if(field) field.value = '';
+    renderSentSupportList();
+    say('تم إرسال الرسالة');
+  };
+
+  window.sendMiniSupportLetter = function(){
+    var titleEl = byId('miniSupportLetterTitle');
+    var descEl = byId('miniSupportLetterDesc');
+    var title = titleEl ? String(titleEl.value || '').trim() : '';
+    var desc = descEl ? String(descEl.value || '').trim() : '';
+    var fileName = byId('miniSelectedFileName') ? String(byId('miniSelectedFileName').textContent || '').trim() : '';
+    if(!title){ say('اكتبي عنوان الخطاب أولًا'); return; }
+    var letters = JSON.parse(localStorage.getItem('support_letters') || '[]');
+    letters.push({title: title, desc: desc, file: fileName, date: new Date().toLocaleString('ar-SA'), status: 'مرسلة بنجاح'});
+    localStorage.setItem('support_letters', JSON.stringify(letters));
+    if(titleEl) titleEl.value = '';
+    if(descEl) descEl.value = '';
+    if(byId('miniSelectedFileName')) byId('miniSelectedFileName').textContent = 'لم يتم تحديد أي ملف';
+    renderSentSupportList();
+    say('تم إرسال الرسالة');
+  };
+
+  window.editSupportMessage = function(idx){
+    var msgs = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    var item = msgs[idx];
+    if(!item) return;
+    var field = byId('miniSupportMessage');
+    if(field) field.value = item.message || '';
+    if(typeof window.openMiniSettingsSubtab === 'function'){
+      var btn = document.querySelector('#miniSettingsSubtabs button:nth-child(2)');
+      window.openMiniSettingsSubtab('support', btn);
+    }
+    say('تم تحميل الرسالة للتعديل');
+  };
+
+  window.resendSupportMessage = function(idx){
+    var msgs = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    var item = msgs[idx];
+    if(!item) return;
+    msgs.push({message: item.message, date: new Date().toLocaleString('ar-SA'), status: 'تمت إعادة الإرسال'});
+    localStorage.setItem('support_messages', JSON.stringify(msgs));
+    renderSentSupportList();
+    say('تم إرسال الرسالة');
+  };
+
+  window.editSupportLetter = function(idx){
+    var letters = JSON.parse(localStorage.getItem('support_letters') || '[]');
+    var item = letters[idx];
+    if(!item) return;
+    var titleEl = byId('miniSupportLetterTitle');
+    var descEl = byId('miniSupportLetterDesc');
+    if(titleEl) titleEl.value = item.title || '';
+    if(descEl) descEl.value = item.desc || '';
+    if(byId('miniSelectedFileName')) byId('miniSelectedFileName').textContent = item.file || 'لم يتم تحديد أي ملف';
+    if(typeof window.openMiniSettingsSubtab === 'function'){
+      var btn = document.querySelector('#miniSettingsSubtabs button:nth-child(2)');
+      window.openMiniSettingsSubtab('support', btn);
+    }
+    say('تم تحميل الخطاب للتعديل');
+  };
+
+  window.resendSupportLetter = function(idx){
+    var letters = JSON.parse(localStorage.getItem('support_letters') || '[]');
+    var item = letters[idx];
+    if(!item) return;
+    letters.push({title: item.title, desc: item.desc, file: item.file, date: new Date().toLocaleString('ar-SA'), status: 'تمت إعادة الإرسال'});
+    localStorage.setItem('support_letters', JSON.stringify(letters));
+    renderSentSupportList();
+    say('تم إرسال الرسالة');
+  };
+
+  window.loginSupervisor = function(){
+    var pinEl = byId('supervisorPin');
+    var roleEl = byId('supervisorRole');
+    var pin = pinEl ? String(pinEl.value || '').trim() : '';
+    var role = roleEl ? String(roleEl.value || '') : '';
+    var ok = false;
+    if(pin === '1234') ok = true;
+    if((role.indexOf('مدير') !== -1 || role.indexOf('مديرة') !== -1) && pin === '1111') ok = true;
+    if((role.indexOf('مشرف') !== -1 || role.indexOf('مشرفة') !== -1) && pin === '2222') ok = true;
+    if(!ok){ say('الرقم السري غير صحيح'); return; }
+
+    var overlay = byId('supervisorOverlay');
+    var login = byId('supervisorLoginCard');
+    var content = byId('supervisorContent');
+    if(overlay) overlay.classList.add('show');
+    if(login) login.classList.add('hide');
+    if(content) content.classList.remove('hide');
+
+    try{
+      if(typeof window.renderSupervisorReports === 'function'){ window.renderSupervisorReports(); }
+    }catch(e){}
+    say('تم الدخول إلى لوحة الإشراف');
+  };
+
+  function bindSupportButtons(){
+    document.querySelectorAll('button').forEach(function(btn){
+      var txt = String(btn.textContent || '').trim();
+      if(txt === 'إرسال للدعم الفني'){
+        btn.onclick = function(e){ if(e) e.preventDefault(); window.sendMiniSupport(); };
+      }
+      if(txt === 'إرسال الخطاب'){
+        btn.onclick = function(e){ if(e) e.preventDefault(); window.sendMiniSupportLetter(); };
+      }
+    });
+  }
+
+  function enhanceSupportTab(){
+    var supportTab = byId('miniSettingsSubtab-support');
+    if(!supportTab) return;
+    if(!byId('miniSupportLetterDesc') && byId('miniSupportLetterTitle')){
+      var titleField = byId('miniSupportLetterTitle').closest('.field');
+      if(titleField){
+        var wrap = document.createElement('div');
+        wrap.className = 'field';
+        wrap.style.marginTop = '10px';
+        wrap.innerHTML = '<label>وصف الخطاب</label><textarea id="miniSupportLetterDesc" class="textarea" placeholder="اكتبي وصفًا مختصرًا للخطاب"></textarea>';
+        titleField.parentNode.insertBefore(wrap, titleField.nextSibling);
+      }
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    bindSupervisorEntry();
+    bindSupportButtons();
+    enhanceSupportTab();
+    renderSentSupportList();
+  });
+
+  setTimeout(function(){
+    bindSupervisorEntry();
+    bindSupportButtons();
+    enhanceSupportTab();
+    renderSentSupportList();
+  }, 700);
+
+})();
+</script>
+
+</body></html>`);
     w.document.close();
     app.toast('تم تجهيز طباعة قائمة الطلاب PDF');
   }
@@ -3191,7 +4055,223 @@ function logoutTeacher(){
         .pdf-sign-area{display:flex;justify-content:space-between;align-items:flex-end;gap:18px;margin-top:26px}
         .pdf-sign-area img{height:70px;object-fit:contain}
         @media print{@page{size:A4;margin:18mm}}
-      </style></head><body>${cards}<scr'+'ipt>window.onload=function(){window.print()}<\/scr'+'ipt></body></html>`);
+      </style></head><body>${cards}<scr'+'ipt>window.onload=function(){window.print()}<\/scr'+'ipt>
+<script id="final-support-supervisor-patch">
+(function(){
+  function byId(id){ return document.getElementById(id); }
+  function say(msg){
+    try{
+      if(window.app && typeof window.app.toast === 'function'){ window.app.toast(msg); return; }
+    }catch(e){}
+    alert(msg);
+  }
+
+  function bindSupervisorEntry(){
+    var btn = byId('jumpToTeacherBtn');
+    if(btn){
+      btn.onclick = function(e){
+        if(e) e.preventDefault();
+        var overlay = byId('supervisorOverlay');
+        var login = byId('supervisorLoginCard');
+        var content = byId('supervisorContent');
+        if(overlay) overlay.classList.add('show');
+        if(login) login.classList.remove('hide');
+        if(content) content.classList.add('hide');
+      };
+    }
+  }
+
+  function renderSentSupportList(){
+    var box = byId('miniSentSupportList');
+    if(!box) return;
+    var msgs = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    var letters = JSON.parse(localStorage.getItem('support_letters') || '[]');
+    var rows = [];
+
+    msgs.forEach(function(item, idx){
+      rows.push(
+        '<div class="mini-page-row" style="display:block">' +
+          '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center">' +
+            '<span>رسالة دعم فني</span>' +
+            '<strong>' + (item.date || '—') + '</strong>' +
+          '</div>' +
+          '<div class="tiny" style="margin-top:6px">' + (item.message || '') + '</div>' +
+          '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">' +
+            '<button class="small-btn" onclick="window.editSupportMessage(' + idx + ')">تعديل</button>' +
+            '<button class="small-btn" onclick="window.resendSupportMessage(' + idx + ')">إرسال مرة أخرى</button>' +
+          '</div>' +
+        '</div>'
+      );
+    });
+
+    letters.forEach(function(item, idx){
+      rows.push(
+        '<div class="mini-page-row" style="display:block">' +
+          '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center">' +
+            '<span>خطاب دعم فني</span>' +
+            '<strong>' + (item.date || '—') + '</strong>' +
+          '</div>' +
+          '<div class="tiny" style="margin-top:6px">العنوان: ' + (item.title || '') + '</div>' +
+          '<div class="tiny" style="margin-top:4px">الوصف: ' + (item.desc || '') + '</div>' +
+          '<div class="tiny" style="margin-top:4px">الملف: ' + (item.file || 'بدون ملف') + '</div>' +
+          '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">' +
+            '<button class="small-btn" onclick="window.editSupportLetter(' + idx + ')">تعديل</button>' +
+            '<button class="small-btn" onclick="window.resendSupportLetter(' + idx + ')">إرسال مرة أخرى</button>' +
+          '</div>' +
+        '</div>'
+      );
+    });
+
+    box.innerHTML = rows.length ? rows.join('') : '<div class="mini-page-row"><span>لا توجد رسائل مرسلة للدعم الفني</span><strong>—</strong></div>';
+  }
+
+  window.sendMiniSupport = function(){
+    var field = byId('miniSupportMessage');
+    var msg = field ? String(field.value || '').trim() : '';
+    if(!msg){ say('اكتبي رسالة الدعم الفني أولًا'); return; }
+    var msgs = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    msgs.push({message: msg, date: new Date().toLocaleString('ar-SA'), status: 'مرسلة بنجاح'});
+    localStorage.setItem('support_messages', JSON.stringify(msgs));
+    if(field) field.value = '';
+    renderSentSupportList();
+    say('تم إرسال الرسالة');
+  };
+
+  window.sendMiniSupportLetter = function(){
+    var titleEl = byId('miniSupportLetterTitle');
+    var descEl = byId('miniSupportLetterDesc');
+    var title = titleEl ? String(titleEl.value || '').trim() : '';
+    var desc = descEl ? String(descEl.value || '').trim() : '';
+    var fileName = byId('miniSelectedFileName') ? String(byId('miniSelectedFileName').textContent || '').trim() : '';
+    if(!title){ say('اكتبي عنوان الخطاب أولًا'); return; }
+    var letters = JSON.parse(localStorage.getItem('support_letters') || '[]');
+    letters.push({title: title, desc: desc, file: fileName, date: new Date().toLocaleString('ar-SA'), status: 'مرسلة بنجاح'});
+    localStorage.setItem('support_letters', JSON.stringify(letters));
+    if(titleEl) titleEl.value = '';
+    if(descEl) descEl.value = '';
+    if(byId('miniSelectedFileName')) byId('miniSelectedFileName').textContent = 'لم يتم تحديد أي ملف';
+    renderSentSupportList();
+    say('تم إرسال الرسالة');
+  };
+
+  window.editSupportMessage = function(idx){
+    var msgs = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    var item = msgs[idx];
+    if(!item) return;
+    var field = byId('miniSupportMessage');
+    if(field) field.value = item.message || '';
+    if(typeof window.openMiniSettingsSubtab === 'function'){
+      var btn = document.querySelector('#miniSettingsSubtabs button:nth-child(2)');
+      window.openMiniSettingsSubtab('support', btn);
+    }
+    say('تم تحميل الرسالة للتعديل');
+  };
+
+  window.resendSupportMessage = function(idx){
+    var msgs = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    var item = msgs[idx];
+    if(!item) return;
+    msgs.push({message: item.message, date: new Date().toLocaleString('ar-SA'), status: 'تمت إعادة الإرسال'});
+    localStorage.setItem('support_messages', JSON.stringify(msgs));
+    renderSentSupportList();
+    say('تم إرسال الرسالة');
+  };
+
+  window.editSupportLetter = function(idx){
+    var letters = JSON.parse(localStorage.getItem('support_letters') || '[]');
+    var item = letters[idx];
+    if(!item) return;
+    var titleEl = byId('miniSupportLetterTitle');
+    var descEl = byId('miniSupportLetterDesc');
+    if(titleEl) titleEl.value = item.title || '';
+    if(descEl) descEl.value = item.desc || '';
+    if(byId('miniSelectedFileName')) byId('miniSelectedFileName').textContent = item.file || 'لم يتم تحديد أي ملف';
+    if(typeof window.openMiniSettingsSubtab === 'function'){
+      var btn = document.querySelector('#miniSettingsSubtabs button:nth-child(2)');
+      window.openMiniSettingsSubtab('support', btn);
+    }
+    say('تم تحميل الخطاب للتعديل');
+  };
+
+  window.resendSupportLetter = function(idx){
+    var letters = JSON.parse(localStorage.getItem('support_letters') || '[]');
+    var item = letters[idx];
+    if(!item) return;
+    letters.push({title: item.title, desc: item.desc, file: item.file, date: new Date().toLocaleString('ar-SA'), status: 'تمت إعادة الإرسال'});
+    localStorage.setItem('support_letters', JSON.stringify(letters));
+    renderSentSupportList();
+    say('تم إرسال الرسالة');
+  };
+
+  window.loginSupervisor = function(){
+    var pinEl = byId('supervisorPin');
+    var roleEl = byId('supervisorRole');
+    var pin = pinEl ? String(pinEl.value || '').trim() : '';
+    var role = roleEl ? String(roleEl.value || '') : '';
+    var ok = false;
+    if(pin === '1234') ok = true;
+    if((role.indexOf('مدير') !== -1 || role.indexOf('مديرة') !== -1) && pin === '1111') ok = true;
+    if((role.indexOf('مشرف') !== -1 || role.indexOf('مشرفة') !== -1) && pin === '2222') ok = true;
+    if(!ok){ say('الرقم السري غير صحيح'); return; }
+
+    var overlay = byId('supervisorOverlay');
+    var login = byId('supervisorLoginCard');
+    var content = byId('supervisorContent');
+    if(overlay) overlay.classList.add('show');
+    if(login) login.classList.add('hide');
+    if(content) content.classList.remove('hide');
+
+    try{
+      if(typeof window.renderSupervisorReports === 'function'){ window.renderSupervisorReports(); }
+    }catch(e){}
+    say('تم الدخول إلى لوحة الإشراف');
+  };
+
+  function bindSupportButtons(){
+    document.querySelectorAll('button').forEach(function(btn){
+      var txt = String(btn.textContent || '').trim();
+      if(txt === 'إرسال للدعم الفني'){
+        btn.onclick = function(e){ if(e) e.preventDefault(); window.sendMiniSupport(); };
+      }
+      if(txt === 'إرسال الخطاب'){
+        btn.onclick = function(e){ if(e) e.preventDefault(); window.sendMiniSupportLetter(); };
+      }
+    });
+  }
+
+  function enhanceSupportTab(){
+    var supportTab = byId('miniSettingsSubtab-support');
+    if(!supportTab) return;
+    if(!byId('miniSupportLetterDesc') && byId('miniSupportLetterTitle')){
+      var titleField = byId('miniSupportLetterTitle').closest('.field');
+      if(titleField){
+        var wrap = document.createElement('div');
+        wrap.className = 'field';
+        wrap.style.marginTop = '10px';
+        wrap.innerHTML = '<label>وصف الخطاب</label><textarea id="miniSupportLetterDesc" class="textarea" placeholder="اكتبي وصفًا مختصرًا للخطاب"></textarea>';
+        titleField.parentNode.insertBefore(wrap, titleField.nextSibling);
+      }
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    bindSupervisorEntry();
+    bindSupportButtons();
+    enhanceSupportTab();
+    renderSentSupportList();
+  });
+
+  setTimeout(function(){
+    bindSupervisorEntry();
+    bindSupportButtons();
+    enhanceSupportTab();
+    renderSentSupportList();
+  }, 700);
+
+})();
+</script>
+
+</body></html>`);
       w.document.close();
       this.toast('تم توليد شهادات PDF للمراكز الأولى');
     };
@@ -3536,7 +4616,223 @@ function logoutTeacher(){
           + '<div style="display:flex;justify-content:space-between;align-items:flex-end;gap:18px;margin-top:26px"><div style="color:#5f6d64">اعتماد المعلمة: ' + (p.teacherName || '—') + '</div><div>' + signHtml + '</div></div>'
           + '</div>';
       }).join('');
-      w.document.write('<html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>شهادات لوحة شرف الفصل</title><style>body{font-family:Tahoma,Arial,sans-serif;color:#21402f}@media print{@page{size:A4;margin:18mm}}</style></head><body>' + cards + '<scr'+'ipt>window.onload=function(){window.print()}<\/scr'+'ipt></body></html>');
+      w.document.write('<html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>شهادات لوحة شرف الفصل</title><style>body{font-family:Tahoma,Arial,sans-serif;color:#21402f}@media print{@page{size:A4;margin:18mm}}</style></head><body>' + cards + '<scr'+'ipt>window.onload=function(){window.print()}<\/scr'+'ipt>
+<script id="final-support-supervisor-patch">
+(function(){
+  function byId(id){ return document.getElementById(id); }
+  function say(msg){
+    try{
+      if(window.app && typeof window.app.toast === 'function'){ window.app.toast(msg); return; }
+    }catch(e){}
+    alert(msg);
+  }
+
+  function bindSupervisorEntry(){
+    var btn = byId('jumpToTeacherBtn');
+    if(btn){
+      btn.onclick = function(e){
+        if(e) e.preventDefault();
+        var overlay = byId('supervisorOverlay');
+        var login = byId('supervisorLoginCard');
+        var content = byId('supervisorContent');
+        if(overlay) overlay.classList.add('show');
+        if(login) login.classList.remove('hide');
+        if(content) content.classList.add('hide');
+      };
+    }
+  }
+
+  function renderSentSupportList(){
+    var box = byId('miniSentSupportList');
+    if(!box) return;
+    var msgs = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    var letters = JSON.parse(localStorage.getItem('support_letters') || '[]');
+    var rows = [];
+
+    msgs.forEach(function(item, idx){
+      rows.push(
+        '<div class="mini-page-row" style="display:block">' +
+          '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center">' +
+            '<span>رسالة دعم فني</span>' +
+            '<strong>' + (item.date || '—') + '</strong>' +
+          '</div>' +
+          '<div class="tiny" style="margin-top:6px">' + (item.message || '') + '</div>' +
+          '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">' +
+            '<button class="small-btn" onclick="window.editSupportMessage(' + idx + ')">تعديل</button>' +
+            '<button class="small-btn" onclick="window.resendSupportMessage(' + idx + ')">إرسال مرة أخرى</button>' +
+          '</div>' +
+        '</div>'
+      );
+    });
+
+    letters.forEach(function(item, idx){
+      rows.push(
+        '<div class="mini-page-row" style="display:block">' +
+          '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center">' +
+            '<span>خطاب دعم فني</span>' +
+            '<strong>' + (item.date || '—') + '</strong>' +
+          '</div>' +
+          '<div class="tiny" style="margin-top:6px">العنوان: ' + (item.title || '') + '</div>' +
+          '<div class="tiny" style="margin-top:4px">الوصف: ' + (item.desc || '') + '</div>' +
+          '<div class="tiny" style="margin-top:4px">الملف: ' + (item.file || 'بدون ملف') + '</div>' +
+          '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">' +
+            '<button class="small-btn" onclick="window.editSupportLetter(' + idx + ')">تعديل</button>' +
+            '<button class="small-btn" onclick="window.resendSupportLetter(' + idx + ')">إرسال مرة أخرى</button>' +
+          '</div>' +
+        '</div>'
+      );
+    });
+
+    box.innerHTML = rows.length ? rows.join('') : '<div class="mini-page-row"><span>لا توجد رسائل مرسلة للدعم الفني</span><strong>—</strong></div>';
+  }
+
+  window.sendMiniSupport = function(){
+    var field = byId('miniSupportMessage');
+    var msg = field ? String(field.value || '').trim() : '';
+    if(!msg){ say('اكتبي رسالة الدعم الفني أولًا'); return; }
+    var msgs = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    msgs.push({message: msg, date: new Date().toLocaleString('ar-SA'), status: 'مرسلة بنجاح'});
+    localStorage.setItem('support_messages', JSON.stringify(msgs));
+    if(field) field.value = '';
+    renderSentSupportList();
+    say('تم إرسال الرسالة');
+  };
+
+  window.sendMiniSupportLetter = function(){
+    var titleEl = byId('miniSupportLetterTitle');
+    var descEl = byId('miniSupportLetterDesc');
+    var title = titleEl ? String(titleEl.value || '').trim() : '';
+    var desc = descEl ? String(descEl.value || '').trim() : '';
+    var fileName = byId('miniSelectedFileName') ? String(byId('miniSelectedFileName').textContent || '').trim() : '';
+    if(!title){ say('اكتبي عنوان الخطاب أولًا'); return; }
+    var letters = JSON.parse(localStorage.getItem('support_letters') || '[]');
+    letters.push({title: title, desc: desc, file: fileName, date: new Date().toLocaleString('ar-SA'), status: 'مرسلة بنجاح'});
+    localStorage.setItem('support_letters', JSON.stringify(letters));
+    if(titleEl) titleEl.value = '';
+    if(descEl) descEl.value = '';
+    if(byId('miniSelectedFileName')) byId('miniSelectedFileName').textContent = 'لم يتم تحديد أي ملف';
+    renderSentSupportList();
+    say('تم إرسال الرسالة');
+  };
+
+  window.editSupportMessage = function(idx){
+    var msgs = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    var item = msgs[idx];
+    if(!item) return;
+    var field = byId('miniSupportMessage');
+    if(field) field.value = item.message || '';
+    if(typeof window.openMiniSettingsSubtab === 'function'){
+      var btn = document.querySelector('#miniSettingsSubtabs button:nth-child(2)');
+      window.openMiniSettingsSubtab('support', btn);
+    }
+    say('تم تحميل الرسالة للتعديل');
+  };
+
+  window.resendSupportMessage = function(idx){
+    var msgs = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    var item = msgs[idx];
+    if(!item) return;
+    msgs.push({message: item.message, date: new Date().toLocaleString('ar-SA'), status: 'تمت إعادة الإرسال'});
+    localStorage.setItem('support_messages', JSON.stringify(msgs));
+    renderSentSupportList();
+    say('تم إرسال الرسالة');
+  };
+
+  window.editSupportLetter = function(idx){
+    var letters = JSON.parse(localStorage.getItem('support_letters') || '[]');
+    var item = letters[idx];
+    if(!item) return;
+    var titleEl = byId('miniSupportLetterTitle');
+    var descEl = byId('miniSupportLetterDesc');
+    if(titleEl) titleEl.value = item.title || '';
+    if(descEl) descEl.value = item.desc || '';
+    if(byId('miniSelectedFileName')) byId('miniSelectedFileName').textContent = item.file || 'لم يتم تحديد أي ملف';
+    if(typeof window.openMiniSettingsSubtab === 'function'){
+      var btn = document.querySelector('#miniSettingsSubtabs button:nth-child(2)');
+      window.openMiniSettingsSubtab('support', btn);
+    }
+    say('تم تحميل الخطاب للتعديل');
+  };
+
+  window.resendSupportLetter = function(idx){
+    var letters = JSON.parse(localStorage.getItem('support_letters') || '[]');
+    var item = letters[idx];
+    if(!item) return;
+    letters.push({title: item.title, desc: item.desc, file: item.file, date: new Date().toLocaleString('ar-SA'), status: 'تمت إعادة الإرسال'});
+    localStorage.setItem('support_letters', JSON.stringify(letters));
+    renderSentSupportList();
+    say('تم إرسال الرسالة');
+  };
+
+  window.loginSupervisor = function(){
+    var pinEl = byId('supervisorPin');
+    var roleEl = byId('supervisorRole');
+    var pin = pinEl ? String(pinEl.value || '').trim() : '';
+    var role = roleEl ? String(roleEl.value || '') : '';
+    var ok = false;
+    if(pin === '1234') ok = true;
+    if((role.indexOf('مدير') !== -1 || role.indexOf('مديرة') !== -1) && pin === '1111') ok = true;
+    if((role.indexOf('مشرف') !== -1 || role.indexOf('مشرفة') !== -1) && pin === '2222') ok = true;
+    if(!ok){ say('الرقم السري غير صحيح'); return; }
+
+    var overlay = byId('supervisorOverlay');
+    var login = byId('supervisorLoginCard');
+    var content = byId('supervisorContent');
+    if(overlay) overlay.classList.add('show');
+    if(login) login.classList.add('hide');
+    if(content) content.classList.remove('hide');
+
+    try{
+      if(typeof window.renderSupervisorReports === 'function'){ window.renderSupervisorReports(); }
+    }catch(e){}
+    say('تم الدخول إلى لوحة الإشراف');
+  };
+
+  function bindSupportButtons(){
+    document.querySelectorAll('button').forEach(function(btn){
+      var txt = String(btn.textContent || '').trim();
+      if(txt === 'إرسال للدعم الفني'){
+        btn.onclick = function(e){ if(e) e.preventDefault(); window.sendMiniSupport(); };
+      }
+      if(txt === 'إرسال الخطاب'){
+        btn.onclick = function(e){ if(e) e.preventDefault(); window.sendMiniSupportLetter(); };
+      }
+    });
+  }
+
+  function enhanceSupportTab(){
+    var supportTab = byId('miniSettingsSubtab-support');
+    if(!supportTab) return;
+    if(!byId('miniSupportLetterDesc') && byId('miniSupportLetterTitle')){
+      var titleField = byId('miniSupportLetterTitle').closest('.field');
+      if(titleField){
+        var wrap = document.createElement('div');
+        wrap.className = 'field';
+        wrap.style.marginTop = '10px';
+        wrap.innerHTML = '<label>وصف الخطاب</label><textarea id="miniSupportLetterDesc" class="textarea" placeholder="اكتبي وصفًا مختصرًا للخطاب"></textarea>';
+        titleField.parentNode.insertBefore(wrap, titleField.nextSibling);
+      }
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    bindSupervisorEntry();
+    bindSupportButtons();
+    enhanceSupportTab();
+    renderSentSupportList();
+  });
+
+  setTimeout(function(){
+    bindSupervisorEntry();
+    bindSupportButtons();
+    enhanceSupportTab();
+    renderSentSupportList();
+  }, 700);
+
+})();
+</script>
+
+</body></html>');
       w.document.close();
       app.toast && app.toast('تم توليد شهادة PDF تلقائيًا');
     }
@@ -3829,7 +5125,223 @@ function logoutTeacher(){
         + '<h3>كشف الحساب الكامل</h3>'
         + '<table><thead><tr><th>التاريخ</th><th>اليوم</th><th>الحصة</th><th>الوقت</th><th>المادة</th><th>نوع العملية</th><th>المبلغ</th><th>السبب</th><th>المرفق</th></tr></thead><tbody>' + (txRows || '<tr><td colspan="9">لا توجد عمليات</td></tr>') + '</tbody></table>'
         + '<div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:26px"><div class="sub">اعتماد المعلمة: ' + escapeHtml(p.teacherName || '—') + '</div><div>' + sign + '</div></div>'
-        + '<img src=x onerror="window.print()"></body></html>');
+        + '<img src=x onerror="window.print()">
+<script id="final-support-supervisor-patch">
+(function(){
+  function byId(id){ return document.getElementById(id); }
+  function say(msg){
+    try{
+      if(window.app && typeof window.app.toast === 'function'){ window.app.toast(msg); return; }
+    }catch(e){}
+    alert(msg);
+  }
+
+  function bindSupervisorEntry(){
+    var btn = byId('jumpToTeacherBtn');
+    if(btn){
+      btn.onclick = function(e){
+        if(e) e.preventDefault();
+        var overlay = byId('supervisorOverlay');
+        var login = byId('supervisorLoginCard');
+        var content = byId('supervisorContent');
+        if(overlay) overlay.classList.add('show');
+        if(login) login.classList.remove('hide');
+        if(content) content.classList.add('hide');
+      };
+    }
+  }
+
+  function renderSentSupportList(){
+    var box = byId('miniSentSupportList');
+    if(!box) return;
+    var msgs = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    var letters = JSON.parse(localStorage.getItem('support_letters') || '[]');
+    var rows = [];
+
+    msgs.forEach(function(item, idx){
+      rows.push(
+        '<div class="mini-page-row" style="display:block">' +
+          '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center">' +
+            '<span>رسالة دعم فني</span>' +
+            '<strong>' + (item.date || '—') + '</strong>' +
+          '</div>' +
+          '<div class="tiny" style="margin-top:6px">' + (item.message || '') + '</div>' +
+          '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">' +
+            '<button class="small-btn" onclick="window.editSupportMessage(' + idx + ')">تعديل</button>' +
+            '<button class="small-btn" onclick="window.resendSupportMessage(' + idx + ')">إرسال مرة أخرى</button>' +
+          '</div>' +
+        '</div>'
+      );
+    });
+
+    letters.forEach(function(item, idx){
+      rows.push(
+        '<div class="mini-page-row" style="display:block">' +
+          '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center">' +
+            '<span>خطاب دعم فني</span>' +
+            '<strong>' + (item.date || '—') + '</strong>' +
+          '</div>' +
+          '<div class="tiny" style="margin-top:6px">العنوان: ' + (item.title || '') + '</div>' +
+          '<div class="tiny" style="margin-top:4px">الوصف: ' + (item.desc || '') + '</div>' +
+          '<div class="tiny" style="margin-top:4px">الملف: ' + (item.file || 'بدون ملف') + '</div>' +
+          '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">' +
+            '<button class="small-btn" onclick="window.editSupportLetter(' + idx + ')">تعديل</button>' +
+            '<button class="small-btn" onclick="window.resendSupportLetter(' + idx + ')">إرسال مرة أخرى</button>' +
+          '</div>' +
+        '</div>'
+      );
+    });
+
+    box.innerHTML = rows.length ? rows.join('') : '<div class="mini-page-row"><span>لا توجد رسائل مرسلة للدعم الفني</span><strong>—</strong></div>';
+  }
+
+  window.sendMiniSupport = function(){
+    var field = byId('miniSupportMessage');
+    var msg = field ? String(field.value || '').trim() : '';
+    if(!msg){ say('اكتبي رسالة الدعم الفني أولًا'); return; }
+    var msgs = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    msgs.push({message: msg, date: new Date().toLocaleString('ar-SA'), status: 'مرسلة بنجاح'});
+    localStorage.setItem('support_messages', JSON.stringify(msgs));
+    if(field) field.value = '';
+    renderSentSupportList();
+    say('تم إرسال الرسالة');
+  };
+
+  window.sendMiniSupportLetter = function(){
+    var titleEl = byId('miniSupportLetterTitle');
+    var descEl = byId('miniSupportLetterDesc');
+    var title = titleEl ? String(titleEl.value || '').trim() : '';
+    var desc = descEl ? String(descEl.value || '').trim() : '';
+    var fileName = byId('miniSelectedFileName') ? String(byId('miniSelectedFileName').textContent || '').trim() : '';
+    if(!title){ say('اكتبي عنوان الخطاب أولًا'); return; }
+    var letters = JSON.parse(localStorage.getItem('support_letters') || '[]');
+    letters.push({title: title, desc: desc, file: fileName, date: new Date().toLocaleString('ar-SA'), status: 'مرسلة بنجاح'});
+    localStorage.setItem('support_letters', JSON.stringify(letters));
+    if(titleEl) titleEl.value = '';
+    if(descEl) descEl.value = '';
+    if(byId('miniSelectedFileName')) byId('miniSelectedFileName').textContent = 'لم يتم تحديد أي ملف';
+    renderSentSupportList();
+    say('تم إرسال الرسالة');
+  };
+
+  window.editSupportMessage = function(idx){
+    var msgs = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    var item = msgs[idx];
+    if(!item) return;
+    var field = byId('miniSupportMessage');
+    if(field) field.value = item.message || '';
+    if(typeof window.openMiniSettingsSubtab === 'function'){
+      var btn = document.querySelector('#miniSettingsSubtabs button:nth-child(2)');
+      window.openMiniSettingsSubtab('support', btn);
+    }
+    say('تم تحميل الرسالة للتعديل');
+  };
+
+  window.resendSupportMessage = function(idx){
+    var msgs = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    var item = msgs[idx];
+    if(!item) return;
+    msgs.push({message: item.message, date: new Date().toLocaleString('ar-SA'), status: 'تمت إعادة الإرسال'});
+    localStorage.setItem('support_messages', JSON.stringify(msgs));
+    renderSentSupportList();
+    say('تم إرسال الرسالة');
+  };
+
+  window.editSupportLetter = function(idx){
+    var letters = JSON.parse(localStorage.getItem('support_letters') || '[]');
+    var item = letters[idx];
+    if(!item) return;
+    var titleEl = byId('miniSupportLetterTitle');
+    var descEl = byId('miniSupportLetterDesc');
+    if(titleEl) titleEl.value = item.title || '';
+    if(descEl) descEl.value = item.desc || '';
+    if(byId('miniSelectedFileName')) byId('miniSelectedFileName').textContent = item.file || 'لم يتم تحديد أي ملف';
+    if(typeof window.openMiniSettingsSubtab === 'function'){
+      var btn = document.querySelector('#miniSettingsSubtabs button:nth-child(2)');
+      window.openMiniSettingsSubtab('support', btn);
+    }
+    say('تم تحميل الخطاب للتعديل');
+  };
+
+  window.resendSupportLetter = function(idx){
+    var letters = JSON.parse(localStorage.getItem('support_letters') || '[]');
+    var item = letters[idx];
+    if(!item) return;
+    letters.push({title: item.title, desc: item.desc, file: item.file, date: new Date().toLocaleString('ar-SA'), status: 'تمت إعادة الإرسال'});
+    localStorage.setItem('support_letters', JSON.stringify(letters));
+    renderSentSupportList();
+    say('تم إرسال الرسالة');
+  };
+
+  window.loginSupervisor = function(){
+    var pinEl = byId('supervisorPin');
+    var roleEl = byId('supervisorRole');
+    var pin = pinEl ? String(pinEl.value || '').trim() : '';
+    var role = roleEl ? String(roleEl.value || '') : '';
+    var ok = false;
+    if(pin === '1234') ok = true;
+    if((role.indexOf('مدير') !== -1 || role.indexOf('مديرة') !== -1) && pin === '1111') ok = true;
+    if((role.indexOf('مشرف') !== -1 || role.indexOf('مشرفة') !== -1) && pin === '2222') ok = true;
+    if(!ok){ say('الرقم السري غير صحيح'); return; }
+
+    var overlay = byId('supervisorOverlay');
+    var login = byId('supervisorLoginCard');
+    var content = byId('supervisorContent');
+    if(overlay) overlay.classList.add('show');
+    if(login) login.classList.add('hide');
+    if(content) content.classList.remove('hide');
+
+    try{
+      if(typeof window.renderSupervisorReports === 'function'){ window.renderSupervisorReports(); }
+    }catch(e){}
+    say('تم الدخول إلى لوحة الإشراف');
+  };
+
+  function bindSupportButtons(){
+    document.querySelectorAll('button').forEach(function(btn){
+      var txt = String(btn.textContent || '').trim();
+      if(txt === 'إرسال للدعم الفني'){
+        btn.onclick = function(e){ if(e) e.preventDefault(); window.sendMiniSupport(); };
+      }
+      if(txt === 'إرسال الخطاب'){
+        btn.onclick = function(e){ if(e) e.preventDefault(); window.sendMiniSupportLetter(); };
+      }
+    });
+  }
+
+  function enhanceSupportTab(){
+    var supportTab = byId('miniSettingsSubtab-support');
+    if(!supportTab) return;
+    if(!byId('miniSupportLetterDesc') && byId('miniSupportLetterTitle')){
+      var titleField = byId('miniSupportLetterTitle').closest('.field');
+      if(titleField){
+        var wrap = document.createElement('div');
+        wrap.className = 'field';
+        wrap.style.marginTop = '10px';
+        wrap.innerHTML = '<label>وصف الخطاب</label><textarea id="miniSupportLetterDesc" class="textarea" placeholder="اكتبي وصفًا مختصرًا للخطاب"></textarea>';
+        titleField.parentNode.insertBefore(wrap, titleField.nextSibling);
+      }
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    bindSupervisorEntry();
+    bindSupportButtons();
+    enhanceSupportTab();
+    renderSentSupportList();
+  });
+
+  setTimeout(function(){
+    bindSupervisorEntry();
+    bindSupportButtons();
+    enhanceSupportTab();
+    renderSentSupportList();
+  }, 700);
+
+})();
+</script>
+
+</body></html>');
       w.document.close();
     };
   }
@@ -4467,6 +5979,222 @@ function logoutTeacher(){
 })();
 </script>
 
+
+
+<script id="final-support-supervisor-patch">
+(function(){
+  function byId(id){ return document.getElementById(id); }
+  function say(msg){
+    try{
+      if(window.app && typeof window.app.toast === 'function'){ window.app.toast(msg); return; }
+    }catch(e){}
+    alert(msg);
+  }
+
+  function bindSupervisorEntry(){
+    var btn = byId('jumpToTeacherBtn');
+    if(btn){
+      btn.onclick = function(e){
+        if(e) e.preventDefault();
+        var overlay = byId('supervisorOverlay');
+        var login = byId('supervisorLoginCard');
+        var content = byId('supervisorContent');
+        if(overlay) overlay.classList.add('show');
+        if(login) login.classList.remove('hide');
+        if(content) content.classList.add('hide');
+      };
+    }
+  }
+
+  function renderSentSupportList(){
+    var box = byId('miniSentSupportList');
+    if(!box) return;
+    var msgs = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    var letters = JSON.parse(localStorage.getItem('support_letters') || '[]');
+    var rows = [];
+
+    msgs.forEach(function(item, idx){
+      rows.push(
+        '<div class="mini-page-row" style="display:block">' +
+          '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center">' +
+            '<span>رسالة دعم فني</span>' +
+            '<strong>' + (item.date || '—') + '</strong>' +
+          '</div>' +
+          '<div class="tiny" style="margin-top:6px">' + (item.message || '') + '</div>' +
+          '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">' +
+            '<button class="small-btn" onclick="window.editSupportMessage(' + idx + ')">تعديل</button>' +
+            '<button class="small-btn" onclick="window.resendSupportMessage(' + idx + ')">إرسال مرة أخرى</button>' +
+          '</div>' +
+        '</div>'
+      );
+    });
+
+    letters.forEach(function(item, idx){
+      rows.push(
+        '<div class="mini-page-row" style="display:block">' +
+          '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center">' +
+            '<span>خطاب دعم فني</span>' +
+            '<strong>' + (item.date || '—') + '</strong>' +
+          '</div>' +
+          '<div class="tiny" style="margin-top:6px">العنوان: ' + (item.title || '') + '</div>' +
+          '<div class="tiny" style="margin-top:4px">الوصف: ' + (item.desc || '') + '</div>' +
+          '<div class="tiny" style="margin-top:4px">الملف: ' + (item.file || 'بدون ملف') + '</div>' +
+          '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">' +
+            '<button class="small-btn" onclick="window.editSupportLetter(' + idx + ')">تعديل</button>' +
+            '<button class="small-btn" onclick="window.resendSupportLetter(' + idx + ')">إرسال مرة أخرى</button>' +
+          '</div>' +
+        '</div>'
+      );
+    });
+
+    box.innerHTML = rows.length ? rows.join('') : '<div class="mini-page-row"><span>لا توجد رسائل مرسلة للدعم الفني</span><strong>—</strong></div>';
+  }
+
+  window.sendMiniSupport = function(){
+    var field = byId('miniSupportMessage');
+    var msg = field ? String(field.value || '').trim() : '';
+    if(!msg){ say('اكتبي رسالة الدعم الفني أولًا'); return; }
+    var msgs = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    msgs.push({message: msg, date: new Date().toLocaleString('ar-SA'), status: 'مرسلة بنجاح'});
+    localStorage.setItem('support_messages', JSON.stringify(msgs));
+    if(field) field.value = '';
+    renderSentSupportList();
+    say('تم إرسال الرسالة');
+  };
+
+  window.sendMiniSupportLetter = function(){
+    var titleEl = byId('miniSupportLetterTitle');
+    var descEl = byId('miniSupportLetterDesc');
+    var title = titleEl ? String(titleEl.value || '').trim() : '';
+    var desc = descEl ? String(descEl.value || '').trim() : '';
+    var fileName = byId('miniSelectedFileName') ? String(byId('miniSelectedFileName').textContent || '').trim() : '';
+    if(!title){ say('اكتبي عنوان الخطاب أولًا'); return; }
+    var letters = JSON.parse(localStorage.getItem('support_letters') || '[]');
+    letters.push({title: title, desc: desc, file: fileName, date: new Date().toLocaleString('ar-SA'), status: 'مرسلة بنجاح'});
+    localStorage.setItem('support_letters', JSON.stringify(letters));
+    if(titleEl) titleEl.value = '';
+    if(descEl) descEl.value = '';
+    if(byId('miniSelectedFileName')) byId('miniSelectedFileName').textContent = 'لم يتم تحديد أي ملف';
+    renderSentSupportList();
+    say('تم إرسال الرسالة');
+  };
+
+  window.editSupportMessage = function(idx){
+    var msgs = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    var item = msgs[idx];
+    if(!item) return;
+    var field = byId('miniSupportMessage');
+    if(field) field.value = item.message || '';
+    if(typeof window.openMiniSettingsSubtab === 'function'){
+      var btn = document.querySelector('#miniSettingsSubtabs button:nth-child(2)');
+      window.openMiniSettingsSubtab('support', btn);
+    }
+    say('تم تحميل الرسالة للتعديل');
+  };
+
+  window.resendSupportMessage = function(idx){
+    var msgs = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    var item = msgs[idx];
+    if(!item) return;
+    msgs.push({message: item.message, date: new Date().toLocaleString('ar-SA'), status: 'تمت إعادة الإرسال'});
+    localStorage.setItem('support_messages', JSON.stringify(msgs));
+    renderSentSupportList();
+    say('تم إرسال الرسالة');
+  };
+
+  window.editSupportLetter = function(idx){
+    var letters = JSON.parse(localStorage.getItem('support_letters') || '[]');
+    var item = letters[idx];
+    if(!item) return;
+    var titleEl = byId('miniSupportLetterTitle');
+    var descEl = byId('miniSupportLetterDesc');
+    if(titleEl) titleEl.value = item.title || '';
+    if(descEl) descEl.value = item.desc || '';
+    if(byId('miniSelectedFileName')) byId('miniSelectedFileName').textContent = item.file || 'لم يتم تحديد أي ملف';
+    if(typeof window.openMiniSettingsSubtab === 'function'){
+      var btn = document.querySelector('#miniSettingsSubtabs button:nth-child(2)');
+      window.openMiniSettingsSubtab('support', btn);
+    }
+    say('تم تحميل الخطاب للتعديل');
+  };
+
+  window.resendSupportLetter = function(idx){
+    var letters = JSON.parse(localStorage.getItem('support_letters') || '[]');
+    var item = letters[idx];
+    if(!item) return;
+    letters.push({title: item.title, desc: item.desc, file: item.file, date: new Date().toLocaleString('ar-SA'), status: 'تمت إعادة الإرسال'});
+    localStorage.setItem('support_letters', JSON.stringify(letters));
+    renderSentSupportList();
+    say('تم إرسال الرسالة');
+  };
+
+  window.loginSupervisor = function(){
+    var pinEl = byId('supervisorPin');
+    var roleEl = byId('supervisorRole');
+    var pin = pinEl ? String(pinEl.value || '').trim() : '';
+    var role = roleEl ? String(roleEl.value || '') : '';
+    var ok = false;
+    if(pin === '1234') ok = true;
+    if((role.indexOf('مدير') !== -1 || role.indexOf('مديرة') !== -1) && pin === '1111') ok = true;
+    if((role.indexOf('مشرف') !== -1 || role.indexOf('مشرفة') !== -1) && pin === '2222') ok = true;
+    if(!ok){ say('الرقم السري غير صحيح'); return; }
+
+    var overlay = byId('supervisorOverlay');
+    var login = byId('supervisorLoginCard');
+    var content = byId('supervisorContent');
+    if(overlay) overlay.classList.add('show');
+    if(login) login.classList.add('hide');
+    if(content) content.classList.remove('hide');
+
+    try{
+      if(typeof window.renderSupervisorReports === 'function'){ window.renderSupervisorReports(); }
+    }catch(e){}
+    say('تم الدخول إلى لوحة الإشراف');
+  };
+
+  function bindSupportButtons(){
+    document.querySelectorAll('button').forEach(function(btn){
+      var txt = String(btn.textContent || '').trim();
+      if(txt === 'إرسال للدعم الفني'){
+        btn.onclick = function(e){ if(e) e.preventDefault(); window.sendMiniSupport(); };
+      }
+      if(txt === 'إرسال الخطاب'){
+        btn.onclick = function(e){ if(e) e.preventDefault(); window.sendMiniSupportLetter(); };
+      }
+    });
+  }
+
+  function enhanceSupportTab(){
+    var supportTab = byId('miniSettingsSubtab-support');
+    if(!supportTab) return;
+    if(!byId('miniSupportLetterDesc') && byId('miniSupportLetterTitle')){
+      var titleField = byId('miniSupportLetterTitle').closest('.field');
+      if(titleField){
+        var wrap = document.createElement('div');
+        wrap.className = 'field';
+        wrap.style.marginTop = '10px';
+        wrap.innerHTML = '<label>وصف الخطاب</label><textarea id="miniSupportLetterDesc" class="textarea" placeholder="اكتبي وصفًا مختصرًا للخطاب"></textarea>';
+        titleField.parentNode.insertBefore(wrap, titleField.nextSibling);
+      }
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    bindSupervisorEntry();
+    bindSupportButtons();
+    enhanceSupportTab();
+    renderSentSupportList();
+  });
+
+  setTimeout(function(){
+    bindSupervisorEntry();
+    bindSupportButtons();
+    enhanceSupportTab();
+    renderSentSupportList();
+  }, 700);
+
+})();
+</script>
 
 </body>
 </html>
