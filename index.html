@@ -1706,7 +1706,7 @@
     };
 
     window.app.init();
-  
+</script>
 <script>
 (function(){
   const USER_KEY = 'masraf_teacher_username';
@@ -1803,6 +1803,62 @@
     }
     setTeacherAuth(localStorage.getItem(AUTH_KEY) === '1');
   });
+})();
+</script>
+<script>
+(function(){
+  function $(id){ return document.getElementById(id); }
+  function cleanBottomCode(){
+    var patterns=[/window\.loginSupervisor/,/FIX LOGIN/,/function byId\(id\)/,/<scr'\+'ipt>/,/support_messages/,/support_letters/];
+    try{
+      Array.from(document.body.childNodes).forEach(function(n){
+        if(n.nodeType===3){
+          var t=(n.textContent||'').trim();
+          if(t && patterns.some(function(p){ return p.test(t); })) n.remove();
+        }
+      });
+      Array.from(document.querySelectorAll('body *')).forEach(function(el){
+        if(['SCRIPT','STYLE'].includes(el.tagName)) return;
+        var t=(el.textContent||'').trim();
+        if(t.length>120 && patterns.some(function(p){ return p.test(t); })){
+          el.remove();
+        }
+      });
+    }catch(e){}
+  }
+  function bindTeacherLogin(){
+    var USER_KEY='masraf_teacher_username';
+    var PASS_KEY='masraf_teacher_password';
+    var AUTH_KEY='masraf_teacher_auth';
+    if(!localStorage.getItem(USER_KEY)) localStorage.setItem(USER_KEY,'teacher');
+    if(!localStorage.getItem(PASS_KEY)) localStorage.setItem(PASS_KEY,'1234');
+
+    window.teacherLogin=function(){
+      var u=( $('teacherUsernameInput') && $('teacherUsernameInput').value || '' ).trim();
+      var p=( $('teacherPasswordInput') && $('teacherPasswordInput').value || '' ).trim();
+      var su=localStorage.getItem(USER_KEY)||'teacher';
+      var sp=localStorage.getItem(PASS_KEY)||'1234';
+      var err=$('teacherLoginError');
+      if(u===su && p===sp){
+        if(err) err.style.display='none';
+        localStorage.setItem(AUTH_KEY,'1');
+        if($('teacherLoginGate')) $('teacherLoginGate').style.display='none';
+        var page=document.querySelector('.page');
+        if(page) page.style.visibility='visible';
+      }else{
+        if(err) err.style.display='block';
+      }
+    };
+
+    var form=document.querySelector('#teacherLoginGate form');
+    if(form){
+      form.addEventListener('submit', function(e){ e.preventDefault(); window.teacherLogin(); });
+    }
+    var page=document.querySelector('.page');
+    if(page) page.style.visibility=(localStorage.getItem(AUTH_KEY)==='1'?'visible':'hidden');
+    if(localStorage.getItem(AUTH_KEY)==='1' && $('teacherLoginGate')) $('teacherLoginGate').style.display='none';
+  }
+  document.addEventListener('DOMContentLoaded', function(){ bindTeacherLogin(); cleanBottomCode(); setTimeout(cleanBottomCode,300); setTimeout(cleanBottomCode,1200); });
 })();
 </script>
 <div class="pass-modal" id="resetPassModal">
