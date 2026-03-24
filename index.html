@@ -4015,6 +4015,10 @@ function logoutTeacher(){
               </select>
             </div>
           </div>
+          <div class="field" style="margin-top:12px">
+            <label>بحث سريع داخل الجدول</label>
+            <input id="miniScheduleSearch" class="input" placeholder="ابحثي عن صف / مادة / ملاحظة" oninput="filterMiniSchedule()">
+          </div>
           <div style="overflow:auto;margin-top:14px">
             <table class="statement-full-table" style="min-width:900px">
               <thead>
@@ -4024,17 +4028,17 @@ function logoutTeacher(){
                 </tr>
               </thead>
               <tbody>
-                <tr><th>الأحد</th><td><input placeholder="الصف / المادة"></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td></tr>
-                <tr><th>الاثنين</th><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td></tr>
-                <tr><th>الثلاثاء</th><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td></tr>
-                <tr><th>الأربعاء</th><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td></tr>
-                <tr><th>الخميس</th><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td></tr>
+                <tr><th>الأحد</th><td><input class="mini-schedule-input input" placeholder="الصف / المادة"></td><td><input class="mini-schedule-input input"></td><td><input class="mini-schedule-input input"></td><td><input class="mini-schedule-input input"></td><td><input class="mini-schedule-input input"></td><td><input class="mini-schedule-input input"></td><td><input class="mini-schedule-input input"></td><td><input class="mini-schedule-input input"></td></tr>
+                <tr><th>الاثنين</th><td><input class="mini-schedule-input input"></td><td><input class="mini-schedule-input input"></td><td><input class="mini-schedule-input input"></td><td><input class="mini-schedule-input input"></td><td><input class="mini-schedule-input input"></td><td><input class="mini-schedule-input input"></td><td><input class="mini-schedule-input input"></td><td><input class="mini-schedule-input input"></td></tr>
+                <tr><th>الثلاثاء</th><td><input class="mini-schedule-input input"></td><td><input class="mini-schedule-input input"></td><td><input class="mini-schedule-input input"></td><td><input class="mini-schedule-input input"></td><td><input class="mini-schedule-input input"></td><td><input class="mini-schedule-input input"></td><td><input class="mini-schedule-input input"></td><td><input class="mini-schedule-input input"></td></tr>
+                <tr><th>الأربعاء</th><td><input class="mini-schedule-input input"></td><td><input class="mini-schedule-input input"></td><td><input class="mini-schedule-input input"></td><td><input class="mini-schedule-input input"></td><td><input class="mini-schedule-input input"></td><td><input class="mini-schedule-input input"></td><td><input class="mini-schedule-input input"></td><td><input class="mini-schedule-input input"></td></tr>
+                <tr><th>الخميس</th><td><input class="mini-schedule-input input"></td><td><input class="mini-schedule-input input"></td><td><input class="mini-schedule-input input"></td><td><input class="mini-schedule-input input"></td><td><input class="mini-schedule-input input"></td><td><input class="mini-schedule-input input"></td><td><input class="mini-schedule-input input"></td><td><input class="mini-schedule-input input"></td></tr>
               </tbody>
             </table>
           </div>
           <div class="actions-row" style="margin-top:12px">
-            <button class="btn primary">حفظ الجدول المدرسي للفصل المحدد</button>
-            <button class="btn secondary">تفريغ الجدول</button>
+            <button class="btn primary" onclick="saveMiniSchedule()">حفظ الجدول المدرسي للفصل المحدد</button>
+            <button class="btn secondary" onclick="clearMiniSchedule()">تفريغ الجدول</button>
           </div>
           <div class="note-box" style="margin-top:12px">يتم حفظ جدول مستقل لكل فصل حسب الصف والعام الدراسي الذي يتم اختيارهما في الأعلى.</div>
         </div>
@@ -4113,15 +4117,15 @@ function logoutTeacher(){
         <div class="mini-page-card">
           <h4 style="margin:0 0 10px">أوزان النقاط</h4>
           <div class="grid-3">
-            <div class="field"><label>الواجب الأسبوعي</label><input class="input" value="10"></div>
-            <div class="field"><label>الواجب الشهري</label><input class="input" value="25"></div>
-            <div class="field"><label>المشاركة الأسبوعية</label><input class="input" value="5"></div>
-            <div class="field"><label>المشاركة الشهرية</label><input class="input" value="8"></div>
-            <div class="field"><label>التفكير العليا</label><input class="input" value="12"></div>
-            <div class="field"><label>الإثرائية</label><input class="input" value="7"></div>
+            <div class="field"><label>الواجب الأسبوعي</label><input id="miniWeightWeeklyHw" class="input" value="10"></div>
+            <div class="field"><label>الواجب الشهري</label><input id="miniWeightMonthlyHw" class="input" value="25"></div>
+            <div class="field"><label>المشاركة الأسبوعية</label><input id="miniWeightWeeklyPart" class="input" value="5"></div>
+            <div class="field"><label>المشاركة الشهرية</label><input id="miniWeightMonthlyPart" class="input" value="8"></div>
+            <div class="field"><label>التفكير العليا</label><input id="miniWeightHigher" class="input" value="12"></div>
+            <div class="field"><label>الإثرائية</label><input id="miniWeightEnrich" class="input" value="7"></div>
           </div>
           <div class="actions-row" style="margin-top:12px">
-            <button class="btn primary">حفظ أوزان النقاط</button>
+            <button class="btn primary" onclick="saveMiniWeights()">حفظ أوزان النقاط</button>
           </div>
           <div class="mini-page-stat" style="margin-top:12px;background:linear-gradient(135deg,var(--green-2),var(--green));color:#fff">
             <div class="tiny" style="color:#eaf7ef">مجموع نقاط الطالب المحدد</div>
@@ -4141,13 +4145,13 @@ function logoutTeacher(){
       <div class="mini-page-card">
         <h4 style="margin:0 0 10px">بيانات أولياء الأمور</h4>
         <div class="grid-2">
-          <div class="field"><label>اسم الطالب / الطالبة</label><input class="input" placeholder="اسم الطالب / الطالبة"></div>
-          <div class="field"><label>اسم ولي الأمر</label><input class="input" placeholder="اسم ولي الأمر"></div>
-          <div class="field"><label>الصف</label><input class="input" placeholder="الصف"></div>
-          <div class="field"><label>رقم ولي الأمر</label><input class="input" placeholder="رقم ولي الأمر"></div>
+          <div class="field"><label>اسم الطالب / الطالبة</label><input id="miniGuardianStudent" class="input" placeholder="اسم الطالب / الطالبة"></div>
+          <div class="field"><label>اسم ولي الأمر</label><input id="miniGuardianParent" class="input" placeholder="اسم ولي الأمر"></div>
+          <div class="field"><label>الصف</label><input id="miniGuardianClass" class="input" placeholder="الصف"></div>
+          <div class="field"><label>رقم ولي الأمر</label><input id="miniGuardianPhone" class="input" placeholder="رقم ولي الأمر"></div>
         </div>
         <div class="actions-row" style="margin-top:12px">
-          <button class="btn primary">حفظ بيانات ولي الأمر</button>
+          <button class="btn primary" onclick="saveMiniGuardian()">حفظ بيانات ولي الأمر</button>
         </div>
       </div>
       <div class="mini-page-card">
@@ -4207,21 +4211,25 @@ function logoutTeacher(){
       <div id="miniSettingsSubtab-support" class="hide">
         <div class="mini-page-card" style="margin-top:0">
           <h4 style="margin:0 0 10px">الدعم الفني</h4>
-          <div class="grid-2">
-            <div class="field"><label>نوع الطلب</label><select class="select"><option>استفسار</option><option>مشكلة تقنية</option><option>طلب تطوير</option><option>بلاغ عاجل</option></select></div>
-            <div class="field"><label>أولوية الطلب</label><select class="select"><option>عادية</option><option>مرتفعة</option><option>عاجلة</option></select></div>
+          <div class="note-box" style="margin-bottom:12px">
+            <div><strong>رقم الدعم الفني:</strong> 0500000000</div>
+            <div style="margin-top:6px"><strong>البريد الإلكتروني:</strong> support@edu-bank.sa</div>
           </div>
-          <div class="field" style="margin-top:10px"><label>رسالة الدعم الفني</label><textarea class="textarea" placeholder="اكتبي وصف المشكلة أو الطلب بشكل واضح"></textarea></div>
-          <div class="actions-row" style="margin-top:12px"><button class="btn primary">إرسال للدعم الفني</button></div>
+          <div class="grid-2">
+            <div class="field"><label>نوع الطلب</label><select id="miniSupportType" class="select"><option>استفسار</option><option>مشكلة تقنية</option><option>طلب تطوير</option><option>بلاغ عاجل</option></select></div>
+            <div class="field"><label>أولوية الطلب</label><select id="miniSupportPriority" class="select"><option>عادية</option><option>مرتفعة</option><option>عاجلة</option></select></div>
+          </div>
+          <div class="field" style="margin-top:10px"><label>رسالة الدعم الفني</label><textarea id="miniSupportMessage" class="textarea" placeholder="اكتبي وصف المشكلة أو الطلب بشكل واضح"></textarea></div>
+          <div class="actions-row" style="margin-top:12px"><button class="btn primary" onclick="sendMiniSupport()">إرسال للدعم الفني</button></div>
         </div>
 
         <div class="mini-page-card">
           <h4 style="margin:0 0 10px">رفع خطاب الدعم الفني</h4>
           <div class="grid-2">
-            <div class="field"><label>العميل المناسب</label><select class="select"><option>اختر العميل</option><option>ولي أمر طالب / طالبة</option><option>طالب / طالبة</option><option>معلم / معلمة</option><option>إدارة المدرسة</option><option>الدعم الفني</option><option>عميل آخر</option></select></div>
-            <div class="field"><label>عنوان الخطاب</label><input class="input" placeholder="مثال: خطاب خلل فني - منصة المتابعة"></div>
+            <div class="field"><label>العميل المناسب</label><select id="miniLetterClient" class="select"><option>اختر العميل</option><option>ولي أمر طالب / طالبة</option><option>طالب / طالبة</option><option>معلم / معلمة</option><option>إدارة المدرسة</option><option>الدعم الفني</option><option>عميل آخر</option></select></div>
+            <div class="field"><label>عنوان الخطاب</label><input id="miniLetterTitle" class="input" placeholder="مثال: خطاب خلل فني - منصة المتابعة"></div>
           </div>
-          <div class="field" style="margin-top:10px"><label>وصف مختصر</label><textarea class="textarea" placeholder="اكتبي وصفًا مختصرًا للخطاب أو المرفق"></textarea></div>
+          <div class="field" style="margin-top:10px"><label>وصف مختصر</label><textarea id="miniLetterDesc" class="textarea" placeholder="اكتبي وصفًا مختصرًا للخطاب أو المرفق"></textarea></div>
           <div class="mini-page-grid" style="margin-top:12px">
             <label class="mini-page-row" style="cursor:pointer">مكتبة الصور <input id="miniGalleryInput" type="file" accept="image/*" style="display:none"></label>
             <label class="mini-page-row" style="cursor:pointer">التقاط صورة <input id="miniCameraInput" type="file" accept="image/*" capture="environment" style="display:none"></label>
@@ -4229,7 +4237,7 @@ function logoutTeacher(){
             <label class="mini-page-row" style="cursor:pointer">Google Drive / الملفات السحابية <input id="miniCloudInput" type="file" style="display:none"></label>
           </div>
           <div id="miniSelectedFileName" class="note-box" style="margin-top:12px">لم يتم تحديد أي ملف</div>
-          <div class="actions-row" style="margin-top:12px"><button class="btn primary">إرسال الخطاب</button></div>
+          <div class="actions-row" style="margin-top:12px"><button class="btn primary" onclick="sendMiniLetter()">إرسال الخطاب</button></div>
         </div>
       </div>
 
@@ -4405,15 +4413,114 @@ function logoutTeacher(){
     alert('تم إرسال الاستبيان');
   };
 
+  function miniScheduleKey(){
+    var cls = byId('miniScheduleClass') ? byId('miniScheduleClass').value.trim() : '';
+    var year = byId('miniScheduleYear') ? byId('miniScheduleYear').value.trim() : '';
+    if(!cls || cls === 'اختر الصف' || !year || year === 'اختر العام الدراسي'){
+      alert('اختاري الصف والعام الدراسي أولاً');
+      return null;
+    }
+    return 'mini_schedule_' + cls + '_' + year;
+  }
+
+  window.saveMiniSchedule = function(){
+    var key = miniScheduleKey();
+    if(!key) return;
+    var vals = Array.from(document.querySelectorAll('.mini-schedule-input')).map(function(i){ return i.value || ''; });
+    localStorage.setItem(key, JSON.stringify(vals));
+    alert('تم حفظ جدول الفصل المحدد');
+  };
+
+  function loadMiniSchedule(){
+    var key = miniScheduleKey();
+    if(!key) return;
+    var vals = JSON.parse(localStorage.getItem(key) || '[]');
+    document.querySelectorAll('.mini-schedule-input').forEach(function(i,idx){ i.value = vals[idx] || ''; i.closest('td').style.display=''; });
+  }
+
+  window.clearMiniSchedule = function(){
+    document.querySelectorAll('.mini-schedule-input').forEach(function(i){ i.value=''; i.closest('td').style.display=''; });
+    var key = miniScheduleKey(); if(key) localStorage.removeItem(key);
+    alert('تم تفريغ الجدول');
+  };
+
+  window.filterMiniSchedule = function(){
+    var q = (byId('miniScheduleSearch') ? byId('miniScheduleSearch').value : '').trim();
+    document.querySelectorAll('.mini-schedule-input').forEach(function(i){
+      var td = i.closest('td');
+      if(!q){ td.style.display=''; return; }
+      td.style.display = (String(i.value || '').indexOf(q) !== -1) ? '' : '';
+      i.style.background = q && String(i.value || '').indexOf(q) !== -1 ? '#fff9d9' : '#fff';
+    });
+  };
+
+  window.saveMiniWeights = function(){
+    var data = {
+      weeklyHw: byId('miniWeightWeeklyHw')?.value || '',
+      monthlyHw: byId('miniWeightMonthlyHw')?.value || '',
+      weeklyPart: byId('miniWeightWeeklyPart')?.value || '',
+      monthlyPart: byId('miniWeightMonthlyPart')?.value || '',
+      higher: byId('miniWeightHigher')?.value || '',
+      enrich: byId('miniWeightEnrich')?.value || ''
+    };
+    localStorage.setItem('mini_homework_weights', JSON.stringify(data));
+    alert('تم حفظ أوزان الواجب والنقاط');
+  };
+
+  function loadMiniWeights(){
+    var data = JSON.parse(localStorage.getItem('mini_homework_weights') || '{}');
+    if(byId('miniWeightWeeklyHw') && data.weeklyHw != null) byId('miniWeightWeeklyHw').value = data.weeklyHw;
+    if(byId('miniWeightMonthlyHw') && data.monthlyHw != null) byId('miniWeightMonthlyHw').value = data.monthlyHw;
+    if(byId('miniWeightWeeklyPart') && data.weeklyPart != null) byId('miniWeightWeeklyPart').value = data.weeklyPart;
+    if(byId('miniWeightMonthlyPart') && data.monthlyPart != null) byId('miniWeightMonthlyPart').value = data.monthlyPart;
+    if(byId('miniWeightHigher') && data.higher != null) byId('miniWeightHigher').value = data.higher;
+    if(byId('miniWeightEnrich') && data.enrich != null) byId('miniWeightEnrich').value = data.enrich;
+  }
+
+  window.saveMiniGuardian = function(){
+    var rec = {
+      student: byId('miniGuardianStudent')?.value.trim() || '',
+      parent: byId('miniGuardianParent')?.value.trim() || '',
+      cls: byId('miniGuardianClass')?.value.trim() || '',
+      phone: byId('miniGuardianPhone')?.value.trim() || ''
+    };
+    if(!rec.student || !rec.parent || !rec.phone){ alert('أكملي اسم الطالب وولي الأمر ورقم الجوال'); return; }
+    var arr = JSON.parse(localStorage.getItem('mini_guardians') || '[]');
+    arr.push(rec);
+    localStorage.setItem('mini_guardians', JSON.stringify(arr));
+    alert('تم حفظ بيانات ولي الأمر');
+  };
+
+  window.sendMiniSupport = function(){
+    var msg = (byId('miniSupportMessage')?.value || '').trim();
+    if(!msg){ alert('اكتبي رسالة الدعم الفني أولاً'); return; }
+    var arr = JSON.parse(localStorage.getItem('mini_support_requests') || '[]');
+    arr.push({type: byId('miniSupportType')?.value || '', priority: byId('miniSupportPriority')?.value || '', message: msg, createdAt: new Date().toISOString()});
+    localStorage.setItem('mini_support_requests', JSON.stringify(arr));
+    alert('تم إرسال طلب الدعم الفني');
+  };
+
+  window.sendMiniLetter = function(){
+    var client = byId('miniLetterClient')?.value || '';
+    var title = (byId('miniLetterTitle')?.value || '').trim();
+    if(!client || client === 'اختر العميل' || !title){ alert('اختاري العميل وأدخلي عنوان الخطاب'); return; }
+    var arr = JSON.parse(localStorage.getItem('mini_support_letters') || '[]');
+    arr.push({client: client, title: title, desc: byId('miniLetterDesc')?.value || '', file: byId('miniSelectedFileName')?.textContent || '', createdAt: new Date().toISOString()});
+    localStorage.setItem('mini_support_letters', JSON.stringify(arr));
+    alert('تم إرسال الخطاب');
+  };
+
   document.addEventListener('DOMContentLoaded', function(){
     setTimeout(bindMiniNav, 200);
     setTimeout(fillMiniPages, 600);
     ['miniGalleryInput','miniCameraInput','miniFileInput','miniCloudInput'].forEach(bindFileName);
+    loadMiniWeights();
     document.addEventListener('input', function(e){
       if(e.target && (e.target.id || '').startsWith('mini') || e.target.classList.contains('miniSurveyAnswer')) updateMiniSettingsCompletion();
     });
     document.addEventListener('change', function(e){
-      if(e.target && (e.target.id || '').startsWith('mini') || e.target.classList.contains('miniSurveyAnswer')) updateMiniSettingsCompletion();
+      if(e.target && ((e.target.id || '').startsWith('mini') || e.target.classList.contains('miniSurveyAnswer'))) updateMiniSettingsCompletion();
+      if(e.target && (e.target.id === 'miniScheduleClass' || e.target.id === 'miniScheduleYear')) loadMiniSchedule();
     });
   });
 
