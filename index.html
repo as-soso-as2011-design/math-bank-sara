@@ -1737,6 +1737,277 @@
           
 .vip-podium-avatar{display:none!important;}
 </style></head><body>${cards}<img src=x onerror="window.print();setTimeout(()=>window.close(),300);">
+
+<div id="supervisorLoginOverlay" class="mini-page-overlay">
+  <div class="mini-page-shell">
+    <div class="mini-page-head">
+      <button class="mini-back-btn" onclick="closeSupervisorLogin()">رجوع</button>
+      <h3 style="margin:0;color:var(--green-3)">التقييم والإشراف المدرسي</h3>
+    </div>
+    <div id="supervisorLoginCard" class="mini-page-card">
+      <div class="note-box" style="margin-bottom:12px">🔒 صلاحية عرض فقط — لا يمكن التعديل أو الحذف أو تنفيذ أي عملية داخل المصرف.</div>
+      <div class="grid-2">
+        <div class="field">
+          <label>نوع الدخول</label>
+          <select id="supervisorRole" class="select">
+            <option value="manager">مدير / مديرة</option>
+            <option value="supervisor">مشرف / مشرفة</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>الرقم السري</label>
+          <input id="supervisorPin" type="password" class="input" placeholder="أدخلي الرقم السري">
+        </div>
+      </div>
+      <div class="actions-row" style="margin-top:12px">
+        <button class="btn primary" onclick="loginSupervisor()">دخول</button>
+      </div>
+      <div class="tiny" style="margin-top:8px">الأرقام الافتراضية للتجربة: المدير/ة 1111 — المشرف/ة 2222</div>
+    </div>
+    <div id="supervisorPanel" class="mini-page-card hide">
+      <div class="note-box" style="margin-bottom:12px">🔒 وضع الإشراف — عرض وتقارير فقط</div>
+      <div class="subtabs" id="supervisorSubtabs">
+        <button class="small-btn active" onclick="openSupervisorSubtab('bank', this)">الحساب المصرفي</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('tasks', this)">المهام الأدائية</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('messages', this)">الرسائل</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('evaluation', this)">التقييم</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('certificate', this)">شهادة شكر</button><button class="small-btn" onclick="openSupervisorSubtab('homemail', this)">البريد المنزلي</button>
+      </div>
+      <div id="supervisorSubtab-bank">
+        <div id="supBankReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+      <div id="supervisorSubtab-tasks" class="hide">
+        <div id="supTasksReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+      <div id="supervisorSubtab-messages" class="hide">
+        <div id="supMessagesReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+      <div id="supervisorSubtab-evaluation" class="hide">
+        <div id="supEvaluationReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+      
+<div id="supervisorSubtab-certificate" class="hide">
+        <div class="grid-2">
+          <div class="field"><label>اسم المعلم / المعلمة</label><input id="supCertTeacher" class="input" placeholder="اسم المعلم / المعلمة"></div>
+          <div class="field"><label>المادة</label><select id="supCertSubject" class="select"><option>اختر المادة</option><option>لغتي</option><option>الرياضيات</option><option>العلوم</option><option>الدراسات الإسلامية</option><option>الدراسات الاجتماعية</option><option>اللغة الإنجليزية</option><option>التربية الفنية</option><option>التربية البدنية</option><option>المهارات الحياتية والأسرية</option><option>المهارات الرقمية</option><option>القرآن الكريم</option><option>التوحيد</option><option>الفقه</option><option>الحديث</option><option>التفسير</option><option>الحاسب</option><option>الاجتماعيات</option><option>التفكير الناقد</option><option>الكيمياء</option><option>الفيزياء</option><option>الأحياء</option><option>التاريخ</option><option>الجغرافيا</option><option>الإحصاء</option><option>الأمن السيبراني</option><option>الصحة والحياة</option><option>البيئة</option><option>التصميم الهندسي</option><option>علوم الأرض والفضاء</option><option>إدارة الأعمال</option><option>المواطنة الرقمية</option></select></div>
+          <div class="field"><label>عنوان الشهادة</label><input id="supCertTitle" class="input" placeholder="عنوان الشهادة"></div>
+          <div class="field"><label>وسيلة الإرسال</label><select id="supCertSendType" class="select"><option>واتساب</option><option>بريد إلكتروني</option></select></div>
+        </div>
+        <div class="field" style="margin-top:10px"><label>نص الشهادة</label><textarea id="supCertText" class="textarea" placeholder="اكتبي نص شهادة الشكر"></textarea></div>
+        <div class="field" style="margin-top:10px"><label>رفع شهادة شكر</label><input id="supCertFile" type="file" class="input" accept=".pdf,.jpg,.jpeg,.png"></div>
+        <div class="actions-row" style="margin-top:12px"><button class="btn primary" onclick="sendSupervisorCertificate()">إرسال الشهادة</button></div>
+      </div>
+      <div id="supervisorSubtab-homemail" class="hide">
+
+        <div class="mini-page-card" style="margin-top:12px">
+          <h4 style="margin:0 0 10px">📬 البريد المنزلي</h4>
+          <div class="note-box" style="margin-bottom:12px">يظهر هنا سجل الرسائل المرسلة إلى أولياء الأمور مع نص الرسالة كاملًا.</div>
+          <div id="supHomeMailStats" class="mini-page-grid" style="margin-bottom:12px"></div>
+          <div id="supHomeMailReport" class="mini-page-list"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script id="oai-supervisor-clean-v4">
+(function(){
+  function byId(id){ return document.getElementById(id); }
+  function toastMsg(msg){
+    try{
+      if(window.app && typeof window.app.toast === 'function'){ window.app.toast(msg); return; }
+    }catch(e){}
+    alert(msg);
+  }
+  function getApp(){
+    try{ return window.app || null; }catch(e){ return null; }
+  }
+
+  window.closeSupervisorOverlay = function(){
+    var ov = byId('supervisorOverlay');
+    if(ov) ov.classList.remove('show');
+    var login = byId('supervisorLoginCard');
+    var content = byId('supervisorContent');
+    if(login) login.classList.remove('hide');
+    if(content) content.classList.add('hide');
+    if(byId('supervisorPin')) byId('supervisorPin').value = '';
+  };
+
+  window.loginSupervisor = function(){
+    var pin = (byId('supervisorPin') && byId('supervisorPin').value || '').trim();
+    var role = (byId('supervisorRole') && byId('supervisorRole').value || '').trim();
+    var ok = (role === 'manager' && pin === '1111') || (role === 'supervisor' && pin === '2222');
+    if(!ok){ toastMsg('الرقم السري غير صحيح'); return; }
+
+    var roleLabel = role === 'manager' ? 'مدير/ة' : 'مشرف/ة';
+    var logs = JSON.parse(localStorage.getItem('supervisor_login_logs') || '[]');
+    logs.unshift({role: roleLabel, date: new Date().toLocaleString('ar-SA')});
+    localStorage.setItem('supervisor_login_logs', JSON.stringify(logs.slice(0, 30)));
+
+    var login = byId('supervisorLoginCard');
+    var content = byId('supervisorContent');
+    if(login) login.classList.add('hide');
+    if(content) content.classList.remove('hide');
+    renderSupervisorReports();
+    toastMsg('تم الدخول إلى لوحة الإشراف');
+  };
+
+  window.openSupervisorTab = function(id, btn){
+    ['bank','tasks','messages','evaluation','certificate','homemail','lastlog'].forEach(function(key){
+      var el = byId('supTab-' + key);
+      if(el) el.classList.toggle('hide', key !== id);
+    });
+    var wrap = btn && btn.parentElement;
+    if(wrap){
+      wrap.querySelectorAll('button').forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+    }
+  };
+
+  window.sendSupervisorCertificate = function(){
+    var teacher = (byId('supCertTeacher') && byId('supCertTeacher').value || '').trim();
+    var subject = (byId('supCertSubject') && byId('supCertSubject').value || '').trim();
+    var title = (byId('supCertTitle') && byId('supCertTitle').value || '').trim();
+    if(!teacher || !subject || subject === 'اختر المادة' || !title){
+      toastMsg('أكملي اسم المعلم / المعلمة والمادة وعنوان الشهادة أولًا');
+      return;
+    }
+    toastMsg('تم تجهيز إرسال شهادة الشكر');
+  };
+
+  function renderHomeMail(parents){
+    var stats = byId('supHomeMailStats');
+    var report = byId('supHomeMailReport');
+    var today = new Date().toLocaleDateString('ar-SA');
+    var todayCount = parents.filter(function(m){
+      var d = String(m.date || m.createdAt || '');
+      return d.indexOf(today) !== -1;
+    }).length;
+    var whatsappCount = parents.filter(function(m){
+      return String(m.type || '').indexOf('واتساب') !== -1;
+    }).length;
+
+    if(stats){
+      stats.innerHTML =
+        '<div class="mini-page-stat"><div class="tiny">عدد رسائل البريد المنزلي</div><strong>' + parents.length.toLocaleString('ar-SA') + '</strong></div>' +
+        '<div class="mini-page-stat"><div class="tiny">رسائل اليوم</div><strong>' + todayCount.toLocaleString('ar-SA') + '</strong></div>' +
+        '<div class="mini-page-stat"><div class="tiny">رسائل واتساب</div><strong>' + whatsappCount.toLocaleString('ar-SA') + '</strong></div>' +
+        '<div class="mini-page-stat"><div class="tiny">تاريخ التقرير</div><strong>' + today + '</strong></div>';
+    }
+
+    if(report){
+      report.innerHTML = parents.length ? parents.slice(0,30).map(function(m){
+        return '<div class="mini-page-row" style="display:block">' +
+          '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center">' +
+            '<span><strong>الطالب:</strong> ' + (m.studentName || m.student || '—') + ' | <strong>الفصل:</strong> ' + (m.className || m.classroom || '—') + '</span>' +
+            '<strong>' + (m.date || m.createdAt || '—') + '</strong>' +
+          '</div>' +
+          '<div class="tiny" style="margin-top:6px"><strong>نوع الرسالة:</strong> ' + (m.type || 'البريد المنزلي') + '</div>' +
+          '<div class="tiny" style="margin-top:4px"><strong>الحالة:</strong> ' + (m.status || 'مرسلة بنجاح') + '</div>' +
+          '<div class="tiny" style="margin-top:6px;white-space:pre-line"><strong>نص الرسالة:</strong>\n' + (m.text || m.message || '—') + '</div>' +
+        '</div>';
+      }).join('') : '<div class="mini-page-row"><span>لا توجد رسائل مرسلة إلى أولياء الأمور</span><strong>—</strong></div>';
+    }
+  }
+
+  window.renderSupervisorReports = function(){
+    var app = getApp();
+    if(!app || !app.state) return;
+
+    var classes = app.state.classes || [];
+    var students = app.state.students || [];
+    var txs = app.state.transactions || [];
+    var tasks = app.state.tasks || [];
+    var parents = Array.isArray(app.state.parentMessages) && app.state.parentMessages.length
+      ? app.state.parentMessages
+      : JSON.parse(localStorage.getItem('mini_parent_records') || '[]');
+    var logs = JSON.parse(localStorage.getItem('supervisor_login_logs') || '[]');
+
+    if(byId('supClasses')) byId('supClasses').textContent = classes.length.toLocaleString('ar-SA');
+    if(byId('supStudents')) byId('supStudents').textContent = students.length.toLocaleString('ar-SA');
+    if(byId('supTx')) byId('supTx').textContent = txs.length.toLocaleString('ar-SA');
+    if(byId('supMsg')) byId('supMsg').textContent = parents.length.toLocaleString('ar-SA');
+
+    var sel = byId('supClassFilter');
+    if(sel && !sel.dataset.filled){
+      sel.dataset.filled = '1';
+      sel.innerHTML = '<option value="">كل الفصول</option>' + classes.map(function(c){
+        return '<option value="' + (c.id || '') + '">' + (c.name || c.id || 'فصل') + '</option>';
+      }).join('');
+    }
+
+    var q = (byId('supSearch') && byId('supSearch').value || '').trim();
+    var cls = (sel && sel.value) || '';
+    var filteredTx = txs.filter(function(t){
+      var s = students.find(function(st){ return st.id === t.studentId; });
+      var okClass = !cls || (s && s.classId === cls);
+      var text = ((t.reason || '') + ' ' + (s ? s.name : '')).trim();
+      return okClass && (!q || text.indexOf(q) !== -1);
+    });
+
+    var bank = byId('supBankReport');
+    if(bank){
+      bank.innerHTML = filteredTx.length ? filteredTx.slice(0,25).map(function(t){
+        var s = students.find(function(st){ return st.id === t.studentId; });
+        return '<div class="mini-page-row"><span>' + (t.date || t.createdAt || '—') + ' | ' + (s ? s.name : 'بدون اسم') + ' | ' + (t.type || 'عملية') + ' | ' + (t.reason || 'بدون سبب') + '</span><strong>' + Number(t.amount || 0).toLocaleString('ar-SA') + '</strong></div>';
+      }).join('') : '<div class="mini-page-row"><span>لا توجد عمليات</span><strong>—</strong></div>';
+    }
+
+    var taskBox = byId('supTasksReport');
+    if(taskBox){
+      taskBox.innerHTML = tasks.length ? tasks.map(function(t){
+        return '<div class="mini-page-row"><span>' + (t.title || 'مهمة') + ' | ' + (t.className || t.classId || '—') + ' | ' + (t.date || '—') + '</span><strong>' + (t.submitted ? 'مسلّمة' : 'غير مسلّمة') + '</strong></div>';
+      }).join('') : '<div class="mini-page-row"><span>لا توجد مهام</span><strong>—</strong></div>';
+    }
+
+    var msgBox = byId('supMessagesReport');
+    if(msgBox){
+      msgBox.innerHTML = parents.length ? parents.slice(0,20).map(function(m){
+        return '<div class="mini-page-row"><span>' + (m.date || m.createdAt || '—') + ' | ' + (m.studentName || m.student || '—') + '</span><strong>' + (m.status || 'مرسلة بنجاح') + '</strong></div>';
+      }).join('') : '<div class="mini-page-row"><span>لا توجد رسائل</span><strong>—</strong></div>';
+    }
+
+    var evalBox = byId('supEvaluationReport');
+    if(evalBox){
+      var high = students.filter(function(s){ return Number(s.balance || 0) >= 5000; }).map(function(s){ return s.name; }).slice(0,6).join('، ') || '—';
+      var low = students.filter(function(s){ return Number(s.balance || 0) < 1000; }).map(function(s){ return s.name; }).slice(0,6).join('، ') || '—';
+      evalBox.innerHTML =
+        '<div class="mini-page-row"><span>طلاب متميزون</span><strong>' + high + '</strong></div>' +
+        '<div class="mini-page-row"><span>طلاب منخفضون</span><strong>' + low + '</strong></div>' +
+        '<div class="mini-page-row"><span>تاريخ التقرير</span><strong>' + new Date().toLocaleDateString('ar-SA') + '</strong></div>';
+    }
+
+    renderHomeMail(parents);
+
+    var logBox = byId('supLastLoginReport');
+    if(logBox){
+      logBox.innerHTML = logs.length ? logs.map(function(item){
+        return '<div class="mini-page-row"><span>' + item.role + '</span><strong>' + item.date + '</strong></div>';
+      }).join('') : '<div class="mini-page-row"><span>لا توجد سجلات دخول حتى الآن</span><strong>—</strong></div>';
+    }
+  };
+
+  function bindSupervisorEntry(){
+    var btn = byId('jumpToTeacherBtn');
+    if(btn){
+      btn.onclick = function(e){
+        if(e) e.preventDefault();
+        var ov = byId('supervisorOverlay');
+        if(ov) ov.classList.add('show');
+      };
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    bindSupervisorEntry();
+    setTimeout(function(){
+      if(typeof window.renderSupervisorReports === 'function'){ window.renderSupervisorReports(); }
+    }, 500);
+  });
+  setTimeout(bindSupervisorEntry, 800);
+})();
+</script>
+
 </body></html>
         `);
         w.document.close();
@@ -2437,6 +2708,267 @@ function logoutTeacher(){
           </table>
           <img src=x onerror="window.print()">
         
+
+<div id="supervisorLoginOverlay" class="mini-page-overlay">
+  <div class="mini-page-shell">
+    <div class="mini-page-head">
+      <button class="mini-back-btn" onclick="closeSupervisorLogin()">رجوع</button>
+      <h3 style="margin:0;color:var(--green-3)">التقييم والإشراف المدرسي</h3>
+    </div>
+    <div id="supervisorLoginCard" class="mini-page-card">
+      <div class="note-box" style="margin-bottom:12px">🔒 صلاحية عرض فقط — لا يمكن التعديل أو الحذف أو تنفيذ أي عملية داخل المصرف.</div>
+      <div class="grid-2">
+        <div class="field">
+          <label>نوع الدخول</label>
+          <select id="supervisorRole" class="select">
+            <option value="manager">مدير / مديرة</option>
+            <option value="supervisor">مشرف / مشرفة</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>الرقم السري</label>
+          <input id="supervisorPin" type="password" class="input" placeholder="أدخلي الرقم السري">
+        </div>
+      </div>
+      <div class="actions-row" style="margin-top:12px">
+        <button class="btn primary" onclick="loginSupervisor()">دخول</button>
+      </div>
+      <div class="tiny" style="margin-top:8px">الأرقام الافتراضية للتجربة: المدير/ة 1111 — المشرف/ة 2222</div>
+    </div>
+    <div id="supervisorPanel" class="mini-page-card hide">
+      <div class="note-box" style="margin-bottom:12px">🔒 وضع الإشراف — عرض وتقارير فقط</div>
+      <div class="subtabs" id="supervisorSubtabs">
+        <button class="small-btn active" onclick="openSupervisorSubtab('bank', this)">الحساب المصرفي</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('tasks', this)">المهام الأدائية</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('messages', this)">الرسائل</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('evaluation', this)">التقييم</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('certificate', this)">شهادة شكر</button><button class="small-btn" onclick="openSupervisorSubtab('homemail', this)">البريد المنزلي</button>
+      </div>
+      <div id="supervisorSubtab-bank">
+        <div id="supBankReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+      <div id="supervisorSubtab-tasks" class="hide">
+        <div id="supTasksReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+      <div id="supervisorSubtab-messages" class="hide">
+        <div id="supMessagesReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+      <div id="supervisorSubtab-evaluation" class="hide">
+        <div id="supEvaluationReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+      <div id="supervisorSubtab-certificate" class="hide">
+        <div class="grid-2">
+          <div class="field"><label>اسم الطالب / الطالبة</label><input id="supCertStudent" class="input" placeholder="اسم الطالب / الطالبة"></div>
+          <div class="field"><label>الفصل</label><input id="supCertClass" class="input" placeholder="الفصل"></div>
+          <div class="field"><label>عنوان الشهادة</label><input id="supCertTitle" class="input" placeholder="عنوان الشهادة"></div>
+          <div class="field"><label>وسيلة الإرسال</label><select id="supCertSendType" class="select"><option>واتساب</option><option>بريد إلكتروني</option></select></div>
+        </div>
+        <div class="field" style="margin-top:10px"><label>نص الشهادة</label><textarea id="supCertText" class="textarea" placeholder="اكتبي نص شهادة الشكر"></textarea></div>
+        <div class="field" style="margin-top:10px"><label>رفع شهادة شكر</label><input id="supCertFile" type="file" class="input" accept=".pdf,.jpg,.jpeg,.png"></div>
+        <div class="actions-row" style="margin-top:12px"><button class="btn primary" onclick="sendSupervisorCertificate()">إرسال الشهادة</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script id="oai-supervisor-clean-v4">
+(function(){
+  function byId(id){ return document.getElementById(id); }
+  function toastMsg(msg){
+    try{
+      if(window.app && typeof window.app.toast === 'function'){ window.app.toast(msg); return; }
+    }catch(e){}
+    alert(msg);
+  }
+  function getApp(){
+    try{ return window.app || null; }catch(e){ return null; }
+  }
+
+  window.closeSupervisorOverlay = function(){
+    var ov = byId('supervisorOverlay');
+    if(ov) ov.classList.remove('show');
+    var login = byId('supervisorLoginCard');
+    var content = byId('supervisorContent');
+    if(login) login.classList.remove('hide');
+    if(content) content.classList.add('hide');
+    if(byId('supervisorPin')) byId('supervisorPin').value = '';
+  };
+
+  window.loginSupervisor = function(){
+    var pin = (byId('supervisorPin') && byId('supervisorPin').value || '').trim();
+    var role = (byId('supervisorRole') && byId('supervisorRole').value || '').trim();
+    var ok = (role === 'manager' && pin === '1111') || (role === 'supervisor' && pin === '2222');
+    if(!ok){ toastMsg('الرقم السري غير صحيح'); return; }
+
+    var roleLabel = role === 'manager' ? 'مدير/ة' : 'مشرف/ة';
+    var logs = JSON.parse(localStorage.getItem('supervisor_login_logs') || '[]');
+    logs.unshift({role: roleLabel, date: new Date().toLocaleString('ar-SA')});
+    localStorage.setItem('supervisor_login_logs', JSON.stringify(logs.slice(0, 30)));
+
+    var login = byId('supervisorLoginCard');
+    var content = byId('supervisorContent');
+    if(login) login.classList.add('hide');
+    if(content) content.classList.remove('hide');
+    renderSupervisorReports();
+    toastMsg('تم الدخول إلى لوحة الإشراف');
+  };
+
+  window.openSupervisorTab = function(id, btn){
+    ['bank','tasks','messages','evaluation','certificate','homemail','lastlog'].forEach(function(key){
+      var el = byId('supTab-' + key);
+      if(el) el.classList.toggle('hide', key !== id);
+    });
+    var wrap = btn && btn.parentElement;
+    if(wrap){
+      wrap.querySelectorAll('button').forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+    }
+  };
+
+  window.sendSupervisorCertificate = function(){
+    var teacher = (byId('supCertTeacher') && byId('supCertTeacher').value || '').trim();
+    var subject = (byId('supCertSubject') && byId('supCertSubject').value || '').trim();
+    var title = (byId('supCertTitle') && byId('supCertTitle').value || '').trim();
+    if(!teacher || !subject || subject === 'اختر المادة' || !title){
+      toastMsg('أكملي اسم المعلم / المعلمة والمادة وعنوان الشهادة أولًا');
+      return;
+    }
+    toastMsg('تم تجهيز إرسال شهادة الشكر');
+  };
+
+  function renderHomeMail(parents){
+    var stats = byId('supHomeMailStats');
+    var report = byId('supHomeMailReport');
+    var today = new Date().toLocaleDateString('ar-SA');
+    var todayCount = parents.filter(function(m){
+      var d = String(m.date || m.createdAt || '');
+      return d.indexOf(today) !== -1;
+    }).length;
+    var whatsappCount = parents.filter(function(m){
+      return String(m.type || '').indexOf('واتساب') !== -1;
+    }).length;
+
+    if(stats){
+      stats.innerHTML =
+        '<div class="mini-page-stat"><div class="tiny">عدد رسائل البريد المنزلي</div><strong>' + parents.length.toLocaleString('ar-SA') + '</strong></div>' +
+        '<div class="mini-page-stat"><div class="tiny">رسائل اليوم</div><strong>' + todayCount.toLocaleString('ar-SA') + '</strong></div>' +
+        '<div class="mini-page-stat"><div class="tiny">رسائل واتساب</div><strong>' + whatsappCount.toLocaleString('ar-SA') + '</strong></div>' +
+        '<div class="mini-page-stat"><div class="tiny">تاريخ التقرير</div><strong>' + today + '</strong></div>';
+    }
+
+    if(report){
+      report.innerHTML = parents.length ? parents.slice(0,30).map(function(m){
+        return '<div class="mini-page-row" style="display:block">' +
+          '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center">' +
+            '<span><strong>الطالب:</strong> ' + (m.studentName || m.student || '—') + ' | <strong>الفصل:</strong> ' + (m.className || m.classroom || '—') + '</span>' +
+            '<strong>' + (m.date || m.createdAt || '—') + '</strong>' +
+          '</div>' +
+          '<div class="tiny" style="margin-top:6px"><strong>نوع الرسالة:</strong> ' + (m.type || 'البريد المنزلي') + '</div>' +
+          '<div class="tiny" style="margin-top:4px"><strong>الحالة:</strong> ' + (m.status || 'مرسلة بنجاح') + '</div>' +
+          '<div class="tiny" style="margin-top:6px;white-space:pre-line"><strong>نص الرسالة:</strong>\n' + (m.text || m.message || '—') + '</div>' +
+        '</div>';
+      }).join('') : '<div class="mini-page-row"><span>لا توجد رسائل مرسلة إلى أولياء الأمور</span><strong>—</strong></div>';
+    }
+  }
+
+  window.renderSupervisorReports = function(){
+    var app = getApp();
+    if(!app || !app.state) return;
+
+    var classes = app.state.classes || [];
+    var students = app.state.students || [];
+    var txs = app.state.transactions || [];
+    var tasks = app.state.tasks || [];
+    var parents = Array.isArray(app.state.parentMessages) && app.state.parentMessages.length
+      ? app.state.parentMessages
+      : JSON.parse(localStorage.getItem('mini_parent_records') || '[]');
+    var logs = JSON.parse(localStorage.getItem('supervisor_login_logs') || '[]');
+
+    if(byId('supClasses')) byId('supClasses').textContent = classes.length.toLocaleString('ar-SA');
+    if(byId('supStudents')) byId('supStudents').textContent = students.length.toLocaleString('ar-SA');
+    if(byId('supTx')) byId('supTx').textContent = txs.length.toLocaleString('ar-SA');
+    if(byId('supMsg')) byId('supMsg').textContent = parents.length.toLocaleString('ar-SA');
+
+    var sel = byId('supClassFilter');
+    if(sel && !sel.dataset.filled){
+      sel.dataset.filled = '1';
+      sel.innerHTML = '<option value="">كل الفصول</option>' + classes.map(function(c){
+        return '<option value="' + (c.id || '') + '">' + (c.name || c.id || 'فصل') + '</option>';
+      }).join('');
+    }
+
+    var q = (byId('supSearch') && byId('supSearch').value || '').trim();
+    var cls = (sel && sel.value) || '';
+    var filteredTx = txs.filter(function(t){
+      var s = students.find(function(st){ return st.id === t.studentId; });
+      var okClass = !cls || (s && s.classId === cls);
+      var text = ((t.reason || '') + ' ' + (s ? s.name : '')).trim();
+      return okClass && (!q || text.indexOf(q) !== -1);
+    });
+
+    var bank = byId('supBankReport');
+    if(bank){
+      bank.innerHTML = filteredTx.length ? filteredTx.slice(0,25).map(function(t){
+        var s = students.find(function(st){ return st.id === t.studentId; });
+        return '<div class="mini-page-row"><span>' + (t.date || t.createdAt || '—') + ' | ' + (s ? s.name : 'بدون اسم') + ' | ' + (t.type || 'عملية') + ' | ' + (t.reason || 'بدون سبب') + '</span><strong>' + Number(t.amount || 0).toLocaleString('ar-SA') + '</strong></div>';
+      }).join('') : '<div class="mini-page-row"><span>لا توجد عمليات</span><strong>—</strong></div>';
+    }
+
+    var taskBox = byId('supTasksReport');
+    if(taskBox){
+      taskBox.innerHTML = tasks.length ? tasks.map(function(t){
+        return '<div class="mini-page-row"><span>' + (t.title || 'مهمة') + ' | ' + (t.className || t.classId || '—') + ' | ' + (t.date || '—') + '</span><strong>' + (t.submitted ? 'مسلّمة' : 'غير مسلّمة') + '</strong></div>';
+      }).join('') : '<div class="mini-page-row"><span>لا توجد مهام</span><strong>—</strong></div>';
+    }
+
+    var msgBox = byId('supMessagesReport');
+    if(msgBox){
+      msgBox.innerHTML = parents.length ? parents.slice(0,20).map(function(m){
+        return '<div class="mini-page-row"><span>' + (m.date || m.createdAt || '—') + ' | ' + (m.studentName || m.student || '—') + '</span><strong>' + (m.status || 'مرسلة بنجاح') + '</strong></div>';
+      }).join('') : '<div class="mini-page-row"><span>لا توجد رسائل</span><strong>—</strong></div>';
+    }
+
+    var evalBox = byId('supEvaluationReport');
+    if(evalBox){
+      var high = students.filter(function(s){ return Number(s.balance || 0) >= 5000; }).map(function(s){ return s.name; }).slice(0,6).join('، ') || '—';
+      var low = students.filter(function(s){ return Number(s.balance || 0) < 1000; }).map(function(s){ return s.name; }).slice(0,6).join('، ') || '—';
+      evalBox.innerHTML =
+        '<div class="mini-page-row"><span>طلاب متميزون</span><strong>' + high + '</strong></div>' +
+        '<div class="mini-page-row"><span>طلاب منخفضون</span><strong>' + low + '</strong></div>' +
+        '<div class="mini-page-row"><span>تاريخ التقرير</span><strong>' + new Date().toLocaleDateString('ar-SA') + '</strong></div>';
+    }
+
+    renderHomeMail(parents);
+
+    var logBox = byId('supLastLoginReport');
+    if(logBox){
+      logBox.innerHTML = logs.length ? logs.map(function(item){
+        return '<div class="mini-page-row"><span>' + item.role + '</span><strong>' + item.date + '</strong></div>';
+      }).join('') : '<div class="mini-page-row"><span>لا توجد سجلات دخول حتى الآن</span><strong>—</strong></div>';
+    }
+  };
+
+  function bindSupervisorEntry(){
+    var btn = byId('jumpToTeacherBtn');
+    if(btn){
+      btn.onclick = function(e){
+        if(e) e.preventDefault();
+        var ov = byId('supervisorOverlay');
+        if(ov) ov.classList.add('show');
+      };
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    bindSupervisorEntry();
+    setTimeout(function(){
+      if(typeof window.renderSupervisorReports === 'function'){ window.renderSupervisorReports(); }
+    }, 500);
+  });
+  setTimeout(bindSupervisorEntry, 800);
+})();
+</script>
+
 </body>
         </html>
       `);
@@ -2664,6 +3196,267 @@ function logoutTeacher(){
           </table>
           <img src=x onerror="window.print()">
         
+
+<div id="supervisorLoginOverlay" class="mini-page-overlay">
+  <div class="mini-page-shell">
+    <div class="mini-page-head">
+      <button class="mini-back-btn" onclick="closeSupervisorLogin()">رجوع</button>
+      <h3 style="margin:0;color:var(--green-3)">التقييم والإشراف المدرسي</h3>
+    </div>
+    <div id="supervisorLoginCard" class="mini-page-card">
+      <div class="note-box" style="margin-bottom:12px">🔒 صلاحية عرض فقط — لا يمكن التعديل أو الحذف أو تنفيذ أي عملية داخل المصرف.</div>
+      <div class="grid-2">
+        <div class="field">
+          <label>نوع الدخول</label>
+          <select id="supervisorRole" class="select">
+            <option value="manager">مدير / مديرة</option>
+            <option value="supervisor">مشرف / مشرفة</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>الرقم السري</label>
+          <input id="supervisorPin" type="password" class="input" placeholder="أدخلي الرقم السري">
+        </div>
+      </div>
+      <div class="actions-row" style="margin-top:12px">
+        <button class="btn primary" onclick="loginSupervisor()">دخول</button>
+      </div>
+      <div class="tiny" style="margin-top:8px">الأرقام الافتراضية للتجربة: المدير/ة 1111 — المشرف/ة 2222</div>
+    </div>
+    <div id="supervisorPanel" class="mini-page-card hide">
+      <div class="note-box" style="margin-bottom:12px">🔒 وضع الإشراف — عرض وتقارير فقط</div>
+      <div class="subtabs" id="supervisorSubtabs">
+        <button class="small-btn active" onclick="openSupervisorSubtab('bank', this)">الحساب المصرفي</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('tasks', this)">المهام الأدائية</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('messages', this)">الرسائل</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('evaluation', this)">التقييم</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('certificate', this)">شهادة شكر</button><button class="small-btn" onclick="openSupervisorSubtab('homemail', this)">البريد المنزلي</button>
+      </div>
+      <div id="supervisorSubtab-bank">
+        <div id="supBankReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+      <div id="supervisorSubtab-tasks" class="hide">
+        <div id="supTasksReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+      <div id="supervisorSubtab-messages" class="hide">
+        <div id="supMessagesReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+      <div id="supervisorSubtab-evaluation" class="hide">
+        <div id="supEvaluationReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+      <div id="supervisorSubtab-certificate" class="hide">
+        <div class="grid-2">
+          <div class="field"><label>اسم الطالب / الطالبة</label><input id="supCertStudent" class="input" placeholder="اسم الطالب / الطالبة"></div>
+          <div class="field"><label>الفصل</label><input id="supCertClass" class="input" placeholder="الفصل"></div>
+          <div class="field"><label>عنوان الشهادة</label><input id="supCertTitle" class="input" placeholder="عنوان الشهادة"></div>
+          <div class="field"><label>وسيلة الإرسال</label><select id="supCertSendType" class="select"><option>واتساب</option><option>بريد إلكتروني</option></select></div>
+        </div>
+        <div class="field" style="margin-top:10px"><label>نص الشهادة</label><textarea id="supCertText" class="textarea" placeholder="اكتبي نص شهادة الشكر"></textarea></div>
+        <div class="field" style="margin-top:10px"><label>رفع شهادة شكر</label><input id="supCertFile" type="file" class="input" accept=".pdf,.jpg,.jpeg,.png"></div>
+        <div class="actions-row" style="margin-top:12px"><button class="btn primary" onclick="sendSupervisorCertificate()">إرسال الشهادة</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script id="oai-supervisor-clean-v4">
+(function(){
+  function byId(id){ return document.getElementById(id); }
+  function toastMsg(msg){
+    try{
+      if(window.app && typeof window.app.toast === 'function'){ window.app.toast(msg); return; }
+    }catch(e){}
+    alert(msg);
+  }
+  function getApp(){
+    try{ return window.app || null; }catch(e){ return null; }
+  }
+
+  window.closeSupervisorOverlay = function(){
+    var ov = byId('supervisorOverlay');
+    if(ov) ov.classList.remove('show');
+    var login = byId('supervisorLoginCard');
+    var content = byId('supervisorContent');
+    if(login) login.classList.remove('hide');
+    if(content) content.classList.add('hide');
+    if(byId('supervisorPin')) byId('supervisorPin').value = '';
+  };
+
+  window.loginSupervisor = function(){
+    var pin = (byId('supervisorPin') && byId('supervisorPin').value || '').trim();
+    var role = (byId('supervisorRole') && byId('supervisorRole').value || '').trim();
+    var ok = (role === 'manager' && pin === '1111') || (role === 'supervisor' && pin === '2222');
+    if(!ok){ toastMsg('الرقم السري غير صحيح'); return; }
+
+    var roleLabel = role === 'manager' ? 'مدير/ة' : 'مشرف/ة';
+    var logs = JSON.parse(localStorage.getItem('supervisor_login_logs') || '[]');
+    logs.unshift({role: roleLabel, date: new Date().toLocaleString('ar-SA')});
+    localStorage.setItem('supervisor_login_logs', JSON.stringify(logs.slice(0, 30)));
+
+    var login = byId('supervisorLoginCard');
+    var content = byId('supervisorContent');
+    if(login) login.classList.add('hide');
+    if(content) content.classList.remove('hide');
+    renderSupervisorReports();
+    toastMsg('تم الدخول إلى لوحة الإشراف');
+  };
+
+  window.openSupervisorTab = function(id, btn){
+    ['bank','tasks','messages','evaluation','certificate','homemail','lastlog'].forEach(function(key){
+      var el = byId('supTab-' + key);
+      if(el) el.classList.toggle('hide', key !== id);
+    });
+    var wrap = btn && btn.parentElement;
+    if(wrap){
+      wrap.querySelectorAll('button').forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+    }
+  };
+
+  window.sendSupervisorCertificate = function(){
+    var teacher = (byId('supCertTeacher') && byId('supCertTeacher').value || '').trim();
+    var subject = (byId('supCertSubject') && byId('supCertSubject').value || '').trim();
+    var title = (byId('supCertTitle') && byId('supCertTitle').value || '').trim();
+    if(!teacher || !subject || subject === 'اختر المادة' || !title){
+      toastMsg('أكملي اسم المعلم / المعلمة والمادة وعنوان الشهادة أولًا');
+      return;
+    }
+    toastMsg('تم تجهيز إرسال شهادة الشكر');
+  };
+
+  function renderHomeMail(parents){
+    var stats = byId('supHomeMailStats');
+    var report = byId('supHomeMailReport');
+    var today = new Date().toLocaleDateString('ar-SA');
+    var todayCount = parents.filter(function(m){
+      var d = String(m.date || m.createdAt || '');
+      return d.indexOf(today) !== -1;
+    }).length;
+    var whatsappCount = parents.filter(function(m){
+      return String(m.type || '').indexOf('واتساب') !== -1;
+    }).length;
+
+    if(stats){
+      stats.innerHTML =
+        '<div class="mini-page-stat"><div class="tiny">عدد رسائل البريد المنزلي</div><strong>' + parents.length.toLocaleString('ar-SA') + '</strong></div>' +
+        '<div class="mini-page-stat"><div class="tiny">رسائل اليوم</div><strong>' + todayCount.toLocaleString('ar-SA') + '</strong></div>' +
+        '<div class="mini-page-stat"><div class="tiny">رسائل واتساب</div><strong>' + whatsappCount.toLocaleString('ar-SA') + '</strong></div>' +
+        '<div class="mini-page-stat"><div class="tiny">تاريخ التقرير</div><strong>' + today + '</strong></div>';
+    }
+
+    if(report){
+      report.innerHTML = parents.length ? parents.slice(0,30).map(function(m){
+        return '<div class="mini-page-row" style="display:block">' +
+          '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center">' +
+            '<span><strong>الطالب:</strong> ' + (m.studentName || m.student || '—') + ' | <strong>الفصل:</strong> ' + (m.className || m.classroom || '—') + '</span>' +
+            '<strong>' + (m.date || m.createdAt || '—') + '</strong>' +
+          '</div>' +
+          '<div class="tiny" style="margin-top:6px"><strong>نوع الرسالة:</strong> ' + (m.type || 'البريد المنزلي') + '</div>' +
+          '<div class="tiny" style="margin-top:4px"><strong>الحالة:</strong> ' + (m.status || 'مرسلة بنجاح') + '</div>' +
+          '<div class="tiny" style="margin-top:6px;white-space:pre-line"><strong>نص الرسالة:</strong>\n' + (m.text || m.message || '—') + '</div>' +
+        '</div>';
+      }).join('') : '<div class="mini-page-row"><span>لا توجد رسائل مرسلة إلى أولياء الأمور</span><strong>—</strong></div>';
+    }
+  }
+
+  window.renderSupervisorReports = function(){
+    var app = getApp();
+    if(!app || !app.state) return;
+
+    var classes = app.state.classes || [];
+    var students = app.state.students || [];
+    var txs = app.state.transactions || [];
+    var tasks = app.state.tasks || [];
+    var parents = Array.isArray(app.state.parentMessages) && app.state.parentMessages.length
+      ? app.state.parentMessages
+      : JSON.parse(localStorage.getItem('mini_parent_records') || '[]');
+    var logs = JSON.parse(localStorage.getItem('supervisor_login_logs') || '[]');
+
+    if(byId('supClasses')) byId('supClasses').textContent = classes.length.toLocaleString('ar-SA');
+    if(byId('supStudents')) byId('supStudents').textContent = students.length.toLocaleString('ar-SA');
+    if(byId('supTx')) byId('supTx').textContent = txs.length.toLocaleString('ar-SA');
+    if(byId('supMsg')) byId('supMsg').textContent = parents.length.toLocaleString('ar-SA');
+
+    var sel = byId('supClassFilter');
+    if(sel && !sel.dataset.filled){
+      sel.dataset.filled = '1';
+      sel.innerHTML = '<option value="">كل الفصول</option>' + classes.map(function(c){
+        return '<option value="' + (c.id || '') + '">' + (c.name || c.id || 'فصل') + '</option>';
+      }).join('');
+    }
+
+    var q = (byId('supSearch') && byId('supSearch').value || '').trim();
+    var cls = (sel && sel.value) || '';
+    var filteredTx = txs.filter(function(t){
+      var s = students.find(function(st){ return st.id === t.studentId; });
+      var okClass = !cls || (s && s.classId === cls);
+      var text = ((t.reason || '') + ' ' + (s ? s.name : '')).trim();
+      return okClass && (!q || text.indexOf(q) !== -1);
+    });
+
+    var bank = byId('supBankReport');
+    if(bank){
+      bank.innerHTML = filteredTx.length ? filteredTx.slice(0,25).map(function(t){
+        var s = students.find(function(st){ return st.id === t.studentId; });
+        return '<div class="mini-page-row"><span>' + (t.date || t.createdAt || '—') + ' | ' + (s ? s.name : 'بدون اسم') + ' | ' + (t.type || 'عملية') + ' | ' + (t.reason || 'بدون سبب') + '</span><strong>' + Number(t.amount || 0).toLocaleString('ar-SA') + '</strong></div>';
+      }).join('') : '<div class="mini-page-row"><span>لا توجد عمليات</span><strong>—</strong></div>';
+    }
+
+    var taskBox = byId('supTasksReport');
+    if(taskBox){
+      taskBox.innerHTML = tasks.length ? tasks.map(function(t){
+        return '<div class="mini-page-row"><span>' + (t.title || 'مهمة') + ' | ' + (t.className || t.classId || '—') + ' | ' + (t.date || '—') + '</span><strong>' + (t.submitted ? 'مسلّمة' : 'غير مسلّمة') + '</strong></div>';
+      }).join('') : '<div class="mini-page-row"><span>لا توجد مهام</span><strong>—</strong></div>';
+    }
+
+    var msgBox = byId('supMessagesReport');
+    if(msgBox){
+      msgBox.innerHTML = parents.length ? parents.slice(0,20).map(function(m){
+        return '<div class="mini-page-row"><span>' + (m.date || m.createdAt || '—') + ' | ' + (m.studentName || m.student || '—') + '</span><strong>' + (m.status || 'مرسلة بنجاح') + '</strong></div>';
+      }).join('') : '<div class="mini-page-row"><span>لا توجد رسائل</span><strong>—</strong></div>';
+    }
+
+    var evalBox = byId('supEvaluationReport');
+    if(evalBox){
+      var high = students.filter(function(s){ return Number(s.balance || 0) >= 5000; }).map(function(s){ return s.name; }).slice(0,6).join('، ') || '—';
+      var low = students.filter(function(s){ return Number(s.balance || 0) < 1000; }).map(function(s){ return s.name; }).slice(0,6).join('، ') || '—';
+      evalBox.innerHTML =
+        '<div class="mini-page-row"><span>طلاب متميزون</span><strong>' + high + '</strong></div>' +
+        '<div class="mini-page-row"><span>طلاب منخفضون</span><strong>' + low + '</strong></div>' +
+        '<div class="mini-page-row"><span>تاريخ التقرير</span><strong>' + new Date().toLocaleDateString('ar-SA') + '</strong></div>';
+    }
+
+    renderHomeMail(parents);
+
+    var logBox = byId('supLastLoginReport');
+    if(logBox){
+      logBox.innerHTML = logs.length ? logs.map(function(item){
+        return '<div class="mini-page-row"><span>' + item.role + '</span><strong>' + item.date + '</strong></div>';
+      }).join('') : '<div class="mini-page-row"><span>لا توجد سجلات دخول حتى الآن</span><strong>—</strong></div>';
+    }
+  };
+
+  function bindSupervisorEntry(){
+    var btn = byId('jumpToTeacherBtn');
+    if(btn){
+      btn.onclick = function(e){
+        if(e) e.preventDefault();
+        var ov = byId('supervisorOverlay');
+        if(ov) ov.classList.add('show');
+      };
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    bindSupervisorEntry();
+    setTimeout(function(){
+      if(typeof window.renderSupervisorReports === 'function'){ window.renderSupervisorReports(); }
+    }, 500);
+  });
+  setTimeout(bindSupervisorEntry, 800);
+})();
+</script>
+
 </body>
         </html>
       `);
@@ -3157,6 +3950,267 @@ function logoutTeacher(){
       ${signArea()}
       <scr'+'ipt>window.onload=function(){window.print();setTimeout(function(){window.close()},300)}<\/scr'+'ipt>
       
+
+<div id="supervisorLoginOverlay" class="mini-page-overlay">
+  <div class="mini-page-shell">
+    <div class="mini-page-head">
+      <button class="mini-back-btn" onclick="closeSupervisorLogin()">رجوع</button>
+      <h3 style="margin:0;color:var(--green-3)">التقييم والإشراف المدرسي</h3>
+    </div>
+    <div id="supervisorLoginCard" class="mini-page-card">
+      <div class="note-box" style="margin-bottom:12px">🔒 صلاحية عرض فقط — لا يمكن التعديل أو الحذف أو تنفيذ أي عملية داخل المصرف.</div>
+      <div class="grid-2">
+        <div class="field">
+          <label>نوع الدخول</label>
+          <select id="supervisorRole" class="select">
+            <option value="manager">مدير / مديرة</option>
+            <option value="supervisor">مشرف / مشرفة</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>الرقم السري</label>
+          <input id="supervisorPin" type="password" class="input" placeholder="أدخلي الرقم السري">
+        </div>
+      </div>
+      <div class="actions-row" style="margin-top:12px">
+        <button class="btn primary" onclick="loginSupervisor()">دخول</button>
+      </div>
+      <div class="tiny" style="margin-top:8px">الأرقام الافتراضية للتجربة: المدير/ة 1111 — المشرف/ة 2222</div>
+    </div>
+    <div id="supervisorPanel" class="mini-page-card hide">
+      <div class="note-box" style="margin-bottom:12px">🔒 وضع الإشراف — عرض وتقارير فقط</div>
+      <div class="subtabs" id="supervisorSubtabs">
+        <button class="small-btn active" onclick="openSupervisorSubtab('bank', this)">الحساب المصرفي</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('tasks', this)">المهام الأدائية</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('messages', this)">الرسائل</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('evaluation', this)">التقييم</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('certificate', this)">شهادة شكر</button><button class="small-btn" onclick="openSupervisorSubtab('homemail', this)">البريد المنزلي</button>
+      </div>
+      <div id="supervisorSubtab-bank">
+        <div id="supBankReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+      <div id="supervisorSubtab-tasks" class="hide">
+        <div id="supTasksReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+      <div id="supervisorSubtab-messages" class="hide">
+        <div id="supMessagesReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+      <div id="supervisorSubtab-evaluation" class="hide">
+        <div id="supEvaluationReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+      <div id="supervisorSubtab-certificate" class="hide">
+        <div class="grid-2">
+          <div class="field"><label>اسم الطالب / الطالبة</label><input id="supCertStudent" class="input" placeholder="اسم الطالب / الطالبة"></div>
+          <div class="field"><label>الفصل</label><input id="supCertClass" class="input" placeholder="الفصل"></div>
+          <div class="field"><label>عنوان الشهادة</label><input id="supCertTitle" class="input" placeholder="عنوان الشهادة"></div>
+          <div class="field"><label>وسيلة الإرسال</label><select id="supCertSendType" class="select"><option>واتساب</option><option>بريد إلكتروني</option></select></div>
+        </div>
+        <div class="field" style="margin-top:10px"><label>نص الشهادة</label><textarea id="supCertText" class="textarea" placeholder="اكتبي نص شهادة الشكر"></textarea></div>
+        <div class="field" style="margin-top:10px"><label>رفع شهادة شكر</label><input id="supCertFile" type="file" class="input" accept=".pdf,.jpg,.jpeg,.png"></div>
+        <div class="actions-row" style="margin-top:12px"><button class="btn primary" onclick="sendSupervisorCertificate()">إرسال الشهادة</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script id="oai-supervisor-clean-v4">
+(function(){
+  function byId(id){ return document.getElementById(id); }
+  function toastMsg(msg){
+    try{
+      if(window.app && typeof window.app.toast === 'function'){ window.app.toast(msg); return; }
+    }catch(e){}
+    alert(msg);
+  }
+  function getApp(){
+    try{ return window.app || null; }catch(e){ return null; }
+  }
+
+  window.closeSupervisorOverlay = function(){
+    var ov = byId('supervisorOverlay');
+    if(ov) ov.classList.remove('show');
+    var login = byId('supervisorLoginCard');
+    var content = byId('supervisorContent');
+    if(login) login.classList.remove('hide');
+    if(content) content.classList.add('hide');
+    if(byId('supervisorPin')) byId('supervisorPin').value = '';
+  };
+
+  window.loginSupervisor = function(){
+    var pin = (byId('supervisorPin') && byId('supervisorPin').value || '').trim();
+    var role = (byId('supervisorRole') && byId('supervisorRole').value || '').trim();
+    var ok = (role === 'manager' && pin === '1111') || (role === 'supervisor' && pin === '2222');
+    if(!ok){ toastMsg('الرقم السري غير صحيح'); return; }
+
+    var roleLabel = role === 'manager' ? 'مدير/ة' : 'مشرف/ة';
+    var logs = JSON.parse(localStorage.getItem('supervisor_login_logs') || '[]');
+    logs.unshift({role: roleLabel, date: new Date().toLocaleString('ar-SA')});
+    localStorage.setItem('supervisor_login_logs', JSON.stringify(logs.slice(0, 30)));
+
+    var login = byId('supervisorLoginCard');
+    var content = byId('supervisorContent');
+    if(login) login.classList.add('hide');
+    if(content) content.classList.remove('hide');
+    renderSupervisorReports();
+    toastMsg('تم الدخول إلى لوحة الإشراف');
+  };
+
+  window.openSupervisorTab = function(id, btn){
+    ['bank','tasks','messages','evaluation','certificate','homemail','lastlog'].forEach(function(key){
+      var el = byId('supTab-' + key);
+      if(el) el.classList.toggle('hide', key !== id);
+    });
+    var wrap = btn && btn.parentElement;
+    if(wrap){
+      wrap.querySelectorAll('button').forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+    }
+  };
+
+  window.sendSupervisorCertificate = function(){
+    var teacher = (byId('supCertTeacher') && byId('supCertTeacher').value || '').trim();
+    var subject = (byId('supCertSubject') && byId('supCertSubject').value || '').trim();
+    var title = (byId('supCertTitle') && byId('supCertTitle').value || '').trim();
+    if(!teacher || !subject || subject === 'اختر المادة' || !title){
+      toastMsg('أكملي اسم المعلم / المعلمة والمادة وعنوان الشهادة أولًا');
+      return;
+    }
+    toastMsg('تم تجهيز إرسال شهادة الشكر');
+  };
+
+  function renderHomeMail(parents){
+    var stats = byId('supHomeMailStats');
+    var report = byId('supHomeMailReport');
+    var today = new Date().toLocaleDateString('ar-SA');
+    var todayCount = parents.filter(function(m){
+      var d = String(m.date || m.createdAt || '');
+      return d.indexOf(today) !== -1;
+    }).length;
+    var whatsappCount = parents.filter(function(m){
+      return String(m.type || '').indexOf('واتساب') !== -1;
+    }).length;
+
+    if(stats){
+      stats.innerHTML =
+        '<div class="mini-page-stat"><div class="tiny">عدد رسائل البريد المنزلي</div><strong>' + parents.length.toLocaleString('ar-SA') + '</strong></div>' +
+        '<div class="mini-page-stat"><div class="tiny">رسائل اليوم</div><strong>' + todayCount.toLocaleString('ar-SA') + '</strong></div>' +
+        '<div class="mini-page-stat"><div class="tiny">رسائل واتساب</div><strong>' + whatsappCount.toLocaleString('ar-SA') + '</strong></div>' +
+        '<div class="mini-page-stat"><div class="tiny">تاريخ التقرير</div><strong>' + today + '</strong></div>';
+    }
+
+    if(report){
+      report.innerHTML = parents.length ? parents.slice(0,30).map(function(m){
+        return '<div class="mini-page-row" style="display:block">' +
+          '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center">' +
+            '<span><strong>الطالب:</strong> ' + (m.studentName || m.student || '—') + ' | <strong>الفصل:</strong> ' + (m.className || m.classroom || '—') + '</span>' +
+            '<strong>' + (m.date || m.createdAt || '—') + '</strong>' +
+          '</div>' +
+          '<div class="tiny" style="margin-top:6px"><strong>نوع الرسالة:</strong> ' + (m.type || 'البريد المنزلي') + '</div>' +
+          '<div class="tiny" style="margin-top:4px"><strong>الحالة:</strong> ' + (m.status || 'مرسلة بنجاح') + '</div>' +
+          '<div class="tiny" style="margin-top:6px;white-space:pre-line"><strong>نص الرسالة:</strong>\n' + (m.text || m.message || '—') + '</div>' +
+        '</div>';
+      }).join('') : '<div class="mini-page-row"><span>لا توجد رسائل مرسلة إلى أولياء الأمور</span><strong>—</strong></div>';
+    }
+  }
+
+  window.renderSupervisorReports = function(){
+    var app = getApp();
+    if(!app || !app.state) return;
+
+    var classes = app.state.classes || [];
+    var students = app.state.students || [];
+    var txs = app.state.transactions || [];
+    var tasks = app.state.tasks || [];
+    var parents = Array.isArray(app.state.parentMessages) && app.state.parentMessages.length
+      ? app.state.parentMessages
+      : JSON.parse(localStorage.getItem('mini_parent_records') || '[]');
+    var logs = JSON.parse(localStorage.getItem('supervisor_login_logs') || '[]');
+
+    if(byId('supClasses')) byId('supClasses').textContent = classes.length.toLocaleString('ar-SA');
+    if(byId('supStudents')) byId('supStudents').textContent = students.length.toLocaleString('ar-SA');
+    if(byId('supTx')) byId('supTx').textContent = txs.length.toLocaleString('ar-SA');
+    if(byId('supMsg')) byId('supMsg').textContent = parents.length.toLocaleString('ar-SA');
+
+    var sel = byId('supClassFilter');
+    if(sel && !sel.dataset.filled){
+      sel.dataset.filled = '1';
+      sel.innerHTML = '<option value="">كل الفصول</option>' + classes.map(function(c){
+        return '<option value="' + (c.id || '') + '">' + (c.name || c.id || 'فصل') + '</option>';
+      }).join('');
+    }
+
+    var q = (byId('supSearch') && byId('supSearch').value || '').trim();
+    var cls = (sel && sel.value) || '';
+    var filteredTx = txs.filter(function(t){
+      var s = students.find(function(st){ return st.id === t.studentId; });
+      var okClass = !cls || (s && s.classId === cls);
+      var text = ((t.reason || '') + ' ' + (s ? s.name : '')).trim();
+      return okClass && (!q || text.indexOf(q) !== -1);
+    });
+
+    var bank = byId('supBankReport');
+    if(bank){
+      bank.innerHTML = filteredTx.length ? filteredTx.slice(0,25).map(function(t){
+        var s = students.find(function(st){ return st.id === t.studentId; });
+        return '<div class="mini-page-row"><span>' + (t.date || t.createdAt || '—') + ' | ' + (s ? s.name : 'بدون اسم') + ' | ' + (t.type || 'عملية') + ' | ' + (t.reason || 'بدون سبب') + '</span><strong>' + Number(t.amount || 0).toLocaleString('ar-SA') + '</strong></div>';
+      }).join('') : '<div class="mini-page-row"><span>لا توجد عمليات</span><strong>—</strong></div>';
+    }
+
+    var taskBox = byId('supTasksReport');
+    if(taskBox){
+      taskBox.innerHTML = tasks.length ? tasks.map(function(t){
+        return '<div class="mini-page-row"><span>' + (t.title || 'مهمة') + ' | ' + (t.className || t.classId || '—') + ' | ' + (t.date || '—') + '</span><strong>' + (t.submitted ? 'مسلّمة' : 'غير مسلّمة') + '</strong></div>';
+      }).join('') : '<div class="mini-page-row"><span>لا توجد مهام</span><strong>—</strong></div>';
+    }
+
+    var msgBox = byId('supMessagesReport');
+    if(msgBox){
+      msgBox.innerHTML = parents.length ? parents.slice(0,20).map(function(m){
+        return '<div class="mini-page-row"><span>' + (m.date || m.createdAt || '—') + ' | ' + (m.studentName || m.student || '—') + '</span><strong>' + (m.status || 'مرسلة بنجاح') + '</strong></div>';
+      }).join('') : '<div class="mini-page-row"><span>لا توجد رسائل</span><strong>—</strong></div>';
+    }
+
+    var evalBox = byId('supEvaluationReport');
+    if(evalBox){
+      var high = students.filter(function(s){ return Number(s.balance || 0) >= 5000; }).map(function(s){ return s.name; }).slice(0,6).join('، ') || '—';
+      var low = students.filter(function(s){ return Number(s.balance || 0) < 1000; }).map(function(s){ return s.name; }).slice(0,6).join('، ') || '—';
+      evalBox.innerHTML =
+        '<div class="mini-page-row"><span>طلاب متميزون</span><strong>' + high + '</strong></div>' +
+        '<div class="mini-page-row"><span>طلاب منخفضون</span><strong>' + low + '</strong></div>' +
+        '<div class="mini-page-row"><span>تاريخ التقرير</span><strong>' + new Date().toLocaleDateString('ar-SA') + '</strong></div>';
+    }
+
+    renderHomeMail(parents);
+
+    var logBox = byId('supLastLoginReport');
+    if(logBox){
+      logBox.innerHTML = logs.length ? logs.map(function(item){
+        return '<div class="mini-page-row"><span>' + item.role + '</span><strong>' + item.date + '</strong></div>';
+      }).join('') : '<div class="mini-page-row"><span>لا توجد سجلات دخول حتى الآن</span><strong>—</strong></div>';
+    }
+  };
+
+  function bindSupervisorEntry(){
+    var btn = byId('jumpToTeacherBtn');
+    if(btn){
+      btn.onclick = function(e){
+        if(e) e.preventDefault();
+        var ov = byId('supervisorOverlay');
+        if(ov) ov.classList.add('show');
+      };
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    bindSupervisorEntry();
+    setTimeout(function(){
+      if(typeof window.renderSupervisorReports === 'function'){ window.renderSupervisorReports(); }
+    }, 500);
+  });
+  setTimeout(bindSupervisorEntry, 800);
+})();
+</script>
+
 </body></html>`);
     w.document.close();
     app.toast('تم تجهيز طباعة قائمة الطلاب PDF');
@@ -3196,6 +4250,267 @@ function logoutTeacher(){
         .pdf-sign-area img{height:70px;object-fit:contain}
         @media print{@page{size:A4;margin:18mm}}
       </style></head><body>${cards}<scr'+'ipt>window.onload=function(){window.print()}<\/scr'+'ipt>
+
+<div id="supervisorLoginOverlay" class="mini-page-overlay">
+  <div class="mini-page-shell">
+    <div class="mini-page-head">
+      <button class="mini-back-btn" onclick="closeSupervisorLogin()">رجوع</button>
+      <h3 style="margin:0;color:var(--green-3)">التقييم والإشراف المدرسي</h3>
+    </div>
+    <div id="supervisorLoginCard" class="mini-page-card">
+      <div class="note-box" style="margin-bottom:12px">🔒 صلاحية عرض فقط — لا يمكن التعديل أو الحذف أو تنفيذ أي عملية داخل المصرف.</div>
+      <div class="grid-2">
+        <div class="field">
+          <label>نوع الدخول</label>
+          <select id="supervisorRole" class="select">
+            <option value="manager">مدير / مديرة</option>
+            <option value="supervisor">مشرف / مشرفة</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>الرقم السري</label>
+          <input id="supervisorPin" type="password" class="input" placeholder="أدخلي الرقم السري">
+        </div>
+      </div>
+      <div class="actions-row" style="margin-top:12px">
+        <button class="btn primary" onclick="loginSupervisor()">دخول</button>
+      </div>
+      <div class="tiny" style="margin-top:8px">الأرقام الافتراضية للتجربة: المدير/ة 1111 — المشرف/ة 2222</div>
+    </div>
+    <div id="supervisorPanel" class="mini-page-card hide">
+      <div class="note-box" style="margin-bottom:12px">🔒 وضع الإشراف — عرض وتقارير فقط</div>
+      <div class="subtabs" id="supervisorSubtabs">
+        <button class="small-btn active" onclick="openSupervisorSubtab('bank', this)">الحساب المصرفي</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('tasks', this)">المهام الأدائية</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('messages', this)">الرسائل</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('evaluation', this)">التقييم</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('certificate', this)">شهادة شكر</button><button class="small-btn" onclick="openSupervisorSubtab('homemail', this)">البريد المنزلي</button>
+      </div>
+      <div id="supervisorSubtab-bank">
+        <div id="supBankReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+      <div id="supervisorSubtab-tasks" class="hide">
+        <div id="supTasksReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+      <div id="supervisorSubtab-messages" class="hide">
+        <div id="supMessagesReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+      <div id="supervisorSubtab-evaluation" class="hide">
+        <div id="supEvaluationReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+      <div id="supervisorSubtab-certificate" class="hide">
+        <div class="grid-2">
+          <div class="field"><label>اسم الطالب / الطالبة</label><input id="supCertStudent" class="input" placeholder="اسم الطالب / الطالبة"></div>
+          <div class="field"><label>الفصل</label><input id="supCertClass" class="input" placeholder="الفصل"></div>
+          <div class="field"><label>عنوان الشهادة</label><input id="supCertTitle" class="input" placeholder="عنوان الشهادة"></div>
+          <div class="field"><label>وسيلة الإرسال</label><select id="supCertSendType" class="select"><option>واتساب</option><option>بريد إلكتروني</option></select></div>
+        </div>
+        <div class="field" style="margin-top:10px"><label>نص الشهادة</label><textarea id="supCertText" class="textarea" placeholder="اكتبي نص شهادة الشكر"></textarea></div>
+        <div class="field" style="margin-top:10px"><label>رفع شهادة شكر</label><input id="supCertFile" type="file" class="input" accept=".pdf,.jpg,.jpeg,.png"></div>
+        <div class="actions-row" style="margin-top:12px"><button class="btn primary" onclick="sendSupervisorCertificate()">إرسال الشهادة</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script id="oai-supervisor-clean-v4">
+(function(){
+  function byId(id){ return document.getElementById(id); }
+  function toastMsg(msg){
+    try{
+      if(window.app && typeof window.app.toast === 'function'){ window.app.toast(msg); return; }
+    }catch(e){}
+    alert(msg);
+  }
+  function getApp(){
+    try{ return window.app || null; }catch(e){ return null; }
+  }
+
+  window.closeSupervisorOverlay = function(){
+    var ov = byId('supervisorOverlay');
+    if(ov) ov.classList.remove('show');
+    var login = byId('supervisorLoginCard');
+    var content = byId('supervisorContent');
+    if(login) login.classList.remove('hide');
+    if(content) content.classList.add('hide');
+    if(byId('supervisorPin')) byId('supervisorPin').value = '';
+  };
+
+  window.loginSupervisor = function(){
+    var pin = (byId('supervisorPin') && byId('supervisorPin').value || '').trim();
+    var role = (byId('supervisorRole') && byId('supervisorRole').value || '').trim();
+    var ok = (role === 'manager' && pin === '1111') || (role === 'supervisor' && pin === '2222');
+    if(!ok){ toastMsg('الرقم السري غير صحيح'); return; }
+
+    var roleLabel = role === 'manager' ? 'مدير/ة' : 'مشرف/ة';
+    var logs = JSON.parse(localStorage.getItem('supervisor_login_logs') || '[]');
+    logs.unshift({role: roleLabel, date: new Date().toLocaleString('ar-SA')});
+    localStorage.setItem('supervisor_login_logs', JSON.stringify(logs.slice(0, 30)));
+
+    var login = byId('supervisorLoginCard');
+    var content = byId('supervisorContent');
+    if(login) login.classList.add('hide');
+    if(content) content.classList.remove('hide');
+    renderSupervisorReports();
+    toastMsg('تم الدخول إلى لوحة الإشراف');
+  };
+
+  window.openSupervisorTab = function(id, btn){
+    ['bank','tasks','messages','evaluation','certificate','homemail','lastlog'].forEach(function(key){
+      var el = byId('supTab-' + key);
+      if(el) el.classList.toggle('hide', key !== id);
+    });
+    var wrap = btn && btn.parentElement;
+    if(wrap){
+      wrap.querySelectorAll('button').forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+    }
+  };
+
+  window.sendSupervisorCertificate = function(){
+    var teacher = (byId('supCertTeacher') && byId('supCertTeacher').value || '').trim();
+    var subject = (byId('supCertSubject') && byId('supCertSubject').value || '').trim();
+    var title = (byId('supCertTitle') && byId('supCertTitle').value || '').trim();
+    if(!teacher || !subject || subject === 'اختر المادة' || !title){
+      toastMsg('أكملي اسم المعلم / المعلمة والمادة وعنوان الشهادة أولًا');
+      return;
+    }
+    toastMsg('تم تجهيز إرسال شهادة الشكر');
+  };
+
+  function renderHomeMail(parents){
+    var stats = byId('supHomeMailStats');
+    var report = byId('supHomeMailReport');
+    var today = new Date().toLocaleDateString('ar-SA');
+    var todayCount = parents.filter(function(m){
+      var d = String(m.date || m.createdAt || '');
+      return d.indexOf(today) !== -1;
+    }).length;
+    var whatsappCount = parents.filter(function(m){
+      return String(m.type || '').indexOf('واتساب') !== -1;
+    }).length;
+
+    if(stats){
+      stats.innerHTML =
+        '<div class="mini-page-stat"><div class="tiny">عدد رسائل البريد المنزلي</div><strong>' + parents.length.toLocaleString('ar-SA') + '</strong></div>' +
+        '<div class="mini-page-stat"><div class="tiny">رسائل اليوم</div><strong>' + todayCount.toLocaleString('ar-SA') + '</strong></div>' +
+        '<div class="mini-page-stat"><div class="tiny">رسائل واتساب</div><strong>' + whatsappCount.toLocaleString('ar-SA') + '</strong></div>' +
+        '<div class="mini-page-stat"><div class="tiny">تاريخ التقرير</div><strong>' + today + '</strong></div>';
+    }
+
+    if(report){
+      report.innerHTML = parents.length ? parents.slice(0,30).map(function(m){
+        return '<div class="mini-page-row" style="display:block">' +
+          '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center">' +
+            '<span><strong>الطالب:</strong> ' + (m.studentName || m.student || '—') + ' | <strong>الفصل:</strong> ' + (m.className || m.classroom || '—') + '</span>' +
+            '<strong>' + (m.date || m.createdAt || '—') + '</strong>' +
+          '</div>' +
+          '<div class="tiny" style="margin-top:6px"><strong>نوع الرسالة:</strong> ' + (m.type || 'البريد المنزلي') + '</div>' +
+          '<div class="tiny" style="margin-top:4px"><strong>الحالة:</strong> ' + (m.status || 'مرسلة بنجاح') + '</div>' +
+          '<div class="tiny" style="margin-top:6px;white-space:pre-line"><strong>نص الرسالة:</strong>\n' + (m.text || m.message || '—') + '</div>' +
+        '</div>';
+      }).join('') : '<div class="mini-page-row"><span>لا توجد رسائل مرسلة إلى أولياء الأمور</span><strong>—</strong></div>';
+    }
+  }
+
+  window.renderSupervisorReports = function(){
+    var app = getApp();
+    if(!app || !app.state) return;
+
+    var classes = app.state.classes || [];
+    var students = app.state.students || [];
+    var txs = app.state.transactions || [];
+    var tasks = app.state.tasks || [];
+    var parents = Array.isArray(app.state.parentMessages) && app.state.parentMessages.length
+      ? app.state.parentMessages
+      : JSON.parse(localStorage.getItem('mini_parent_records') || '[]');
+    var logs = JSON.parse(localStorage.getItem('supervisor_login_logs') || '[]');
+
+    if(byId('supClasses')) byId('supClasses').textContent = classes.length.toLocaleString('ar-SA');
+    if(byId('supStudents')) byId('supStudents').textContent = students.length.toLocaleString('ar-SA');
+    if(byId('supTx')) byId('supTx').textContent = txs.length.toLocaleString('ar-SA');
+    if(byId('supMsg')) byId('supMsg').textContent = parents.length.toLocaleString('ar-SA');
+
+    var sel = byId('supClassFilter');
+    if(sel && !sel.dataset.filled){
+      sel.dataset.filled = '1';
+      sel.innerHTML = '<option value="">كل الفصول</option>' + classes.map(function(c){
+        return '<option value="' + (c.id || '') + '">' + (c.name || c.id || 'فصل') + '</option>';
+      }).join('');
+    }
+
+    var q = (byId('supSearch') && byId('supSearch').value || '').trim();
+    var cls = (sel && sel.value) || '';
+    var filteredTx = txs.filter(function(t){
+      var s = students.find(function(st){ return st.id === t.studentId; });
+      var okClass = !cls || (s && s.classId === cls);
+      var text = ((t.reason || '') + ' ' + (s ? s.name : '')).trim();
+      return okClass && (!q || text.indexOf(q) !== -1);
+    });
+
+    var bank = byId('supBankReport');
+    if(bank){
+      bank.innerHTML = filteredTx.length ? filteredTx.slice(0,25).map(function(t){
+        var s = students.find(function(st){ return st.id === t.studentId; });
+        return '<div class="mini-page-row"><span>' + (t.date || t.createdAt || '—') + ' | ' + (s ? s.name : 'بدون اسم') + ' | ' + (t.type || 'عملية') + ' | ' + (t.reason || 'بدون سبب') + '</span><strong>' + Number(t.amount || 0).toLocaleString('ar-SA') + '</strong></div>';
+      }).join('') : '<div class="mini-page-row"><span>لا توجد عمليات</span><strong>—</strong></div>';
+    }
+
+    var taskBox = byId('supTasksReport');
+    if(taskBox){
+      taskBox.innerHTML = tasks.length ? tasks.map(function(t){
+        return '<div class="mini-page-row"><span>' + (t.title || 'مهمة') + ' | ' + (t.className || t.classId || '—') + ' | ' + (t.date || '—') + '</span><strong>' + (t.submitted ? 'مسلّمة' : 'غير مسلّمة') + '</strong></div>';
+      }).join('') : '<div class="mini-page-row"><span>لا توجد مهام</span><strong>—</strong></div>';
+    }
+
+    var msgBox = byId('supMessagesReport');
+    if(msgBox){
+      msgBox.innerHTML = parents.length ? parents.slice(0,20).map(function(m){
+        return '<div class="mini-page-row"><span>' + (m.date || m.createdAt || '—') + ' | ' + (m.studentName || m.student || '—') + '</span><strong>' + (m.status || 'مرسلة بنجاح') + '</strong></div>';
+      }).join('') : '<div class="mini-page-row"><span>لا توجد رسائل</span><strong>—</strong></div>';
+    }
+
+    var evalBox = byId('supEvaluationReport');
+    if(evalBox){
+      var high = students.filter(function(s){ return Number(s.balance || 0) >= 5000; }).map(function(s){ return s.name; }).slice(0,6).join('، ') || '—';
+      var low = students.filter(function(s){ return Number(s.balance || 0) < 1000; }).map(function(s){ return s.name; }).slice(0,6).join('، ') || '—';
+      evalBox.innerHTML =
+        '<div class="mini-page-row"><span>طلاب متميزون</span><strong>' + high + '</strong></div>' +
+        '<div class="mini-page-row"><span>طلاب منخفضون</span><strong>' + low + '</strong></div>' +
+        '<div class="mini-page-row"><span>تاريخ التقرير</span><strong>' + new Date().toLocaleDateString('ar-SA') + '</strong></div>';
+    }
+
+    renderHomeMail(parents);
+
+    var logBox = byId('supLastLoginReport');
+    if(logBox){
+      logBox.innerHTML = logs.length ? logs.map(function(item){
+        return '<div class="mini-page-row"><span>' + item.role + '</span><strong>' + item.date + '</strong></div>';
+      }).join('') : '<div class="mini-page-row"><span>لا توجد سجلات دخول حتى الآن</span><strong>—</strong></div>';
+    }
+  };
+
+  function bindSupervisorEntry(){
+    var btn = byId('jumpToTeacherBtn');
+    if(btn){
+      btn.onclick = function(e){
+        if(e) e.preventDefault();
+        var ov = byId('supervisorOverlay');
+        if(ov) ov.classList.add('show');
+      };
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    bindSupervisorEntry();
+    setTimeout(function(){
+      if(typeof window.renderSupervisorReports === 'function'){ window.renderSupervisorReports(); }
+    }, 500);
+  });
+  setTimeout(bindSupervisorEntry, 800);
+})();
+</script>
+
 </body></html>`);
       w.document.close();
       this.toast('تم توليد شهادات PDF للمراكز الأولى');
@@ -3542,6 +4857,267 @@ function logoutTeacher(){
           + '</div>';
       }).join('');
       w.document.write('<html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>شهادات لوحة شرف الفصل</title><style>body{font-family:Tahoma,Arial,sans-serif;color:#21402f}@media print{@page{size:A4;margin:18mm}}</style></head><body>' + cards + '<scr'+'ipt>window.onload=function(){window.print()}<\/scr'+'ipt>
+
+<div id="supervisorLoginOverlay" class="mini-page-overlay">
+  <div class="mini-page-shell">
+    <div class="mini-page-head">
+      <button class="mini-back-btn" onclick="closeSupervisorLogin()">رجوع</button>
+      <h3 style="margin:0;color:var(--green-3)">التقييم والإشراف المدرسي</h3>
+    </div>
+    <div id="supervisorLoginCard" class="mini-page-card">
+      <div class="note-box" style="margin-bottom:12px">🔒 صلاحية عرض فقط — لا يمكن التعديل أو الحذف أو تنفيذ أي عملية داخل المصرف.</div>
+      <div class="grid-2">
+        <div class="field">
+          <label>نوع الدخول</label>
+          <select id="supervisorRole" class="select">
+            <option value="manager">مدير / مديرة</option>
+            <option value="supervisor">مشرف / مشرفة</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>الرقم السري</label>
+          <input id="supervisorPin" type="password" class="input" placeholder="أدخلي الرقم السري">
+        </div>
+      </div>
+      <div class="actions-row" style="margin-top:12px">
+        <button class="btn primary" onclick="loginSupervisor()">دخول</button>
+      </div>
+      <div class="tiny" style="margin-top:8px">الأرقام الافتراضية للتجربة: المدير/ة 1111 — المشرف/ة 2222</div>
+    </div>
+    <div id="supervisorPanel" class="mini-page-card hide">
+      <div class="note-box" style="margin-bottom:12px">🔒 وضع الإشراف — عرض وتقارير فقط</div>
+      <div class="subtabs" id="supervisorSubtabs">
+        <button class="small-btn active" onclick="openSupervisorSubtab('bank', this)">الحساب المصرفي</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('tasks', this)">المهام الأدائية</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('messages', this)">الرسائل</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('evaluation', this)">التقييم</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('certificate', this)">شهادة شكر</button><button class="small-btn" onclick="openSupervisorSubtab('homemail', this)">البريد المنزلي</button>
+      </div>
+      <div id="supervisorSubtab-bank">
+        <div id="supBankReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+      <div id="supervisorSubtab-tasks" class="hide">
+        <div id="supTasksReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+      <div id="supervisorSubtab-messages" class="hide">
+        <div id="supMessagesReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+      <div id="supervisorSubtab-evaluation" class="hide">
+        <div id="supEvaluationReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+      <div id="supervisorSubtab-certificate" class="hide">
+        <div class="grid-2">
+          <div class="field"><label>اسم الطالب / الطالبة</label><input id="supCertStudent" class="input" placeholder="اسم الطالب / الطالبة"></div>
+          <div class="field"><label>الفصل</label><input id="supCertClass" class="input" placeholder="الفصل"></div>
+          <div class="field"><label>عنوان الشهادة</label><input id="supCertTitle" class="input" placeholder="عنوان الشهادة"></div>
+          <div class="field"><label>وسيلة الإرسال</label><select id="supCertSendType" class="select"><option>واتساب</option><option>بريد إلكتروني</option></select></div>
+        </div>
+        <div class="field" style="margin-top:10px"><label>نص الشهادة</label><textarea id="supCertText" class="textarea" placeholder="اكتبي نص شهادة الشكر"></textarea></div>
+        <div class="field" style="margin-top:10px"><label>رفع شهادة شكر</label><input id="supCertFile" type="file" class="input" accept=".pdf,.jpg,.jpeg,.png"></div>
+        <div class="actions-row" style="margin-top:12px"><button class="btn primary" onclick="sendSupervisorCertificate()">إرسال الشهادة</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script id="oai-supervisor-clean-v4">
+(function(){
+  function byId(id){ return document.getElementById(id); }
+  function toastMsg(msg){
+    try{
+      if(window.app && typeof window.app.toast === 'function'){ window.app.toast(msg); return; }
+    }catch(e){}
+    alert(msg);
+  }
+  function getApp(){
+    try{ return window.app || null; }catch(e){ return null; }
+  }
+
+  window.closeSupervisorOverlay = function(){
+    var ov = byId('supervisorOverlay');
+    if(ov) ov.classList.remove('show');
+    var login = byId('supervisorLoginCard');
+    var content = byId('supervisorContent');
+    if(login) login.classList.remove('hide');
+    if(content) content.classList.add('hide');
+    if(byId('supervisorPin')) byId('supervisorPin').value = '';
+  };
+
+  window.loginSupervisor = function(){
+    var pin = (byId('supervisorPin') && byId('supervisorPin').value || '').trim();
+    var role = (byId('supervisorRole') && byId('supervisorRole').value || '').trim();
+    var ok = (role === 'manager' && pin === '1111') || (role === 'supervisor' && pin === '2222');
+    if(!ok){ toastMsg('الرقم السري غير صحيح'); return; }
+
+    var roleLabel = role === 'manager' ? 'مدير/ة' : 'مشرف/ة';
+    var logs = JSON.parse(localStorage.getItem('supervisor_login_logs') || '[]');
+    logs.unshift({role: roleLabel, date: new Date().toLocaleString('ar-SA')});
+    localStorage.setItem('supervisor_login_logs', JSON.stringify(logs.slice(0, 30)));
+
+    var login = byId('supervisorLoginCard');
+    var content = byId('supervisorContent');
+    if(login) login.classList.add('hide');
+    if(content) content.classList.remove('hide');
+    renderSupervisorReports();
+    toastMsg('تم الدخول إلى لوحة الإشراف');
+  };
+
+  window.openSupervisorTab = function(id, btn){
+    ['bank','tasks','messages','evaluation','certificate','homemail','lastlog'].forEach(function(key){
+      var el = byId('supTab-' + key);
+      if(el) el.classList.toggle('hide', key !== id);
+    });
+    var wrap = btn && btn.parentElement;
+    if(wrap){
+      wrap.querySelectorAll('button').forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+    }
+  };
+
+  window.sendSupervisorCertificate = function(){
+    var teacher = (byId('supCertTeacher') && byId('supCertTeacher').value || '').trim();
+    var subject = (byId('supCertSubject') && byId('supCertSubject').value || '').trim();
+    var title = (byId('supCertTitle') && byId('supCertTitle').value || '').trim();
+    if(!teacher || !subject || subject === 'اختر المادة' || !title){
+      toastMsg('أكملي اسم المعلم / المعلمة والمادة وعنوان الشهادة أولًا');
+      return;
+    }
+    toastMsg('تم تجهيز إرسال شهادة الشكر');
+  };
+
+  function renderHomeMail(parents){
+    var stats = byId('supHomeMailStats');
+    var report = byId('supHomeMailReport');
+    var today = new Date().toLocaleDateString('ar-SA');
+    var todayCount = parents.filter(function(m){
+      var d = String(m.date || m.createdAt || '');
+      return d.indexOf(today) !== -1;
+    }).length;
+    var whatsappCount = parents.filter(function(m){
+      return String(m.type || '').indexOf('واتساب') !== -1;
+    }).length;
+
+    if(stats){
+      stats.innerHTML =
+        '<div class="mini-page-stat"><div class="tiny">عدد رسائل البريد المنزلي</div><strong>' + parents.length.toLocaleString('ar-SA') + '</strong></div>' +
+        '<div class="mini-page-stat"><div class="tiny">رسائل اليوم</div><strong>' + todayCount.toLocaleString('ar-SA') + '</strong></div>' +
+        '<div class="mini-page-stat"><div class="tiny">رسائل واتساب</div><strong>' + whatsappCount.toLocaleString('ar-SA') + '</strong></div>' +
+        '<div class="mini-page-stat"><div class="tiny">تاريخ التقرير</div><strong>' + today + '</strong></div>';
+    }
+
+    if(report){
+      report.innerHTML = parents.length ? parents.slice(0,30).map(function(m){
+        return '<div class="mini-page-row" style="display:block">' +
+          '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center">' +
+            '<span><strong>الطالب:</strong> ' + (m.studentName || m.student || '—') + ' | <strong>الفصل:</strong> ' + (m.className || m.classroom || '—') + '</span>' +
+            '<strong>' + (m.date || m.createdAt || '—') + '</strong>' +
+          '</div>' +
+          '<div class="tiny" style="margin-top:6px"><strong>نوع الرسالة:</strong> ' + (m.type || 'البريد المنزلي') + '</div>' +
+          '<div class="tiny" style="margin-top:4px"><strong>الحالة:</strong> ' + (m.status || 'مرسلة بنجاح') + '</div>' +
+          '<div class="tiny" style="margin-top:6px;white-space:pre-line"><strong>نص الرسالة:</strong>\n' + (m.text || m.message || '—') + '</div>' +
+        '</div>';
+      }).join('') : '<div class="mini-page-row"><span>لا توجد رسائل مرسلة إلى أولياء الأمور</span><strong>—</strong></div>';
+    }
+  }
+
+  window.renderSupervisorReports = function(){
+    var app = getApp();
+    if(!app || !app.state) return;
+
+    var classes = app.state.classes || [];
+    var students = app.state.students || [];
+    var txs = app.state.transactions || [];
+    var tasks = app.state.tasks || [];
+    var parents = Array.isArray(app.state.parentMessages) && app.state.parentMessages.length
+      ? app.state.parentMessages
+      : JSON.parse(localStorage.getItem('mini_parent_records') || '[]');
+    var logs = JSON.parse(localStorage.getItem('supervisor_login_logs') || '[]');
+
+    if(byId('supClasses')) byId('supClasses').textContent = classes.length.toLocaleString('ar-SA');
+    if(byId('supStudents')) byId('supStudents').textContent = students.length.toLocaleString('ar-SA');
+    if(byId('supTx')) byId('supTx').textContent = txs.length.toLocaleString('ar-SA');
+    if(byId('supMsg')) byId('supMsg').textContent = parents.length.toLocaleString('ar-SA');
+
+    var sel = byId('supClassFilter');
+    if(sel && !sel.dataset.filled){
+      sel.dataset.filled = '1';
+      sel.innerHTML = '<option value="">كل الفصول</option>' + classes.map(function(c){
+        return '<option value="' + (c.id || '') + '">' + (c.name || c.id || 'فصل') + '</option>';
+      }).join('');
+    }
+
+    var q = (byId('supSearch') && byId('supSearch').value || '').trim();
+    var cls = (sel && sel.value) || '';
+    var filteredTx = txs.filter(function(t){
+      var s = students.find(function(st){ return st.id === t.studentId; });
+      var okClass = !cls || (s && s.classId === cls);
+      var text = ((t.reason || '') + ' ' + (s ? s.name : '')).trim();
+      return okClass && (!q || text.indexOf(q) !== -1);
+    });
+
+    var bank = byId('supBankReport');
+    if(bank){
+      bank.innerHTML = filteredTx.length ? filteredTx.slice(0,25).map(function(t){
+        var s = students.find(function(st){ return st.id === t.studentId; });
+        return '<div class="mini-page-row"><span>' + (t.date || t.createdAt || '—') + ' | ' + (s ? s.name : 'بدون اسم') + ' | ' + (t.type || 'عملية') + ' | ' + (t.reason || 'بدون سبب') + '</span><strong>' + Number(t.amount || 0).toLocaleString('ar-SA') + '</strong></div>';
+      }).join('') : '<div class="mini-page-row"><span>لا توجد عمليات</span><strong>—</strong></div>';
+    }
+
+    var taskBox = byId('supTasksReport');
+    if(taskBox){
+      taskBox.innerHTML = tasks.length ? tasks.map(function(t){
+        return '<div class="mini-page-row"><span>' + (t.title || 'مهمة') + ' | ' + (t.className || t.classId || '—') + ' | ' + (t.date || '—') + '</span><strong>' + (t.submitted ? 'مسلّمة' : 'غير مسلّمة') + '</strong></div>';
+      }).join('') : '<div class="mini-page-row"><span>لا توجد مهام</span><strong>—</strong></div>';
+    }
+
+    var msgBox = byId('supMessagesReport');
+    if(msgBox){
+      msgBox.innerHTML = parents.length ? parents.slice(0,20).map(function(m){
+        return '<div class="mini-page-row"><span>' + (m.date || m.createdAt || '—') + ' | ' + (m.studentName || m.student || '—') + '</span><strong>' + (m.status || 'مرسلة بنجاح') + '</strong></div>';
+      }).join('') : '<div class="mini-page-row"><span>لا توجد رسائل</span><strong>—</strong></div>';
+    }
+
+    var evalBox = byId('supEvaluationReport');
+    if(evalBox){
+      var high = students.filter(function(s){ return Number(s.balance || 0) >= 5000; }).map(function(s){ return s.name; }).slice(0,6).join('، ') || '—';
+      var low = students.filter(function(s){ return Number(s.balance || 0) < 1000; }).map(function(s){ return s.name; }).slice(0,6).join('، ') || '—';
+      evalBox.innerHTML =
+        '<div class="mini-page-row"><span>طلاب متميزون</span><strong>' + high + '</strong></div>' +
+        '<div class="mini-page-row"><span>طلاب منخفضون</span><strong>' + low + '</strong></div>' +
+        '<div class="mini-page-row"><span>تاريخ التقرير</span><strong>' + new Date().toLocaleDateString('ar-SA') + '</strong></div>';
+    }
+
+    renderHomeMail(parents);
+
+    var logBox = byId('supLastLoginReport');
+    if(logBox){
+      logBox.innerHTML = logs.length ? logs.map(function(item){
+        return '<div class="mini-page-row"><span>' + item.role + '</span><strong>' + item.date + '</strong></div>';
+      }).join('') : '<div class="mini-page-row"><span>لا توجد سجلات دخول حتى الآن</span><strong>—</strong></div>';
+    }
+  };
+
+  function bindSupervisorEntry(){
+    var btn = byId('jumpToTeacherBtn');
+    if(btn){
+      btn.onclick = function(e){
+        if(e) e.preventDefault();
+        var ov = byId('supervisorOverlay');
+        if(ov) ov.classList.add('show');
+      };
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    bindSupervisorEntry();
+    setTimeout(function(){
+      if(typeof window.renderSupervisorReports === 'function'){ window.renderSupervisorReports(); }
+    }, 500);
+  });
+  setTimeout(bindSupervisorEntry, 800);
+})();
+</script>
+
 </body></html>');
       w.document.close();
       app.toast && app.toast('تم توليد شهادة PDF تلقائيًا');
@@ -3836,6 +5412,267 @@ function logoutTeacher(){
         + '<table><thead><tr><th>التاريخ</th><th>اليوم</th><th>الحصة</th><th>الوقت</th><th>المادة</th><th>نوع العملية</th><th>المبلغ</th><th>السبب</th><th>المرفق</th></tr></thead><tbody>' + (txRows || '<tr><td colspan="9">لا توجد عمليات</td></tr>') + '</tbody></table>'
         + '<div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:26px"><div class="sub">اعتماد المعلمة: ' + escapeHtml(p.teacherName || '—') + '</div><div>' + sign + '</div></div>'
         + '<img src=x onerror="window.print()">
+
+<div id="supervisorLoginOverlay" class="mini-page-overlay">
+  <div class="mini-page-shell">
+    <div class="mini-page-head">
+      <button class="mini-back-btn" onclick="closeSupervisorLogin()">رجوع</button>
+      <h3 style="margin:0;color:var(--green-3)">التقييم والإشراف المدرسي</h3>
+    </div>
+    <div id="supervisorLoginCard" class="mini-page-card">
+      <div class="note-box" style="margin-bottom:12px">🔒 صلاحية عرض فقط — لا يمكن التعديل أو الحذف أو تنفيذ أي عملية داخل المصرف.</div>
+      <div class="grid-2">
+        <div class="field">
+          <label>نوع الدخول</label>
+          <select id="supervisorRole" class="select">
+            <option value="manager">مدير / مديرة</option>
+            <option value="supervisor">مشرف / مشرفة</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>الرقم السري</label>
+          <input id="supervisorPin" type="password" class="input" placeholder="أدخلي الرقم السري">
+        </div>
+      </div>
+      <div class="actions-row" style="margin-top:12px">
+        <button class="btn primary" onclick="loginSupervisor()">دخول</button>
+      </div>
+      <div class="tiny" style="margin-top:8px">الأرقام الافتراضية للتجربة: المدير/ة 1111 — المشرف/ة 2222</div>
+    </div>
+    <div id="supervisorPanel" class="mini-page-card hide">
+      <div class="note-box" style="margin-bottom:12px">🔒 وضع الإشراف — عرض وتقارير فقط</div>
+      <div class="subtabs" id="supervisorSubtabs">
+        <button class="small-btn active" onclick="openSupervisorSubtab('bank', this)">الحساب المصرفي</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('tasks', this)">المهام الأدائية</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('messages', this)">الرسائل</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('evaluation', this)">التقييم</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('certificate', this)">شهادة شكر</button><button class="small-btn" onclick="openSupervisorSubtab('homemail', this)">البريد المنزلي</button>
+      </div>
+      <div id="supervisorSubtab-bank">
+        <div id="supBankReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+      <div id="supervisorSubtab-tasks" class="hide">
+        <div id="supTasksReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+      <div id="supervisorSubtab-messages" class="hide">
+        <div id="supMessagesReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+      <div id="supervisorSubtab-evaluation" class="hide">
+        <div id="supEvaluationReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+      <div id="supervisorSubtab-certificate" class="hide">
+        <div class="grid-2">
+          <div class="field"><label>اسم الطالب / الطالبة</label><input id="supCertStudent" class="input" placeholder="اسم الطالب / الطالبة"></div>
+          <div class="field"><label>الفصل</label><input id="supCertClass" class="input" placeholder="الفصل"></div>
+          <div class="field"><label>عنوان الشهادة</label><input id="supCertTitle" class="input" placeholder="عنوان الشهادة"></div>
+          <div class="field"><label>وسيلة الإرسال</label><select id="supCertSendType" class="select"><option>واتساب</option><option>بريد إلكتروني</option></select></div>
+        </div>
+        <div class="field" style="margin-top:10px"><label>نص الشهادة</label><textarea id="supCertText" class="textarea" placeholder="اكتبي نص شهادة الشكر"></textarea></div>
+        <div class="field" style="margin-top:10px"><label>رفع شهادة شكر</label><input id="supCertFile" type="file" class="input" accept=".pdf,.jpg,.jpeg,.png"></div>
+        <div class="actions-row" style="margin-top:12px"><button class="btn primary" onclick="sendSupervisorCertificate()">إرسال الشهادة</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script id="oai-supervisor-clean-v4">
+(function(){
+  function byId(id){ return document.getElementById(id); }
+  function toastMsg(msg){
+    try{
+      if(window.app && typeof window.app.toast === 'function'){ window.app.toast(msg); return; }
+    }catch(e){}
+    alert(msg);
+  }
+  function getApp(){
+    try{ return window.app || null; }catch(e){ return null; }
+  }
+
+  window.closeSupervisorOverlay = function(){
+    var ov = byId('supervisorOverlay');
+    if(ov) ov.classList.remove('show');
+    var login = byId('supervisorLoginCard');
+    var content = byId('supervisorContent');
+    if(login) login.classList.remove('hide');
+    if(content) content.classList.add('hide');
+    if(byId('supervisorPin')) byId('supervisorPin').value = '';
+  };
+
+  window.loginSupervisor = function(){
+    var pin = (byId('supervisorPin') && byId('supervisorPin').value || '').trim();
+    var role = (byId('supervisorRole') && byId('supervisorRole').value || '').trim();
+    var ok = (role === 'manager' && pin === '1111') || (role === 'supervisor' && pin === '2222');
+    if(!ok){ toastMsg('الرقم السري غير صحيح'); return; }
+
+    var roleLabel = role === 'manager' ? 'مدير/ة' : 'مشرف/ة';
+    var logs = JSON.parse(localStorage.getItem('supervisor_login_logs') || '[]');
+    logs.unshift({role: roleLabel, date: new Date().toLocaleString('ar-SA')});
+    localStorage.setItem('supervisor_login_logs', JSON.stringify(logs.slice(0, 30)));
+
+    var login = byId('supervisorLoginCard');
+    var content = byId('supervisorContent');
+    if(login) login.classList.add('hide');
+    if(content) content.classList.remove('hide');
+    renderSupervisorReports();
+    toastMsg('تم الدخول إلى لوحة الإشراف');
+  };
+
+  window.openSupervisorTab = function(id, btn){
+    ['bank','tasks','messages','evaluation','certificate','homemail','lastlog'].forEach(function(key){
+      var el = byId('supTab-' + key);
+      if(el) el.classList.toggle('hide', key !== id);
+    });
+    var wrap = btn && btn.parentElement;
+    if(wrap){
+      wrap.querySelectorAll('button').forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+    }
+  };
+
+  window.sendSupervisorCertificate = function(){
+    var teacher = (byId('supCertTeacher') && byId('supCertTeacher').value || '').trim();
+    var subject = (byId('supCertSubject') && byId('supCertSubject').value || '').trim();
+    var title = (byId('supCertTitle') && byId('supCertTitle').value || '').trim();
+    if(!teacher || !subject || subject === 'اختر المادة' || !title){
+      toastMsg('أكملي اسم المعلم / المعلمة والمادة وعنوان الشهادة أولًا');
+      return;
+    }
+    toastMsg('تم تجهيز إرسال شهادة الشكر');
+  };
+
+  function renderHomeMail(parents){
+    var stats = byId('supHomeMailStats');
+    var report = byId('supHomeMailReport');
+    var today = new Date().toLocaleDateString('ar-SA');
+    var todayCount = parents.filter(function(m){
+      var d = String(m.date || m.createdAt || '');
+      return d.indexOf(today) !== -1;
+    }).length;
+    var whatsappCount = parents.filter(function(m){
+      return String(m.type || '').indexOf('واتساب') !== -1;
+    }).length;
+
+    if(stats){
+      stats.innerHTML =
+        '<div class="mini-page-stat"><div class="tiny">عدد رسائل البريد المنزلي</div><strong>' + parents.length.toLocaleString('ar-SA') + '</strong></div>' +
+        '<div class="mini-page-stat"><div class="tiny">رسائل اليوم</div><strong>' + todayCount.toLocaleString('ar-SA') + '</strong></div>' +
+        '<div class="mini-page-stat"><div class="tiny">رسائل واتساب</div><strong>' + whatsappCount.toLocaleString('ar-SA') + '</strong></div>' +
+        '<div class="mini-page-stat"><div class="tiny">تاريخ التقرير</div><strong>' + today + '</strong></div>';
+    }
+
+    if(report){
+      report.innerHTML = parents.length ? parents.slice(0,30).map(function(m){
+        return '<div class="mini-page-row" style="display:block">' +
+          '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center">' +
+            '<span><strong>الطالب:</strong> ' + (m.studentName || m.student || '—') + ' | <strong>الفصل:</strong> ' + (m.className || m.classroom || '—') + '</span>' +
+            '<strong>' + (m.date || m.createdAt || '—') + '</strong>' +
+          '</div>' +
+          '<div class="tiny" style="margin-top:6px"><strong>نوع الرسالة:</strong> ' + (m.type || 'البريد المنزلي') + '</div>' +
+          '<div class="tiny" style="margin-top:4px"><strong>الحالة:</strong> ' + (m.status || 'مرسلة بنجاح') + '</div>' +
+          '<div class="tiny" style="margin-top:6px;white-space:pre-line"><strong>نص الرسالة:</strong>\n' + (m.text || m.message || '—') + '</div>' +
+        '</div>';
+      }).join('') : '<div class="mini-page-row"><span>لا توجد رسائل مرسلة إلى أولياء الأمور</span><strong>—</strong></div>';
+    }
+  }
+
+  window.renderSupervisorReports = function(){
+    var app = getApp();
+    if(!app || !app.state) return;
+
+    var classes = app.state.classes || [];
+    var students = app.state.students || [];
+    var txs = app.state.transactions || [];
+    var tasks = app.state.tasks || [];
+    var parents = Array.isArray(app.state.parentMessages) && app.state.parentMessages.length
+      ? app.state.parentMessages
+      : JSON.parse(localStorage.getItem('mini_parent_records') || '[]');
+    var logs = JSON.parse(localStorage.getItem('supervisor_login_logs') || '[]');
+
+    if(byId('supClasses')) byId('supClasses').textContent = classes.length.toLocaleString('ar-SA');
+    if(byId('supStudents')) byId('supStudents').textContent = students.length.toLocaleString('ar-SA');
+    if(byId('supTx')) byId('supTx').textContent = txs.length.toLocaleString('ar-SA');
+    if(byId('supMsg')) byId('supMsg').textContent = parents.length.toLocaleString('ar-SA');
+
+    var sel = byId('supClassFilter');
+    if(sel && !sel.dataset.filled){
+      sel.dataset.filled = '1';
+      sel.innerHTML = '<option value="">كل الفصول</option>' + classes.map(function(c){
+        return '<option value="' + (c.id || '') + '">' + (c.name || c.id || 'فصل') + '</option>';
+      }).join('');
+    }
+
+    var q = (byId('supSearch') && byId('supSearch').value || '').trim();
+    var cls = (sel && sel.value) || '';
+    var filteredTx = txs.filter(function(t){
+      var s = students.find(function(st){ return st.id === t.studentId; });
+      var okClass = !cls || (s && s.classId === cls);
+      var text = ((t.reason || '') + ' ' + (s ? s.name : '')).trim();
+      return okClass && (!q || text.indexOf(q) !== -1);
+    });
+
+    var bank = byId('supBankReport');
+    if(bank){
+      bank.innerHTML = filteredTx.length ? filteredTx.slice(0,25).map(function(t){
+        var s = students.find(function(st){ return st.id === t.studentId; });
+        return '<div class="mini-page-row"><span>' + (t.date || t.createdAt || '—') + ' | ' + (s ? s.name : 'بدون اسم') + ' | ' + (t.type || 'عملية') + ' | ' + (t.reason || 'بدون سبب') + '</span><strong>' + Number(t.amount || 0).toLocaleString('ar-SA') + '</strong></div>';
+      }).join('') : '<div class="mini-page-row"><span>لا توجد عمليات</span><strong>—</strong></div>';
+    }
+
+    var taskBox = byId('supTasksReport');
+    if(taskBox){
+      taskBox.innerHTML = tasks.length ? tasks.map(function(t){
+        return '<div class="mini-page-row"><span>' + (t.title || 'مهمة') + ' | ' + (t.className || t.classId || '—') + ' | ' + (t.date || '—') + '</span><strong>' + (t.submitted ? 'مسلّمة' : 'غير مسلّمة') + '</strong></div>';
+      }).join('') : '<div class="mini-page-row"><span>لا توجد مهام</span><strong>—</strong></div>';
+    }
+
+    var msgBox = byId('supMessagesReport');
+    if(msgBox){
+      msgBox.innerHTML = parents.length ? parents.slice(0,20).map(function(m){
+        return '<div class="mini-page-row"><span>' + (m.date || m.createdAt || '—') + ' | ' + (m.studentName || m.student || '—') + '</span><strong>' + (m.status || 'مرسلة بنجاح') + '</strong></div>';
+      }).join('') : '<div class="mini-page-row"><span>لا توجد رسائل</span><strong>—</strong></div>';
+    }
+
+    var evalBox = byId('supEvaluationReport');
+    if(evalBox){
+      var high = students.filter(function(s){ return Number(s.balance || 0) >= 5000; }).map(function(s){ return s.name; }).slice(0,6).join('، ') || '—';
+      var low = students.filter(function(s){ return Number(s.balance || 0) < 1000; }).map(function(s){ return s.name; }).slice(0,6).join('، ') || '—';
+      evalBox.innerHTML =
+        '<div class="mini-page-row"><span>طلاب متميزون</span><strong>' + high + '</strong></div>' +
+        '<div class="mini-page-row"><span>طلاب منخفضون</span><strong>' + low + '</strong></div>' +
+        '<div class="mini-page-row"><span>تاريخ التقرير</span><strong>' + new Date().toLocaleDateString('ar-SA') + '</strong></div>';
+    }
+
+    renderHomeMail(parents);
+
+    var logBox = byId('supLastLoginReport');
+    if(logBox){
+      logBox.innerHTML = logs.length ? logs.map(function(item){
+        return '<div class="mini-page-row"><span>' + item.role + '</span><strong>' + item.date + '</strong></div>';
+      }).join('') : '<div class="mini-page-row"><span>لا توجد سجلات دخول حتى الآن</span><strong>—</strong></div>';
+    }
+  };
+
+  function bindSupervisorEntry(){
+    var btn = byId('jumpToTeacherBtn');
+    if(btn){
+      btn.onclick = function(e){
+        if(e) e.preventDefault();
+        var ov = byId('supervisorOverlay');
+        if(ov) ov.classList.add('show');
+      };
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    bindSupervisorEntry();
+    setTimeout(function(){
+      if(typeof window.renderSupervisorReports === 'function'){ window.renderSupervisorReports(); }
+    }, 500);
+  });
+  setTimeout(bindSupervisorEntry, 800);
+})();
+</script>
+
 </body></html>');
       w.document.close();
     };
@@ -4269,20 +6106,28 @@ function logoutTeacher(){
       <button class="mini-back-btn" onclick="closeSupervisorOverlay()">رجوع</button>
       <h3 style="margin:0;color:var(--green-3)">التقييم والإشراف المدرسي</h3>
     </div>
+
     <div id="supervisorLoginCard" class="mini-page-card">
       <div class="grid-2">
-        <div class="field"><label>نوع الدخول</label>
+        <div class="field">
+          <label>نوع الدخول</label>
           <select id="supervisorRole" class="select">
             <option value="manager">مدير / مديرة</option>
             <option value="supervisor">مشرف / مشرفة</option>
           </select>
         </div>
-        <div class="field"><label>الرقم السري</label><input id="supervisorPin" class="input" placeholder="الرقم السري"></div>
+        <div class="field">
+          <label>الرقم السري</label>
+          <input id="supervisorPin" class="input" placeholder="الرقم السري">
+        </div>
       </div>
       <div class="note-box" style="margin-top:12px">صلاحية عرض فقط – لا يمكن التعديل على البيانات.</div>
-      <div class="actions-row" style="margin-top:12px"><button class="btn primary" onclick="loginSupervisor()">دخول</button></div>
+      <div class="actions-row" style="margin-top:12px">
+        <button class="btn primary" onclick="loginSupervisor()">دخول</button>
+      </div>
       <div class="tiny" style="margin-top:8px">الأرقام الافتراضية: المدير/ة 1111 — المشرف/ة 2222</div>
     </div>
+
     <div id="supervisorContent" class="mini-page-card hide">
       <div class="mini-page-grid">
         <div class="mini-page-stat"><div class="tiny">عدد الفصول</div><strong id="supClasses">0</strong></div>
@@ -4290,6 +6135,7 @@ function logoutTeacher(){
         <div class="mini-page-stat"><div class="tiny">إجمالي العمليات</div><strong id="supTx">0</strong></div>
         <div class="mini-page-stat"><div class="tiny">عدد الرسائل</div><strong id="supMsg">0</strong></div>
       </div>
+
       <div class="subtabs" style="margin-top:14px">
         <button class="small-btn active" onclick="openSupervisorTab('bank', this)">الحساب المصرفي</button>
         <button class="small-btn" onclick="openSupervisorTab('tasks', this)">المهام الأدائية</button>
@@ -4308,9 +6154,17 @@ function logoutTeacher(){
         <div class="mini-page-card"><div id="supBankReport" class="mini-page-list"></div></div>
       </div>
 
-      <div id="supTab-tasks" class="hide"><div class="mini-page-card"><div id="supTasksReport" class="mini-page-list"></div></div></div>
-      <div id="supTab-messages" class="hide"><div class="mini-page-card"><div id="supMessagesReport" class="mini-page-list"></div></div></div>
-      <div id="supTab-evaluation" class="hide"><div class="mini-page-card"><div id="supEvaluationReport" class="mini-page-list"></div></div></div>
+      <div id="supTab-tasks" class="hide">
+        <div class="mini-page-card"><div id="supTasksReport" class="mini-page-list"></div></div>
+      </div>
+
+      <div id="supTab-messages" class="hide">
+        <div class="mini-page-card"><div id="supMessagesReport" class="mini-page-list"></div></div>
+      </div>
+
+      <div id="supTab-evaluation" class="hide">
+        <div class="mini-page-card"><div id="supEvaluationReport" class="mini-page-list"></div></div>
+      </div>
 
       <div id="supTab-certificate" class="hide">
         <div class="mini-page-card">
@@ -4346,14 +6200,13 @@ function logoutTeacher(){
 
       <div id="supTab-lastlog" class="hide">
         <div class="mini-page-card">
-          <div class="note-box" style="margin-bottom:12px">يعرض آخر عمليات الدخول للمدير/ة والمشرف/ة.</div>
+          <div class="note-box" style="margin-bottom:12px">يعرض آخر دخول للمدير/ة والمشرف/ة مع التاريخ والوقت.</div>
           <div id="supLastLoginReport" class="mini-page-list"></div>
         </div>
       </div>
     </div>
   </div>
 </div>
-
 
 <div id="backupOverlay" class="mini-page-overlay">
   <div class="mini-page-shell">
@@ -4514,6 +6367,267 @@ function logoutTeacher(){
 </script>
 
 
+
+
+<div id="supervisorLoginOverlay" class="mini-page-overlay">
+  <div class="mini-page-shell">
+    <div class="mini-page-head">
+      <button class="mini-back-btn" onclick="closeSupervisorLogin()">رجوع</button>
+      <h3 style="margin:0;color:var(--green-3)">التقييم والإشراف المدرسي</h3>
+    </div>
+    <div id="supervisorLoginCard" class="mini-page-card">
+      <div class="note-box" style="margin-bottom:12px">🔒 صلاحية عرض فقط — لا يمكن التعديل أو الحذف أو تنفيذ أي عملية داخل المصرف.</div>
+      <div class="grid-2">
+        <div class="field">
+          <label>نوع الدخول</label>
+          <select id="supervisorRole" class="select">
+            <option value="manager">مدير / مديرة</option>
+            <option value="supervisor">مشرف / مشرفة</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>الرقم السري</label>
+          <input id="supervisorPin" type="password" class="input" placeholder="أدخلي الرقم السري">
+        </div>
+      </div>
+      <div class="actions-row" style="margin-top:12px">
+        <button class="btn primary" onclick="loginSupervisor()">دخول</button>
+      </div>
+      <div class="tiny" style="margin-top:8px">الأرقام الافتراضية للتجربة: المدير/ة 1111 — المشرف/ة 2222</div>
+    </div>
+    <div id="supervisorPanel" class="mini-page-card hide">
+      <div class="note-box" style="margin-bottom:12px">🔒 وضع الإشراف — عرض وتقارير فقط</div>
+      <div class="subtabs" id="supervisorSubtabs">
+        <button class="small-btn active" onclick="openSupervisorSubtab('bank', this)">الحساب المصرفي</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('tasks', this)">المهام الأدائية</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('messages', this)">الرسائل</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('evaluation', this)">التقييم</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('certificate', this)">شهادة شكر</button><button class="small-btn" onclick="openSupervisorSubtab('homemail', this)">البريد المنزلي</button>
+      </div>
+      <div id="supervisorSubtab-bank">
+        <div id="supBankReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+      <div id="supervisorSubtab-tasks" class="hide">
+        <div id="supTasksReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+      <div id="supervisorSubtab-messages" class="hide">
+        <div id="supMessagesReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+      <div id="supervisorSubtab-evaluation" class="hide">
+        <div id="supEvaluationReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+      <div id="supervisorSubtab-certificate" class="hide">
+        <div class="grid-2">
+          <div class="field"><label>اسم الطالب / الطالبة</label><input id="supCertStudent" class="input" placeholder="اسم الطالب / الطالبة"></div>
+          <div class="field"><label>الفصل</label><input id="supCertClass" class="input" placeholder="الفصل"></div>
+          <div class="field"><label>عنوان الشهادة</label><input id="supCertTitle" class="input" placeholder="عنوان الشهادة"></div>
+          <div class="field"><label>وسيلة الإرسال</label><select id="supCertSendType" class="select"><option>واتساب</option><option>بريد إلكتروني</option></select></div>
+        </div>
+        <div class="field" style="margin-top:10px"><label>نص الشهادة</label><textarea id="supCertText" class="textarea" placeholder="اكتبي نص شهادة الشكر"></textarea></div>
+        <div class="field" style="margin-top:10px"><label>رفع شهادة شكر</label><input id="supCertFile" type="file" class="input" accept=".pdf,.jpg,.jpeg,.png"></div>
+        <div class="actions-row" style="margin-top:12px"><button class="btn primary" onclick="sendSupervisorCertificate()">إرسال الشهادة</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script id="oai-supervisor-clean-v4">
+(function(){
+  function byId(id){ return document.getElementById(id); }
+  function toastMsg(msg){
+    try{
+      if(window.app && typeof window.app.toast === 'function'){ window.app.toast(msg); return; }
+    }catch(e){}
+    alert(msg);
+  }
+  function getApp(){
+    try{ return window.app || null; }catch(e){ return null; }
+  }
+
+  window.closeSupervisorOverlay = function(){
+    var ov = byId('supervisorOverlay');
+    if(ov) ov.classList.remove('show');
+    var login = byId('supervisorLoginCard');
+    var content = byId('supervisorContent');
+    if(login) login.classList.remove('hide');
+    if(content) content.classList.add('hide');
+    if(byId('supervisorPin')) byId('supervisorPin').value = '';
+  };
+
+  window.loginSupervisor = function(){
+    var pin = (byId('supervisorPin') && byId('supervisorPin').value || '').trim();
+    var role = (byId('supervisorRole') && byId('supervisorRole').value || '').trim();
+    var ok = (role === 'manager' && pin === '1111') || (role === 'supervisor' && pin === '2222');
+    if(!ok){ toastMsg('الرقم السري غير صحيح'); return; }
+
+    var roleLabel = role === 'manager' ? 'مدير/ة' : 'مشرف/ة';
+    var logs = JSON.parse(localStorage.getItem('supervisor_login_logs') || '[]');
+    logs.unshift({role: roleLabel, date: new Date().toLocaleString('ar-SA')});
+    localStorage.setItem('supervisor_login_logs', JSON.stringify(logs.slice(0, 30)));
+
+    var login = byId('supervisorLoginCard');
+    var content = byId('supervisorContent');
+    if(login) login.classList.add('hide');
+    if(content) content.classList.remove('hide');
+    renderSupervisorReports();
+    toastMsg('تم الدخول إلى لوحة الإشراف');
+  };
+
+  window.openSupervisorTab = function(id, btn){
+    ['bank','tasks','messages','evaluation','certificate','homemail','lastlog'].forEach(function(key){
+      var el = byId('supTab-' + key);
+      if(el) el.classList.toggle('hide', key !== id);
+    });
+    var wrap = btn && btn.parentElement;
+    if(wrap){
+      wrap.querySelectorAll('button').forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+    }
+  };
+
+  window.sendSupervisorCertificate = function(){
+    var teacher = (byId('supCertTeacher') && byId('supCertTeacher').value || '').trim();
+    var subject = (byId('supCertSubject') && byId('supCertSubject').value || '').trim();
+    var title = (byId('supCertTitle') && byId('supCertTitle').value || '').trim();
+    if(!teacher || !subject || subject === 'اختر المادة' || !title){
+      toastMsg('أكملي اسم المعلم / المعلمة والمادة وعنوان الشهادة أولًا');
+      return;
+    }
+    toastMsg('تم تجهيز إرسال شهادة الشكر');
+  };
+
+  function renderHomeMail(parents){
+    var stats = byId('supHomeMailStats');
+    var report = byId('supHomeMailReport');
+    var today = new Date().toLocaleDateString('ar-SA');
+    var todayCount = parents.filter(function(m){
+      var d = String(m.date || m.createdAt || '');
+      return d.indexOf(today) !== -1;
+    }).length;
+    var whatsappCount = parents.filter(function(m){
+      return String(m.type || '').indexOf('واتساب') !== -1;
+    }).length;
+
+    if(stats){
+      stats.innerHTML =
+        '<div class="mini-page-stat"><div class="tiny">عدد رسائل البريد المنزلي</div><strong>' + parents.length.toLocaleString('ar-SA') + '</strong></div>' +
+        '<div class="mini-page-stat"><div class="tiny">رسائل اليوم</div><strong>' + todayCount.toLocaleString('ar-SA') + '</strong></div>' +
+        '<div class="mini-page-stat"><div class="tiny">رسائل واتساب</div><strong>' + whatsappCount.toLocaleString('ar-SA') + '</strong></div>' +
+        '<div class="mini-page-stat"><div class="tiny">تاريخ التقرير</div><strong>' + today + '</strong></div>';
+    }
+
+    if(report){
+      report.innerHTML = parents.length ? parents.slice(0,30).map(function(m){
+        return '<div class="mini-page-row" style="display:block">' +
+          '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center">' +
+            '<span><strong>الطالب:</strong> ' + (m.studentName || m.student || '—') + ' | <strong>الفصل:</strong> ' + (m.className || m.classroom || '—') + '</span>' +
+            '<strong>' + (m.date || m.createdAt || '—') + '</strong>' +
+          '</div>' +
+          '<div class="tiny" style="margin-top:6px"><strong>نوع الرسالة:</strong> ' + (m.type || 'البريد المنزلي') + '</div>' +
+          '<div class="tiny" style="margin-top:4px"><strong>الحالة:</strong> ' + (m.status || 'مرسلة بنجاح') + '</div>' +
+          '<div class="tiny" style="margin-top:6px;white-space:pre-line"><strong>نص الرسالة:</strong>\n' + (m.text || m.message || '—') + '</div>' +
+        '</div>';
+      }).join('') : '<div class="mini-page-row"><span>لا توجد رسائل مرسلة إلى أولياء الأمور</span><strong>—</strong></div>';
+    }
+  }
+
+  window.renderSupervisorReports = function(){
+    var app = getApp();
+    if(!app || !app.state) return;
+
+    var classes = app.state.classes || [];
+    var students = app.state.students || [];
+    var txs = app.state.transactions || [];
+    var tasks = app.state.tasks || [];
+    var parents = Array.isArray(app.state.parentMessages) && app.state.parentMessages.length
+      ? app.state.parentMessages
+      : JSON.parse(localStorage.getItem('mini_parent_records') || '[]');
+    var logs = JSON.parse(localStorage.getItem('supervisor_login_logs') || '[]');
+
+    if(byId('supClasses')) byId('supClasses').textContent = classes.length.toLocaleString('ar-SA');
+    if(byId('supStudents')) byId('supStudents').textContent = students.length.toLocaleString('ar-SA');
+    if(byId('supTx')) byId('supTx').textContent = txs.length.toLocaleString('ar-SA');
+    if(byId('supMsg')) byId('supMsg').textContent = parents.length.toLocaleString('ar-SA');
+
+    var sel = byId('supClassFilter');
+    if(sel && !sel.dataset.filled){
+      sel.dataset.filled = '1';
+      sel.innerHTML = '<option value="">كل الفصول</option>' + classes.map(function(c){
+        return '<option value="' + (c.id || '') + '">' + (c.name || c.id || 'فصل') + '</option>';
+      }).join('');
+    }
+
+    var q = (byId('supSearch') && byId('supSearch').value || '').trim();
+    var cls = (sel && sel.value) || '';
+    var filteredTx = txs.filter(function(t){
+      var s = students.find(function(st){ return st.id === t.studentId; });
+      var okClass = !cls || (s && s.classId === cls);
+      var text = ((t.reason || '') + ' ' + (s ? s.name : '')).trim();
+      return okClass && (!q || text.indexOf(q) !== -1);
+    });
+
+    var bank = byId('supBankReport');
+    if(bank){
+      bank.innerHTML = filteredTx.length ? filteredTx.slice(0,25).map(function(t){
+        var s = students.find(function(st){ return st.id === t.studentId; });
+        return '<div class="mini-page-row"><span>' + (t.date || t.createdAt || '—') + ' | ' + (s ? s.name : 'بدون اسم') + ' | ' + (t.type || 'عملية') + ' | ' + (t.reason || 'بدون سبب') + '</span><strong>' + Number(t.amount || 0).toLocaleString('ar-SA') + '</strong></div>';
+      }).join('') : '<div class="mini-page-row"><span>لا توجد عمليات</span><strong>—</strong></div>';
+    }
+
+    var taskBox = byId('supTasksReport');
+    if(taskBox){
+      taskBox.innerHTML = tasks.length ? tasks.map(function(t){
+        return '<div class="mini-page-row"><span>' + (t.title || 'مهمة') + ' | ' + (t.className || t.classId || '—') + ' | ' + (t.date || '—') + '</span><strong>' + (t.submitted ? 'مسلّمة' : 'غير مسلّمة') + '</strong></div>';
+      }).join('') : '<div class="mini-page-row"><span>لا توجد مهام</span><strong>—</strong></div>';
+    }
+
+    var msgBox = byId('supMessagesReport');
+    if(msgBox){
+      msgBox.innerHTML = parents.length ? parents.slice(0,20).map(function(m){
+        return '<div class="mini-page-row"><span>' + (m.date || m.createdAt || '—') + ' | ' + (m.studentName || m.student || '—') + '</span><strong>' + (m.status || 'مرسلة بنجاح') + '</strong></div>';
+      }).join('') : '<div class="mini-page-row"><span>لا توجد رسائل</span><strong>—</strong></div>';
+    }
+
+    var evalBox = byId('supEvaluationReport');
+    if(evalBox){
+      var high = students.filter(function(s){ return Number(s.balance || 0) >= 5000; }).map(function(s){ return s.name; }).slice(0,6).join('، ') || '—';
+      var low = students.filter(function(s){ return Number(s.balance || 0) < 1000; }).map(function(s){ return s.name; }).slice(0,6).join('، ') || '—';
+      evalBox.innerHTML =
+        '<div class="mini-page-row"><span>طلاب متميزون</span><strong>' + high + '</strong></div>' +
+        '<div class="mini-page-row"><span>طلاب منخفضون</span><strong>' + low + '</strong></div>' +
+        '<div class="mini-page-row"><span>تاريخ التقرير</span><strong>' + new Date().toLocaleDateString('ar-SA') + '</strong></div>';
+    }
+
+    renderHomeMail(parents);
+
+    var logBox = byId('supLastLoginReport');
+    if(logBox){
+      logBox.innerHTML = logs.length ? logs.map(function(item){
+        return '<div class="mini-page-row"><span>' + item.role + '</span><strong>' + item.date + '</strong></div>';
+      }).join('') : '<div class="mini-page-row"><span>لا توجد سجلات دخول حتى الآن</span><strong>—</strong></div>';
+    }
+  };
+
+  function bindSupervisorEntry(){
+    var btn = byId('jumpToTeacherBtn');
+    if(btn){
+      btn.onclick = function(e){
+        if(e) e.preventDefault();
+        var ov = byId('supervisorOverlay');
+        if(ov) ov.classList.add('show');
+      };
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    bindSupervisorEntry();
+    setTimeout(function(){
+      if(typeof window.renderSupervisorReports === 'function'){ window.renderSupervisorReports(); }
+    }, 500);
+  });
+  setTimeout(bindSupervisorEntry, 800);
+})();
+</script>
 
 </body>
 </html>
