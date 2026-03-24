@@ -775,19 +775,19 @@
       <div class="phone-shell">
         <div class="phone">
           <div class="phone-head"><span>09:31</span><span>مصرف التعليم</span><span>☰</span></div>
-          <div class="phone-hero">
+          <div class="phone-hero" onclick="showFeatureNotice('الرصيد التحفيزي')" style="cursor:pointer">
             <h3>الرصيد التحفيزي</h3>
             <p class="balance" id="heroBalance">0</p>
             <div class="muted">نقطة</div>
           </div>
-          <div class="phone-grid">
-            <div class="mini-card">📘<strong id="heroTaskCount">0 مهام أدائية</strong></div>
-            <div class="mini-card">👥<strong id="heroStudentCount">0 طالب/طالبة</strong></div>
-            <div class="mini-card">📄<strong id="heroTransactionCount">0 عملية</strong></div>
-            <div class="mini-card">🎡<strong id="heroRewardCount">0 جوائز روليت</strong></div>
+          <div class="phone-grid" id="phoneQuickGrid">
+            <div class="mini-card" onclick="showFeatureNotice('المهام الأدائية')" style="cursor:pointer">📘<strong id="heroTaskCount">0 مهام أدائية</strong></div>
+            <div class="mini-card" onclick="showFeatureNotice('طالب / طالبة')" style="cursor:pointer">👥<strong id="heroStudentCount">0 طالب/طالبة</strong></div>
+            <div class="mini-card" onclick="showFeatureNotice('عملية')" style="cursor:pointer">📄<strong id="heroTransactionCount">0 عملية</strong></div>
+            <div class="mini-card" onclick="showFeatureNotice('جوائز روليت')" style="cursor:pointer">🎡<strong id="heroRewardCount">0 جوائز روليت</strong></div>
           </div>
           <div class="list" id="heroRecentList"></div>
-          <div class="phone-nav" id="miniPhoneNav"><div data-mini-page="follow">المتابعة</div><div data-mini-page="messages">التواصل</div><div data-mini-page="settings">الإعدادات</div></div>
+          <div class="phone-nav" id="miniPhoneNav"><div data-mini-page="follow">المتابعة</div><div data-mini-page="messages">التواصل</div><div data-mini-page="settings">الإعدادات</div></div><div data-mini-page="statement">الكشف</div><div data-mini-page="follow">المتابعة</div><div data-mini-page="settings">الإعدادات</div></div>
         </div>
       </div>
     </section>
@@ -3994,50 +3994,40 @@ function logoutTeacher(){
               <div class="tiny">الصف</div>
               <select id="miniScheduleClass" style="margin-top:8px">
                 <option>اختر الصف</option>
-                <option>الصف الأول</option>
-                <option>الصف الثاني</option>
-                <option>الصف الثالث</option>
-                <option>الصف الرابع</option>
-                <option>الصف الخامس</option>
-                <option>الصف السادس</option>
-                <option>الأول المتوسط</option>
-                <option>الثاني المتوسط</option>
-                <option>الثالث المتوسط</option>
+                <option>الصف الأول</option><option>الصف الثاني</option><option>الصف الثالث</option>
+                <option>الصف الرابع</option><option>الصف الخامس</option><option>الصف السادس</option>
+                <option>الأول المتوسط</option><option>الثاني المتوسط</option><option>الثالث المتوسط</option>
               </select>
             </div>
             <div class="mini-page-stat">
               <div class="tiny">العام الدراسي</div>
               <select id="miniScheduleYear" style="margin-top:8px">
                 <option>اختر العام الدراسي</option>
-                <option>1446 / 1447</option>
-                <option>1447 / 1448</option>
-                <option>1448 / 1449</option>
+                <option>1446 / 1447</option><option>1447 / 1448</option><option>1448 / 1449</option>
               </select>
             </div>
           </div>
           <div class="field" style="margin-top:12px">
             <label>بحث سريع داخل الجدول</label>
-            <input id="miniScheduleSearch" class="input" placeholder="ابحثي عن صف / مادة / ملاحظة" oninput="filterMiniSchedule()">
+            <input id="miniScheduleSearch" class="input" placeholder="ابحثي باسم الصف أو المادة أو اليوم">
           </div>
           <div style="overflow:auto;margin-top:14px">
-            <table class="statement-full-table" style="min-width:900px">
+            <table class="statement-full-table" id="miniScheduleTable" style="min-width:900px">
               <thead>
-                <tr>
-                  <th>اليوم \ الحصة</th>
-                  <th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th>
-                </tr>
+                <tr><th>اليوم \ الحصة</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th></tr>
               </thead>
               <tbody>
-                <tr><th>الأحد</th><td><input class="mini-schedule-input input" placeholder="الصف / المادة"></td><td><input class="mini-schedule-input input"></td><td><input class="mini-schedule-input input"></td><td><input class="mini-schedule-input input"></td><td><input class="mini-schedule-input input"></td><td><input class="mini-schedule-input input"></td><td><input class="mini-schedule-input input"></td><td><input class="mini-schedule-input input"></td></tr>
-                <tr><th>الاثنين</th><td><input class="mini-schedule-input input"></td><td><input class="mini-schedule-input input"></td><td><input class="mini-schedule-input input"></td><td><input class="mini-schedule-input input"></td><td><input class="mini-schedule-input input"></td><td><input class="mini-schedule-input input"></td><td><input class="mini-schedule-input input"></td><td><input class="mini-schedule-input input"></td></tr>
-                <tr><th>الثلاثاء</th><td><input class="mini-schedule-input input"></td><td><input class="mini-schedule-input input"></td><td><input class="mini-schedule-input input"></td><td><input class="mini-schedule-input input"></td><td><input class="mini-schedule-input input"></td><td><input class="mini-schedule-input input"></td><td><input class="mini-schedule-input input"></td><td><input class="mini-schedule-input input"></td></tr>
-                <tr><th>الأربعاء</th><td><input class="mini-schedule-input input"></td><td><input class="mini-schedule-input input"></td><td><input class="mini-schedule-input input"></td><td><input class="mini-schedule-input input"></td><td><input class="mini-schedule-input input"></td><td><input class="mini-schedule-input input"></td><td><input class="mini-schedule-input input"></td><td><input class="mini-schedule-input input"></td></tr>
-                <tr><th>الخميس</th><td><input class="mini-schedule-input input"></td><td><input class="mini-schedule-input input"></td><td><input class="mini-schedule-input input"></td><td><input class="mini-schedule-input input"></td><td><input class="mini-schedule-input input"></td><td><input class="mini-schedule-input input"></td><td><input class="mini-schedule-input input"></td><td><input class="mini-schedule-input input"></td></tr>
+                <tr><th>الأحد</th><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td></tr>
+                <tr><th>الاثنين</th><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td></tr>
+                <tr><th>الثلاثاء</th><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td></tr>
+                <tr><th>الأربعاء</th><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td></tr>
+                <tr><th>الخميس</th><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td></tr>
               </tbody>
             </table>
           </div>
           <div class="actions-row" style="margin-top:12px">
             <button class="btn primary" onclick="saveMiniSchedule()">حفظ الجدول المدرسي للفصل المحدد</button>
+            <button class="btn secondary" onclick="loadMiniSchedule()">تحميل جدول الفصل المحدد</button>
             <button class="btn secondary" onclick="clearMiniSchedule()">تفريغ الجدول</button>
           </div>
           <div class="note-box" style="margin-top:12px">يتم حفظ جدول مستقل لكل فصل حسب الصف والعام الدراسي الذي يتم اختيارهما في الأعلى.</div>
@@ -4063,74 +4053,17 @@ function logoutTeacher(){
       </div>
 
       <div id="miniFollowSubtab-homework" class="hide">
-        <div class="mini-page-grid">
-          <div class="mini-page-stat"><div class="tiny">الواجبات المطلوبة أسبوعيًا</div><strong>0</strong></div>
-          <div class="mini-page-stat"><div class="tiny">الواجبات الأسبوعية المنجزة</div><strong>0</strong></div>
-          <div class="mini-page-stat"><div class="tiny">الواجبات الشهرية المنجزة</div><strong>0</strong></div>
-          <div class="mini-page-stat"><div class="tiny">إجمالي النقاط المحتسبة</div><strong>0</strong></div>
-        </div>
-        <div class="mini-page-grid" style="margin-top:12px">
-          <div class="mini-page-stat"><div class="tiny">المشاركات الأسبوعية</div><strong>0</strong></div>
-          <div class="mini-page-stat"><div class="tiny">المشاركات الشهرية</div><strong>0</strong></div>
-          <div class="mini-page-stat"><div class="tiny">أسئلة التفكير العليا</div><strong>0</strong></div>
-          <div class="mini-page-stat"><div class="tiny">الأسئلة الإثرائية</div><strong>0</strong></div>
-        </div>
-        <div class="mini-page-card">
-          <h4 style="margin:0 0 10px">متابعة الطالب وربطها بالنقاط</h4>
-          <div class="grid-2">
-            <div class="field"><label>الطالب / الطالبة</label><select class="select"><option>اختر الطالب / الطالبة</option></select></div>
-            <div class="field"><label>عدد الواجبات المطلوبة أسبوعيًا</label><input class="input" value="0"></div>
-            <div class="field"><label>متابعة الواجبات الأسبوعية المنجزة</label><input class="input" value="0"></div>
-            <div class="field"><label>متابعة الواجبات الشهرية المنجزة</label><input class="input" value="0"></div>
-            <div class="field"><label>عدد المشاركات الأسبوعية</label><input class="input" value="0"></div>
-            <div class="field"><label>عدد المشاركات الشهرية</label><input class="input" value="0"></div>
-            <div class="field"><label>عداد أسئلة التفكير العليا</label><input class="input" value="0"></div>
-            <div class="field"><label>عداد الأسئلة الإثرائية</label><input class="input" value="0"></div>
-          </div>
-          <div class="actions-row" style="margin-top:12px">
-            <button class="btn warn">عرض بيانات الطالب</button>
-            <button class="btn primary">حفظ المتابعة واحتساب النقاط</button>
-          </div>
-          <div class="note-box" style="margin-top:10px">يتم تحويل النقاط المحتسبة تلقائيًا إلى رصيد الطالب التحفيزي دون تكرار الاحتساب السابق.</div>
-        </div>
-
-        <div class="mini-page-card">
-          <h4 style="margin:0 0 10px">إضافة سريعة للفصل المحدد</h4>
-          <div class="grid-2">
-            <div class="field"><label>الفصل المحدد</label><select class="select"><option>اختر الفصل</option></select></div>
-            <div class="field"><label>عدد الواجبات المطلوبة أسبوعيًا</label><input class="input" value="0"></div>
-            <div class="field"><label>الواجب الأسبوعي المنجز</label><input class="input" value="0"></div>
-            <div class="field"><label>الواجب الشهري المنجز</label><input class="input" value="0"></div>
-            <div class="field"><label>المشاركة الأسبوعية</label><input class="input" value="0"></div>
-            <div class="field"><label>المشاركة الشهرية</label><input class="input" value="0"></div>
-            <div class="field"><label>التفكير العليا</label><input class="input" value="0"></div>
-            <div class="field"><label>الإثرائية</label><input class="input" value="0"></div>
-          </div>
-          <div class="actions-row" style="margin-top:12px">
-            <button class="btn warn">نسخ من بيانات الطالب المحدد</button>
-            <button class="btn primary">حفظ للفصل المحدد واحتساب النقاط</button>
-            <button class="btn primary">إرسال تقرير الفصل واتساب</button>
-          </div>
-          <div class="note-box" style="margin-top:10px">هذا الخيار يطبق نفس القيم على جميع طلاب الفصل المحدد دفعة واحدة، ثم يربطها بالنقاط والرصيد تلقائيًا عند الحفظ.</div>
-        </div>
-
-        <div class="mini-page-card">
-          <h4 style="margin:0 0 10px">أوزان النقاط</h4>
+        <div class="mini-page-card" style="margin-top:0">
           <div class="grid-3">
-            <div class="field"><label>الواجب الأسبوعي</label><input id="miniWeightWeeklyHw" class="input" value="10"></div>
-            <div class="field"><label>الواجب الشهري</label><input id="miniWeightMonthlyHw" class="input" value="25"></div>
-            <div class="field"><label>المشاركة الأسبوعية</label><input id="miniWeightWeeklyPart" class="input" value="5"></div>
-            <div class="field"><label>المشاركة الشهرية</label><input id="miniWeightMonthlyPart" class="input" value="8"></div>
+            <div class="field"><label>الواجب الأسبوعي</label><input id="miniWeightWeekly" class="input" value="10"></div>
+            <div class="field"><label>الواجب الشهري</label><input id="miniWeightMonthly" class="input" value="25"></div>
+            <div class="field"><label>المشاركة الأسبوعية</label><input id="miniWeightParticipation" class="input" value="5"></div>
+            <div class="field"><label>المشاركة الشهرية</label><input id="miniWeightParticipationMonthly" class="input" value="8"></div>
             <div class="field"><label>التفكير العليا</label><input id="miniWeightHigher" class="input" value="12"></div>
             <div class="field"><label>الإثرائية</label><input id="miniWeightEnrich" class="input" value="7"></div>
           </div>
           <div class="actions-row" style="margin-top:12px">
             <button class="btn primary" onclick="saveMiniWeights()">حفظ أوزان النقاط</button>
-          </div>
-          <div class="mini-page-stat" style="margin-top:12px;background:linear-gradient(135deg,var(--green-2),var(--green));color:#fff">
-            <div class="tiny" style="color:#eaf7ef">مجموع نقاط الطالب المحدد</div>
-            <strong style="color:#fff">0</strong>
-            <div class="tiny" style="color:#eaf7ef">هذه النقاط مرتبطة مباشرة برصيد الطالب الحالي داخل النظام البنكي.</div>
           </div>
         </div>
       </div>
@@ -4145,26 +4078,13 @@ function logoutTeacher(){
       <div class="mini-page-card">
         <h4 style="margin:0 0 10px">بيانات أولياء الأمور</h4>
         <div class="grid-2">
-          <div class="field"><label>اسم الطالب / الطالبة</label><input id="miniGuardianStudent" class="input" placeholder="اسم الطالب / الطالبة"></div>
-          <div class="field"><label>اسم ولي الأمر</label><input id="miniGuardianParent" class="input" placeholder="اسم ولي الأمر"></div>
-          <div class="field"><label>الصف</label><input id="miniGuardianClass" class="input" placeholder="الصف"></div>
-          <div class="field"><label>رقم ولي الأمر</label><input id="miniGuardianPhone" class="input" placeholder="رقم ولي الأمر"></div>
+          <div class="field"><label>اسم الطالب / الطالبة</label><input id="miniParentStudentName" class="input" placeholder="اسم الطالب / الطالبة"></div>
+          <div class="field"><label>اسم ولي الأمر</label><input id="miniParentName" class="input" placeholder="اسم ولي الأمر"></div>
+          <div class="field"><label>الصف</label><input id="miniParentClass" class="input" placeholder="الصف"></div>
+          <div class="field"><label>رقم ولي الأمر</label><input id="miniParentPhone" class="input" placeholder="رقم ولي الأمر"></div>
         </div>
         <div class="actions-row" style="margin-top:12px">
-          <button class="btn primary" onclick="saveMiniGuardian()">حفظ بيانات ولي الأمر</button>
-        </div>
-      </div>
-      <div class="mini-page-card">
-        <h4 style="margin:0 0 10px">إرسال رسالة</h4>
-        <div class="grid-2">
-          <div class="field"><label>إرسال رسالة لولي أمر</label><select class="select"><option>اختر ولي الأمر</option></select></div>
-          <div class="field"><label>إرسال رسالة لولي الأمر للفصل كامل</label><select class="select"><option>اختر الفصل</option></select></div>
-          <div class="field"><label>نوع الرسالة</label><select class="select"><option>نصية</option><option>واتساب</option></select></div>
-        </div>
-        <div class="field" style="margin-top:10px"><label>نص الرسالة</label><textarea class="textarea" placeholder="نص الرسالة"></textarea></div>
-        <div class="actions-row" style="margin-top:12px">
-          <button class="btn primary">إرسال</button>
-          <button class="btn secondary">تهيئة الرسالة</button>
+          <button class="btn primary" onclick="saveMiniParent()">حفظ بيانات ولي الأمر</button>
         </div>
       </div>
     </div>
@@ -4200,7 +4120,6 @@ function logoutTeacher(){
             </div>
             <div class="field"><label>سنوات الخبرة</label><input id="miniTeacherYearsInput" class="input" placeholder="سنوات الخبرة"></div>
             <div class="field"><label>البريد الإلكتروني</label><input id="miniTeacherEmailInput" class="input" placeholder="البريد الإلكتروني"></div>
-            <div class="field"><label>تغيير الرقم السري</label><input class="input" placeholder="الرقم السري الجديد"></div>
           </div>
           <div class="actions-row" style="margin-top:12px">
             <button class="btn primary" onclick="saveMiniPersonalSettings()">حفظ البيانات الشخصية</button>
@@ -4213,11 +4132,11 @@ function logoutTeacher(){
           <h4 style="margin:0 0 10px">الدعم الفني</h4>
           <div class="note-box" style="margin-bottom:12px">
             <div><strong>رقم الدعم الفني:</strong> 0500000000</div>
-            <div style="margin-top:6px"><strong>البريد الإلكتروني:</strong> support@edu-bank.sa</div>
+            <div><strong>البريد الإلكتروني:</strong> support@masraf-edu.com</div>
           </div>
           <div class="grid-2">
-            <div class="field"><label>نوع الطلب</label><select id="miniSupportType" class="select"><option>استفسار</option><option>مشكلة تقنية</option><option>طلب تطوير</option><option>بلاغ عاجل</option></select></div>
-            <div class="field"><label>أولوية الطلب</label><select id="miniSupportPriority" class="select"><option>عادية</option><option>مرتفعة</option><option>عاجلة</option></select></div>
+            <div class="field"><label>نوع الطلب</label><select class="select"><option>استفسار</option><option>مشكلة تقنية</option><option>طلب تطوير</option><option>بلاغ عاجل</option></select></div>
+            <div class="field"><label>أولوية الطلب</label><select class="select"><option>عادية</option><option>مرتفعة</option><option>عاجلة</option></select></div>
           </div>
           <div class="field" style="margin-top:10px"><label>رسالة الدعم الفني</label><textarea id="miniSupportMessage" class="textarea" placeholder="اكتبي وصف المشكلة أو الطلب بشكل واضح"></textarea></div>
           <div class="actions-row" style="margin-top:12px"><button class="btn primary" onclick="sendMiniSupport()">إرسال للدعم الفني</button></div>
@@ -4226,7 +4145,7 @@ function logoutTeacher(){
         <div class="mini-page-card">
           <h4 style="margin:0 0 10px">رفع خطاب الدعم الفني</h4>
           <div class="grid-2">
-            <div class="field"><label>العميل المناسب</label><select id="miniLetterClient" class="select"><option>اختر العميل</option><option>ولي أمر طالب / طالبة</option><option>طالب / طالبة</option><option>معلم / معلمة</option><option>إدارة المدرسة</option><option>الدعم الفني</option><option>عميل آخر</option></select></div>
+            <div class="field"><label>العميل المناسب</label><select class="select"><option>اختر العميل</option><option>ولي أمر طالب / طالبة</option><option>طالب / طالبة</option><option>معلم / معلمة</option><option>إدارة المدرسة</option><option>الدعم الفني</option><option>عميل آخر</option></select></div>
             <div class="field"><label>عنوان الخطاب</label><input id="miniLetterTitle" class="input" placeholder="مثال: خطاب خلل فني - منصة المتابعة"></div>
           </div>
           <div class="field" style="margin-top:10px"><label>وصف مختصر</label><textarea id="miniLetterDesc" class="textarea" placeholder="اكتبي وصفًا مختصرًا للخطاب أو المرفق"></textarea></div>
@@ -4259,11 +4178,131 @@ function logoutTeacher(){
   </div>
 </div>
 
+<!-- backup modal -->
+<div id="backupOverlay" class="mini-page-overlay">
+  <div class="mini-page-shell">
+    <div class="mini-page-head">
+      <button class="mini-back-btn" onclick="closeBackupOverlay()">رجوع</button>
+      <h3 style="margin:0;color:var(--green-3)">نسخة احتياطية للبيانات</h3>
+    </div>
+    <div class="mini-page-card">
+      <div class="mini-page-grid">
+        <div class="mini-page-stat"><div class="tiny">آخر نسخة</div><strong id="backupLastDate">—</strong></div>
+        <div class="mini-page-stat"><div class="tiny">عدد الطلاب</div><strong id="backupStudentCount">0</strong></div>
+        <div class="mini-page-stat"><div class="tiny">عدد الفصول</div><strong id="backupClassCount">0</strong></div>
+        <div class="mini-page-stat"><div class="tiny">عدد العمليات</div><strong id="backupTxCount">0</strong></div>
+      </div>
+      <div class="actions-row" style="margin-top:12px">
+        <button class="btn primary" onclick="createBackupNow()">إنشاء نسخة احتياطية الآن</button>
+        <button class="btn secondary" onclick="downloadBackupNow()">تحميل النسخة الأخيرة</button>
+      </div>
+      <div class="field" style="margin-top:12px">
+        <label>استرجاع نسخة احتياطية</label>
+        <input id="restoreBackupInput" type="file" class="input" accept=".json">
+      </div>
+      <div class="actions-row" style="margin-top:12px">
+        <button class="btn warn" onclick="restoreBackupNow()">استرجاع النسخة المختارة</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- supervisor login + portal -->
+<div id="supervisorLoginOverlay" class="mini-page-overlay">
+  <div class="mini-page-shell">
+    <div class="mini-page-head">
+      <button class="mini-back-btn" onclick="closeSupervisorLogin()">رجوع</button>
+      <h3 style="margin:0;color:var(--green-3)">التقييم والإشراف المدرسي</h3>
+    </div>
+    <div class="mini-page-card">
+      <div class="note-box" style="margin-bottom:12px">🔒 صلاحية عرض فقط — لا يمكن التعديل أو الحذف أو تنفيذ أي عملية داخل المصرف.</div>
+      <div class="grid-2">
+        <div class="field"><label>نوع الدخول</label>
+          <select id="supervisorRole" class="select">
+            <option value="manager">مدير / مديرة</option>
+            <option value="supervisor">مشرف / مشرفة</option>
+          </select>
+        </div>
+        <div class="field"><label>الرقم السري</label><input id="supervisorPin" type="password" class="input" placeholder="أدخلي الرقم السري"></div>
+      </div>
+      <div class="actions-row" style="margin-top:12px">
+        <button class="btn primary" onclick="loginSupervisorPortal()">دخول</button>
+      </div>
+      <div class="tiny" style="margin-top:8px">الأرقام الافتراضية للتجربة: المدير 1111 — المشرف 2222</div>
+    </div>
+  </div>
+</div>
+
+<div id="supervisorPortalOverlay" class="mini-page-overlay">
+  <div class="mini-page-shell">
+    <div class="mini-page-head">
+      <button class="mini-back-btn" onclick="closeSupervisorPortal()">رجوع</button>
+      <h3 style="margin:0;color:var(--green-3)">لوحة الإشراف المدرسي</h3>
+    </div>
+
+    <div class="mini-page-card">
+      <div class="note-box" style="margin-bottom:12px">🔒 وضع الإشراف — عرض وتقارير فقط</div>
+      <div class="mini-page-grid">
+        <div class="mini-page-stat"><div class="tiny">عدد الفصول</div><strong id="supClassCount">0</strong></div>
+        <div class="mini-page-stat"><div class="tiny">عدد الطلاب</div><strong id="supStudentCount">0</strong></div>
+        <div class="mini-page-stat"><div class="tiny">إجمالي العمليات</div><strong id="supTxCount">0</strong></div>
+        <div class="mini-page-stat"><div class="tiny">عدد الرسائل</div><strong id="supMsgCount">0</strong></div>
+      </div>
+      <div class="subtabs" id="supervisorSubtabs" style="margin-top:14px">
+        <button class="small-btn active" onclick="openSupervisorSubtab('bank', this)">الحساب المصرفي</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('tasks', this)">المهام الأدائية</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('roulette', this)">الروليت</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('messages', this)">الرسائل</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('evaluation', this)">التقييم</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('certificate', this)">شهادة شكر</button>
+      </div>
+
+      <div id="supervisorSubtab-bank">
+        <div class="grid-3">
+          <div class="field"><label>الفصل</label><select id="supClassFilter" class="select"><option>كل الفصول</option></select></div>
+          <div class="field"><label>من تاريخ</label><input id="supFromDate" type="date" class="input"></div>
+          <div class="field"><label>إلى تاريخ</label><input id="supToDate" type="date" class="input"></div>
+        </div>
+        <div id="supBankReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+
+      <div id="supervisorSubtab-tasks" class="hide">
+        <div id="supTasksReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+
+      <div id="supervisorSubtab-roulette" class="hide">
+        <div id="supRouletteReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+
+      <div id="supervisorSubtab-messages" class="hide">
+        <div id="supMessagesReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+
+      <div id="supervisorSubtab-evaluation" class="hide">
+        <div id="supEvaluationReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+
+      <div id="supervisorSubtab-certificate" class="hide">
+        <div class="grid-2">
+          <div class="field"><label>اسم الطالب / الطالبة</label><input id="supCertStudent" class="input" placeholder="اسم الطالب / الطالبة"></div>
+          <div class="field"><label>الفصل</label><input id="supCertClass" class="input" placeholder="الفصل"></div>
+          <div class="field"><label>عنوان الشهادة</label><input id="supCertTitle" class="input" placeholder="عنوان الشهادة"></div>
+          <div class="field"><label>وسيلة الإرسال</label><select id="supCertSendType" class="select"><option>واتساب</option><option>بريد إلكتروني</option></select></div>
+        </div>
+        <div class="field" style="margin-top:10px"><label>نص الشهادة</label><textarea id="supCertText" class="textarea" placeholder="اكتبي نص شهادة الشكر"></textarea></div>
+        <div class="field" style="margin-top:10px"><label>رفع شهادة شكر</label><input id="supCertFile" type="file" class="input" accept=".pdf,.jpg,.jpeg,.png"></div>
+        <div class="actions-row" style="margin-top:12px"><button class="btn primary" onclick="sendSupervisorCertificate()">إرسال الشهادة</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script id="mini-pages-script">
 (function(){
   function byId(id){ return document.getElementById(id); }
   function getApp(){ return window.app || null; }
   function setText(id, value){ var el = byId(id); if(el) el.textContent = value; }
+  function toastMsg(msg){ if(window.app && window.app.toast) window.app.toast(msg); else alert(msg); }
 
   function setActiveNav(page){
     var btns = document.querySelectorAll('#miniPhoneNav [data-mini-page]');
@@ -4274,20 +4313,24 @@ function logoutTeacher(){
     return list.length ? list.slice(0,3).map(function(s){ return s.name || '—'; }).join('، ') : '—';
   }
 
+  function getProfile(){
+    var app = getApp();
+    return app && app.state ? (app.state.pdfProfile || {}) : {};
+  }
+
   function fillMiniPages(){
     var app = getApp();
     if(!app || !app.state) return;
     var students = Array.isArray(app.state.students) ? app.state.students : [];
-    var profile = app.state.pdfProfile || {};
     var txs = Array.isArray(app.state.transactions) ? app.state.transactions : [];
+    var msgs = Array.isArray(app.state.parentMessages) ? app.state.parentMessages : [];
+    var profile = getProfile();
 
     var high = students.filter(function(s){ return Number(s.balance || 0) >= 5000; });
     var low = students.filter(function(s){ return Number(s.balance || 0) < 1000; });
-    var noOps = students.filter(function(s){
-      return !txs.some(function(t){ return t.studentId === s.id; });
-    });
+    var noOps = students.filter(function(s){ return !txs.some(function(t){ return t.studentId === s.id; }); });
     var penalties = students.filter(function(s){
-      var c = txs.filter(function(t){ return t.studentId === s.id && (t.type === 'withdraw' || t.type === 'transfer_out' || (t.amount && Number(t.amount)<0)); }).length;
+      var c = txs.filter(function(t){ return t.studentId === s.id && (t.type === 'withdraw' || t.type === 'transfer_out'); }).length;
       return c >= 2;
     });
     var best = students.slice().sort(function(a,b){ return Number(b.balance||0)-Number(a.balance||0); })[0];
@@ -4297,24 +4340,37 @@ function logoutTeacher(){
     setText('miniEvalPenaltyNames', namesFor(penalties));
     setText('miniEvalNoOpsNames', namesFor(noOps));
     setText('miniEvalBestStudent', best ? (best.name || '—') : '—');
+    setText('miniEvalAttendance', students.length.toLocaleString('ar-SA'));
+    setText('miniEvalParticipation', txs.filter(function(t){ return t.type === 'deposit'; }).length.toLocaleString('ar-SA'));
+    setText('miniEvalDeductions', txs.filter(function(t){ return t.type === 'withdraw' || t.type === 'transfer_out'; }).length.toLocaleString('ar-SA'));
 
-    var attendance = students.length;
-    var participation = txs.filter(function(t){ return t.type === 'deposit'; }).length;
-    var deductions = txs.filter(function(t){ return t.type === 'withdraw' || t.type === 'transfer_out'; }).length;
-    var result = 'جيدة';
-    if(participation >= deductions * 2 && participation > 0) result = 'ممتازة';
-    else if(deductions > participation) result = 'تحتاج تحسين';
-    setText('miniEvalAttendance', attendance.toLocaleString('ar-SA'));
-    setText('miniEvalParticipation', participation.toLocaleString('ar-SA'));
-    setText('miniEvalDeductions', deductions.toLocaleString('ar-SA'));
-    setText('miniEvalResult', result);
+    if(byId('miniSchoolNameInput')) byId('miniSchoolNameInput').value = profile.schoolName || '';
+    if(byId('miniTeacherNameInput')) byId('miniTeacherNameInput').value = profile.teacherName || '';
+    if(byId('miniTeacherYearsInput')) byId('miniTeacherYearsInput').value = profile.experienceYears || '';
+    if(byId('miniTeacherEmailInput')) byId('miniTeacherEmailInput').value = profile.email || '';
 
-    if(byId('miniSchoolNameInput') && !byId('miniSchoolNameInput').value) byId('miniSchoolNameInput').value = profile.schoolName || '';
-    if(byId('miniTeacherNameInput') && !byId('miniTeacherNameInput').value) byId('miniTeacherNameInput').value = profile.teacherName || '';
-    if(byId('miniTeacherYearsInput') && !byId('miniTeacherYearsInput').value) byId('miniTeacherYearsInput').value = profile.experienceYears || '';
-    if(byId('miniTeacherEmailInput') && !byId('miniTeacherEmailInput').value) byId('miniTeacherEmailInput').value = profile.email || '';
+    setText('supClassCount', Array.isArray(app.state.classes)?app.state.classes.length.toLocaleString('ar-SA'):'0');
+    setText('supStudentCount', students.length.toLocaleString('ar-SA'));
+    setText('supTxCount', txs.length.toLocaleString('ar-SA'));
+    setText('supMsgCount', msgs.length.toLocaleString('ar-SA'));
+
+    var classSel = byId('supClassFilter');
+    if(classSel && classSel.options.length <= 1){
+      (app.state.classes || []).forEach(function(c){
+        var opt = document.createElement('option');
+        opt.value = c.id || c.name || '';
+        opt.textContent = c.name || c.id || 'فصل';
+        classSel.appendChild(opt);
+      });
+    }
+
     updateMiniSettingsCompletion();
+    renderSupervisorReports();
   }
+
+  window.showFeatureNotice = function(name){
+    toastMsg('زر ' + name + ' ظاهر فقط الآن وسيتم تفعيله لاحقًا.');
+  };
 
   window.openMiniPage = function(page){
     fillMiniPages();
@@ -4336,8 +4392,7 @@ function logoutTeacher(){
   window.closeMiniPage = function(){
     var overlay = byId('miniPagesOverlay');
     if(overlay) overlay.classList.remove('show');
-    var btns = document.querySelectorAll('#miniPhoneNav [data-mini-page]');
-    btns.forEach(function(btn){ btn.classList.remove('active'); });
+    document.querySelectorAll('#miniPhoneNav [data-mini-page]').forEach(function(btn){ btn.classList.remove('active'); });
   };
 
   window.openMiniFollowSubtab = function(id, btn){
@@ -4359,13 +4414,124 @@ function logoutTeacher(){
   };
 
   function bindMiniNav(){
-    var btns = document.querySelectorAll('#miniPhoneNav [data-mini-page]');
-    btns.forEach(function(btn){
+    document.querySelectorAll('#miniPhoneNav [data-mini-page]').forEach(function(btn){
       if(btn.dataset.boundMini === '1') return;
       btn.dataset.boundMini = '1';
       btn.onclick = function(){ openMiniPage(btn.getAttribute('data-mini-page')); };
     });
   }
+
+  function scheduleKey(){
+    var cls = byId('miniScheduleClass') ? byId('miniScheduleClass').value : '';
+    var year = byId('miniScheduleYear') ? byId('miniScheduleYear').value : '';
+    if(!cls || cls === 'اختر الصف' || !year || year === 'اختر العام الدراسي'){
+      toastMsg('اختاري الصف والعام الدراسي أولًا');
+      return null;
+    }
+    return 'mini_schedule_' + cls + '_' + year;
+  }
+
+  function scheduleInputs(){ return Array.from(document.querySelectorAll('#miniScheduleTable tbody input')); }
+
+  window.saveMiniSchedule = function(){
+    var key = scheduleKey(); if(!key) return;
+    var data = scheduleInputs().map(function(i){ return i.value || ''; });
+    localStorage.setItem(key, JSON.stringify(data));
+    toastMsg('تم حفظ الجدول للفصل المحدد');
+  };
+
+  window.loadMiniSchedule = function(){
+    var key = scheduleKey(); if(!key) return;
+    var raw = localStorage.getItem(key);
+    var data = raw ? JSON.parse(raw) : [];
+    scheduleInputs().forEach(function(inp, idx){ inp.value = data[idx] || ''; });
+    toastMsg(raw ? 'تم تحميل جدول الفصل المحدد' : 'لا يوجد جدول محفوظ لهذا الفصل');
+  };
+
+  window.clearMiniSchedule = function(){
+    scheduleInputs().forEach(function(inp){ inp.value = ''; });
+  };
+
+  function bindScheduleFilters(){
+    ['miniScheduleClass','miniScheduleYear'].forEach(function(id){
+      var el = byId(id);
+      if(!el || el.dataset.bound === '1') return;
+      el.dataset.bound = '1';
+      el.addEventListener('change', function(){
+        if(byId('miniScheduleClass').value !== 'اختر الصف' && byId('miniScheduleYear').value !== 'اختر العام الدراسي'){
+          loadMiniSchedule();
+        }
+      });
+    });
+    var search = byId('miniScheduleSearch');
+    if(search && search.dataset.bound !== '1'){
+      search.dataset.bound = '1';
+      search.addEventListener('input', function(){
+        var q = search.value.trim();
+        scheduleInputs().forEach(function(inp){
+          inp.style.background = (q && inp.value && inp.value.indexOf(q) !== -1) ? '#fff5d8' : '#fff';
+        });
+      });
+    }
+  }
+
+  window.saveMiniWeights = function(){
+    var data = {
+      weekly: byId('miniWeightWeekly').value,
+      monthly: byId('miniWeightMonthly').value,
+      participation: byId('miniWeightParticipation').value,
+      participationMonthly: byId('miniWeightParticipationMonthly').value,
+      higher: byId('miniWeightHigher').value,
+      enrich: byId('miniWeightEnrich').value
+    };
+    localStorage.setItem('mini_follow_weights', JSON.stringify(data));
+    toastMsg('تم حفظ أوزان النقاط');
+  };
+
+  window.saveMiniParent = function(){
+    var item = {
+      student: byId('miniParentStudentName').value.trim(),
+      parent: byId('miniParentName').value.trim(),
+      classroom: byId('miniParentClass').value.trim(),
+      phone: byId('miniParentPhone').value.trim()
+    };
+    if(!item.student || !item.parent || !item.phone){ toastMsg('أكملي بيانات ولي الأمر أولًا'); return; }
+    var list = JSON.parse(localStorage.getItem('mini_parent_data') || '[]');
+    list.push(item);
+    localStorage.setItem('mini_parent_data', JSON.stringify(list));
+    toastMsg('تم حفظ بيانات ولي الأمر');
+  };
+
+  function updateMiniSettingsCompletion(){
+    var personalIds = ['miniSchoolNameInput','miniTeacherNameInput','miniTeacherRankInput','miniTeacherYearsInput','miniTeacherEmailInput'];
+    var personalDone = personalIds.every(function(id){
+      var el = byId(id); return el && String(el.value || '').trim() !== '';
+    });
+    var surveyAnswers = Array.from(document.querySelectorAll('.miniSurveyAnswer'));
+    var surveyDone = surveyAnswers.length > 0 && surveyAnswers.every(function(el){ return String(el.value || '').trim() !== ''; });
+    var percent = 0; if(personalDone) percent += 50; if(surveyDone) percent += 50;
+    if(byId('miniSettingsCompletionBar')) byId('miniSettingsCompletionBar').style.width = percent + '%';
+    if(byId('miniSettingsCompletionText')) byId('miniSettingsCompletionText').textContent = 'اكتمال الملف: ' + percent + '%';
+  }
+
+  window.saveMiniPersonalSettings = function(){
+    updateMiniSettingsCompletion();
+    var app = getApp();
+    if(app && app.state){
+      app.state.pdfProfile = app.state.pdfProfile || {};
+      app.state.pdfProfile.schoolName = byId('miniSchoolNameInput').value.trim();
+      app.state.pdfProfile.teacherName = byId('miniTeacherNameInput').value.trim();
+      app.state.pdfProfile.experienceYears = byId('miniTeacherYearsInput').value.trim();
+      app.state.pdfProfile.email = byId('miniTeacherEmailInput').value.trim();
+      if(app.save) app.save();
+    }
+    toastMsg('تم حفظ البيانات الشخصية');
+  };
+
+  window.saveMiniSurveySettings = function(){
+    updateMiniSettingsCompletion();
+    toastMsg('تم إرسال الاستبيان');
+  };
 
   function bindFileName(id){
     var input = byId(id);
@@ -4378,149 +4544,162 @@ function logoutTeacher(){
     });
   }
 
-  function updateMiniSettingsCompletion(){
-    var personalIds = ['miniSchoolNameInput','miniTeacherNameInput','miniTeacherRankInput','miniTeacherYearsInput','miniTeacherEmailInput'];
-    var personalDone = personalIds.every(function(id){
-      var el = byId(id);
-      return el && String(el.value || '').trim() !== '';
-    });
-    var surveyAnswers = Array.from(document.querySelectorAll('.miniSurveyAnswer'));
-    var surveyDone = surveyAnswers.length > 0 && surveyAnswers.every(function(el){ return String(el.value || '').trim() !== ''; });
-    var percent = 0;
-    if(personalDone) percent += 50;
-    if(surveyDone) percent += 50;
-    var bar = byId('miniSettingsCompletionBar');
-    var txt = byId('miniSettingsCompletionText');
-    if(bar) bar.style.width = percent + '%';
-    if(txt) txt.textContent = 'اكتمال الملف: ' + percent + '%';
-  }
-
-  window.saveMiniPersonalSettings = function(){
-    updateMiniSettingsCompletion();
-    if(window.app && window.app.state){
-      window.app.state.pdfProfile = window.app.state.pdfProfile || {};
-      window.app.state.pdfProfile.schoolName = byId('miniSchoolNameInput').value.trim();
-      window.app.state.pdfProfile.teacherName = byId('miniTeacherNameInput').value.trim();
-      window.app.state.pdfProfile.experienceYears = byId('miniTeacherYearsInput').value.trim();
-      window.app.state.pdfProfile.email = byId('miniTeacherEmailInput').value.trim();
-      if(window.app.save) window.app.save();
-    }
-    alert('تم حفظ البيانات الشخصية');
-  };
-
-  window.saveMiniSurveySettings = function(){
-    updateMiniSettingsCompletion();
-    alert('تم إرسال الاستبيان');
-  };
-
-  function miniScheduleKey(){
-    var cls = byId('miniScheduleClass') ? byId('miniScheduleClass').value.trim() : '';
-    var year = byId('miniScheduleYear') ? byId('miniScheduleYear').value.trim() : '';
-    if(!cls || cls === 'اختر الصف' || !year || year === 'اختر العام الدراسي'){
-      alert('اختاري الصف والعام الدراسي أولاً');
-      return null;
-    }
-    return 'mini_schedule_' + cls + '_' + year;
-  }
-
-  window.saveMiniSchedule = function(){
-    var key = miniScheduleKey();
-    if(!key) return;
-    var vals = Array.from(document.querySelectorAll('.mini-schedule-input')).map(function(i){ return i.value || ''; });
-    localStorage.setItem(key, JSON.stringify(vals));
-    alert('تم حفظ جدول الفصل المحدد');
-  };
-
-  function loadMiniSchedule(){
-    var key = miniScheduleKey();
-    if(!key) return;
-    var vals = JSON.parse(localStorage.getItem(key) || '[]');
-    document.querySelectorAll('.mini-schedule-input').forEach(function(i,idx){ i.value = vals[idx] || ''; i.closest('td').style.display=''; });
-  }
-
-  window.clearMiniSchedule = function(){
-    document.querySelectorAll('.mini-schedule-input').forEach(function(i){ i.value=''; i.closest('td').style.display=''; });
-    var key = miniScheduleKey(); if(key) localStorage.removeItem(key);
-    alert('تم تفريغ الجدول');
-  };
-
-  window.filterMiniSchedule = function(){
-    var q = (byId('miniScheduleSearch') ? byId('miniScheduleSearch').value : '').trim();
-    document.querySelectorAll('.mini-schedule-input').forEach(function(i){
-      var td = i.closest('td');
-      if(!q){ td.style.display=''; return; }
-      td.style.display = (String(i.value || '').indexOf(q) !== -1) ? '' : '';
-      i.style.background = q && String(i.value || '').indexOf(q) !== -1 ? '#fff9d9' : '#fff';
-    });
-  };
-
-  window.saveMiniWeights = function(){
-    var data = {
-      weeklyHw: byId('miniWeightWeeklyHw')?.value || '',
-      monthlyHw: byId('miniWeightMonthlyHw')?.value || '',
-      weeklyPart: byId('miniWeightWeeklyPart')?.value || '',
-      monthlyPart: byId('miniWeightMonthlyPart')?.value || '',
-      higher: byId('miniWeightHigher')?.value || '',
-      enrich: byId('miniWeightEnrich')?.value || ''
-    };
-    localStorage.setItem('mini_homework_weights', JSON.stringify(data));
-    alert('تم حفظ أوزان الواجب والنقاط');
-  };
-
-  function loadMiniWeights(){
-    var data = JSON.parse(localStorage.getItem('mini_homework_weights') || '{}');
-    if(byId('miniWeightWeeklyHw') && data.weeklyHw != null) byId('miniWeightWeeklyHw').value = data.weeklyHw;
-    if(byId('miniWeightMonthlyHw') && data.monthlyHw != null) byId('miniWeightMonthlyHw').value = data.monthlyHw;
-    if(byId('miniWeightWeeklyPart') && data.weeklyPart != null) byId('miniWeightWeeklyPart').value = data.weeklyPart;
-    if(byId('miniWeightMonthlyPart') && data.monthlyPart != null) byId('miniWeightMonthlyPart').value = data.monthlyPart;
-    if(byId('miniWeightHigher') && data.higher != null) byId('miniWeightHigher').value = data.higher;
-    if(byId('miniWeightEnrich') && data.enrich != null) byId('miniWeightEnrich').value = data.enrich;
-  }
-
-  window.saveMiniGuardian = function(){
-    var rec = {
-      student: byId('miniGuardianStudent')?.value.trim() || '',
-      parent: byId('miniGuardianParent')?.value.trim() || '',
-      cls: byId('miniGuardianClass')?.value.trim() || '',
-      phone: byId('miniGuardianPhone')?.value.trim() || ''
-    };
-    if(!rec.student || !rec.parent || !rec.phone){ alert('أكملي اسم الطالب وولي الأمر ورقم الجوال'); return; }
-    var arr = JSON.parse(localStorage.getItem('mini_guardians') || '[]');
-    arr.push(rec);
-    localStorage.setItem('mini_guardians', JSON.stringify(arr));
-    alert('تم حفظ بيانات ولي الأمر');
-  };
-
   window.sendMiniSupport = function(){
-    var msg = (byId('miniSupportMessage')?.value || '').trim();
-    if(!msg){ alert('اكتبي رسالة الدعم الفني أولاً'); return; }
-    var arr = JSON.parse(localStorage.getItem('mini_support_requests') || '[]');
-    arr.push({type: byId('miniSupportType')?.value || '', priority: byId('miniSupportPriority')?.value || '', message: msg, createdAt: new Date().toISOString()});
-    localStorage.setItem('mini_support_requests', JSON.stringify(arr));
-    alert('تم إرسال طلب الدعم الفني');
+    var msg = byId('miniSupportMessage').value.trim();
+    if(!msg){ toastMsg('اكتبي رسالة الدعم الفني أولًا'); return; }
+    toastMsg('تم إرسال طلب الدعم الفني');
   };
 
   window.sendMiniLetter = function(){
-    var client = byId('miniLetterClient')?.value || '';
-    var title = (byId('miniLetterTitle')?.value || '').trim();
-    if(!client || client === 'اختر العميل' || !title){ alert('اختاري العميل وأدخلي عنوان الخطاب'); return; }
-    var arr = JSON.parse(localStorage.getItem('mini_support_letters') || '[]');
-    arr.push({client: client, title: title, desc: byId('miniLetterDesc')?.value || '', file: byId('miniSelectedFileName')?.textContent || '', createdAt: new Date().toISOString()});
-    localStorage.setItem('mini_support_letters', JSON.stringify(arr));
-    alert('تم إرسال الخطاب');
+    var title = byId('miniLetterTitle').value.trim();
+    if(!title){ toastMsg('اكتبي عنوان الخطاب أولًا'); return; }
+    toastMsg('تم إرسال الخطاب');
   };
+
+  // Backup
+  window.openBackupOverlay = function(){
+    var app = getApp();
+    var st = app && app.state ? app.state : {};
+    setText('backupStudentCount', ((st.students||[]).length).toLocaleString('ar-SA'));
+    setText('backupClassCount', ((st.classes||[]).length).toLocaleString('ar-SA'));
+    setText('backupTxCount', ((st.transactions||[]).length).toLocaleString('ar-SA'));
+    setText('backupLastDate', localStorage.getItem('bank_last_backup_date') || '—');
+    byId('backupOverlay').classList.add('show');
+  };
+  window.closeBackupOverlay = function(){ byId('backupOverlay').classList.remove('show'); };
+  window.createBackupNow = function(){
+    var app = getApp(); if(!app || !app.state){ toastMsg('تعذر إنشاء النسخة الآن'); return; }
+    localStorage.setItem('bank_last_backup_json', JSON.stringify(app.state));
+    localStorage.setItem('bank_last_backup_date', new Date().toLocaleString('ar-SA'));
+    openBackupOverlay();
+    toastMsg('تم إنشاء نسخة احتياطية');
+  };
+  window.downloadBackupNow = function(){
+    var raw = localStorage.getItem('bank_last_backup_json');
+    if(!raw){ toastMsg('لا توجد نسخة محفوظة'); return; }
+    var blob = new Blob([raw], {type:'application/json'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'bank-backup.json';
+    a.click();
+    setTimeout(function(){ URL.revokeObjectURL(a.href); }, 1000);
+  };
+  window.restoreBackupNow = function(){
+    var input = byId('restoreBackupInput');
+    if(!input.files || !input.files[0]){ toastMsg('اختاري ملف النسخة أولًا'); return; }
+    var reader = new FileReader();
+    reader.onload = function(){
+      try{
+        var data = JSON.parse(reader.result);
+        var app = getApp();
+        if(app && app.state){
+          app.state = data;
+          if(app.save) app.save();
+          if(app.renderAll) app.renderAll();
+          toastMsg('تم استرجاع النسخة الاحتياطية');
+        }
+      }catch(e){ toastMsg('ملف النسخة غير صالح'); }
+    };
+    reader.readAsText(input.files[0]);
+  };
+
+  // Supervisor portal
+  window.openSupervisorLogin = function(){ byId('supervisorLoginOverlay').classList.add('show'); };
+  window.closeSupervisorLogin = function(){ byId('supervisorLoginOverlay').classList.remove('show'); };
+  window.loginSupervisorPortal = function(){
+    var role = byId('supervisorRole').value;
+    var pin = byId('supervisorPin').value.trim();
+    if((role === 'manager' && pin === '1111') || (role === 'supervisor' && pin === '2222')){
+      closeSupervisorLogin();
+      byId('supervisorPortalOverlay').classList.add('show');
+      fillMiniPages();
+    }else{
+      toastMsg('الرقم السري غير صحيح');
+    }
+  };
+  window.closeSupervisorPortal = function(){ byId('supervisorPortalOverlay').classList.remove('show'); };
+  window.openSupervisorSubtab = function(id, btn){
+    ['bank','tasks','roulette','messages','evaluation','certificate'].forEach(function(s){
+      var el = byId('supervisorSubtab-' + s);
+      if(el) el.classList.toggle('hide', s !== id);
+    });
+    document.querySelectorAll('#supervisorSubtabs button').forEach(function(b){ b.classList.remove('active'); });
+    if(btn) btn.classList.add('active');
+  };
+
+  function renderSupervisorReports(){
+    var app = getApp(); if(!app || !app.state) return;
+    var students = app.state.students || [];
+    var classes = app.state.classes || [];
+    var txs = app.state.transactions || [];
+    var msgs = app.state.parentMessages || [];
+    var tasks = app.state.tasks || [];
+    var rewards = app.state.rewards || app.state.rouletteRewards || [];
+
+    var classMap = {};
+    classes.forEach(function(c){ classMap[c.id || c.name] = c.name || c.id; });
+
+    var bankHTML = '<div class="mini-page-list">';
+    bankHTML += '<div class="mini-page-row"><span>إجمالي العمليات</span><strong>' + txs.length.toLocaleString('ar-SA') + '</strong></div>';
+    txs.slice(0,12).forEach(function(tx){
+      bankHTML += '<div class="mini-page-row"><span>' + (tx.type || 'عملية') + ' — ' + (tx.reason || 'بدون سبب') + '</span><strong>' + Number(tx.amount || 0).toLocaleString('ar-SA') + '</strong></div>';
+    });
+    bankHTML += '</div>';
+    if(byId('supBankReport')) byId('supBankReport').innerHTML = bankHTML;
+
+    var tasksHTML = '<div class="mini-page-list"><div class="mini-page-row"><span>عدد المهام</span><strong>' + tasks.length.toLocaleString('ar-SA') + '</strong></div>';
+    tasksHTML += '<div class="mini-page-row"><span>المهام المسلمة</span><strong>' + tasks.filter(function(t){ return t.submitted; }).length.toLocaleString('ar-SA') + '</strong></div>';
+    tasksHTML += '<div class="mini-page-row"><span>المهام غير المسلمة</span><strong>' + tasks.filter(function(t){ return !t.submitted; }).length.toLocaleString('ar-SA') + '</strong></div></div>';
+    if(byId('supTasksReport')) byId('supTasksReport').innerHTML = tasksHTML;
+
+    var rewardCount = rewards.length + txs.filter(function(t){ return String(t.reason || '').includes('روليت'); }).length;
+    var rouletteHTML = '<div class="mini-page-list"><div class="mini-page-row"><span>عدد جوائز الروليت</span><strong>' + rewardCount.toLocaleString('ar-SA') + '</strong></div></div>';
+    if(byId('supRouletteReport')) byId('supRouletteReport').innerHTML = rouletteHTML;
+
+    var msgHTML = '<div class="mini-page-list"><div class="mini-page-row"><span>إجمالي الرسائل</span><strong>' + msgs.length.toLocaleString('ar-SA') + '</strong></div></div>';
+    if(byId('supMessagesReport')) byId('supMessagesReport').innerHTML = msgHTML;
+
+    var high = students.filter(function(s){ return Number(s.balance || 0) >= 5000; }).length;
+    var low = students.filter(function(s){ return Number(s.balance || 0) < 1000; }).length;
+    var evalHTML = '<div class="mini-page-list">';
+    evalHTML += '<div class="mini-page-row"><span>طلاب متميزون</span><strong>' + high.toLocaleString('ar-SA') + '</strong></div>';
+    evalHTML += '<div class="mini-page-row"><span>طلاب منخفضون</span><strong>' + low.toLocaleString('ar-SA') + '</strong></div>';
+    evalHTML += '<div class="mini-page-row"><span>عدد الفصول</span><strong>' + classes.length.toLocaleString('ar-SA') + '</strong></div>';
+    evalHTML += '</div>';
+    if(byId('supEvaluationReport')) byId('supEvaluationReport').innerHTML = evalHTML;
+  }
+
+  window.sendSupervisorCertificate = function(){
+    var student = byId('supCertStudent').value.trim();
+    var title = byId('supCertTitle').value.trim();
+    if(!student || !title){ toastMsg('أكملي بيانات الشهادة أولًا'); return; }
+    toastMsg('تم تجهيز إرسال شهادة الشكر');
+  };
+
+  function bindHeroButtons(){
+    var backupBtn = byId('quickAddDemoBtn');
+    if(backupBtn && backupBtn.dataset.boundBackup !== '1'){
+      backupBtn.dataset.boundBackup = '1';
+      backupBtn.onclick = openBackupOverlay;
+    }
+    var supBtn = byId('jumpToTeacherBtn');
+    if(supBtn && supBtn.dataset.boundSup !== '1'){
+      supBtn.dataset.boundSup = '1';
+      supBtn.onclick = openSupervisorLogin;
+    }
+  }
 
   document.addEventListener('DOMContentLoaded', function(){
     setTimeout(bindMiniNav, 200);
     setTimeout(fillMiniPages, 600);
+    setTimeout(bindHeroButtons, 200);
+    setTimeout(bindScheduleFilters, 300);
     ['miniGalleryInput','miniCameraInput','miniFileInput','miniCloudInput'].forEach(bindFileName);
-    loadMiniWeights();
     document.addEventListener('input', function(e){
-      if(e.target && (e.target.id || '').startsWith('mini') || e.target.classList.contains('miniSurveyAnswer')) updateMiniSettingsCompletion();
+      if((e.target && (e.target.id || '').startsWith('mini')) || (e.target && e.target.classList && e.target.classList.contains('miniSurveyAnswer'))) updateMiniSettingsCompletion();
     });
     document.addEventListener('change', function(e){
-      if(e.target && ((e.target.id || '').startsWith('mini') || e.target.classList.contains('miniSurveyAnswer'))) updateMiniSettingsCompletion();
-      if(e.target && (e.target.id === 'miniScheduleClass' || e.target.id === 'miniScheduleYear')) loadMiniSchedule();
+      if((e.target && (e.target.id || '').startsWith('mini')) || (e.target && e.target.classList && e.target.classList.contains('miniSurveyAnswer'))) updateMiniSettingsCompletion();
     });
   });
 
@@ -4528,7 +4707,7 @@ function logoutTeacher(){
     var oldRenderAll = window.app.renderAll.bind(window.app);
     window.app.renderAll = function(){
       oldRenderAll();
-      setTimeout(function(){ bindMiniNav(); fillMiniPages(); }, 60);
+      setTimeout(function(){ bindMiniNav(); bindHeroButtons(); bindScheduleFilters(); fillMiniPages(); }, 60);
     };
   }
 })();
