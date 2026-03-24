@@ -787,7 +787,7 @@
             <div class="mini-card">🎡<strong id="heroRewardCount">0 جوائز روليت</strong></div>
           </div>
           <div class="list" id="heroRecentList"></div>
-          <div class="phone-nav" id="miniPhoneNav"><div data-mini-page="follow">المتابعة</div><div data-mini-page="contact">التواصل</div><div data-mini-page="settings">الإعدادات</div></div><div data-mini-page="statement">الكشف</div><div data-mini-page="follow">المتابعة</div><div data-mini-page="settings">الإعدادات</div></div>
+          <div class="phone-nav" id="miniPhoneNav"><div data-mini-page="follow">المتابعة</div><div data-mini-page="messages">التواصل</div><div data-mini-page="settings">الإعدادات</div></div>
         </div>
       </div>
     </section>
@@ -3980,117 +3980,139 @@ function logoutTeacher(){
     </div>
 
     <div id="miniPage-follow" class="mini-page-card">
-      <div class="tabs" id="miniFollowTabs" style="margin-bottom:14px">
-        <button class="active" onclick="openMiniFollowTab('schedule', this)">جدول الحصص</button>
-        <button onclick="openMiniFollowTab('evaluation', this)">تقييم الحصة</button>
-        <button onclick="openMiniFollowTab('homework', this)">المتابعة والواجب</button>
+      <div class="subtabs" id="miniFollowSubtabs" style="margin-bottom:14px">
+        <button class="small-btn active" onclick="openMiniFollowSubtab('schedule', this)">جدول الحصص</button>
+        <button class="small-btn" onclick="openMiniFollowSubtab('evaluation', this)">تقييم الحصة</button>
+        <button class="small-btn" onclick="openMiniFollowSubtab('homework', this)">المتابعة والواجب</button>
       </div>
 
-      <div id="miniFollow-schedule" class="mini-follow-pane">
-        <div class="note-box" style="margin-bottom:12px">أدخلي جدولك المدرسي كاملًا من الحصة 1 إلى الحصة 8 ومن الأحد إلى الخميس ثم احفظي الجدول.</div>
-        <div style="overflow:auto">
-          <table class="statement-full-table" style="background:#fff">
-            <thead>
-              <tr><th>اليوم \ الحصة</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th></tr>
-            </thead>
-            <tbody>
-              <tr><th>الأحد</th><td><input class="input" placeholder="الصف / المادة"></td><td><input class="input"></td><td><input class="input"></td><td><input class="input"></td><td><input class="input"></td><td><input class="input"></td><td><input class="input"></td><td><input class="input"></td></tr>
-              <tr><th>الاثنين</th><td><input class="input"></td><td><input class="input"></td><td><input class="input"></td><td><input class="input"></td><td><input class="input"></td><td><input class="input"></td><td><input class="input"></td><td><input class="input"></td></tr>
-              <tr><th>الثلاثاء</th><td><input class="input"></td><td><input class="input"></td><td><input class="input"></td><td><input class="input"></td><td><input class="input"></td><td><input class="input"></td><td><input class="input"></td><td><input class="input"></td></tr>
-              <tr><th>الأربعاء</th><td><input class="input"></td><td><input class="input"></td><td><input class="input"></td><td><input class="input"></td><td><input class="input"></td><td><input class="input"></td><td><input class="input"></td><td><input class="input"></td></tr>
-              <tr><th>الخميس</th><td><input class="input"></td><td><input class="input"></td><td><input class="input"></td><td><input class="input"></td><td><input class="input"></td><td><input class="input"></td><td><input class="input"></td><td><input class="input"></td></tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="actions-row" style="margin-top:12px">
-          <button class="btn primary">حفظ الجدول المدرسي</button>
-          <button class="btn ghost">تفريغ الجدول</button>
-        </div>
-      </div>
-
-      <div id="miniFollow-evaluation" class="mini-follow-pane hide">
-        <div class="mini-page-grid">
-          <div class="mini-page-stat"><div class="tiny">الحضور اليومي</div><strong>0</strong></div>
-          <div class="mini-page-stat"><div class="tiny">المشاركات اليوم</div><strong>0</strong></div>
-          <div class="mini-page-stat"><div class="tiny">الخصومات اليوم</div><strong>0</strong></div>
-          <div class="mini-page-stat"><div class="tiny">تقييم الحصة</div><strong>--</strong></div>
-        </div>
-        <div class="mini-page-card" style="margin-top:14px">
-          <h4 style="margin:0 0 10px">مستوى الطلاب اليومي</h4>
-          <div class="mini-page-list">
-            <div class="mini-page-row"><span>🟢 طلاب رصيدهم مرتفع</span><strong>سارة أحمد، نورة علي</strong></div>
-            <div class="mini-page-row"><span>🔴 طلاب رصيدهم منخفض</span><strong>محمد سعيد، فيصل عمر</strong></div>
-            <div class="mini-page-row"><span>⚠️ طلاب عليهم خصومات كثيرة</span><strong>أحمد سالم، جود فهد</strong></div>
-            <div class="mini-page-row"><span>🟡 طلاب بدون عمليات</span><strong>لينا يوسف، عبدالعزيز حسن</strong></div>
+      <div id="miniFollowSubtab-schedule">
+        <div class="mini-page-card" style="margin-top:0">
+          <div class="tiny" style="margin-bottom:10px">اختاري الصف والعام الدراسي أولًا، ثم أدخلي جدول كل فصل من الحصة 1 إلى الحصة 8، ومن الأحد إلى الخميس، ثم احفظي الجدول المدرسي.</div>
+          <div class="mini-page-grid">
+            <div class="mini-page-stat">
+              <div class="tiny">الصف</div>
+              <select id="miniScheduleClass" style="margin-top:8px">
+                <option>اختر الصف</option>
+                <option>الصف الأول</option>
+                <option>الصف الثاني</option>
+                <option>الصف الثالث</option>
+                <option>الصف الرابع</option>
+                <option>الصف الخامس</option>
+                <option>الصف السادس</option>
+                <option>الأول المتوسط</option>
+                <option>الثاني المتوسط</option>
+                <option>الثالث المتوسط</option>
+              </select>
+            </div>
+            <div class="mini-page-stat">
+              <div class="tiny">العام الدراسي</div>
+              <select id="miniScheduleYear" style="margin-top:8px">
+                <option>اختر العام الدراسي</option>
+                <option>1446 / 1447</option>
+                <option>1447 / 1448</option>
+                <option>1448 / 1449</option>
+              </select>
+            </div>
           </div>
+          <div style="overflow:auto;margin-top:14px">
+            <table class="statement-full-table" style="min-width:900px">
+              <thead>
+                <tr>
+                  <th>اليوم \ الحصة</th>
+                  <th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><th>الأحد</th><td><input placeholder="الصف / المادة"></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td></tr>
+                <tr><th>الاثنين</th><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td></tr>
+                <tr><th>الثلاثاء</th><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td></tr>
+                <tr><th>الأربعاء</th><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td></tr>
+                <tr><th>الخميس</th><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="actions-row" style="margin-top:12px">
+            <button class="btn primary">حفظ الجدول المدرسي للفصل المحدد</button>
+            <button class="btn secondary">تفريغ الجدول</button>
+          </div>
+          <div class="note-box" style="margin-top:12px">يتم حفظ جدول مستقل لكل فصل حسب الصف والعام الدراسي الذي يتم اختيارهما في الأعلى.</div>
+        </div>
+      </div>
+
+      <div id="miniFollowSubtab-evaluation" class="hide">
+        <div class="mini-page-grid">
+          <div class="mini-page-stat"><div class="tiny">الحضور اليومي</div><strong id="miniEvalAttendance">0</strong></div>
+          <div class="mini-page-stat"><div class="tiny">المشاركات اليوم</div><strong id="miniEvalParticipation">0</strong></div>
+          <div class="mini-page-stat"><div class="tiny">الخصومات اليوم</div><strong id="miniEvalDeductions">0</strong></div>
+          <div class="mini-page-stat"><div class="tiny">تقييم الحصة</div><strong id="miniEvalResult">--</strong></div>
         </div>
         <div class="mini-page-card">
-          <h4 style="margin:0 0 10px">أفضل طالب اليوم</h4>
-          <input class="input" placeholder="يظهر اسم أفضل طالب تلقائيًا">
-          <textarea class="textarea" placeholder="ملاحظة عامة للحصة"></textarea>
-          <div class="actions-row" style="margin-top:12px">
-            <button class="btn primary">تحديث التقييم التلقائي</button>
+          <div class="mini-page-list">
+            <div class="mini-page-row"><span>🟢 طلاب رصيدهم مرتفع</span><strong id="miniEvalHighNames">—</strong></div>
+            <div class="mini-page-row"><span>🔴 طلاب رصيدهم منخفض</span><strong id="miniEvalLowNames">—</strong></div>
+            <div class="mini-page-row"><span>⚠️ خصومات كثيرة</span><strong id="miniEvalPenaltyNames">—</strong></div>
+            <div class="mini-page-row"><span>🟡 بدون عمليات</span><strong id="miniEvalNoOpsNames">—</strong></div>
+            <div class="mini-page-row"><span>🏆 أفضل طالب</span><strong id="miniEvalBestStudent">—</strong></div>
           </div>
         </div>
       </div>
 
-      <div id="miniFollow-homework" class="mini-follow-pane hide">
-        <div class="summary-grid">
-          <div class="stat-card"><h4>الواجبات المطلوبة أسبوعيًا</h4><strong>0</strong></div>
-          <div class="stat-card"><h4>الواجبات الأسبوعية المنجزة</h4><strong>0</strong></div>
-          <div class="stat-card"><h4>الواجبات الشهرية المنجزة</h4><strong>0</strong></div>
-          <div class="stat-card"><h4>إجمالي النقاط المحتسبة</h4><strong>0</strong></div>
+      <div id="miniFollowSubtab-homework" class="hide">
+        <div class="mini-page-grid">
+          <div class="mini-page-stat"><div class="tiny">الواجبات المطلوبة أسبوعيًا</div><strong>0</strong></div>
+          <div class="mini-page-stat"><div class="tiny">الواجبات الأسبوعية المنجزة</div><strong>0</strong></div>
+          <div class="mini-page-stat"><div class="tiny">الواجبات الشهرية المنجزة</div><strong>0</strong></div>
+          <div class="mini-page-stat"><div class="tiny">إجمالي النقاط المحتسبة</div><strong>0</strong></div>
         </div>
-        <div class="summary-grid" style="margin-top:14px">
-          <div class="stat-card"><h4>المشاركات الأسبوعية</h4><strong>0</strong></div>
-          <div class="stat-card"><h4>المشاركات الشهرية</h4><strong>0</strong></div>
-          <div class="stat-card"><h4>أسئلة التفكير العليا</h4><strong>0</strong></div>
-          <div class="stat-card"><h4>الأسئلة الإثرائية</h4><strong>0</strong></div>
+        <div class="mini-page-grid" style="margin-top:12px">
+          <div class="mini-page-stat"><div class="tiny">المشاركات الأسبوعية</div><strong>0</strong></div>
+          <div class="mini-page-stat"><div class="tiny">المشاركات الشهرية</div><strong>0</strong></div>
+          <div class="mini-page-stat"><div class="tiny">أسئلة التفكير العليا</div><strong>0</strong></div>
+          <div class="mini-page-stat"><div class="tiny">الأسئلة الإثرائية</div><strong>0</strong></div>
         </div>
-        <div class="grid-2" style="margin-top:14px">
-          <div class="panel">
-            <h4>إضافة سريعة للفصل المحدد</h4>
-            <div class="form-grid">
-              <div class="field"><label>الفصل المحدد</label><select class="select"><option>اختر الفصل</option></select></div>
-              <div class="field"><label>عدد الواجبات المطلوبة أسبوعيًا</label><input class="input" value="0"></div>
-              <div class="field"><label>الواجب الأسبوعي المنجز</label><input class="input" value="0"></div>
-              <div class="field"><label>الواجب الشهري المنجز</label><input class="input" value="0"></div>
-              <div class="field"><label>المشاركة الأسبوعية</label><input class="input" value="0"></div>
-              <div class="field"><label>المشاركة الشهرية</label><input class="input" value="0"></div>
-              <div class="field"><label>التفكير العليا</label><input class="input" value="0"></div>
-              <div class="field"><label>الإثرائية</label><input class="input" value="0"></div>
-            </div>
-            <div class="actions-row" style="margin-top:12px">
-              <button class="btn warn">نسخ من بيانات الطالب المحدد</button>
-              <button class="btn primary">حفظ للفصل المحدد واحتساب النقاط</button>
-              <button class="btn primary">إرسال تقرير الفصل واتساب</button>
-            </div>
-            <div class="note-box" style="margin-top:10px">هذا الخيار يطبق نفس القيم على جميع طلاب الفصل المحدد دفعة واحدة، ثم يربطها بالنقاط والرصيد تلقائيًا عند الحفظ.</div>
+        <div class="mini-page-card">
+          <h4 style="margin:0 0 10px">متابعة الطالب وربطها بالنقاط</h4>
+          <div class="grid-2">
+            <div class="field"><label>الطالب / الطالبة</label><select class="select"><option>اختر الطالب / الطالبة</option></select></div>
+            <div class="field"><label>عدد الواجبات المطلوبة أسبوعيًا</label><input class="input" value="0"></div>
+            <div class="field"><label>متابعة الواجبات الأسبوعية المنجزة</label><input class="input" value="0"></div>
+            <div class="field"><label>متابعة الواجبات الشهرية المنجزة</label><input class="input" value="0"></div>
+            <div class="field"><label>عدد المشاركات الأسبوعية</label><input class="input" value="0"></div>
+            <div class="field"><label>عدد المشاركات الشهرية</label><input class="input" value="0"></div>
+            <div class="field"><label>عداد أسئلة التفكير العليا</label><input class="input" value="0"></div>
+            <div class="field"><label>عداد الأسئلة الإثرائية</label><input class="input" value="0"></div>
           </div>
-
-          <div class="panel">
-            <h4>متابعة الطالب وربطها بالنقاط</h4>
-            <div class="form-grid">
-              <div class="field"><label>الطالب / الطالبة</label><select class="select"><option>اختر الطالب / الطالبة</option></select></div>
-              <div class="field"><label>عدد الواجبات المطلوبة أسبوعيًا</label><input class="input" value="0"></div>
-              <div class="field"><label>متابعة الواجبات الأسبوعية المنجزة</label><input class="input" value="0"></div>
-              <div class="field"><label>متابعة الواجبات الشهرية المنجزة</label><input class="input" value="0"></div>
-              <div class="field"><label>عدد المشاركات الأسبوعية</label><input class="input" value="0"></div>
-              <div class="field"><label>عدد المشاركات الشهرية</label><input class="input" value="0"></div>
-              <div class="field"><label>عداد أسئلة التفكير العليا</label><input class="input" value="0"></div>
-              <div class="field"><label>عداد الأسئلة الإثرائية</label><input class="input" value="0"></div>
-            </div>
-            <div class="actions-row" style="margin-top:12px">
-              <button class="btn warn">عرض بيانات الطالب</button>
-              <button class="btn primary">حفظ المتابعة واحتساب النقاط</button>
-            </div>
-            <div class="note-box" style="margin-top:10px">يتم تحويل النقاط المحتسبة تلقائيًا إلى رصيد الطالب التحفيزي دون تكرار الاحتساب السابق.</div>
+          <div class="actions-row" style="margin-top:12px">
+            <button class="btn warn">عرض بيانات الطالب</button>
+            <button class="btn primary">حفظ المتابعة واحتساب النقاط</button>
           </div>
+          <div class="note-box" style="margin-top:10px">يتم تحويل النقاط المحتسبة تلقائيًا إلى رصيد الطالب التحفيزي دون تكرار الاحتساب السابق.</div>
         </div>
 
-        <div class="panel" style="margin-top:14px">
-          <h4>أوزان النقاط</h4>
-          <div class="form-grid">
+        <div class="mini-page-card">
+          <h4 style="margin:0 0 10px">إضافة سريعة للفصل المحدد</h4>
+          <div class="grid-2">
+            <div class="field"><label>الفصل المحدد</label><select class="select"><option>اختر الفصل</option></select></div>
+            <div class="field"><label>عدد الواجبات المطلوبة أسبوعيًا</label><input class="input" value="0"></div>
+            <div class="field"><label>الواجب الأسبوعي المنجز</label><input class="input" value="0"></div>
+            <div class="field"><label>الواجب الشهري المنجز</label><input class="input" value="0"></div>
+            <div class="field"><label>المشاركة الأسبوعية</label><input class="input" value="0"></div>
+            <div class="field"><label>المشاركة الشهرية</label><input class="input" value="0"></div>
+            <div class="field"><label>التفكير العليا</label><input class="input" value="0"></div>
+            <div class="field"><label>الإثرائية</label><input class="input" value="0"></div>
+          </div>
+          <div class="actions-row" style="margin-top:12px">
+            <button class="btn warn">نسخ من بيانات الطالب المحدد</button>
+            <button class="btn primary">حفظ للفصل المحدد واحتساب النقاط</button>
+            <button class="btn primary">إرسال تقرير الفصل واتساب</button>
+          </div>
+          <div class="note-box" style="margin-top:10px">هذا الخيار يطبق نفس القيم على جميع طلاب الفصل المحدد دفعة واحدة، ثم يربطها بالنقاط والرصيد تلقائيًا عند الحفظ.</div>
+        </div>
+
+        <div class="mini-page-card">
+          <h4 style="margin:0 0 10px">أوزان النقاط</h4>
+          <div class="grid-3">
             <div class="field"><label>الواجب الأسبوعي</label><input class="input" value="10"></div>
             <div class="field"><label>الواجب الشهري</label><input class="input" value="25"></div>
             <div class="field"><label>المشاركة الأسبوعية</label><input class="input" value="5"></div>
@@ -4098,71 +4120,73 @@ function logoutTeacher(){
             <div class="field"><label>التفكير العليا</label><input class="input" value="12"></div>
             <div class="field"><label>الإثرائية</label><input class="input" value="7"></div>
           </div>
-          <div class="actions-row" style="margin-top:12px"><button class="btn primary">حفظ أوزان النقاط</button></div>
-          <div class="bank-balance" style="margin-top:14px">
-            <div class="tiny" style="color:#e5f5ec">مجموع نقاط الطالب المحدد</div>
-            <div class="num">0</div>
-            <div class="tiny" style="color:#e5f5ec">هذه النقاط مرتبطة مباشرة برصيد الطالب الحالي داخل النظام البنكي.</div>
+          <div class="actions-row" style="margin-top:12px">
+            <button class="btn primary">حفظ أوزان النقاط</button>
+          </div>
+          <div class="mini-page-stat" style="margin-top:12px;background:linear-gradient(135deg,var(--green-2),var(--green));color:#fff">
+            <div class="tiny" style="color:#eaf7ef">مجموع نقاط الطالب المحدد</div>
+            <strong style="color:#fff">0</strong>
+            <div class="tiny" style="color:#eaf7ef">هذه النقاط مرتبطة مباشرة برصيد الطالب الحالي داخل النظام البنكي.</div>
           </div>
         </div>
       </div>
     </div>
 
-    <div id="miniPage-contact" class="mini-page-card hide">
+    <div id="miniPage-messages" class="mini-page-card hide">
       <div class="mini-page-grid">
         <div class="mini-page-stat"><div class="tiny">عدد الرسائل المرسلة لولي الأمر</div><strong>0</strong></div>
         <div class="mini-page-stat"><div class="tiny">عدد الرسائل المرسلة اليوم</div><strong>0</strong></div>
         <div class="mini-page-stat"><div class="tiny">أولياء الأمور لم تصلهم رسائل</div><strong>0</strong></div>
       </div>
-      <div class="grid-2" style="margin-top:14px">
-        <div class="panel">
-          <h4>بيانات ولي الأمر</h4>
-          <div class="form-grid">
-            <div class="field"><label>اسم الطالب / الطالبة</label><input class="input"></div>
-            <div class="field"><label>اسم ولي الأمر</label><input class="input"></div>
-            <div class="field"><label>الصف</label><input class="input"></div>
-            <div class="field"><label>رقم ولي الأمر</label><input class="input"></div>
-          </div>
-          <div class="actions-row" style="margin-top:12px"><button class="btn primary">حفظ بيانات ولي الأمر</button></div>
+      <div class="mini-page-card">
+        <h4 style="margin:0 0 10px">بيانات أولياء الأمور</h4>
+        <div class="grid-2">
+          <div class="field"><label>اسم الطالب / الطالبة</label><input class="input" placeholder="اسم الطالب / الطالبة"></div>
+          <div class="field"><label>اسم ولي الأمر</label><input class="input" placeholder="اسم ولي الأمر"></div>
+          <div class="field"><label>الصف</label><input class="input" placeholder="الصف"></div>
+          <div class="field"><label>رقم ولي الأمر</label><input class="input" placeholder="رقم ولي الأمر"></div>
         </div>
-        <div class="panel">
-          <h4>إرسال رسالة</h4>
-          <div class="form-grid">
-            <div class="field"><label>إرسال رسالة لولي أمر</label><select class="select"><option>اختر ولي الأمر</option></select></div>
-            <div class="field"><label>إرسال رسالة لولي الأمر للفصل كامل</label><select class="select"><option>اختر الفصل</option></select></div>
-            <div class="field"><label>نوع الرسالة</label><select class="select"><option>نصية</option><option>واتساب</option></select></div>
-          </div>
-          <textarea class="textarea" placeholder="نص الرسالة"></textarea>
-          <div class="actions-row" style="margin-top:12px">
-            <button class="btn primary">إرسال</button>
-            <button class="btn ghost">تهيئة الرسالة</button>
-          </div>
+        <div class="actions-row" style="margin-top:12px">
+          <button class="btn primary">حفظ بيانات ولي الأمر</button>
+        </div>
+      </div>
+      <div class="mini-page-card">
+        <h4 style="margin:0 0 10px">إرسال رسالة</h4>
+        <div class="grid-2">
+          <div class="field"><label>إرسال رسالة لولي أمر</label><select class="select"><option>اختر ولي الأمر</option></select></div>
+          <div class="field"><label>إرسال رسالة لولي الأمر للفصل كامل</label><select class="select"><option>اختر الفصل</option></select></div>
+          <div class="field"><label>نوع الرسالة</label><select class="select"><option>نصية</option><option>واتساب</option></select></div>
+        </div>
+        <div class="field" style="margin-top:10px"><label>نص الرسالة</label><textarea class="textarea" placeholder="نص الرسالة"></textarea></div>
+        <div class="actions-row" style="margin-top:12px">
+          <button class="btn primary">إرسال</button>
+          <button class="btn secondary">تهيئة الرسالة</button>
         </div>
       </div>
     </div>
 
     <div id="miniPage-settings" class="mini-page-card hide">
-      <div class="panel" style="margin-bottom:14px">
+      <div class="mini-page-card" style="margin-top:0">
         <h4 style="margin:0 0 10px">نسبة اكتمال الإعدادات</h4>
         <div style="background:#edf5ef;border:1px solid #dfe9e2;border-radius:18px;overflow:hidden;height:22px">
-          <div id="settingsCompletionBar" style="height:100%;width:0%;background:linear-gradient(135deg,#146a48,#1d8b5a)"></div>
+          <div id="miniSettingsCompletionBar" style="height:100%;width:0%;background:linear-gradient(135deg,#146a48,#1d8b5a)"></div>
         </div>
-        <div id="settingsCompletionText" class="note-box" style="margin-top:8px">اكتمال الملف: 0%</div>
+        <div id="miniSettingsCompletionText" class="tiny" style="margin-top:8px">اكتمال الملف: 0%</div>
       </div>
 
-      <div class="tabs" id="miniSettingsTabs" style="margin-bottom:14px">
-        <button class="active" onclick="openMiniSettingsTab('personal', this)">البيانات الشخصية</button>
-        <button onclick="openMiniSettingsTab('support', this)">التواصل مع الدعم الفني</button>
-        <button onclick="openMiniSettingsTab('survey', this)">تعبئة الاستبيان</button>
+      <div class="subtabs" id="miniSettingsSubtabs" style="margin-bottom:14px">
+        <button class="small-btn active" onclick="openMiniSettingsSubtab('personal', this)">البيانات الشخصية</button>
+        <button class="small-btn" onclick="openMiniSettingsSubtab('support', this)">التواصل مع الدعم الفني</button>
+        <button class="small-btn" onclick="openMiniSettingsSubtab('survey', this)">تعبئة الاستبيان</button>
       </div>
 
-      <div id="miniSettings-personal" class="mini-settings-pane">
-        <div class="panel">
-          <div class="form-grid">
-            <div class="field"><label>اسم المدرسة</label><input class="input" id="miniSchoolField"></div>
-            <div class="field"><label>اسم المعلمة</label><input class="input" id="miniTeacherField"></div>
+      <div id="miniSettingsSubtab-personal">
+        <div class="mini-page-card" style="margin-top:0">
+          <div class="grid-2">
+            <div class="field"><label>اسم المدرسة</label><input id="miniSchoolNameInput" class="input" placeholder="اسم المدرسة"></div>
+            <div class="field"><label>اسم المعلمة</label><input id="miniTeacherNameInput" class="input" placeholder="اسم المعلمة"></div>
             <div class="field"><label>رتبة المعلم / المعلمة</label>
-              <select class="select" id="miniRankField">
+              <select id="miniTeacherRankInput" class="select">
                 <option value="">اختر الرتبة</option>
                 <option>معلم ممارس / معلمة ممارس</option>
                 <option>معلم متقدم / معلمة متقدمة</option>
@@ -4170,54 +4194,57 @@ function logoutTeacher(){
                 <option>أخرى</option>
               </select>
             </div>
-            <div class="field"><label>سنوات الخبرة</label><input class="input" id="miniYearsField"></div>
-            <div class="field"><label>البريد الإلكتروني</label><input class="input" id="miniEmailField"></div>
-            <div class="field"><label>تغيير الرقم السري</label><input class="input"></div>
+            <div class="field"><label>سنوات الخبرة</label><input id="miniTeacherYearsInput" class="input" placeholder="سنوات الخبرة"></div>
+            <div class="field"><label>البريد الإلكتروني</label><input id="miniTeacherEmailInput" class="input" placeholder="البريد الإلكتروني"></div>
+            <div class="field"><label>تغيير الرقم السري</label><input class="input" placeholder="الرقم السري الجديد"></div>
           </div>
-          <div class="actions-row" style="margin-top:12px"><button class="btn primary" onclick="saveMiniPersonal()">حفظ البيانات الشخصية</button></div>
+          <div class="actions-row" style="margin-top:12px">
+            <button class="btn primary" onclick="saveMiniPersonalSettings()">حفظ البيانات الشخصية</button>
+          </div>
         </div>
       </div>
 
-      <div id="miniSettings-support" class="mini-settings-pane hide">
-        <div class="panel">
-          <h4>الدعم الفني</h4>
-          <div class="form-grid">
+      <div id="miniSettingsSubtab-support" class="hide">
+        <div class="mini-page-card" style="margin-top:0">
+          <h4 style="margin:0 0 10px">الدعم الفني</h4>
+          <div class="grid-2">
             <div class="field"><label>نوع الطلب</label><select class="select"><option>استفسار</option><option>مشكلة تقنية</option><option>طلب تطوير</option><option>بلاغ عاجل</option></select></div>
             <div class="field"><label>أولوية الطلب</label><select class="select"><option>عادية</option><option>مرتفعة</option><option>عاجلة</option></select></div>
           </div>
-          <div class="field"><label>رسالة الدعم الفني</label><textarea class="textarea" placeholder="اكتبي وصف المشكلة أو الطلب بشكل واضح"></textarea></div>
+          <div class="field" style="margin-top:10px"><label>رسالة الدعم الفني</label><textarea class="textarea" placeholder="اكتبي وصف المشكلة أو الطلب بشكل واضح"></textarea></div>
           <div class="actions-row" style="margin-top:12px"><button class="btn primary">إرسال للدعم الفني</button></div>
         </div>
-        <div class="panel">
-          <h4>رفع خطاب الدعم الفني</h4>
-          <div class="form-grid">
+
+        <div class="mini-page-card">
+          <h4 style="margin:0 0 10px">رفع خطاب الدعم الفني</h4>
+          <div class="grid-2">
             <div class="field"><label>العميل المناسب</label><select class="select"><option>اختر العميل</option><option>ولي أمر طالب / طالبة</option><option>طالب / طالبة</option><option>معلم / معلمة</option><option>إدارة المدرسة</option><option>الدعم الفني</option><option>عميل آخر</option></select></div>
             <div class="field"><label>عنوان الخطاب</label><input class="input" placeholder="مثال: خطاب خلل فني - منصة المتابعة"></div>
-            <div class="field" style="grid-column:1/-1"><label>وصف مختصر</label><textarea class="textarea"></textarea></div>
           </div>
-          <div class="upload-grid" style="margin-top:12px">
-            <label class="upload-label">مكتبة الصور <span>🖼️</span><input id="miniGalleryInput" type="file" accept="image/*"></label>
-            <label class="upload-label">التقاط صورة <span>📷</span><input id="miniCameraInput" type="file" accept="image/*" capture="environment"></label>
-            <label class="upload-label">اختيار ملف <span>📁</span><input id="miniFileInput" type="file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.zip,.txt"></label>
-            <label class="upload-label">Google Drive / الملفات السحابية <span>☁️</span><input id="miniCloudInput" type="file"></label>
+          <div class="field" style="margin-top:10px"><label>وصف مختصر</label><textarea class="textarea" placeholder="اكتبي وصفًا مختصرًا للخطاب أو المرفق"></textarea></div>
+          <div class="mini-page-grid" style="margin-top:12px">
+            <label class="mini-page-row" style="cursor:pointer">مكتبة الصور <input id="miniGalleryInput" type="file" accept="image/*" style="display:none"></label>
+            <label class="mini-page-row" style="cursor:pointer">التقاط صورة <input id="miniCameraInput" type="file" accept="image/*" capture="environment" style="display:none"></label>
+            <label class="mini-page-row" style="cursor:pointer">اختيار ملف <input id="miniFileInput" type="file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.zip,.txt" style="display:none"></label>
+            <label class="mini-page-row" style="cursor:pointer">Google Drive / الملفات السحابية <input id="miniCloudInput" type="file" style="display:none"></label>
           </div>
-          <div id="miniSelectedFileName" class="filename">لم يتم تحديد أي ملف</div>
+          <div id="miniSelectedFileName" class="note-box" style="margin-top:12px">لم يتم تحديد أي ملف</div>
           <div class="actions-row" style="margin-top:12px"><button class="btn primary">إرسال الخطاب</button></div>
         </div>
       </div>
 
-      <div id="miniSettings-survey" class="mini-settings-pane hide">
-        <div class="panel">
-          <h4>استبيان رضا العملاء</h4>
-          <div class="form-grid">
+      <div id="miniSettingsSubtab-survey" class="hide">
+        <div class="mini-page-card" style="margin-top:0">
+          <h4 style="margin:0 0 10px">استبيان رضا العملاء</h4>
+          <div class="grid-2">
             <div class="field"><label>السؤال 1: ما مدى رضاك عن سهولة استخدام النظام؟</label><select class="select miniSurveyAnswer"><option value="">اختر الإجابة</option><option>راضي</option><option>غير راضي</option></select></div>
-            <div class="field"><label>ملاحظات السؤال 1</label><textarea class="textarea"></textarea></div>
+            <div class="field"><label>ملاحظات السؤال 1</label><textarea class="textarea" placeholder="اكتبي ملاحظتك"></textarea></div>
             <div class="field"><label>السؤال 2: ما مدى رضاك عن سرعة تنفيذ الخدمات؟</label><select class="select miniSurveyAnswer"><option value="">اختر الإجابة</option><option>راضي</option><option>غير راضي</option></select></div>
-            <div class="field"><label>ملاحظات السؤال 2</label><textarea class="textarea"></textarea></div>
+            <div class="field"><label>ملاحظات السؤال 2</label><textarea class="textarea" placeholder="اكتبي ملاحظتك"></textarea></div>
             <div class="field"><label>السؤال 3: ما مدى رضاك عن التواصل والدعم؟</label><select class="select miniSurveyAnswer"><option value="">اختر الإجابة</option><option>راضي</option><option>غير راضي</option></select></div>
-            <div class="field"><label>ملاحظات السؤال 3</label><textarea class="textarea"></textarea></div>
+            <div class="field"><label>ملاحظات السؤال 3</label><textarea class="textarea" placeholder="اكتبي ملاحظتك"></textarea></div>
           </div>
-          <div class="actions-row" style="margin-top:12px"><button class="btn primary" onclick="saveMiniSurvey()">إرسال الاستبيان</button></div>
+          <div class="actions-row" style="margin-top:12px"><button class="btn primary" onclick="saveMiniSurveySettings()">إرسال الاستبيان</button></div>
         </div>
       </div>
     </div>
@@ -4227,92 +4254,176 @@ function logoutTeacher(){
 <script id="mini-pages-script">
 (function(){
   function byId(id){ return document.getElementById(id); }
+  function getApp(){ return window.app || null; }
+  function setText(id, value){ var el = byId(id); if(el) el.textContent = value; }
 
   function setActiveNav(page){
     var btns = document.querySelectorAll('#miniPhoneNav [data-mini-page]');
     btns.forEach(function(btn){ btn.classList.toggle('active', btn.getAttribute('data-mini-page') === page); });
   }
 
-  function bindFileName(inputId, boxId){
-    var input = byId(inputId), box = byId(boxId);
-    if(!input || !box) return;
-    input.addEventListener('change', function(){
-      box.textContent = input.files && input.files.length ? Array.from(input.files).map(function(f){return f.name;}).join(' ، ') : 'لم يتم تحديد أي ملف';
-    });
+  function namesFor(list){
+    return list.length ? list.slice(0,3).map(function(s){ return s.name || '—'; }).join('، ') : '—';
   }
 
-  function updateSettingsCompletion(){
-    var personalDone = ['miniSchoolField','miniTeacherField','miniRankField','miniYearsField','miniEmailField'].every(function(id){
-      var el = byId(id); return el && String(el.value || '').trim() !== '';
+  function fillMiniPages(){
+    var app = getApp();
+    if(!app || !app.state) return;
+    var students = Array.isArray(app.state.students) ? app.state.students : [];
+    var profile = app.state.pdfProfile || {};
+    var txs = Array.isArray(app.state.transactions) ? app.state.transactions : [];
+
+    var high = students.filter(function(s){ return Number(s.balance || 0) >= 5000; });
+    var low = students.filter(function(s){ return Number(s.balance || 0) < 1000; });
+    var noOps = students.filter(function(s){
+      return !txs.some(function(t){ return t.studentId === s.id; });
     });
-    var answers = Array.from(document.querySelectorAll('.miniSurveyAnswer'));
-    var surveyDone = answers.length && answers.every(function(el){ return String(el.value || '').trim() !== ''; });
-    var percent = 0;
-    if(personalDone) percent += 50;
-    if(surveyDone) percent += 50;
-    var bar = byId('settingsCompletionBar'), txt = byId('settingsCompletionText');
-    if(bar) bar.style.width = percent + '%';
-    if(txt) txt.textContent = 'اكتمال الملف: ' + percent + '%';
+    var penalties = students.filter(function(s){
+      var c = txs.filter(function(t){ return t.studentId === s.id && (t.type === 'withdraw' || t.type === 'transfer_out' || (t.amount && Number(t.amount)<0)); }).length;
+      return c >= 2;
+    });
+    var best = students.slice().sort(function(a,b){ return Number(b.balance||0)-Number(a.balance||0); })[0];
+
+    setText('miniEvalHighNames', namesFor(high));
+    setText('miniEvalLowNames', namesFor(low));
+    setText('miniEvalPenaltyNames', namesFor(penalties));
+    setText('miniEvalNoOpsNames', namesFor(noOps));
+    setText('miniEvalBestStudent', best ? (best.name || '—') : '—');
+
+    var attendance = students.length;
+    var participation = txs.filter(function(t){ return t.type === 'deposit'; }).length;
+    var deductions = txs.filter(function(t){ return t.type === 'withdraw' || t.type === 'transfer_out'; }).length;
+    var result = 'جيدة';
+    if(participation >= deductions * 2 && participation > 0) result = 'ممتازة';
+    else if(deductions > participation) result = 'تحتاج تحسين';
+    setText('miniEvalAttendance', attendance.toLocaleString('ar-SA'));
+    setText('miniEvalParticipation', participation.toLocaleString('ar-SA'));
+    setText('miniEvalDeductions', deductions.toLocaleString('ar-SA'));
+    setText('miniEvalResult', result);
+
+    if(byId('miniSchoolNameInput') && !byId('miniSchoolNameInput').value) byId('miniSchoolNameInput').value = profile.schoolName || '';
+    if(byId('miniTeacherNameInput') && !byId('miniTeacherNameInput').value) byId('miniTeacherNameInput').value = profile.teacherName || '';
+    if(byId('miniTeacherYearsInput') && !byId('miniTeacherYearsInput').value) byId('miniTeacherYearsInput').value = profile.experienceYears || '';
+    if(byId('miniTeacherEmailInput') && !byId('miniTeacherEmailInput').value) byId('miniTeacherEmailInput').value = profile.email || '';
+    updateMiniSettingsCompletion();
   }
 
   window.openMiniPage = function(page){
+    fillMiniPages();
     var overlay = byId('miniPagesOverlay');
     if(overlay) overlay.classList.add('show');
-    ['follow','contact','settings'].forEach(function(id){
-      var card = byId('miniPage-' + id);
-      if(card) card.classList.toggle('hide', id !== page);
+    ['follow','messages','settings'].forEach(function(id){
+      var el = byId('miniPage-' + id);
+      if(el) el.classList.toggle('hide', id !== page);
     });
-    var titleMap = {follow:'المتابعة', contact:'التواصل', settings:'الإعدادات'};
-    var title = byId('miniPageTitle');
-    if(title) title.textContent = titleMap[page] || 'المتابعة';
     setActiveNav(page);
-    updateSettingsCompletion();
+    var title = byId('miniPageTitle');
+    if(title){
+      if(page === 'follow') title.textContent = 'المتابعة';
+      else if(page === 'messages') title.textContent = 'التواصل';
+      else title.textContent = 'الإعدادات';
+    }
   };
 
   window.closeMiniPage = function(){
     var overlay = byId('miniPagesOverlay');
     if(overlay) overlay.classList.remove('show');
+    var btns = document.querySelectorAll('#miniPhoneNav [data-mini-page]');
+    btns.forEach(function(btn){ btn.classList.remove('active'); });
   };
 
-  window.openMiniFollowTab = function(id, btn){
-    ['schedule','evaluation','homework'].forEach(function(key){
-      var el = byId('miniFollow-' + key);
-      if(el) el.classList.toggle('hide', key !== id);
+  window.openMiniFollowSubtab = function(id, btn){
+    ['schedule','evaluation','homework'].forEach(function(s){
+      var el = byId('miniFollowSubtab-' + s);
+      if(el) el.classList.toggle('hide', s !== id);
     });
-    document.querySelectorAll('#miniFollowTabs button').forEach(function(b){ b.classList.remove('active'); });
+    document.querySelectorAll('#miniFollowSubtabs button').forEach(function(b){ b.classList.remove('active'); });
     if(btn) btn.classList.add('active');
   };
 
-  window.openMiniSettingsTab = function(id, btn){
-    ['personal','support','survey'].forEach(function(key){
-      var el = byId('miniSettings-' + key);
-      if(el) el.classList.toggle('hide', key !== id);
+  window.openMiniSettingsSubtab = function(id, btn){
+    ['personal','support','survey'].forEach(function(s){
+      var el = byId('miniSettingsSubtab-' + s);
+      if(el) el.classList.toggle('hide', s !== id);
     });
-    document.querySelectorAll('#miniSettingsTabs button').forEach(function(b){ b.classList.remove('active'); });
+    document.querySelectorAll('#miniSettingsSubtabs button').forEach(function(b){ b.classList.remove('active'); });
     if(btn) btn.classList.add('active');
   };
 
-  window.saveMiniPersonal = function(){ updateSettingsCompletion(); };
-  window.saveMiniSurvey = function(){ updateSettingsCompletion(); };
+  function bindMiniNav(){
+    var btns = document.querySelectorAll('#miniPhoneNav [data-mini-page]');
+    btns.forEach(function(btn){
+      if(btn.dataset.boundMini === '1') return;
+      btn.dataset.boundMini = '1';
+      btn.onclick = function(){ openMiniPage(btn.getAttribute('data-mini-page')); };
+    });
+  }
 
-  document.querySelectorAll('#miniPhoneNav [data-mini-page]').forEach(function(btn){
-    btn.style.cursor = 'pointer';
-    btn.addEventListener('click', function(){
-      openMiniPage(btn.getAttribute('data-mini-page'));
+  function bindFileName(id){
+    var input = byId(id);
+    if(!input) return;
+    input.addEventListener('change', function(){
+      var box = byId('miniSelectedFileName');
+      if(box){
+        box.textContent = input.files && input.files.length ? Array.from(input.files).map(function(f){ return f.name; }).join(' ، ') : 'لم يتم تحديد أي ملف';
+      }
+    });
+  }
+
+  function updateMiniSettingsCompletion(){
+    var personalIds = ['miniSchoolNameInput','miniTeacherNameInput','miniTeacherRankInput','miniTeacherYearsInput','miniTeacherEmailInput'];
+    var personalDone = personalIds.every(function(id){
+      var el = byId(id);
+      return el && String(el.value || '').trim() !== '';
+    });
+    var surveyAnswers = Array.from(document.querySelectorAll('.miniSurveyAnswer'));
+    var surveyDone = surveyAnswers.length > 0 && surveyAnswers.every(function(el){ return String(el.value || '').trim() !== ''; });
+    var percent = 0;
+    if(personalDone) percent += 50;
+    if(surveyDone) percent += 50;
+    var bar = byId('miniSettingsCompletionBar');
+    var txt = byId('miniSettingsCompletionText');
+    if(bar) bar.style.width = percent + '%';
+    if(txt) txt.textContent = 'اكتمال الملف: ' + percent + '%';
+  }
+
+  window.saveMiniPersonalSettings = function(){
+    updateMiniSettingsCompletion();
+    if(window.app && window.app.state){
+      window.app.state.pdfProfile = window.app.state.pdfProfile || {};
+      window.app.state.pdfProfile.schoolName = byId('miniSchoolNameInput').value.trim();
+      window.app.state.pdfProfile.teacherName = byId('miniTeacherNameInput').value.trim();
+      window.app.state.pdfProfile.experienceYears = byId('miniTeacherYearsInput').value.trim();
+      window.app.state.pdfProfile.email = byId('miniTeacherEmailInput').value.trim();
+      if(window.app.save) window.app.save();
+    }
+    alert('تم حفظ البيانات الشخصية');
+  };
+
+  window.saveMiniSurveySettings = function(){
+    updateMiniSettingsCompletion();
+    alert('تم إرسال الاستبيان');
+  };
+
+  document.addEventListener('DOMContentLoaded', function(){
+    setTimeout(bindMiniNav, 200);
+    setTimeout(fillMiniPages, 600);
+    ['miniGalleryInput','miniCameraInput','miniFileInput','miniCloudInput'].forEach(bindFileName);
+    document.addEventListener('input', function(e){
+      if(e.target && (e.target.id || '').startsWith('mini') || e.target.classList.contains('miniSurveyAnswer')) updateMiniSettingsCompletion();
+    });
+    document.addEventListener('change', function(e){
+      if(e.target && (e.target.id || '').startsWith('mini') || e.target.classList.contains('miniSurveyAnswer')) updateMiniSettingsCompletion();
     });
   });
 
-  document.addEventListener('input', function(e){
-    if(e.target.closest('#miniPage-settings')) updateSettingsCompletion();
-  });
-  document.addEventListener('change', function(e){
-    if(e.target.closest('#miniPage-settings')) updateSettingsCompletion();
-  });
-
-  bindFileName('miniGalleryInput','miniSelectedFileName');
-  bindFileName('miniCameraInput','miniSelectedFileName');
-  bindFileName('miniFileInput','miniSelectedFileName');
-  bindFileName('miniCloudInput','miniSelectedFileName');
+  if(window.app && typeof window.app.renderAll === 'function'){
+    var oldRenderAll = window.app.renderAll.bind(window.app);
+    window.app.renderAll = function(){
+      oldRenderAll();
+      setTimeout(function(){ bindMiniNav(); fillMiniPages(); }, 60);
+    };
+  }
 })();
 </script>
 
