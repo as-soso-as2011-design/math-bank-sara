@@ -1771,16 +1771,10 @@
         <button class="small-btn" onclick="openSupervisorSubtab('tasks', this)">المهام الأدائية</button>
         <button class="small-btn" onclick="openSupervisorSubtab('messages', this)">الرسائل</button>
         <button class="small-btn" onclick="openSupervisorSubtab('evaluation', this)">التقييم</button>
-        <button class="small-btn" onclick="openSupervisorSubtab('certificate', this)">شهادة شكر</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('certificate', this)">شهادة شكر</button><button class="small-btn" onclick="openSupervisorSubtab('homemail', this)">البريد المنزلي</button>
       </div>
       <div id="supervisorSubtab-bank">
         <div id="supBankReport" class="mini-page-card" style="margin-top:12px"></div>
-        <div class="mini-page-card" style="margin-top:12px">
-          <h4 style="margin:0 0 10px">📬 البريد المنزلي</h4>
-          <div class="note-box" style="margin-bottom:12px">يظهر هنا سجل الرسائل المرسلة إلى أولياء الأمور مع نص الرسالة كاملًا.</div>
-          <div id="supHomeMailStats" class="mini-page-grid" style="margin-bottom:12px"></div>
-          <div id="supHomeMailReport" class="mini-page-list"></div>
-        </div>
       </div>
       <div id="supervisorSubtab-tasks" class="hide">
         <div id="supTasksReport" class="mini-page-card" style="margin-top:12px"></div>
@@ -1793,14 +1787,22 @@
       </div>
       <div id="supervisorSubtab-certificate" class="hide">
         <div class="grid-2">
-          <div class="field"><label>اسم الطالب / الطالبة</label><input id="supCertStudent" class="input" placeholder="اسم الطالب / الطالبة"></div>
-          <div class="field"><label>الفصل</label><input id="supCertClass" class="input" placeholder="الفصل"></div>
+          <div class="field"><label>اسم المعلم / المعلمة</label><input id="supCertTeacher" class="input" placeholder="اسم المعلم / المعلمة"></div>
+          <div class="field"><label>المادة</label><select id="supCertSubject" class="select"><option>اختر المادة</option><option>لغتي</option><option>الرياضيات</option><option>العلوم</option><option>الدراسات الإسلامية</option><option>الدراسات الاجتماعية</option><option>المهارات الرقمية</option><option>اللغة الإنجليزية</option><option>التربية الفنية</option><option>التربية البدنية</option><option>المهارات الحياتية والأسرية</option><option>التوحيد</option><option>الفقه</option><option>الحديث</option><option>التفسير</option><option>القرآن الكريم</option><option>الاجتماعيات</option><option>الحاسب</option><option>التفكير الناقد</option><option>المواطنة الرقمية</option><option>الكيمياء</option><option>الفيزياء</option><option>الأحياء</option><option>التاريخ</option><option>الجغرافيا</option><option>الاقتصاد</option><option>الإدارة</option><option>الأمن السيبراني</option><option>الصحة والحياة</option><option>الإحصاء</option><option>البيئة</option><option>التصميم الهندسي</option><option>علوم الأرض والفضاء</option></select></div>
           <div class="field"><label>عنوان الشهادة</label><input id="supCertTitle" class="input" placeholder="عنوان الشهادة"></div>
           <div class="field"><label>وسيلة الإرسال</label><select id="supCertSendType" class="select"><option>واتساب</option><option>بريد إلكتروني</option></select></div>
         </div>
         <div class="field" style="margin-top:10px"><label>نص الشهادة</label><textarea id="supCertText" class="textarea" placeholder="اكتبي نص شهادة الشكر"></textarea></div>
         <div class="field" style="margin-top:10px"><label>رفع شهادة شكر</label><input id="supCertFile" type="file" class="input" accept=".pdf,.jpg,.jpeg,.png"></div>
         <div class="actions-row" style="margin-top:12px"><button class="btn primary" onclick="sendSupervisorCertificate()">إرسال الشهادة</button></div>
+      </div>
+      <div id="supervisorSubtab-homemail" class="hide">
+        <div class="mini-page-card" style="margin-top:12px">
+          <h4 style="margin:0 0 10px">📬 البريد المنزلي</h4>
+          <div class="note-box" style="margin-bottom:12px">يظهر هنا سجل الرسائل المرسلة إلى أولياء الأمور مع نص الرسالة كاملًا.</div>
+          <div id="supHomeMailStats" class="mini-page-grid" style="margin-bottom:12px"></div>
+          <div id="supHomeMailReport" class="mini-page-list"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -2037,7 +2039,7 @@ ${teacher || 'اسم المعلمة / الجهة'}`;
   };
 
   window.openSupervisorSubtab = function(id, btn){
-    ['bank','tasks','messages','evaluation','certificate'].forEach(function(s){
+    ['bank','tasks','messages','evaluation','certificate','homemail'].forEach(function(s){
       var el = byId('supervisorSubtab-' + s);
       if(el) el.classList.toggle('hide', s !== id);
     });
@@ -2139,6 +2141,10 @@ ${teacher || 'اسم المعلمة / الجهة'}`;
   };
 
   window.sendSupervisorCertificate = function(){
+    var teacher = byId('supCertTeacher') ? String(byId('supCertTeacher').value || '').trim() : '';
+    var subject = byId('supCertSubject') ? String(byId('supCertSubject').value || '').trim() : '';
+    var title = byId('supCertTitle') ? String(byId('supCertTitle').value || '').trim() : '';
+    if(!teacher || !subject || !title){ say('أكملي بيانات الشهادة أولًا'); return; }
     say('تم تجهيز إرسال شهادة الشكر');
   };
 
@@ -2191,23 +2197,56 @@ ${teacher || 'اسم المعلمة / الجهة'}`;
 </script>
 
 
-<script id="oai-home-mail-patch">
+
+<script id="oai-clean-homemail-patch">
 (function(){
-  function syncParentMessages(){
+  function byId(id){ return document.getElementById(id); }
+  function renderHomeMailOnly(){
+    var parentMsgs = JSON.parse(localStorage.getItem('parent_messages') || '[]');
     try{
-      if(window.app && window.app.state && Array.isArray(window.app.state.parentMessages)){
-        localStorage.setItem('parent_messages', JSON.stringify(window.app.state.parentMessages));
+      if(window.app && window.app.state && Array.isArray(window.app.state.parentMessages) && window.app.state.parentMessages.length){
+        parentMsgs = window.app.state.parentMessages;
+        localStorage.setItem('parent_messages', JSON.stringify(parentMsgs));
       }
     }catch(e){}
+    var mailStats = byId('supHomeMailStats');
+    var mailReport = byId('supHomeMailReport');
+    if(mailStats){
+      var today = new Date().toLocaleDateString('ar-SA');
+      var todayCount = parentMsgs.filter(function(m){
+        var d = String(m.date || m.createdAt || '');
+        return d.indexOf(today) !== -1;
+      }).length;
+      var types = parentMsgs.filter(function(m){ return String(m.type || '').includes('واتساب'); }).length;
+      mailStats.innerHTML =
+        '<div class="mini-page-stat"><div class="tiny">عدد رسائل البريد المنزلي</div><strong>' + parentMsgs.length.toLocaleString('ar-SA') + '</strong></div>' +
+        '<div class="mini-page-stat"><div class="tiny">رسائل اليوم</div><strong>' + todayCount.toLocaleString('ar-SA') + '</strong></div>' +
+        '<div class="mini-page-stat"><div class="tiny">رسائل واتساب</div><strong>' + types.toLocaleString('ar-SA') + '</strong></div>' +
+        '<div class="mini-page-stat"><div class="tiny">تاريخ التقرير</div><strong>' + today + '</strong></div>';
+    }
+    if(mailReport){
+      if(!parentMsgs.length){
+        mailReport.innerHTML = '<div class="mini-page-row"><span>لا توجد رسائل مرسلة إلى أولياء الأمور</span><strong>—</strong></div>';
+      } else {
+        mailReport.innerHTML = parentMsgs.slice(0,30).map(function(m){
+          return '<div class="mini-page-row" style="display:block">' +
+            '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center">' +
+              '<span><strong>الطالب:</strong> ' + (m.studentName || m.student || '—') + ' | <strong>الفصل:</strong> ' + (m.className || m.classroom || '—') + '</span>' +
+              '<strong>' + (m.date || m.createdAt || '—') + '</strong>' +
+            '</div>' +
+            '<div class="tiny" style="margin-top:6px"><strong>نوع الرسالة:</strong> ' + (m.type || 'البريد المنزلي') + '</div>' +
+            '<div class="tiny" style="margin-top:4px"><strong>الحالة:</strong> ' + (m.status || 'مرسلة بنجاح') + '</div>' +
+            '<div class="tiny" style="margin-top:6px;white-space:pre-line"><strong>نص الرسالة:</strong>\n' + (m.text || m.message || '—') + '</div>' +
+          '</div>';
+        }).join('');
+      }
+    }
   }
+
   document.addEventListener('DOMContentLoaded', function(){
-    syncParentMessages();
-    if(typeof window.renderSupervisorReports === 'function'){ window.renderSupervisorReports(); }
+    setTimeout(renderHomeMailOnly, 400);
   });
-  setTimeout(function(){
-    syncParentMessages();
-    if(typeof window.renderSupervisorReports === 'function'){ window.renderSupervisorReports(); }
-  }, 900);
+  setTimeout(renderHomeMailOnly, 900);
 })();
 </script>
 
@@ -2945,16 +2984,10 @@ function logoutTeacher(){
         <button class="small-btn" onclick="openSupervisorSubtab('tasks', this)">المهام الأدائية</button>
         <button class="small-btn" onclick="openSupervisorSubtab('messages', this)">الرسائل</button>
         <button class="small-btn" onclick="openSupervisorSubtab('evaluation', this)">التقييم</button>
-        <button class="small-btn" onclick="openSupervisorSubtab('certificate', this)">شهادة شكر</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('certificate', this)">شهادة شكر</button><button class="small-btn" onclick="openSupervisorSubtab('homemail', this)">البريد المنزلي</button>
       </div>
       <div id="supervisorSubtab-bank">
         <div id="supBankReport" class="mini-page-card" style="margin-top:12px"></div>
-        <div class="mini-page-card" style="margin-top:12px">
-          <h4 style="margin:0 0 10px">📬 البريد المنزلي</h4>
-          <div class="note-box" style="margin-bottom:12px">يظهر هنا سجل الرسائل المرسلة إلى أولياء الأمور مع نص الرسالة كاملًا.</div>
-          <div id="supHomeMailStats" class="mini-page-grid" style="margin-bottom:12px"></div>
-          <div id="supHomeMailReport" class="mini-page-list"></div>
-        </div>
       </div>
       <div id="supervisorSubtab-tasks" class="hide">
         <div id="supTasksReport" class="mini-page-card" style="margin-top:12px"></div>
@@ -3211,7 +3244,7 @@ ${teacher || 'اسم المعلمة / الجهة'}`;
   };
 
   window.openSupervisorSubtab = function(id, btn){
-    ['bank','tasks','messages','evaluation','certificate'].forEach(function(s){
+    ['bank','tasks','messages','evaluation','certificate','homemail'].forEach(function(s){
       var el = byId('supervisorSubtab-' + s);
       if(el) el.classList.toggle('hide', s !== id);
     });
@@ -3321,23 +3354,56 @@ ${teacher || 'اسم المعلمة / الجهة'}`;
 </script>
 
 
-<script id="oai-home-mail-patch">
+
+<script id="oai-clean-homemail-patch">
 (function(){
-  function syncParentMessages(){
+  function byId(id){ return document.getElementById(id); }
+  function renderHomeMailOnly(){
+    var parentMsgs = JSON.parse(localStorage.getItem('parent_messages') || '[]');
     try{
-      if(window.app && window.app.state && Array.isArray(window.app.state.parentMessages)){
-        localStorage.setItem('parent_messages', JSON.stringify(window.app.state.parentMessages));
+      if(window.app && window.app.state && Array.isArray(window.app.state.parentMessages) && window.app.state.parentMessages.length){
+        parentMsgs = window.app.state.parentMessages;
+        localStorage.setItem('parent_messages', JSON.stringify(parentMsgs));
       }
     }catch(e){}
+    var mailStats = byId('supHomeMailStats');
+    var mailReport = byId('supHomeMailReport');
+    if(mailStats){
+      var today = new Date().toLocaleDateString('ar-SA');
+      var todayCount = parentMsgs.filter(function(m){
+        var d = String(m.date || m.createdAt || '');
+        return d.indexOf(today) !== -1;
+      }).length;
+      var types = parentMsgs.filter(function(m){ return String(m.type || '').includes('واتساب'); }).length;
+      mailStats.innerHTML =
+        '<div class="mini-page-stat"><div class="tiny">عدد رسائل البريد المنزلي</div><strong>' + parentMsgs.length.toLocaleString('ar-SA') + '</strong></div>' +
+        '<div class="mini-page-stat"><div class="tiny">رسائل اليوم</div><strong>' + todayCount.toLocaleString('ar-SA') + '</strong></div>' +
+        '<div class="mini-page-stat"><div class="tiny">رسائل واتساب</div><strong>' + types.toLocaleString('ar-SA') + '</strong></div>' +
+        '<div class="mini-page-stat"><div class="tiny">تاريخ التقرير</div><strong>' + today + '</strong></div>';
+    }
+    if(mailReport){
+      if(!parentMsgs.length){
+        mailReport.innerHTML = '<div class="mini-page-row"><span>لا توجد رسائل مرسلة إلى أولياء الأمور</span><strong>—</strong></div>';
+      } else {
+        mailReport.innerHTML = parentMsgs.slice(0,30).map(function(m){
+          return '<div class="mini-page-row" style="display:block">' +
+            '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center">' +
+              '<span><strong>الطالب:</strong> ' + (m.studentName || m.student || '—') + ' | <strong>الفصل:</strong> ' + (m.className || m.classroom || '—') + '</span>' +
+              '<strong>' + (m.date || m.createdAt || '—') + '</strong>' +
+            '</div>' +
+            '<div class="tiny" style="margin-top:6px"><strong>نوع الرسالة:</strong> ' + (m.type || 'البريد المنزلي') + '</div>' +
+            '<div class="tiny" style="margin-top:4px"><strong>الحالة:</strong> ' + (m.status || 'مرسلة بنجاح') + '</div>' +
+            '<div class="tiny" style="margin-top:6px;white-space:pre-line"><strong>نص الرسالة:</strong>\n' + (m.text || m.message || '—') + '</div>' +
+          '</div>';
+        }).join('');
+      }
+    }
   }
+
   document.addEventListener('DOMContentLoaded', function(){
-    syncParentMessages();
-    if(typeof window.renderSupervisorReports === 'function'){ window.renderSupervisorReports(); }
+    setTimeout(renderHomeMailOnly, 400);
   });
-  setTimeout(function(){
-    syncParentMessages();
-    if(typeof window.renderSupervisorReports === 'function'){ window.renderSupervisorReports(); }
-  }, 900);
+  setTimeout(renderHomeMailOnly, 900);
 })();
 </script>
 
@@ -3602,16 +3668,10 @@ ${teacher || 'اسم المعلمة / الجهة'}`;
         <button class="small-btn" onclick="openSupervisorSubtab('tasks', this)">المهام الأدائية</button>
         <button class="small-btn" onclick="openSupervisorSubtab('messages', this)">الرسائل</button>
         <button class="small-btn" onclick="openSupervisorSubtab('evaluation', this)">التقييم</button>
-        <button class="small-btn" onclick="openSupervisorSubtab('certificate', this)">شهادة شكر</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('certificate', this)">شهادة شكر</button><button class="small-btn" onclick="openSupervisorSubtab('homemail', this)">البريد المنزلي</button>
       </div>
       <div id="supervisorSubtab-bank">
         <div id="supBankReport" class="mini-page-card" style="margin-top:12px"></div>
-        <div class="mini-page-card" style="margin-top:12px">
-          <h4 style="margin:0 0 10px">📬 البريد المنزلي</h4>
-          <div class="note-box" style="margin-bottom:12px">يظهر هنا سجل الرسائل المرسلة إلى أولياء الأمور مع نص الرسالة كاملًا.</div>
-          <div id="supHomeMailStats" class="mini-page-grid" style="margin-bottom:12px"></div>
-          <div id="supHomeMailReport" class="mini-page-list"></div>
-        </div>
       </div>
       <div id="supervisorSubtab-tasks" class="hide">
         <div id="supTasksReport" class="mini-page-card" style="margin-top:12px"></div>
@@ -3868,7 +3928,7 @@ ${teacher || 'اسم المعلمة / الجهة'}`;
   };
 
   window.openSupervisorSubtab = function(id, btn){
-    ['bank','tasks','messages','evaluation','certificate'].forEach(function(s){
+    ['bank','tasks','messages','evaluation','certificate','homemail'].forEach(function(s){
       var el = byId('supervisorSubtab-' + s);
       if(el) el.classList.toggle('hide', s !== id);
     });
@@ -3978,23 +4038,56 @@ ${teacher || 'اسم المعلمة / الجهة'}`;
 </script>
 
 
-<script id="oai-home-mail-patch">
+
+<script id="oai-clean-homemail-patch">
 (function(){
-  function syncParentMessages(){
+  function byId(id){ return document.getElementById(id); }
+  function renderHomeMailOnly(){
+    var parentMsgs = JSON.parse(localStorage.getItem('parent_messages') || '[]');
     try{
-      if(window.app && window.app.state && Array.isArray(window.app.state.parentMessages)){
-        localStorage.setItem('parent_messages', JSON.stringify(window.app.state.parentMessages));
+      if(window.app && window.app.state && Array.isArray(window.app.state.parentMessages) && window.app.state.parentMessages.length){
+        parentMsgs = window.app.state.parentMessages;
+        localStorage.setItem('parent_messages', JSON.stringify(parentMsgs));
       }
     }catch(e){}
+    var mailStats = byId('supHomeMailStats');
+    var mailReport = byId('supHomeMailReport');
+    if(mailStats){
+      var today = new Date().toLocaleDateString('ar-SA');
+      var todayCount = parentMsgs.filter(function(m){
+        var d = String(m.date || m.createdAt || '');
+        return d.indexOf(today) !== -1;
+      }).length;
+      var types = parentMsgs.filter(function(m){ return String(m.type || '').includes('واتساب'); }).length;
+      mailStats.innerHTML =
+        '<div class="mini-page-stat"><div class="tiny">عدد رسائل البريد المنزلي</div><strong>' + parentMsgs.length.toLocaleString('ar-SA') + '</strong></div>' +
+        '<div class="mini-page-stat"><div class="tiny">رسائل اليوم</div><strong>' + todayCount.toLocaleString('ar-SA') + '</strong></div>' +
+        '<div class="mini-page-stat"><div class="tiny">رسائل واتساب</div><strong>' + types.toLocaleString('ar-SA') + '</strong></div>' +
+        '<div class="mini-page-stat"><div class="tiny">تاريخ التقرير</div><strong>' + today + '</strong></div>';
+    }
+    if(mailReport){
+      if(!parentMsgs.length){
+        mailReport.innerHTML = '<div class="mini-page-row"><span>لا توجد رسائل مرسلة إلى أولياء الأمور</span><strong>—</strong></div>';
+      } else {
+        mailReport.innerHTML = parentMsgs.slice(0,30).map(function(m){
+          return '<div class="mini-page-row" style="display:block">' +
+            '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center">' +
+              '<span><strong>الطالب:</strong> ' + (m.studentName || m.student || '—') + ' | <strong>الفصل:</strong> ' + (m.className || m.classroom || '—') + '</span>' +
+              '<strong>' + (m.date || m.createdAt || '—') + '</strong>' +
+            '</div>' +
+            '<div class="tiny" style="margin-top:6px"><strong>نوع الرسالة:</strong> ' + (m.type || 'البريد المنزلي') + '</div>' +
+            '<div class="tiny" style="margin-top:4px"><strong>الحالة:</strong> ' + (m.status || 'مرسلة بنجاح') + '</div>' +
+            '<div class="tiny" style="margin-top:6px;white-space:pre-line"><strong>نص الرسالة:</strong>\n' + (m.text || m.message || '—') + '</div>' +
+          '</div>';
+        }).join('');
+      }
+    }
   }
+
   document.addEventListener('DOMContentLoaded', function(){
-    syncParentMessages();
-    if(typeof window.renderSupervisorReports === 'function'){ window.renderSupervisorReports(); }
+    setTimeout(renderHomeMailOnly, 400);
   });
-  setTimeout(function(){
-    syncParentMessages();
-    if(typeof window.renderSupervisorReports === 'function'){ window.renderSupervisorReports(); }
-  }, 900);
+  setTimeout(renderHomeMailOnly, 900);
 })();
 </script>
 
@@ -4525,16 +4618,10 @@ ${teacher || 'اسم المعلمة / الجهة'}`;
         <button class="small-btn" onclick="openSupervisorSubtab('tasks', this)">المهام الأدائية</button>
         <button class="small-btn" onclick="openSupervisorSubtab('messages', this)">الرسائل</button>
         <button class="small-btn" onclick="openSupervisorSubtab('evaluation', this)">التقييم</button>
-        <button class="small-btn" onclick="openSupervisorSubtab('certificate', this)">شهادة شكر</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('certificate', this)">شهادة شكر</button><button class="small-btn" onclick="openSupervisorSubtab('homemail', this)">البريد المنزلي</button>
       </div>
       <div id="supervisorSubtab-bank">
         <div id="supBankReport" class="mini-page-card" style="margin-top:12px"></div>
-        <div class="mini-page-card" style="margin-top:12px">
-          <h4 style="margin:0 0 10px">📬 البريد المنزلي</h4>
-          <div class="note-box" style="margin-bottom:12px">يظهر هنا سجل الرسائل المرسلة إلى أولياء الأمور مع نص الرسالة كاملًا.</div>
-          <div id="supHomeMailStats" class="mini-page-grid" style="margin-bottom:12px"></div>
-          <div id="supHomeMailReport" class="mini-page-list"></div>
-        </div>
       </div>
       <div id="supervisorSubtab-tasks" class="hide">
         <div id="supTasksReport" class="mini-page-card" style="margin-top:12px"></div>
@@ -4791,7 +4878,7 @@ ${teacher || 'اسم المعلمة / الجهة'}`;
   };
 
   window.openSupervisorSubtab = function(id, btn){
-    ['bank','tasks','messages','evaluation','certificate'].forEach(function(s){
+    ['bank','tasks','messages','evaluation','certificate','homemail'].forEach(function(s){
       var el = byId('supervisorSubtab-' + s);
       if(el) el.classList.toggle('hide', s !== id);
     });
@@ -4901,23 +4988,56 @@ ${teacher || 'اسم المعلمة / الجهة'}`;
 </script>
 
 
-<script id="oai-home-mail-patch">
+
+<script id="oai-clean-homemail-patch">
 (function(){
-  function syncParentMessages(){
+  function byId(id){ return document.getElementById(id); }
+  function renderHomeMailOnly(){
+    var parentMsgs = JSON.parse(localStorage.getItem('parent_messages') || '[]');
     try{
-      if(window.app && window.app.state && Array.isArray(window.app.state.parentMessages)){
-        localStorage.setItem('parent_messages', JSON.stringify(window.app.state.parentMessages));
+      if(window.app && window.app.state && Array.isArray(window.app.state.parentMessages) && window.app.state.parentMessages.length){
+        parentMsgs = window.app.state.parentMessages;
+        localStorage.setItem('parent_messages', JSON.stringify(parentMsgs));
       }
     }catch(e){}
+    var mailStats = byId('supHomeMailStats');
+    var mailReport = byId('supHomeMailReport');
+    if(mailStats){
+      var today = new Date().toLocaleDateString('ar-SA');
+      var todayCount = parentMsgs.filter(function(m){
+        var d = String(m.date || m.createdAt || '');
+        return d.indexOf(today) !== -1;
+      }).length;
+      var types = parentMsgs.filter(function(m){ return String(m.type || '').includes('واتساب'); }).length;
+      mailStats.innerHTML =
+        '<div class="mini-page-stat"><div class="tiny">عدد رسائل البريد المنزلي</div><strong>' + parentMsgs.length.toLocaleString('ar-SA') + '</strong></div>' +
+        '<div class="mini-page-stat"><div class="tiny">رسائل اليوم</div><strong>' + todayCount.toLocaleString('ar-SA') + '</strong></div>' +
+        '<div class="mini-page-stat"><div class="tiny">رسائل واتساب</div><strong>' + types.toLocaleString('ar-SA') + '</strong></div>' +
+        '<div class="mini-page-stat"><div class="tiny">تاريخ التقرير</div><strong>' + today + '</strong></div>';
+    }
+    if(mailReport){
+      if(!parentMsgs.length){
+        mailReport.innerHTML = '<div class="mini-page-row"><span>لا توجد رسائل مرسلة إلى أولياء الأمور</span><strong>—</strong></div>';
+      } else {
+        mailReport.innerHTML = parentMsgs.slice(0,30).map(function(m){
+          return '<div class="mini-page-row" style="display:block">' +
+            '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center">' +
+              '<span><strong>الطالب:</strong> ' + (m.studentName || m.student || '—') + ' | <strong>الفصل:</strong> ' + (m.className || m.classroom || '—') + '</span>' +
+              '<strong>' + (m.date || m.createdAt || '—') + '</strong>' +
+            '</div>' +
+            '<div class="tiny" style="margin-top:6px"><strong>نوع الرسالة:</strong> ' + (m.type || 'البريد المنزلي') + '</div>' +
+            '<div class="tiny" style="margin-top:4px"><strong>الحالة:</strong> ' + (m.status || 'مرسلة بنجاح') + '</div>' +
+            '<div class="tiny" style="margin-top:6px;white-space:pre-line"><strong>نص الرسالة:</strong>\n' + (m.text || m.message || '—') + '</div>' +
+          '</div>';
+        }).join('');
+      }
+    }
   }
+
   document.addEventListener('DOMContentLoaded', function(){
-    syncParentMessages();
-    if(typeof window.renderSupervisorReports === 'function'){ window.renderSupervisorReports(); }
+    setTimeout(renderHomeMailOnly, 400);
   });
-  setTimeout(function(){
-    syncParentMessages();
-    if(typeof window.renderSupervisorReports === 'function'){ window.renderSupervisorReports(); }
-  }, 900);
+  setTimeout(renderHomeMailOnly, 900);
 })();
 </script>
 
@@ -4994,16 +5114,10 @@ ${teacher || 'اسم المعلمة / الجهة'}`;
         <button class="small-btn" onclick="openSupervisorSubtab('tasks', this)">المهام الأدائية</button>
         <button class="small-btn" onclick="openSupervisorSubtab('messages', this)">الرسائل</button>
         <button class="small-btn" onclick="openSupervisorSubtab('evaluation', this)">التقييم</button>
-        <button class="small-btn" onclick="openSupervisorSubtab('certificate', this)">شهادة شكر</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('certificate', this)">شهادة شكر</button><button class="small-btn" onclick="openSupervisorSubtab('homemail', this)">البريد المنزلي</button>
       </div>
       <div id="supervisorSubtab-bank">
         <div id="supBankReport" class="mini-page-card" style="margin-top:12px"></div>
-        <div class="mini-page-card" style="margin-top:12px">
-          <h4 style="margin:0 0 10px">📬 البريد المنزلي</h4>
-          <div class="note-box" style="margin-bottom:12px">يظهر هنا سجل الرسائل المرسلة إلى أولياء الأمور مع نص الرسالة كاملًا.</div>
-          <div id="supHomeMailStats" class="mini-page-grid" style="margin-bottom:12px"></div>
-          <div id="supHomeMailReport" class="mini-page-list"></div>
-        </div>
       </div>
       <div id="supervisorSubtab-tasks" class="hide">
         <div id="supTasksReport" class="mini-page-card" style="margin-top:12px"></div>
@@ -5260,7 +5374,7 @@ ${teacher || 'اسم المعلمة / الجهة'}`;
   };
 
   window.openSupervisorSubtab = function(id, btn){
-    ['bank','tasks','messages','evaluation','certificate'].forEach(function(s){
+    ['bank','tasks','messages','evaluation','certificate','homemail'].forEach(function(s){
       var el = byId('supervisorSubtab-' + s);
       if(el) el.classList.toggle('hide', s !== id);
     });
@@ -5370,23 +5484,56 @@ ${teacher || 'اسم المعلمة / الجهة'}`;
 </script>
 
 
-<script id="oai-home-mail-patch">
+
+<script id="oai-clean-homemail-patch">
 (function(){
-  function syncParentMessages(){
+  function byId(id){ return document.getElementById(id); }
+  function renderHomeMailOnly(){
+    var parentMsgs = JSON.parse(localStorage.getItem('parent_messages') || '[]');
     try{
-      if(window.app && window.app.state && Array.isArray(window.app.state.parentMessages)){
-        localStorage.setItem('parent_messages', JSON.stringify(window.app.state.parentMessages));
+      if(window.app && window.app.state && Array.isArray(window.app.state.parentMessages) && window.app.state.parentMessages.length){
+        parentMsgs = window.app.state.parentMessages;
+        localStorage.setItem('parent_messages', JSON.stringify(parentMsgs));
       }
     }catch(e){}
+    var mailStats = byId('supHomeMailStats');
+    var mailReport = byId('supHomeMailReport');
+    if(mailStats){
+      var today = new Date().toLocaleDateString('ar-SA');
+      var todayCount = parentMsgs.filter(function(m){
+        var d = String(m.date || m.createdAt || '');
+        return d.indexOf(today) !== -1;
+      }).length;
+      var types = parentMsgs.filter(function(m){ return String(m.type || '').includes('واتساب'); }).length;
+      mailStats.innerHTML =
+        '<div class="mini-page-stat"><div class="tiny">عدد رسائل البريد المنزلي</div><strong>' + parentMsgs.length.toLocaleString('ar-SA') + '</strong></div>' +
+        '<div class="mini-page-stat"><div class="tiny">رسائل اليوم</div><strong>' + todayCount.toLocaleString('ar-SA') + '</strong></div>' +
+        '<div class="mini-page-stat"><div class="tiny">رسائل واتساب</div><strong>' + types.toLocaleString('ar-SA') + '</strong></div>' +
+        '<div class="mini-page-stat"><div class="tiny">تاريخ التقرير</div><strong>' + today + '</strong></div>';
+    }
+    if(mailReport){
+      if(!parentMsgs.length){
+        mailReport.innerHTML = '<div class="mini-page-row"><span>لا توجد رسائل مرسلة إلى أولياء الأمور</span><strong>—</strong></div>';
+      } else {
+        mailReport.innerHTML = parentMsgs.slice(0,30).map(function(m){
+          return '<div class="mini-page-row" style="display:block">' +
+            '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center">' +
+              '<span><strong>الطالب:</strong> ' + (m.studentName || m.student || '—') + ' | <strong>الفصل:</strong> ' + (m.className || m.classroom || '—') + '</span>' +
+              '<strong>' + (m.date || m.createdAt || '—') + '</strong>' +
+            '</div>' +
+            '<div class="tiny" style="margin-top:6px"><strong>نوع الرسالة:</strong> ' + (m.type || 'البريد المنزلي') + '</div>' +
+            '<div class="tiny" style="margin-top:4px"><strong>الحالة:</strong> ' + (m.status || 'مرسلة بنجاح') + '</div>' +
+            '<div class="tiny" style="margin-top:6px;white-space:pre-line"><strong>نص الرسالة:</strong>\n' + (m.text || m.message || '—') + '</div>' +
+          '</div>';
+        }).join('');
+      }
+    }
   }
+
   document.addEventListener('DOMContentLoaded', function(){
-    syncParentMessages();
-    if(typeof window.renderSupervisorReports === 'function'){ window.renderSupervisorReports(); }
+    setTimeout(renderHomeMailOnly, 400);
   });
-  setTimeout(function(){
-    syncParentMessages();
-    if(typeof window.renderSupervisorReports === 'function'){ window.renderSupervisorReports(); }
-  }, 900);
+  setTimeout(renderHomeMailOnly, 900);
 })();
 </script>
 
@@ -5770,16 +5917,10 @@ ${teacher || 'اسم المعلمة / الجهة'}`;
         <button class="small-btn" onclick="openSupervisorSubtab('tasks', this)">المهام الأدائية</button>
         <button class="small-btn" onclick="openSupervisorSubtab('messages', this)">الرسائل</button>
         <button class="small-btn" onclick="openSupervisorSubtab('evaluation', this)">التقييم</button>
-        <button class="small-btn" onclick="openSupervisorSubtab('certificate', this)">شهادة شكر</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('certificate', this)">شهادة شكر</button><button class="small-btn" onclick="openSupervisorSubtab('homemail', this)">البريد المنزلي</button>
       </div>
       <div id="supervisorSubtab-bank">
         <div id="supBankReport" class="mini-page-card" style="margin-top:12px"></div>
-        <div class="mini-page-card" style="margin-top:12px">
-          <h4 style="margin:0 0 10px">📬 البريد المنزلي</h4>
-          <div class="note-box" style="margin-bottom:12px">يظهر هنا سجل الرسائل المرسلة إلى أولياء الأمور مع نص الرسالة كاملًا.</div>
-          <div id="supHomeMailStats" class="mini-page-grid" style="margin-bottom:12px"></div>
-          <div id="supHomeMailReport" class="mini-page-list"></div>
-        </div>
       </div>
       <div id="supervisorSubtab-tasks" class="hide">
         <div id="supTasksReport" class="mini-page-card" style="margin-top:12px"></div>
@@ -6036,7 +6177,7 @@ ${teacher || 'اسم المعلمة / الجهة'}`;
   };
 
   window.openSupervisorSubtab = function(id, btn){
-    ['bank','tasks','messages','evaluation','certificate'].forEach(function(s){
+    ['bank','tasks','messages','evaluation','certificate','homemail'].forEach(function(s){
       var el = byId('supervisorSubtab-' + s);
       if(el) el.classList.toggle('hide', s !== id);
     });
@@ -6146,23 +6287,56 @@ ${teacher || 'اسم المعلمة / الجهة'}`;
 </script>
 
 
-<script id="oai-home-mail-patch">
+
+<script id="oai-clean-homemail-patch">
 (function(){
-  function syncParentMessages(){
+  function byId(id){ return document.getElementById(id); }
+  function renderHomeMailOnly(){
+    var parentMsgs = JSON.parse(localStorage.getItem('parent_messages') || '[]');
     try{
-      if(window.app && window.app.state && Array.isArray(window.app.state.parentMessages)){
-        localStorage.setItem('parent_messages', JSON.stringify(window.app.state.parentMessages));
+      if(window.app && window.app.state && Array.isArray(window.app.state.parentMessages) && window.app.state.parentMessages.length){
+        parentMsgs = window.app.state.parentMessages;
+        localStorage.setItem('parent_messages', JSON.stringify(parentMsgs));
       }
     }catch(e){}
+    var mailStats = byId('supHomeMailStats');
+    var mailReport = byId('supHomeMailReport');
+    if(mailStats){
+      var today = new Date().toLocaleDateString('ar-SA');
+      var todayCount = parentMsgs.filter(function(m){
+        var d = String(m.date || m.createdAt || '');
+        return d.indexOf(today) !== -1;
+      }).length;
+      var types = parentMsgs.filter(function(m){ return String(m.type || '').includes('واتساب'); }).length;
+      mailStats.innerHTML =
+        '<div class="mini-page-stat"><div class="tiny">عدد رسائل البريد المنزلي</div><strong>' + parentMsgs.length.toLocaleString('ar-SA') + '</strong></div>' +
+        '<div class="mini-page-stat"><div class="tiny">رسائل اليوم</div><strong>' + todayCount.toLocaleString('ar-SA') + '</strong></div>' +
+        '<div class="mini-page-stat"><div class="tiny">رسائل واتساب</div><strong>' + types.toLocaleString('ar-SA') + '</strong></div>' +
+        '<div class="mini-page-stat"><div class="tiny">تاريخ التقرير</div><strong>' + today + '</strong></div>';
+    }
+    if(mailReport){
+      if(!parentMsgs.length){
+        mailReport.innerHTML = '<div class="mini-page-row"><span>لا توجد رسائل مرسلة إلى أولياء الأمور</span><strong>—</strong></div>';
+      } else {
+        mailReport.innerHTML = parentMsgs.slice(0,30).map(function(m){
+          return '<div class="mini-page-row" style="display:block">' +
+            '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center">' +
+              '<span><strong>الطالب:</strong> ' + (m.studentName || m.student || '—') + ' | <strong>الفصل:</strong> ' + (m.className || m.classroom || '—') + '</span>' +
+              '<strong>' + (m.date || m.createdAt || '—') + '</strong>' +
+            '</div>' +
+            '<div class="tiny" style="margin-top:6px"><strong>نوع الرسالة:</strong> ' + (m.type || 'البريد المنزلي') + '</div>' +
+            '<div class="tiny" style="margin-top:4px"><strong>الحالة:</strong> ' + (m.status || 'مرسلة بنجاح') + '</div>' +
+            '<div class="tiny" style="margin-top:6px;white-space:pre-line"><strong>نص الرسالة:</strong>\n' + (m.text || m.message || '—') + '</div>' +
+          '</div>';
+        }).join('');
+      }
+    }
   }
+
   document.addEventListener('DOMContentLoaded', function(){
-    syncParentMessages();
-    if(typeof window.renderSupervisorReports === 'function'){ window.renderSupervisorReports(); }
+    setTimeout(renderHomeMailOnly, 400);
   });
-  setTimeout(function(){
-    syncParentMessages();
-    if(typeof window.renderSupervisorReports === 'function'){ window.renderSupervisorReports(); }
-  }, 900);
+  setTimeout(renderHomeMailOnly, 900);
 })();
 </script>
 
@@ -6494,16 +6668,10 @@ ${teacher || 'اسم المعلمة / الجهة'}`;
         <button class="small-btn" onclick="openSupervisorSubtab('tasks', this)">المهام الأدائية</button>
         <button class="small-btn" onclick="openSupervisorSubtab('messages', this)">الرسائل</button>
         <button class="small-btn" onclick="openSupervisorSubtab('evaluation', this)">التقييم</button>
-        <button class="small-btn" onclick="openSupervisorSubtab('certificate', this)">شهادة شكر</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('certificate', this)">شهادة شكر</button><button class="small-btn" onclick="openSupervisorSubtab('homemail', this)">البريد المنزلي</button>
       </div>
       <div id="supervisorSubtab-bank">
         <div id="supBankReport" class="mini-page-card" style="margin-top:12px"></div>
-        <div class="mini-page-card" style="margin-top:12px">
-          <h4 style="margin:0 0 10px">📬 البريد المنزلي</h4>
-          <div class="note-box" style="margin-bottom:12px">يظهر هنا سجل الرسائل المرسلة إلى أولياء الأمور مع نص الرسالة كاملًا.</div>
-          <div id="supHomeMailStats" class="mini-page-grid" style="margin-bottom:12px"></div>
-          <div id="supHomeMailReport" class="mini-page-list"></div>
-        </div>
       </div>
       <div id="supervisorSubtab-tasks" class="hide">
         <div id="supTasksReport" class="mini-page-card" style="margin-top:12px"></div>
@@ -6760,7 +6928,7 @@ ${teacher || 'اسم المعلمة / الجهة'}`;
   };
 
   window.openSupervisorSubtab = function(id, btn){
-    ['bank','tasks','messages','evaluation','certificate'].forEach(function(s){
+    ['bank','tasks','messages','evaluation','certificate','homemail'].forEach(function(s){
       var el = byId('supervisorSubtab-' + s);
       if(el) el.classList.toggle('hide', s !== id);
     });
@@ -6870,23 +7038,56 @@ ${teacher || 'اسم المعلمة / الجهة'}`;
 </script>
 
 
-<script id="oai-home-mail-patch">
+
+<script id="oai-clean-homemail-patch">
 (function(){
-  function syncParentMessages(){
+  function byId(id){ return document.getElementById(id); }
+  function renderHomeMailOnly(){
+    var parentMsgs = JSON.parse(localStorage.getItem('parent_messages') || '[]');
     try{
-      if(window.app && window.app.state && Array.isArray(window.app.state.parentMessages)){
-        localStorage.setItem('parent_messages', JSON.stringify(window.app.state.parentMessages));
+      if(window.app && window.app.state && Array.isArray(window.app.state.parentMessages) && window.app.state.parentMessages.length){
+        parentMsgs = window.app.state.parentMessages;
+        localStorage.setItem('parent_messages', JSON.stringify(parentMsgs));
       }
     }catch(e){}
+    var mailStats = byId('supHomeMailStats');
+    var mailReport = byId('supHomeMailReport');
+    if(mailStats){
+      var today = new Date().toLocaleDateString('ar-SA');
+      var todayCount = parentMsgs.filter(function(m){
+        var d = String(m.date || m.createdAt || '');
+        return d.indexOf(today) !== -1;
+      }).length;
+      var types = parentMsgs.filter(function(m){ return String(m.type || '').includes('واتساب'); }).length;
+      mailStats.innerHTML =
+        '<div class="mini-page-stat"><div class="tiny">عدد رسائل البريد المنزلي</div><strong>' + parentMsgs.length.toLocaleString('ar-SA') + '</strong></div>' +
+        '<div class="mini-page-stat"><div class="tiny">رسائل اليوم</div><strong>' + todayCount.toLocaleString('ar-SA') + '</strong></div>' +
+        '<div class="mini-page-stat"><div class="tiny">رسائل واتساب</div><strong>' + types.toLocaleString('ar-SA') + '</strong></div>' +
+        '<div class="mini-page-stat"><div class="tiny">تاريخ التقرير</div><strong>' + today + '</strong></div>';
+    }
+    if(mailReport){
+      if(!parentMsgs.length){
+        mailReport.innerHTML = '<div class="mini-page-row"><span>لا توجد رسائل مرسلة إلى أولياء الأمور</span><strong>—</strong></div>';
+      } else {
+        mailReport.innerHTML = parentMsgs.slice(0,30).map(function(m){
+          return '<div class="mini-page-row" style="display:block">' +
+            '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center">' +
+              '<span><strong>الطالب:</strong> ' + (m.studentName || m.student || '—') + ' | <strong>الفصل:</strong> ' + (m.className || m.classroom || '—') + '</span>' +
+              '<strong>' + (m.date || m.createdAt || '—') + '</strong>' +
+            '</div>' +
+            '<div class="tiny" style="margin-top:6px"><strong>نوع الرسالة:</strong> ' + (m.type || 'البريد المنزلي') + '</div>' +
+            '<div class="tiny" style="margin-top:4px"><strong>الحالة:</strong> ' + (m.status || 'مرسلة بنجاح') + '</div>' +
+            '<div class="tiny" style="margin-top:6px;white-space:pre-line"><strong>نص الرسالة:</strong>\n' + (m.text || m.message || '—') + '</div>' +
+          '</div>';
+        }).join('');
+      }
+    }
   }
+
   document.addEventListener('DOMContentLoaded', function(){
-    syncParentMessages();
-    if(typeof window.renderSupervisorReports === 'function'){ window.renderSupervisorReports(); }
+    setTimeout(renderHomeMailOnly, 400);
   });
-  setTimeout(function(){
-    syncParentMessages();
-    if(typeof window.renderSupervisorReports === 'function'){ window.renderSupervisorReports(); }
-  }, 900);
+  setTimeout(renderHomeMailOnly, 900);
 })();
 </script>
 
@@ -7564,16 +7765,10 @@ ${teacher || 'اسم المعلمة / الجهة'}`;
         <button class="small-btn" onclick="openSupervisorSubtab('tasks', this)">المهام الأدائية</button>
         <button class="small-btn" onclick="openSupervisorSubtab('messages', this)">الرسائل</button>
         <button class="small-btn" onclick="openSupervisorSubtab('evaluation', this)">التقييم</button>
-        <button class="small-btn" onclick="openSupervisorSubtab('certificate', this)">شهادة شكر</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('certificate', this)">شهادة شكر</button><button class="small-btn" onclick="openSupervisorSubtab('homemail', this)">البريد المنزلي</button>
       </div>
       <div id="supervisorSubtab-bank">
         <div id="supBankReport" class="mini-page-card" style="margin-top:12px"></div>
-        <div class="mini-page-card" style="margin-top:12px">
-          <h4 style="margin:0 0 10px">📬 البريد المنزلي</h4>
-          <div class="note-box" style="margin-bottom:12px">يظهر هنا سجل الرسائل المرسلة إلى أولياء الأمور مع نص الرسالة كاملًا.</div>
-          <div id="supHomeMailStats" class="mini-page-grid" style="margin-bottom:12px"></div>
-          <div id="supHomeMailReport" class="mini-page-list"></div>
-        </div>
       </div>
       <div id="supervisorSubtab-tasks" class="hide">
         <div id="supTasksReport" class="mini-page-card" style="margin-top:12px"></div>
@@ -7830,7 +8025,7 @@ ${teacher || 'اسم المعلمة / الجهة'}`;
   };
 
   window.openSupervisorSubtab = function(id, btn){
-    ['bank','tasks','messages','evaluation','certificate'].forEach(function(s){
+    ['bank','tasks','messages','evaluation','certificate','homemail'].forEach(function(s){
       var el = byId('supervisorSubtab-' + s);
       if(el) el.classList.toggle('hide', s !== id);
     });
@@ -7940,23 +8135,56 @@ ${teacher || 'اسم المعلمة / الجهة'}`;
 </script>
 
 
-<script id="oai-home-mail-patch">
+
+<script id="oai-clean-homemail-patch">
 (function(){
-  function syncParentMessages(){
+  function byId(id){ return document.getElementById(id); }
+  function renderHomeMailOnly(){
+    var parentMsgs = JSON.parse(localStorage.getItem('parent_messages') || '[]');
     try{
-      if(window.app && window.app.state && Array.isArray(window.app.state.parentMessages)){
-        localStorage.setItem('parent_messages', JSON.stringify(window.app.state.parentMessages));
+      if(window.app && window.app.state && Array.isArray(window.app.state.parentMessages) && window.app.state.parentMessages.length){
+        parentMsgs = window.app.state.parentMessages;
+        localStorage.setItem('parent_messages', JSON.stringify(parentMsgs));
       }
     }catch(e){}
+    var mailStats = byId('supHomeMailStats');
+    var mailReport = byId('supHomeMailReport');
+    if(mailStats){
+      var today = new Date().toLocaleDateString('ar-SA');
+      var todayCount = parentMsgs.filter(function(m){
+        var d = String(m.date || m.createdAt || '');
+        return d.indexOf(today) !== -1;
+      }).length;
+      var types = parentMsgs.filter(function(m){ return String(m.type || '').includes('واتساب'); }).length;
+      mailStats.innerHTML =
+        '<div class="mini-page-stat"><div class="tiny">عدد رسائل البريد المنزلي</div><strong>' + parentMsgs.length.toLocaleString('ar-SA') + '</strong></div>' +
+        '<div class="mini-page-stat"><div class="tiny">رسائل اليوم</div><strong>' + todayCount.toLocaleString('ar-SA') + '</strong></div>' +
+        '<div class="mini-page-stat"><div class="tiny">رسائل واتساب</div><strong>' + types.toLocaleString('ar-SA') + '</strong></div>' +
+        '<div class="mini-page-stat"><div class="tiny">تاريخ التقرير</div><strong>' + today + '</strong></div>';
+    }
+    if(mailReport){
+      if(!parentMsgs.length){
+        mailReport.innerHTML = '<div class="mini-page-row"><span>لا توجد رسائل مرسلة إلى أولياء الأمور</span><strong>—</strong></div>';
+      } else {
+        mailReport.innerHTML = parentMsgs.slice(0,30).map(function(m){
+          return '<div class="mini-page-row" style="display:block">' +
+            '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center">' +
+              '<span><strong>الطالب:</strong> ' + (m.studentName || m.student || '—') + ' | <strong>الفصل:</strong> ' + (m.className || m.classroom || '—') + '</span>' +
+              '<strong>' + (m.date || m.createdAt || '—') + '</strong>' +
+            '</div>' +
+            '<div class="tiny" style="margin-top:6px"><strong>نوع الرسالة:</strong> ' + (m.type || 'البريد المنزلي') + '</div>' +
+            '<div class="tiny" style="margin-top:4px"><strong>الحالة:</strong> ' + (m.status || 'مرسلة بنجاح') + '</div>' +
+            '<div class="tiny" style="margin-top:6px;white-space:pre-line"><strong>نص الرسالة:</strong>\n' + (m.text || m.message || '—') + '</div>' +
+          '</div>';
+        }).join('');
+      }
+    }
   }
+
   document.addEventListener('DOMContentLoaded', function(){
-    syncParentMessages();
-    if(typeof window.renderSupervisorReports === 'function'){ window.renderSupervisorReports(); }
+    setTimeout(renderHomeMailOnly, 400);
   });
-  setTimeout(function(){
-    syncParentMessages();
-    if(typeof window.renderSupervisorReports === 'function'){ window.renderSupervisorReports(); }
-  }, 900);
+  setTimeout(renderHomeMailOnly, 900);
 })();
 </script>
 
