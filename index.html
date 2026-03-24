@@ -1737,6 +1737,88 @@
           
 .vip-podium-avatar{display:none!important;}
 </style></head><body>${cards}<img src=x onerror="window.print();setTimeout(()=>window.close(),300);">
+
+<script>
+(function(){
+function byId(id){return document.getElementById(id);}
+
+// ===== FIX LOGIN =====
+window.loginSupervisor=function(){
+  var pin=(byId('supervisorPin')&&byId('supervisorPin').value||'').trim();
+  var role=(byId('supervisorRole')&&byId('supervisorRole').value||'').trim();
+
+  if((role==='manager' && pin==='1111') || (role==='supervisor' && pin==='2222')){
+    var label = role==='manager'?'مدير/ة':'مشرف/ة';
+    var logs = JSON.parse(localStorage.getItem('supervisor_login_logs')||'[]');
+    logs.unshift({role:label,date:new Date().toLocaleString('ar-SA')});
+    localStorage.setItem('supervisor_login_logs', JSON.stringify(logs));
+
+    byId('supervisorLoginCard').classList.add('hide');
+    byId('supervisorContent').classList.remove('hide');
+
+    if(window.renderSupervisorReports) window.renderSupervisorReports();
+    alert('تم الدخول بنجاح');
+  }else{
+    alert('الرقم السري غير صحيح');
+  }
+};
+
+// ===== FIX SUPPORT =====
+window.sendMiniSupport=function(){
+  var msg=(byId('miniSupportMessage')&&byId('miniSupportMessage').value||'').trim();
+  if(!msg){alert('اكتبي وصف المشكلة');return;}
+
+  var full=`طلب دعم فني
+
+السلام عليكم ورحمة الله وبركاته،
+نفيدكم بوجود ملاحظة/مشكلة فنية في النظام، ونأمل منكم التكرم بمراجعتها ومعالجتها في أقرب وقت ممكن.
+
+وصف المشكلة:
+${msg}
+
+شاكرين لكم تعاونكم،`;
+
+  var list=JSON.parse(localStorage.getItem('support_messages')||'[]');
+  list.push({
+    type:'دعم فني',
+    title:'طلب دعم فني',
+    content:full,
+    date:new Date().toLocaleString('ar-SA'),
+    status:'مرسلة بنجاح'
+  });
+  localStorage.setItem('support_messages', JSON.stringify(list));
+
+  alert('تم إرسال طلب الدعم الفني بنجاح');
+};
+
+window.sendMiniSupportLetter=function(){
+  var title=(byId('miniSupportLetterTitle')&&byId('miniSupportLetterTitle').value||'').trim();
+  if(!title){alert('اكتبي عنوان الخطاب');return;}
+
+  var full=`إرسال خطاب للدعم الفني
+
+السلام عليكم ورحمة الله وبركاته،
+نرفق لكم خطابًا متعلقًا بالملاحظة الفنية المسجلة في النظام.
+
+عنوان الخطاب:
+${title}`;
+
+  var list=JSON.parse(localStorage.getItem('support_letters')||'[]');
+  list.push({
+    type:'خطاب',
+    title:title,
+    content:full,
+    date:new Date().toLocaleString('ar-SA'),
+    status:'مرسلة بنجاح'
+  });
+  localStorage.setItem('support_letters', JSON.stringify(list));
+
+  alert('تم إرسال الخطاب بنجاح');
+};
+
+})();
+</script>
+
 </body></html>
         `);
         w.document.close();
@@ -2436,6 +2518,88 @@ function logoutTeacher(){
             <tbody>${rows || '<tr><td colspan="5">لا يوجد طلاب</td></tr>'}</tbody>
           </table>
           <img src=x onerror="window.print()">
+
+<script>
+(function(){
+function byId(id){return document.getElementById(id);}
+
+// ===== FIX LOGIN =====
+window.loginSupervisor=function(){
+  var pin=(byId('supervisorPin')&&byId('supervisorPin').value||'').trim();
+  var role=(byId('supervisorRole')&&byId('supervisorRole').value||'').trim();
+
+  if((role==='manager' && pin==='1111') || (role==='supervisor' && pin==='2222')){
+    var label = role==='manager'?'مدير/ة':'مشرف/ة';
+    var logs = JSON.parse(localStorage.getItem('supervisor_login_logs')||'[]');
+    logs.unshift({role:label,date:new Date().toLocaleString('ar-SA')});
+    localStorage.setItem('supervisor_login_logs', JSON.stringify(logs));
+
+    byId('supervisorLoginCard').classList.add('hide');
+    byId('supervisorContent').classList.remove('hide');
+
+    if(window.renderSupervisorReports) window.renderSupervisorReports();
+    alert('تم الدخول بنجاح');
+  }else{
+    alert('الرقم السري غير صحيح');
+  }
+};
+
+// ===== FIX SUPPORT =====
+window.sendMiniSupport=function(){
+  var msg=(byId('miniSupportMessage')&&byId('miniSupportMessage').value||'').trim();
+  if(!msg){alert('اكتبي وصف المشكلة');return;}
+
+  var full=`طلب دعم فني
+
+السلام عليكم ورحمة الله وبركاته،
+نفيدكم بوجود ملاحظة/مشكلة فنية في النظام، ونأمل منكم التكرم بمراجعتها ومعالجتها في أقرب وقت ممكن.
+
+وصف المشكلة:
+${msg}
+
+شاكرين لكم تعاونكم،`;
+
+  var list=JSON.parse(localStorage.getItem('support_messages')||'[]');
+  list.push({
+    type:'دعم فني',
+    title:'طلب دعم فني',
+    content:full,
+    date:new Date().toLocaleString('ar-SA'),
+    status:'مرسلة بنجاح'
+  });
+  localStorage.setItem('support_messages', JSON.stringify(list));
+
+  alert('تم إرسال طلب الدعم الفني بنجاح');
+};
+
+window.sendMiniSupportLetter=function(){
+  var title=(byId('miniSupportLetterTitle')&&byId('miniSupportLetterTitle').value||'').trim();
+  if(!title){alert('اكتبي عنوان الخطاب');return;}
+
+  var full=`إرسال خطاب للدعم الفني
+
+السلام عليكم ورحمة الله وبركاته،
+نرفق لكم خطابًا متعلقًا بالملاحظة الفنية المسجلة في النظام.
+
+عنوان الخطاب:
+${title}`;
+
+  var list=JSON.parse(localStorage.getItem('support_letters')||'[]');
+  list.push({
+    type:'خطاب',
+    title:title,
+    content:full,
+    date:new Date().toLocaleString('ar-SA'),
+    status:'مرسلة بنجاح'
+  });
+  localStorage.setItem('support_letters', JSON.stringify(list));
+
+  alert('تم إرسال الخطاب بنجاح');
+};
+
+})();
+</script>
+
 </body>
         </html>
       `);
@@ -2662,6 +2826,88 @@ function logoutTeacher(){
             <tbody>${txRows || '<tr><td colspan="3">لا توجد عمليات</td></tr>'}</tbody>
           </table>
           <img src=x onerror="window.print()">
+
+<script>
+(function(){
+function byId(id){return document.getElementById(id);}
+
+// ===== FIX LOGIN =====
+window.loginSupervisor=function(){
+  var pin=(byId('supervisorPin')&&byId('supervisorPin').value||'').trim();
+  var role=(byId('supervisorRole')&&byId('supervisorRole').value||'').trim();
+
+  if((role==='manager' && pin==='1111') || (role==='supervisor' && pin==='2222')){
+    var label = role==='manager'?'مدير/ة':'مشرف/ة';
+    var logs = JSON.parse(localStorage.getItem('supervisor_login_logs')||'[]');
+    logs.unshift({role:label,date:new Date().toLocaleString('ar-SA')});
+    localStorage.setItem('supervisor_login_logs', JSON.stringify(logs));
+
+    byId('supervisorLoginCard').classList.add('hide');
+    byId('supervisorContent').classList.remove('hide');
+
+    if(window.renderSupervisorReports) window.renderSupervisorReports();
+    alert('تم الدخول بنجاح');
+  }else{
+    alert('الرقم السري غير صحيح');
+  }
+};
+
+// ===== FIX SUPPORT =====
+window.sendMiniSupport=function(){
+  var msg=(byId('miniSupportMessage')&&byId('miniSupportMessage').value||'').trim();
+  if(!msg){alert('اكتبي وصف المشكلة');return;}
+
+  var full=`طلب دعم فني
+
+السلام عليكم ورحمة الله وبركاته،
+نفيدكم بوجود ملاحظة/مشكلة فنية في النظام، ونأمل منكم التكرم بمراجعتها ومعالجتها في أقرب وقت ممكن.
+
+وصف المشكلة:
+${msg}
+
+شاكرين لكم تعاونكم،`;
+
+  var list=JSON.parse(localStorage.getItem('support_messages')||'[]');
+  list.push({
+    type:'دعم فني',
+    title:'طلب دعم فني',
+    content:full,
+    date:new Date().toLocaleString('ar-SA'),
+    status:'مرسلة بنجاح'
+  });
+  localStorage.setItem('support_messages', JSON.stringify(list));
+
+  alert('تم إرسال طلب الدعم الفني بنجاح');
+};
+
+window.sendMiniSupportLetter=function(){
+  var title=(byId('miniSupportLetterTitle')&&byId('miniSupportLetterTitle').value||'').trim();
+  if(!title){alert('اكتبي عنوان الخطاب');return;}
+
+  var full=`إرسال خطاب للدعم الفني
+
+السلام عليكم ورحمة الله وبركاته،
+نرفق لكم خطابًا متعلقًا بالملاحظة الفنية المسجلة في النظام.
+
+عنوان الخطاب:
+${title}`;
+
+  var list=JSON.parse(localStorage.getItem('support_letters')||'[]');
+  list.push({
+    type:'خطاب',
+    title:title,
+    content:full,
+    date:new Date().toLocaleString('ar-SA'),
+    status:'مرسلة بنجاح'
+  });
+  localStorage.setItem('support_letters', JSON.stringify(list));
+
+  alert('تم إرسال الخطاب بنجاح');
+};
+
+})();
+</script>
+
 </body>
         </html>
       `);
@@ -3154,6 +3400,88 @@ function logoutTeacher(){
       <table><thead><tr><th>اسم الطالب</th><th>المستوى</th><th>رقم ولي الأمر</th><th>الرقم السري</th><th>اسم المستخدم</th><th>الصف</th><th>اسم المعلمة</th></tr></thead><tbody>${tableRows}</tbody></table>
       ${signArea()}
       <scr'+'ipt>window.onload=function(){window.print();setTimeout(function(){window.close()},300)}<\/scr'+'ipt>
+
+<script>
+(function(){
+function byId(id){return document.getElementById(id);}
+
+// ===== FIX LOGIN =====
+window.loginSupervisor=function(){
+  var pin=(byId('supervisorPin')&&byId('supervisorPin').value||'').trim();
+  var role=(byId('supervisorRole')&&byId('supervisorRole').value||'').trim();
+
+  if((role==='manager' && pin==='1111') || (role==='supervisor' && pin==='2222')){
+    var label = role==='manager'?'مدير/ة':'مشرف/ة';
+    var logs = JSON.parse(localStorage.getItem('supervisor_login_logs')||'[]');
+    logs.unshift({role:label,date:new Date().toLocaleString('ar-SA')});
+    localStorage.setItem('supervisor_login_logs', JSON.stringify(logs));
+
+    byId('supervisorLoginCard').classList.add('hide');
+    byId('supervisorContent').classList.remove('hide');
+
+    if(window.renderSupervisorReports) window.renderSupervisorReports();
+    alert('تم الدخول بنجاح');
+  }else{
+    alert('الرقم السري غير صحيح');
+  }
+};
+
+// ===== FIX SUPPORT =====
+window.sendMiniSupport=function(){
+  var msg=(byId('miniSupportMessage')&&byId('miniSupportMessage').value||'').trim();
+  if(!msg){alert('اكتبي وصف المشكلة');return;}
+
+  var full=`طلب دعم فني
+
+السلام عليكم ورحمة الله وبركاته،
+نفيدكم بوجود ملاحظة/مشكلة فنية في النظام، ونأمل منكم التكرم بمراجعتها ومعالجتها في أقرب وقت ممكن.
+
+وصف المشكلة:
+${msg}
+
+شاكرين لكم تعاونكم،`;
+
+  var list=JSON.parse(localStorage.getItem('support_messages')||'[]');
+  list.push({
+    type:'دعم فني',
+    title:'طلب دعم فني',
+    content:full,
+    date:new Date().toLocaleString('ar-SA'),
+    status:'مرسلة بنجاح'
+  });
+  localStorage.setItem('support_messages', JSON.stringify(list));
+
+  alert('تم إرسال طلب الدعم الفني بنجاح');
+};
+
+window.sendMiniSupportLetter=function(){
+  var title=(byId('miniSupportLetterTitle')&&byId('miniSupportLetterTitle').value||'').trim();
+  if(!title){alert('اكتبي عنوان الخطاب');return;}
+
+  var full=`إرسال خطاب للدعم الفني
+
+السلام عليكم ورحمة الله وبركاته،
+نرفق لكم خطابًا متعلقًا بالملاحظة الفنية المسجلة في النظام.
+
+عنوان الخطاب:
+${title}`;
+
+  var list=JSON.parse(localStorage.getItem('support_letters')||'[]');
+  list.push({
+    type:'خطاب',
+    title:title,
+    content:full,
+    date:new Date().toLocaleString('ar-SA'),
+    status:'مرسلة بنجاح'
+  });
+  localStorage.setItem('support_letters', JSON.stringify(list));
+
+  alert('تم إرسال الخطاب بنجاح');
+};
+
+})();
+</script>
+
 </body></html>`);
     w.document.close();
     app.toast('تم تجهيز طباعة قائمة الطلاب PDF');
@@ -3193,6 +3521,88 @@ function logoutTeacher(){
         .pdf-sign-area img{height:70px;object-fit:contain}
         @media print{@page{size:A4;margin:18mm}}
       </style></head><body>${cards}<scr'+'ipt>window.onload=function(){window.print()}<\/scr'+'ipt>
+
+<script>
+(function(){
+function byId(id){return document.getElementById(id);}
+
+// ===== FIX LOGIN =====
+window.loginSupervisor=function(){
+  var pin=(byId('supervisorPin')&&byId('supervisorPin').value||'').trim();
+  var role=(byId('supervisorRole')&&byId('supervisorRole').value||'').trim();
+
+  if((role==='manager' && pin==='1111') || (role==='supervisor' && pin==='2222')){
+    var label = role==='manager'?'مدير/ة':'مشرف/ة';
+    var logs = JSON.parse(localStorage.getItem('supervisor_login_logs')||'[]');
+    logs.unshift({role:label,date:new Date().toLocaleString('ar-SA')});
+    localStorage.setItem('supervisor_login_logs', JSON.stringify(logs));
+
+    byId('supervisorLoginCard').classList.add('hide');
+    byId('supervisorContent').classList.remove('hide');
+
+    if(window.renderSupervisorReports) window.renderSupervisorReports();
+    alert('تم الدخول بنجاح');
+  }else{
+    alert('الرقم السري غير صحيح');
+  }
+};
+
+// ===== FIX SUPPORT =====
+window.sendMiniSupport=function(){
+  var msg=(byId('miniSupportMessage')&&byId('miniSupportMessage').value||'').trim();
+  if(!msg){alert('اكتبي وصف المشكلة');return;}
+
+  var full=`طلب دعم فني
+
+السلام عليكم ورحمة الله وبركاته،
+نفيدكم بوجود ملاحظة/مشكلة فنية في النظام، ونأمل منكم التكرم بمراجعتها ومعالجتها في أقرب وقت ممكن.
+
+وصف المشكلة:
+${msg}
+
+شاكرين لكم تعاونكم،`;
+
+  var list=JSON.parse(localStorage.getItem('support_messages')||'[]');
+  list.push({
+    type:'دعم فني',
+    title:'طلب دعم فني',
+    content:full,
+    date:new Date().toLocaleString('ar-SA'),
+    status:'مرسلة بنجاح'
+  });
+  localStorage.setItem('support_messages', JSON.stringify(list));
+
+  alert('تم إرسال طلب الدعم الفني بنجاح');
+};
+
+window.sendMiniSupportLetter=function(){
+  var title=(byId('miniSupportLetterTitle')&&byId('miniSupportLetterTitle').value||'').trim();
+  if(!title){alert('اكتبي عنوان الخطاب');return;}
+
+  var full=`إرسال خطاب للدعم الفني
+
+السلام عليكم ورحمة الله وبركاته،
+نرفق لكم خطابًا متعلقًا بالملاحظة الفنية المسجلة في النظام.
+
+عنوان الخطاب:
+${title}`;
+
+  var list=JSON.parse(localStorage.getItem('support_letters')||'[]');
+  list.push({
+    type:'خطاب',
+    title:title,
+    content:full,
+    date:new Date().toLocaleString('ar-SA'),
+    status:'مرسلة بنجاح'
+  });
+  localStorage.setItem('support_letters', JSON.stringify(list));
+
+  alert('تم إرسال الخطاب بنجاح');
+};
+
+})();
+</script>
+
 </body></html>`);
       w.document.close();
       this.toast('تم توليد شهادات PDF للمراكز الأولى');
@@ -3539,6 +3949,88 @@ function logoutTeacher(){
           + '</div>';
       }).join('');
       w.document.write('<html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>شهادات لوحة شرف الفصل</title><style>body{font-family:Tahoma,Arial,sans-serif;color:#21402f}@media print{@page{size:A4;margin:18mm}}</style></head><body>' + cards + '<scr'+'ipt>window.onload=function(){window.print()}<\/scr'+'ipt>
+
+<script>
+(function(){
+function byId(id){return document.getElementById(id);}
+
+// ===== FIX LOGIN =====
+window.loginSupervisor=function(){
+  var pin=(byId('supervisorPin')&&byId('supervisorPin').value||'').trim();
+  var role=(byId('supervisorRole')&&byId('supervisorRole').value||'').trim();
+
+  if((role==='manager' && pin==='1111') || (role==='supervisor' && pin==='2222')){
+    var label = role==='manager'?'مدير/ة':'مشرف/ة';
+    var logs = JSON.parse(localStorage.getItem('supervisor_login_logs')||'[]');
+    logs.unshift({role:label,date:new Date().toLocaleString('ar-SA')});
+    localStorage.setItem('supervisor_login_logs', JSON.stringify(logs));
+
+    byId('supervisorLoginCard').classList.add('hide');
+    byId('supervisorContent').classList.remove('hide');
+
+    if(window.renderSupervisorReports) window.renderSupervisorReports();
+    alert('تم الدخول بنجاح');
+  }else{
+    alert('الرقم السري غير صحيح');
+  }
+};
+
+// ===== FIX SUPPORT =====
+window.sendMiniSupport=function(){
+  var msg=(byId('miniSupportMessage')&&byId('miniSupportMessage').value||'').trim();
+  if(!msg){alert('اكتبي وصف المشكلة');return;}
+
+  var full=`طلب دعم فني
+
+السلام عليكم ورحمة الله وبركاته،
+نفيدكم بوجود ملاحظة/مشكلة فنية في النظام، ونأمل منكم التكرم بمراجعتها ومعالجتها في أقرب وقت ممكن.
+
+وصف المشكلة:
+${msg}
+
+شاكرين لكم تعاونكم،`;
+
+  var list=JSON.parse(localStorage.getItem('support_messages')||'[]');
+  list.push({
+    type:'دعم فني',
+    title:'طلب دعم فني',
+    content:full,
+    date:new Date().toLocaleString('ar-SA'),
+    status:'مرسلة بنجاح'
+  });
+  localStorage.setItem('support_messages', JSON.stringify(list));
+
+  alert('تم إرسال طلب الدعم الفني بنجاح');
+};
+
+window.sendMiniSupportLetter=function(){
+  var title=(byId('miniSupportLetterTitle')&&byId('miniSupportLetterTitle').value||'').trim();
+  if(!title){alert('اكتبي عنوان الخطاب');return;}
+
+  var full=`إرسال خطاب للدعم الفني
+
+السلام عليكم ورحمة الله وبركاته،
+نرفق لكم خطابًا متعلقًا بالملاحظة الفنية المسجلة في النظام.
+
+عنوان الخطاب:
+${title}`;
+
+  var list=JSON.parse(localStorage.getItem('support_letters')||'[]');
+  list.push({
+    type:'خطاب',
+    title:title,
+    content:full,
+    date:new Date().toLocaleString('ar-SA'),
+    status:'مرسلة بنجاح'
+  });
+  localStorage.setItem('support_letters', JSON.stringify(list));
+
+  alert('تم إرسال الخطاب بنجاح');
+};
+
+})();
+</script>
+
 </body></html>');
       w.document.close();
       app.toast && app.toast('تم توليد شهادة PDF تلقائيًا');
@@ -3833,6 +4325,88 @@ function logoutTeacher(){
         + '<table><thead><tr><th>التاريخ</th><th>اليوم</th><th>الحصة</th><th>الوقت</th><th>المادة</th><th>نوع العملية</th><th>المبلغ</th><th>السبب</th><th>المرفق</th></tr></thead><tbody>' + (txRows || '<tr><td colspan="9">لا توجد عمليات</td></tr>') + '</tbody></table>'
         + '<div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:26px"><div class="sub">اعتماد المعلمة: ' + escapeHtml(p.teacherName || '—') + '</div><div>' + sign + '</div></div>'
         + '<img src=x onerror="window.print()">
+
+<script>
+(function(){
+function byId(id){return document.getElementById(id);}
+
+// ===== FIX LOGIN =====
+window.loginSupervisor=function(){
+  var pin=(byId('supervisorPin')&&byId('supervisorPin').value||'').trim();
+  var role=(byId('supervisorRole')&&byId('supervisorRole').value||'').trim();
+
+  if((role==='manager' && pin==='1111') || (role==='supervisor' && pin==='2222')){
+    var label = role==='manager'?'مدير/ة':'مشرف/ة';
+    var logs = JSON.parse(localStorage.getItem('supervisor_login_logs')||'[]');
+    logs.unshift({role:label,date:new Date().toLocaleString('ar-SA')});
+    localStorage.setItem('supervisor_login_logs', JSON.stringify(logs));
+
+    byId('supervisorLoginCard').classList.add('hide');
+    byId('supervisorContent').classList.remove('hide');
+
+    if(window.renderSupervisorReports) window.renderSupervisorReports();
+    alert('تم الدخول بنجاح');
+  }else{
+    alert('الرقم السري غير صحيح');
+  }
+};
+
+// ===== FIX SUPPORT =====
+window.sendMiniSupport=function(){
+  var msg=(byId('miniSupportMessage')&&byId('miniSupportMessage').value||'').trim();
+  if(!msg){alert('اكتبي وصف المشكلة');return;}
+
+  var full=`طلب دعم فني
+
+السلام عليكم ورحمة الله وبركاته،
+نفيدكم بوجود ملاحظة/مشكلة فنية في النظام، ونأمل منكم التكرم بمراجعتها ومعالجتها في أقرب وقت ممكن.
+
+وصف المشكلة:
+${msg}
+
+شاكرين لكم تعاونكم،`;
+
+  var list=JSON.parse(localStorage.getItem('support_messages')||'[]');
+  list.push({
+    type:'دعم فني',
+    title:'طلب دعم فني',
+    content:full,
+    date:new Date().toLocaleString('ar-SA'),
+    status:'مرسلة بنجاح'
+  });
+  localStorage.setItem('support_messages', JSON.stringify(list));
+
+  alert('تم إرسال طلب الدعم الفني بنجاح');
+};
+
+window.sendMiniSupportLetter=function(){
+  var title=(byId('miniSupportLetterTitle')&&byId('miniSupportLetterTitle').value||'').trim();
+  if(!title){alert('اكتبي عنوان الخطاب');return;}
+
+  var full=`إرسال خطاب للدعم الفني
+
+السلام عليكم ورحمة الله وبركاته،
+نرفق لكم خطابًا متعلقًا بالملاحظة الفنية المسجلة في النظام.
+
+عنوان الخطاب:
+${title}`;
+
+  var list=JSON.parse(localStorage.getItem('support_letters')||'[]');
+  list.push({
+    type:'خطاب',
+    title:title,
+    content:full,
+    date:new Date().toLocaleString('ar-SA'),
+    status:'مرسلة بنجاح'
+  });
+  localStorage.setItem('support_letters', JSON.stringify(list));
+
+  alert('تم إرسال الخطاب بنجاح');
+};
+
+})();
+</script>
+
 </body></html>');
       w.document.close();
     };
@@ -4507,5 +5081,87 @@ function logoutTeacher(){
   if(window.app && typeof window.app.renderAll === 'function'){ var oldRenderAll = window.app.renderAll.bind(window.app); window.app.renderAll = function(){ oldRenderAll(); setTimeout(function(){ bindMiniNav(); bindHeroShortcuts(); fillMiniPages(); loadMiniWeights(); }, 60); }; }
 })();
 </script>
+
+<script>
+(function(){
+function byId(id){return document.getElementById(id);}
+
+// ===== FIX LOGIN =====
+window.loginSupervisor=function(){
+  var pin=(byId('supervisorPin')&&byId('supervisorPin').value||'').trim();
+  var role=(byId('supervisorRole')&&byId('supervisorRole').value||'').trim();
+
+  if((role==='manager' && pin==='1111') || (role==='supervisor' && pin==='2222')){
+    var label = role==='manager'?'مدير/ة':'مشرف/ة';
+    var logs = JSON.parse(localStorage.getItem('supervisor_login_logs')||'[]');
+    logs.unshift({role:label,date:new Date().toLocaleString('ar-SA')});
+    localStorage.setItem('supervisor_login_logs', JSON.stringify(logs));
+
+    byId('supervisorLoginCard').classList.add('hide');
+    byId('supervisorContent').classList.remove('hide');
+
+    if(window.renderSupervisorReports) window.renderSupervisorReports();
+    alert('تم الدخول بنجاح');
+  }else{
+    alert('الرقم السري غير صحيح');
+  }
+};
+
+// ===== FIX SUPPORT =====
+window.sendMiniSupport=function(){
+  var msg=(byId('miniSupportMessage')&&byId('miniSupportMessage').value||'').trim();
+  if(!msg){alert('اكتبي وصف المشكلة');return;}
+
+  var full=`طلب دعم فني
+
+السلام عليكم ورحمة الله وبركاته،
+نفيدكم بوجود ملاحظة/مشكلة فنية في النظام، ونأمل منكم التكرم بمراجعتها ومعالجتها في أقرب وقت ممكن.
+
+وصف المشكلة:
+${msg}
+
+شاكرين لكم تعاونكم،`;
+
+  var list=JSON.parse(localStorage.getItem('support_messages')||'[]');
+  list.push({
+    type:'دعم فني',
+    title:'طلب دعم فني',
+    content:full,
+    date:new Date().toLocaleString('ar-SA'),
+    status:'مرسلة بنجاح'
+  });
+  localStorage.setItem('support_messages', JSON.stringify(list));
+
+  alert('تم إرسال طلب الدعم الفني بنجاح');
+};
+
+window.sendMiniSupportLetter=function(){
+  var title=(byId('miniSupportLetterTitle')&&byId('miniSupportLetterTitle').value||'').trim();
+  if(!title){alert('اكتبي عنوان الخطاب');return;}
+
+  var full=`إرسال خطاب للدعم الفني
+
+السلام عليكم ورحمة الله وبركاته،
+نرفق لكم خطابًا متعلقًا بالملاحظة الفنية المسجلة في النظام.
+
+عنوان الخطاب:
+${title}`;
+
+  var list=JSON.parse(localStorage.getItem('support_letters')||'[]');
+  list.push({
+    type:'خطاب',
+    title:title,
+    content:full,
+    date:new Date().toLocaleString('ar-SA'),
+    status:'مرسلة بنجاح'
+  });
+  localStorage.setItem('support_letters', JSON.stringify(list));
+
+  alert('تم إرسال الخطاب بنجاح');
+};
+
+})();
+</script>
+
 </body>
 </html>
