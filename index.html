@@ -766,6 +766,7 @@
 <div class="phone-nav" id="miniPhoneNav"><div data-mini-page="follow">المتابعة</div><div data-mini-page="messages">التواصل</div><div data-mini-page="settings">الإعدادات</div></div><div data-mini-page="statement">الكشف</div><div data-mini-page="follow">المتابعة</div><div data-mini-page="settings">الإعدادات</div></div>
 </div>
 </section></div>
+
 <section class="section" id="teacherSection">
 <div class="section-head">
 <h3>لوحة المعلمة</h3>
@@ -1010,6 +1011,7 @@
 </div>
 </div>
 </section>
+
 <div class="modal" id="taskRewardModal">
 <div class="modal-body">
 <div class="modal-top">
@@ -1690,100 +1692,16 @@
             .sub{font-size:24px;line-height:1.9;margin:0}
             .score{font-size:38px;font-weight:900;margin:24px auto;padding:14px 24px;border-radius:20px;background:#fff8e2;border:2px solid #e0c270;display:inline-block}
             .foot{display:flex;justify-content:space-between;gap:12px;margin-top:40px;font-size:22px;font-weight:700}
-          
-.vip-podium-avatar{display:none!important;}
-</style></head><body>${cards}<img src=x onerror="window.print();setTimeout(()=>window.close(),300);">
-
-<script>
-(function(){
-function byId(id){return document.getElementById(id);}
-
-// ===== FIX LOGIN =====
-window.loginSupervisor=function(){
-  var pin=(byId('supervisorPin')&&byId('supervisorPin').value||'').trim();
-  var role=(byId('supervisorRole')&&byId('supervisorRole').value||'').trim();
-
-  if((role==='manager' && pin==='1111') || (role==='supervisor' && pin==='2222')){
-    var label = role==='manager'?'مدير/ة':'مشرف/ة';
-    var logs = JSON.parse(localStorage.getItem('supervisor_login_logs')||'[]');
-    logs.unshift({role:label,date:new Date().toLocaleString('ar-SA')});
-    localStorage.setItem('supervisor_login_logs', JSON.stringify(logs));
-
-    byId('supervisorLoginCard').classList.add('hide');
-    byId('supervisorContent').classList.remove('hide');
-
-    if(window.renderSupervisorReports) window.renderSupervisorReports();
-    alert('تم الدخول بنجاح');
-  }else{
-    alert('الرقم السري غير صحيح');
-  }
-};
-
-// ===== FIX SUPPORT =====
-window.sendMiniSupport=function(){
-  var msg=(byId('miniSupportMessage')&&byId('miniSupportMessage').value||'').trim();
-  if(!msg){alert('اكتبي وصف المشكلة');return;}
-
-  var full=`طلب دعم فني
-
-السلام عليكم ورحمة الله وبركاته،
-نفيدكم بوجود ملاحظة/مشكلة فنية في النظام، ونأمل منكم التكرم بمراجعتها ومعالجتها في أقرب وقت ممكن.
-
-وصف المشكلة:
-${msg}
-
-شاكرين لكم تعاونكم،`;
-
-  var list=JSON.parse(localStorage.getItem('support_messages')||'[]');
-  list.push({
-    type:'دعم فني',
-    title:'طلب دعم فني',
-    content:full,
-    date:new Date().toLocaleString('ar-SA'),
-    status:'مرسلة بنجاح'
-  });
-  localStorage.setItem('support_messages', JSON.stringify(list));
-
-  alert('تم إرسال طلب الدعم الفني بنجاح');
-};
-
-window.sendMiniSupportLetter=function(){
-  var title=(byId('miniSupportLetterTitle')&&byId('miniSupportLetterTitle').value||'').trim();
-  if(!title){alert('اكتبي عنوان الخطاب');return;}
-
-  var full=`إرسال خطاب للدعم الفني
-
-السلام عليكم ورحمة الله وبركاته،
-نرفق لكم خطابًا متعلقًا بالملاحظة الفنية المسجلة في النظام.
-
-عنوان الخطاب:
-${title}`;
-
-  var list=JSON.parse(localStorage.getItem('support_letters')||'[]');
-  list.push({
-    type:'خطاب',
-    title:title,
-    content:full,
-    date:new Date().toLocaleString('ar-SA'),
-    status:'مرسلة بنجاح'
-  });
-  localStorage.setItem('support_letters', JSON.stringify(list));
-
-  alert('تم إرسال الخطاب بنجاح');
-};
-
-})();
-</script>
-</body></html>
+          </style></head><body>${cards}<img src="x" onerror="window.print();setTimeout(()=>window.close(),300);"></body></html>
         `);
-        w.document.close();
+        
         this.state.vipHonor.lastPdfRunKey = this.state.vipHonor.currentWeekKey || this.vipWeekKey();
         this.save();
         this.toast('تم توليد شهادات PDF للمراكز الأولى');
       },
       toast(text) {
         const el = this.refs.toast; el.textContent = text; el.classList.add('show');
-        clearTimeout(this.toastTimer); this.toastTimer = setTimeout(()=&gt;el.classList.remove('show'), 2200);
+        clearTimeout(this.toastTimer); this.toastTimer = setTimeout(()=>el.classList.remove('show'), 2200);
       }
     };
 
@@ -2553,13 +2471,13 @@ ${title}`;
       openModal(
         'عملية سريعة',
         `
-          <select id="quickTypeSel">${QUICK_REASONS.map(x=&gt;`<option>${x}</option>`).join('')}</select>
+          <select id="quickTypeSel">${QUICK_REASONS.map(x=>`<option>${x}</option>`).join('')}</select>
 <input id="quickOtherTxt" placeholder="اكتب النوع..." style="display:none"/>
 <div class="row">
 <input id="quickAmountVal" placeholder="القيمة" type="number"/>
 <select id="quickTargetSel">
 <option value="">الطالب / الطالبة المحول إليه (اختياري)</option>
-              ${classStudents().filter(s=&gt;s.id!==student.id).map(s=&gt;`<option value="${s.id}">${s.name}</option>`).join('')}
+              ${classStudents().filter(s=>s.id!==student.id).map(s=>`<option value="${s.id}">${s.name}</option>`).join('')}
             </select>
 </div>
 <input id="quickReasonTxt" placeholder="السبب"/>
@@ -2580,7 +2498,7 @@ ${title}`;
             addTx(student,'withdraw',amount,reason);
           } else if(qType.includes('تحويل')){
             if(!targetId) return alert('اختَر الطالب / الطالبة المحول إليه');
-            const target = (app.state.students || []).find(s =&gt; s.id === targetId);
+            const target = (app.state.students || []).find(s => s.id === targetId);
             if(!target) return alert('تعذر العثور على الطالب / الطالبة');
             student.balance = Math.max(0, Number(student.balance || 0) - amount);
             target.balance = Number(target.balance || 0) + amount;
@@ -2603,7 +2521,7 @@ ${title}`;
       openModal(
         'مكافأة',
         `
-          <select id="rewardReasonSel">${DEPOSIT_REASONS.map(x=&gt;`<option>${x}</option>`).join('')}</select>
+          <select id="rewardReasonSel">${DEPOSIT_REASONS.map(x=>`<option>${x}</option>`).join('')}</select>
 <input id="rewardOtherTxt" placeholder="اكتب السبب..." style="display:none"/>
 <input id="rewardAmountVal" placeholder="قيمة المكافأة" type="number"/>
         `,
@@ -2628,7 +2546,7 @@ ${title}`;
       openModal(
         'ملاحظة',
         `
-          <select id="noteReasonSel">${NOTE_REASONS.map(x=&gt;`<option>${x}</option>`).join('')}</select>
+          <select id="noteReasonSel">${NOTE_REASONS.map(x=>`<option>${x}</option>`).join('')}</select>
 <textarea id="noteExtraTxt" placeholder="نص الملاحظة / التفاصيل"></textarea>
         `,
         function(){
@@ -2664,7 +2582,7 @@ ${title}`;
       openModal(
         title,
         `
-          <select id="statusReasonSel">${reasons.map(x=&gt;`<option>${x}</option>`).join('')}</select>
+          <select id="statusReasonSel">${reasons.map(x=>`<option>${x}</option>`).join('')}</select>
 <textarea id="statusReasonTxt" placeholder="سبب إضافي / توضيح"></textarea>
         `,
         function(){
@@ -2727,8 +2645,8 @@ ${title}`;
     }
 
     function openStudentPdf(student){
-      const txs = (app.state.transactions || []).filter(t =&gt; t.studentId === student.id).slice(0,10);
-      const txRows = txs.map(t=&gt;`<tr><td>${t.type}</td><td>${Number(t.amount||0).toLocaleString('ar-SA')}</td><td>${t.reason||'—'}</td></tr>`).join('');
+      const txs = (app.state.transactions || []).filter(t => t.studentId === student.id).slice(0,10);
+      const txRows = txs.map(t=>`<tr><td>${t.type}</td><td>${Number(t.amount||0).toLocaleString('ar-SA')}</td><td>${t.reason||'—'}</td></tr>`).join('');
       const w = window.open('', '_blank');
       w.document.write(`
         <html dir="rtl" lang="ar">
@@ -2848,10 +2766,7 @@ ${title}`;
 };
 
 })();
-</script>
-</body>
-</html>
-      `);
+`);
       w.document.close();
     }
 
@@ -2862,16 +2777,16 @@ ${title}`;
       const tb = detail.querySelector('.advtab-toolbar');
       if(tb){
         const btns = tb.querySelectorAll('button');
-        if(btns[0]) btns[0].onclick = ()=&gt; openBulkOperation('deposit');
-        if(btns[1]) btns[1].onclick = ()=&gt; openClassMessage();
-        if(btns[2]) btns[2].onclick = ()=&gt; classPdf();
-        if(btns[3]) btns[3].onclick = ()=&gt; openBulkOperation('withdraw');
-        if(btns[4]) btns[4].onclick = ()=&gt;{
+        if(btns[0]) btns[0].onclick = ()=> openBulkOperation('deposit');
+        if(btns[1]) btns[1].onclick = ()=> openClassMessage();
+        if(btns[2]) btns[2].onclick = ()=> classPdf();
+        if(btns[3]) btns[3].onclick = ()=> openBulkOperation('withdraw');
+        if(btns[4]) btns[4].onclick = ()=>{
           const cid = currentClassId();
           const cls = currentClass();
           if(cls &amp;&amp; confirm(`حذف الفصل ${cls.name}؟`)){
-            app.state.students = (app.state.students || []).filter(s =&gt; s.classId !== cid);
-            app.state.classes = (app.state.classes || []).filter(c =&gt; c.id !== cid);
+            app.state.students = (app.state.students || []).filter(s => s.classId !== cid);
+            app.state.classes = (app.state.classes || []).filter(c => c.id !== cid);
             app.state.selectedClassId = '';
             app.state.advtabSelectedClassId = '';
             saveRender('تم حذف الفصل');
@@ -2879,34 +2794,34 @@ ${title}`;
         };
       }
 
-      detail.querySelectorAll('.advtab-student').forEach(card=&gt;{
+      detail.querySelectorAll('.advtab-student').forEach(card=>{
         const name = card.querySelector('.name')?.textContent?.trim() || '';
         const student = studentByName(name);
         const btns = card.querySelectorAll('.advtab-actions2 button');
-        if(!student || btns.length &lt; 15) return;
+        if(!student || btns.length < 15) return;
 
-        btns[0].onclick = ()=&gt; toast('تم فتح حساب: ' + student.name);
-        btns[1].onclick = ()=&gt; toast('كشف الحساب: ' + student.name);
-        btns[2].onclick = ()=&gt; openQuickAction(student);
-        btns[3].onclick = ()=&gt; openNote(student);
-        btns[4].onclick = ()=&gt; toast('الحضور: ' + student.name);
-        btns[5].onclick = ()=&gt; openTasks(student);
-        btns[6].onclick = ()=&gt; openParentMessage(student);
-        btns[7].onclick = ()=&gt; openReward(student);
-        btns[8].onclick = ()=&gt; {
+        btns[0].onclick = ()=> toast('تم فتح حساب: ' + student.name);
+        btns[1].onclick = ()=> toast('كشف الحساب: ' + student.name);
+        btns[2].onclick = ()=> openQuickAction(student);
+        btns[3].onclick = ()=> openNote(student);
+        btns[4].onclick = ()=> toast('الحضور: ' + student.name);
+        btns[5].onclick = ()=> openTasks(student);
+        btns[6].onclick = ()=> openParentMessage(student);
+        btns[7].onclick = ()=> openReward(student);
+        btns[8].onclick = ()=> {
           const newName = prompt('اكتب الاسم الجديد', student.name || '');
           if(!newName) return;
           student.name = newName;
           saveRender('تم تعديل الاسم');
         };
-        btns[9].onclick = ()=&gt; openPassword(student);
-        btns[10].onclick = ()=&gt; openStatusReason(student,'تجميد الحساب','مجمد',FREEZE_REASONS);
-        btns[11].onclick = ()=&gt; openStatusReason(student,'تفعيل الحساب','مفعل',['إعادة تفعيل بعد مراجعة','انتهاء سبب التجميد','تحسن السلوك','طلب من الإدارة','أخرى']);
-        btns[12].onclick = ()=&gt; openStatusReason(student,'إقفال الحساب','مغلق',CLOSE_REASONS);
-        btns[13].onclick = ()=&gt; openStudentPdf(student);
-        btns[14].onclick = ()=&gt; {
+        btns[9].onclick = ()=> openPassword(student);
+        btns[10].onclick = ()=> openStatusReason(student,'تجميد الحساب','مجمد',FREEZE_REASONS);
+        btns[11].onclick = ()=> openStatusReason(student,'تفعيل الحساب','مفعل',['إعادة تفعيل بعد مراجعة','انتهاء سبب التجميد','تحسن السلوك','طلب من الإدارة','أخرى']);
+        btns[12].onclick = ()=> openStatusReason(student,'إقفال الحساب','مغلق',CLOSE_REASONS);
+        btns[13].onclick = ()=> openStudentPdf(student);
+        btns[14].onclick = ()=> {
           if(confirm(`حذف ${student.name}؟`)){
-            app.state.students = (app.state.students || []).filter(s =&gt; s.id !== student.id);
+            app.state.students = (app.state.students || []).filter(s => s.id !== student.id);
             saveRender('تم حذف الطالب / الطالبة');
           }
         };
@@ -2942,7 +2857,7 @@ ${title}`;
   }
 
   function escapeHtml(v){
-    return String(v ?? '').replace(/[&<>"']/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));
+    return String(v ?? '').replace(/[&<>"']/g, m=>({ '&':'&amp;','<':'<','>':'>','"':'&quot;',"'":'&#39;' }[m]));
   }
 
   function profile(){
@@ -3430,11 +3345,11 @@ ${title}`;
       ensureProfile();
       this.ensureVipState &amp;&amp; this.ensureVipState();
       const info = this.state.vipHonor || {};
-      const leaders = (info.currentLeaders || []).filter(x=&gt;Number(x.rank)&lt;=3);
+      const leaders = (info.currentLeaders || []).filter(x=>Number(x.rank)<=3);
       if(!leaders.length) return this.toast('لا توجد مراكز أولى حالياً');
       const w = window.open('', '_blank');
       if(!w) return this.toast('تعذر فتح نافذة PDF');
-      const cards = leaders.map(item=&gt;`
+      const cards = leaders.map(item=>`
         <div style="page-break-after:always;padding:28px;min-height:92vh;display:flex;flex-direction:column;justify-content:center">
           ${pdfHead('شهادة لوحة الشرف VIP')}
           <div style="border:4px solid #d9bf75;border-radius:28px;padding:32px;background:linear-gradient(135deg,#fffdf6,#f8f1d8);text-align:center">
@@ -3458,7 +3373,7 @@ ${title}`;
         .pdf-sign-area{display:flex;justify-content:space-between;align-items:flex-end;gap:18px;margin-top:26px}
         .pdf-sign-area img{height:70px;object-fit:contain}
         @media print{@page{size:A4;margin:18mm}}
-      </style></head><body>${cards}<scr'+'ipt>window.onload=function(){window.print()}&lt;\/scr'+'ipt&gt;
+      </style></head><body>${cards}<scr'+'ipt>window.onload=function(){window.print()}<\/scr'+'ipt>
 
 <script>
 (function(){
@@ -4143,7 +4058,7 @@ ${title}`;
   if(!app) return;
 
   function escapeHtml(v){
-    return String(v ?? '').replace(/[&<>"']/g, function(m){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m]; });
+    return String(v ?? '').replace(/[&<>"']/g, function(m){ return ({'&':'&amp;','<':'<','>':'>','"':'&quot;',"'":'&#39;'})[m]; });
   }
 
   function txLabel(tx){
@@ -5071,3 +4986,5 @@ ${title}`;
 
 })();
 </script>
+</body>
+</html>
