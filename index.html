@@ -4180,6 +4180,7 @@ function logoutTeacher(){
       <div class="subtabs" id="miniSettingsSubtabs" style="margin-bottom:14px">
         <button class="small-btn active" onclick="openMiniSettingsSubtab('personal', this)">البيانات الشخصية</button>
         <button class="small-btn" onclick="openMiniSettingsSubtab('support', this)">التواصل مع الدعم الفني</button>
+        <button class="small-btn" onclick="openMiniSettingsSubtab('sent', this)">الرسائل المرسلة</button>
         <button class="small-btn" onclick="openMiniSettingsSubtab('survey', this)">تعبئة الاستبيان</button>
       </div>
       <div id="miniSettingsSubtab-personal">
@@ -4229,6 +4230,13 @@ function logoutTeacher(){
           <div class="actions-row" style="margin-top:12px"><button class="btn primary" onclick="sendMiniSupportLetter()">إرسال الخطاب</button></div>
         </div>
       </div>
+      <div id="miniSettingsSubtab-sent" class="hide">
+        <div class="mini-page-card" style="margin-top:0">
+          <h4 style="margin:0 0 10px">الرسائل المرسلة للدعم الفني</h4>
+          <div id="miniSentSupportList" class="mini-page-list"></div>
+        </div>
+      </div>
+
       <div id="miniSettingsSubtab-survey" class="hide">
         <div class="mini-page-card" style="margin-top:0">
           <h4 style="margin:0 0 10px">استبيان رضا العملاء</h4>
@@ -4400,7 +4408,7 @@ function logoutTeacher(){
   };
   window.closeMiniPage = function(){ var overlay = byId('miniPagesOverlay'); if(overlay) overlay.classList.remove('show'); };
   window.openMiniFollowSubtab = function(id, btn){ ['schedule','evaluation','homework'].forEach(function(s){ var el = byId('miniFollowSubtab-' + s); if(el) el.classList.toggle('hide', s !== id); }); document.querySelectorAll('#miniFollowSubtabs button').forEach(function(b){ b.classList.remove('active'); }); if(btn) btn.classList.add('active'); };
-  window.openMiniSettingsSubtab = function(id, btn){ ['personal','support','survey'].forEach(function(s){ var el = byId('miniSettingsSubtab-' + s); if(el) el.classList.toggle('hide', s !== id); }); document.querySelectorAll('#miniSettingsSubtabs button').forEach(function(b){ b.classList.remove('active'); }); if(btn) btn.classList.add('active'); };
+  window.openMiniSettingsSubtab = function(id, btn){ ['personal','support','sent','survey'].forEach(function(s){ var el = byId('miniSettingsSubtab-' + s); if(el) el.classList.toggle('hide', s !== id); }); document.querySelectorAll('#miniSettingsSubtabs button').forEach(function(b){ b.classList.remove('active'); }); if(btn) btn.classList.add('active'); };
 
   function bindMiniNav(){ document.querySelectorAll('#miniPhoneNav [data-mini-page]').forEach(function(btn){ if(btn.dataset.boundMini==='1') return; btn.dataset.boundMini='1'; btn.onclick = function(){ openMiniPage(btn.getAttribute('data-mini-page')); }; }); }
   function bindHeroShortcuts(){
