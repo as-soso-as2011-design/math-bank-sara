@@ -775,19 +775,19 @@
       <div class="phone-shell">
         <div class="phone">
           <div class="phone-head"><span>09:31</span><span>مصرف التعليم</span><span>☰</span></div>
-          <div class="phone-hero" id="miniHeroBalanceCard" style="cursor:pointer">
+          <div class="phone-hero">
             <h3>الرصيد التحفيزي</h3>
             <p class="balance" id="heroBalance">0</p>
             <div class="muted">نقطة</div>
           </div>
           <div class="phone-grid">
-            <div class="mini-card" id="miniTasksCard" style="cursor:pointer">📘<strong id="heroTaskCount">0 مهام أدائية</strong></div>
-            <div class="mini-card" id="miniStudentCard" style="cursor:pointer">👥<strong id="heroStudentCount">0 طالب/طالبة</strong></div>
-            <div class="mini-card" id="miniTransactionCard" style="cursor:pointer">📄<strong id="heroTransactionCount">0 عملية</strong></div>
-            <div class="mini-card" id="miniRewardsCard" style="cursor:pointer">🎡<strong id="heroRewardCount">0 جوائز روليت</strong></div>
+            <div class="mini-card">📘<strong id="heroTaskCount">0 مهام أدائية</strong></div>
+            <div class="mini-card">👥<strong id="heroStudentCount">0 طالب/طالبة</strong></div>
+            <div class="mini-card">📄<strong id="heroTransactionCount">0 عملية</strong></div>
+            <div class="mini-card">🎡<strong id="heroRewardCount">0 جوائز روليت</strong></div>
           </div>
           <div class="list" id="heroRecentList"></div>
-          <div class="phone-nav" id="miniPhoneNav"><div data-mini-page="follow">المتابعة</div><div data-mini-page="messages">التواصل</div><div data-mini-page="settings">الإعدادات</div></div><div data-mini-page="statement">الكشف</div><div data-mini-page="follow">المتابعة</div><div data-mini-page="settings">الإعدادات</div></div>
+          <div class="phone-nav" id="miniPhoneNav"><div data-mini-page="home">الرئيسية</div><div data-mini-page="statement">الكشف</div><div data-mini-page="follow">المتابعة</div><div data-mini-page="settings">الإعدادات</div></div>
         </div>
       </div>
     </section>
@@ -1737,6 +1737,390 @@
           
 .vip-podium-avatar{display:none!important;}
 </style></head><body>${cards}<img src=x onerror="window.print();setTimeout(()=>window.close(),300);">
+<div id="supervisorLoginOverlay" class="mini-page-overlay">
+  <div class="mini-page-shell">
+    <div class="mini-page-head">
+      <button class="mini-back-btn" onclick="closeSupervisorLogin()">رجوع</button>
+      <h3 style="margin:0;color:var(--green-3)">التقييم والإشراف المدرسي</h3>
+    </div>
+    <div id="supervisorLoginCard" class="mini-page-card">
+      <div class="note-box" style="margin-bottom:12px">🔒 صلاحية عرض فقط — لا يمكن التعديل أو الحذف أو تنفيذ أي عملية داخل المصرف.</div>
+      <div class="grid-2">
+        <div class="field">
+          <label>نوع الدخول</label>
+          <select id="supervisorRole" class="select">
+            <option value="manager">مدير / مديرة</option>
+            <option value="supervisor">مشرف / مشرفة</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>الرقم السري</label>
+          <input id="supervisorPin" type="password" class="input" placeholder="أدخلي الرقم السري">
+        </div>
+      </div>
+      <div class="actions-row" style="margin-top:12px">
+        <button class="btn primary" onclick="loginSupervisor()">دخول</button>
+      </div>
+      <div class="tiny" style="margin-top:8px">الأرقام الافتراضية للتجربة: المدير/ة 1111 — المشرف/ة 2222</div>
+    </div>
+    <div id="supervisorPanel" class="mini-page-card hide">
+      <div class="note-box" style="margin-bottom:12px">🔒 وضع الإشراف — عرض وتقارير فقط</div>
+      <div class="subtabs" id="supervisorSubtabs">
+        <button class="small-btn active" onclick="openSupervisorSubtab('bank', this)">الحساب المصرفي</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('tasks', this)">المهام الأدائية</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('messages', this)">الرسائل</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('evaluation', this)">التقييم</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('certificate', this)">شهادة شكر</button>
+      </div>
+      <div id="supervisorSubtab-bank">
+        <div id="supBankReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+      <div id="supervisorSubtab-tasks" class="hide">
+        <div id="supTasksReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+      <div id="supervisorSubtab-messages" class="hide">
+        <div id="supMessagesReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+      <div id="supervisorSubtab-evaluation" class="hide">
+        <div id="supEvaluationReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+      <div id="supervisorSubtab-certificate" class="hide">
+        <div class="grid-2">
+          <div class="field"><label>اسم الطالب / الطالبة</label><input id="supCertStudent" class="input" placeholder="اسم الطالب / الطالبة"></div>
+          <div class="field"><label>الفصل</label><input id="supCertClass" class="input" placeholder="الفصل"></div>
+          <div class="field"><label>عنوان الشهادة</label><input id="supCertTitle" class="input" placeholder="عنوان الشهادة"></div>
+          <div class="field"><label>وسيلة الإرسال</label><select id="supCertSendType" class="select"><option>واتساب</option><option>بريد إلكتروني</option></select></div>
+        </div>
+        <div class="field" style="margin-top:10px"><label>نص الشهادة</label><textarea id="supCertText" class="textarea" placeholder="اكتبي نص شهادة الشكر"></textarea></div>
+        <div class="field" style="margin-top:10px"><label>رفع شهادة شكر</label><input id="supCertFile" type="file" class="input" accept=".pdf,.jpg,.jpeg,.png"></div>
+        <div class="actions-row" style="margin-top:12px"><button class="btn primary" onclick="sendSupervisorCertificate()">إرسال الشهادة</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script id="oai-fix-support-supervisor">
+(function(){
+  function byId(id){ return document.getElementById(id); }
+  function say(msg){
+    try{
+      if(window.app && typeof window.app.toast === 'function'){ window.app.toast(msg); return; }
+    }catch(e){}
+    alert(msg);
+  }
+
+  function renderSentSupportList(){
+    var box = byId('miniSentSupportList');
+    if(!box) return;
+    var msgs = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    var letters = JSON.parse(localStorage.getItem('support_letters') || '[]');
+    var rows = [];
+
+    msgs.forEach(function(item, idx){
+      rows.push(
+        '<div class="mini-page-row" style="display:block">' +
+          '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center">' +
+            '<span><strong>نوع الرسالة:</strong> دعم فني</span>' +
+            '<strong>' + (item.date || '—') + '</strong>' +
+          '</div>' +
+          '<div class="tiny" style="margin-top:6px"><strong>العنوان:</strong> طلب دعم فني</div>' +
+          '<div class="tiny" style="margin-top:4px"><strong>الحالة:</strong> ' + (item.status || 'مرسلة بنجاح') + '</div>' +
+          '<div class="tiny" style="margin-top:6px">' + (item.content || item.message || '') + '</div>' +
+          '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">' +
+            '<button class="small-btn" onclick="editSupportMessage(' + idx + ')">تعديل</button>' +
+            '<button class="small-btn" onclick="resendSupportMessage(' + idx + ')">إرسال مرة أخرى</button>' +
+          '</div>' +
+        '</div>'
+      );
+    });
+
+    letters.forEach(function(item, idx){
+      rows.push(
+        '<div class="mini-page-row" style="display:block">' +
+          '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center">' +
+            '<span><strong>نوع الرسالة:</strong> خطاب</span>' +
+            '<strong>' + (item.date || '—') + '</strong>' +
+          '</div>' +
+          '<div class="tiny" style="margin-top:6px"><strong>العنوان:</strong> ' + (item.title || 'إرسال خطاب للدعم الفني') + '</div>' +
+          '<div class="tiny" style="margin-top:4px"><strong>الحالة:</strong> ' + (item.status || 'مرسلة بنجاح') + '</div>' +
+          '<div class="tiny" style="margin-top:4px">' + (item.content || '') + '</div>' +
+          '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">' +
+            '<button class="small-btn" onclick="editSupportLetter(' + idx + ')">تعديل</button>' +
+            '<button class="small-btn" onclick="resendSupportLetter(' + idx + ')">إرسال مرة أخرى</button>' +
+          '</div>' +
+        '</div>'
+      );
+    });
+
+    box.innerHTML = rows.length ? rows.join('') : '<div class="mini-page-row"><span>لا توجد رسائل مرسلة للدعم الفني</span><strong>—</strong></div>';
+  }
+
+  window.sendMiniSupport = function(){
+    var msgEl = byId('miniSupportMessage');
+    var msg = msgEl ? String(msgEl.value || '').trim() : '';
+    if(!msg){ say('يرجى كتابة وصف المشكلة أولًا'); return; }
+
+    var typeReq = document.querySelector('#miniSettingsSubtab-support select') ? document.querySelector('#miniSettingsSubtab-support select').value : 'استفسار';
+    var priorityEls = document.querySelectorAll('#miniSettingsSubtab-support select');
+    var priority = priorityEls && priorityEls.length > 1 ? priorityEls[1].value : 'عادية';
+    var teacher = byId('miniTeacherNameInput') ? byId('miniTeacherNameInput').value.trim() : 'اسم المعلمة / الجهة';
+
+    var fullMessage =
+`طلب دعم فني
+
+السلام عليكم ورحمة الله وبركاته،
+نفيدكم بوجود ملاحظة/مشكلة فنية في النظام، ونأمل منكم التكرم بمراجعتها ومعالجتها في أقرب وقت ممكن.
+تم إرفاق التفاصيل اللازمة أدناه:
+• نوع الطلب: ${typeReq}
+• مستوى الأولوية: ${priority}
+• وصف المشكلة: ${msg}
+
+شاكرين لكم تعاونكم،
+${teacher || 'اسم المعلمة / الجهة'}`;
+
+    var list = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    list.push({
+      title: 'طلب دعم فني',
+      message: msg,
+      content: fullMessage,
+      date: new Date().toLocaleString('ar-SA'),
+      status: 'مرسلة بنجاح'
+    });
+    localStorage.setItem('support_messages', JSON.stringify(list));
+    if(msgEl) msgEl.value = '';
+    renderSentSupportList();
+    say('تم إرسال طلب الدعم الفني بنجاح، وسيتم مراجعته في أقرب وقت ممكن.');
+  };
+
+  window.sendMiniSupportLetter = function(){
+    var titleEl = byId('miniSupportLetterTitle');
+    var descEl = byId('miniSupportLetterDesc');
+    var title = titleEl ? String(titleEl.value || '').trim() : '';
+    var desc = descEl ? String(descEl.value || '').trim() : '';
+    var fileName = byId('miniSelectedFileName') ? String(byId('miniSelectedFileName').textContent || '').trim() : 'بدون ملف';
+    var clientSelects = document.querySelectorAll('#miniSettingsSubtab-support select');
+    var client = clientSelects && clientSelects.length > 2 ? clientSelects[2].value : 'اسم العميل';
+    var teacher = byId('miniTeacherNameInput') ? byId('miniTeacherNameInput').value.trim() : 'اسم المعلمة / الجهة';
+    if(!title){ say('اكتبي عنوان الخطاب أولًا'); return; }
+
+    var fullMessage =
+`إرسال خطاب للدعم الفني
+
+السلام عليكم ورحمة الله وبركاته،
+نرفق لكم خطابًا متعلقًا بالملاحظة الفنية المسجلة في النظام، ونأمل الاطلاع عليه واتخاذ اللازم.
+
+بيانات الخطاب:
+• العميل/الجهة المعنية: ${client || 'اسم العميل'}
+• عنوان الخطاب: ${title}
+• وصف مختصر: ${desc || '—'}
+• المرفق: ${fileName}
+
+وتفضلوا بقبول خالص الشكر والتقدير،
+${teacher || 'اسم المعلمة / الجهة'}`;
+
+    var list = JSON.parse(localStorage.getItem('support_letters') || '[]');
+    list.push({
+      title: title,
+      desc: desc,
+      file: fileName,
+      content: fullMessage,
+      date: new Date().toLocaleString('ar-SA'),
+      status: 'مرسلة بنجاح'
+    });
+    localStorage.setItem('support_letters', JSON.stringify(list));
+    if(titleEl) titleEl.value = '';
+    if(descEl) descEl.value = '';
+    if(byId('miniSelectedFileName')) byId('miniSelectedFileName').textContent = 'لم يتم تحديد أي ملف';
+    renderSentSupportList();
+    say('تم إرسال الخطاب بنجاح وإرفاقه ضمن سجل الدعم الفني.');
+  };
+
+  window.editSupportMessage = function(idx){
+    var msgs = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    var item = msgs[idx];
+    if(!item) return;
+    if(typeof window.openMiniSettingsSubtab === 'function'){
+      var btn = document.querySelector('#miniSettingsSubtabs button:nth-child(2)');
+      window.openMiniSettingsSubtab('support', btn);
+    }
+    var field = byId('miniSupportMessage');
+    if(field) field.value = item.message || '';
+    say('تم تحميل الرسالة للتعديل');
+  };
+
+  window.resendSupportMessage = function(idx){
+    var msgs = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    var item = msgs[idx];
+    if(!item) return;
+    msgs.push({
+      title: item.title || 'طلب دعم فني',
+      message: item.message,
+      content: item.content,
+      date: new Date().toLocaleString('ar-SA'),
+      status: 'تمت إعادة الإرسال'
+    });
+    localStorage.setItem('support_messages', JSON.stringify(msgs));
+    renderSentSupportList();
+    say('تمت إعادة إرسال رسالة الدعم الفني بنجاح.');
+  };
+
+  window.editSupportLetter = function(idx){
+    var letters = JSON.parse(localStorage.getItem('support_letters') || '[]');
+    var item = letters[idx];
+    if(!item) return;
+    if(typeof window.openMiniSettingsSubtab === 'function'){
+      var btn = document.querySelector('#miniSettingsSubtabs button:nth-child(2)');
+      window.openMiniSettingsSubtab('support', btn);
+    }
+    var titleEl = byId('miniSupportLetterTitle');
+    var descEl = byId('miniSupportLetterDesc');
+    if(titleEl) titleEl.value = item.title || '';
+    if(descEl) descEl.value = item.desc || '';
+    if(byId('miniSelectedFileName')) byId('miniSelectedFileName').textContent = item.file || 'لم يتم تحديد أي ملف';
+    say('تم تحميل الخطاب للتعديل');
+  };
+
+  window.resendSupportLetter = function(idx){
+    var letters = JSON.parse(localStorage.getItem('support_letters') || '[]');
+    var item = letters[idx];
+    if(!item) return;
+    letters.push({
+      title: item.title,
+      desc: item.desc,
+      file: item.file,
+      content: item.content,
+      date: new Date().toLocaleString('ar-SA'),
+      status: 'تمت إعادة الإرسال'
+    });
+    localStorage.setItem('support_letters', JSON.stringify(letters));
+    renderSentSupportList();
+    say('تمت إعادة إرسال الخطاب بنجاح.');
+  };
+
+  window.openSupervisorLogin = function(){
+    var overlay = byId('supervisorLoginOverlay');
+    if(overlay) overlay.classList.add('show');
+  };
+  window.closeSupervisorLogin = function(){
+    var overlay = byId('supervisorLoginOverlay');
+    if(overlay) overlay.classList.remove('show');
+  };
+
+  window.loginSupervisor = function(){
+    var pinEl = byId('supervisorPin');
+    var roleEl = byId('supervisorRole');
+    var pin = pinEl ? String(pinEl.value || '').trim() : '';
+    var role = roleEl ? String(roleEl.value || '') : '';
+    var ok = false;
+    if(role === 'manager' and False): pass
+    if(role === 'manager' && pin === '1111') ok = true;
+    if(role === 'supervisor' && pin === '2222') ok = true;
+    if(!ok){ say('الرقم السري غير صحيح'); return; }
+
+    var loginCard = byId('supervisorLoginCard');
+    var panel = byId('supervisorPanel');
+    if(loginCard) loginCard.classList.add('hide');
+    if(panel) panel.classList.remove('hide');
+    say('تم الدخول إلى لوحة الإشراف');
+    try{ if(typeof renderSupervisorReports === 'function') renderSupervisorReports(); }catch(e){}
+  };
+
+  window.closeSupervisorPanel = function(){
+    var panel = byId('supervisorPanel');
+    var loginCard = byId('supervisorLoginCard');
+    if(panel) panel.classList.add('hide');
+    if(loginCard) loginCard.classList.remove('hide');
+    closeSupervisorLogin();
+  };
+
+  window.openSupervisorSubtab = function(id, btn){
+    ['bank','tasks','messages','evaluation','certificate'].forEach(function(s){
+      var el = byId('supervisorSubtab-' + s);
+      if(el) el.classList.toggle('hide', s !== id);
+    });
+    document.querySelectorAll('#supervisorSubtabs button').forEach(function(b){ b.classList.remove('active'); });
+    if(btn) btn.classList.add('active');
+  };
+
+  window.renderSupervisorReports = function(){
+    var students = [];
+    var txs = [];
+    var tasks = [];
+    var msgs = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    try{
+      if(window.app && window.app.state){
+        students = window.app.state.students || [];
+        txs = window.app.state.transactions || [];
+        tasks = window.app.state.tasks || [];
+      }
+    }catch(e){}
+    var bank = byId('supBankReport');
+    if(bank){
+      var rows = txs.slice(0,20).map(function(tx){
+        var st = students.find(function(s){ return s.id === tx.studentId; });
+        return '<div class="mini-page-row"><span>' + (tx.date || tx.createdAt || '—') + ' | ' + (st ? st.name : 'بدون اسم') + ' | ' + (tx.type || 'عملية') + ' | ' + (tx.reason || 'بدون سبب') + '</span><strong>' + Number(tx.amount || 0).toLocaleString('ar-SA') + '</strong></div>';
+      }).join('');
+      bank.innerHTML = rows || '<div class="mini-page-row"><span>لا توجد عمليات</span><strong>—</strong></div>';
+    }
+    var taskBox = byId('supTasksReport');
+    if(taskBox){
+      var rows = tasks.map(function(t){
+        return '<div class="mini-page-row"><span>' + (t.title || 'مهمة') + ' | ' + (t.className || t.classId || '—') + ' | ' + (t.date || '—') + '</span><strong>' + (t.submitted ? 'مسلّمة' : 'غير مسلّمة') + '</strong></div>';
+      }).join('');
+      taskBox.innerHTML = rows || '<div class="mini-page-row"><span>لا توجد مهام</span><strong>—</strong></div>';
+    }
+    var msgBox = byId('supMessagesReport');
+    if(msgBox){
+      var rows = msgs.map(function(m){
+        return '<div class="mini-page-row"><span>' + (m.date || '—') + ' | ' + (m.title || 'طلب دعم فني') + '</span><strong>' + (m.status || 'مرسلة بنجاح') + '</strong></div>';
+      }).join('');
+      msgBox.innerHTML = rows || '<div class="mini-page-row"><span>لا توجد رسائل</span><strong>—</strong></div>';
+    }
+    var evalBox = byId('supEvaluationReport');
+    if(evalBox){
+      var high = students.filter(function(s){ return Number(s.balance||0) >= 5000; }).map(function(s){ return s.name; }).slice(0,6).join('، ') || '—';
+      var low = students.filter(function(s){ return Number(s.balance||0) < 1000; }).map(function(s){ return s.name; }).slice(0,6).join('، ') || '—';
+      evalBox.innerHTML =
+        '<div class="mini-page-row"><span>طلاب متميزون</span><strong>' + high + '</strong></div>' +
+        '<div class="mini-page-row"><span>طلاب منخفضون</span><strong>' + low + '</strong></div>' +
+        '<div class="mini-page-row"><span>تاريخ التقرير</span><strong>' + new Date().toLocaleDateString('ar-SA') + '</strong></div>';
+    }
+  };
+
+  function bindButtons(){
+    document.querySelectorAll('button').forEach(function(btn){
+      var t = String(btn.textContent || '').trim();
+      if(t === 'إرسال للدعم الفني'){
+        btn.onclick = function(e){ if(e) e.preventDefault(); window.sendMiniSupport(); };
+      }
+      if(t === 'إرسال الخطاب'){
+        btn.onclick = function(e){ if(e) e.preventDefault(); window.sendMiniSupportLetter(); };
+      }
+      if(t === 'دخول'){
+        if(btn.closest('#supervisorLoginCard')){
+          btn.onclick = function(e){ if(e) e.preventDefault(); window.loginSupervisor(); };
+        }
+      }
+    });
+
+    var supEntry = byId('jumpToTeacherBtn');
+    if(supEntry){
+      supEntry.onclick = function(e){ if(e) e.preventDefault(); window.openSupervisorLogin(); };
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    bindButtons();
+    renderSentSupportList();
+  });
+  setTimeout(function(){
+    bindButtons();
+    renderSentSupportList();
+  }, 800);
+})();
+</script>
+
 </body></html>
         `);
         w.document.close();
@@ -2437,6 +2821,390 @@ function logoutTeacher(){
           </table>
           <img src=x onerror="window.print()">
         
+<div id="supervisorLoginOverlay" class="mini-page-overlay">
+  <div class="mini-page-shell">
+    <div class="mini-page-head">
+      <button class="mini-back-btn" onclick="closeSupervisorLogin()">رجوع</button>
+      <h3 style="margin:0;color:var(--green-3)">التقييم والإشراف المدرسي</h3>
+    </div>
+    <div id="supervisorLoginCard" class="mini-page-card">
+      <div class="note-box" style="margin-bottom:12px">🔒 صلاحية عرض فقط — لا يمكن التعديل أو الحذف أو تنفيذ أي عملية داخل المصرف.</div>
+      <div class="grid-2">
+        <div class="field">
+          <label>نوع الدخول</label>
+          <select id="supervisorRole" class="select">
+            <option value="manager">مدير / مديرة</option>
+            <option value="supervisor">مشرف / مشرفة</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>الرقم السري</label>
+          <input id="supervisorPin" type="password" class="input" placeholder="أدخلي الرقم السري">
+        </div>
+      </div>
+      <div class="actions-row" style="margin-top:12px">
+        <button class="btn primary" onclick="loginSupervisor()">دخول</button>
+      </div>
+      <div class="tiny" style="margin-top:8px">الأرقام الافتراضية للتجربة: المدير/ة 1111 — المشرف/ة 2222</div>
+    </div>
+    <div id="supervisorPanel" class="mini-page-card hide">
+      <div class="note-box" style="margin-bottom:12px">🔒 وضع الإشراف — عرض وتقارير فقط</div>
+      <div class="subtabs" id="supervisorSubtabs">
+        <button class="small-btn active" onclick="openSupervisorSubtab('bank', this)">الحساب المصرفي</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('tasks', this)">المهام الأدائية</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('messages', this)">الرسائل</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('evaluation', this)">التقييم</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('certificate', this)">شهادة شكر</button>
+      </div>
+      <div id="supervisorSubtab-bank">
+        <div id="supBankReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+      <div id="supervisorSubtab-tasks" class="hide">
+        <div id="supTasksReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+      <div id="supervisorSubtab-messages" class="hide">
+        <div id="supMessagesReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+      <div id="supervisorSubtab-evaluation" class="hide">
+        <div id="supEvaluationReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+      <div id="supervisorSubtab-certificate" class="hide">
+        <div class="grid-2">
+          <div class="field"><label>اسم الطالب / الطالبة</label><input id="supCertStudent" class="input" placeholder="اسم الطالب / الطالبة"></div>
+          <div class="field"><label>الفصل</label><input id="supCertClass" class="input" placeholder="الفصل"></div>
+          <div class="field"><label>عنوان الشهادة</label><input id="supCertTitle" class="input" placeholder="عنوان الشهادة"></div>
+          <div class="field"><label>وسيلة الإرسال</label><select id="supCertSendType" class="select"><option>واتساب</option><option>بريد إلكتروني</option></select></div>
+        </div>
+        <div class="field" style="margin-top:10px"><label>نص الشهادة</label><textarea id="supCertText" class="textarea" placeholder="اكتبي نص شهادة الشكر"></textarea></div>
+        <div class="field" style="margin-top:10px"><label>رفع شهادة شكر</label><input id="supCertFile" type="file" class="input" accept=".pdf,.jpg,.jpeg,.png"></div>
+        <div class="actions-row" style="margin-top:12px"><button class="btn primary" onclick="sendSupervisorCertificate()">إرسال الشهادة</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script id="oai-fix-support-supervisor">
+(function(){
+  function byId(id){ return document.getElementById(id); }
+  function say(msg){
+    try{
+      if(window.app && typeof window.app.toast === 'function'){ window.app.toast(msg); return; }
+    }catch(e){}
+    alert(msg);
+  }
+
+  function renderSentSupportList(){
+    var box = byId('miniSentSupportList');
+    if(!box) return;
+    var msgs = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    var letters = JSON.parse(localStorage.getItem('support_letters') || '[]');
+    var rows = [];
+
+    msgs.forEach(function(item, idx){
+      rows.push(
+        '<div class="mini-page-row" style="display:block">' +
+          '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center">' +
+            '<span><strong>نوع الرسالة:</strong> دعم فني</span>' +
+            '<strong>' + (item.date || '—') + '</strong>' +
+          '</div>' +
+          '<div class="tiny" style="margin-top:6px"><strong>العنوان:</strong> طلب دعم فني</div>' +
+          '<div class="tiny" style="margin-top:4px"><strong>الحالة:</strong> ' + (item.status || 'مرسلة بنجاح') + '</div>' +
+          '<div class="tiny" style="margin-top:6px">' + (item.content || item.message || '') + '</div>' +
+          '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">' +
+            '<button class="small-btn" onclick="editSupportMessage(' + idx + ')">تعديل</button>' +
+            '<button class="small-btn" onclick="resendSupportMessage(' + idx + ')">إرسال مرة أخرى</button>' +
+          '</div>' +
+        '</div>'
+      );
+    });
+
+    letters.forEach(function(item, idx){
+      rows.push(
+        '<div class="mini-page-row" style="display:block">' +
+          '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center">' +
+            '<span><strong>نوع الرسالة:</strong> خطاب</span>' +
+            '<strong>' + (item.date || '—') + '</strong>' +
+          '</div>' +
+          '<div class="tiny" style="margin-top:6px"><strong>العنوان:</strong> ' + (item.title || 'إرسال خطاب للدعم الفني') + '</div>' +
+          '<div class="tiny" style="margin-top:4px"><strong>الحالة:</strong> ' + (item.status || 'مرسلة بنجاح') + '</div>' +
+          '<div class="tiny" style="margin-top:4px">' + (item.content || '') + '</div>' +
+          '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">' +
+            '<button class="small-btn" onclick="editSupportLetter(' + idx + ')">تعديل</button>' +
+            '<button class="small-btn" onclick="resendSupportLetter(' + idx + ')">إرسال مرة أخرى</button>' +
+          '</div>' +
+        '</div>'
+      );
+    });
+
+    box.innerHTML = rows.length ? rows.join('') : '<div class="mini-page-row"><span>لا توجد رسائل مرسلة للدعم الفني</span><strong>—</strong></div>';
+  }
+
+  window.sendMiniSupport = function(){
+    var msgEl = byId('miniSupportMessage');
+    var msg = msgEl ? String(msgEl.value || '').trim() : '';
+    if(!msg){ say('يرجى كتابة وصف المشكلة أولًا'); return; }
+
+    var typeReq = document.querySelector('#miniSettingsSubtab-support select') ? document.querySelector('#miniSettingsSubtab-support select').value : 'استفسار';
+    var priorityEls = document.querySelectorAll('#miniSettingsSubtab-support select');
+    var priority = priorityEls && priorityEls.length > 1 ? priorityEls[1].value : 'عادية';
+    var teacher = byId('miniTeacherNameInput') ? byId('miniTeacherNameInput').value.trim() : 'اسم المعلمة / الجهة';
+
+    var fullMessage =
+`طلب دعم فني
+
+السلام عليكم ورحمة الله وبركاته،
+نفيدكم بوجود ملاحظة/مشكلة فنية في النظام، ونأمل منكم التكرم بمراجعتها ومعالجتها في أقرب وقت ممكن.
+تم إرفاق التفاصيل اللازمة أدناه:
+• نوع الطلب: ${typeReq}
+• مستوى الأولوية: ${priority}
+• وصف المشكلة: ${msg}
+
+شاكرين لكم تعاونكم،
+${teacher || 'اسم المعلمة / الجهة'}`;
+
+    var list = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    list.push({
+      title: 'طلب دعم فني',
+      message: msg,
+      content: fullMessage,
+      date: new Date().toLocaleString('ar-SA'),
+      status: 'مرسلة بنجاح'
+    });
+    localStorage.setItem('support_messages', JSON.stringify(list));
+    if(msgEl) msgEl.value = '';
+    renderSentSupportList();
+    say('تم إرسال طلب الدعم الفني بنجاح، وسيتم مراجعته في أقرب وقت ممكن.');
+  };
+
+  window.sendMiniSupportLetter = function(){
+    var titleEl = byId('miniSupportLetterTitle');
+    var descEl = byId('miniSupportLetterDesc');
+    var title = titleEl ? String(titleEl.value || '').trim() : '';
+    var desc = descEl ? String(descEl.value || '').trim() : '';
+    var fileName = byId('miniSelectedFileName') ? String(byId('miniSelectedFileName').textContent || '').trim() : 'بدون ملف';
+    var clientSelects = document.querySelectorAll('#miniSettingsSubtab-support select');
+    var client = clientSelects && clientSelects.length > 2 ? clientSelects[2].value : 'اسم العميل';
+    var teacher = byId('miniTeacherNameInput') ? byId('miniTeacherNameInput').value.trim() : 'اسم المعلمة / الجهة';
+    if(!title){ say('اكتبي عنوان الخطاب أولًا'); return; }
+
+    var fullMessage =
+`إرسال خطاب للدعم الفني
+
+السلام عليكم ورحمة الله وبركاته،
+نرفق لكم خطابًا متعلقًا بالملاحظة الفنية المسجلة في النظام، ونأمل الاطلاع عليه واتخاذ اللازم.
+
+بيانات الخطاب:
+• العميل/الجهة المعنية: ${client || 'اسم العميل'}
+• عنوان الخطاب: ${title}
+• وصف مختصر: ${desc || '—'}
+• المرفق: ${fileName}
+
+وتفضلوا بقبول خالص الشكر والتقدير،
+${teacher || 'اسم المعلمة / الجهة'}`;
+
+    var list = JSON.parse(localStorage.getItem('support_letters') || '[]');
+    list.push({
+      title: title,
+      desc: desc,
+      file: fileName,
+      content: fullMessage,
+      date: new Date().toLocaleString('ar-SA'),
+      status: 'مرسلة بنجاح'
+    });
+    localStorage.setItem('support_letters', JSON.stringify(list));
+    if(titleEl) titleEl.value = '';
+    if(descEl) descEl.value = '';
+    if(byId('miniSelectedFileName')) byId('miniSelectedFileName').textContent = 'لم يتم تحديد أي ملف';
+    renderSentSupportList();
+    say('تم إرسال الخطاب بنجاح وإرفاقه ضمن سجل الدعم الفني.');
+  };
+
+  window.editSupportMessage = function(idx){
+    var msgs = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    var item = msgs[idx];
+    if(!item) return;
+    if(typeof window.openMiniSettingsSubtab === 'function'){
+      var btn = document.querySelector('#miniSettingsSubtabs button:nth-child(2)');
+      window.openMiniSettingsSubtab('support', btn);
+    }
+    var field = byId('miniSupportMessage');
+    if(field) field.value = item.message || '';
+    say('تم تحميل الرسالة للتعديل');
+  };
+
+  window.resendSupportMessage = function(idx){
+    var msgs = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    var item = msgs[idx];
+    if(!item) return;
+    msgs.push({
+      title: item.title || 'طلب دعم فني',
+      message: item.message,
+      content: item.content,
+      date: new Date().toLocaleString('ar-SA'),
+      status: 'تمت إعادة الإرسال'
+    });
+    localStorage.setItem('support_messages', JSON.stringify(msgs));
+    renderSentSupportList();
+    say('تمت إعادة إرسال رسالة الدعم الفني بنجاح.');
+  };
+
+  window.editSupportLetter = function(idx){
+    var letters = JSON.parse(localStorage.getItem('support_letters') || '[]');
+    var item = letters[idx];
+    if(!item) return;
+    if(typeof window.openMiniSettingsSubtab === 'function'){
+      var btn = document.querySelector('#miniSettingsSubtabs button:nth-child(2)');
+      window.openMiniSettingsSubtab('support', btn);
+    }
+    var titleEl = byId('miniSupportLetterTitle');
+    var descEl = byId('miniSupportLetterDesc');
+    if(titleEl) titleEl.value = item.title || '';
+    if(descEl) descEl.value = item.desc || '';
+    if(byId('miniSelectedFileName')) byId('miniSelectedFileName').textContent = item.file || 'لم يتم تحديد أي ملف';
+    say('تم تحميل الخطاب للتعديل');
+  };
+
+  window.resendSupportLetter = function(idx){
+    var letters = JSON.parse(localStorage.getItem('support_letters') || '[]');
+    var item = letters[idx];
+    if(!item) return;
+    letters.push({
+      title: item.title,
+      desc: item.desc,
+      file: item.file,
+      content: item.content,
+      date: new Date().toLocaleString('ar-SA'),
+      status: 'تمت إعادة الإرسال'
+    });
+    localStorage.setItem('support_letters', JSON.stringify(letters));
+    renderSentSupportList();
+    say('تمت إعادة إرسال الخطاب بنجاح.');
+  };
+
+  window.openSupervisorLogin = function(){
+    var overlay = byId('supervisorLoginOverlay');
+    if(overlay) overlay.classList.add('show');
+  };
+  window.closeSupervisorLogin = function(){
+    var overlay = byId('supervisorLoginOverlay');
+    if(overlay) overlay.classList.remove('show');
+  };
+
+  window.loginSupervisor = function(){
+    var pinEl = byId('supervisorPin');
+    var roleEl = byId('supervisorRole');
+    var pin = pinEl ? String(pinEl.value || '').trim() : '';
+    var role = roleEl ? String(roleEl.value || '') : '';
+    var ok = false;
+    if(role === 'manager' and False): pass
+    if(role === 'manager' && pin === '1111') ok = true;
+    if(role === 'supervisor' && pin === '2222') ok = true;
+    if(!ok){ say('الرقم السري غير صحيح'); return; }
+
+    var loginCard = byId('supervisorLoginCard');
+    var panel = byId('supervisorPanel');
+    if(loginCard) loginCard.classList.add('hide');
+    if(panel) panel.classList.remove('hide');
+    say('تم الدخول إلى لوحة الإشراف');
+    try{ if(typeof renderSupervisorReports === 'function') renderSupervisorReports(); }catch(e){}
+  };
+
+  window.closeSupervisorPanel = function(){
+    var panel = byId('supervisorPanel');
+    var loginCard = byId('supervisorLoginCard');
+    if(panel) panel.classList.add('hide');
+    if(loginCard) loginCard.classList.remove('hide');
+    closeSupervisorLogin();
+  };
+
+  window.openSupervisorSubtab = function(id, btn){
+    ['bank','tasks','messages','evaluation','certificate'].forEach(function(s){
+      var el = byId('supervisorSubtab-' + s);
+      if(el) el.classList.toggle('hide', s !== id);
+    });
+    document.querySelectorAll('#supervisorSubtabs button').forEach(function(b){ b.classList.remove('active'); });
+    if(btn) btn.classList.add('active');
+  };
+
+  window.renderSupervisorReports = function(){
+    var students = [];
+    var txs = [];
+    var tasks = [];
+    var msgs = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    try{
+      if(window.app && window.app.state){
+        students = window.app.state.students || [];
+        txs = window.app.state.transactions || [];
+        tasks = window.app.state.tasks || [];
+      }
+    }catch(e){}
+    var bank = byId('supBankReport');
+    if(bank){
+      var rows = txs.slice(0,20).map(function(tx){
+        var st = students.find(function(s){ return s.id === tx.studentId; });
+        return '<div class="mini-page-row"><span>' + (tx.date || tx.createdAt || '—') + ' | ' + (st ? st.name : 'بدون اسم') + ' | ' + (tx.type || 'عملية') + ' | ' + (tx.reason || 'بدون سبب') + '</span><strong>' + Number(tx.amount || 0).toLocaleString('ar-SA') + '</strong></div>';
+      }).join('');
+      bank.innerHTML = rows || '<div class="mini-page-row"><span>لا توجد عمليات</span><strong>—</strong></div>';
+    }
+    var taskBox = byId('supTasksReport');
+    if(taskBox){
+      var rows = tasks.map(function(t){
+        return '<div class="mini-page-row"><span>' + (t.title || 'مهمة') + ' | ' + (t.className || t.classId || '—') + ' | ' + (t.date || '—') + '</span><strong>' + (t.submitted ? 'مسلّمة' : 'غير مسلّمة') + '</strong></div>';
+      }).join('');
+      taskBox.innerHTML = rows || '<div class="mini-page-row"><span>لا توجد مهام</span><strong>—</strong></div>';
+    }
+    var msgBox = byId('supMessagesReport');
+    if(msgBox){
+      var rows = msgs.map(function(m){
+        return '<div class="mini-page-row"><span>' + (m.date || '—') + ' | ' + (m.title || 'طلب دعم فني') + '</span><strong>' + (m.status || 'مرسلة بنجاح') + '</strong></div>';
+      }).join('');
+      msgBox.innerHTML = rows || '<div class="mini-page-row"><span>لا توجد رسائل</span><strong>—</strong></div>';
+    }
+    var evalBox = byId('supEvaluationReport');
+    if(evalBox){
+      var high = students.filter(function(s){ return Number(s.balance||0) >= 5000; }).map(function(s){ return s.name; }).slice(0,6).join('، ') || '—';
+      var low = students.filter(function(s){ return Number(s.balance||0) < 1000; }).map(function(s){ return s.name; }).slice(0,6).join('، ') || '—';
+      evalBox.innerHTML =
+        '<div class="mini-page-row"><span>طلاب متميزون</span><strong>' + high + '</strong></div>' +
+        '<div class="mini-page-row"><span>طلاب منخفضون</span><strong>' + low + '</strong></div>' +
+        '<div class="mini-page-row"><span>تاريخ التقرير</span><strong>' + new Date().toLocaleDateString('ar-SA') + '</strong></div>';
+    }
+  };
+
+  function bindButtons(){
+    document.querySelectorAll('button').forEach(function(btn){
+      var t = String(btn.textContent || '').trim();
+      if(t === 'إرسال للدعم الفني'){
+        btn.onclick = function(e){ if(e) e.preventDefault(); window.sendMiniSupport(); };
+      }
+      if(t === 'إرسال الخطاب'){
+        btn.onclick = function(e){ if(e) e.preventDefault(); window.sendMiniSupportLetter(); };
+      }
+      if(t === 'دخول'){
+        if(btn.closest('#supervisorLoginCard')){
+          btn.onclick = function(e){ if(e) e.preventDefault(); window.loginSupervisor(); };
+        }
+      }
+    });
+
+    var supEntry = byId('jumpToTeacherBtn');
+    if(supEntry){
+      supEntry.onclick = function(e){ if(e) e.preventDefault(); window.openSupervisorLogin(); };
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    bindButtons();
+    renderSentSupportList();
+  });
+  setTimeout(function(){
+    bindButtons();
+    renderSentSupportList();
+  }, 800);
+})();
+</script>
+
 </body>
         </html>
       `);
@@ -2664,6 +3432,390 @@ function logoutTeacher(){
           </table>
           <img src=x onerror="window.print()">
         
+<div id="supervisorLoginOverlay" class="mini-page-overlay">
+  <div class="mini-page-shell">
+    <div class="mini-page-head">
+      <button class="mini-back-btn" onclick="closeSupervisorLogin()">رجوع</button>
+      <h3 style="margin:0;color:var(--green-3)">التقييم والإشراف المدرسي</h3>
+    </div>
+    <div id="supervisorLoginCard" class="mini-page-card">
+      <div class="note-box" style="margin-bottom:12px">🔒 صلاحية عرض فقط — لا يمكن التعديل أو الحذف أو تنفيذ أي عملية داخل المصرف.</div>
+      <div class="grid-2">
+        <div class="field">
+          <label>نوع الدخول</label>
+          <select id="supervisorRole" class="select">
+            <option value="manager">مدير / مديرة</option>
+            <option value="supervisor">مشرف / مشرفة</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>الرقم السري</label>
+          <input id="supervisorPin" type="password" class="input" placeholder="أدخلي الرقم السري">
+        </div>
+      </div>
+      <div class="actions-row" style="margin-top:12px">
+        <button class="btn primary" onclick="loginSupervisor()">دخول</button>
+      </div>
+      <div class="tiny" style="margin-top:8px">الأرقام الافتراضية للتجربة: المدير/ة 1111 — المشرف/ة 2222</div>
+    </div>
+    <div id="supervisorPanel" class="mini-page-card hide">
+      <div class="note-box" style="margin-bottom:12px">🔒 وضع الإشراف — عرض وتقارير فقط</div>
+      <div class="subtabs" id="supervisorSubtabs">
+        <button class="small-btn active" onclick="openSupervisorSubtab('bank', this)">الحساب المصرفي</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('tasks', this)">المهام الأدائية</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('messages', this)">الرسائل</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('evaluation', this)">التقييم</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('certificate', this)">شهادة شكر</button>
+      </div>
+      <div id="supervisorSubtab-bank">
+        <div id="supBankReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+      <div id="supervisorSubtab-tasks" class="hide">
+        <div id="supTasksReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+      <div id="supervisorSubtab-messages" class="hide">
+        <div id="supMessagesReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+      <div id="supervisorSubtab-evaluation" class="hide">
+        <div id="supEvaluationReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+      <div id="supervisorSubtab-certificate" class="hide">
+        <div class="grid-2">
+          <div class="field"><label>اسم الطالب / الطالبة</label><input id="supCertStudent" class="input" placeholder="اسم الطالب / الطالبة"></div>
+          <div class="field"><label>الفصل</label><input id="supCertClass" class="input" placeholder="الفصل"></div>
+          <div class="field"><label>عنوان الشهادة</label><input id="supCertTitle" class="input" placeholder="عنوان الشهادة"></div>
+          <div class="field"><label>وسيلة الإرسال</label><select id="supCertSendType" class="select"><option>واتساب</option><option>بريد إلكتروني</option></select></div>
+        </div>
+        <div class="field" style="margin-top:10px"><label>نص الشهادة</label><textarea id="supCertText" class="textarea" placeholder="اكتبي نص شهادة الشكر"></textarea></div>
+        <div class="field" style="margin-top:10px"><label>رفع شهادة شكر</label><input id="supCertFile" type="file" class="input" accept=".pdf,.jpg,.jpeg,.png"></div>
+        <div class="actions-row" style="margin-top:12px"><button class="btn primary" onclick="sendSupervisorCertificate()">إرسال الشهادة</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script id="oai-fix-support-supervisor">
+(function(){
+  function byId(id){ return document.getElementById(id); }
+  function say(msg){
+    try{
+      if(window.app && typeof window.app.toast === 'function'){ window.app.toast(msg); return; }
+    }catch(e){}
+    alert(msg);
+  }
+
+  function renderSentSupportList(){
+    var box = byId('miniSentSupportList');
+    if(!box) return;
+    var msgs = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    var letters = JSON.parse(localStorage.getItem('support_letters') || '[]');
+    var rows = [];
+
+    msgs.forEach(function(item, idx){
+      rows.push(
+        '<div class="mini-page-row" style="display:block">' +
+          '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center">' +
+            '<span><strong>نوع الرسالة:</strong> دعم فني</span>' +
+            '<strong>' + (item.date || '—') + '</strong>' +
+          '</div>' +
+          '<div class="tiny" style="margin-top:6px"><strong>العنوان:</strong> طلب دعم فني</div>' +
+          '<div class="tiny" style="margin-top:4px"><strong>الحالة:</strong> ' + (item.status || 'مرسلة بنجاح') + '</div>' +
+          '<div class="tiny" style="margin-top:6px">' + (item.content || item.message || '') + '</div>' +
+          '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">' +
+            '<button class="small-btn" onclick="editSupportMessage(' + idx + ')">تعديل</button>' +
+            '<button class="small-btn" onclick="resendSupportMessage(' + idx + ')">إرسال مرة أخرى</button>' +
+          '</div>' +
+        '</div>'
+      );
+    });
+
+    letters.forEach(function(item, idx){
+      rows.push(
+        '<div class="mini-page-row" style="display:block">' +
+          '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center">' +
+            '<span><strong>نوع الرسالة:</strong> خطاب</span>' +
+            '<strong>' + (item.date || '—') + '</strong>' +
+          '</div>' +
+          '<div class="tiny" style="margin-top:6px"><strong>العنوان:</strong> ' + (item.title || 'إرسال خطاب للدعم الفني') + '</div>' +
+          '<div class="tiny" style="margin-top:4px"><strong>الحالة:</strong> ' + (item.status || 'مرسلة بنجاح') + '</div>' +
+          '<div class="tiny" style="margin-top:4px">' + (item.content || '') + '</div>' +
+          '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">' +
+            '<button class="small-btn" onclick="editSupportLetter(' + idx + ')">تعديل</button>' +
+            '<button class="small-btn" onclick="resendSupportLetter(' + idx + ')">إرسال مرة أخرى</button>' +
+          '</div>' +
+        '</div>'
+      );
+    });
+
+    box.innerHTML = rows.length ? rows.join('') : '<div class="mini-page-row"><span>لا توجد رسائل مرسلة للدعم الفني</span><strong>—</strong></div>';
+  }
+
+  window.sendMiniSupport = function(){
+    var msgEl = byId('miniSupportMessage');
+    var msg = msgEl ? String(msgEl.value || '').trim() : '';
+    if(!msg){ say('يرجى كتابة وصف المشكلة أولًا'); return; }
+
+    var typeReq = document.querySelector('#miniSettingsSubtab-support select') ? document.querySelector('#miniSettingsSubtab-support select').value : 'استفسار';
+    var priorityEls = document.querySelectorAll('#miniSettingsSubtab-support select');
+    var priority = priorityEls && priorityEls.length > 1 ? priorityEls[1].value : 'عادية';
+    var teacher = byId('miniTeacherNameInput') ? byId('miniTeacherNameInput').value.trim() : 'اسم المعلمة / الجهة';
+
+    var fullMessage =
+`طلب دعم فني
+
+السلام عليكم ورحمة الله وبركاته،
+نفيدكم بوجود ملاحظة/مشكلة فنية في النظام، ونأمل منكم التكرم بمراجعتها ومعالجتها في أقرب وقت ممكن.
+تم إرفاق التفاصيل اللازمة أدناه:
+• نوع الطلب: ${typeReq}
+• مستوى الأولوية: ${priority}
+• وصف المشكلة: ${msg}
+
+شاكرين لكم تعاونكم،
+${teacher || 'اسم المعلمة / الجهة'}`;
+
+    var list = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    list.push({
+      title: 'طلب دعم فني',
+      message: msg,
+      content: fullMessage,
+      date: new Date().toLocaleString('ar-SA'),
+      status: 'مرسلة بنجاح'
+    });
+    localStorage.setItem('support_messages', JSON.stringify(list));
+    if(msgEl) msgEl.value = '';
+    renderSentSupportList();
+    say('تم إرسال طلب الدعم الفني بنجاح، وسيتم مراجعته في أقرب وقت ممكن.');
+  };
+
+  window.sendMiniSupportLetter = function(){
+    var titleEl = byId('miniSupportLetterTitle');
+    var descEl = byId('miniSupportLetterDesc');
+    var title = titleEl ? String(titleEl.value || '').trim() : '';
+    var desc = descEl ? String(descEl.value || '').trim() : '';
+    var fileName = byId('miniSelectedFileName') ? String(byId('miniSelectedFileName').textContent || '').trim() : 'بدون ملف';
+    var clientSelects = document.querySelectorAll('#miniSettingsSubtab-support select');
+    var client = clientSelects && clientSelects.length > 2 ? clientSelects[2].value : 'اسم العميل';
+    var teacher = byId('miniTeacherNameInput') ? byId('miniTeacherNameInput').value.trim() : 'اسم المعلمة / الجهة';
+    if(!title){ say('اكتبي عنوان الخطاب أولًا'); return; }
+
+    var fullMessage =
+`إرسال خطاب للدعم الفني
+
+السلام عليكم ورحمة الله وبركاته،
+نرفق لكم خطابًا متعلقًا بالملاحظة الفنية المسجلة في النظام، ونأمل الاطلاع عليه واتخاذ اللازم.
+
+بيانات الخطاب:
+• العميل/الجهة المعنية: ${client || 'اسم العميل'}
+• عنوان الخطاب: ${title}
+• وصف مختصر: ${desc || '—'}
+• المرفق: ${fileName}
+
+وتفضلوا بقبول خالص الشكر والتقدير،
+${teacher || 'اسم المعلمة / الجهة'}`;
+
+    var list = JSON.parse(localStorage.getItem('support_letters') || '[]');
+    list.push({
+      title: title,
+      desc: desc,
+      file: fileName,
+      content: fullMessage,
+      date: new Date().toLocaleString('ar-SA'),
+      status: 'مرسلة بنجاح'
+    });
+    localStorage.setItem('support_letters', JSON.stringify(list));
+    if(titleEl) titleEl.value = '';
+    if(descEl) descEl.value = '';
+    if(byId('miniSelectedFileName')) byId('miniSelectedFileName').textContent = 'لم يتم تحديد أي ملف';
+    renderSentSupportList();
+    say('تم إرسال الخطاب بنجاح وإرفاقه ضمن سجل الدعم الفني.');
+  };
+
+  window.editSupportMessage = function(idx){
+    var msgs = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    var item = msgs[idx];
+    if(!item) return;
+    if(typeof window.openMiniSettingsSubtab === 'function'){
+      var btn = document.querySelector('#miniSettingsSubtabs button:nth-child(2)');
+      window.openMiniSettingsSubtab('support', btn);
+    }
+    var field = byId('miniSupportMessage');
+    if(field) field.value = item.message || '';
+    say('تم تحميل الرسالة للتعديل');
+  };
+
+  window.resendSupportMessage = function(idx){
+    var msgs = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    var item = msgs[idx];
+    if(!item) return;
+    msgs.push({
+      title: item.title || 'طلب دعم فني',
+      message: item.message,
+      content: item.content,
+      date: new Date().toLocaleString('ar-SA'),
+      status: 'تمت إعادة الإرسال'
+    });
+    localStorage.setItem('support_messages', JSON.stringify(msgs));
+    renderSentSupportList();
+    say('تمت إعادة إرسال رسالة الدعم الفني بنجاح.');
+  };
+
+  window.editSupportLetter = function(idx){
+    var letters = JSON.parse(localStorage.getItem('support_letters') || '[]');
+    var item = letters[idx];
+    if(!item) return;
+    if(typeof window.openMiniSettingsSubtab === 'function'){
+      var btn = document.querySelector('#miniSettingsSubtabs button:nth-child(2)');
+      window.openMiniSettingsSubtab('support', btn);
+    }
+    var titleEl = byId('miniSupportLetterTitle');
+    var descEl = byId('miniSupportLetterDesc');
+    if(titleEl) titleEl.value = item.title || '';
+    if(descEl) descEl.value = item.desc || '';
+    if(byId('miniSelectedFileName')) byId('miniSelectedFileName').textContent = item.file || 'لم يتم تحديد أي ملف';
+    say('تم تحميل الخطاب للتعديل');
+  };
+
+  window.resendSupportLetter = function(idx){
+    var letters = JSON.parse(localStorage.getItem('support_letters') || '[]');
+    var item = letters[idx];
+    if(!item) return;
+    letters.push({
+      title: item.title,
+      desc: item.desc,
+      file: item.file,
+      content: item.content,
+      date: new Date().toLocaleString('ar-SA'),
+      status: 'تمت إعادة الإرسال'
+    });
+    localStorage.setItem('support_letters', JSON.stringify(letters));
+    renderSentSupportList();
+    say('تمت إعادة إرسال الخطاب بنجاح.');
+  };
+
+  window.openSupervisorLogin = function(){
+    var overlay = byId('supervisorLoginOverlay');
+    if(overlay) overlay.classList.add('show');
+  };
+  window.closeSupervisorLogin = function(){
+    var overlay = byId('supervisorLoginOverlay');
+    if(overlay) overlay.classList.remove('show');
+  };
+
+  window.loginSupervisor = function(){
+    var pinEl = byId('supervisorPin');
+    var roleEl = byId('supervisorRole');
+    var pin = pinEl ? String(pinEl.value || '').trim() : '';
+    var role = roleEl ? String(roleEl.value || '') : '';
+    var ok = false;
+    if(role === 'manager' and False): pass
+    if(role === 'manager' && pin === '1111') ok = true;
+    if(role === 'supervisor' && pin === '2222') ok = true;
+    if(!ok){ say('الرقم السري غير صحيح'); return; }
+
+    var loginCard = byId('supervisorLoginCard');
+    var panel = byId('supervisorPanel');
+    if(loginCard) loginCard.classList.add('hide');
+    if(panel) panel.classList.remove('hide');
+    say('تم الدخول إلى لوحة الإشراف');
+    try{ if(typeof renderSupervisorReports === 'function') renderSupervisorReports(); }catch(e){}
+  };
+
+  window.closeSupervisorPanel = function(){
+    var panel = byId('supervisorPanel');
+    var loginCard = byId('supervisorLoginCard');
+    if(panel) panel.classList.add('hide');
+    if(loginCard) loginCard.classList.remove('hide');
+    closeSupervisorLogin();
+  };
+
+  window.openSupervisorSubtab = function(id, btn){
+    ['bank','tasks','messages','evaluation','certificate'].forEach(function(s){
+      var el = byId('supervisorSubtab-' + s);
+      if(el) el.classList.toggle('hide', s !== id);
+    });
+    document.querySelectorAll('#supervisorSubtabs button').forEach(function(b){ b.classList.remove('active'); });
+    if(btn) btn.classList.add('active');
+  };
+
+  window.renderSupervisorReports = function(){
+    var students = [];
+    var txs = [];
+    var tasks = [];
+    var msgs = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    try{
+      if(window.app && window.app.state){
+        students = window.app.state.students || [];
+        txs = window.app.state.transactions || [];
+        tasks = window.app.state.tasks || [];
+      }
+    }catch(e){}
+    var bank = byId('supBankReport');
+    if(bank){
+      var rows = txs.slice(0,20).map(function(tx){
+        var st = students.find(function(s){ return s.id === tx.studentId; });
+        return '<div class="mini-page-row"><span>' + (tx.date || tx.createdAt || '—') + ' | ' + (st ? st.name : 'بدون اسم') + ' | ' + (tx.type || 'عملية') + ' | ' + (tx.reason || 'بدون سبب') + '</span><strong>' + Number(tx.amount || 0).toLocaleString('ar-SA') + '</strong></div>';
+      }).join('');
+      bank.innerHTML = rows || '<div class="mini-page-row"><span>لا توجد عمليات</span><strong>—</strong></div>';
+    }
+    var taskBox = byId('supTasksReport');
+    if(taskBox){
+      var rows = tasks.map(function(t){
+        return '<div class="mini-page-row"><span>' + (t.title || 'مهمة') + ' | ' + (t.className || t.classId || '—') + ' | ' + (t.date || '—') + '</span><strong>' + (t.submitted ? 'مسلّمة' : 'غير مسلّمة') + '</strong></div>';
+      }).join('');
+      taskBox.innerHTML = rows || '<div class="mini-page-row"><span>لا توجد مهام</span><strong>—</strong></div>';
+    }
+    var msgBox = byId('supMessagesReport');
+    if(msgBox){
+      var rows = msgs.map(function(m){
+        return '<div class="mini-page-row"><span>' + (m.date || '—') + ' | ' + (m.title || 'طلب دعم فني') + '</span><strong>' + (m.status || 'مرسلة بنجاح') + '</strong></div>';
+      }).join('');
+      msgBox.innerHTML = rows || '<div class="mini-page-row"><span>لا توجد رسائل</span><strong>—</strong></div>';
+    }
+    var evalBox = byId('supEvaluationReport');
+    if(evalBox){
+      var high = students.filter(function(s){ return Number(s.balance||0) >= 5000; }).map(function(s){ return s.name; }).slice(0,6).join('، ') || '—';
+      var low = students.filter(function(s){ return Number(s.balance||0) < 1000; }).map(function(s){ return s.name; }).slice(0,6).join('، ') || '—';
+      evalBox.innerHTML =
+        '<div class="mini-page-row"><span>طلاب متميزون</span><strong>' + high + '</strong></div>' +
+        '<div class="mini-page-row"><span>طلاب منخفضون</span><strong>' + low + '</strong></div>' +
+        '<div class="mini-page-row"><span>تاريخ التقرير</span><strong>' + new Date().toLocaleDateString('ar-SA') + '</strong></div>';
+    }
+  };
+
+  function bindButtons(){
+    document.querySelectorAll('button').forEach(function(btn){
+      var t = String(btn.textContent || '').trim();
+      if(t === 'إرسال للدعم الفني'){
+        btn.onclick = function(e){ if(e) e.preventDefault(); window.sendMiniSupport(); };
+      }
+      if(t === 'إرسال الخطاب'){
+        btn.onclick = function(e){ if(e) e.preventDefault(); window.sendMiniSupportLetter(); };
+      }
+      if(t === 'دخول'){
+        if(btn.closest('#supervisorLoginCard')){
+          btn.onclick = function(e){ if(e) e.preventDefault(); window.loginSupervisor(); };
+        }
+      }
+    });
+
+    var supEntry = byId('jumpToTeacherBtn');
+    if(supEntry){
+      supEntry.onclick = function(e){ if(e) e.preventDefault(); window.openSupervisorLogin(); };
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    bindButtons();
+    renderSentSupportList();
+  });
+  setTimeout(function(){
+    bindButtons();
+    renderSentSupportList();
+  }, 800);
+})();
+</script>
+
 </body>
         </html>
       `);
@@ -3157,6 +4309,390 @@ function logoutTeacher(){
       ${signArea()}
       <scr'+'ipt>window.onload=function(){window.print();setTimeout(function(){window.close()},300)}<\/scr'+'ipt>
       
+<div id="supervisorLoginOverlay" class="mini-page-overlay">
+  <div class="mini-page-shell">
+    <div class="mini-page-head">
+      <button class="mini-back-btn" onclick="closeSupervisorLogin()">رجوع</button>
+      <h3 style="margin:0;color:var(--green-3)">التقييم والإشراف المدرسي</h3>
+    </div>
+    <div id="supervisorLoginCard" class="mini-page-card">
+      <div class="note-box" style="margin-bottom:12px">🔒 صلاحية عرض فقط — لا يمكن التعديل أو الحذف أو تنفيذ أي عملية داخل المصرف.</div>
+      <div class="grid-2">
+        <div class="field">
+          <label>نوع الدخول</label>
+          <select id="supervisorRole" class="select">
+            <option value="manager">مدير / مديرة</option>
+            <option value="supervisor">مشرف / مشرفة</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>الرقم السري</label>
+          <input id="supervisorPin" type="password" class="input" placeholder="أدخلي الرقم السري">
+        </div>
+      </div>
+      <div class="actions-row" style="margin-top:12px">
+        <button class="btn primary" onclick="loginSupervisor()">دخول</button>
+      </div>
+      <div class="tiny" style="margin-top:8px">الأرقام الافتراضية للتجربة: المدير/ة 1111 — المشرف/ة 2222</div>
+    </div>
+    <div id="supervisorPanel" class="mini-page-card hide">
+      <div class="note-box" style="margin-bottom:12px">🔒 وضع الإشراف — عرض وتقارير فقط</div>
+      <div class="subtabs" id="supervisorSubtabs">
+        <button class="small-btn active" onclick="openSupervisorSubtab('bank', this)">الحساب المصرفي</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('tasks', this)">المهام الأدائية</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('messages', this)">الرسائل</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('evaluation', this)">التقييم</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('certificate', this)">شهادة شكر</button>
+      </div>
+      <div id="supervisorSubtab-bank">
+        <div id="supBankReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+      <div id="supervisorSubtab-tasks" class="hide">
+        <div id="supTasksReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+      <div id="supervisorSubtab-messages" class="hide">
+        <div id="supMessagesReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+      <div id="supervisorSubtab-evaluation" class="hide">
+        <div id="supEvaluationReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+      <div id="supervisorSubtab-certificate" class="hide">
+        <div class="grid-2">
+          <div class="field"><label>اسم الطالب / الطالبة</label><input id="supCertStudent" class="input" placeholder="اسم الطالب / الطالبة"></div>
+          <div class="field"><label>الفصل</label><input id="supCertClass" class="input" placeholder="الفصل"></div>
+          <div class="field"><label>عنوان الشهادة</label><input id="supCertTitle" class="input" placeholder="عنوان الشهادة"></div>
+          <div class="field"><label>وسيلة الإرسال</label><select id="supCertSendType" class="select"><option>واتساب</option><option>بريد إلكتروني</option></select></div>
+        </div>
+        <div class="field" style="margin-top:10px"><label>نص الشهادة</label><textarea id="supCertText" class="textarea" placeholder="اكتبي نص شهادة الشكر"></textarea></div>
+        <div class="field" style="margin-top:10px"><label>رفع شهادة شكر</label><input id="supCertFile" type="file" class="input" accept=".pdf,.jpg,.jpeg,.png"></div>
+        <div class="actions-row" style="margin-top:12px"><button class="btn primary" onclick="sendSupervisorCertificate()">إرسال الشهادة</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script id="oai-fix-support-supervisor">
+(function(){
+  function byId(id){ return document.getElementById(id); }
+  function say(msg){
+    try{
+      if(window.app && typeof window.app.toast === 'function'){ window.app.toast(msg); return; }
+    }catch(e){}
+    alert(msg);
+  }
+
+  function renderSentSupportList(){
+    var box = byId('miniSentSupportList');
+    if(!box) return;
+    var msgs = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    var letters = JSON.parse(localStorage.getItem('support_letters') || '[]');
+    var rows = [];
+
+    msgs.forEach(function(item, idx){
+      rows.push(
+        '<div class="mini-page-row" style="display:block">' +
+          '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center">' +
+            '<span><strong>نوع الرسالة:</strong> دعم فني</span>' +
+            '<strong>' + (item.date || '—') + '</strong>' +
+          '</div>' +
+          '<div class="tiny" style="margin-top:6px"><strong>العنوان:</strong> طلب دعم فني</div>' +
+          '<div class="tiny" style="margin-top:4px"><strong>الحالة:</strong> ' + (item.status || 'مرسلة بنجاح') + '</div>' +
+          '<div class="tiny" style="margin-top:6px">' + (item.content || item.message || '') + '</div>' +
+          '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">' +
+            '<button class="small-btn" onclick="editSupportMessage(' + idx + ')">تعديل</button>' +
+            '<button class="small-btn" onclick="resendSupportMessage(' + idx + ')">إرسال مرة أخرى</button>' +
+          '</div>' +
+        '</div>'
+      );
+    });
+
+    letters.forEach(function(item, idx){
+      rows.push(
+        '<div class="mini-page-row" style="display:block">' +
+          '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center">' +
+            '<span><strong>نوع الرسالة:</strong> خطاب</span>' +
+            '<strong>' + (item.date || '—') + '</strong>' +
+          '</div>' +
+          '<div class="tiny" style="margin-top:6px"><strong>العنوان:</strong> ' + (item.title || 'إرسال خطاب للدعم الفني') + '</div>' +
+          '<div class="tiny" style="margin-top:4px"><strong>الحالة:</strong> ' + (item.status || 'مرسلة بنجاح') + '</div>' +
+          '<div class="tiny" style="margin-top:4px">' + (item.content || '') + '</div>' +
+          '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">' +
+            '<button class="small-btn" onclick="editSupportLetter(' + idx + ')">تعديل</button>' +
+            '<button class="small-btn" onclick="resendSupportLetter(' + idx + ')">إرسال مرة أخرى</button>' +
+          '</div>' +
+        '</div>'
+      );
+    });
+
+    box.innerHTML = rows.length ? rows.join('') : '<div class="mini-page-row"><span>لا توجد رسائل مرسلة للدعم الفني</span><strong>—</strong></div>';
+  }
+
+  window.sendMiniSupport = function(){
+    var msgEl = byId('miniSupportMessage');
+    var msg = msgEl ? String(msgEl.value || '').trim() : '';
+    if(!msg){ say('يرجى كتابة وصف المشكلة أولًا'); return; }
+
+    var typeReq = document.querySelector('#miniSettingsSubtab-support select') ? document.querySelector('#miniSettingsSubtab-support select').value : 'استفسار';
+    var priorityEls = document.querySelectorAll('#miniSettingsSubtab-support select');
+    var priority = priorityEls && priorityEls.length > 1 ? priorityEls[1].value : 'عادية';
+    var teacher = byId('miniTeacherNameInput') ? byId('miniTeacherNameInput').value.trim() : 'اسم المعلمة / الجهة';
+
+    var fullMessage =
+`طلب دعم فني
+
+السلام عليكم ورحمة الله وبركاته،
+نفيدكم بوجود ملاحظة/مشكلة فنية في النظام، ونأمل منكم التكرم بمراجعتها ومعالجتها في أقرب وقت ممكن.
+تم إرفاق التفاصيل اللازمة أدناه:
+• نوع الطلب: ${typeReq}
+• مستوى الأولوية: ${priority}
+• وصف المشكلة: ${msg}
+
+شاكرين لكم تعاونكم،
+${teacher || 'اسم المعلمة / الجهة'}`;
+
+    var list = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    list.push({
+      title: 'طلب دعم فني',
+      message: msg,
+      content: fullMessage,
+      date: new Date().toLocaleString('ar-SA'),
+      status: 'مرسلة بنجاح'
+    });
+    localStorage.setItem('support_messages', JSON.stringify(list));
+    if(msgEl) msgEl.value = '';
+    renderSentSupportList();
+    say('تم إرسال طلب الدعم الفني بنجاح، وسيتم مراجعته في أقرب وقت ممكن.');
+  };
+
+  window.sendMiniSupportLetter = function(){
+    var titleEl = byId('miniSupportLetterTitle');
+    var descEl = byId('miniSupportLetterDesc');
+    var title = titleEl ? String(titleEl.value || '').trim() : '';
+    var desc = descEl ? String(descEl.value || '').trim() : '';
+    var fileName = byId('miniSelectedFileName') ? String(byId('miniSelectedFileName').textContent || '').trim() : 'بدون ملف';
+    var clientSelects = document.querySelectorAll('#miniSettingsSubtab-support select');
+    var client = clientSelects && clientSelects.length > 2 ? clientSelects[2].value : 'اسم العميل';
+    var teacher = byId('miniTeacherNameInput') ? byId('miniTeacherNameInput').value.trim() : 'اسم المعلمة / الجهة';
+    if(!title){ say('اكتبي عنوان الخطاب أولًا'); return; }
+
+    var fullMessage =
+`إرسال خطاب للدعم الفني
+
+السلام عليكم ورحمة الله وبركاته،
+نرفق لكم خطابًا متعلقًا بالملاحظة الفنية المسجلة في النظام، ونأمل الاطلاع عليه واتخاذ اللازم.
+
+بيانات الخطاب:
+• العميل/الجهة المعنية: ${client || 'اسم العميل'}
+• عنوان الخطاب: ${title}
+• وصف مختصر: ${desc || '—'}
+• المرفق: ${fileName}
+
+وتفضلوا بقبول خالص الشكر والتقدير،
+${teacher || 'اسم المعلمة / الجهة'}`;
+
+    var list = JSON.parse(localStorage.getItem('support_letters') || '[]');
+    list.push({
+      title: title,
+      desc: desc,
+      file: fileName,
+      content: fullMessage,
+      date: new Date().toLocaleString('ar-SA'),
+      status: 'مرسلة بنجاح'
+    });
+    localStorage.setItem('support_letters', JSON.stringify(list));
+    if(titleEl) titleEl.value = '';
+    if(descEl) descEl.value = '';
+    if(byId('miniSelectedFileName')) byId('miniSelectedFileName').textContent = 'لم يتم تحديد أي ملف';
+    renderSentSupportList();
+    say('تم إرسال الخطاب بنجاح وإرفاقه ضمن سجل الدعم الفني.');
+  };
+
+  window.editSupportMessage = function(idx){
+    var msgs = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    var item = msgs[idx];
+    if(!item) return;
+    if(typeof window.openMiniSettingsSubtab === 'function'){
+      var btn = document.querySelector('#miniSettingsSubtabs button:nth-child(2)');
+      window.openMiniSettingsSubtab('support', btn);
+    }
+    var field = byId('miniSupportMessage');
+    if(field) field.value = item.message || '';
+    say('تم تحميل الرسالة للتعديل');
+  };
+
+  window.resendSupportMessage = function(idx){
+    var msgs = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    var item = msgs[idx];
+    if(!item) return;
+    msgs.push({
+      title: item.title || 'طلب دعم فني',
+      message: item.message,
+      content: item.content,
+      date: new Date().toLocaleString('ar-SA'),
+      status: 'تمت إعادة الإرسال'
+    });
+    localStorage.setItem('support_messages', JSON.stringify(msgs));
+    renderSentSupportList();
+    say('تمت إعادة إرسال رسالة الدعم الفني بنجاح.');
+  };
+
+  window.editSupportLetter = function(idx){
+    var letters = JSON.parse(localStorage.getItem('support_letters') || '[]');
+    var item = letters[idx];
+    if(!item) return;
+    if(typeof window.openMiniSettingsSubtab === 'function'){
+      var btn = document.querySelector('#miniSettingsSubtabs button:nth-child(2)');
+      window.openMiniSettingsSubtab('support', btn);
+    }
+    var titleEl = byId('miniSupportLetterTitle');
+    var descEl = byId('miniSupportLetterDesc');
+    if(titleEl) titleEl.value = item.title || '';
+    if(descEl) descEl.value = item.desc || '';
+    if(byId('miniSelectedFileName')) byId('miniSelectedFileName').textContent = item.file || 'لم يتم تحديد أي ملف';
+    say('تم تحميل الخطاب للتعديل');
+  };
+
+  window.resendSupportLetter = function(idx){
+    var letters = JSON.parse(localStorage.getItem('support_letters') || '[]');
+    var item = letters[idx];
+    if(!item) return;
+    letters.push({
+      title: item.title,
+      desc: item.desc,
+      file: item.file,
+      content: item.content,
+      date: new Date().toLocaleString('ar-SA'),
+      status: 'تمت إعادة الإرسال'
+    });
+    localStorage.setItem('support_letters', JSON.stringify(letters));
+    renderSentSupportList();
+    say('تمت إعادة إرسال الخطاب بنجاح.');
+  };
+
+  window.openSupervisorLogin = function(){
+    var overlay = byId('supervisorLoginOverlay');
+    if(overlay) overlay.classList.add('show');
+  };
+  window.closeSupervisorLogin = function(){
+    var overlay = byId('supervisorLoginOverlay');
+    if(overlay) overlay.classList.remove('show');
+  };
+
+  window.loginSupervisor = function(){
+    var pinEl = byId('supervisorPin');
+    var roleEl = byId('supervisorRole');
+    var pin = pinEl ? String(pinEl.value || '').trim() : '';
+    var role = roleEl ? String(roleEl.value || '') : '';
+    var ok = false;
+    if(role === 'manager' and False): pass
+    if(role === 'manager' && pin === '1111') ok = true;
+    if(role === 'supervisor' && pin === '2222') ok = true;
+    if(!ok){ say('الرقم السري غير صحيح'); return; }
+
+    var loginCard = byId('supervisorLoginCard');
+    var panel = byId('supervisorPanel');
+    if(loginCard) loginCard.classList.add('hide');
+    if(panel) panel.classList.remove('hide');
+    say('تم الدخول إلى لوحة الإشراف');
+    try{ if(typeof renderSupervisorReports === 'function') renderSupervisorReports(); }catch(e){}
+  };
+
+  window.closeSupervisorPanel = function(){
+    var panel = byId('supervisorPanel');
+    var loginCard = byId('supervisorLoginCard');
+    if(panel) panel.classList.add('hide');
+    if(loginCard) loginCard.classList.remove('hide');
+    closeSupervisorLogin();
+  };
+
+  window.openSupervisorSubtab = function(id, btn){
+    ['bank','tasks','messages','evaluation','certificate'].forEach(function(s){
+      var el = byId('supervisorSubtab-' + s);
+      if(el) el.classList.toggle('hide', s !== id);
+    });
+    document.querySelectorAll('#supervisorSubtabs button').forEach(function(b){ b.classList.remove('active'); });
+    if(btn) btn.classList.add('active');
+  };
+
+  window.renderSupervisorReports = function(){
+    var students = [];
+    var txs = [];
+    var tasks = [];
+    var msgs = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    try{
+      if(window.app && window.app.state){
+        students = window.app.state.students || [];
+        txs = window.app.state.transactions || [];
+        tasks = window.app.state.tasks || [];
+      }
+    }catch(e){}
+    var bank = byId('supBankReport');
+    if(bank){
+      var rows = txs.slice(0,20).map(function(tx){
+        var st = students.find(function(s){ return s.id === tx.studentId; });
+        return '<div class="mini-page-row"><span>' + (tx.date || tx.createdAt || '—') + ' | ' + (st ? st.name : 'بدون اسم') + ' | ' + (tx.type || 'عملية') + ' | ' + (tx.reason || 'بدون سبب') + '</span><strong>' + Number(tx.amount || 0).toLocaleString('ar-SA') + '</strong></div>';
+      }).join('');
+      bank.innerHTML = rows || '<div class="mini-page-row"><span>لا توجد عمليات</span><strong>—</strong></div>';
+    }
+    var taskBox = byId('supTasksReport');
+    if(taskBox){
+      var rows = tasks.map(function(t){
+        return '<div class="mini-page-row"><span>' + (t.title || 'مهمة') + ' | ' + (t.className || t.classId || '—') + ' | ' + (t.date || '—') + '</span><strong>' + (t.submitted ? 'مسلّمة' : 'غير مسلّمة') + '</strong></div>';
+      }).join('');
+      taskBox.innerHTML = rows || '<div class="mini-page-row"><span>لا توجد مهام</span><strong>—</strong></div>';
+    }
+    var msgBox = byId('supMessagesReport');
+    if(msgBox){
+      var rows = msgs.map(function(m){
+        return '<div class="mini-page-row"><span>' + (m.date || '—') + ' | ' + (m.title || 'طلب دعم فني') + '</span><strong>' + (m.status || 'مرسلة بنجاح') + '</strong></div>';
+      }).join('');
+      msgBox.innerHTML = rows || '<div class="mini-page-row"><span>لا توجد رسائل</span><strong>—</strong></div>';
+    }
+    var evalBox = byId('supEvaluationReport');
+    if(evalBox){
+      var high = students.filter(function(s){ return Number(s.balance||0) >= 5000; }).map(function(s){ return s.name; }).slice(0,6).join('، ') || '—';
+      var low = students.filter(function(s){ return Number(s.balance||0) < 1000; }).map(function(s){ return s.name; }).slice(0,6).join('، ') || '—';
+      evalBox.innerHTML =
+        '<div class="mini-page-row"><span>طلاب متميزون</span><strong>' + high + '</strong></div>' +
+        '<div class="mini-page-row"><span>طلاب منخفضون</span><strong>' + low + '</strong></div>' +
+        '<div class="mini-page-row"><span>تاريخ التقرير</span><strong>' + new Date().toLocaleDateString('ar-SA') + '</strong></div>';
+    }
+  };
+
+  function bindButtons(){
+    document.querySelectorAll('button').forEach(function(btn){
+      var t = String(btn.textContent || '').trim();
+      if(t === 'إرسال للدعم الفني'){
+        btn.onclick = function(e){ if(e) e.preventDefault(); window.sendMiniSupport(); };
+      }
+      if(t === 'إرسال الخطاب'){
+        btn.onclick = function(e){ if(e) e.preventDefault(); window.sendMiniSupportLetter(); };
+      }
+      if(t === 'دخول'){
+        if(btn.closest('#supervisorLoginCard')){
+          btn.onclick = function(e){ if(e) e.preventDefault(); window.loginSupervisor(); };
+        }
+      }
+    });
+
+    var supEntry = byId('jumpToTeacherBtn');
+    if(supEntry){
+      supEntry.onclick = function(e){ if(e) e.preventDefault(); window.openSupervisorLogin(); };
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    bindButtons();
+    renderSentSupportList();
+  });
+  setTimeout(function(){
+    bindButtons();
+    renderSentSupportList();
+  }, 800);
+})();
+</script>
+
 </body></html>`);
     w.document.close();
     app.toast('تم تجهيز طباعة قائمة الطلاب PDF');
@@ -3196,6 +4732,390 @@ function logoutTeacher(){
         .pdf-sign-area img{height:70px;object-fit:contain}
         @media print{@page{size:A4;margin:18mm}}
       </style></head><body>${cards}<scr'+'ipt>window.onload=function(){window.print()}<\/scr'+'ipt>
+<div id="supervisorLoginOverlay" class="mini-page-overlay">
+  <div class="mini-page-shell">
+    <div class="mini-page-head">
+      <button class="mini-back-btn" onclick="closeSupervisorLogin()">رجوع</button>
+      <h3 style="margin:0;color:var(--green-3)">التقييم والإشراف المدرسي</h3>
+    </div>
+    <div id="supervisorLoginCard" class="mini-page-card">
+      <div class="note-box" style="margin-bottom:12px">🔒 صلاحية عرض فقط — لا يمكن التعديل أو الحذف أو تنفيذ أي عملية داخل المصرف.</div>
+      <div class="grid-2">
+        <div class="field">
+          <label>نوع الدخول</label>
+          <select id="supervisorRole" class="select">
+            <option value="manager">مدير / مديرة</option>
+            <option value="supervisor">مشرف / مشرفة</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>الرقم السري</label>
+          <input id="supervisorPin" type="password" class="input" placeholder="أدخلي الرقم السري">
+        </div>
+      </div>
+      <div class="actions-row" style="margin-top:12px">
+        <button class="btn primary" onclick="loginSupervisor()">دخول</button>
+      </div>
+      <div class="tiny" style="margin-top:8px">الأرقام الافتراضية للتجربة: المدير/ة 1111 — المشرف/ة 2222</div>
+    </div>
+    <div id="supervisorPanel" class="mini-page-card hide">
+      <div class="note-box" style="margin-bottom:12px">🔒 وضع الإشراف — عرض وتقارير فقط</div>
+      <div class="subtabs" id="supervisorSubtabs">
+        <button class="small-btn active" onclick="openSupervisorSubtab('bank', this)">الحساب المصرفي</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('tasks', this)">المهام الأدائية</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('messages', this)">الرسائل</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('evaluation', this)">التقييم</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('certificate', this)">شهادة شكر</button>
+      </div>
+      <div id="supervisorSubtab-bank">
+        <div id="supBankReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+      <div id="supervisorSubtab-tasks" class="hide">
+        <div id="supTasksReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+      <div id="supervisorSubtab-messages" class="hide">
+        <div id="supMessagesReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+      <div id="supervisorSubtab-evaluation" class="hide">
+        <div id="supEvaluationReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+      <div id="supervisorSubtab-certificate" class="hide">
+        <div class="grid-2">
+          <div class="field"><label>اسم الطالب / الطالبة</label><input id="supCertStudent" class="input" placeholder="اسم الطالب / الطالبة"></div>
+          <div class="field"><label>الفصل</label><input id="supCertClass" class="input" placeholder="الفصل"></div>
+          <div class="field"><label>عنوان الشهادة</label><input id="supCertTitle" class="input" placeholder="عنوان الشهادة"></div>
+          <div class="field"><label>وسيلة الإرسال</label><select id="supCertSendType" class="select"><option>واتساب</option><option>بريد إلكتروني</option></select></div>
+        </div>
+        <div class="field" style="margin-top:10px"><label>نص الشهادة</label><textarea id="supCertText" class="textarea" placeholder="اكتبي نص شهادة الشكر"></textarea></div>
+        <div class="field" style="margin-top:10px"><label>رفع شهادة شكر</label><input id="supCertFile" type="file" class="input" accept=".pdf,.jpg,.jpeg,.png"></div>
+        <div class="actions-row" style="margin-top:12px"><button class="btn primary" onclick="sendSupervisorCertificate()">إرسال الشهادة</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script id="oai-fix-support-supervisor">
+(function(){
+  function byId(id){ return document.getElementById(id); }
+  function say(msg){
+    try{
+      if(window.app && typeof window.app.toast === 'function'){ window.app.toast(msg); return; }
+    }catch(e){}
+    alert(msg);
+  }
+
+  function renderSentSupportList(){
+    var box = byId('miniSentSupportList');
+    if(!box) return;
+    var msgs = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    var letters = JSON.parse(localStorage.getItem('support_letters') || '[]');
+    var rows = [];
+
+    msgs.forEach(function(item, idx){
+      rows.push(
+        '<div class="mini-page-row" style="display:block">' +
+          '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center">' +
+            '<span><strong>نوع الرسالة:</strong> دعم فني</span>' +
+            '<strong>' + (item.date || '—') + '</strong>' +
+          '</div>' +
+          '<div class="tiny" style="margin-top:6px"><strong>العنوان:</strong> طلب دعم فني</div>' +
+          '<div class="tiny" style="margin-top:4px"><strong>الحالة:</strong> ' + (item.status || 'مرسلة بنجاح') + '</div>' +
+          '<div class="tiny" style="margin-top:6px">' + (item.content || item.message || '') + '</div>' +
+          '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">' +
+            '<button class="small-btn" onclick="editSupportMessage(' + idx + ')">تعديل</button>' +
+            '<button class="small-btn" onclick="resendSupportMessage(' + idx + ')">إرسال مرة أخرى</button>' +
+          '</div>' +
+        '</div>'
+      );
+    });
+
+    letters.forEach(function(item, idx){
+      rows.push(
+        '<div class="mini-page-row" style="display:block">' +
+          '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center">' +
+            '<span><strong>نوع الرسالة:</strong> خطاب</span>' +
+            '<strong>' + (item.date || '—') + '</strong>' +
+          '</div>' +
+          '<div class="tiny" style="margin-top:6px"><strong>العنوان:</strong> ' + (item.title || 'إرسال خطاب للدعم الفني') + '</div>' +
+          '<div class="tiny" style="margin-top:4px"><strong>الحالة:</strong> ' + (item.status || 'مرسلة بنجاح') + '</div>' +
+          '<div class="tiny" style="margin-top:4px">' + (item.content || '') + '</div>' +
+          '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">' +
+            '<button class="small-btn" onclick="editSupportLetter(' + idx + ')">تعديل</button>' +
+            '<button class="small-btn" onclick="resendSupportLetter(' + idx + ')">إرسال مرة أخرى</button>' +
+          '</div>' +
+        '</div>'
+      );
+    });
+
+    box.innerHTML = rows.length ? rows.join('') : '<div class="mini-page-row"><span>لا توجد رسائل مرسلة للدعم الفني</span><strong>—</strong></div>';
+  }
+
+  window.sendMiniSupport = function(){
+    var msgEl = byId('miniSupportMessage');
+    var msg = msgEl ? String(msgEl.value || '').trim() : '';
+    if(!msg){ say('يرجى كتابة وصف المشكلة أولًا'); return; }
+
+    var typeReq = document.querySelector('#miniSettingsSubtab-support select') ? document.querySelector('#miniSettingsSubtab-support select').value : 'استفسار';
+    var priorityEls = document.querySelectorAll('#miniSettingsSubtab-support select');
+    var priority = priorityEls && priorityEls.length > 1 ? priorityEls[1].value : 'عادية';
+    var teacher = byId('miniTeacherNameInput') ? byId('miniTeacherNameInput').value.trim() : 'اسم المعلمة / الجهة';
+
+    var fullMessage =
+`طلب دعم فني
+
+السلام عليكم ورحمة الله وبركاته،
+نفيدكم بوجود ملاحظة/مشكلة فنية في النظام، ونأمل منكم التكرم بمراجعتها ومعالجتها في أقرب وقت ممكن.
+تم إرفاق التفاصيل اللازمة أدناه:
+• نوع الطلب: ${typeReq}
+• مستوى الأولوية: ${priority}
+• وصف المشكلة: ${msg}
+
+شاكرين لكم تعاونكم،
+${teacher || 'اسم المعلمة / الجهة'}`;
+
+    var list = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    list.push({
+      title: 'طلب دعم فني',
+      message: msg,
+      content: fullMessage,
+      date: new Date().toLocaleString('ar-SA'),
+      status: 'مرسلة بنجاح'
+    });
+    localStorage.setItem('support_messages', JSON.stringify(list));
+    if(msgEl) msgEl.value = '';
+    renderSentSupportList();
+    say('تم إرسال طلب الدعم الفني بنجاح، وسيتم مراجعته في أقرب وقت ممكن.');
+  };
+
+  window.sendMiniSupportLetter = function(){
+    var titleEl = byId('miniSupportLetterTitle');
+    var descEl = byId('miniSupportLetterDesc');
+    var title = titleEl ? String(titleEl.value || '').trim() : '';
+    var desc = descEl ? String(descEl.value || '').trim() : '';
+    var fileName = byId('miniSelectedFileName') ? String(byId('miniSelectedFileName').textContent || '').trim() : 'بدون ملف';
+    var clientSelects = document.querySelectorAll('#miniSettingsSubtab-support select');
+    var client = clientSelects && clientSelects.length > 2 ? clientSelects[2].value : 'اسم العميل';
+    var teacher = byId('miniTeacherNameInput') ? byId('miniTeacherNameInput').value.trim() : 'اسم المعلمة / الجهة';
+    if(!title){ say('اكتبي عنوان الخطاب أولًا'); return; }
+
+    var fullMessage =
+`إرسال خطاب للدعم الفني
+
+السلام عليكم ورحمة الله وبركاته،
+نرفق لكم خطابًا متعلقًا بالملاحظة الفنية المسجلة في النظام، ونأمل الاطلاع عليه واتخاذ اللازم.
+
+بيانات الخطاب:
+• العميل/الجهة المعنية: ${client || 'اسم العميل'}
+• عنوان الخطاب: ${title}
+• وصف مختصر: ${desc || '—'}
+• المرفق: ${fileName}
+
+وتفضلوا بقبول خالص الشكر والتقدير،
+${teacher || 'اسم المعلمة / الجهة'}`;
+
+    var list = JSON.parse(localStorage.getItem('support_letters') || '[]');
+    list.push({
+      title: title,
+      desc: desc,
+      file: fileName,
+      content: fullMessage,
+      date: new Date().toLocaleString('ar-SA'),
+      status: 'مرسلة بنجاح'
+    });
+    localStorage.setItem('support_letters', JSON.stringify(list));
+    if(titleEl) titleEl.value = '';
+    if(descEl) descEl.value = '';
+    if(byId('miniSelectedFileName')) byId('miniSelectedFileName').textContent = 'لم يتم تحديد أي ملف';
+    renderSentSupportList();
+    say('تم إرسال الخطاب بنجاح وإرفاقه ضمن سجل الدعم الفني.');
+  };
+
+  window.editSupportMessage = function(idx){
+    var msgs = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    var item = msgs[idx];
+    if(!item) return;
+    if(typeof window.openMiniSettingsSubtab === 'function'){
+      var btn = document.querySelector('#miniSettingsSubtabs button:nth-child(2)');
+      window.openMiniSettingsSubtab('support', btn);
+    }
+    var field = byId('miniSupportMessage');
+    if(field) field.value = item.message || '';
+    say('تم تحميل الرسالة للتعديل');
+  };
+
+  window.resendSupportMessage = function(idx){
+    var msgs = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    var item = msgs[idx];
+    if(!item) return;
+    msgs.push({
+      title: item.title || 'طلب دعم فني',
+      message: item.message,
+      content: item.content,
+      date: new Date().toLocaleString('ar-SA'),
+      status: 'تمت إعادة الإرسال'
+    });
+    localStorage.setItem('support_messages', JSON.stringify(msgs));
+    renderSentSupportList();
+    say('تمت إعادة إرسال رسالة الدعم الفني بنجاح.');
+  };
+
+  window.editSupportLetter = function(idx){
+    var letters = JSON.parse(localStorage.getItem('support_letters') || '[]');
+    var item = letters[idx];
+    if(!item) return;
+    if(typeof window.openMiniSettingsSubtab === 'function'){
+      var btn = document.querySelector('#miniSettingsSubtabs button:nth-child(2)');
+      window.openMiniSettingsSubtab('support', btn);
+    }
+    var titleEl = byId('miniSupportLetterTitle');
+    var descEl = byId('miniSupportLetterDesc');
+    if(titleEl) titleEl.value = item.title || '';
+    if(descEl) descEl.value = item.desc || '';
+    if(byId('miniSelectedFileName')) byId('miniSelectedFileName').textContent = item.file || 'لم يتم تحديد أي ملف';
+    say('تم تحميل الخطاب للتعديل');
+  };
+
+  window.resendSupportLetter = function(idx){
+    var letters = JSON.parse(localStorage.getItem('support_letters') || '[]');
+    var item = letters[idx];
+    if(!item) return;
+    letters.push({
+      title: item.title,
+      desc: item.desc,
+      file: item.file,
+      content: item.content,
+      date: new Date().toLocaleString('ar-SA'),
+      status: 'تمت إعادة الإرسال'
+    });
+    localStorage.setItem('support_letters', JSON.stringify(letters));
+    renderSentSupportList();
+    say('تمت إعادة إرسال الخطاب بنجاح.');
+  };
+
+  window.openSupervisorLogin = function(){
+    var overlay = byId('supervisorLoginOverlay');
+    if(overlay) overlay.classList.add('show');
+  };
+  window.closeSupervisorLogin = function(){
+    var overlay = byId('supervisorLoginOverlay');
+    if(overlay) overlay.classList.remove('show');
+  };
+
+  window.loginSupervisor = function(){
+    var pinEl = byId('supervisorPin');
+    var roleEl = byId('supervisorRole');
+    var pin = pinEl ? String(pinEl.value || '').trim() : '';
+    var role = roleEl ? String(roleEl.value || '') : '';
+    var ok = false;
+    if(role === 'manager' and False): pass
+    if(role === 'manager' && pin === '1111') ok = true;
+    if(role === 'supervisor' && pin === '2222') ok = true;
+    if(!ok){ say('الرقم السري غير صحيح'); return; }
+
+    var loginCard = byId('supervisorLoginCard');
+    var panel = byId('supervisorPanel');
+    if(loginCard) loginCard.classList.add('hide');
+    if(panel) panel.classList.remove('hide');
+    say('تم الدخول إلى لوحة الإشراف');
+    try{ if(typeof renderSupervisorReports === 'function') renderSupervisorReports(); }catch(e){}
+  };
+
+  window.closeSupervisorPanel = function(){
+    var panel = byId('supervisorPanel');
+    var loginCard = byId('supervisorLoginCard');
+    if(panel) panel.classList.add('hide');
+    if(loginCard) loginCard.classList.remove('hide');
+    closeSupervisorLogin();
+  };
+
+  window.openSupervisorSubtab = function(id, btn){
+    ['bank','tasks','messages','evaluation','certificate'].forEach(function(s){
+      var el = byId('supervisorSubtab-' + s);
+      if(el) el.classList.toggle('hide', s !== id);
+    });
+    document.querySelectorAll('#supervisorSubtabs button').forEach(function(b){ b.classList.remove('active'); });
+    if(btn) btn.classList.add('active');
+  };
+
+  window.renderSupervisorReports = function(){
+    var students = [];
+    var txs = [];
+    var tasks = [];
+    var msgs = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    try{
+      if(window.app && window.app.state){
+        students = window.app.state.students || [];
+        txs = window.app.state.transactions || [];
+        tasks = window.app.state.tasks || [];
+      }
+    }catch(e){}
+    var bank = byId('supBankReport');
+    if(bank){
+      var rows = txs.slice(0,20).map(function(tx){
+        var st = students.find(function(s){ return s.id === tx.studentId; });
+        return '<div class="mini-page-row"><span>' + (tx.date || tx.createdAt || '—') + ' | ' + (st ? st.name : 'بدون اسم') + ' | ' + (tx.type || 'عملية') + ' | ' + (tx.reason || 'بدون سبب') + '</span><strong>' + Number(tx.amount || 0).toLocaleString('ar-SA') + '</strong></div>';
+      }).join('');
+      bank.innerHTML = rows || '<div class="mini-page-row"><span>لا توجد عمليات</span><strong>—</strong></div>';
+    }
+    var taskBox = byId('supTasksReport');
+    if(taskBox){
+      var rows = tasks.map(function(t){
+        return '<div class="mini-page-row"><span>' + (t.title || 'مهمة') + ' | ' + (t.className || t.classId || '—') + ' | ' + (t.date || '—') + '</span><strong>' + (t.submitted ? 'مسلّمة' : 'غير مسلّمة') + '</strong></div>';
+      }).join('');
+      taskBox.innerHTML = rows || '<div class="mini-page-row"><span>لا توجد مهام</span><strong>—</strong></div>';
+    }
+    var msgBox = byId('supMessagesReport');
+    if(msgBox){
+      var rows = msgs.map(function(m){
+        return '<div class="mini-page-row"><span>' + (m.date || '—') + ' | ' + (m.title || 'طلب دعم فني') + '</span><strong>' + (m.status || 'مرسلة بنجاح') + '</strong></div>';
+      }).join('');
+      msgBox.innerHTML = rows || '<div class="mini-page-row"><span>لا توجد رسائل</span><strong>—</strong></div>';
+    }
+    var evalBox = byId('supEvaluationReport');
+    if(evalBox){
+      var high = students.filter(function(s){ return Number(s.balance||0) >= 5000; }).map(function(s){ return s.name; }).slice(0,6).join('، ') || '—';
+      var low = students.filter(function(s){ return Number(s.balance||0) < 1000; }).map(function(s){ return s.name; }).slice(0,6).join('، ') || '—';
+      evalBox.innerHTML =
+        '<div class="mini-page-row"><span>طلاب متميزون</span><strong>' + high + '</strong></div>' +
+        '<div class="mini-page-row"><span>طلاب منخفضون</span><strong>' + low + '</strong></div>' +
+        '<div class="mini-page-row"><span>تاريخ التقرير</span><strong>' + new Date().toLocaleDateString('ar-SA') + '</strong></div>';
+    }
+  };
+
+  function bindButtons(){
+    document.querySelectorAll('button').forEach(function(btn){
+      var t = String(btn.textContent || '').trim();
+      if(t === 'إرسال للدعم الفني'){
+        btn.onclick = function(e){ if(e) e.preventDefault(); window.sendMiniSupport(); };
+      }
+      if(t === 'إرسال الخطاب'){
+        btn.onclick = function(e){ if(e) e.preventDefault(); window.sendMiniSupportLetter(); };
+      }
+      if(t === 'دخول'){
+        if(btn.closest('#supervisorLoginCard')){
+          btn.onclick = function(e){ if(e) e.preventDefault(); window.loginSupervisor(); };
+        }
+      }
+    });
+
+    var supEntry = byId('jumpToTeacherBtn');
+    if(supEntry){
+      supEntry.onclick = function(e){ if(e) e.preventDefault(); window.openSupervisorLogin(); };
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    bindButtons();
+    renderSentSupportList();
+  });
+  setTimeout(function(){
+    bindButtons();
+    renderSentSupportList();
+  }, 800);
+})();
+</script>
+
 </body></html>`);
       w.document.close();
       this.toast('تم توليد شهادات PDF للمراكز الأولى');
@@ -3542,6 +5462,390 @@ function logoutTeacher(){
           + '</div>';
       }).join('');
       w.document.write('<html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>شهادات لوحة شرف الفصل</title><style>body{font-family:Tahoma,Arial,sans-serif;color:#21402f}@media print{@page{size:A4;margin:18mm}}</style></head><body>' + cards + '<scr'+'ipt>window.onload=function(){window.print()}<\/scr'+'ipt>
+<div id="supervisorLoginOverlay" class="mini-page-overlay">
+  <div class="mini-page-shell">
+    <div class="mini-page-head">
+      <button class="mini-back-btn" onclick="closeSupervisorLogin()">رجوع</button>
+      <h3 style="margin:0;color:var(--green-3)">التقييم والإشراف المدرسي</h3>
+    </div>
+    <div id="supervisorLoginCard" class="mini-page-card">
+      <div class="note-box" style="margin-bottom:12px">🔒 صلاحية عرض فقط — لا يمكن التعديل أو الحذف أو تنفيذ أي عملية داخل المصرف.</div>
+      <div class="grid-2">
+        <div class="field">
+          <label>نوع الدخول</label>
+          <select id="supervisorRole" class="select">
+            <option value="manager">مدير / مديرة</option>
+            <option value="supervisor">مشرف / مشرفة</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>الرقم السري</label>
+          <input id="supervisorPin" type="password" class="input" placeholder="أدخلي الرقم السري">
+        </div>
+      </div>
+      <div class="actions-row" style="margin-top:12px">
+        <button class="btn primary" onclick="loginSupervisor()">دخول</button>
+      </div>
+      <div class="tiny" style="margin-top:8px">الأرقام الافتراضية للتجربة: المدير/ة 1111 — المشرف/ة 2222</div>
+    </div>
+    <div id="supervisorPanel" class="mini-page-card hide">
+      <div class="note-box" style="margin-bottom:12px">🔒 وضع الإشراف — عرض وتقارير فقط</div>
+      <div class="subtabs" id="supervisorSubtabs">
+        <button class="small-btn active" onclick="openSupervisorSubtab('bank', this)">الحساب المصرفي</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('tasks', this)">المهام الأدائية</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('messages', this)">الرسائل</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('evaluation', this)">التقييم</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('certificate', this)">شهادة شكر</button>
+      </div>
+      <div id="supervisorSubtab-bank">
+        <div id="supBankReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+      <div id="supervisorSubtab-tasks" class="hide">
+        <div id="supTasksReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+      <div id="supervisorSubtab-messages" class="hide">
+        <div id="supMessagesReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+      <div id="supervisorSubtab-evaluation" class="hide">
+        <div id="supEvaluationReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+      <div id="supervisorSubtab-certificate" class="hide">
+        <div class="grid-2">
+          <div class="field"><label>اسم الطالب / الطالبة</label><input id="supCertStudent" class="input" placeholder="اسم الطالب / الطالبة"></div>
+          <div class="field"><label>الفصل</label><input id="supCertClass" class="input" placeholder="الفصل"></div>
+          <div class="field"><label>عنوان الشهادة</label><input id="supCertTitle" class="input" placeholder="عنوان الشهادة"></div>
+          <div class="field"><label>وسيلة الإرسال</label><select id="supCertSendType" class="select"><option>واتساب</option><option>بريد إلكتروني</option></select></div>
+        </div>
+        <div class="field" style="margin-top:10px"><label>نص الشهادة</label><textarea id="supCertText" class="textarea" placeholder="اكتبي نص شهادة الشكر"></textarea></div>
+        <div class="field" style="margin-top:10px"><label>رفع شهادة شكر</label><input id="supCertFile" type="file" class="input" accept=".pdf,.jpg,.jpeg,.png"></div>
+        <div class="actions-row" style="margin-top:12px"><button class="btn primary" onclick="sendSupervisorCertificate()">إرسال الشهادة</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script id="oai-fix-support-supervisor">
+(function(){
+  function byId(id){ return document.getElementById(id); }
+  function say(msg){
+    try{
+      if(window.app && typeof window.app.toast === 'function'){ window.app.toast(msg); return; }
+    }catch(e){}
+    alert(msg);
+  }
+
+  function renderSentSupportList(){
+    var box = byId('miniSentSupportList');
+    if(!box) return;
+    var msgs = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    var letters = JSON.parse(localStorage.getItem('support_letters') || '[]');
+    var rows = [];
+
+    msgs.forEach(function(item, idx){
+      rows.push(
+        '<div class="mini-page-row" style="display:block">' +
+          '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center">' +
+            '<span><strong>نوع الرسالة:</strong> دعم فني</span>' +
+            '<strong>' + (item.date || '—') + '</strong>' +
+          '</div>' +
+          '<div class="tiny" style="margin-top:6px"><strong>العنوان:</strong> طلب دعم فني</div>' +
+          '<div class="tiny" style="margin-top:4px"><strong>الحالة:</strong> ' + (item.status || 'مرسلة بنجاح') + '</div>' +
+          '<div class="tiny" style="margin-top:6px">' + (item.content || item.message || '') + '</div>' +
+          '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">' +
+            '<button class="small-btn" onclick="editSupportMessage(' + idx + ')">تعديل</button>' +
+            '<button class="small-btn" onclick="resendSupportMessage(' + idx + ')">إرسال مرة أخرى</button>' +
+          '</div>' +
+        '</div>'
+      );
+    });
+
+    letters.forEach(function(item, idx){
+      rows.push(
+        '<div class="mini-page-row" style="display:block">' +
+          '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center">' +
+            '<span><strong>نوع الرسالة:</strong> خطاب</span>' +
+            '<strong>' + (item.date || '—') + '</strong>' +
+          '</div>' +
+          '<div class="tiny" style="margin-top:6px"><strong>العنوان:</strong> ' + (item.title || 'إرسال خطاب للدعم الفني') + '</div>' +
+          '<div class="tiny" style="margin-top:4px"><strong>الحالة:</strong> ' + (item.status || 'مرسلة بنجاح') + '</div>' +
+          '<div class="tiny" style="margin-top:4px">' + (item.content || '') + '</div>' +
+          '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">' +
+            '<button class="small-btn" onclick="editSupportLetter(' + idx + ')">تعديل</button>' +
+            '<button class="small-btn" onclick="resendSupportLetter(' + idx + ')">إرسال مرة أخرى</button>' +
+          '</div>' +
+        '</div>'
+      );
+    });
+
+    box.innerHTML = rows.length ? rows.join('') : '<div class="mini-page-row"><span>لا توجد رسائل مرسلة للدعم الفني</span><strong>—</strong></div>';
+  }
+
+  window.sendMiniSupport = function(){
+    var msgEl = byId('miniSupportMessage');
+    var msg = msgEl ? String(msgEl.value || '').trim() : '';
+    if(!msg){ say('يرجى كتابة وصف المشكلة أولًا'); return; }
+
+    var typeReq = document.querySelector('#miniSettingsSubtab-support select') ? document.querySelector('#miniSettingsSubtab-support select').value : 'استفسار';
+    var priorityEls = document.querySelectorAll('#miniSettingsSubtab-support select');
+    var priority = priorityEls && priorityEls.length > 1 ? priorityEls[1].value : 'عادية';
+    var teacher = byId('miniTeacherNameInput') ? byId('miniTeacherNameInput').value.trim() : 'اسم المعلمة / الجهة';
+
+    var fullMessage =
+`طلب دعم فني
+
+السلام عليكم ورحمة الله وبركاته،
+نفيدكم بوجود ملاحظة/مشكلة فنية في النظام، ونأمل منكم التكرم بمراجعتها ومعالجتها في أقرب وقت ممكن.
+تم إرفاق التفاصيل اللازمة أدناه:
+• نوع الطلب: ${typeReq}
+• مستوى الأولوية: ${priority}
+• وصف المشكلة: ${msg}
+
+شاكرين لكم تعاونكم،
+${teacher || 'اسم المعلمة / الجهة'}`;
+
+    var list = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    list.push({
+      title: 'طلب دعم فني',
+      message: msg,
+      content: fullMessage,
+      date: new Date().toLocaleString('ar-SA'),
+      status: 'مرسلة بنجاح'
+    });
+    localStorage.setItem('support_messages', JSON.stringify(list));
+    if(msgEl) msgEl.value = '';
+    renderSentSupportList();
+    say('تم إرسال طلب الدعم الفني بنجاح، وسيتم مراجعته في أقرب وقت ممكن.');
+  };
+
+  window.sendMiniSupportLetter = function(){
+    var titleEl = byId('miniSupportLetterTitle');
+    var descEl = byId('miniSupportLetterDesc');
+    var title = titleEl ? String(titleEl.value || '').trim() : '';
+    var desc = descEl ? String(descEl.value || '').trim() : '';
+    var fileName = byId('miniSelectedFileName') ? String(byId('miniSelectedFileName').textContent || '').trim() : 'بدون ملف';
+    var clientSelects = document.querySelectorAll('#miniSettingsSubtab-support select');
+    var client = clientSelects && clientSelects.length > 2 ? clientSelects[2].value : 'اسم العميل';
+    var teacher = byId('miniTeacherNameInput') ? byId('miniTeacherNameInput').value.trim() : 'اسم المعلمة / الجهة';
+    if(!title){ say('اكتبي عنوان الخطاب أولًا'); return; }
+
+    var fullMessage =
+`إرسال خطاب للدعم الفني
+
+السلام عليكم ورحمة الله وبركاته،
+نرفق لكم خطابًا متعلقًا بالملاحظة الفنية المسجلة في النظام، ونأمل الاطلاع عليه واتخاذ اللازم.
+
+بيانات الخطاب:
+• العميل/الجهة المعنية: ${client || 'اسم العميل'}
+• عنوان الخطاب: ${title}
+• وصف مختصر: ${desc || '—'}
+• المرفق: ${fileName}
+
+وتفضلوا بقبول خالص الشكر والتقدير،
+${teacher || 'اسم المعلمة / الجهة'}`;
+
+    var list = JSON.parse(localStorage.getItem('support_letters') || '[]');
+    list.push({
+      title: title,
+      desc: desc,
+      file: fileName,
+      content: fullMessage,
+      date: new Date().toLocaleString('ar-SA'),
+      status: 'مرسلة بنجاح'
+    });
+    localStorage.setItem('support_letters', JSON.stringify(list));
+    if(titleEl) titleEl.value = '';
+    if(descEl) descEl.value = '';
+    if(byId('miniSelectedFileName')) byId('miniSelectedFileName').textContent = 'لم يتم تحديد أي ملف';
+    renderSentSupportList();
+    say('تم إرسال الخطاب بنجاح وإرفاقه ضمن سجل الدعم الفني.');
+  };
+
+  window.editSupportMessage = function(idx){
+    var msgs = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    var item = msgs[idx];
+    if(!item) return;
+    if(typeof window.openMiniSettingsSubtab === 'function'){
+      var btn = document.querySelector('#miniSettingsSubtabs button:nth-child(2)');
+      window.openMiniSettingsSubtab('support', btn);
+    }
+    var field = byId('miniSupportMessage');
+    if(field) field.value = item.message || '';
+    say('تم تحميل الرسالة للتعديل');
+  };
+
+  window.resendSupportMessage = function(idx){
+    var msgs = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    var item = msgs[idx];
+    if(!item) return;
+    msgs.push({
+      title: item.title || 'طلب دعم فني',
+      message: item.message,
+      content: item.content,
+      date: new Date().toLocaleString('ar-SA'),
+      status: 'تمت إعادة الإرسال'
+    });
+    localStorage.setItem('support_messages', JSON.stringify(msgs));
+    renderSentSupportList();
+    say('تمت إعادة إرسال رسالة الدعم الفني بنجاح.');
+  };
+
+  window.editSupportLetter = function(idx){
+    var letters = JSON.parse(localStorage.getItem('support_letters') || '[]');
+    var item = letters[idx];
+    if(!item) return;
+    if(typeof window.openMiniSettingsSubtab === 'function'){
+      var btn = document.querySelector('#miniSettingsSubtabs button:nth-child(2)');
+      window.openMiniSettingsSubtab('support', btn);
+    }
+    var titleEl = byId('miniSupportLetterTitle');
+    var descEl = byId('miniSupportLetterDesc');
+    if(titleEl) titleEl.value = item.title || '';
+    if(descEl) descEl.value = item.desc || '';
+    if(byId('miniSelectedFileName')) byId('miniSelectedFileName').textContent = item.file || 'لم يتم تحديد أي ملف';
+    say('تم تحميل الخطاب للتعديل');
+  };
+
+  window.resendSupportLetter = function(idx){
+    var letters = JSON.parse(localStorage.getItem('support_letters') || '[]');
+    var item = letters[idx];
+    if(!item) return;
+    letters.push({
+      title: item.title,
+      desc: item.desc,
+      file: item.file,
+      content: item.content,
+      date: new Date().toLocaleString('ar-SA'),
+      status: 'تمت إعادة الإرسال'
+    });
+    localStorage.setItem('support_letters', JSON.stringify(letters));
+    renderSentSupportList();
+    say('تمت إعادة إرسال الخطاب بنجاح.');
+  };
+
+  window.openSupervisorLogin = function(){
+    var overlay = byId('supervisorLoginOverlay');
+    if(overlay) overlay.classList.add('show');
+  };
+  window.closeSupervisorLogin = function(){
+    var overlay = byId('supervisorLoginOverlay');
+    if(overlay) overlay.classList.remove('show');
+  };
+
+  window.loginSupervisor = function(){
+    var pinEl = byId('supervisorPin');
+    var roleEl = byId('supervisorRole');
+    var pin = pinEl ? String(pinEl.value || '').trim() : '';
+    var role = roleEl ? String(roleEl.value || '') : '';
+    var ok = false;
+    if(role === 'manager' and False): pass
+    if(role === 'manager' && pin === '1111') ok = true;
+    if(role === 'supervisor' && pin === '2222') ok = true;
+    if(!ok){ say('الرقم السري غير صحيح'); return; }
+
+    var loginCard = byId('supervisorLoginCard');
+    var panel = byId('supervisorPanel');
+    if(loginCard) loginCard.classList.add('hide');
+    if(panel) panel.classList.remove('hide');
+    say('تم الدخول إلى لوحة الإشراف');
+    try{ if(typeof renderSupervisorReports === 'function') renderSupervisorReports(); }catch(e){}
+  };
+
+  window.closeSupervisorPanel = function(){
+    var panel = byId('supervisorPanel');
+    var loginCard = byId('supervisorLoginCard');
+    if(panel) panel.classList.add('hide');
+    if(loginCard) loginCard.classList.remove('hide');
+    closeSupervisorLogin();
+  };
+
+  window.openSupervisorSubtab = function(id, btn){
+    ['bank','tasks','messages','evaluation','certificate'].forEach(function(s){
+      var el = byId('supervisorSubtab-' + s);
+      if(el) el.classList.toggle('hide', s !== id);
+    });
+    document.querySelectorAll('#supervisorSubtabs button').forEach(function(b){ b.classList.remove('active'); });
+    if(btn) btn.classList.add('active');
+  };
+
+  window.renderSupervisorReports = function(){
+    var students = [];
+    var txs = [];
+    var tasks = [];
+    var msgs = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    try{
+      if(window.app && window.app.state){
+        students = window.app.state.students || [];
+        txs = window.app.state.transactions || [];
+        tasks = window.app.state.tasks || [];
+      }
+    }catch(e){}
+    var bank = byId('supBankReport');
+    if(bank){
+      var rows = txs.slice(0,20).map(function(tx){
+        var st = students.find(function(s){ return s.id === tx.studentId; });
+        return '<div class="mini-page-row"><span>' + (tx.date || tx.createdAt || '—') + ' | ' + (st ? st.name : 'بدون اسم') + ' | ' + (tx.type || 'عملية') + ' | ' + (tx.reason || 'بدون سبب') + '</span><strong>' + Number(tx.amount || 0).toLocaleString('ar-SA') + '</strong></div>';
+      }).join('');
+      bank.innerHTML = rows || '<div class="mini-page-row"><span>لا توجد عمليات</span><strong>—</strong></div>';
+    }
+    var taskBox = byId('supTasksReport');
+    if(taskBox){
+      var rows = tasks.map(function(t){
+        return '<div class="mini-page-row"><span>' + (t.title || 'مهمة') + ' | ' + (t.className || t.classId || '—') + ' | ' + (t.date || '—') + '</span><strong>' + (t.submitted ? 'مسلّمة' : 'غير مسلّمة') + '</strong></div>';
+      }).join('');
+      taskBox.innerHTML = rows || '<div class="mini-page-row"><span>لا توجد مهام</span><strong>—</strong></div>';
+    }
+    var msgBox = byId('supMessagesReport');
+    if(msgBox){
+      var rows = msgs.map(function(m){
+        return '<div class="mini-page-row"><span>' + (m.date || '—') + ' | ' + (m.title || 'طلب دعم فني') + '</span><strong>' + (m.status || 'مرسلة بنجاح') + '</strong></div>';
+      }).join('');
+      msgBox.innerHTML = rows || '<div class="mini-page-row"><span>لا توجد رسائل</span><strong>—</strong></div>';
+    }
+    var evalBox = byId('supEvaluationReport');
+    if(evalBox){
+      var high = students.filter(function(s){ return Number(s.balance||0) >= 5000; }).map(function(s){ return s.name; }).slice(0,6).join('، ') || '—';
+      var low = students.filter(function(s){ return Number(s.balance||0) < 1000; }).map(function(s){ return s.name; }).slice(0,6).join('، ') || '—';
+      evalBox.innerHTML =
+        '<div class="mini-page-row"><span>طلاب متميزون</span><strong>' + high + '</strong></div>' +
+        '<div class="mini-page-row"><span>طلاب منخفضون</span><strong>' + low + '</strong></div>' +
+        '<div class="mini-page-row"><span>تاريخ التقرير</span><strong>' + new Date().toLocaleDateString('ar-SA') + '</strong></div>';
+    }
+  };
+
+  function bindButtons(){
+    document.querySelectorAll('button').forEach(function(btn){
+      var t = String(btn.textContent || '').trim();
+      if(t === 'إرسال للدعم الفني'){
+        btn.onclick = function(e){ if(e) e.preventDefault(); window.sendMiniSupport(); };
+      }
+      if(t === 'إرسال الخطاب'){
+        btn.onclick = function(e){ if(e) e.preventDefault(); window.sendMiniSupportLetter(); };
+      }
+      if(t === 'دخول'){
+        if(btn.closest('#supervisorLoginCard')){
+          btn.onclick = function(e){ if(e) e.preventDefault(); window.loginSupervisor(); };
+        }
+      }
+    });
+
+    var supEntry = byId('jumpToTeacherBtn');
+    if(supEntry){
+      supEntry.onclick = function(e){ if(e) e.preventDefault(); window.openSupervisorLogin(); };
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    bindButtons();
+    renderSentSupportList();
+  });
+  setTimeout(function(){
+    bindButtons();
+    renderSentSupportList();
+  }, 800);
+})();
+</script>
+
 </body></html>');
       w.document.close();
       app.toast && app.toast('تم توليد شهادة PDF تلقائيًا');
@@ -3836,6 +6140,390 @@ function logoutTeacher(){
         + '<table><thead><tr><th>التاريخ</th><th>اليوم</th><th>الحصة</th><th>الوقت</th><th>المادة</th><th>نوع العملية</th><th>المبلغ</th><th>السبب</th><th>المرفق</th></tr></thead><tbody>' + (txRows || '<tr><td colspan="9">لا توجد عمليات</td></tr>') + '</tbody></table>'
         + '<div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:26px"><div class="sub">اعتماد المعلمة: ' + escapeHtml(p.teacherName || '—') + '</div><div>' + sign + '</div></div>'
         + '<img src=x onerror="window.print()">
+<div id="supervisorLoginOverlay" class="mini-page-overlay">
+  <div class="mini-page-shell">
+    <div class="mini-page-head">
+      <button class="mini-back-btn" onclick="closeSupervisorLogin()">رجوع</button>
+      <h3 style="margin:0;color:var(--green-3)">التقييم والإشراف المدرسي</h3>
+    </div>
+    <div id="supervisorLoginCard" class="mini-page-card">
+      <div class="note-box" style="margin-bottom:12px">🔒 صلاحية عرض فقط — لا يمكن التعديل أو الحذف أو تنفيذ أي عملية داخل المصرف.</div>
+      <div class="grid-2">
+        <div class="field">
+          <label>نوع الدخول</label>
+          <select id="supervisorRole" class="select">
+            <option value="manager">مدير / مديرة</option>
+            <option value="supervisor">مشرف / مشرفة</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>الرقم السري</label>
+          <input id="supervisorPin" type="password" class="input" placeholder="أدخلي الرقم السري">
+        </div>
+      </div>
+      <div class="actions-row" style="margin-top:12px">
+        <button class="btn primary" onclick="loginSupervisor()">دخول</button>
+      </div>
+      <div class="tiny" style="margin-top:8px">الأرقام الافتراضية للتجربة: المدير/ة 1111 — المشرف/ة 2222</div>
+    </div>
+    <div id="supervisorPanel" class="mini-page-card hide">
+      <div class="note-box" style="margin-bottom:12px">🔒 وضع الإشراف — عرض وتقارير فقط</div>
+      <div class="subtabs" id="supervisorSubtabs">
+        <button class="small-btn active" onclick="openSupervisorSubtab('bank', this)">الحساب المصرفي</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('tasks', this)">المهام الأدائية</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('messages', this)">الرسائل</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('evaluation', this)">التقييم</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('certificate', this)">شهادة شكر</button>
+      </div>
+      <div id="supervisorSubtab-bank">
+        <div id="supBankReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+      <div id="supervisorSubtab-tasks" class="hide">
+        <div id="supTasksReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+      <div id="supervisorSubtab-messages" class="hide">
+        <div id="supMessagesReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+      <div id="supervisorSubtab-evaluation" class="hide">
+        <div id="supEvaluationReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+      <div id="supervisorSubtab-certificate" class="hide">
+        <div class="grid-2">
+          <div class="field"><label>اسم الطالب / الطالبة</label><input id="supCertStudent" class="input" placeholder="اسم الطالب / الطالبة"></div>
+          <div class="field"><label>الفصل</label><input id="supCertClass" class="input" placeholder="الفصل"></div>
+          <div class="field"><label>عنوان الشهادة</label><input id="supCertTitle" class="input" placeholder="عنوان الشهادة"></div>
+          <div class="field"><label>وسيلة الإرسال</label><select id="supCertSendType" class="select"><option>واتساب</option><option>بريد إلكتروني</option></select></div>
+        </div>
+        <div class="field" style="margin-top:10px"><label>نص الشهادة</label><textarea id="supCertText" class="textarea" placeholder="اكتبي نص شهادة الشكر"></textarea></div>
+        <div class="field" style="margin-top:10px"><label>رفع شهادة شكر</label><input id="supCertFile" type="file" class="input" accept=".pdf,.jpg,.jpeg,.png"></div>
+        <div class="actions-row" style="margin-top:12px"><button class="btn primary" onclick="sendSupervisorCertificate()">إرسال الشهادة</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script id="oai-fix-support-supervisor">
+(function(){
+  function byId(id){ return document.getElementById(id); }
+  function say(msg){
+    try{
+      if(window.app && typeof window.app.toast === 'function'){ window.app.toast(msg); return; }
+    }catch(e){}
+    alert(msg);
+  }
+
+  function renderSentSupportList(){
+    var box = byId('miniSentSupportList');
+    if(!box) return;
+    var msgs = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    var letters = JSON.parse(localStorage.getItem('support_letters') || '[]');
+    var rows = [];
+
+    msgs.forEach(function(item, idx){
+      rows.push(
+        '<div class="mini-page-row" style="display:block">' +
+          '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center">' +
+            '<span><strong>نوع الرسالة:</strong> دعم فني</span>' +
+            '<strong>' + (item.date || '—') + '</strong>' +
+          '</div>' +
+          '<div class="tiny" style="margin-top:6px"><strong>العنوان:</strong> طلب دعم فني</div>' +
+          '<div class="tiny" style="margin-top:4px"><strong>الحالة:</strong> ' + (item.status || 'مرسلة بنجاح') + '</div>' +
+          '<div class="tiny" style="margin-top:6px">' + (item.content || item.message || '') + '</div>' +
+          '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">' +
+            '<button class="small-btn" onclick="editSupportMessage(' + idx + ')">تعديل</button>' +
+            '<button class="small-btn" onclick="resendSupportMessage(' + idx + ')">إرسال مرة أخرى</button>' +
+          '</div>' +
+        '</div>'
+      );
+    });
+
+    letters.forEach(function(item, idx){
+      rows.push(
+        '<div class="mini-page-row" style="display:block">' +
+          '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center">' +
+            '<span><strong>نوع الرسالة:</strong> خطاب</span>' +
+            '<strong>' + (item.date || '—') + '</strong>' +
+          '</div>' +
+          '<div class="tiny" style="margin-top:6px"><strong>العنوان:</strong> ' + (item.title || 'إرسال خطاب للدعم الفني') + '</div>' +
+          '<div class="tiny" style="margin-top:4px"><strong>الحالة:</strong> ' + (item.status || 'مرسلة بنجاح') + '</div>' +
+          '<div class="tiny" style="margin-top:4px">' + (item.content || '') + '</div>' +
+          '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">' +
+            '<button class="small-btn" onclick="editSupportLetter(' + idx + ')">تعديل</button>' +
+            '<button class="small-btn" onclick="resendSupportLetter(' + idx + ')">إرسال مرة أخرى</button>' +
+          '</div>' +
+        '</div>'
+      );
+    });
+
+    box.innerHTML = rows.length ? rows.join('') : '<div class="mini-page-row"><span>لا توجد رسائل مرسلة للدعم الفني</span><strong>—</strong></div>';
+  }
+
+  window.sendMiniSupport = function(){
+    var msgEl = byId('miniSupportMessage');
+    var msg = msgEl ? String(msgEl.value || '').trim() : '';
+    if(!msg){ say('يرجى كتابة وصف المشكلة أولًا'); return; }
+
+    var typeReq = document.querySelector('#miniSettingsSubtab-support select') ? document.querySelector('#miniSettingsSubtab-support select').value : 'استفسار';
+    var priorityEls = document.querySelectorAll('#miniSettingsSubtab-support select');
+    var priority = priorityEls && priorityEls.length > 1 ? priorityEls[1].value : 'عادية';
+    var teacher = byId('miniTeacherNameInput') ? byId('miniTeacherNameInput').value.trim() : 'اسم المعلمة / الجهة';
+
+    var fullMessage =
+`طلب دعم فني
+
+السلام عليكم ورحمة الله وبركاته،
+نفيدكم بوجود ملاحظة/مشكلة فنية في النظام، ونأمل منكم التكرم بمراجعتها ومعالجتها في أقرب وقت ممكن.
+تم إرفاق التفاصيل اللازمة أدناه:
+• نوع الطلب: ${typeReq}
+• مستوى الأولوية: ${priority}
+• وصف المشكلة: ${msg}
+
+شاكرين لكم تعاونكم،
+${teacher || 'اسم المعلمة / الجهة'}`;
+
+    var list = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    list.push({
+      title: 'طلب دعم فني',
+      message: msg,
+      content: fullMessage,
+      date: new Date().toLocaleString('ar-SA'),
+      status: 'مرسلة بنجاح'
+    });
+    localStorage.setItem('support_messages', JSON.stringify(list));
+    if(msgEl) msgEl.value = '';
+    renderSentSupportList();
+    say('تم إرسال طلب الدعم الفني بنجاح، وسيتم مراجعته في أقرب وقت ممكن.');
+  };
+
+  window.sendMiniSupportLetter = function(){
+    var titleEl = byId('miniSupportLetterTitle');
+    var descEl = byId('miniSupportLetterDesc');
+    var title = titleEl ? String(titleEl.value || '').trim() : '';
+    var desc = descEl ? String(descEl.value || '').trim() : '';
+    var fileName = byId('miniSelectedFileName') ? String(byId('miniSelectedFileName').textContent || '').trim() : 'بدون ملف';
+    var clientSelects = document.querySelectorAll('#miniSettingsSubtab-support select');
+    var client = clientSelects && clientSelects.length > 2 ? clientSelects[2].value : 'اسم العميل';
+    var teacher = byId('miniTeacherNameInput') ? byId('miniTeacherNameInput').value.trim() : 'اسم المعلمة / الجهة';
+    if(!title){ say('اكتبي عنوان الخطاب أولًا'); return; }
+
+    var fullMessage =
+`إرسال خطاب للدعم الفني
+
+السلام عليكم ورحمة الله وبركاته،
+نرفق لكم خطابًا متعلقًا بالملاحظة الفنية المسجلة في النظام، ونأمل الاطلاع عليه واتخاذ اللازم.
+
+بيانات الخطاب:
+• العميل/الجهة المعنية: ${client || 'اسم العميل'}
+• عنوان الخطاب: ${title}
+• وصف مختصر: ${desc || '—'}
+• المرفق: ${fileName}
+
+وتفضلوا بقبول خالص الشكر والتقدير،
+${teacher || 'اسم المعلمة / الجهة'}`;
+
+    var list = JSON.parse(localStorage.getItem('support_letters') || '[]');
+    list.push({
+      title: title,
+      desc: desc,
+      file: fileName,
+      content: fullMessage,
+      date: new Date().toLocaleString('ar-SA'),
+      status: 'مرسلة بنجاح'
+    });
+    localStorage.setItem('support_letters', JSON.stringify(list));
+    if(titleEl) titleEl.value = '';
+    if(descEl) descEl.value = '';
+    if(byId('miniSelectedFileName')) byId('miniSelectedFileName').textContent = 'لم يتم تحديد أي ملف';
+    renderSentSupportList();
+    say('تم إرسال الخطاب بنجاح وإرفاقه ضمن سجل الدعم الفني.');
+  };
+
+  window.editSupportMessage = function(idx){
+    var msgs = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    var item = msgs[idx];
+    if(!item) return;
+    if(typeof window.openMiniSettingsSubtab === 'function'){
+      var btn = document.querySelector('#miniSettingsSubtabs button:nth-child(2)');
+      window.openMiniSettingsSubtab('support', btn);
+    }
+    var field = byId('miniSupportMessage');
+    if(field) field.value = item.message || '';
+    say('تم تحميل الرسالة للتعديل');
+  };
+
+  window.resendSupportMessage = function(idx){
+    var msgs = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    var item = msgs[idx];
+    if(!item) return;
+    msgs.push({
+      title: item.title || 'طلب دعم فني',
+      message: item.message,
+      content: item.content,
+      date: new Date().toLocaleString('ar-SA'),
+      status: 'تمت إعادة الإرسال'
+    });
+    localStorage.setItem('support_messages', JSON.stringify(msgs));
+    renderSentSupportList();
+    say('تمت إعادة إرسال رسالة الدعم الفني بنجاح.');
+  };
+
+  window.editSupportLetter = function(idx){
+    var letters = JSON.parse(localStorage.getItem('support_letters') || '[]');
+    var item = letters[idx];
+    if(!item) return;
+    if(typeof window.openMiniSettingsSubtab === 'function'){
+      var btn = document.querySelector('#miniSettingsSubtabs button:nth-child(2)');
+      window.openMiniSettingsSubtab('support', btn);
+    }
+    var titleEl = byId('miniSupportLetterTitle');
+    var descEl = byId('miniSupportLetterDesc');
+    if(titleEl) titleEl.value = item.title || '';
+    if(descEl) descEl.value = item.desc || '';
+    if(byId('miniSelectedFileName')) byId('miniSelectedFileName').textContent = item.file || 'لم يتم تحديد أي ملف';
+    say('تم تحميل الخطاب للتعديل');
+  };
+
+  window.resendSupportLetter = function(idx){
+    var letters = JSON.parse(localStorage.getItem('support_letters') || '[]');
+    var item = letters[idx];
+    if(!item) return;
+    letters.push({
+      title: item.title,
+      desc: item.desc,
+      file: item.file,
+      content: item.content,
+      date: new Date().toLocaleString('ar-SA'),
+      status: 'تمت إعادة الإرسال'
+    });
+    localStorage.setItem('support_letters', JSON.stringify(letters));
+    renderSentSupportList();
+    say('تمت إعادة إرسال الخطاب بنجاح.');
+  };
+
+  window.openSupervisorLogin = function(){
+    var overlay = byId('supervisorLoginOverlay');
+    if(overlay) overlay.classList.add('show');
+  };
+  window.closeSupervisorLogin = function(){
+    var overlay = byId('supervisorLoginOverlay');
+    if(overlay) overlay.classList.remove('show');
+  };
+
+  window.loginSupervisor = function(){
+    var pinEl = byId('supervisorPin');
+    var roleEl = byId('supervisorRole');
+    var pin = pinEl ? String(pinEl.value || '').trim() : '';
+    var role = roleEl ? String(roleEl.value || '') : '';
+    var ok = false;
+    if(role === 'manager' and False): pass
+    if(role === 'manager' && pin === '1111') ok = true;
+    if(role === 'supervisor' && pin === '2222') ok = true;
+    if(!ok){ say('الرقم السري غير صحيح'); return; }
+
+    var loginCard = byId('supervisorLoginCard');
+    var panel = byId('supervisorPanel');
+    if(loginCard) loginCard.classList.add('hide');
+    if(panel) panel.classList.remove('hide');
+    say('تم الدخول إلى لوحة الإشراف');
+    try{ if(typeof renderSupervisorReports === 'function') renderSupervisorReports(); }catch(e){}
+  };
+
+  window.closeSupervisorPanel = function(){
+    var panel = byId('supervisorPanel');
+    var loginCard = byId('supervisorLoginCard');
+    if(panel) panel.classList.add('hide');
+    if(loginCard) loginCard.classList.remove('hide');
+    closeSupervisorLogin();
+  };
+
+  window.openSupervisorSubtab = function(id, btn){
+    ['bank','tasks','messages','evaluation','certificate'].forEach(function(s){
+      var el = byId('supervisorSubtab-' + s);
+      if(el) el.classList.toggle('hide', s !== id);
+    });
+    document.querySelectorAll('#supervisorSubtabs button').forEach(function(b){ b.classList.remove('active'); });
+    if(btn) btn.classList.add('active');
+  };
+
+  window.renderSupervisorReports = function(){
+    var students = [];
+    var txs = [];
+    var tasks = [];
+    var msgs = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    try{
+      if(window.app && window.app.state){
+        students = window.app.state.students || [];
+        txs = window.app.state.transactions || [];
+        tasks = window.app.state.tasks || [];
+      }
+    }catch(e){}
+    var bank = byId('supBankReport');
+    if(bank){
+      var rows = txs.slice(0,20).map(function(tx){
+        var st = students.find(function(s){ return s.id === tx.studentId; });
+        return '<div class="mini-page-row"><span>' + (tx.date || tx.createdAt || '—') + ' | ' + (st ? st.name : 'بدون اسم') + ' | ' + (tx.type || 'عملية') + ' | ' + (tx.reason || 'بدون سبب') + '</span><strong>' + Number(tx.amount || 0).toLocaleString('ar-SA') + '</strong></div>';
+      }).join('');
+      bank.innerHTML = rows || '<div class="mini-page-row"><span>لا توجد عمليات</span><strong>—</strong></div>';
+    }
+    var taskBox = byId('supTasksReport');
+    if(taskBox){
+      var rows = tasks.map(function(t){
+        return '<div class="mini-page-row"><span>' + (t.title || 'مهمة') + ' | ' + (t.className || t.classId || '—') + ' | ' + (t.date || '—') + '</span><strong>' + (t.submitted ? 'مسلّمة' : 'غير مسلّمة') + '</strong></div>';
+      }).join('');
+      taskBox.innerHTML = rows || '<div class="mini-page-row"><span>لا توجد مهام</span><strong>—</strong></div>';
+    }
+    var msgBox = byId('supMessagesReport');
+    if(msgBox){
+      var rows = msgs.map(function(m){
+        return '<div class="mini-page-row"><span>' + (m.date || '—') + ' | ' + (m.title || 'طلب دعم فني') + '</span><strong>' + (m.status || 'مرسلة بنجاح') + '</strong></div>';
+      }).join('');
+      msgBox.innerHTML = rows || '<div class="mini-page-row"><span>لا توجد رسائل</span><strong>—</strong></div>';
+    }
+    var evalBox = byId('supEvaluationReport');
+    if(evalBox){
+      var high = students.filter(function(s){ return Number(s.balance||0) >= 5000; }).map(function(s){ return s.name; }).slice(0,6).join('، ') || '—';
+      var low = students.filter(function(s){ return Number(s.balance||0) < 1000; }).map(function(s){ return s.name; }).slice(0,6).join('، ') || '—';
+      evalBox.innerHTML =
+        '<div class="mini-page-row"><span>طلاب متميزون</span><strong>' + high + '</strong></div>' +
+        '<div class="mini-page-row"><span>طلاب منخفضون</span><strong>' + low + '</strong></div>' +
+        '<div class="mini-page-row"><span>تاريخ التقرير</span><strong>' + new Date().toLocaleDateString('ar-SA') + '</strong></div>';
+    }
+  };
+
+  function bindButtons(){
+    document.querySelectorAll('button').forEach(function(btn){
+      var t = String(btn.textContent || '').trim();
+      if(t === 'إرسال للدعم الفني'){
+        btn.onclick = function(e){ if(e) e.preventDefault(); window.sendMiniSupport(); };
+      }
+      if(t === 'إرسال الخطاب'){
+        btn.onclick = function(e){ if(e) e.preventDefault(); window.sendMiniSupportLetter(); };
+      }
+      if(t === 'دخول'){
+        if(btn.closest('#supervisorLoginCard')){
+          btn.onclick = function(e){ if(e) e.preventDefault(); window.loginSupervisor(); };
+        }
+      }
+    });
+
+    var supEntry = byId('jumpToTeacherBtn');
+    if(supEntry){
+      supEntry.onclick = function(e){ if(e) e.preventDefault(); window.openSupervisorLogin(); };
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    bindButtons();
+    renderSentSupportList();
+  });
+  setTimeout(function(){
+    bindButtons();
+    renderSentSupportList();
+  }, 800);
+})();
+</script>
+
 </body></html>');
       w.document.close();
     };
@@ -3978,355 +6666,41 @@ function logoutTeacher(){
 </script>
 
 
-
 <div id="miniPagesOverlay" class="mini-page-overlay">
   <div class="mini-page-shell">
     <div class="mini-page-head">
       <button class="mini-back-btn" onclick="closeMiniPage()">رجوع</button>
-      <h3 id="miniPageTitle" style="margin:0;color:var(--green-3)">المتابعة</h3>
+      <h3 id="miniPageTitle" style="margin:0;color:var(--green-3)">الرئيسية</h3>
     </div>
 
-    <div id="miniPage-follow" class="mini-page-card">
-      <div class="subtabs" id="miniFollowSubtabs" style="margin-bottom:14px">
-        <button class="small-btn active" onclick="openMiniFollowSubtab('schedule', this)">جدول الحصص</button>
-        <button class="small-btn" onclick="openMiniFollowSubtab('evaluation', this)">تقييم الحصة</button>
-        <button class="small-btn" onclick="openMiniFollowSubtab('homework', this)">المتابعة والواجب</button>
-      </div>
-
-      <div id="miniFollowSubtab-schedule">
-        <div class="mini-page-card" style="margin-top:0">
-          <div class="tiny" style="margin-bottom:10px">اختاري الصف والعام الدراسي أولًا، ثم أدخلي جدول كل فصل من الحصة 1 إلى الحصة 8، ومن الأحد إلى الخميس، ثم احفظي الجدول المدرسي.</div>
-          <div class="mini-page-grid">
-            <div class="mini-page-stat">
-              <div class="tiny">الصف</div>
-              <select id="miniScheduleClass" style="margin-top:8px">
-                <option>اختر الصف</option>
-                <option>الصف الأول الابتدائي</option>
-                <option>الصف الثاني الابتدائي</option>
-                <option>الصف الثالث الابتدائي</option>
-                <option>الصف الرابع الابتدائي</option>
-                <option>الصف الخامس الابتدائي</option>
-                <option>الصف السادس الابتدائي</option>
-                <option>الأول المتوسط</option>
-                <option>الثاني المتوسط</option>
-                <option>الثالث المتوسط</option>
-                <option>الأول الثانوي - مسارات</option>
-                <option>الثاني الثانوي - مسارات</option>
-                <option>الثالث الثانوي - مسارات</option>
-              </select>
-            </div>
-            <div class="mini-page-stat">
-              <div class="tiny">العام الدراسي</div>
-              <select id="miniScheduleYear" style="margin-top:8px">
-                <option value="">اختر العام الدراسي</option>
-                <option>1446 / 1447</option><option>1447 / 1448</option><option>1448 / 1449</option>
-              </select>
-            </div>
-          </div>
-          <div class="field" style="margin-top:12px">
-            <label>بحث سريع داخل الجدول</label>
-            <input id="miniScheduleSearch" class="input" placeholder="ابحثي عن صف أو مادة داخل الجدول">
-          </div>
-          <div style="overflow:auto;margin-top:14px">
-            <table class="statement-full-table" style="min-width:900px" id="miniScheduleTable">
-              <thead>
-                <tr>
-                  <th>اليوم \ الحصة</th>
-                  <th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr data-day="الأحد"><th>الأحد</th><td><input class="mini-schedule-input"></td><td><input class="mini-schedule-input"></td><td><input class="mini-schedule-input"></td><td><input class="mini-schedule-input"></td><td><input class="mini-schedule-input"></td><td><input class="mini-schedule-input"></td><td><input class="mini-schedule-input"></td><td><input class="mini-schedule-input"></td></tr>
-                <tr data-day="الاثنين"><th>الاثنين</th><td><input class="mini-schedule-input"></td><td><input class="mini-schedule-input"></td><td><input class="mini-schedule-input"></td><td><input class="mini-schedule-input"></td><td><input class="mini-schedule-input"></td><td><input class="mini-schedule-input"></td><td><input class="mini-schedule-input"></td><td><input class="mini-schedule-input"></td></tr>
-                <tr data-day="الثلاثاء"><th>الثلاثاء</th><td><input class="mini-schedule-input"></td><td><input class="mini-schedule-input"></td><td><input class="mini-schedule-input"></td><td><input class="mini-schedule-input"></td><td><input class="mini-schedule-input"></td><td><input class="mini-schedule-input"></td><td><input class="mini-schedule-input"></td><td><input class="mini-schedule-input"></td></tr>
-                <tr data-day="الأربعاء"><th>الأربعاء</th><td><input class="mini-schedule-input"></td><td><input class="mini-schedule-input"></td><td><input class="mini-schedule-input"></td><td><input class="mini-schedule-input"></td><td><input class="mini-schedule-input"></td><td><input class="mini-schedule-input"></td><td><input class="mini-schedule-input"></td><td><input class="mini-schedule-input"></td></tr>
-                <tr data-day="الخميس"><th>الخميس</th><td><input class="mini-schedule-input"></td><td><input class="mini-schedule-input"></td><td><input class="mini-schedule-input"></td><td><input class="mini-schedule-input"></td><td><input class="mini-schedule-input"></td><td><input class="mini-schedule-input"></td><td><input class="mini-schedule-input"></td><td><input class="mini-schedule-input"></td></tr>
-              </tbody>
-            </table>
-          </div>
-          <div class="actions-row" style="margin-top:12px">
-            <button class="btn primary" onclick="saveMiniSchedule()">حفظ الجدول المدرسي للفصل المحدد</button>
-            <button class="btn secondary" onclick="clearMiniSchedule()">تفريغ الجدول</button>
-          </div>
-          <div class="note-box" style="margin-top:12px">يتم حفظ جدول مستقل لكل فصل حسب الصف والعام الدراسي الذي يتم اختيارهما في الأعلى.</div>
-        </div>
-      </div>
-
-      <div id="miniFollowSubtab-evaluation" class="hide">
-        <div class="mini-page-grid">
-          <div class="mini-page-stat"><div class="tiny">الحضور اليومي</div><strong id="miniEvalAttendance">0</strong></div>
-          <div class="mini-page-stat"><div class="tiny">المشاركات اليوم</div><strong id="miniEvalParticipation">0</strong></div>
-          <div class="mini-page-stat"><div class="tiny">الخصومات اليوم</div><strong id="miniEvalDeductions">0</strong></div>
-          <div class="mini-page-stat"><div class="tiny">تقييم الحصة</div><strong id="miniEvalResult">--</strong></div>
-        </div>
-        <div class="mini-page-card">
-          <div class="mini-page-list">
-            <div class="mini-page-row"><span>🟢 طلاب رصيدهم مرتفع</span><strong id="miniEvalHighNames">—</strong></div>
-            <div class="mini-page-row"><span>🔴 طلاب رصيدهم منخفض</span><strong id="miniEvalLowNames">—</strong></div>
-            <div class="mini-page-row"><span>⚠️ خصومات كثيرة</span><strong id="miniEvalPenaltyNames">—</strong></div>
-            <div class="mini-page-row"><span>🟡 بدون عمليات</span><strong id="miniEvalNoOpsNames">—</strong></div>
-            <div class="mini-page-row"><span>🏆 أفضل طالب</span><strong id="miniEvalBestStudent">—</strong></div>
-          </div>
-        </div>
-      </div>
-
-      <div id="miniFollowSubtab-homework" class="hide">
-        <div class="mini-page-grid">
-          <div class="mini-page-stat"><div class="tiny">الواجبات المطلوبة أسبوعيًا</div><strong>0</strong></div>
-          <div class="mini-page-stat"><div class="tiny">الواجبات الأسبوعية المنجزة</div><strong>0</strong></div>
-          <div class="mini-page-stat"><div class="tiny">الواجبات الشهرية المنجزة</div><strong>0</strong></div>
-          <div class="mini-page-stat"><div class="tiny">إجمالي النقاط المحتسبة</div><strong>0</strong></div>
-        </div>
-        <div class="mini-page-grid" style="margin-top:12px">
-          <div class="mini-page-stat"><div class="tiny">المشاركات الأسبوعية</div><strong>0</strong></div>
-          <div class="mini-page-stat"><div class="tiny">المشاركات الشهرية</div><strong>0</strong></div>
-          <div class="mini-page-stat"><div class="tiny">أسئلة التفكير العليا</div><strong>0</strong></div>
-          <div class="mini-page-stat"><div class="tiny">الأسئلة الإثرائية</div><strong>0</strong></div>
-        </div>
-
-        <div class="mini-page-card">
-          <h4 style="margin:0 0 10px">متابعة الطالب وربطها بالنقاط</h4>
-          <div class="grid-2">
-            <div class="field"><label>الطالب / الطالبة</label><select class="select"><option>اختر الطالب / الطالبة</option></select></div>
-            <div class="field"><label>عدد الواجبات المطلوبة أسبوعيًا</label><input class="input" value="0"></div>
-            <div class="field"><label>متابعة الواجبات الأسبوعية المنجزة</label><input class="input" value="0"></div>
-            <div class="field"><label>متابعة الواجبات الشهرية المنجزة</label><input class="input" value="0"></div>
-            <div class="field"><label>عدد المشاركات الأسبوعية</label><input class="input" value="0"></div>
-            <div class="field"><label>عدد المشاركات الشهرية</label><input class="input" value="0"></div>
-            <div class="field"><label>عداد أسئلة التفكير العليا</label><input class="input" value="0"></div>
-            <div class="field"><label>عداد الأسئلة الإثرائية</label><input class="input" value="0"></div>
-          </div>
-          <div class="actions-row" style="margin-top:12px">
-            <button class="btn warn">عرض بيانات الطالب</button>
-            <button class="btn primary">حفظ المتابعة واحتساب النقاط</button>
-          </div>
-          <div class="note-box" style="margin-top:10px">يتم تحويل النقاط المحتسبة تلقائيًا إلى رصيد الطالب التحفيزي دون تكرار الاحتساب السابق.</div>
-        </div>
-
-        <div class="mini-page-card">
-          <h4 style="margin:0 0 10px">إضافة سريعة للفصل المحدد</h4>
-          <div class="grid-2">
-            <div class="field"><label>الفصل المحدد</label><select class="select"><option>اختر الفصل</option></select></div>
-            <div class="field"><label>عدد الواجبات المطلوبة أسبوعيًا</label><input class="input" value="0"></div>
-            <div class="field"><label>الواجب الأسبوعي المنجز</label><input class="input" value="0"></div>
-            <div class="field"><label>الواجب الشهري المنجز</label><input class="input" value="0"></div>
-            <div class="field"><label>المشاركة الأسبوعية</label><input class="input" value="0"></div>
-            <div class="field"><label>المشاركة الشهرية</label><input class="input" value="0"></div>
-            <div class="field"><label>التفكير العليا</label><input class="input" value="0"></div>
-            <div class="field"><label>الإثرائية</label><input class="input" value="0"></div>
-          </div>
-          <div class="actions-row" style="margin-top:12px">
-            <button class="btn warn">نسخ من بيانات الطالب المحدد</button>
-            <button class="btn primary">حفظ للفصل المحدد واحتساب النقاط</button>
-            <button class="btn primary">إرسال تقرير الفصل واتساب</button>
-          </div>
-          <div class="note-box" style="margin-top:10px">هذا الخيار يطبق نفس القيم على جميع طلاب الفصل المحدد دفعة واحدة، ثم يربطها بالنقاط والرصيد تلقائيًا عند الحفظ.</div>
-        </div>
-
-        <div class="mini-page-card">
-          <h4 style="margin:0 0 10px">أوزان النقاط</h4>
-          <div class="grid-3">
-            <div class="field"><label>الواجب الأسبوعي</label><input id="miniWeightWeekly" class="input" value="10"></div>
-            <div class="field"><label>الواجب الشهري</label><input id="miniWeightMonthly" class="input" value="25"></div>
-            <div class="field"><label>المشاركة الأسبوعية</label><input id="miniWeightParticipation" class="input" value="5"></div>
-            <div class="field"><label>المشاركة الشهرية</label><input id="miniWeightParticipationMonthly" class="input" value="8"></div>
-            <div class="field"><label>التفكير العليا</label><input id="miniWeightHigher" class="input" value="12"></div>
-            <div class="field"><label>الإثرائية</label><input id="miniWeightEnrich" class="input" value="7"></div>
-          </div>
-          <div class="actions-row" style="margin-top:12px">
-            <button class="btn primary" onclick="saveMiniWeights()">حفظ أوزان النقاط</button>
-          </div>
-          <div class="mini-page-stat" style="margin-top:12px;background:linear-gradient(135deg,var(--green-2),var(--green));color:#fff">
-            <div class="tiny" style="color:#eaf7ef">مجموع نقاط الطالب المحدد</div>
-            <strong style="color:#fff">0</strong>
-            <div class="tiny" style="color:#eaf7ef">هذه النقاط مرتبطة مباشرة برصيد الطالب الحالي داخل النظام البنكي.</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div id="miniPage-messages" class="mini-page-card hide">
+    <div id="miniPage-home" class="mini-page-card">
       <div class="mini-page-grid">
-        <div class="mini-page-stat"><div class="tiny">عدد الرسائل المرسلة لولي الأمر</div><strong>0</strong></div>
-        <div class="mini-page-stat"><div class="tiny">عدد الرسائل المرسلة اليوم</div><strong>0</strong></div>
-        <div class="mini-page-stat"><div class="tiny">أولياء الأمور لم تصلهم رسائل</div><strong>0</strong></div>
+        <div class="mini-page-stat"><div class="tiny">عدد الطلاب والطالبات</div><strong id="miniHomeStudents">0</strong></div>
+        <div class="mini-page-stat"><div class="tiny">عدد الفصول</div><strong id="miniHomeClasses">0</strong></div>
+        <div class="mini-page-stat"><div class="tiny">إجمالي الأرصدة</div><strong id="miniHomeBalance">0</strong></div>
+        <div class="mini-page-stat"><div class="tiny">عدد العمليات</div><strong id="miniHomeOps">0</strong></div>
       </div>
-      <div class="mini-page-card">
-        <h4 style="margin:0 0 10px">بيانات أولياء الأمور</h4>
-        <div class="grid-2">
-          <div class="field"><label>اسم الطالب / الطالبة</label><input id="miniParentStudentName" class="input" placeholder="اسم الطالب / الطالبة"></div>
-          <div class="field"><label>اسم ولي الأمر</label><input id="miniParentName" class="input" placeholder="اسم ولي الأمر"></div>
-          <div class="field"><label>الصف</label><input id="miniParentClass" class="input" placeholder="الصف"></div>
-          <div class="field"><label>رقم ولي الأمر</label><input id="miniParentPhone" class="input" placeholder="رقم ولي الأمر"></div>
-        </div>
-        <div class="actions-row" style="margin-top:12px">
-          <button class="btn primary" onclick="saveMiniParentData()">حفظ بيانات ولي الأمر</button>
-        </div>
-      </div>
-      <div class="mini-page-card">
-        <h4 style="margin:0 0 10px">إرسال رسالة</h4>
-        <div class="grid-2">
-          <div class="field"><label>إرسال رسالة لولي أمر</label><select class="select"><option>اختر ولي الأمر</option></select></div>
-          <div class="field"><label>إرسال رسالة لولي الأمر للفصل كامل</label><select class="select"><option>اختر الفصل</option></select></div>
-          <div class="field"><label>نوع الرسالة</label><select class="select"><option>نصية</option><option>واتساب</option></select></div>
-        </div>
-        <div class="field" style="margin-top:10px"><label>نص الرسالة</label><textarea class="textarea" placeholder="نص الرسالة"></textarea></div>
-        <div class="actions-row" style="margin-top:12px">
-          <button class="btn primary">إرسال</button>
-          <button class="btn secondary">تهيئة الرسالة</button>
-        </div>
+    </div>
+
+    <div id="miniPage-statement" class="mini-page-card hide">
+      <div class="mini-page-list" id="miniStatementList"></div>
+    </div>
+
+    <div id="miniPage-follow" class="mini-page-card hide">
+      <div class="mini-page-grid">
+        <div class="mini-page-stat"><div class="tiny">القريبون من الترقية</div><strong id="miniFollowNear">0</strong></div>
+        <div class="mini-page-stat"><div class="tiny">منخفضو الرصيد</div><strong id="miniFollowLow">0</strong></div>
+        <div class="mini-page-stat"><div class="tiny">المهام غير المسلمة</div><strong id="miniFollowTasks">0</strong></div>
+        <div class="mini-page-stat"><div class="tiny">الحسابات غير المفعلة</div><strong id="miniFollowInactive">0</strong></div>
       </div>
     </div>
 
     <div id="miniPage-settings" class="mini-page-card hide">
-      <div class="mini-page-card" style="margin-top:0">
-        <h4 style="margin:0 0 10px">نسبة اكتمال الإعدادات</h4>
-        <div style="background:#edf5ef;border:1px solid #dfe9e2;border-radius:18px;overflow:hidden;height:22px"><div id="miniSettingsCompletionBar" style="height:100%;width:0%;background:linear-gradient(135deg,#146a48,#1d8b5a)"></div></div>
-        <div id="miniSettingsCompletionText" class="tiny" style="margin-top:8px">اكتمال الملف: 0%</div>
-      </div>
-      <div class="subtabs" id="miniSettingsSubtabs" style="margin-bottom:14px">
-        <button class="small-btn active" onclick="openMiniSettingsSubtab('personal', this)">البيانات الشخصية</button>
-        <button class="small-btn" onclick="openMiniSettingsSubtab('support', this)">التواصل مع الدعم الفني</button>
-        <button class="small-btn" onclick="openMiniSettingsSubtab('sent', this)">الرسائل المرسلة</button>
-        <button class="small-btn" onclick="openMiniSettingsSubtab('survey', this)">تعبئة الاستبيان</button>
-      </div>
-      <div id="miniSettingsSubtab-personal">
-        <div class="mini-page-card" style="margin-top:0">
-          <div class="grid-2">
-            <div class="field"><label>اسم المدرسة</label><input id="miniSchoolNameInput" class="input" placeholder="اسم المدرسة"></div>
-            <div class="field"><label>اسم المعلمة</label><input id="miniTeacherNameInput" class="input" placeholder="اسم المعلمة"></div>
-            <div class="field"><label>رتبة المعلم / المعلمة</label><select id="miniTeacherRankInput" class="select"><option value="">اختر الرتبة</option><option>معلم ممارس / معلمة ممارس</option><option>معلم متقدم / معلمة متقدمة</option><option>معلم خبير / معلمة خبيرة</option><option>أخرى</option></select></div>
-            <div class="field"><label>سنوات الخبرة</label><input id="miniTeacherYearsInput" class="input" placeholder="سنوات الخبرة"></div>
-            <div class="field"><label>البريد الإلكتروني</label><input id="miniTeacherEmailInput" class="input" placeholder="البريد الإلكتروني"></div>
-            <div class="field"><label>تغيير الرقم السري</label><input class="input" placeholder="الرقم السري الجديد"></div>
-          </div>
-          <div class="actions-row" style="margin-top:12px"><button class="btn primary" onclick="saveMiniPersonalSettings()">حفظ البيانات الشخصية</button></div>
-        </div>
-      </div>
-      <div id="miniSettingsSubtab-support" class="hide">
-        <div class="mini-page-card" style="margin-top:0">
-          <h4 style="margin:0 0 10px">بيانات الدعم الفني</h4>
-          <div class="mini-page-list">
-            <div class="mini-page-row"><span>رقم الدعم الفني</span><strong>0500000000</strong></div>
-            <div class="mini-page-row"><span>البريد الإلكتروني</span><strong>support@masraf.edu.sa</strong></div>
-          </div>
-        </div>
-        <div class="mini-page-card">
-          <h4 style="margin:0 0 10px">الدعم الفني</h4>
-          <div class="grid-2">
-            <div class="field"><label>نوع الطلب</label><select class="select"><option>استفسار</option><option>مشكلة تقنية</option><option>طلب تطوير</option><option>بلاغ عاجل</option></select></div>
-            <div class="field"><label>أولوية الطلب</label><select class="select"><option>عادية</option><option>مرتفعة</option><option>عاجلة</option></select></div>
-          </div>
-          <div class="field" style="margin-top:10px"><label>رسالة الدعم الفني</label><textarea id="miniSupportMessage" class="textarea" placeholder="اكتبي وصف المشكلة أو الطلب بشكل واضح"></textarea></div>
-          <div class="actions-row" style="margin-top:12px"><button class="btn primary" onclick="sendMiniSupport()">إرسال للدعم الفني</button></div>
-        </div>
-        <div class="mini-page-card">
-          <h4 style="margin:0 0 10px">رفع خطاب الدعم الفني</h4>
-          <div class="grid-2">
-            <div class="field"><label>العميل المناسب</label><select class="select"><option>اختر العميل</option><option>ولي أمر طالب / طالبة</option><option>طالب / طالبة</option><option>معلم / معلمة</option><option>إدارة المدرسة</option><option>الدعم الفني</option><option>عميل آخر</option></select></div>
-            <div class="field"><label>عنوان الخطاب</label><input id="miniSupportLetterTitle" class="input" placeholder="مثال: خطاب خلل فني - منصة المتابعة"></div>
-          </div>
-          <div class="field" style="margin-top:10px"><label>وصف مختصر</label><textarea class="textarea" placeholder="اكتبي وصفًا مختصرًا للخطاب أو المرفق"></textarea></div>
-          <div class="mini-page-grid" style="margin-top:12px">
-            <label class="mini-page-row" style="cursor:pointer">مكتبة الصور <input id="miniGalleryInput" type="file" accept="image/*" style="display:none"></label>
-            <label class="mini-page-row" style="cursor:pointer">التقاط صورة <input id="miniCameraInput" type="file" accept="image/*" capture="environment" style="display:none"></label>
-            <label class="mini-page-row" style="cursor:pointer">اختيار ملف <input id="miniFileInput" type="file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.zip,.txt" style="display:none"></label>
-            <label class="mini-page-row" style="cursor:pointer">Google Drive / الملفات السحابية <input id="miniCloudInput" type="file" style="display:none"></label>
-          </div>
-          <div id="miniSelectedFileName" class="note-box" style="margin-top:12px">لم يتم تحديد أي ملف</div>
-          <div class="actions-row" style="margin-top:12px"><button class="btn primary" onclick="sendMiniSupportLetter()">إرسال الخطاب</button></div>
-        </div>
-      </div>
-      <div id="miniSettingsSubtab-sent" class="hide">
-        <div class="mini-page-card" style="margin-top:0">
-          <h4 style="margin:0 0 10px">الرسائل المرسلة للدعم الفني</h4>
-          <div id="miniSentSupportList" class="mini-page-list"></div>
-        </div>
-      </div>
-
-      <div id="miniSettingsSubtab-survey" class="hide">
-        <div class="mini-page-card" style="margin-top:0">
-          <h4 style="margin:0 0 10px">استبيان رضا العملاء</h4>
-          <div class="grid-2">
-            <div class="field"><label>السؤال 1: ما مدى رضاك عن سهولة استخدام النظام؟</label><select class="select miniSurveyAnswer"><option value="">اختر الإجابة</option><option>راضي</option><option>غير راضي</option></select></div>
-            <div class="field"><label>ملاحظات السؤال 1</label><textarea class="textarea" placeholder="اكتبي ملاحظتك"></textarea></div>
-            <div class="field"><label>السؤال 2: ما مدى رضاك عن سرعة تنفيذ الخدمات؟</label><select class="select miniSurveyAnswer"><option value="">اختر الإجابة</option><option>راضي</option><option>غير راضي</option></select></div>
-            <div class="field"><label>ملاحظات السؤال 2</label><textarea class="textarea" placeholder="اكتبي ملاحظتك"></textarea></div>
-            <div class="field"><label>السؤال 3: ما مدى رضاك عن التواصل والدعم؟</label><select class="select miniSurveyAnswer"><option value="">اختر الإجابة</option><option>راضي</option><option>غير راضي</option></select></div>
-            <div class="field"><label>ملاحظات السؤال 3</label><textarea class="textarea" placeholder="اكتبي ملاحظتك"></textarea></div>
-          </div>
-          <div class="actions-row" style="margin-top:12px"><button class="btn primary" onclick="saveMiniSurveySettings()">إرسال الاستبيان</button></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div id="supervisorOverlay" class="mini-page-overlay">
-  <div class="mini-page-shell">
-    <div class="mini-page-head">
-      <button class="mini-back-btn" onclick="closeSupervisorOverlay()">رجوع</button>
-      <h3 style="margin:0;color:var(--green-3)">التقييم والإشراف المدرسي</h3>
-    </div>
-    <div id="supervisorLoginCard" class="mini-page-card">
-      <div class="grid-2">
-        <div class="field"><label>نوع الدخول</label><select id="supervisorRole" class="select"><option>مدير / مديرة</option><option>مشرف / مشرفة</option></select></div>
-        <div class="field"><label>الرقم السري</label><input id="supervisorPin" class="input" placeholder="الرقم السري"></div>
-      </div>
-      <div class="note-box" style="margin-top:12px">صلاحية عرض فقط – لا يمكن التعديل على البيانات.</div>
-      <div class="actions-row" style="margin-top:12px"><button class="btn primary" onclick="loginSupervisor()">دخول</button></div>
-    </div>
-    <div id="supervisorContent" class="mini-page-card hide">
-      <div class="mini-page-grid">
-        <div class="mini-page-stat"><div class="tiny">عدد الفصول</div><strong id="supClasses">0</strong></div>
-        <div class="mini-page-stat"><div class="tiny">عدد الطلاب</div><strong id="supStudents">0</strong></div>
-        <div class="mini-page-stat"><div class="tiny">إجمالي العمليات</div><strong id="supTx">0</strong></div>
-        <div class="mini-page-stat"><div class="tiny">عدد الرسائل</div><strong id="supMsg">0</strong></div>
-      </div>
-      <div class="subtabs" style="margin-top:14px">
-        <button class="small-btn active" onclick="openSupervisorTab('bank', this)">الحساب المصرفي</button>
-        <button class="small-btn" onclick="openSupervisorTab('tasks', this)">المهام</button>
-        <button class="small-btn" onclick="openSupervisorTab('roulette', this)">الروليت</button>
-        <button class="small-btn" onclick="openSupervisorTab('messages', this)">الرسائل</button>
-        <button class="small-btn" onclick="openSupervisorTab('certificate', this)">شهادة شكر</button>
-      </div>
-      <div id="supTab-bank">
-        <div class="grid-2">
-          <div class="field"><label>الفصل</label><select id="supClassFilter" class="select"></select></div>
-          <div class="field"><label>بحث بالأسباب / الطالب</label><input id="supSearch" class="input" placeholder="بحث"></div>
-        </div>
-        <div class="mini-page-card"><div id="supBankReport" class="mini-page-list"></div></div>
-      </div>
-      <div id="supTab-tasks" class="hide"><div class="mini-page-card"><div id="supTasksReport" class="mini-page-list"></div></div></div>
-      <div id="supTab-roulette" class="hide"><div class="mini-page-card"><div id="supRouletteReport" class="mini-page-list"></div></div></div>
-      <div id="supTab-messages" class="hide"><div class="mini-page-card"><div id="supMessagesReport" class="mini-page-list"></div></div></div>
-      <div id="supTab-certificate" class="hide">
-        <div class="mini-page-card">
-          <div class="grid-2">
-            <div class="field"><label>اسم الطالب / الطالبة</label><input class="input" placeholder="اسم الطالب / الطالبة"></div>
-            <div class="field"><label>الفصل</label><input class="input" placeholder="الفصل"></div>
-            <div class="field"><label>عنوان الشهادة</label><input class="input" placeholder="عنوان الشهادة"></div>
-            <div class="field"><label>طريقة الإرسال</label><select class="select"><option>واتساب</option><option>بريد إلكتروني</option></select></div>
-          </div>
-          <div class="field" style="margin-top:10px"><label>نص الشهادة</label><textarea class="textarea" placeholder="نص الشهادة"></textarea></div>
-          <div class="actions-row" style="margin-top:12px"><button class="btn primary">إرسال الشهادة</button></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div id="backupOverlay" class="mini-page-overlay">
-  <div class="mini-page-shell">
-    <div class="mini-page-head"><button class="mini-back-btn" onclick="closeBackupOverlay()">رجوع</button><h3 style="margin:0;color:var(--green-3)">نسخة احتياطية للبيانات</h3></div>
-    <div class="mini-page-card">
-      <div class="mini-page-grid">
-        <div class="mini-page-stat"><div class="tiny">آخر نسخة</div><strong id="backupLast">—</strong></div>
-        <div class="mini-page-stat"><div class="tiny">عدد السجلات</div><strong id="backupCount">0</strong></div>
-      </div>
-      <div class="actions-row" style="margin-top:12px">
-        <button class="btn primary" onclick="createLocalBackup()">إنشاء نسخة احتياطية الآن</button>
-        <button class="btn secondary" onclick="downloadLocalBackup()">تحميل النسخة</button>
+      <div class="mini-page-list">
+        <div class="mini-page-row"><span>اسم المدرسة</span><strong id="miniSchoolName">—</strong></div>
+        <div class="mini-page-row"><span>اسم المعلمة</span><strong id="miniTeacherName">—</strong></div>
+        <div class="mini-page-row"><span>المادة</span><strong id="miniSubject">—</strong></div>
+        <div class="mini-page-row"><span>الفصل الدراسي</span><strong id="miniSemester">—</strong></div>
       </div>
     </div>
   </div>
@@ -4337,144 +6711,492 @@ function logoutTeacher(){
   function byId(id){ return document.getElementById(id); }
   function getApp(){ return window.app || null; }
   function setText(id, value){ var el = byId(id); if(el) el.textContent = value; }
-  function toast(msg){ if(window.app && app.toast) app.toast(msg); else alert(msg); }
 
   function setActiveNav(page){
     var btns = document.querySelectorAll('#miniPhoneNav [data-mini-page]');
     btns.forEach(function(btn){ btn.classList.toggle('active', btn.getAttribute('data-mini-page') === page); });
   }
-  function namesFor(list){ return list.length ? list.slice(0,3).map(function(s){ return s.name || '—'; }).join('، ') : '—'; }
-
-  function scheduleKey(){
-    var cls = byId('miniScheduleClass').value, yr = byId('miniScheduleYear').value;
-    if(!cls || !yr) return null;
-    return 'mini_schedule_' + cls + '_' + yr;
-  }
-  function loadMiniSchedule(){
-    var key = scheduleKey();
-    var inputs = document.querySelectorAll('.mini-schedule-input');
-    inputs.forEach(function(i){ i.value=''; });
-    if(!key) return;
-    var data = JSON.parse(localStorage.getItem(key) || '[]');
-    inputs.forEach(function(i,idx){ i.value = data[idx] || ''; });
-  }
-  window.saveMiniSchedule = function(){
-    var key = scheduleKey();
-    if(!key) return toast('اختاري الصف والعام الدراسي أولاً');
-    var data = Array.from(document.querySelectorAll('.mini-schedule-input')).map(function(i){ return i.value; });
-    localStorage.setItem(key, JSON.stringify(data));
-    toast('تم حفظ الجدول المدرسي للفصل المحدد');
-  };
-  window.clearMiniSchedule = function(){
-    document.querySelectorAll('.mini-schedule-input').forEach(function(i){ i.value=''; });
-  };
-  function bindMiniScheduleFilters(){
-    ['miniScheduleClass','miniScheduleYear'].forEach(function(id){
-      var el = byId(id); if(el) el.addEventListener('change', loadMiniSchedule);
-    });
-    var search = byId('miniScheduleSearch');
-    if(search) search.addEventListener('input', function(){
-      var q = search.value.trim();
-      document.querySelectorAll('#miniScheduleTable tbody tr').forEach(function(tr){
-        var text = tr.innerText || tr.textContent;
-        tr.style.display = !q || text.includes(q) ? '' : 'none';
-      });
-    });
-  }
 
   function fillMiniPages(){
-    var app = getApp(); if(!app || !app.state) return;
+    var app = getApp();
+    if(!app || !app.state) return;
     var students = Array.isArray(app.state.students) ? app.state.students : [];
     var classes = Array.isArray(app.state.classes) ? app.state.classes : [];
-    var profile = app.state.pdfProfile || {};
     var txs = Array.isArray(app.state.transactions) ? app.state.transactions : [];
-    var high = students.filter(function(s){ return Number(s.balance || 0) >= 5000; });
-    var low = students.filter(function(s){ return Number(s.balance || 0) < 1000; });
-    var noOps = students.filter(function(s){ return !txs.some(function(t){ return t.studentId === s.id; }); });
-    var penalties = students.filter(function(s){ return txs.filter(function(t){ return t.studentId === s.id && (t.type === 'withdraw' || t.type === 'transfer_out' || (t.amount && Number(t.amount)<0)); }).length >= 2; });
-    var best = students.slice().sort(function(a,b){ return Number(b.balance||0)-Number(a.balance||0); })[0];
-    setText('miniEvalHighNames', namesFor(high)); setText('miniEvalLowNames', namesFor(low)); setText('miniEvalPenaltyNames', namesFor(penalties)); setText('miniEvalNoOpsNames', namesFor(noOps)); setText('miniEvalBestStudent', best ? (best.name || '—') : '—');
-    var attendance = students.length, participation = txs.filter(function(t){ return t.type === 'deposit'; }).length, deductions = txs.filter(function(t){ return t.type === 'withdraw' || t.type === 'transfer_out'; }).length;
-    var result = 'جيدة'; if(participation >= deductions * 2 && participation > 0) result = 'ممتازة'; else if(deductions > participation) result = 'تحتاج تحسين';
-    setText('miniEvalAttendance', attendance.toLocaleString('ar-SA')); setText('miniEvalParticipation', participation.toLocaleString('ar-SA')); setText('miniEvalDeductions', deductions.toLocaleString('ar-SA')); setText('miniEvalResult', result);
-    if(byId('miniSchoolNameInput') && !byId('miniSchoolNameInput').value) byId('miniSchoolNameInput').value = profile.schoolName || '';
-    if(byId('miniTeacherNameInput') && !byId('miniTeacherNameInput').value) byId('miniTeacherNameInput').value = profile.teacherName || '';
-    if(byId('miniTeacherYearsInput') && !byId('miniTeacherYearsInput').value) byId('miniTeacherYearsInput').value = profile.experienceYears || '';
-    if(byId('miniTeacherEmailInput') && !byId('miniTeacherEmailInput').value) byId('miniTeacherEmailInput').value = profile.email || '';
-    var clsSel = byId('supClassFilter'); if(clsSel){ clsSel.innerHTML = '<option value="">كل الفصول</option>' + classes.map(function(c){ return '<option value="'+c.id+'">'+(c.name||'فصل')+'</option>'; }).join(''); }
-    setText('supClasses', classes.length.toLocaleString('ar-SA')); setText('supStudents', students.length.toLocaleString('ar-SA')); setText('supTx', txs.length.toLocaleString('ar-SA')); setText('supMsg', (JSON.parse(localStorage.getItem('mini_parent_records')||'[]').length).toLocaleString('ar-SA'));
-    updateMiniSettingsCompletion(); updateBackupStats(); renderSupervisorReports();
+    var profile = app.state.pdfProfile || {};
+    var totalBalance = 0;
+    students.forEach(function(s){ totalBalance += Number(s.balance || 0); });
+    var near = students.filter(function(s){ return Number(s.balance || 0) >= 9000; }).length;
+    var low = students.filter(function(s){ return Number(s.balance || 0) < 1000; }).length;
+    var tasks = students.filter(function(s){ return Number(s.tasks || 0) === 0; }).length;
+    var inactive = students.filter(function(s){ var st = s.status || s.statusMode || 'مفعل'; return st !== 'مفعل'; }).length;
+
+    setText('miniHomeStudents', students.length.toLocaleString('ar-SA'));
+    setText('miniHomeClasses', classes.length.toLocaleString('ar-SA'));
+    setText('miniHomeBalance', totalBalance.toLocaleString('ar-SA'));
+    setText('miniHomeOps', txs.length.toLocaleString('ar-SA'));
+    setText('miniFollowNear', near.toLocaleString('ar-SA'));
+    setText('miniFollowLow', low.toLocaleString('ar-SA'));
+    setText('miniFollowTasks', tasks.toLocaleString('ar-SA'));
+    setText('miniFollowInactive', inactive.toLocaleString('ar-SA'));
+    setText('miniSchoolName', profile.schoolName || '—');
+    setText('miniTeacherName', profile.teacherName || '—');
+    setText('miniSubject', profile.subject || '—');
+    setText('miniSemester', profile.semester || '—');
+
+    var statement = byId('miniStatementList');
+    if(statement){
+      statement.innerHTML = '';
+      var items = txs.slice(0, 6);
+      if(!items.length){
+        statement.innerHTML = '<div class="empty">لا توجد عمليات بعد.</div>';
+      } else {
+        items.forEach(function(tx){
+          var row = document.createElement('div');
+          row.className = 'mini-page-row';
+          var amount = Number(tx.amount || 0).toLocaleString('ar-SA');
+          var label = tx.type || 'عملية';
+          var reason = tx.reason || 'بدون سبب';
+          row.innerHTML = '<div><strong>' + label + '</strong><div class="tiny">' + reason + '</div></div><div>' + amount + '</div>';
+          statement.appendChild(row);
+        });
+      }
+    }
   }
 
   window.openMiniPage = function(page){
     fillMiniPages();
-    var overlay = byId('miniPagesOverlay'); if(overlay) overlay.classList.add('show');
-    ['follow','messages','settings'].forEach(function(id){ var el = byId('miniPage-' + id); if(el) el.classList.toggle('hide', id !== page); });
+    var overlay = byId('miniPagesOverlay');
+    if(overlay) overlay.classList.add('show');
+    ['home','statement','follow','settings'].forEach(function(id){
+      var el = byId('miniPage-' + id);
+      if(el) el.classList.toggle('hide', id !== page);
+    });
     setActiveNav(page);
-    var title = byId('miniPageTitle'); if(title){ title.textContent = page === 'follow' ? 'المتابعة' : page === 'messages' ? 'التواصل' : 'الإعدادات'; }
-  };
-  window.closeMiniPage = function(){ var overlay = byId('miniPagesOverlay'); if(overlay) overlay.classList.remove('show'); };
-  window.openMiniFollowSubtab = function(id, btn){ ['schedule','evaluation','homework'].forEach(function(s){ var el = byId('miniFollowSubtab-' + s); if(el) el.classList.toggle('hide', s !== id); }); document.querySelectorAll('#miniFollowSubtabs button').forEach(function(b){ b.classList.remove('active'); }); if(btn) btn.classList.add('active'); };
-  window.openMiniSettingsSubtab = function(id, btn){ ['personal','support','sent','survey'].forEach(function(s){ var el = byId('miniSettingsSubtab-' + s); if(el) el.classList.toggle('hide', s !== id); }); document.querySelectorAll('#miniSettingsSubtabs button').forEach(function(b){ b.classList.remove('active'); }); if(btn) btn.classList.add('active'); };
-
-  function bindMiniNav(){ document.querySelectorAll('#miniPhoneNav [data-mini-page]').forEach(function(btn){ if(btn.dataset.boundMini==='1') return; btn.dataset.boundMini='1'; btn.onclick = function(){ openMiniPage(btn.getAttribute('data-mini-page')); }; }); }
-  function bindHeroShortcuts(){
-    var ids = ['miniHeroBalanceCard','miniTasksCard','miniStudentCard','miniTransactionCard','miniRewardsCard'];
-    ids.forEach(function(id){ var el=byId(id); if(el && !el.dataset.boundShortcut){ el.dataset.boundShortcut='1'; el.onclick=function(){ toast('سيتم تفعيل هذا القسم لاحقًا حسب الإعدادات'); }; }});
-    var backupBtn = byId('quickAddDemoBtn'); if(backupBtn) backupBtn.onclick = function(){ openBackupOverlay(); };
-    var supBtn = byId('jumpToTeacherBtn'); if(supBtn) supBtn.onclick = function(){ openSupervisorOverlay(); };
-  }
-
-  function bindFileName(id){ var input=byId(id); if(!input) return; input.addEventListener('change', function(){ var box=byId(id.startsWith('mini') ? 'miniSelectedFileName' : 'selectedFileName'); if(box){ box.textContent = input.files && input.files.length ? Array.from(input.files).map(function(f){ return f.name; }).join(' ، ') : 'لم يتم تحديد أي ملف'; } }); }
-  function updateMiniSettingsCompletion(){
-    var personalIds=['miniSchoolNameInput','miniTeacherNameInput','miniTeacherRankInput','miniTeacherYearsInput','miniTeacherEmailInput'];
-    var personalDone=personalIds.every(function(id){ var el=byId(id); return el && String(el.value||'').trim()!==''; });
-    var surveyAnswers=Array.from(document.querySelectorAll('.miniSurveyAnswer'));
-    var surveyDone=surveyAnswers.length>0 && surveyAnswers.every(function(el){ return String(el.value||'').trim()!==''; });
-    var percent=0; if(personalDone) percent+=50; if(surveyDone) percent+=50;
-    var bar=byId('miniSettingsCompletionBar'), txt=byId('miniSettingsCompletionText'); if(bar) bar.style.width=percent+'%'; if(txt) txt.textContent='اكتمال الملف: '+percent+'%';
-  }
-  window.saveMiniPersonalSettings=function(){ updateMiniSettingsCompletion(); if(window.app&&window.app.state){ window.app.state.pdfProfile=window.app.state.pdfProfile||{}; window.app.state.pdfProfile.schoolName=byId('miniSchoolNameInput').value.trim(); window.app.state.pdfProfile.teacherName=byId('miniTeacherNameInput').value.trim(); window.app.state.pdfProfile.experienceYears=byId('miniTeacherYearsInput').value.trim(); window.app.state.pdfProfile.email=byId('miniTeacherEmailInput').value.trim(); if(window.app.save) window.app.save(); } toast('تم حفظ البيانات الشخصية'); };
-  window.saveMiniSurveySettings=function(){ updateMiniSettingsCompletion(); toast('تم إرسال الاستبيان'); };
-  window.sendMiniSupport=function(){ var msg=byId('miniSupportMessage'); if(!msg || !msg.value.trim()) return toast('اكتبي رسالة الدعم الفني أولاً'); toast('تم إرسال طلب الدعم الفني'); };
-  window.sendMiniSupportLetter=function(){ var title=byId('miniSupportLetterTitle'); if(!title || !title.value.trim()) return toast('اكتبي عنوان الخطاب أولاً'); toast('تم إرسال الخطاب'); };
-  window.saveMiniWeights=function(){
-    var data={weekly:byId('miniWeightWeekly').value,monthly:byId('miniWeightMonthly').value,participation:byId('miniWeightParticipation').value,monthlyParticipation:byId('miniWeightMonthlyParticipation').value,higher:byId('miniWeightHigher').value,enrichment:byId('miniWeightEnrichment').value};
-    localStorage.setItem('mini_homework_weights', JSON.stringify(data));
-    toast('تم حفظ أوزان النقاط');
-  };
-  function loadMiniWeights(){ try{ var d=JSON.parse(localStorage.getItem('mini_homework_weights')||'null'); if(!d) return; byId('miniWeightWeekly').value=d.weekly||10; byId('miniWeightMonthly').value=d.monthly||25; byId('miniWeightParticipation').value=d.participation||5; byId('miniWeightMonthlyParticipation').value=d.monthlyParticipation||8; byId('miniWeightHigher').value=d.higher||12; byId('miniWeightEnrichment').value=d.enrichment||7; }catch(e){} }
-  window.saveMiniParentData=function(){
-    var rec={student:byId('miniParentStudentName').value.trim(), parent:byId('miniParentName').value.trim(), className:byId('miniParentClass').value.trim(), phone:byId('miniParentPhone').value.trim(), at:new Date().toISOString()};
-    if(!rec.student || !rec.parent || !rec.phone) return toast('أكملي بيانات ولي الأمر');
-    var arr=JSON.parse(localStorage.getItem('mini_parent_records')||'[]'); arr.push(rec); localStorage.setItem('mini_parent_records', JSON.stringify(arr)); toast('تم حفظ بيانات ولي الأمر'); fillMiniPages();
+    var title = byId('miniPageTitle');
+    if(title){
+      if(page === 'home') title.textContent = 'الرئيسية';
+      else if(page === 'statement') title.textContent = 'الكشف';
+      else if(page === 'follow') title.textContent = 'المتابعة';
+      else title.textContent = 'الإعدادات';
+    }
   };
 
-  window.openSupervisorOverlay=function(){ byId('supervisorOverlay').classList.add('show'); byId('supervisorLoginCard').classList.remove('hide'); byId('supervisorContent').classList.add('hide'); };
-  window.closeSupervisorOverlay=function(){ byId('supervisorOverlay').classList.remove('show'); };
-  window.loginSupervisor=function(){ var pin=byId('supervisorPin').value.trim(); if(pin!=='1234') return toast('الرقم السري غير صحيح'); byId('supervisorLoginCard').classList.add('hide'); byId('supervisorContent').classList.remove('hide'); renderSupervisorReports(); };
-  window.openSupervisorTab=function(id, btn){ ['bank','tasks','roulette','messages','certificate'].forEach(function(s){ var el=byId('supTab-'+s); if(el) el.classList.toggle('hide', s!==id); }); btn.parentElement.querySelectorAll('button').forEach(function(b){ b.classList.remove('active'); }); btn.classList.add('active'); };
-  function renderSupervisorReports(){
-    var app=getApp(); if(!app||!app.state) return; var classes=app.state.classes||[]; var students=app.state.students||[]; var txs=app.state.transactions||[]; var tasks=app.state.tasks||[]; var rewardCount=(app.state.rewards||[]).length; var parents=JSON.parse(localStorage.getItem('mini_parent_records')||'[]');
-    var bank=byId('supBankReport'); if(bank){ var q=(byId('supSearch')&&byId('supSearch').value.trim())||''; var cls=(byId('supClassFilter')&&byId('supClassFilter').value)||''; var filteredTx=txs.filter(function(t){ var s=students.find(function(st){ return st.id===t.studentId; }); var ok=!cls || (s&&s.classId===cls); var text=((t.reason||'')+' '+(s?s.name:'')).trim(); return ok && (!q || text.includes(q)); }); bank.innerHTML = filteredTx.slice(0,20).map(function(t){ var s=students.find(function(st){ return st.id===t.studentId; }); return '<div class="mini-page-row"><span>'+(s?s.name:'طالب')+' — '+(t.reason||'بدون سبب')+'</span><strong>'+(t.amount||0)+'</strong></div>'; }).join('') || '<div class="note-box">لا توجد بيانات حالياً</div>'; }
-    var taskBox=byId('supTasksReport'); if(taskBox){ taskBox.innerHTML='<div class="mini-page-row"><span>عدد المهام</span><strong>'+tasks.length+'</strong></div><div class="mini-page-row"><span>المهام المسلمة وغير المسلمة</span><strong>متاح للعرض لاحقًا</strong></div>'; }
-    var roul=byId('supRouletteReport'); if(roul){ roul.innerHTML='<div class="mini-page-row"><span>عدد جوائز الروليت</span><strong>'+rewardCount+'</strong></div>'; }
-    var msgBox=byId('supMessagesReport'); if(msgBox){ msgBox.innerHTML=parents.map(function(p){ return '<div class="mini-page-row"><span>'+p.student+' / '+p.parent+'</span><strong>'+p.phone+'</strong></div>'; }).join('') || '<div class="note-box">لا توجد رسائل محفوظة</div>'; }
+  window.closeMiniPage = function(){
+    var overlay = byId('miniPagesOverlay');
+    if(overlay) overlay.classList.remove('show');
+    var btns = document.querySelectorAll('#miniPhoneNav [data-mini-page]');
+    btns.forEach(function(btn){ btn.classList.remove('active'); });
+  };
+
+  function bindMiniNav(){
+    var btns = document.querySelectorAll('#miniPhoneNav [data-mini-page]');
+    btns.forEach(function(btn){
+      if(btn.dataset.boundMini === '1') return;
+      btn.dataset.boundMini = '1';
+      btn.onclick = function(){ openMiniPage(btn.getAttribute('data-mini-page')); };
+    });
   }
 
-  window.openBackupOverlay=function(){ byId('backupOverlay').classList.add('show'); updateBackupStats(); };
-  window.closeBackupOverlay=function(){ byId('backupOverlay').classList.remove('show'); };
-  function backupPayload(){ var app=getApp(); return JSON.stringify(app&&app.state?app.state:{}, null, 2); }
-  function updateBackupStats(){ var app=getApp(); var state=(app&&app.state)||{}; var count=(state.students||[]).length+(state.transactions||[]).length+(state.classes||[]).length; setText('backupCount', String(count)); setText('backupLast', localStorage.getItem('mini_backup_last') || '—'); }
-  window.createLocalBackup=function(){ localStorage.setItem('mini_backup_blob', backupPayload()); localStorage.setItem('mini_backup_last', new Date().toLocaleString('ar-SA')); updateBackupStats(); toast('تم إنشاء نسخة احتياطية'); };
-  window.downloadLocalBackup=function(){ var data=localStorage.getItem('mini_backup_blob')||backupPayload(); var blob=new Blob([data],{type:'application/json'}); var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='masraf-backup.json'; a.click(); URL.revokeObjectURL(a.href); };
+  document.addEventListener('DOMContentLoaded', function(){
+    setTimeout(bindMiniNav, 200);
+    setTimeout(fillMiniPages, 600);
+  });
 
-  document.addEventListener('DOMContentLoaded', function(){ setTimeout(function(){ bindMiniNav(); bindHeroShortcuts(); fillMiniPages(); bindMiniScheduleFilters(); loadMiniWeights(); }, 250); ['miniGalleryInput','miniCameraInput','miniFileInput','miniCloudInput'].forEach(bindFileName); document.addEventListener('input', function(e){ if((e.target && (e.target.id||'').startsWith('mini')) || e.target.classList.contains('miniSurveyAnswer')) updateMiniSettingsCompletion(); }); document.addEventListener('change', function(e){ if((e.target && (e.target.id||'').startsWith('mini')) || e.target.classList.contains('miniSurveyAnswer')) updateMiniSettingsCompletion(); if(e.target && (e.target.id==='supClassFilter' || e.target.id==='supSearch')) renderSupervisorReports(); }); });
-  if(window.app && typeof window.app.renderAll === 'function'){ var oldRenderAll = window.app.renderAll.bind(window.app); window.app.renderAll = function(){ oldRenderAll(); setTimeout(function(){ bindMiniNav(); bindHeroShortcuts(); fillMiniPages(); loadMiniWeights(); }, 60); }; }
+  if(window.app && typeof window.app.renderAll === 'function'){
+    var oldRenderAll = window.app.renderAll.bind(window.app);
+    window.app.renderAll = function(){
+      oldRenderAll();
+      setTimeout(function(){ bindMiniNav(); fillMiniPages(); }, 60);
+    };
+  }
 })();
 </script>
 
 
+<div id="supervisorLoginOverlay" class="mini-page-overlay">
+  <div class="mini-page-shell">
+    <div class="mini-page-head">
+      <button class="mini-back-btn" onclick="closeSupervisorLogin()">رجوع</button>
+      <h3 style="margin:0;color:var(--green-3)">التقييم والإشراف المدرسي</h3>
+    </div>
+    <div id="supervisorLoginCard" class="mini-page-card">
+      <div class="note-box" style="margin-bottom:12px">🔒 صلاحية عرض فقط — لا يمكن التعديل أو الحذف أو تنفيذ أي عملية داخل المصرف.</div>
+      <div class="grid-2">
+        <div class="field">
+          <label>نوع الدخول</label>
+          <select id="supervisorRole" class="select">
+            <option value="manager">مدير / مديرة</option>
+            <option value="supervisor">مشرف / مشرفة</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>الرقم السري</label>
+          <input id="supervisorPin" type="password" class="input" placeholder="أدخلي الرقم السري">
+        </div>
+      </div>
+      <div class="actions-row" style="margin-top:12px">
+        <button class="btn primary" onclick="loginSupervisor()">دخول</button>
+      </div>
+      <div class="tiny" style="margin-top:8px">الأرقام الافتراضية للتجربة: المدير/ة 1111 — المشرف/ة 2222</div>
+    </div>
+    <div id="supervisorPanel" class="mini-page-card hide">
+      <div class="note-box" style="margin-bottom:12px">🔒 وضع الإشراف — عرض وتقارير فقط</div>
+      <div class="subtabs" id="supervisorSubtabs">
+        <button class="small-btn active" onclick="openSupervisorSubtab('bank', this)">الحساب المصرفي</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('tasks', this)">المهام الأدائية</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('messages', this)">الرسائل</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('evaluation', this)">التقييم</button>
+        <button class="small-btn" onclick="openSupervisorSubtab('certificate', this)">شهادة شكر</button>
+      </div>
+      <div id="supervisorSubtab-bank">
+        <div id="supBankReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+      <div id="supervisorSubtab-tasks" class="hide">
+        <div id="supTasksReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+      <div id="supervisorSubtab-messages" class="hide">
+        <div id="supMessagesReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+      <div id="supervisorSubtab-evaluation" class="hide">
+        <div id="supEvaluationReport" class="mini-page-card" style="margin-top:12px"></div>
+      </div>
+      <div id="supervisorSubtab-certificate" class="hide">
+        <div class="grid-2">
+          <div class="field"><label>اسم الطالب / الطالبة</label><input id="supCertStudent" class="input" placeholder="اسم الطالب / الطالبة"></div>
+          <div class="field"><label>الفصل</label><input id="supCertClass" class="input" placeholder="الفصل"></div>
+          <div class="field"><label>عنوان الشهادة</label><input id="supCertTitle" class="input" placeholder="عنوان الشهادة"></div>
+          <div class="field"><label>وسيلة الإرسال</label><select id="supCertSendType" class="select"><option>واتساب</option><option>بريد إلكتروني</option></select></div>
+        </div>
+        <div class="field" style="margin-top:10px"><label>نص الشهادة</label><textarea id="supCertText" class="textarea" placeholder="اكتبي نص شهادة الشكر"></textarea></div>
+        <div class="field" style="margin-top:10px"><label>رفع شهادة شكر</label><input id="supCertFile" type="file" class="input" accept=".pdf,.jpg,.jpeg,.png"></div>
+        <div class="actions-row" style="margin-top:12px"><button class="btn primary" onclick="sendSupervisorCertificate()">إرسال الشهادة</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script id="oai-fix-support-supervisor">
+(function(){
+  function byId(id){ return document.getElementById(id); }
+  function say(msg){
+    try{
+      if(window.app && typeof window.app.toast === 'function'){ window.app.toast(msg); return; }
+    }catch(e){}
+    alert(msg);
+  }
+
+  function renderSentSupportList(){
+    var box = byId('miniSentSupportList');
+    if(!box) return;
+    var msgs = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    var letters = JSON.parse(localStorage.getItem('support_letters') || '[]');
+    var rows = [];
+
+    msgs.forEach(function(item, idx){
+      rows.push(
+        '<div class="mini-page-row" style="display:block">' +
+          '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center">' +
+            '<span><strong>نوع الرسالة:</strong> دعم فني</span>' +
+            '<strong>' + (item.date || '—') + '</strong>' +
+          '</div>' +
+          '<div class="tiny" style="margin-top:6px"><strong>العنوان:</strong> طلب دعم فني</div>' +
+          '<div class="tiny" style="margin-top:4px"><strong>الحالة:</strong> ' + (item.status || 'مرسلة بنجاح') + '</div>' +
+          '<div class="tiny" style="margin-top:6px">' + (item.content || item.message || '') + '</div>' +
+          '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">' +
+            '<button class="small-btn" onclick="editSupportMessage(' + idx + ')">تعديل</button>' +
+            '<button class="small-btn" onclick="resendSupportMessage(' + idx + ')">إرسال مرة أخرى</button>' +
+          '</div>' +
+        '</div>'
+      );
+    });
+
+    letters.forEach(function(item, idx){
+      rows.push(
+        '<div class="mini-page-row" style="display:block">' +
+          '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center">' +
+            '<span><strong>نوع الرسالة:</strong> خطاب</span>' +
+            '<strong>' + (item.date || '—') + '</strong>' +
+          '</div>' +
+          '<div class="tiny" style="margin-top:6px"><strong>العنوان:</strong> ' + (item.title || 'إرسال خطاب للدعم الفني') + '</div>' +
+          '<div class="tiny" style="margin-top:4px"><strong>الحالة:</strong> ' + (item.status || 'مرسلة بنجاح') + '</div>' +
+          '<div class="tiny" style="margin-top:4px">' + (item.content || '') + '</div>' +
+          '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">' +
+            '<button class="small-btn" onclick="editSupportLetter(' + idx + ')">تعديل</button>' +
+            '<button class="small-btn" onclick="resendSupportLetter(' + idx + ')">إرسال مرة أخرى</button>' +
+          '</div>' +
+        '</div>'
+      );
+    });
+
+    box.innerHTML = rows.length ? rows.join('') : '<div class="mini-page-row"><span>لا توجد رسائل مرسلة للدعم الفني</span><strong>—</strong></div>';
+  }
+
+  window.sendMiniSupport = function(){
+    var msgEl = byId('miniSupportMessage');
+    var msg = msgEl ? String(msgEl.value || '').trim() : '';
+    if(!msg){ say('يرجى كتابة وصف المشكلة أولًا'); return; }
+
+    var typeReq = document.querySelector('#miniSettingsSubtab-support select') ? document.querySelector('#miniSettingsSubtab-support select').value : 'استفسار';
+    var priorityEls = document.querySelectorAll('#miniSettingsSubtab-support select');
+    var priority = priorityEls && priorityEls.length > 1 ? priorityEls[1].value : 'عادية';
+    var teacher = byId('miniTeacherNameInput') ? byId('miniTeacherNameInput').value.trim() : 'اسم المعلمة / الجهة';
+
+    var fullMessage =
+`طلب دعم فني
+
+السلام عليكم ورحمة الله وبركاته،
+نفيدكم بوجود ملاحظة/مشكلة فنية في النظام، ونأمل منكم التكرم بمراجعتها ومعالجتها في أقرب وقت ممكن.
+تم إرفاق التفاصيل اللازمة أدناه:
+• نوع الطلب: ${typeReq}
+• مستوى الأولوية: ${priority}
+• وصف المشكلة: ${msg}
+
+شاكرين لكم تعاونكم،
+${teacher || 'اسم المعلمة / الجهة'}`;
+
+    var list = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    list.push({
+      title: 'طلب دعم فني',
+      message: msg,
+      content: fullMessage,
+      date: new Date().toLocaleString('ar-SA'),
+      status: 'مرسلة بنجاح'
+    });
+    localStorage.setItem('support_messages', JSON.stringify(list));
+    if(msgEl) msgEl.value = '';
+    renderSentSupportList();
+    say('تم إرسال طلب الدعم الفني بنجاح، وسيتم مراجعته في أقرب وقت ممكن.');
+  };
+
+  window.sendMiniSupportLetter = function(){
+    var titleEl = byId('miniSupportLetterTitle');
+    var descEl = byId('miniSupportLetterDesc');
+    var title = titleEl ? String(titleEl.value || '').trim() : '';
+    var desc = descEl ? String(descEl.value || '').trim() : '';
+    var fileName = byId('miniSelectedFileName') ? String(byId('miniSelectedFileName').textContent || '').trim() : 'بدون ملف';
+    var clientSelects = document.querySelectorAll('#miniSettingsSubtab-support select');
+    var client = clientSelects && clientSelects.length > 2 ? clientSelects[2].value : 'اسم العميل';
+    var teacher = byId('miniTeacherNameInput') ? byId('miniTeacherNameInput').value.trim() : 'اسم المعلمة / الجهة';
+    if(!title){ say('اكتبي عنوان الخطاب أولًا'); return; }
+
+    var fullMessage =
+`إرسال خطاب للدعم الفني
+
+السلام عليكم ورحمة الله وبركاته،
+نرفق لكم خطابًا متعلقًا بالملاحظة الفنية المسجلة في النظام، ونأمل الاطلاع عليه واتخاذ اللازم.
+
+بيانات الخطاب:
+• العميل/الجهة المعنية: ${client || 'اسم العميل'}
+• عنوان الخطاب: ${title}
+• وصف مختصر: ${desc || '—'}
+• المرفق: ${fileName}
+
+وتفضلوا بقبول خالص الشكر والتقدير،
+${teacher || 'اسم المعلمة / الجهة'}`;
+
+    var list = JSON.parse(localStorage.getItem('support_letters') || '[]');
+    list.push({
+      title: title,
+      desc: desc,
+      file: fileName,
+      content: fullMessage,
+      date: new Date().toLocaleString('ar-SA'),
+      status: 'مرسلة بنجاح'
+    });
+    localStorage.setItem('support_letters', JSON.stringify(list));
+    if(titleEl) titleEl.value = '';
+    if(descEl) descEl.value = '';
+    if(byId('miniSelectedFileName')) byId('miniSelectedFileName').textContent = 'لم يتم تحديد أي ملف';
+    renderSentSupportList();
+    say('تم إرسال الخطاب بنجاح وإرفاقه ضمن سجل الدعم الفني.');
+  };
+
+  window.editSupportMessage = function(idx){
+    var msgs = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    var item = msgs[idx];
+    if(!item) return;
+    if(typeof window.openMiniSettingsSubtab === 'function'){
+      var btn = document.querySelector('#miniSettingsSubtabs button:nth-child(2)');
+      window.openMiniSettingsSubtab('support', btn);
+    }
+    var field = byId('miniSupportMessage');
+    if(field) field.value = item.message || '';
+    say('تم تحميل الرسالة للتعديل');
+  };
+
+  window.resendSupportMessage = function(idx){
+    var msgs = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    var item = msgs[idx];
+    if(!item) return;
+    msgs.push({
+      title: item.title || 'طلب دعم فني',
+      message: item.message,
+      content: item.content,
+      date: new Date().toLocaleString('ar-SA'),
+      status: 'تمت إعادة الإرسال'
+    });
+    localStorage.setItem('support_messages', JSON.stringify(msgs));
+    renderSentSupportList();
+    say('تمت إعادة إرسال رسالة الدعم الفني بنجاح.');
+  };
+
+  window.editSupportLetter = function(idx){
+    var letters = JSON.parse(localStorage.getItem('support_letters') || '[]');
+    var item = letters[idx];
+    if(!item) return;
+    if(typeof window.openMiniSettingsSubtab === 'function'){
+      var btn = document.querySelector('#miniSettingsSubtabs button:nth-child(2)');
+      window.openMiniSettingsSubtab('support', btn);
+    }
+    var titleEl = byId('miniSupportLetterTitle');
+    var descEl = byId('miniSupportLetterDesc');
+    if(titleEl) titleEl.value = item.title || '';
+    if(descEl) descEl.value = item.desc || '';
+    if(byId('miniSelectedFileName')) byId('miniSelectedFileName').textContent = item.file || 'لم يتم تحديد أي ملف';
+    say('تم تحميل الخطاب للتعديل');
+  };
+
+  window.resendSupportLetter = function(idx){
+    var letters = JSON.parse(localStorage.getItem('support_letters') || '[]');
+    var item = letters[idx];
+    if(!item) return;
+    letters.push({
+      title: item.title,
+      desc: item.desc,
+      file: item.file,
+      content: item.content,
+      date: new Date().toLocaleString('ar-SA'),
+      status: 'تمت إعادة الإرسال'
+    });
+    localStorage.setItem('support_letters', JSON.stringify(letters));
+    renderSentSupportList();
+    say('تمت إعادة إرسال الخطاب بنجاح.');
+  };
+
+  window.openSupervisorLogin = function(){
+    var overlay = byId('supervisorLoginOverlay');
+    if(overlay) overlay.classList.add('show');
+  };
+  window.closeSupervisorLogin = function(){
+    var overlay = byId('supervisorLoginOverlay');
+    if(overlay) overlay.classList.remove('show');
+  };
+
+  window.loginSupervisor = function(){
+    var pinEl = byId('supervisorPin');
+    var roleEl = byId('supervisorRole');
+    var pin = pinEl ? String(pinEl.value || '').trim() : '';
+    var role = roleEl ? String(roleEl.value || '') : '';
+    var ok = false;
+    if(role === 'manager' and False): pass
+    if(role === 'manager' && pin === '1111') ok = true;
+    if(role === 'supervisor' && pin === '2222') ok = true;
+    if(!ok){ say('الرقم السري غير صحيح'); return; }
+
+    var loginCard = byId('supervisorLoginCard');
+    var panel = byId('supervisorPanel');
+    if(loginCard) loginCard.classList.add('hide');
+    if(panel) panel.classList.remove('hide');
+    say('تم الدخول إلى لوحة الإشراف');
+    try{ if(typeof renderSupervisorReports === 'function') renderSupervisorReports(); }catch(e){}
+  };
+
+  window.closeSupervisorPanel = function(){
+    var panel = byId('supervisorPanel');
+    var loginCard = byId('supervisorLoginCard');
+    if(panel) panel.classList.add('hide');
+    if(loginCard) loginCard.classList.remove('hide');
+    closeSupervisorLogin();
+  };
+
+  window.openSupervisorSubtab = function(id, btn){
+    ['bank','tasks','messages','evaluation','certificate'].forEach(function(s){
+      var el = byId('supervisorSubtab-' + s);
+      if(el) el.classList.toggle('hide', s !== id);
+    });
+    document.querySelectorAll('#supervisorSubtabs button').forEach(function(b){ b.classList.remove('active'); });
+    if(btn) btn.classList.add('active');
+  };
+
+  window.renderSupervisorReports = function(){
+    var students = [];
+    var txs = [];
+    var tasks = [];
+    var msgs = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    try{
+      if(window.app && window.app.state){
+        students = window.app.state.students || [];
+        txs = window.app.state.transactions || [];
+        tasks = window.app.state.tasks || [];
+      }
+    }catch(e){}
+    var bank = byId('supBankReport');
+    if(bank){
+      var rows = txs.slice(0,20).map(function(tx){
+        var st = students.find(function(s){ return s.id === tx.studentId; });
+        return '<div class="mini-page-row"><span>' + (tx.date || tx.createdAt || '—') + ' | ' + (st ? st.name : 'بدون اسم') + ' | ' + (tx.type || 'عملية') + ' | ' + (tx.reason || 'بدون سبب') + '</span><strong>' + Number(tx.amount || 0).toLocaleString('ar-SA') + '</strong></div>';
+      }).join('');
+      bank.innerHTML = rows || '<div class="mini-page-row"><span>لا توجد عمليات</span><strong>—</strong></div>';
+    }
+    var taskBox = byId('supTasksReport');
+    if(taskBox){
+      var rows = tasks.map(function(t){
+        return '<div class="mini-page-row"><span>' + (t.title || 'مهمة') + ' | ' + (t.className || t.classId || '—') + ' | ' + (t.date || '—') + '</span><strong>' + (t.submitted ? 'مسلّمة' : 'غير مسلّمة') + '</strong></div>';
+      }).join('');
+      taskBox.innerHTML = rows || '<div class="mini-page-row"><span>لا توجد مهام</span><strong>—</strong></div>';
+    }
+    var msgBox = byId('supMessagesReport');
+    if(msgBox){
+      var rows = msgs.map(function(m){
+        return '<div class="mini-page-row"><span>' + (m.date || '—') + ' | ' + (m.title || 'طلب دعم فني') + '</span><strong>' + (m.status || 'مرسلة بنجاح') + '</strong></div>';
+      }).join('');
+      msgBox.innerHTML = rows || '<div class="mini-page-row"><span>لا توجد رسائل</span><strong>—</strong></div>';
+    }
+    var evalBox = byId('supEvaluationReport');
+    if(evalBox){
+      var high = students.filter(function(s){ return Number(s.balance||0) >= 5000; }).map(function(s){ return s.name; }).slice(0,6).join('، ') || '—';
+      var low = students.filter(function(s){ return Number(s.balance||0) < 1000; }).map(function(s){ return s.name; }).slice(0,6).join('، ') || '—';
+      evalBox.innerHTML =
+        '<div class="mini-page-row"><span>طلاب متميزون</span><strong>' + high + '</strong></div>' +
+        '<div class="mini-page-row"><span>طلاب منخفضون</span><strong>' + low + '</strong></div>' +
+        '<div class="mini-page-row"><span>تاريخ التقرير</span><strong>' + new Date().toLocaleDateString('ar-SA') + '</strong></div>';
+    }
+  };
+
+  function bindButtons(){
+    document.querySelectorAll('button').forEach(function(btn){
+      var t = String(btn.textContent || '').trim();
+      if(t === 'إرسال للدعم الفني'){
+        btn.onclick = function(e){ if(e) e.preventDefault(); window.sendMiniSupport(); };
+      }
+      if(t === 'إرسال الخطاب'){
+        btn.onclick = function(e){ if(e) e.preventDefault(); window.sendMiniSupportLetter(); };
+      }
+      if(t === 'دخول'){
+        if(btn.closest('#supervisorLoginCard')){
+          btn.onclick = function(e){ if(e) e.preventDefault(); window.loginSupervisor(); };
+        }
+      }
+    });
+
+    var supEntry = byId('jumpToTeacherBtn');
+    if(supEntry){
+      supEntry.onclick = function(e){ if(e) e.preventDefault(); window.openSupervisorLogin(); };
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    bindButtons();
+    renderSentSupportList();
+  });
+  setTimeout(function(){
+    bindButtons();
+    renderSentSupportList();
+  }, 800);
+})();
+</script>
 
 </body>
 </html>
