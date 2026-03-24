@@ -1785,10 +1785,11 @@
       <div id="supervisorSubtab-evaluation" class="hide">
         <div id="supEvaluationReport" class="mini-page-card" style="margin-top:12px"></div>
       </div>
-      <div id="supervisorSubtab-certificate" class="hide">
+      
+<div id="supervisorSubtab-certificate" class="hide">
         <div class="grid-2">
           <div class="field"><label>اسم المعلم / المعلمة</label><input id="supCertTeacher" class="input" placeholder="اسم المعلم / المعلمة"></div>
-          <div class="field"><label>المادة</label><select id="supCertSubject" class="select"><option>اختر المادة</option><option>لغتي</option><option>الرياضيات</option><option>العلوم</option><option>الدراسات الإسلامية</option><option>الدراسات الاجتماعية</option><option>المهارات الرقمية</option><option>اللغة الإنجليزية</option><option>التربية الفنية</option><option>التربية البدنية</option><option>المهارات الحياتية والأسرية</option><option>التوحيد</option><option>الفقه</option><option>الحديث</option><option>التفسير</option><option>القرآن الكريم</option><option>الاجتماعيات</option><option>الحاسب</option><option>التفكير الناقد</option><option>المواطنة الرقمية</option><option>الكيمياء</option><option>الفيزياء</option><option>الأحياء</option><option>التاريخ</option><option>الجغرافيا</option><option>الاقتصاد</option><option>الإدارة</option><option>الأمن السيبراني</option><option>الصحة والحياة</option><option>الإحصاء</option><option>البيئة</option><option>التصميم الهندسي</option><option>علوم الأرض والفضاء</option></select></div>
+          <div class="field"><label>المادة</label><select id="supCertSubject" class="select"><option>اختر المادة</option><option>لغتي</option><option>الرياضيات</option><option>العلوم</option><option>الدراسات الإسلامية</option><option>الدراسات الاجتماعية</option><option>اللغة الإنجليزية</option><option>التربية الفنية</option><option>التربية البدنية</option><option>المهارات الحياتية والأسرية</option><option>المهارات الرقمية</option><option>القرآن الكريم</option><option>التوحيد</option><option>الفقه</option><option>الحديث</option><option>التفسير</option><option>الحاسب</option><option>الاجتماعيات</option><option>التفكير الناقد</option><option>الكيمياء</option><option>الفيزياء</option><option>الأحياء</option><option>التاريخ</option><option>الجغرافيا</option><option>الإحصاء</option><option>الأمن السيبراني</option><option>الصحة والحياة</option><option>البيئة</option><option>التصميم الهندسي</option><option>علوم الأرض والفضاء</option><option>إدارة الأعمال</option><option>المواطنة الرقمية</option></select></div>
           <div class="field"><label>عنوان الشهادة</label><input id="supCertTitle" class="input" placeholder="عنوان الشهادة"></div>
           <div class="field"><label>وسيلة الإرسال</label><select id="supCertSendType" class="select"><option>واتساب</option><option>بريد إلكتروني</option></select></div>
         </div>
@@ -1797,6 +1798,7 @@
         <div class="actions-row" style="margin-top:12px"><button class="btn primary" onclick="sendSupervisorCertificate()">إرسال الشهادة</button></div>
       </div>
       <div id="supervisorSubtab-homemail" class="hide">
+
         <div class="mini-page-card" style="margin-top:12px">
           <h4 style="margin:0 0 10px">📬 البريد المنزلي</h4>
           <div class="note-box" style="margin-bottom:12px">يظهر هنا سجل الرسائل المرسلة إلى أولياء الأمور مع نص الرسالة كاملًا.</div>
@@ -2144,7 +2146,10 @@ ${teacher || 'اسم المعلمة / الجهة'}`;
     var teacher = byId('supCertTeacher') ? String(byId('supCertTeacher').value || '').trim() : '';
     var subject = byId('supCertSubject') ? String(byId('supCertSubject').value || '').trim() : '';
     var title = byId('supCertTitle') ? String(byId('supCertTitle').value || '').trim() : '';
-    if(!teacher || !subject || !title){ say('أكملي بيانات الشهادة أولًا'); return; }
+    if(!teacher || !subject || subject === 'اختر المادة' || !title){
+      say('أكملي اسم المعلم / المعلمة والمادة وعنوان الشهادة أولًا');
+      return;
+    }
     say('تم تجهيز إرسال شهادة الشكر');
   };
 
