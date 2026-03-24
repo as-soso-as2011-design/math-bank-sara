@@ -1775,6 +1775,12 @@
       </div>
       <div id="supervisorSubtab-bank">
         <div id="supBankReport" class="mini-page-card" style="margin-top:12px"></div>
+        <div class="mini-page-card" style="margin-top:12px">
+          <h4 style="margin:0 0 10px">📬 البريد المنزلي</h4>
+          <div class="note-box" style="margin-bottom:12px">يظهر هنا سجل الرسائل المرسلة إلى أولياء الأمور مع نص الرسالة كاملًا.</div>
+          <div id="supHomeMailStats" class="mini-page-grid" style="margin-bottom:12px"></div>
+          <div id="supHomeMailReport" class="mini-page-list"></div>
+        </div>
       </div>
       <div id="supervisorSubtab-tasks" class="hide">
         <div id="supTasksReport" class="mini-page-card" style="margin-top:12px"></div>
@@ -2043,22 +2049,32 @@ ${teacher || 'اسم المعلمة / الجهة'}`;
     var students = [];
     var txs = [];
     var tasks = [];
-    var msgs = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    var supportMsgs = JSON.parse(localStorage.getItem('support_messages') || '[]');
+    var parentMsgs = JSON.parse(localStorage.getItem('parent_messages') || '[]');
     try{
       if(window.app && window.app.state){
         students = window.app.state.students || [];
         txs = window.app.state.transactions || [];
         tasks = window.app.state.tasks || [];
+        if(Array.isArray(window.app.state.parentMessages) && window.app.state.parentMessages.length){
+          parentMsgs = window.app.state.parentMessages;
+        }
       }
     }catch(e){}
 
     var bank = byId('supBankReport');
     if(bank){
+      var summary = '<div class="mini-page-grid">' +
+        '<div class="mini-page-stat"><div class="tiny">إجمالي العمليات</div><strong>' + txs.length.toLocaleString('ar-SA') + '</strong></div>' +
+        '<div class="mini-page-stat"><div class="tiny">إجمالي الإيداعات</div><strong>' + txs.filter(function(t){ return t.type === "deposit"; }).length.toLocaleString('ar-SA') + '</strong></div>' +
+        '<div class="mini-page-stat"><div class="tiny">إجمالي السحوبات</div><strong>' + txs.filter(function(t){ return t.type === "withdraw" || t.type === "transfer_out"; }).length.toLocaleString('ar-SA') + '</strong></div>' +
+        '<div class="mini-page-stat"><div class="tiny">عدد الطلاب</div><strong>' + students.length.toLocaleString('ar-SA') + '</strong></div>' +
+      '</div>';
       var rows = txs.slice(0,20).map(function(tx){
         var st = students.find(function(s){ return s.id === tx.studentId; });
         return '<div class="mini-page-row"><span>' + (tx.date || tx.createdAt || '—') + ' | ' + (st ? st.name : 'بدون اسم') + ' | ' + (tx.type || 'عملية') + ' | ' + (tx.reason || 'بدون سبب') + '</span><strong>' + Number(tx.amount || 0).toLocaleString('ar-SA') + '</strong></div>';
       }).join('');
-      bank.innerHTML = rows || '<div class="mini-page-row"><span>لا توجد عمليات</span><strong>—</strong></div>';
+      bank.innerHTML = summary + '<div class="mini-page-list" style="margin-top:12px">' + (rows || '<div class="mini-page-row"><span>لا توجد عمليات</span><strong>—</strong></div>') + '</div>';
     }
 
     var taskBox = byId('supTasksReport');
@@ -2071,7 +2087,7 @@ ${teacher || 'اسم المعلمة / الجهة'}`;
 
     var msgBox = byId('supMessagesReport');
     if(msgBox){
-      var rows = msgs.map(function(m){
+      var rows = supportMsgs.map(function(m){
         return '<div class="mini-page-row"><span>' + (m.date || '—') + ' | ' + (m.title || 'طلب دعم فني') + '</span><strong>' + (m.status || 'مرسلة بنجاح') + '</strong></div>';
       }).join('');
       msgBox.innerHTML = rows || '<div class="mini-page-row"><span>لا توجد رسائل</span><strong>—</strong></div>';
@@ -2085,6 +2101,40 @@ ${teacher || 'اسم المعلمة / الجهة'}`;
         '<div class="mini-page-row"><span>طلاب متميزون</span><strong>' + high + '</strong></div>' +
         '<div class="mini-page-row"><span>طلاب منخفضون</span><strong>' + low + '</strong></div>' +
         '<div class="mini-page-row"><span>تاريخ التقرير</span><strong>' + new Date().toLocaleDateString('ar-SA') + '</strong></div>';
+    }
+
+    var mailStats = byId('supHomeMailStats');
+    var mailReport = byId('supHomeMailReport');
+    if(mailStats){
+      var today = new Date().toLocaleDateString('ar-SA');
+      var todayCount = parentMsgs.filter(function(m){
+        var d = String(m.date || m.createdAt || '');
+        return d.indexOf(today) !== -1;
+      }).length;
+      var types = parentMsgs.filter(function(m){ return String(m.type || '').includes('واتساب'); }).length;
+      mailStats.innerHTML =
+        '<div class="mini-page-stat"><div class="tiny">عدد رسائل البريد المنزلي</div><strong>' + parentMsgs.length.toLocaleString('ar-SA') + '</strong></div>' +
+        '<div class="mini-page-stat"><div class="tiny">رسائل اليوم</div><strong>' + todayCount.toLocaleString('ar-SA') + '</strong></div>' +
+        '<div class="mini-page-stat"><div class="tiny">رسائل واتساب</div><strong>' + types.toLocaleString('ar-SA') + '</strong></div>' +
+        '<div class="mini-page-stat"><div class="tiny">تاريخ التقرير</div><strong>' + today + '</strong></div>';
+    }
+    if(mailReport){
+      if(!parentMsgs.length){
+        mailReport.innerHTML = '<div class="mini-page-row"><span>لا توجد رسائل مرسلة إلى أولياء الأمور</span><strong>—</strong></div>';
+      } else {
+        mailReport.innerHTML = parentMsgs.slice(0,30).map(function(m){
+          return '<div class="mini-page-row" style="display:block">' +
+            '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center">' +
+              '<span><strong>الطالب:</strong> ' + (m.studentName || m.student || '—') + ' | <strong>الفصل:</strong> ' + (m.className || m.classroom || '—') + '</span>' +
+              '<strong>' + (m.date || m.createdAt || '—') + '</strong>' +
+            '</div>' +
+            '<div class="tiny" style="margin-top:6px"><strong>نوع الرسالة:</strong> ' + (m.type || 'البريد المنزلي') + '</div>' +
+            '<div class="tiny" style="margin-top:4px"><strong>الحالة:</strong> ' + (m.status || 'مرسلة بنجاح') + '</div>' +
+            '<div class="tiny" style="margin-top:6px;white-space:pre-line"><strong>نص الرسالة:</strong>
+' + (m.text || m.message || '—') + '</div>' +
+          '</div>';
+        }).join('');
+      }
     }
   };
 
@@ -2137,6 +2187,27 @@ ${teacher || 'اسم المعلمة / الجهة'}`;
     ensureSupportDesc();
     renderSentSupportList();
   }, 700);
+})();
+</script>
+
+
+<script id="oai-home-mail-patch">
+(function(){
+  function syncParentMessages(){
+    try{
+      if(window.app && window.app.state && Array.isArray(window.app.state.parentMessages)){
+        localStorage.setItem('parent_messages', JSON.stringify(window.app.state.parentMessages));
+      }
+    }catch(e){}
+  }
+  document.addEventListener('DOMContentLoaded', function(){
+    syncParentMessages();
+    if(typeof window.renderSupervisorReports === 'function'){ window.renderSupervisorReports(); }
+  });
+  setTimeout(function(){
+    syncParentMessages();
+    if(typeof window.renderSupervisorReports === 'function'){ window.renderSupervisorReports(); }
+  }, 900);
 })();
 </script>
 
@@ -2878,6 +2949,12 @@ function logoutTeacher(){
       </div>
       <div id="supervisorSubtab-bank">
         <div id="supBankReport" class="mini-page-card" style="margin-top:12px"></div>
+        <div class="mini-page-card" style="margin-top:12px">
+          <h4 style="margin:0 0 10px">📬 البريد المنزلي</h4>
+          <div class="note-box" style="margin-bottom:12px">يظهر هنا سجل الرسائل المرسلة إلى أولياء الأمور مع نص الرسالة كاملًا.</div>
+          <div id="supHomeMailStats" class="mini-page-grid" style="margin-bottom:12px"></div>
+          <div id="supHomeMailReport" class="mini-page-list"></div>
+        </div>
       </div>
       <div id="supervisorSubtab-tasks" class="hide">
         <div id="supTasksReport" class="mini-page-card" style="margin-top:12px"></div>
@@ -3243,6 +3320,27 @@ ${teacher || 'اسم المعلمة / الجهة'}`;
 })();
 </script>
 
+
+<script id="oai-home-mail-patch">
+(function(){
+  function syncParentMessages(){
+    try{
+      if(window.app && window.app.state && Array.isArray(window.app.state.parentMessages)){
+        localStorage.setItem('parent_messages', JSON.stringify(window.app.state.parentMessages));
+      }
+    }catch(e){}
+  }
+  document.addEventListener('DOMContentLoaded', function(){
+    syncParentMessages();
+    if(typeof window.renderSupervisorReports === 'function'){ window.renderSupervisorReports(); }
+  });
+  setTimeout(function(){
+    syncParentMessages();
+    if(typeof window.renderSupervisorReports === 'function'){ window.renderSupervisorReports(); }
+  }, 900);
+})();
+</script>
+
 </body>
         </html>
       `);
@@ -3508,6 +3606,12 @@ ${teacher || 'اسم المعلمة / الجهة'}`;
       </div>
       <div id="supervisorSubtab-bank">
         <div id="supBankReport" class="mini-page-card" style="margin-top:12px"></div>
+        <div class="mini-page-card" style="margin-top:12px">
+          <h4 style="margin:0 0 10px">📬 البريد المنزلي</h4>
+          <div class="note-box" style="margin-bottom:12px">يظهر هنا سجل الرسائل المرسلة إلى أولياء الأمور مع نص الرسالة كاملًا.</div>
+          <div id="supHomeMailStats" class="mini-page-grid" style="margin-bottom:12px"></div>
+          <div id="supHomeMailReport" class="mini-page-list"></div>
+        </div>
       </div>
       <div id="supervisorSubtab-tasks" class="hide">
         <div id="supTasksReport" class="mini-page-card" style="margin-top:12px"></div>
@@ -3870,6 +3974,27 @@ ${teacher || 'اسم المعلمة / الجهة'}`;
     ensureSupportDesc();
     renderSentSupportList();
   }, 700);
+})();
+</script>
+
+
+<script id="oai-home-mail-patch">
+(function(){
+  function syncParentMessages(){
+    try{
+      if(window.app && window.app.state && Array.isArray(window.app.state.parentMessages)){
+        localStorage.setItem('parent_messages', JSON.stringify(window.app.state.parentMessages));
+      }
+    }catch(e){}
+  }
+  document.addEventListener('DOMContentLoaded', function(){
+    syncParentMessages();
+    if(typeof window.renderSupervisorReports === 'function'){ window.renderSupervisorReports(); }
+  });
+  setTimeout(function(){
+    syncParentMessages();
+    if(typeof window.renderSupervisorReports === 'function'){ window.renderSupervisorReports(); }
+  }, 900);
 })();
 </script>
 
@@ -4404,6 +4529,12 @@ ${teacher || 'اسم المعلمة / الجهة'}`;
       </div>
       <div id="supervisorSubtab-bank">
         <div id="supBankReport" class="mini-page-card" style="margin-top:12px"></div>
+        <div class="mini-page-card" style="margin-top:12px">
+          <h4 style="margin:0 0 10px">📬 البريد المنزلي</h4>
+          <div class="note-box" style="margin-bottom:12px">يظهر هنا سجل الرسائل المرسلة إلى أولياء الأمور مع نص الرسالة كاملًا.</div>
+          <div id="supHomeMailStats" class="mini-page-grid" style="margin-bottom:12px"></div>
+          <div id="supHomeMailReport" class="mini-page-list"></div>
+        </div>
       </div>
       <div id="supervisorSubtab-tasks" class="hide">
         <div id="supTasksReport" class="mini-page-card" style="margin-top:12px"></div>
@@ -4769,6 +4900,27 @@ ${teacher || 'اسم المعلمة / الجهة'}`;
 })();
 </script>
 
+
+<script id="oai-home-mail-patch">
+(function(){
+  function syncParentMessages(){
+    try{
+      if(window.app && window.app.state && Array.isArray(window.app.state.parentMessages)){
+        localStorage.setItem('parent_messages', JSON.stringify(window.app.state.parentMessages));
+      }
+    }catch(e){}
+  }
+  document.addEventListener('DOMContentLoaded', function(){
+    syncParentMessages();
+    if(typeof window.renderSupervisorReports === 'function'){ window.renderSupervisorReports(); }
+  });
+  setTimeout(function(){
+    syncParentMessages();
+    if(typeof window.renderSupervisorReports === 'function'){ window.renderSupervisorReports(); }
+  }, 900);
+})();
+</script>
+
 </body></html>`);
     w.document.close();
     app.toast('تم تجهيز طباعة قائمة الطلاب PDF');
@@ -4846,6 +4998,12 @@ ${teacher || 'اسم المعلمة / الجهة'}`;
       </div>
       <div id="supervisorSubtab-bank">
         <div id="supBankReport" class="mini-page-card" style="margin-top:12px"></div>
+        <div class="mini-page-card" style="margin-top:12px">
+          <h4 style="margin:0 0 10px">📬 البريد المنزلي</h4>
+          <div class="note-box" style="margin-bottom:12px">يظهر هنا سجل الرسائل المرسلة إلى أولياء الأمور مع نص الرسالة كاملًا.</div>
+          <div id="supHomeMailStats" class="mini-page-grid" style="margin-bottom:12px"></div>
+          <div id="supHomeMailReport" class="mini-page-list"></div>
+        </div>
       </div>
       <div id="supervisorSubtab-tasks" class="hide">
         <div id="supTasksReport" class="mini-page-card" style="margin-top:12px"></div>
@@ -5208,6 +5366,27 @@ ${teacher || 'اسم المعلمة / الجهة'}`;
     ensureSupportDesc();
     renderSentSupportList();
   }, 700);
+})();
+</script>
+
+
+<script id="oai-home-mail-patch">
+(function(){
+  function syncParentMessages(){
+    try{
+      if(window.app && window.app.state && Array.isArray(window.app.state.parentMessages)){
+        localStorage.setItem('parent_messages', JSON.stringify(window.app.state.parentMessages));
+      }
+    }catch(e){}
+  }
+  document.addEventListener('DOMContentLoaded', function(){
+    syncParentMessages();
+    if(typeof window.renderSupervisorReports === 'function'){ window.renderSupervisorReports(); }
+  });
+  setTimeout(function(){
+    syncParentMessages();
+    if(typeof window.renderSupervisorReports === 'function'){ window.renderSupervisorReports(); }
+  }, 900);
 })();
 </script>
 
@@ -5595,6 +5774,12 @@ ${teacher || 'اسم المعلمة / الجهة'}`;
       </div>
       <div id="supervisorSubtab-bank">
         <div id="supBankReport" class="mini-page-card" style="margin-top:12px"></div>
+        <div class="mini-page-card" style="margin-top:12px">
+          <h4 style="margin:0 0 10px">📬 البريد المنزلي</h4>
+          <div class="note-box" style="margin-bottom:12px">يظهر هنا سجل الرسائل المرسلة إلى أولياء الأمور مع نص الرسالة كاملًا.</div>
+          <div id="supHomeMailStats" class="mini-page-grid" style="margin-bottom:12px"></div>
+          <div id="supHomeMailReport" class="mini-page-list"></div>
+        </div>
       </div>
       <div id="supervisorSubtab-tasks" class="hide">
         <div id="supTasksReport" class="mini-page-card" style="margin-top:12px"></div>
@@ -5957,6 +6142,27 @@ ${teacher || 'اسم المعلمة / الجهة'}`;
     ensureSupportDesc();
     renderSentSupportList();
   }, 700);
+})();
+</script>
+
+
+<script id="oai-home-mail-patch">
+(function(){
+  function syncParentMessages(){
+    try{
+      if(window.app && window.app.state && Array.isArray(window.app.state.parentMessages)){
+        localStorage.setItem('parent_messages', JSON.stringify(window.app.state.parentMessages));
+      }
+    }catch(e){}
+  }
+  document.addEventListener('DOMContentLoaded', function(){
+    syncParentMessages();
+    if(typeof window.renderSupervisorReports === 'function'){ window.renderSupervisorReports(); }
+  });
+  setTimeout(function(){
+    syncParentMessages();
+    if(typeof window.renderSupervisorReports === 'function'){ window.renderSupervisorReports(); }
+  }, 900);
 })();
 </script>
 
@@ -6292,6 +6498,12 @@ ${teacher || 'اسم المعلمة / الجهة'}`;
       </div>
       <div id="supervisorSubtab-bank">
         <div id="supBankReport" class="mini-page-card" style="margin-top:12px"></div>
+        <div class="mini-page-card" style="margin-top:12px">
+          <h4 style="margin:0 0 10px">📬 البريد المنزلي</h4>
+          <div class="note-box" style="margin-bottom:12px">يظهر هنا سجل الرسائل المرسلة إلى أولياء الأمور مع نص الرسالة كاملًا.</div>
+          <div id="supHomeMailStats" class="mini-page-grid" style="margin-bottom:12px"></div>
+          <div id="supHomeMailReport" class="mini-page-list"></div>
+        </div>
       </div>
       <div id="supervisorSubtab-tasks" class="hide">
         <div id="supTasksReport" class="mini-page-card" style="margin-top:12px"></div>
@@ -6654,6 +6866,27 @@ ${teacher || 'اسم المعلمة / الجهة'}`;
     ensureSupportDesc();
     renderSentSupportList();
   }, 700);
+})();
+</script>
+
+
+<script id="oai-home-mail-patch">
+(function(){
+  function syncParentMessages(){
+    try{
+      if(window.app && window.app.state && Array.isArray(window.app.state.parentMessages)){
+        localStorage.setItem('parent_messages', JSON.stringify(window.app.state.parentMessages));
+      }
+    }catch(e){}
+  }
+  document.addEventListener('DOMContentLoaded', function(){
+    syncParentMessages();
+    if(typeof window.renderSupervisorReports === 'function'){ window.renderSupervisorReports(); }
+  });
+  setTimeout(function(){
+    syncParentMessages();
+    if(typeof window.renderSupervisorReports === 'function'){ window.renderSupervisorReports(); }
+  }, 900);
 })();
 </script>
 
@@ -7335,6 +7568,12 @@ ${teacher || 'اسم المعلمة / الجهة'}`;
       </div>
       <div id="supervisorSubtab-bank">
         <div id="supBankReport" class="mini-page-card" style="margin-top:12px"></div>
+        <div class="mini-page-card" style="margin-top:12px">
+          <h4 style="margin:0 0 10px">📬 البريد المنزلي</h4>
+          <div class="note-box" style="margin-bottom:12px">يظهر هنا سجل الرسائل المرسلة إلى أولياء الأمور مع نص الرسالة كاملًا.</div>
+          <div id="supHomeMailStats" class="mini-page-grid" style="margin-bottom:12px"></div>
+          <div id="supHomeMailReport" class="mini-page-list"></div>
+        </div>
       </div>
       <div id="supervisorSubtab-tasks" class="hide">
         <div id="supTasksReport" class="mini-page-card" style="margin-top:12px"></div>
@@ -7697,6 +7936,27 @@ ${teacher || 'اسم المعلمة / الجهة'}`;
     ensureSupportDesc();
     renderSentSupportList();
   }, 700);
+})();
+</script>
+
+
+<script id="oai-home-mail-patch">
+(function(){
+  function syncParentMessages(){
+    try{
+      if(window.app && window.app.state && Array.isArray(window.app.state.parentMessages)){
+        localStorage.setItem('parent_messages', JSON.stringify(window.app.state.parentMessages));
+      }
+    }catch(e){}
+  }
+  document.addEventListener('DOMContentLoaded', function(){
+    syncParentMessages();
+    if(typeof window.renderSupervisorReports === 'function'){ window.renderSupervisorReports(); }
+  });
+  setTimeout(function(){
+    syncParentMessages();
+    if(typeof window.renderSupervisorReports === 'function'){ window.renderSupervisorReports(); }
+  }, 900);
 })();
 </script>
 
