@@ -574,6 +574,82 @@
     .studentQuickTabs{gap:10px}
     .studentQuickTabs .miniTab{min-width:165px;flex:0 0 auto}
     .studentSectionTitle{margin-top:8px;font-size:16px;font-weight:1000;color:#0b2a66}
+
+
+    /* ===== Eid greeting on student login ===== */
+    .eid-banner{
+      position:relative;
+      width:100%;
+      margin:0 0 14px 0;
+      padding:14px 16px;
+      border-radius:18px;
+      overflow:hidden;
+      text-align:center;
+      background:linear-gradient(135deg,#c89b2f 0%,#f7df8a 32%,#b8841a 68%,#f4d56b 100%);
+      color:#fff;
+      box-shadow:0 14px 30px rgba(200,155,47,.28);
+      border:1px solid rgba(255,255,255,.38);
+      isolation:isolate;
+      animation:eidBannerIn .9s ease both;
+    }
+    .eid-banner::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:linear-gradient(120deg,transparent 18%,rgba(255,255,255,.18) 32%,rgba(255,255,255,.72) 50%,rgba(255,255,255,.16) 68%,transparent 82%);
+      transform:translateX(-130%);
+      animation:eidShine 4.2s linear infinite;
+      z-index:0;
+      pointer-events:none;
+    }
+    .eid-banner::after{
+      content:"";
+      position:absolute;
+      inset:1px;
+      border-radius:17px;
+      background:linear-gradient(180deg,rgba(255,255,255,.18),rgba(255,255,255,.02));
+      z-index:0;
+      pointer-events:none;
+    }
+    .eid-banner .eid-text,
+    .eid-banner .eid-sub{
+      position:relative;
+      z-index:1;
+      display:block;
+    }
+    .eid-banner .eid-text{
+      font-size:18px;
+      font-weight:1000;
+      letter-spacing:.2px;
+      animation:eidGlow 1.8s ease-in-out infinite alternate;
+    }
+    .eid-banner .eid-sub{
+      margin-top:5px;
+      font-size:12px;
+      font-weight:900;
+      color:rgba(255,255,255,.96);
+    }
+    @keyframes eidBannerIn{
+      from{opacity:0;transform:translateY(-16px) scale(.98)}
+      to{opacity:1;transform:translateY(0) scale(1)}
+    }
+    @keyframes eidShine{
+      0%{transform:translateX(-130%)}
+      100%{transform:translateX(130%)}
+    }
+    @keyframes eidGlow{
+      from{text-shadow:0 0 0 rgba(255,255,255,.0),0 0 8px rgba(255,240,190,.35)}
+      to{text-shadow:0 0 10px rgba(255,255,255,.35),0 0 22px rgba(255,238,176,.65)}
+    }
+    body[data-theme="alinma"] .eid-banner{
+      background:linear-gradient(135deg,#8f6238 0%,#d3ad83 35%,#6d4428 68%,#b98352 100%);
+      box-shadow:0 14px 30px rgba(122,82,54,.25);
+    }
+    body[data-theme="ahli"] .eid-banner{
+      background:linear-gradient(135deg,#0f7e5f 0%,#33b28a 32%,#07654c 68%,#5ec7a2 100%);
+      box-shadow:0 14px 30px rgba(11,138,99,.22);
+    }
+
     @media(max-width:820px){
       .studentQuickTabs{overflow:auto;flex-wrap:nowrap;padding-bottom:4px}
       .studentQuickTabs .miniTab{min-width:140px}
@@ -1032,6 +1108,11 @@ body[data-theme="ahli"] .topbar{
         </div>
         <div class="authBody">
           <div id="stuLocked" class="small hidden" style="color:var(--red);font-weight:1000"></div>
+
+          <div class="eid-banner">
+            <span class="eid-text">✨ كل عام وأنتم بخير ✨</span>
+            <span class="eid-sub">نسأل الله لكم فرحًا لا يغيب وأيامًا مباركة</span>
+          </div>
 
           <div class="field">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
@@ -2193,6 +2274,10 @@ body[data-theme="ahli"] .topbar{
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
+
+    const WEBHOOK_URL = "https://math-bank-webhook.onrender.com/send";
+    const AUTO_WEBHOOK_ENABLED = true;
+
 
     function $(id){return document.getElementById(id);}
     function fmt(x){ return (Math.round((Number(x||0)+Number.EPSILON)*100)/100).toFixed(2); }
@@ -4386,17 +4471,32 @@ background:linear-gradient(180deg,#014c39 0%, #0b6d52 24%, #f6fbf8 24%);
     async function logTxn(studentRef, type, reason, amount, balanceAfter, meta){
       try{
         const m = meta || {};
+        const studentName = m.name || m.studentName || "";
+        const guardianWhats = m.guardianWhats || m.guardianPhone || m.guardian || "";
+        const dateKey = localTodayKey();
         await studentRef.collection("txns").add({
           studentId: studentRef.id || "",
-          studentName: m.name || m.studentName || "",
-          guardianWhats: m.guardianWhats || m.guardian || "",
+          studentName,
+          guardianWhats,
           type: type || "",
           reason: reason || "",
           amount: Number(amount||0),
           balanceAfter: Number(balanceAfter||0),
-          dateKey: localTodayKey(),
+          dateKey,
           createdAtClient: Date.now(),
           createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        await sendTxnWebhook({
+          studentId: studentRef.id || "",
+          studentName,
+          guardianWhats,
+          type: type || "",
+          reason: reason || "",
+          amount: Number(amount||0),
+          balanceAfter: Number(balanceAfter||0),
+          dateKey,
+          message: buildOfficialMessage(type || "عملية", studentName || "الطالب/ـة", Number(amount||0), reason || "—")
         });
       }catch(e){
 
