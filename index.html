@@ -2392,6 +2392,46 @@ ${SIGNATURE}`
       );
     }
 
+    async function sendTxnWebhook(payload){
+      try{
+        if(!AUTO_WEBHOOK_ENABLED || !WEBHOOK_URL) return false;
+        const p = payload || {};
+        const phone = String(p.guardianWhats || p.guardianPhone || p.guardian || "").trim();
+        if(!phone) return false;
+
+        const body = {
+          studentId: p.studentId || "",
+          student: p.studentName || p.student || "",
+          studentName: p.studentName || p.student || "",
+          action: p.type || p.action || "عملية",
+          type: p.type || p.action || "عملية",
+          amount: Number(p.amount || 0),
+          reason: p.reason || "",
+          balanceAfter: Number(p.balanceAfter || 0),
+          dateKey: p.dateKey || localTodayKey(),
+          phone,
+          guardianWhats: phone,
+          channel: "whatsapp",
+          source: "math-bank",
+          message: p.message || buildOfficialMessage(p.type || p.action || "عملية", p.studentName || p.student || "الطالب/ـة", Number(p.amount || 0), p.reason || "—")
+        };
+
+        const res = await fetch(WEBHOOK_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body)
+        });
+
+        let out = null;
+        try{ out = await res.json(); }catch(_e){}
+        console.log("sendTxnWebhook", res.status, out || "OK");
+        return res.ok;
+      }catch(err){
+        console.log("sendTxnWebhook error", err);
+        return false;
+      }
+    }
+
     function isAutoWAEnabled(){ return !!$("autoWA")?.checked; }
     function isCopyEnabled(){ return !!$("copyToTeacher")?.checked; }
 
