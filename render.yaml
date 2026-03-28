@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: math-bank-webhook
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    autoDeploy: true
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: LOG_ONLY
+        value: true
+      - key: ENABLE_META_WHATSAPP
+        value: true
+      - key: ENABLE_TWILIO_SMS
+        value: false
