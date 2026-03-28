@@ -2275,10 +2275,6 @@ body[data-theme="ahli"] .topbar{
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    const WEBHOOK_URL = "https://math-bank-webhook.onrender.com/send";
-    const AUTO_WEBHOOK_ENABLED = true;
-
-
     function $(id){return document.getElementById(id);}
     function fmt(x){ return (Math.round((Number(x||0)+Number.EPSILON)*100)/100).toFixed(2); }
     let lastDeletedClassSnapshot = null;
@@ -2390,46 +2386,6 @@ ${contactLink()}
 
 ${SIGNATURE}`
       );
-    }
-
-    async function sendTxnWebhook(payload){
-      try{
-        if(!AUTO_WEBHOOK_ENABLED || !WEBHOOK_URL) return false;
-        const p = payload || {};
-        const phone = String(p.guardianWhats || p.guardianPhone || p.guardian || "").trim();
-        if(!phone) return false;
-
-        const body = {
-          studentId: p.studentId || "",
-          student: p.studentName || p.student || "",
-          studentName: p.studentName || p.student || "",
-          action: p.type || p.action || "عملية",
-          type: p.type || p.action || "عملية",
-          amount: Number(p.amount || 0),
-          reason: p.reason || "",
-          balanceAfter: Number(p.balanceAfter || 0),
-          dateKey: p.dateKey || localTodayKey(),
-          phone,
-          guardianWhats: phone,
-          channel: "whatsapp",
-          source: "math-bank",
-          message: p.message || buildOfficialMessage(p.type || p.action || "عملية", p.studentName || p.student || "الطالب/ـة", Number(p.amount || 0), p.reason || "—")
-        };
-
-        const res = await fetch(WEBHOOK_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body)
-        });
-
-        let out = null;
-        try{ out = await res.json(); }catch(_e){}
-        console.log("sendTxnWebhook", res.status, out || "OK");
-        return res.ok;
-      }catch(err){
-        console.log("sendTxnWebhook error", err);
-        return false;
-      }
     }
 
     function isAutoWAEnabled(){ return !!$("autoWA")?.checked; }
@@ -4508,35 +4464,82 @@ background:linear-gradient(180deg,#014c39 0%, #0b6d52 24%, #f6fbf8 24%);
     }
     function localTodayKey(){ return localDateKeyFromDate(new Date()); }
 
+    const MATH_BANK_WEBHOOK_URL = "https://math-bank-webhook.onrender.com/send";
+
+    function cleanPhone(v){
+      return String(v||"").trim();
+    }
+
+    function buildGuardianMessage(payload){
+      const studentName = payload.studentName || "الطالب/ة";
+      const type = payload.type || "عملية";
+      const reason = payload.reason ? `\nالسبب: ${payload.reason}` : "";
+      const amount = Number(payload.amount||0);
+      const amountLine = amount ? `\nالقيمة: ${fmt(amount)}` : "";
+      const balanceLine = `\nالرصيد الحالي: ${fmt(Number(payload.balanceAfter||0))}`;
+      return `تنبيه من بنك الرياضيات\nالطالب/ة: ${studentName}\nالعملية: ${type}${amountLine}${reason}${balanceLine}`;
+    }
+
+    async function dispatchTxnNotification(payload){
+      try{
+        if(!payload || payload.autoNotify === false) return;
+        const guardianWhats = cleanPhone(payload.guardianWhats || payload.guardian || payload.guardianPhone);
+        const guardianSms = cleanPhone(payload.guardianSms || guardianWhats);
+        const phone = guardianWhats || guardianSms;
+        if(!phone) return;
+
+        const body = {
+          studentId: payload.studentId || "",
+          student: payload.studentName || "",
+          studentName: payload.studentName || "",
+          action: payload.type || "",
+          type: payload.type || "",
+          reason: payload.reason || "",
+          amount: Number(payload.amount || 0),
+          balanceAfter: Number(payload.balanceAfter || 0),
+          phone: phone,
+          guardianWhats: guardianWhats,
+          guardianSms: guardianSms,
+          channel: payload.notifyChannel || "whatsapp",
+          notifyChannel: payload.notifyChannel || "whatsapp",
+          autoNotify: true,
+          message: buildGuardianMessage(payload),
+          dateKey: payload.dateKey || localTodayKey()
+        };
+
+        const res = await fetch(MATH_BANK_WEBHOOK_URL, {
+          method: "POST",
+          headers: {"Content-Type":"application/json"},
+          body: JSON.stringify(body),
+          keepalive: true
+        });
+
+        if(!res.ok){
+          const txt = await res.text().catch(()=>"");
+          throw new Error(`Webhook HTTP ${res.status} ${txt}`.trim());
+        }
+
+        return await res.text().catch(()=>"");
+      }catch(err){
+        console.log("dispatchTxnNotification failed", err);
+        throw err;
+      }
+    }
+
     async function logTxn(studentRef, type, reason, amount, balanceAfter, meta){
       try{
         const m = meta || {};
-        const studentName = m.name || m.studentName || "";
-        const guardianWhats = m.guardianWhats || m.guardianPhone || m.guardian || "";
-        const dateKey = localTodayKey();
         await studentRef.collection("txns").add({
           studentId: studentRef.id || "",
-          studentName,
-          guardianWhats,
+          studentName: m.name || m.studentName || "",
+          guardianWhats: m.guardianWhats || m.guardian || "",
           type: type || "",
           reason: reason || "",
           amount: Number(amount||0),
           balanceAfter: Number(balanceAfter||0),
-          dateKey,
+          dateKey: localTodayKey(),
           createdAtClient: Date.now(),
           createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-
-        await sendTxnWebhook({
-          studentId: studentRef.id || "",
-          studentName,
-          guardianWhats,
-          type: type || "",
-          reason: reason || "",
-          amount: Number(amount||0),
-          balanceAfter: Number(balanceAfter||0),
-          dateKey,
-          message: buildOfficialMessage(type || "عملية", studentName || "الطالب/ـة", Number(amount||0), reason || "—")
         });
       }catch(e){
 
