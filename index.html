@@ -1178,7 +1178,6 @@ body[data-theme="ahli"] .topbar{
             <button class="btn3" onclick="logout()">تسجيل خروج</button>
             <button class="btn2" style="margin-top:8px" onclick="openDailyOps()">📅 العمليات اليومية</button>
             <button class="btn2" style="margin-right:8px" onclick="pdfBankReport()">تقرير PDF شامل</button>
-            <button class="btn" style="margin-top:8px;margin-right:8px" onclick="sendWebhookTestFromTeacher()">📩 إرسال إشعار تجريبي</button>
           </div>
         </div>
       </div>
@@ -4354,53 +4353,6 @@ background:linear-gradient(180deg,#014c39 0%, #0b6d52 24%, #f6fbf8 24%);
 }
 </style>
 
-
-<script>
-async function sendWebhookTestFromTeacher(){
-  const student = (prompt("اسم الطالب/ة", "طالب تجريبي") || "").trim();
-  if(!student){ alert("تم إلغاء الإرسال."); return; }
-
-  const phone = (prompt("رقم ولي الأمر", "05") || "").trim();
-  if(!phone){ alert("أدخل/ي رقم ولي الأمر."); return; }
-
-  const action = (prompt("نوع العملية", "إيداع") || "إيداع").trim();
-  const amountRaw = (prompt("القيمة", "10") || "0").trim();
-  const reason = (prompt("السبب", "تجربة النظام") || "تجربة النظام").trim();
-  const amount = Number(amountRaw) || 0;
-
-  const payload = {
-    student,
-    action,
-    amount,
-    reason,
-    phone,
-    channel: "whatsapp",
-    source: "teacher_test_button",
-    message: `تنبيه من بنك الرياضيات: ${action} للطالب/ة ${student} بقيمة ${amount} بسبب: ${reason}`
-  };
-
-  try{
-    const res = await fetch("https://math-bank-webhook.onrender.com/send", {
-      method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify(payload)
-    });
-
-    let data = null;
-    try{ data = await res.json(); }catch(_){}
-
-    if(!res.ok){
-      throw new Error((data && (data.error || data.message)) || `HTTP ${res.status}`);
-    }
-
-    alert("تم إرسال الطلب إلى السيرفر بنجاح ✅\nافتحي Render > Logs للتأكد من وصوله.");
-    console.log("Webhook test sent:", payload, data);
-  }catch(err){
-    console.error("Webhook test failed:", err);
-    alert("تعذر إرسال الطلب للسيرفر ❌\n" + (err?.message || err));
-  }
-}
-</script>
 </body></html>`);
       w.document.close();
     }
