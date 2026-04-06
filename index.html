@@ -2332,69 +2332,9 @@ body[data-theme="ahli"] .topbar{
     </div>
     <div class="footerNote">الرياضيات لغة الأذكياء ✨</div>
   </div>
-<script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-app-compat.js">
-// 🔥 جلب جميع البيانات القديمة من localStorage مهما كان اسمها
-function getAllLegacyData(){
-  let all = [];
-  for(let i=0;i<localStorage.length;i++){
-    let key = localStorage.key(i);
-    try{
-      let val = JSON.parse(localStorage.getItem(key));
-      if(Array.isArray(val)){
-        val.forEach(v=>{
-          if(v && (v.teacherName || v.name || v.note || v.rating)){
-            all.push(v);
-          }
-        });
-      }
-    }catch(e){}
-  }
-  return all;
-}
-
-</script>
-  <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore-compat.js">
-// 🔥 جلب جميع البيانات القديمة من localStorage مهما كان اسمها
-function getAllLegacyData(){
-  let all = [];
-  for(let i=0;i<localStorage.length;i++){
-    let key = localStorage.key(i);
-    try{
-      let val = JSON.parse(localStorage.getItem(key));
-      if(Array.isArray(val)){
-        val.forEach(v=>{
-          if(v && (v.teacherName || v.name || v.note || v.rating)){
-            all.push(v);
-          }
-        });
-      }
-    }catch(e){}
-  }
-  return all;
-}
-
-</script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js">
-// 🔥 جلب جميع البيانات القديمة من localStorage مهما كان اسمها
-function getAllLegacyData(){
-  let all = [];
-  for(let i=0;i<localStorage.length;i++){
-    let key = localStorage.key(i);
-    try{
-      let val = JSON.parse(localStorage.getItem(key));
-      if(Array.isArray(val)){
-        val.forEach(v=>{
-          if(v && (v.teacherName || v.name || v.note || v.rating)){
-            all.push(v);
-          }
-        });
-      }
-    }catch(e){}
-  }
-  return all;
-}
-
-</script>
+<script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore-compat.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
   <div id="pdfTemp"></div>
 
@@ -2743,6 +2683,74 @@ function getAllLegacyData(){
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
+    window.db = db;
+
+    function getAllLegacyData(){
+      const all = [];
+      const seen = new Set();
+      const pushRow = (row)=>{
+        if(!row || typeof row !== 'object') return;
+        const key = JSON.stringify([
+          row.studentId||'', row.studentName||row.name||row.teacherName||'',
+          row.type||row.kind||'', row.reason||row.note||row.rating||'', row.createdAtClient||row.savedAt||row.at||0, row.amount||0
+        ]);
+        if(seen.has(key)) return;
+        seen.add(key);
+        all.push(row);
+      };
+      const collect = (val)=>{
+        if(Array.isArray(val)){ val.forEach(collect); return; }
+        if(!val || typeof val !== 'object') return;
+        if(val.entries && Array.isArray(val.entries)){ val.entries.forEach(collect); }
+        if(val.rows && Array.isArray(val.rows)){ val.rows.forEach(collect); }
+        if(val.data && Array.isArray(val.data)){ val.data.forEach(collect); }
+        const looksLikeRow = (
+          'teacherName' in val || 'studentName' in val || 'name' in val ||
+          'note' in val || 'rating' in val || 'reason' in val ||
+          'type' in val || 'amount' in val || 'balanceAfter' in val
+        );
+        if(looksLikeRow) pushRow(val);
+      };
+      try{
+        for(let i=0;i<localStorage.length;i++){
+          const key = localStorage.key(i);
+          try{ collect(JSON.parse(localStorage.getItem(key))); }catch(e){}
+        }
+      }catch(e){}
+      return all;
+    }
+
+    async function syncLegacyRowsToFirestore(){
+      if(!window.db) return;
+      try{
+        const legacyRows = getAllLegacyData();
+        if(!legacyRows.length) return;
+        const batch = db.batch();
+        let count = 0;
+        legacyRows.slice(0,400).forEach((item, idx)=>{
+          const ts = Number(item.createdAtClient || item.savedAt || item.at || Date.now());
+          const payload = {
+            studentId: String(item.studentId || ''),
+            studentName: String(item.studentName || item.teacherName || item.name || '—'),
+            classId: String(item.classId || ''),
+            className: String(item.className || 'سجلات سابقة'),
+            type: String(item.type || item.kind || 'بيانات قديمة'),
+            reason: String(item.reason || item.note || item.rating || '—'),
+            amount: Number(item.amount || 0),
+            balanceAfter: Number(item.balanceAfter || 0),
+            guardianWhats: String(item.guardianWhats || ''),
+            executor: String(item.executor || 'ترحيل تلقائي'),
+            createdAtClient: ts,
+            migratedFromLocal: true
+          };
+          const docId = 'legacy_' + ts + '_' + idx;
+          batch.set(db.collection('supervision_rows').doc(docId), payload, {merge:true});
+          count++;
+        });
+        if(count) await batch.commit();
+      }catch(e){ console.log('legacy sync skipped', e); }
+    }
+
 
     function $(id){return document.getElementById(id);}
     function fmt(x){ return (Math.round((Number(x||0)+Number.EPSILON)*100)/100).toFixed(2); }
@@ -6629,25 +6637,6 @@ function renderRoulettePane(){
 })();
 
 
-// 🔥 جلب جميع البيانات القديمة من localStorage مهما كان اسمها
-function getAllLegacyData(){
-  let all = [];
-  for(let i=0;i<localStorage.length;i++){
-    let key = localStorage.key(i);
-    try{
-      let val = JSON.parse(localStorage.getItem(key));
-      if(Array.isArray(val)){
-        val.forEach(v=>{
-          if(v && (v.teacherName || v.name || v.note || v.rating)){
-            all.push(v);
-          }
-        });
-      }
-    }catch(e){}
-  }
-  return all;
-}
-
 </script>
 
 <script>
@@ -6662,25 +6651,6 @@ function loadBankTheme(){
   if(t!=="default"){document.body.setAttribute("data-theme",t);}
 }
 document.addEventListener("DOMContentLoaded",loadBankTheme);
-
-// 🔥 جلب جميع البيانات القديمة من localStorage مهما كان اسمها
-function getAllLegacyData(){
-  let all = [];
-  for(let i=0;i<localStorage.length;i++){
-    let key = localStorage.key(i);
-    try{
-      let val = JSON.parse(localStorage.getItem(key));
-      if(Array.isArray(val)){
-        val.forEach(v=>{
-          if(v && (v.teacherName || v.name || v.note || v.rating)){
-            all.push(v);
-          }
-        });
-      }
-    }catch(e){}
-  }
-  return all;
-}
 
 </script>
 <style>
@@ -6728,25 +6698,6 @@ background:linear-gradient(180deg,#014c39 0%, #0b6d52 24%, #f6fbf8 24%);
   });
 })();
 
-// 🔥 جلب جميع البيانات القديمة من localStorage مهما كان اسمها
-function getAllLegacyData(){
-  let all = [];
-  for(let i=0;i<localStorage.length;i++){
-    let key = localStorage.key(i);
-    try{
-      let val = JSON.parse(localStorage.getItem(key));
-      if(Array.isArray(val)){
-        val.forEach(v=>{
-          if(v && (v.teacherName || v.name || v.note || v.rating)){
-            all.push(v);
-          }
-        });
-      }
-    }catch(e){}
-  }
-  return all;
-}
-
 </script>
 
 <!-- ===== المهام الأدائية ===== -->
@@ -6793,25 +6744,6 @@ function renderTasks(){
     `;
   });
   document.getElementById('tasksList').innerHTML = html;
-}
-
-// 🔥 جلب جميع البيانات القديمة من localStorage مهما كان اسمها
-function getAllLegacyData(){
-  let all = [];
-  for(let i=0;i<localStorage.length;i++){
-    let key = localStorage.key(i);
-    try{
-      let val = JSON.parse(localStorage.getItem(key));
-      if(Array.isArray(val)){
-        val.forEach(v=>{
-          if(v && (v.teacherName || v.name || v.note || v.rating)){
-            all.push(v);
-          }
-        });
-      }
-    }catch(e){}
-  }
-  return all;
 }
 
 </script>
@@ -7183,25 +7115,6 @@ function getAllLegacyData(){
   });
 })();
 
-// 🔥 جلب جميع البيانات القديمة من localStorage مهما كان اسمها
-function getAllLegacyData(){
-  let all = [];
-  for(let i=0;i<localStorage.length;i++){
-    let key = localStorage.key(i);
-    try{
-      let val = JSON.parse(localStorage.getItem(key));
-      if(Array.isArray(val)){
-        val.forEach(v=>{
-          if(v && (v.teacherName || v.name || v.note || v.rating)){
-            all.push(v);
-          }
-        });
-      }
-    }catch(e){}
-  }
-  return all;
-}
-
 </script>
 
 
@@ -7276,25 +7189,6 @@ function getAllLegacyData(){
     }catch(e){}
   });
 })();
-
-// 🔥 جلب جميع البيانات القديمة من localStorage مهما كان اسمها
-function getAllLegacyData(){
-  let all = [];
-  for(let i=0;i<localStorage.length;i++){
-    let key = localStorage.key(i);
-    try{
-      let val = JSON.parse(localStorage.getItem(key));
-      if(Array.isArray(val)){
-        val.forEach(v=>{
-          if(v && (v.teacherName || v.name || v.note || v.rating)){
-            all.push(v);
-          }
-        });
-      }
-    }catch(e){}
-  }
-  return all;
-}
 
 </script>
 
@@ -7647,6 +7541,7 @@ function getAllLegacyData(){
 
     if(window.db){
       try{
+        await syncLegacyRowsToFirestore();
         const classSnap = await db.collection('classes').orderBy('order').get();
         classSnap.forEach(d=>classesList.push({id:d.id, ...(d.data()||{})}));
 
@@ -7677,6 +7572,26 @@ function getAllLegacyData(){
             });
           }catch(e){ console.log('sup tx error', e); }
         }
+        try{
+          const supSnap = await db.collection('supervision_rows').orderBy('createdAtClient','desc').limit(500).get();
+          supSnap.forEach(d=>{
+            const x = d.data() || {};
+            rows.push({
+              id: d.id,
+              studentId: String(x.studentId || ''),
+              studentName: String(x.studentName || '—'),
+              classId: String(x.classId || ''),
+              className: String(x.className || '—'),
+              type: String(x.type || ''),
+              reason: String(x.reason || '—'),
+              amount: Number(x.amount || 0),
+              balanceAfter: Number(x.balanceAfter || 0),
+              createdAtClient: Number(x.createdAtClient || 0) || Date.now(),
+              guardianWhats: String(x.guardianWhats || ''),
+              executor: String(x.executor || 'لوحة الإشراف')
+            });
+          });
+        }catch(e){ console.log('sup rows error', e); }
       }catch(e){
         console.log('sup cache db fallback', e);
       }
@@ -7764,7 +7679,16 @@ legacy.forEach((item,idx)=>{
   });
 });
 
-window.supervisionRowsCache = rows;
+
+    const dedup = new Map();
+    rows.forEach(r=>{
+      const k = [
+        r.studentId||'', r.studentName||'', r.classId||'', r.className||'',
+        r.type||'', r.reason||'', Number(r.amount||0), Number(r.balanceAfter||0), Number(r.createdAtClient||0)
+      ].join('|');
+      if(!dedup.has(k)) dedup.set(k, r);
+    });
+    window.supervisionRowsCache = Array.from(dedup.values()).sort((a,b)=> (b.createdAtClient||0) - (a.createdAtClient||0));
 
   }
 
@@ -7952,25 +7876,6 @@ window.supervisionRowsCache = rows;
   });
 })();
 
-// 🔥 جلب جميع البيانات القديمة من localStorage مهما كان اسمها
-function getAllLegacyData(){
-  let all = [];
-  for(let i=0;i<localStorage.length;i++){
-    let key = localStorage.key(i);
-    try{
-      let val = JSON.parse(localStorage.getItem(key));
-      if(Array.isArray(val)){
-        val.forEach(v=>{
-          if(v && (v.teacherName || v.name || v.note || v.rating)){
-            all.push(v);
-          }
-        });
-      }
-    }catch(e){}
-  }
-  return all;
-}
-
 </script>
 
 
@@ -8037,25 +7942,6 @@ function getAllLegacyData(){
     bindSupervisionTabs();
   }
 })();
-
-// 🔥 جلب جميع البيانات القديمة من localStorage مهما كان اسمها
-function getAllLegacyData(){
-  let all = [];
-  for(let i=0;i<localStorage.length;i++){
-    let key = localStorage.key(i);
-    try{
-      let val = JSON.parse(localStorage.getItem(key));
-      if(Array.isArray(val)){
-        val.forEach(v=>{
-          if(v && (v.teacherName || v.name || v.note || v.rating)){
-            all.push(v);
-          }
-        });
-      }
-    }catch(e){}
-  }
-  return all;
-}
 
 </script>
 
