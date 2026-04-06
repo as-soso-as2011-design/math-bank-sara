@@ -1352,7 +1352,7 @@ body[data-theme="ahli"] .topbar{
               <input id="supStudentFilter" placeholder="ابحثي بالاسم"/>
             </div>
             <div class="supervisionActionRow">
-              <button class="btn" type="button" onclick="renderSupervisionDashboard()">عرض البيانات</button>
+              <button class="btn" type="button" onclick="renderSupervisionDashboard().then(()=>{ if(typeof toast==='function') toast('تم عرض البيانات ✅'); })">عرض البيانات</button>
               <button class="btn3" type="button" onclick="resetSupervisionFilters()">إعادة ضبط</button>
             </div>
           </div>
@@ -7425,6 +7425,7 @@ function renderTasks(){
 
   async function loadSupervisionCaches(){
     const memoryClasses = Array.isArray(classes) ? classes.map(c=>({id:c.id, name:c.name || 'فصل', order:Number(c.order||0)})) : [];
+    const memoryStudents = Array.isArray(window.students) ? window.students.map(s=>({...(s||{})})) : [];
     const domTabs = Array.from(document.querySelectorAll('#classTabs .tab')).map((el,idx)=>({
       id: 'dom_class_' + idx,
       name: String(el.textContent || '').trim() || ('فصل ' + (idx+1)),
@@ -7478,6 +7479,64 @@ function renderTasks(){
     if(!classesList.length && domTabs.length){
       classesList = domTabs.slice();
     }
+    if(!studentsList.length && memoryStudents.length){
+      studentsList = memoryStudents.slice();
+    }
+
+    const evals = (typeof getSupervisionEvaluations === 'function') ? getSupervisionEvaluations() : [];
+    const certs = (typeof getSupervisionCertificates === 'function') ? getSupervisionCertificates() : [];
+    const logins = (typeof getSupervisionLogins === 'function') ? getSupervisionLogins() : [];
+
+    evals.forEach((item, idx)=>{
+      rows.push({
+        id: 'sup_eval_' + idx,
+        studentId: '',
+        studentName: item.teacherName || getTeacherDisplayName(),
+        classId: '',
+        className: 'الإشراف المدرسي',
+        type: 'تقييم المعلمة',
+        reason: item.note || item.rating || 'تم حفظ تقييم المعلمة',
+        amount: 0,
+        balanceAfter: 0,
+        createdAtClient: Number(item.savedAt || 0) || Date.now(),
+        guardianWhats: '',
+        executor: 'لوحة الإشراف'
+      });
+    });
+
+    certs.forEach((item, idx)=>{
+      rows.push({
+        id: 'sup_cert_' + idx,
+        studentId: '',
+        studentName: item.teacherName || getTeacherDisplayName(),
+        classId: '',
+        className: 'الإشراف المدرسي',
+        type: 'شهادة شكر',
+        reason: item.note || 'تم رفع شهادة شكر',
+        amount: 0,
+        balanceAfter: 0,
+        createdAtClient: Number(item.savedAt || 0) || Date.now(),
+        guardianWhats: '',
+        executor: 'لوحة الإشراف'
+      });
+    });
+
+    logins.forEach((item, idx)=>{
+      rows.push({
+        id: 'sup_login_' + idx,
+        studentId: '',
+        studentName: item.role || 'الإشراف',
+        classId: '',
+        className: 'الإشراف المدرسي',
+        type: 'دخول إشرافي',
+        reason: item.username || 'تم تسجيل الدخول',
+        amount: 0,
+        balanceAfter: 0,
+        createdAtClient: Number(item.at || 0) || Date.now(),
+        guardianWhats: '',
+        executor: 'لوحة الإشراف'
+      });
+    });
 
     window.supervisionClassesCache = classesList;
     window.supervisionStudentsCache = studentsList;
@@ -7617,7 +7676,7 @@ function renderTasks(){
     try{
       const page = sup$('supervisionPage');
       if(page) page.classList.remove('hidden');
-      if(!window.supervisionRowsCache.length || !window.supervisionStudentsCache.length){ await loadSupervisionCaches(); }
+      await loadSupervisionCaches();
       ensureSupervisionFilterOptions();
       renderSupervisionTables(getFilteredSupervisionRows(), getFilteredStudents());
       updateTeacherSupervisionSummary();
