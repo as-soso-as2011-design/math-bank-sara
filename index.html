@@ -1352,7 +1352,7 @@ body[data-theme="ahli"] .topbar{
               <input id="supStudentFilter" placeholder="ابحثي بالاسم"/>
             </div>
             <div class="supervisionActionRow">
-              <button class="btn" type="button" onclick="renderSupervisionDashboard().then(()=>{ if(typeof toast==='function') toast('تم عرض البيانات ✅'); })">عرض البيانات</button>
+              <button class="btn" type="button" onclick="renderSupervisionDashboard().then(()=>{ if(typeof toast==='function') toast('تم عرض البيانات الحالية والسابقة ✅'); })">عرض البيانات</button>
               <button class="btn3" type="button" onclick="resetSupervisionFilters()">إعادة ضبط</button>
             </div>
           </div>
@@ -2332,9 +2332,69 @@ body[data-theme="ahli"] .topbar{
     </div>
     <div class="footerNote">الرياضيات لغة الأذكياء ✨</div>
   </div>
-<script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore-compat.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-app-compat.js">
+// 🔥 جلب جميع البيانات القديمة من localStorage مهما كان اسمها
+function getAllLegacyData(){
+  let all = [];
+  for(let i=0;i<localStorage.length;i++){
+    let key = localStorage.key(i);
+    try{
+      let val = JSON.parse(localStorage.getItem(key));
+      if(Array.isArray(val)){
+        val.forEach(v=>{
+          if(v && (v.teacherName || v.name || v.note || v.rating)){
+            all.push(v);
+          }
+        });
+      }
+    }catch(e){}
+  }
+  return all;
+}
+
+</script>
+  <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore-compat.js">
+// 🔥 جلب جميع البيانات القديمة من localStorage مهما كان اسمها
+function getAllLegacyData(){
+  let all = [];
+  for(let i=0;i<localStorage.length;i++){
+    let key = localStorage.key(i);
+    try{
+      let val = JSON.parse(localStorage.getItem(key));
+      if(Array.isArray(val)){
+        val.forEach(v=>{
+          if(v && (v.teacherName || v.name || v.note || v.rating)){
+            all.push(v);
+          }
+        });
+      }
+    }catch(e){}
+  }
+  return all;
+}
+
+</script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js">
+// 🔥 جلب جميع البيانات القديمة من localStorage مهما كان اسمها
+function getAllLegacyData(){
+  let all = [];
+  for(let i=0;i<localStorage.length;i++){
+    let key = localStorage.key(i);
+    try{
+      let val = JSON.parse(localStorage.getItem(key));
+      if(Array.isArray(val)){
+        val.forEach(v=>{
+          if(v && (v.teacherName || v.name || v.note || v.rating)){
+            all.push(v);
+          }
+        });
+      }
+    }catch(e){}
+  }
+  return all;
+}
+
+</script>
 
   <div id="pdfTemp"></div>
 
@@ -6568,6 +6628,26 @@ function renderRoulettePane(){
   window.startAppSafe = window.startApp;
 })();
 
+
+// 🔥 جلب جميع البيانات القديمة من localStorage مهما كان اسمها
+function getAllLegacyData(){
+  let all = [];
+  for(let i=0;i<localStorage.length;i++){
+    let key = localStorage.key(i);
+    try{
+      let val = JSON.parse(localStorage.getItem(key));
+      if(Array.isArray(val)){
+        val.forEach(v=>{
+          if(v && (v.teacherName || v.name || v.note || v.rating)){
+            all.push(v);
+          }
+        });
+      }
+    }catch(e){}
+  }
+  return all;
+}
+
 </script>
 
 <script>
@@ -6582,6 +6662,26 @@ function loadBankTheme(){
   if(t!=="default"){document.body.setAttribute("data-theme",t);}
 }
 document.addEventListener("DOMContentLoaded",loadBankTheme);
+
+// 🔥 جلب جميع البيانات القديمة من localStorage مهما كان اسمها
+function getAllLegacyData(){
+  let all = [];
+  for(let i=0;i<localStorage.length;i++){
+    let key = localStorage.key(i);
+    try{
+      let val = JSON.parse(localStorage.getItem(key));
+      if(Array.isArray(val)){
+        val.forEach(v=>{
+          if(v && (v.teacherName || v.name || v.note || v.rating)){
+            all.push(v);
+          }
+        });
+      }
+    }catch(e){}
+  }
+  return all;
+}
+
 </script>
 <style>
 body[data-theme="alinma"]{
@@ -6627,6 +6727,26 @@ background:linear-gradient(180deg,#014c39 0%, #0b6d52 24%, #f6fbf8 24%);
     }catch(e){}
   });
 })();
+
+// 🔥 جلب جميع البيانات القديمة من localStorage مهما كان اسمها
+function getAllLegacyData(){
+  let all = [];
+  for(let i=0;i<localStorage.length;i++){
+    let key = localStorage.key(i);
+    try{
+      let val = JSON.parse(localStorage.getItem(key));
+      if(Array.isArray(val)){
+        val.forEach(v=>{
+          if(v && (v.teacherName || v.name || v.note || v.rating)){
+            all.push(v);
+          }
+        });
+      }
+    }catch(e){}
+  }
+  return all;
+}
+
 </script>
 
 <!-- ===== المهام الأدائية ===== -->
@@ -6674,6 +6794,26 @@ function renderTasks(){
   });
   document.getElementById('tasksList').innerHTML = html;
 }
+
+// 🔥 جلب جميع البيانات القديمة من localStorage مهما كان اسمها
+function getAllLegacyData(){
+  let all = [];
+  for(let i=0;i<localStorage.length;i++){
+    let key = localStorage.key(i);
+    try{
+      let val = JSON.parse(localStorage.getItem(key));
+      if(Array.isArray(val)){
+        val.forEach(v=>{
+          if(v && (v.teacherName || v.name || v.note || v.rating)){
+            all.push(v);
+          }
+        });
+      }
+    }catch(e){}
+  }
+  return all;
+}
+
 </script>
 
 
@@ -7042,6 +7182,26 @@ function renderTasks(){
     }catch(e){}
   });
 })();
+
+// 🔥 جلب جميع البيانات القديمة من localStorage مهما كان اسمها
+function getAllLegacyData(){
+  let all = [];
+  for(let i=0;i<localStorage.length;i++){
+    let key = localStorage.key(i);
+    try{
+      let val = JSON.parse(localStorage.getItem(key));
+      if(Array.isArray(val)){
+        val.forEach(v=>{
+          if(v && (v.teacherName || v.name || v.note || v.rating)){
+            all.push(v);
+          }
+        });
+      }
+    }catch(e){}
+  }
+  return all;
+}
+
 </script>
 
 
@@ -7116,6 +7276,26 @@ function renderTasks(){
     }catch(e){}
   });
 })();
+
+// 🔥 جلب جميع البيانات القديمة من localStorage مهما كان اسمها
+function getAllLegacyData(){
+  let all = [];
+  for(let i=0;i<localStorage.length;i++){
+    let key = localStorage.key(i);
+    try{
+      let val = JSON.parse(localStorage.getItem(key));
+      if(Array.isArray(val)){
+        val.forEach(v=>{
+          if(v && (v.teacherName || v.name || v.note || v.rating)){
+            all.push(v);
+          }
+        });
+      }
+    }catch(e){}
+  }
+  return all;
+}
+
 </script>
 
 
@@ -7216,11 +7396,40 @@ function renderTasks(){
     document.querySelectorAll('#supervisionTabsBar .superTab').forEach(b=>b.classList.remove('active'));
     if(btn) btn.classList.add('active');
   };
-  function getSupervisionEvaluations(){ return readJson(SUPERVISION_EVAL_KEY, []); }
+  function mergeLegacyArrays(primaryKey, legacyKeys){
+    const all = [];
+    const seen = new Set();
+    [primaryKey].concat(legacyKeys || []).forEach(key=>{
+      try{
+        const arr = readJson(key, []);
+        if(Array.isArray(arr)){
+          arr.forEach(item=>{
+            const stamp = String(item?.savedAt || item?.at || item?.date || '') + '|' + String(item?.teacherName || item?.username || item?.note || item?.rating || '');
+            if(!seen.has(stamp)){
+              seen.add(stamp);
+              all.push(item);
+            }
+          });
+        }
+      }catch(e){}
+    });
+    all.sort((a,b)=> (Number(b?.savedAt || b?.at || 0) - Number(a?.savedAt || a?.at || 0)));
+    return all;
+  }
+
+  function getSupervisionEvaluations(){
+    return mergeLegacyArrays(SUPERVISION_EVAL_KEY, ['MATHBANK_SUPERVISION_EVALS','MATHBANK_SUPERVISION_EVALS_V1']);
+  }
   function setSupervisionEvaluations(v){ writeJson(SUPERVISION_EVAL_KEY, v || []); }
-  function getSupervisionCertificates(){ return readJson(SUPERVISION_CERT_KEY, []); }
+
+  function getSupervisionCertificates(){
+    return mergeLegacyArrays(SUPERVISION_CERT_KEY, ['MATHBANK_SUPERVISION_CERTS','MATHBANK_SUPERVISION_CERTS_V1']);
+  }
   function setSupervisionCertificates(v){ writeJson(SUPERVISION_CERT_KEY, v || []); }
-  function getSupervisionLogins(){ return readJson(SUPERVISION_LOGIN_KEY, []); }
+
+  function getSupervisionLogins(){
+    return mergeLegacyArrays(SUPERVISION_LOGIN_KEY, ['MATHBANK_SUPERVISION_LOGINS','MATHBANK_SUPERVISION_LOGINS_V1']);
+  }
   function setSupervisionLogins(v){ writeJson(SUPERVISION_LOGIN_KEY, v || []); }
 
   window.deleteLastTeacherSupervisionEvaluation = function(){
@@ -7541,7 +7750,22 @@ function renderTasks(){
     window.supervisionClassesCache = classesList;
     window.supervisionStudentsCache = studentsList;
     rows.sort((a,b)=> (b.createdAtClient||0) - (a.createdAtClient||0));
-    window.supervisionRowsCache = rows;
+    
+// إضافة البيانات القديمة
+const legacy = getAllLegacyData();
+legacy.forEach((item,idx)=>{
+  rows.push({
+    id:'legacy_'+idx,
+    studentName: item.teacherName || item.name || '—',
+    className:'سجلات سابقة',
+    type:'بيانات قديمة',
+    reason:item.note || item.rating || '-',
+    createdAtClient: Number(item.savedAt || item.at || Date.now())
+  });
+});
+
+window.supervisionRowsCache = rows;
+
   }
 
   function ensureSupervisionFilterOptions(){
@@ -7727,6 +7951,26 @@ function renderTasks(){
     }catch(e){}
   });
 })();
+
+// 🔥 جلب جميع البيانات القديمة من localStorage مهما كان اسمها
+function getAllLegacyData(){
+  let all = [];
+  for(let i=0;i<localStorage.length;i++){
+    let key = localStorage.key(i);
+    try{
+      let val = JSON.parse(localStorage.getItem(key));
+      if(Array.isArray(val)){
+        val.forEach(v=>{
+          if(v && (v.teacherName || v.name || v.note || v.rating)){
+            all.push(v);
+          }
+        });
+      }
+    }catch(e){}
+  }
+  return all;
+}
+
 </script>
 
 
@@ -7793,6 +8037,26 @@ function renderTasks(){
     bindSupervisionTabs();
   }
 })();
+
+// 🔥 جلب جميع البيانات القديمة من localStorage مهما كان اسمها
+function getAllLegacyData(){
+  let all = [];
+  for(let i=0;i<localStorage.length;i++){
+    let key = localStorage.key(i);
+    try{
+      let val = JSON.parse(localStorage.getItem(key));
+      if(Array.isArray(val)){
+        val.forEach(v=>{
+          if(v && (v.teacherName || v.name || v.note || v.rating)){
+            all.push(v);
+          }
+        });
+      }
+    }catch(e){}
+  }
+  return all;
+}
+
 </script>
 
 </body>
