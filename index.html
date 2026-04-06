@@ -655,6 +655,85 @@
       .studentQuickTabs .miniTab{min-width:140px}
     }
 
+
+/* === supervision upgrade === */
+.supervisionFiltersBox{position:relative !important; top:auto !important; z-index:1 !important}
+.supervisionSettingsGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:12px}
+.supervisionArchiveList{display:grid;gap:10px;margin-top:12px}
+.supervisionArchiveItem{background:linear-gradient(180deg,#ffffff,#f7fbff);border:1px solid rgba(0,0,0,.08);border-radius:14px;padding:12px}
+.supervisionSummaryCard .summaryLine{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:8px 0;border-bottom:1px dashed rgba(0,0,0,.08)}
+.supervisionSummaryCard .summaryLine:last-child{border-bottom:none}
+.supervisionForm textarea{width:100%;min-height:120px;padding:12px;border-radius:12px;border:1px solid rgba(0,0,0,.18);font-size:14px;outline:none;background:#fff}
+.supervisionForm input[type="file"]{width:100%;padding:10px;border-radius:12px;border:1px solid rgba(0,0,0,.18);background:#fff}
+.supervisionNoteBadge{display:inline-block;padding:6px 10px;border-radius:999px;background:#eef6ff;color:#0b2a66;font-size:12px;font-weight:1000}
+.supervisionLoginHint{margin-top:8px;color:#47607e;font-weight:900;line-height:1.8}
+.supervisionTabs{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 14px 0}
+.supervisionTabs .superTab{background:#e9f4fb;color:#0b2a66;border:1px solid rgba(0,0,0,.06);border-radius:999px;padding:10px 14px;font-size:13px;font-weight:1000;cursor:pointer}
+.supervisionTabs .superTab.active{background:linear-gradient(90deg,#0b2a66,#0b5bb5);color:#fff}
+.supervisionSection{display:none}
+.supervisionSection.active{display:block}
+.supervisionSettingsGrid.tight{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media(max-width:820px){
+  .supervisionSettingsGrid,.supervisionSettingsGrid.tight{grid-template-columns:1fr}
+}
+
+
+
+/* === supervision ultra polish === */
+.supervisionHero{position:relative;overflow:hidden}
+.supervisionHero:before{content:"";position:absolute;inset:-20% auto auto -10%;width:240px;height:240px;background:radial-gradient(circle,rgba(255,255,255,.22),transparent 65%);pointer-events:none}
+.supervisionHero:after{content:"";position:absolute;inset:auto -10% -30% auto;width:280px;height:280px;background:radial-gradient(circle,rgba(255,255,255,.12),transparent 65%);pointer-events:none}
+.supervisionTabsCard{position:sticky;top:78px;z-index:90;backdrop-filter:blur(8px);background:rgba(255,255,255,.92)}
+.supervisionTabs{overflow:auto;flex-wrap:nowrap;padding-bottom:4px;scrollbar-width:none}
+.supervisionTabs::-webkit-scrollbar{display:none}
+.supervisionTabs .superTab{min-width:max-content;border:1px solid rgba(11,42,102,.08)}
+.supervisionPanelCard,.supervisionKpi,.themeTile{border-radius:20px}
+.supervisionTableCard table{min-width:980px}
+.supervisionTableCard th{position:sticky;top:0;z-index:1}
+#supAuditTable tr:hover td{background:#f7fbff}
+.supervisionNoteBadge{box-shadow:0 8px 16px rgba(0,0,0,.06)}
+@media(max-width:700px){.supervisionTabsCard{top:70px}.supervisionHero .heroTitle{font-size:19px}.supervisionHero .heroSub{font-size:12px}.supervisionMetric .mValue{font-size:16px}}
+
+/* === supervision clean pro === */
+.supervisionHero{background:linear-gradient(135deg,#0b2a66,#0b5bb5);color:#fff;border:1px solid rgba(255,255,255,.14);box-shadow:0 18px 46px rgba(11,42,102,.22)}
+.supervisionHero .heroTitle{font-size:22px;font-weight:1000}
+.supervisionHero .heroSub{font-size:13px;opacity:.95;line-height:1.9;margin-top:6px}
+.supervisionHero .heroActions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+.supervisionHero .heroActions button{min-width:140px}
+.supervisionMetricStrip{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+.supervisionMetric{background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.14);border-radius:16px;padding:12px}
+.supervisionMetric .mLabel{font-size:12px;opacity:.88}
+.supervisionMetric .mValue{font-size:18px;font-weight:1000;margin-top:4px}
+.supervisionShell{display:grid;gap:14px}
+.supervisionTabsCard{padding:16px 16px 14px}
+.supervisionTabs{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.supervisionTabs .superTab{display:inline-flex;align-items:center;justify-content:center;min-width:140px;padding:12px 16px;border-radius:16px;font-weight:1000;transition:.22s ease;box-shadow:0 8px 18px rgba(0,0,0,.05)}
+.supervisionTabs .superTab:hover{transform:translateY(-1px)}
+.supervisionSection{display:none;animation:supervisionFade .28s ease}
+.supervisionSection.active{display:block}
+@keyframes supervisionFade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.supervisionFiltersBox,.supervisionPanelCard{background:linear-gradient(180deg,#ffffff,#f8fbff);border:1px solid rgba(0,0,0,.07);box-shadow:0 10px 22px rgba(0,0,0,.05)}
+.supervisionPanelTitle{font-weight:1000;color:#0b2a66;margin-bottom:6px}
+.supervisionPanelSub{font-size:12px;color:#5d6b82;line-height:1.8}
+.supervisionActionRow{display:flex;gap:10px;flex-wrap:wrap;align-items:end}
+.supervisionActionRow button{flex:1}
+.supervisionKpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}
+.supervisionKpi{border-radius:18px;background:linear-gradient(180deg,#ffffff,#f6fbff);border:1px solid rgba(0,0,0,.06);padding:12px;box-shadow:0 10px 18px rgba(0,0,0,.05)}
+.supervisionKpi .k{font-size:11px;color:#6b7280;font-weight:1000}
+.supervisionKpi .v{font-size:20px;font-weight:1000;color:#0b2a66;margin-top:5px}
+.supervisionTableCard .tableWrap{margin-top:10px}
+.supervisionEmptyNote{padding:14px;border-radius:14px;background:#f6fbff;border:1px dashed rgba(11,42,102,.16);color:#47607e;font-weight:900;text-align:center}
+body[data-theme="alinma"] .supervisionHero{background:linear-gradient(135deg,#5b3a29,#7a5236)}
+body[data-theme="ahli"] .supervisionHero{background:linear-gradient(135deg,#005b45,#0b8a63)}
+@media(max-width:860px){.supervisionMetricStrip,.supervisionKpis{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:620px){.supervisionMetricStrip,.supervisionKpis{grid-template-columns:1fr}.supervisionHero .heroActions button,.supervisionTabs .superTab{width:100%}.supervisionActionRow{flex-direction:column}.supervisionActionRow button{width:100%}}
+
+#supAuditTable tr:hover td,#supGuardianTable tr:hover td{background:#f7fbff}
+.supervisionPanelCard .themeTile{border-radius:16px}
+.supervisionTabsCard{position:sticky;top:82px;z-index:100;background:linear-gradient(180deg,#ffffff,#f7fbff)}
+body[data-theme="alinma"] .supervisionTabsCard{background:linear-gradient(180deg,#fffdfa,#f8efe7)}
+body[data-theme="ahli"] .supervisionTabsCard{background:linear-gradient(180deg,#ffffff,#eef8f3)}
+
 </style>
 
 <style id="theme-full-transform-v25">
@@ -978,8 +1057,9 @@ body[data-theme="ahli"] .topbar{
         </div>
 
         <div class="startActions">
-          <button class="btn" onclick="startApp()">ابدأ الآن</button>
+          <button id="startNowBtn" class="btn" type="button" onclick="startAppSafeDirect()">ابدأ الآن</button>
           <button class="ghostBtn" onclick="openHelp()">هل تحتاج إلى مساعدة؟</button>
+          <button class="ghostBtn" type="button" onclick="goSupervisionLogin()">دخول الإشراف المدرسي</button>
         </div>
       </div>
     </div>
@@ -1088,6 +1168,7 @@ body[data-theme="ahli"] .topbar{
             <span class="small"></span>
           
             <a href="javascript:void(0)" id="changePinLink">تغيير الرقم السري</a>
+            <a href="javascript:void(0)" onclick="goSupervisionLogin()">دخول التقييم والإشراف</a>
           </div>
 
           <div class="row" style="margin-top:12px">
@@ -1166,7 +1247,284 @@ body[data-theme="ahli"] .topbar{
     </div>
   </div>
 
-  <div id="classesPage" class="hidden">
+  
+  <div id="supervisionLoginPage" class="hidden">
+    <div class="container authWrap">
+      <div class="authCard">
+        <div class="authHead">
+          <div class="t">بوابة التقييم والإشراف المدرسي</div>
+          <div class="s">دخول الإدارة / الإشراف لمتابعة العمليات والتحليلات</div>
+        </div>
+        <div class="authBody">
+          <div class="field">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M4 20h16" stroke="#0b2a66" stroke-width="2" stroke-linecap="round"/>
+              <path d="M6 20v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2" stroke="#0b2a66" stroke-width="2" stroke-linecap="round"/>
+              <circle cx="12" cy="8" r="3" stroke="#0b5bb5" stroke-width="2"/>
+            </svg>
+            <input id="suUser" placeholder="اسم المستخدم الإداري / الإشرافي" autocomplete="username"/>
+          </div>
+
+          <div class="field">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M7 10V8a5 5 0 0 1 10 0v2" stroke="#0b2a66" stroke-width="2" stroke-linecap="round"/>
+              <rect x="6" y="10" width="12" height="10" rx="2" stroke="#0b5bb5" stroke-width="2"/>
+            </svg>
+            <input id="suPass" type="password" placeholder="كلمة المرور" autocomplete="current-password"/>
+            <button class="eyeBtn" type="button" onclick="togglePass('suPass',this)">👁️</button>
+          </div>
+
+          <div class="small supervisionLoginHint" id="supervisionLoginHint">أدخلي اسم المستخدم وكلمة المرور للدخول إلى لوحة الإشراف.</div>
+
+          <div class="row" style="margin-top:12px">
+            <button class="btn col" onclick="supervisionLogin()">دخول لوحة الإشراف</button>
+            <button class="btn3 col" onclick="goPublic()">رجوع</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="supervisionPage" class="hidden">
+    <div class="container supervisionShell">
+      <div class="card supervisionHero">
+        <div class="row" style="align-items:center">
+          <div class="col">
+            <div class="heroTitle">لوحة التقييم والإشراف المدرسي</div>
+            <div class="heroSub">نسخة نظيفة واحترافية لعرض المتابعة، التقييم، الشهادات، والأرشيف داخل لوحة واحدة واضحة وسريعة.</div>
+            <div class="supervisionMetricStrip">
+              <div class="supervisionMetric"><div class="mLabel">آخر تحديث</div><div class="mValue" id="supHeroUpdated">—</div></div>
+              <div class="supervisionMetric"><div class="mLabel">عدد العمليات</div><div class="mValue" id="supHeroOps">0</div></div>
+              <div class="supervisionMetric"><div class="mLabel">الطلاب النشطون</div><div class="mValue" id="supHeroActive">0</div></div>
+            </div>
+          </div>
+          <div class="col heroActions" style="text-align:left">
+            <button class="btn3" type="button" onclick="goSupervisionLogin()">تبديل الحساب</button>
+            <button class="btn2" type="button" onclick="renderSupervisionDashboard()">تحديث اللوحة</button>
+            <button class="btnRed" type="button" onclick="logout()">تسجيل خروج</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card soft supervisionTabsCard">
+        <div class="supervisionPanelTitle">تنظيم لوحة الإشراف</div>
+        <div class="supervisionPanelSub">التنقل السريع بين: المتابعة، شهادة الشكر، تقييم المعلمة، والأرشيف.</div>
+        <div class="supervisionTabs" id="supervisionTabsBar">
+          <button class="superTab active" type="button" data-super-tab="overview">📊 المتابعة</button>
+          <button class="superTab" type="button" data-super-tab="certificate">🏆 شهادة الشكر</button>
+          <button class="superTab" type="button" data-super-tab="evaluation">⭐ تقييم المعلمة</button>
+<button class="superTab" type="button" data-super-tab="archive">🗂 الأرشيف</button>
+        </div>
+      </div>
+
+      <div id="supervisionSectionOverview" class="supervisionSection">
+        <div class="card supervisionFiltersBox supervisionPanelCard">
+          <div class="supervisionPanelTitle">مرشحات المتابعة</div>
+          <div class="supervisionPanelSub">اختاري الفصل والتاريخ ونوع العملية ثم اعرضي النتائج بشكل مباشر داخل سجل الإشراف.</div>
+          <div class="grid3" style="margin-top:12px">
+            <div>
+              <div class="small">الفصل</div>
+              <select id="supClassFilter"><option value="">جميع الفصول</option></select>
+            </div>
+            <div>
+              <div class="small">من تاريخ</div>
+              <input id="supFromDate" type="date"/>
+            </div>
+            <div>
+              <div class="small">إلى تاريخ</div>
+              <input id="supToDate" type="date"/>
+            </div>
+          </div>
+          <div class="grid3" style="margin-top:10px">
+            <div>
+              <div class="small">نوع العملية</div>
+              <select id="supTypeFilter">
+                <option value="">الكل</option>
+                <option value="إيداع">إيداع</option>
+                <option value="سحب">سحب</option>
+                <option value="تحويل">تحويل</option>
+                <option value="ملاحظة">ملاحظة</option>
+                <option value="جائزة">جائزة</option>
+              </select>
+            </div>
+            <div>
+              <div class="small">اسم الطالب/ـة</div>
+              <input id="supStudentFilter" placeholder="ابحثي بالاسم"/>
+            </div>
+            <div class="supervisionActionRow">
+              <button class="btn" type="button" onclick="renderSupervisionDashboard()">عرض البيانات</button>
+              <button class="btn3" type="button" onclick="resetSupervisionFilters()">إعادة ضبط</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="supervisionKpis">
+          <div class="supervisionKpi"><div class="k">إجمالي الرصيد الحالي</div><div class="v" id="supKpiBalance">0</div></div>
+          <div class="supervisionKpi"><div class="k">إجمالي الإيداعات</div><div class="v" id="supKpiDeposits">0</div></div>
+          <div class="supervisionKpi"><div class="k">إجمالي السحوبات</div><div class="v" id="supKpiWithdrawals">0</div></div>
+          <div class="supervisionKpi"><div class="k">عدد العمليات</div><div class="v" id="supKpiOps">0</div></div>
+          <div class="supervisionKpi"><div class="k">الطلاب النشطون</div><div class="v" id="supKpiActive">0</div></div>
+          <div class="supervisionKpi"><div class="k">طلاب بدون عمليات</div><div class="v" id="supKpiNoOps">0</div></div>
+          <div class="supervisionKpi"><div class="k">عدد أولياء الأمور المرسل لهم</div><div class="v" id="supKpiGuardians">0</div></div>
+          <div class="supervisionKpi"><div class="k">آخر تحديث</div><div class="v" id="supKpiUpdated">—</div></div>
+        </div>
+
+        <div class="card supervisionTableCard supervisionPanelCard">
+          <div class="supervisionPanelTitle">سجل المتابعة والإشراف</div>
+          <div class="supervisionPanelSub">يعرض آخر العمليات حسب الفلاتر المختارة، مع التاريخ والرصيد ومنفذ العملية.</div>
+          <div class="tableWrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>التاريخ</th>
+                  <th>اليوم</th>
+                  <th>الطالب/ـة</th>
+                  <th>الفصل</th>
+                  <th>نوع العملية</th>
+                  <th>السبب</th>
+                  <th>المبلغ</th>
+                  <th>الرصيد بعد العملية</th>
+                  <th>منفذ العملية</th>
+                </tr>
+              </thead>
+              <tbody id="supAuditTable"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="grid2" style="margin-top:14px">
+          <div class="card supervisionPanelCard">
+            <div class="supervisionPanelTitle">ملخص إشرافي سريع</div>
+            <div class="supervisionPanelSub">أبرز ما يهم المشرفة أو المديرة الآن داخل لوحة واحدة مختصرة.</div>
+            <div class="grid2" style="margin-top:12px">
+              <div class="themeTile">
+                <div class="small">أكثر فصل نشاطًا</div>
+                <div style="font-weight:1000;color:#0b2a66;margin-top:6px" id="supQuickTopClass">—</div>
+              </div>
+              <div class="themeTile">
+                <div class="small">أكثر طالبة/طالب نشاطًا</div>
+                <div style="font-weight:1000;color:#0b2a66;margin-top:6px" id="supQuickTopStudent">—</div>
+              </div>
+              <div class="themeTile">
+                <div class="small">آخر عملية مسجلة</div>
+                <div style="font-weight:1000;color:#0b2a66;margin-top:6px" id="supQuickLastOp">—</div>
+              </div>
+              <div class="themeTile">
+                <div class="small">أقل فصل نشاطًا</div>
+                <div style="font-weight:1000;color:#0b2a66;margin-top:6px" id="supQuickLowClass">—</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card supervisionPanelCard">
+            <div class="supervisionPanelTitle">حالة لوحة المتابعة</div>
+            <div class="supervisionPanelSub">رسالة ذكية سريعة توضّح حالة البيانات الحالية داخل المتابعة.</div>
+            <div id="supOverviewEmpty" class="supervisionEmptyNote" style="margin-top:12px">جاري تجهيز بيانات لوحة الإشراف…</div>
+          </div>
+        </div>
+
+        <div class="card supervisionTableCard supervisionPanelCard" style="margin-top:14px">
+          <div class="supervisionPanelTitle">البريد المنزلي / أولياء الأمور</div>
+          <div class="supervisionPanelSub">يعرض الأرقام المرتبطة بالعمليات الحالية وعدد مرات الإرسال وآخر تاريخ ظهور.</div>
+          <div class="tableWrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>رقم التواصل</th>
+                  <th>الطالب/ـة</th>
+                  <th>الفصل</th>
+                  <th>عدد العمليات</th>
+                  <th>آخر تاريخ</th>
+                </tr>
+              </thead>
+              <tbody id="supGuardianTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div id="supervisionSectionCertificate" class="supervisionSection">
+        <div class="card soft supervisionForm">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+            <div>
+              <div style="font-weight:1000;color:#0b2a66">🏆 شهادة شكر للمعلمة</div>
+              <div class="small" style="margin-top:4px;color:#47607e">تسجيل شهادة شكر أو ملاحظة إيجابية ورفع صورة الشهادة وحفظها في الأرشيف.</div>
+            </div>
+            <button class="btn" onclick="saveSupervisionCertificate()">حفظ الشهادة</button>
+          </div>
+          <div class="grid2" style="margin-top:12px">
+            <div><div class="small">اسم المعلمة</div><input id="supCertTeacherName" placeholder="اسم المعلمة"></div>
+            <div><div class="small">اليوم</div><input id="supCertDay" placeholder="مثال: الأحد"></div>
+            <div><div class="small">التاريخ</div><input id="supCertDate" type="date"></div>
+            <div><div class="small">رفع شهادة شكر</div><input id="supCertFile" type="file" accept="image/*,.pdf"></div>
+          </div>
+          <div style="margin-top:10px">
+            <div class="small">ملاحظة / نص شكر للمعلمة</div>
+            <textarea id="supCertNote" placeholder="اكتبي نص الشكر أو الملاحظة هنا"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div id="supervisionSectionEvaluation" class="supervisionSection">
+        <div class="card soft supervisionForm">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+            <div>
+              <div style="font-weight:1000;color:#0b2a66">⭐ تقييم المعلمة</div>
+              <div class="small" style="margin-top:4px;color:#47607e">يحفظ التقييم ويظهر مباشرة داخل لوحة المعلمة، مع أرشفة آخر التقييمات.</div>
+            </div>
+            <button class="btn" onclick="saveTeacherSupervisionEvaluation()">حفظ التقييم</button>
+          </div>
+          <div class="grid2" style="margin-top:12px">
+            <div><div class="small">اسم المعلمة</div><input id="supEvalTeacherName" placeholder="اسم المعلمة"></div>
+            <div><div class="small">اليوم</div><input id="supEvalDay" placeholder="مثال: الإثنين"></div>
+            <div><div class="small">التاريخ</div><input id="supEvalDate" type="date"></div>
+            <div>
+              <div class="small">التقييم</div>
+              <select id="supEvalRating">
+                <option value="ممتاز">ممتاز</option>
+                <option value="جيد جدًا">جيد جدًا</option>
+                <option value="جيد">جيد</option>
+                <option value="يحتاج متابعة">يحتاج متابعة</option>
+              </select>
+            </div>
+          </div>
+          <div style="margin-top:10px">
+            <div class="small">ملاحظة التقييم</div>
+            <textarea id="supEvalNote" placeholder="اكتبي ملاحظة أو تعليقًا يوضح سبب التقييم"></textarea>
+          </div>
+          <div style="margin-top:10px" class="supervisionNoteBadge" id="supLastEvalBadge">آخر تقييم محفوظ: —</div>
+        </div>
+      </div>
+
+      <div id="supervisionSectionArchive" class="supervisionSection">
+      <div class="card soft">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+          <div>
+            <div style="font-weight:1000;color:#0b2a66">🗂 الأرشيف الإشرافي</div>
+            <div class="small" style="margin-top:4px;color:#47607e">يحفظ تلقائيًا: آخر دخول للمشرفة/المديرة، شهادات الشكر، والتقييمات.</div>
+          </div>
+          <div class="supervisionNoteBadge">أرشيف تلقائي</div>
+        </div>
+        <div class="grid2" style="margin-top:12px">
+          <div class="themeTile">
+            <div class="small">آخر دخول إشرافي</div>
+            <div style="font-weight:1000;color:#0b2a66;margin-top:6px" id="supArchiveLastLogin">—</div>
+          </div>
+          <div class="themeTile">
+            <div class="small">آخر تقييم</div>
+            <div style="font-weight:1000;color:#0b2a66;margin-top:6px" id="supArchiveLastEval">—</div>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap;margin-top:12px">
+          <button class="btnRed" type="button" onclick="deleteSelectedSupervisionArchiveItems()">حذف المحدد من الأرشيف</button>
+        </div>
+        <div class="supervisionArchiveList" id="supArchiveList"></div>
+      </div>
+      </div>
+    </div>
+  </div>
+
+<div id="classesPage" class="hidden">
     <div class="container">
       <div class="card soft">
         <div class="row" style="align-items:center">
@@ -1244,6 +1602,57 @@ body[data-theme="ahli"] .topbar{
           </div>
           <button class="btn3" onclick="openClassQuickSettings()">فتح الإعدادات</button>
         </div>
+      </div>
+
+
+      <div class="card soft" id="supervisionSettingsTeacherCard" style="margin-top:10px">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+          <div>
+            <div style="font-weight:1000;color:#0b2a66">🛠️ إعدادات الإشراف المدرسي</div>
+            <div class="small" style="margin-top:4px;color:#47607e">تعديل اسم المستخدم وكلمة المرور للمديرة والمشرفة، مع تحديث فوري لبوابة الإشراف.</div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn2" onclick="loadSupervisionAccountsToUI()">تحديث الحقول</button>
+            <button class="btn" onclick="saveSupervisionAccounts()">حفظ الإعدادات</button>
+          </div>
+        </div>
+        <div class="supervisionSettingsGrid">
+          <div class="themeTile">
+            <div style="font-weight:1000;color:#0b2a66">👩🏻‍💼 حساب المديرة</div>
+            <div class="small" style="margin-top:6px">اسم المستخدم</div>
+            <input id="supAdminUser" placeholder="مثال: admin" style="margin-top:6px">
+            <div class="small" style="margin-top:10px">كلمة المرور</div>
+            <input id="supAdminPass" type="password" placeholder="أدخلي كلمة المرور" style="margin-top:6px">
+          </div>
+          <div class="themeTile">
+            <div style="font-weight:1000;color:#0b2a66">🧕 حساب المشرفة</div>
+            <div class="small" style="margin-top:6px">اسم المستخدم</div>
+            <input id="supSupervisorUser" placeholder="مثال: supervisor" style="margin-top:6px">
+            <div class="small" style="margin-top:10px">كلمة المرور</div>
+            <input id="supSupervisorPass" type="password" placeholder="أدخلي كلمة المرور" style="margin-top:6px">
+          </div>
+        </div>
+      </div>
+
+      <div class="card soft supervisionSummaryCard" id="supervisionTeacherSummaryCard" style="margin-top:10px">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+          <div>
+            <div style="font-weight:1000;color:#0b2a66">🏫 ملخص الإشراف في لوحة المعلمة</div>
+            <div class="small" style="margin-top:4px;color:#47607e">يعرض آخر تقييم، آخر دخول إشرافي، وآخر شهادة شكر محفوظة من لوحة الإشراف.</div>
+          </div>
+          <button class="btn3" onclick="goSupervisionLogin()">فتح بوابة الإشراف</button>
+        </div>
+        <div style="margin-top:12px">
+          <div class="summaryLine"><span class="small">⭐ آخر تقييم للمعلمة</span><strong id="teacherSupervisionLastRating">—</strong></div>
+          <div class="summaryLine"><span class="small">🕓 آخر دخول للمشرفة / المديرة</span><strong id="teacherSupervisionLastLogin">—</strong></div>
+          <div class="summaryLine"><span class="small">🏆 آخر شهادة شكر</span><strong id="teacherSupervisionLastCertificate">—</strong></div>
+          <div class="summaryLine"><span class="small">🗂 عدد عناصر الأرشيف</span><strong id="teacherSupervisionArchiveCount">0</strong></div>
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap;margin-top:12px">
+          <button class="btnRed" type="button" onclick="deleteLastTeacherSupervisionEvaluation()">حذف آخر تقييم</button>
+          <button class="btnRed" type="button" onclick="deleteLastTeacherSupervisionCertificate()">حذف آخر شهادة شكر</button>
+        </div>
+        <div id="teacherSupervisionCertificatePreview" style="margin-top:12px"></div>
       </div>
 
       <div class="card soft" id="freezeAccountCard" style="margin-top:10px">
@@ -3961,399 +4370,68 @@ document.addEventListener("DOMContentLoaded", async()=>{
     function openPrintWindow(title, innerHtml){
       const w = window.open("", "_blank");
       if(!w) return warn("المتصفح منع فتح نافذة التقرير. فعّلي Pop-ups ثم جربي.");
-      const {greg, hijri} = hijriAndGregToday();
-      w.document.open();
-      w.document.write(`
-<!doctype html><html lang="ar" dir="rtl"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>${title}</title>
+      const info = (typeof hijriAndGregToday === "function") ? hijriAndGregToday() : {greg:"", hijri:""};
+      const greg = info.greg || "";
+      const hijri = info.hijri || "";
+      const logo = (typeof BANK_LOGO === "string" ? BANK_LOGO : "");
+      const school = (typeof SCHOOL_NAME === "string" ? SCHOOL_NAME : "");
+      const teacher = (typeof TEACHER_NAME === "string" ? TEACHER_NAME : "");
+      const subject = (typeof SUBJECT_NAME === "string" ? SUBJECT_NAME : "الرياضيات");
+      const safeTitle = String(title || "تقرير");
+      const safeInner = String(innerHtml || "");
+      const html = `<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${safeTitle}</title>
 <style>
-  *{box-sizing:border-box;font-family:Tahoma,Arial,sans-serif}
-  body{margin:0;background:#f5f7fb;color:#111827}
-  .paper{max-width:900px;margin:18px auto;background:#fff;border:1px solid #e5e7eb;border-radius:16px;padding:18px}
-  .head{display:flex;justify-content:space-between;gap:14px;align-items:center;flex-wrap:wrap}
-  .brand{display:flex;gap:12px;align-items:center}
-  .logo{width:66px;height:66px;border-radius:14px;overflow:hidden;border:1px solid rgba(0,0,0,.12);background:#fff}
-  .logo img{width:100%;height:100%;object-fit:contain}
-  .t1{font-weight:1000;color:#0b2a66;font-size:18px}
-  .t2{font-weight:900;color:#6b7280;font-size:12px;margin-top:4px}
-  .dates{font-size:12px;color:#6b7280;font-weight:900;line-height:1.7;text-align:left;direction:ltr}
-  .stamp{width:92px;height:92px;opacity:.98}
-  .stamp img{width:92px;height:92px;object-fit:contain}
-  hr{border:0;border-top:1px solid #e5e7eb;margin:14px 0}
-  table{width:100%;border-collapse:collapse}
-  th,td{border-bottom:1px solid #eef2f7;padding:10px;text-align:center;font-size:13px;white-space:nowrap}
-  th{background:#eef6ff;color:#0b2a66;font-weight:1000}
-  .sigRow{display:flex;justify-content:space-between;gap:12px;align-items:flex-end;margin-top:18px;flex-wrap:wrap}
-  .sigBox{min-width:260px;border-top:1px dashed #9ca3af;padding-top:8px;font-weight:900;font-size:12px}
-  .sigBox img{height:46px;object-fit:contain;display:block;margin-top:6px}
-  .muted{color:#6b7280}
-  @media print{ body{background:#fff} .paper{border:0;margin:0;border-radius:0} }
-
-    /* Daily ops list */
-    .opCard{
-      border:1px solid rgba(0,0,0,.08);
-      border-radius:16px;
-      padding:12px;
-      background:linear-gradient(180deg,#ffffff,#f8fbff);
-      box-shadow:0 10px 18px rgba(0,0,0,.05);
-      margin:10px 0;
-    }
-    .opTop{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
-    .opName{font-weight:1000;color:#0b2a66}
-    .opMeta{font-size:12px;color:#6b7280;font-weight:900}
-    .opLine{margin-top:8px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-    .pill2{display:inline-block;background:#eef6ff;border:1px solid rgba(0,0,0,.06);padding:6px 10px;border-radius:999px;font-weight:1000;font-size:12px;color:#0b2a66}
-
-  
-    .studentQuickTabs{gap:10px}
-    .studentQuickTabs .miniTab{min-width:165px;flex:0 0 auto}
-    .studentSectionTitle{margin-top:8px;font-size:16px;font-weight:1000;color:#0b2a66}
-    @media(max-width:820px){
-      .studentQuickTabs{overflow:auto;flex-wrap:nowrap;padding-bottom:4px}
-      .studentQuickTabs .miniTab{min-width:140px}
-    }
-
+*{box-sizing:border-box;font-family:Tahoma,Arial,sans-serif}
+body{margin:0;background:#f5f7fb;color:#111827}
+.paper{max-width:900px;margin:18px auto;background:#fff;border:1px solid #e5e7eb;border-radius:16px;padding:18px}
+.head{display:flex;justify-content:space-between;gap:14px;align-items:center;flex-wrap:wrap}
+.brand{display:flex;gap:12px;align-items:center}
+.logo{width:66px;height:66px;border-radius:14px;overflow:hidden;border:1px solid rgba(0,0,0,.12);background:#fff;display:flex;align-items:center;justify-content:center}
+.logo img{width:100%;height:100%;object-fit:contain}
+.t1{font-weight:1000;color:#0b2a66;font-size:18px}
+.t2{font-weight:900;color:#6b7280;font-size:12px;margin-top:4px}
+.dates{font-size:12px;color:#6b7280;font-weight:900;line-height:1.7;text-align:left;direction:ltr}
+hr{border:0;border-top:1px solid #e5e7eb;margin:14px 0}
+table{width:100%;border-collapse:collapse}
+th,td{border-bottom:1px solid #eef2f7;padding:10px;text-align:center;font-size:13px;white-space:nowrap}
+th{background:#eef6ff;color:#0b2a66;font-weight:1000}
+.sigRow{display:flex;justify-content:space-between;gap:12px;align-items:flex-end;margin-top:18px;flex-wrap:wrap}
+.sigBox{min-width:260px;border-top:1px dashed #9ca3af;padding-top:8px;font-weight:900;font-size:12px}
+.muted{color:#6b7280}
+@media print{body{background:#fff}.paper{border:0;margin:0;border-radius:0}}
 </style>
-
-<style id="theme-full-transform-v25">
-body[data-theme="alinma"]{
-  color:#2f241d;
-}
-body[data-theme="ahli"]{
-  color:#123027;
-}
-body[data-theme="alinma"] .topbar .logo,
-body[data-theme="ahli"] .topbar .logo{
-  background:rgba(255,255,255,.96);
-  box-shadow:0 10px 22px rgba(0,0,0,.14);
-}
-body[data-theme="alinma"] .card,
-body[data-theme="alinma"] .authCard,
-body[data-theme="alinma"] .modalBox,
-body[data-theme="alinma"] .onbBox{
-  background:linear-gradient(180deg,#fffdfa,#f8efe7);
-  border-color:rgba(91,58,41,.12);
-}
-body[data-theme="ahli"] .card,
-body[data-theme="ahli"] .authCard,
-body[data-theme="ahli"] .modalBox,
-body[data-theme="ahli"] .onbBox{
-  background:linear-gradient(180deg,#ffffff,#eff9f4);
-  border-color:rgba(1,76,57,.10);
-}
-body[data-theme="alinma"] .sidebarNav .sideTitle,
-body[data-theme="ahli"] .sidebarNav .sideTitle{
-  color:#fff;
-}
-body[data-theme="alinma"] .sideBtn{
-  background:rgba(255,255,255,.12);
-  color:#fff;
-  border:1px solid rgba(255,255,255,.12);
-}
-body[data-theme="ahli"] .sideBtn{
-  background:rgba(255,255,255,.10);
-  color:#fff;
-  border:1px solid rgba(255,255,255,.12);
-}
-body[data-theme="alinma"] .sideBtn.active,
-body[data-theme="alinma"] .sideBtn:hover{
-  background:#fff5ee;
-  color:#5b3a29;
-}
-body[data-theme="ahli"] .sideBtn.active,
-body[data-theme="ahli"] .sideBtn:hover{
-  background:#f2fff9;
-  color:#005b45;
-}
-body[data-theme="alinma"] .tab.active,
-body[data-theme="alinma"] .miniTab.active{
-  background:linear-gradient(90deg,#5b3a29,#7a5236);
-  color:#fff;
-}
-body[data-theme="ahli"] .tab.active,
-body[data-theme="ahli"] .miniTab.active{
-  background:linear-gradient(90deg,#005b45,#0b8a63);
-  color:#fff;
-}
-body[data-theme="alinma"] .tab,
-body[data-theme="alinma"] .miniTab{
-  background:#f6ece3;
-  color:#4a3022;
-}
-body[data-theme="ahli"] .tab,
-body[data-theme="ahli"] .miniTab{
-  background:#eaf8f1;
-  color:#0c4a38;
-}
-body[data-theme="alinma"] .kpi,
-body[data-theme="alinma"] .awardKpi,
-body[data-theme="alinma"] .leaderWrap,
-body[data-theme="alinma"] .awardCard,
-body[data-theme="alinma"] .opCard{
-  background:linear-gradient(180deg,#fffdfa,#f8efe7);
-  border-color:rgba(91,58,41,.10);
-}
-body[data-theme="ahli"] .kpi,
-body[data-theme="ahli"] .awardKpi,
-body[data-theme="ahli"] .leaderWrap,
-body[data-theme="ahli"] .awardCard,
-body[data-theme="ahli"] .opCard{
-  background:linear-gradient(180deg,#ffffff,#eef8f3);
-  border-color:rgba(1,76,57,.10);
-}
-body[data-theme="alinma"] .kpi .v,
-body[data-theme="alinma"] .aTitle,
-body[data-theme="alinma"] .lbName,
-body[data-theme="alinma"] .bankBrand,
-body[data-theme="alinma"] .cardNum,
-body[data-theme="alinma"] .cardMeta,
-body[data-theme="alinma"] .holder,
-body[data-theme="alinma"] .pdfTitle,
-body[data-theme="alinma"] .lbRank{
-  color:#5b3a29 !important;
-}
-body[data-theme="ahli"] .kpi .v,
-body[data-theme="ahli"] .aTitle,
-body[data-theme="ahli"] .lbName,
-body[data-theme="ahli"] .bankBrand,
-body[data-theme="ahli"] .cardNum,
-body[data-theme="ahli"] .cardMeta,
-body[data-theme="ahli"] .holder,
-body[data-theme="ahli"] .pdfTitle,
-body[data-theme="ahli"] .lbRank{
-  color:#005b45 !important;
-}
-body[data-theme="alinma"] .tableWrap{
-  background:#fffaf6;
-  border-color:#ead8ca;
-}
-body[data-theme="ahli"] .tableWrap{
-  background:#f5fffa;
-  border-color:#dbeee6;
-}
-body[data-theme="alinma"] th{
-  background:#f3e4d8;
-  color:#5b3a29;
-}
-body[data-theme="ahli"] th{
-  background:#e4f5ed;
-  color:#005b45;
-}
-body[data-theme="alinma"] .badge.on,
-body[data-theme="alinma"] .aBadge.ok{
-  background:#ead8ca;
-  color:#5b3a29;
-}
-body[data-theme="ahli"] .badge.on,
-body[data-theme="ahli"] .aBadge.ok{
-  background:#dff3ea;
-  color:#005b45;
-}
-body[data-theme="alinma"] .bankCard:before{
-  background:
-    radial-gradient(circle at 12% 18%, rgba(122,82,54,.24) 0%, rgba(122,82,54,0) 45%),
-    radial-gradient(circle at 88% 72%, rgba(91,58,41,.18) 0%, rgba(91,58,41,0) 48%),
-    linear-gradient(135deg, rgba(0,0,0,.00) 0%, rgba(0,0,0,.03) 100%);
-}
-body[data-theme="ahli"] .bankCard:before{
-  background:
-    radial-gradient(circle at 12% 18%, rgba(11,138,99,.20) 0%, rgba(11,138,99,0) 45%),
-    radial-gradient(circle at 88% 72%, rgba(0,91,69,.16) 0%, rgba(0,91,69,0) 48%),
-    linear-gradient(135deg, rgba(0,0,0,.00) 0%, rgba(0,0,0,.03) 100%);
-}
-body[data-theme="alinma"] .chip{
-  background:linear-gradient(180deg,#d7b28e,#a67855);
-}
-body[data-theme="ahli"] .chip{
-  background:linear-gradient(180deg,#b5e2d1,#5ba98a);
-}
-body[data-theme="alinma"] .footerLinks{
-  background:rgba(91,58,41,.08);
-  border-color:rgba(91,58,41,.16);
-}
-body[data-theme="ahli"] .footerLinks{
-  background:rgba(0,91,69,.06);
-  border-color:rgba(0,91,69,.16);
-}
-body[data-theme="alinma"] .footerLinks a,
-body[data-theme="alinma"] .footerNote{
-  color:#5b3a29;
-}
-body[data-theme="ahli"] .footerLinks a,
-body[data-theme="ahli"] .footerNote{
-  color:#005b45;
-}
-body[data-theme="alinma"] .themeTile{
-  background:linear-gradient(180deg,#fffdfa,#f8efe7);
-}
-body[data-theme="ahli"] .themeTile{
-  background:linear-gradient(180deg,#ffffff,#eef8f3);
-}
-</style>
-
-
-<style id="safe-theme-overrides-v1">
-/* Safe CSS-only theme overrides: no JS changes */
-body[data-theme="alinma"] .onbBox,
-body[data-theme="alinma"] .authCard{
-  background: linear-gradient(180deg,#fffaf6 0%,#f6ede4 100%) !important;
-  border:1px solid rgba(122,82,54,.18) !important;
-  border-radius:28px !important;
-  box-shadow:0 18px 40px rgba(93,61,39,.16) !important;
-}
-body[data-theme="alinma"] #startOverlay{
-  background: radial-gradient(circle at top, #a67c52 0%, #6d4c41 45%, #3e2723 100%) !important;
-}
-body[data-theme="alinma"] #startOverlay .onbBox{
-  background: linear-gradient(135deg,rgba(255,248,240,.95),rgba(247,237,228,.92)) !important;
-}
-body[data-theme="alinma"] .btn{
-  background: linear-gradient(135deg,#8a5b3d,#6d4c41) !important;
-  border-radius:16px !important;
-  box-shadow:0 8px 18px rgba(109,76,65,.25) !important;
-}
-body[data-theme="alinma"] .btn2{
-  background:#ead8ca !important; color:#4e342e !important; border-radius:16px !important;
-}
-body[data-theme="alinma"] .btn3{
-  background:#f6eee7 !important; color:#5d4037 !important; border-radius:16px !important; border:1px solid rgba(122,82,54,.16) !important;
-}
-body[data-theme="alinma"] .tab,
-body[data-theme="alinma"] .miniTab,
-body[data-theme="alinma"] .sideBtn{
-  border-radius:14px !important;
-  background:#f3e7dc !important;
-  color:#4e342e !important;
-  border:1px solid rgba(122,82,54,.14) !important;
-}
-body[data-theme="alinma"] .tab.active,
-body[data-theme="alinma"] .miniTab.active,
-body[data-theme="alinma"] .sideBtn.active{
-  background:linear-gradient(135deg,#8a5b3d,#6d4c41) !important;
-  color:#fff !important;
-}
-body[data-theme="alinma"] .bankCard{
-  border-radius:24px !important;
-  box-shadow:0 14px 34px rgba(93,61,39,.22) !important;
-}
-body[data-theme="alinma"] .card.soft,
-body[data-theme="alinma"] .kpi,
-body[data-theme="alinma"] .awardCard,
-body[data-theme="alinma"] .leaderWrap,
-body[data-theme="alinma"] .opCard{
-  border-radius:22px !important;
-  box-shadow:0 10px 24px rgba(93,61,39,.12) !important;
-}
-body[data-theme="alinma"] .topbar{
-  background: linear-gradient(90deg,#4e342e,#7b5b43) !important;
-}
-
-body[data-theme="ahli"] .onbBox,
-body[data-theme="ahli"] .authCard{
-  background: linear-gradient(180deg,#f7fffb 0%,#eefaf4 100%) !important;
-  border:1px solid rgba(11,138,99,.14) !important;
-  border-radius:28px !important;
-  box-shadow:0 16px 34px rgba(8,102,73,.12) !important;
-}
-body[data-theme="ahli"] #startOverlay{
-  background: radial-gradient(circle at top, #16a085 0%, #0b8a63 48%, #055540 100%) !important;
-}
-body[data-theme="ahli"] #startOverlay .onbBox{
-  background: linear-gradient(135deg,rgba(244,255,250,.96),rgba(230,248,240,.92)) !important;
-}
-body[data-theme="ahli"] .btn{
-  background: linear-gradient(135deg,#10a37f,#0b8a63) !important;
-  border-radius:999px !important;
-  box-shadow:0 8px 18px rgba(11,138,99,.18) !important;
-}
-body[data-theme="ahli"] .btn2{
-  background:#daf4ea !important; color:#075943 !important; border-radius:999px !important;
-}
-body[data-theme="ahli"] .btn3{
-  background:#edf9f4 !important; color:#08664b !important; border-radius:999px !important; border:1px solid rgba(11,138,99,.12) !important;
-}
-body[data-theme="ahli"] .tab,
-body[data-theme="ahli"] .miniTab,
-body[data-theme="ahli"] .sideBtn{
-  border-radius:999px !important;
-  background:#e6f7f0 !important;
-  color:#075943 !important;
-  border:1px solid rgba(11,138,99,.10) !important;
-}
-body[data-theme="ahli"] .tab.active,
-body[data-theme="ahli"] .miniTab.active,
-body[data-theme="ahli"] .sideBtn.active{
-  background:linear-gradient(135deg,#10a37f,#0b8a63) !important;
-  color:#fff !important;
-}
-body[data-theme="ahli"] .bankCard{
-  border-radius:28px !important;
-  box-shadow:0 14px 28px rgba(8,102,73,.16) !important;
-}
-body[data-theme="ahli"] .card.soft,
-body[data-theme="ahli"] .kpi,
-body[data-theme="ahli"] .awardCard,
-body[data-theme="ahli"] .leaderWrap,
-body[data-theme="ahli"] .opCard{
-  border-radius:24px !important;
-  box-shadow:0 10px 22px rgba(8,102,73,.10) !important;
-}
-body[data-theme="ahli"] .topbar{
-  background: linear-gradient(90deg,#066a51,#0b8a63) !important;
-}
-</style>
-</head><body>
-<div class="paper">
-  <div class="head">
-    <div class="brand">
-      <div class="logo"><img src="logo.png" alt="logo"></div>
-      <div>
-        <div class="t1">بنك الرياضيات – المعلمة سارة حقوي</div>
-        <div class="t2">مدرسة رواد الشرق الأهلية</div>
-        <div class="t2 muted">${hijri ? ("التاريخ الهجري: " + hijri + " • ") : ""}التاريخ الميلادي: ${greg}</div>
+</head>
+<body onload="setTimeout(function(){window.print();},300)">
+  <div class="paper">
+    <div class="head">
+      <div class="brand">
+        <div class="logo">${logo ? `<img src="${logo}" alt="logo">` : ``}</div>
+        <div>
+          <div class="t1">${safeTitle}</div>
+          <div class="t2">${school} • ${teacher} • ${subject}</div>
+        </div>
       </div>
+      <div class="dates">${greg}<br>${hijri}</div>
     </div>
-    <div class="stamp"><img src="stamp.png" alt="stamp"></div>
+    <hr>
+    ${safeInner}
+    <div class="sigRow">
+      <div class="sigBox">إعداد النظام<br>${teacher || "—"}</div>
+      <div class="sigBox" style="text-align:left;direction:ltr">التاريخ<br>${greg}</div>
+    </div>
   </div>
-  <hr>
-  ${innerHtml}
-  <div class="sigRow">
-    <div class="sigBox">توقيع المعلمة<br>${SIGNATURE}<img src="signature.png" alt="signature"></div>
-    <div class="sigBox" style="text-align:left;direction:ltr">التاريخ<br>${greg}</div>
-  </div>
-</div>
-<script>
-  window.onload = ()=>{ setTimeout(()=>window.print(), 300); };
-<\/script>
 
-<script>
-function setBankTheme(theme){
-  const body=document.body;
-  body.removeAttribute("data-theme");
-  if(theme!=="default"){body.setAttribute("data-theme",theme);}
-  localStorage.setItem("BANK_THEME",theme);
-}
-function loadBankTheme(){
-  const t=localStorage.getItem("BANK_THEME")||"default";
-  if(t!=="default"){document.body.setAttribute("data-theme",t);}
-}
-document.addEventListener("DOMContentLoaded",loadBankTheme);
-<\/script>
-<style>
-body[data-theme="alinma"]{
-background:linear-gradient(180deg,#4a2d20 0%, #6a422f 24%, #f8f2ec 24%);
---navy:#5b3a29;
---green:#8b6a4b;
-}
-body[data-theme="ahli"]{
-background:linear-gradient(180deg,#014c39 0%, #0b6d52 24%, #f6fbf8 24%);
---navy:#005b45;
---green:#0b8a63;
-}
-</style>
 
-</body></html>`);
+
+</body>
+</html>`;
+      w.document.open();
+      w.document.write(html);
       w.document.close();
     }
 
@@ -5995,8 +6073,50 @@ function renderRoulettePane(){
       {id:'teacher-tabs', label:'الفصول', selector:'#classTabs', wrap:true, wrapTitle:'الفصول — اضغطي على اسم الفصل للدخول مباشرة'},
       {id:'teacher-quick', label:'إعدادات سريعة', childIndex:5},
       {id:'teacher-freeze', label:'تجميد الحساب', selector:'#freezeAccountCard'},
-      {id:'teacher-theme', label:'ألوان البنك', selector:'#themeBankCard'}
+      {id:'teacher-theme', label:'ألوان البنك', selector:'#themeBankCard'},
+      {id:'teacher-sup-settings', label:'إعدادات الإشراف المدرسي', selector:'#supervisionSettingsTeacherCard'},
+      {id:'teacher-sup-summary', label:'ملخص الإشراف', selector:'#supervisionTeacherSummaryCard'},
+      {id:'teacher-tasks', label:'المهام الأدائية', selector:'#perfTeacherSection'}
     ]);
+  }
+
+
+  function enhanceTeacherSidebarTabs(){
+    const page = document.getElementById('classesPage');
+    if(!page) return;
+    const shell = page.querySelector('.sidebarShell');
+    if(!shell) return;
+    const nav = shell.querySelector('.sidebarNav');
+    const content = shell.querySelector('.sidebarContent');
+    if(!nav || !content) return;
+
+    const extras = [
+      {id:'teacher-theme', label:'ألوان البنك', selector:'#themeBankCard'},
+      {id:'teacher-sup-settings', label:'إعدادات الإشراف المدرسي', selector:'#supervisionSettingsTeacherCard'},
+      {id:'teacher-sup-summary', label:'ملخص الإشراف', selector:'#supervisionTeacherSummaryCard'},
+      {id:'teacher-tasks', label:'المهام الأدائية', selector:'#perfTeacherSection'}
+    ];
+
+    extras.forEach((spec)=>{
+      const el = page.querySelector(spec.selector);
+      if(!el) return;
+      el.classList.add('sidebarSection');
+      el.dataset.sidebarItem = spec.id;
+
+      let btn = nav.querySelector('.sideBtn[data-target="'+spec.id+'"]');
+      if(!btn){
+        btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'sideBtn';
+        btn.dataset.target = spec.id;
+        btn.dataset.page = 'classesPage';
+        btn.innerHTML = '<span>'+spec.label+'</span><span class="num">•</span>';
+        btn.addEventListener('click', ()=> sidebarShowSection('classesPage', spec.id));
+        nav.appendChild(btn);
+      }
+
+      content.appendChild(el);
+    });
   }
 
   function initClassSidebar(){
@@ -6042,7 +6162,10 @@ function renderRoulettePane(){
       {id:'teacher-tabs', label:'الفصول'},
       {id:'teacher-quick', label:'إعدادات سريعة'},
       {id:'teacher-freeze', label:'تجميد الحساب'},
-      {id:'teacher-theme', label:'ألوان البنك'}
+      {id:'teacher-theme', label:'ألوان البنك'},
+      {id:'teacher-sup-settings', label:'إعدادات الإشراف المدرسي'},
+      {id:'teacher-sup-summary', label:'ملخص الإشراف'},
+      {id:'teacher-tasks', label:'المهام الأدائية'}
     ];
     teacherLinks.forEach((item, idx)=>{
       const btn = document.createElement('button');
@@ -6083,7 +6206,7 @@ function renderRoulettePane(){
   }
 
   function initSidebars(){
-    try{ initTeacherSidebar(); }catch(e){ console.error('teacher sidebar error', e); }
+    try{ initTeacherSidebar(); enhanceTeacherSidebarTabs(); }catch(e){ console.error('teacher sidebar error', e); }
     try{ initClassSidebar(); }catch(e){ console.error('class sidebar error', e); }
     try{ if(window.injectLayoutChoosers) window.injectLayoutChoosers(); }catch(e){}
   }
@@ -6492,7 +6615,1126 @@ background:linear-gradient(180deg,#014c39 0%, #0b6d52 24%, #f6fbf8 24%);
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', bindStart);
   else bindStart();
+  document.addEventListener('DOMContentLoaded', function(){
+    try{
+      loadSupervisionAccountsToUI();
+      updateTeacherSupervisionSummary();
+      loadSupervisionAccountsToUI();
+      if(sup$('supCertTeacherName') && !sup$('supCertTeacherName').value) sup$('supCertTeacherName').value = getTeacherDisplayName();
+      if(sup$('supEvalTeacherName') && !sup$('supEvalTeacherName').value) sup$('supEvalTeacherName').value = getTeacherDisplayName();
+      if(sup$('supCertDate') && !sup$('supCertDate').value) sup$('supCertDate').value = todayIso();
+      if(sup$('supEvalDate') && !sup$('supEvalDate').value) sup$('supEvalDate').value = todayIso();
+    }catch(e){}
+  });
 })();
 </script>
+
+<!-- ===== المهام الأدائية ===== -->
+<div class="card soft" id="tasksSection">
+  <h3 style="font-weight:1000;color:#0b2a66">📌 المهام الأدائية</h3>
+
+  <div class="card">
+    <input id="taskName" placeholder="اسم المهمة">
+    <input id="taskPoints" placeholder="النقاط">
+    <button class="btn" onclick="addTask()">إضافة مهمة</button>
+  </div>
+
+  <div id="tasksList"></div>
+</div>
+
+<script>
+let tasks = [];
+
+function addTask(){
+  let name = document.getElementById('taskName').value;
+  let points = document.getElementById('taskPoints').value;
+  if(!name) return;
+
+  tasks.push({name, points, done:false});
+  renderTasks();
+}
+
+function toggleTask(i){
+  tasks[i].done = !tasks[i].done;
+  renderTasks();
+}
+
+function renderTasks(){
+  let html = '';
+  tasks.forEach((t,i)=>{
+    html += `
+      <div class="card">
+        <b>${t.name}</b><br>
+        النقاط: ${t.points}<br>
+        الحالة: ${t.done ? '✔ مكتملة' : '⏳ قيد التنفيذ'}
+        <br><br>
+        <button class="btn2" onclick="toggleTask(${i})">تغيير الحالة</button>
+      </div>
+    `;
+  });
+  document.getElementById('tasksList').innerHTML = html;
+}
+</script>
+
+
+<style id="perf-linked-premium-style">
+#tasksSection{display:none!important}
+.perf-shell{display:grid;gap:14px}
+.perf-hero{
+  background:linear-gradient(135deg,#0b2a66,#0b5bb5);
+  color:#fff;border-radius:22px;padding:18px;box-shadow:0 14px 34px rgba(0,0,0,.12)
+}
+.perf-hero h3{margin:0 0 6px;font-size:22px}
+.perf-hero p{margin:0;opacity:.92;line-height:1.9}
+.perf-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:820px){.perf-grid{grid-template-columns:1fr}}
+.perf-card{background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:18px;padding:14px;box-shadow:0 8px 18px rgba(0,0,0,.06)}
+.perf-card h4{margin:0 0 10px;color:#0b2a66;font-size:16px}
+.perf-task-list{display:grid;gap:12px}
+.perf-task{
+  background:linear-gradient(180deg,#fff,#f8fbff);border:1px solid #e6eef7;border-radius:18px;padding:14px
+}
+.perf-task-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap}
+.perf-task-title{font-weight:1000;color:#0b2a66}
+.perf-task-meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.perf-pill{display:inline-flex;align-items:center;gap:6px;background:#eef6ff;color:#0b2a66;border:1px solid rgba(0,0,0,.06);padding:6px 10px;border-radius:999px;font-size:12px;font-weight:1000}
+.perf-pill.ok{background:#e6f7ef;color:#166534}
+.perf-pill.warn{background:#fff4e5;color:#9a6700}
+.perf-pill.no{background:#fdecec;color:#991b1b}
+.perf-student-row{margin-top:10px;border:1px solid #e6eef7;border-radius:16px;padding:12px;background:#fff}
+.perf-student-head{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center}
+.perf-student-name{font-weight:1000;color:#0b2a66}
+.perf-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.perf-actions > *{flex:1}
+.perf-progress{height:10px;background:#eaf3fb;border-radius:999px;overflow:hidden;margin-top:10px}
+.perf-progress > div{height:100%;background:linear-gradient(90deg,#0b5bb5,#2e7d32);border-radius:999px}
+.perf-note{font-size:12px;color:#5b6574;line-height:1.8;margin-top:8px}
+.perf-empty{padding:18px;border:1px dashed #c8d8ec;border-radius:18px;background:#f9fbfe;color:#5b6574;text-align:center}
+.perf-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media(max-width:760px){.perf-kpis{grid-template-columns:1fr}}
+.perf-kpi{background:#fff;border:1px solid #e6eef7;border-radius:16px;padding:12px;text-align:center}
+.perf-kpi strong{display:block;color:#0b2a66;font-size:22px}
+.perf-kpi span{display:block;color:#5b6574;font-size:12px;margin-top:4px}
+</style>
+<script id="perf-linked-premium-script">
+(function(){
+  const collName = 'performanceTasks';
+  function gid(id){ return document.getElementById(id); }
+  function esc(v){ return String(v||'').replace(/[&<>"']/g, s=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[s])); }
+  function perfStatusLabel(st){
+    if(st==='done') return 'مكتملة';
+    if(st==='late') return 'متأخرة';
+    return 'قيد التنفيذ';
+  }
+  function perfNotice(msg, ok=true){
+    if(typeof openModal==='function') openModal(ok?'تم':'تنبيه', `<div class="small" style="line-height:1.9">${esc(msg)}</div>`, '<button class="btn" onclick="closeModal()">إغلاق</button>');
+    else alert(msg);
+  }
+  function addStudentTab(){
+    const tabs = document.querySelector('#studentAccountPage .studentQuickTabs');
+    if(!tabs || gid('perfStudentTabBtn')) return;
+    const tab = document.createElement('div');
+    tab.className='miniTab';
+    tab.id='perfStudentTabBtn';
+    tab.textContent='📝 المهام الأدائية';
+    tab.onclick=function(){ setMiniTab('panePerformanceTasks', this); };
+    tabs.appendChild(tab);
+
+    const pane = document.createElement('div');
+    pane.id='panePerformanceTasks';
+    pane.className='miniPane';
+    pane.innerHTML = `
+      <div class="studentSectionTitle">المهام الأدائية</div>
+      <div class="perf-kpis" style="margin-top:12px">
+        <div class="perf-kpi"><strong id="perfStuCount">0</strong><span>عدد المهام</span></div>
+        <div class="perf-kpi"><strong id="perfStuDone">0</strong><span>المهام المكتملة</span></div>
+        <div class="perf-kpi"><strong id="perfStuPts">0</strong><span>نقاط المهام</span></div>
+      </div>
+      <div id="studentPerformanceTaskList" class="perf-task-list" style="margin-top:12px"></div>`;
+    const card = document.querySelector('#studentAccountPage .card.soft');
+    card.appendChild(pane);
+  }
+  function addTeacherPane(){
+    const container = document.querySelector('#classesPage .container');
+    if(!container || gid('perfTeacherSection')) return;
+    const wrap = document.createElement('div');
+    wrap.id='perfTeacherSection';
+    wrap.className='card soft';
+    wrap.innerHTML = `
+      <div class="perf-shell">
+        <div class="perf-hero">
+          <h3>📝 المهام الأدائية</h3>
+          <p>إضافة مهمة مرتبطة بالفصل، وتقييم كل طالب/ة، وربطها بالنقاط الأسبوعية ولوحة الشرف وكشف الحساب.</p>
+        </div>
+        <div class="perf-grid">
+          <div class="perf-card">
+            <h4>إضافة مهمة أدائية</h4>
+            <div class="row">
+              <div class="col"><div class="small">الفصل</div><select id="perfTaskClass"></select></div>
+              <div class="col"><div class="small">اسم المهمة</div><input id="perfTaskTitle" placeholder="مثال: مشروع النسبة والتناسب"></div>
+            </div>
+            <div class="row">
+              <div class="col"><div class="small">المهارة / الوصف المختصر</div><input id="perfTaskSkill" placeholder="المهارة أو الوصف"></div>
+              <div class="col"><div class="small">نقاط المهمة</div><input id="perfTaskPoints" type="number" min="1" value="10"></div>
+            </div>
+            <div class="row">
+              <div class="col"><div class="small">تاريخ البداية</div><input id="perfTaskStart" type="date"></div>
+              <div class="col"><div class="small">تاريخ النهاية</div><input id="perfTaskDue" type="date"></div>
+            </div>
+            <button class="btn" style="width:100%;margin-top:10px" onclick="window.createPerformanceTaskLinked()">إنشاء المهمة الأدائية</button>
+            <div class="perf-note">عند تقييم الطالب/ة تُسجّل النقاط في نقاط الأسبوع، وتظهر المهمة في حساب الطالب/ة مباشرة.</div>
+          </div>
+          <div class="perf-card">
+            <h4>ملخص المهام</h4>
+            <div class="perf-kpis">
+              <div class="perf-kpi"><strong id="perfCountAll">0</strong><span>عدد المهام</span></div>
+              <div class="perf-kpi"><strong id="perfCountDone">0</strong><span>التقييمات المكتملة</span></div>
+              <div class="perf-kpi"><strong id="perfPointsAll">0</strong><span>إجمالي نقاط المهام</span></div>
+            </div>
+            <div class="perf-note">هذه الإحصاءات تتحدث تلقائيًا عند إنشاء مهمة جديدة أو حفظ تقييم جديد.</div>
+          </div>
+        </div>
+        <div id="teacherPerformanceTasks" class="perf-task-list"></div>
+      </div>`;
+    container.appendChild(wrap);
+  }
+  async function listClasses(){
+    const snap = await db.collection('classes').orderBy('createdAtClient','asc').get();
+    return snap.docs.map(d=>({id:d.id, ...(d.data()||{})}));
+  }
+  async function listStudentsInClass(classId){
+    const snap = await db.collection('students').where('classId','==',classId).get();
+    return snap.docs.map(d=>({id:d.id, ...(d.data()||{})}));
+  }
+  async function listTasks(){
+    const snap = await db.collection(collName).get();
+    return snap.docs.map(d=>({id:d.id, ...(d.data()||{})}));
+  }
+  async function fillPerfClasses(){
+    const sel = gid('perfTaskClass'); if(!sel) return;
+    const cls = await listClasses();
+    sel.innerHTML = '<option value="">اختاري الفصل</option>' + cls.map(c=>`<option value="${c.id}">${esc(c.name||'فصل')}</option>`).join('');
+    if(typeof currentClassId!=='undefined' && currentClassId) sel.value = currentClassId;
+  }
+  window.createPerformanceTaskLinked = async function(){
+    try{
+      const classId = gid('perfTaskClass')?.value || '';
+      const title = (gid('perfTaskTitle')?.value || '').trim();
+      const skill = (gid('perfTaskSkill')?.value || '').trim();
+      const pts = Math.max(1, Number(gid('perfTaskPoints')?.value || 10));
+      const startDate = gid('perfTaskStart')?.value || '';
+      const dueDate = gid('perfTaskDue')?.value || '';
+      if(!classId) return perfNotice('اختاري الفصل أولًا.', false);
+      if(!title) return perfNotice('اكتبي اسم المهمة الأدائية.', false);
+      if(!startDate || !dueDate) return perfNotice('حددي تاريخ البداية والنهاية.', false);
+      const studs = await listStudentsInClass(classId);
+      const entries = {};
+      studs.forEach(st=> entries[st.id] = {status:'pending', score:0, awardedPoints:0, note:'', updatedAt:Date.now()});
+      await db.collection(collName).add({
+        title, skill, classId, pointRate:pts, startDate, dueDate, createdAtClient:Date.now(),
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(), entries
+      });
+      ['perfTaskTitle','perfTaskSkill','perfTaskPoints','perfTaskStart','perfTaskDue'].forEach(id=>{ const el=gid(id); if(el) el.value = ''; });
+      await renderTeacherPerformanceTasksLinked();
+      perfNotice('تم إنشاء المهمة الأدائية وربطها بالنظام.', true);
+    }catch(e){ console.error(e); perfNotice('تعذر إنشاء المهمة الآن.', false); }
+  };
+  async function updateStudentPointsForTask(studentId, task, prevPts, newPts){
+    const ref = db.collection('students').doc(studentId);
+    const snap = await ref.get();
+    const cur = snap.data()||{};
+    const delta = Number(newPts||0) - Number(prevPts||0);
+    if(delta===0) return;
+    const weekPoints = Math.max(0, Number(cur.weekPoints||cur.pointsWeek||0) + delta);
+    await ref.update({weekPoints});
+    await ref.collection('txns').add({
+      studentId,
+      studentName: cur.name || '',
+      guardianWhats: cur.guardianWhats || '',
+      type: 'مهمة أدائية',
+      reason: `${task.title} (${delta>0?'+':''}${delta} نقطة)`,
+      amount: 0,
+      pointsDelta: delta,
+      balanceAfter: Number(cur.balance||0),
+      dateKey: (typeof localTodayKey==='function') ? localTodayKey() : '',
+      createdAtClient: Date.now(),
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  }
+  window.savePerformanceEvalLinked = async function(taskId, studentId){
+    try{
+      const status = gid(`perfStatus_${taskId}_${studentId}`)?.value || 'pending';
+      const score = Math.max(0, Number(gid(`perfScore_${taskId}_${studentId}`)?.value || 0));
+      const note = (gid(`perfNote_${taskId}_${studentId}`)?.value || '').trim();
+      const taskRef = db.collection(collName).doc(taskId);
+      const taskSnap = await taskRef.get();
+      if(!taskSnap.exists) return perfNotice('المهمة غير موجودة.', false);
+      const task = {id:taskId, ...(taskSnap.data()||{})};
+      const entry = (((task.entries||{})[studentId]) || {});
+      const awardedPoints = status==='done' ? Number(task.pointRate||0) : 0;
+      await taskRef.update({
+        [`entries.${studentId}.status`]: status,
+        [`entries.${studentId}.score`]: score,
+        [`entries.${studentId}.note`]: note,
+        [`entries.${studentId}.awardedPoints`]: awardedPoints,
+        [`entries.${studentId}.updatedAt`]: Date.now()
+      });
+      await updateStudentPointsForTask(studentId, task, Number(entry.awardedPoints||0), awardedPoints);
+      await renderTeacherPerformanceTasksLinked();
+      if(typeof currentStudentObj!=='undefined' && currentStudentObj && currentStudentObj.id===studentId){
+        await renderStudentPerformanceTasksLinked(currentStudentObj);
+        try{ showStatement(); }catch(e){}
+      }
+      try{ renderHonorBoard(); }catch(e){}
+      perfNotice('تم حفظ التقييم وربطه بالنظام.', true);
+    }catch(e){ console.error(e); perfNotice('تعذر حفظ التقييم.', false); }
+  };
+  async function buildTeacherTaskCard(task){
+    const classSnap = await db.collection('classes').doc(task.classId).get();
+    const className = (classSnap.data()||{}).name || 'فصل';
+    const studs = await listStudentsInClass(task.classId);
+    let doneCount = 0;
+    const rows = studs.map(st=>{
+      const entry = ((task.entries||{})[st.id]) || {status:'pending', score:0, awardedPoints:0, note:''};
+      if(entry.status==='done') doneCount++;
+      return `
+        <div class="perf-student-row">
+          <div class="perf-student-head">
+            <div class="perf-student-name">${esc(st.name||'طالب/ة')}</div>
+            <div class="perf-task-meta">
+              <span class="perf-pill ${entry.status==='done'?'ok':entry.status==='late'?'no':'warn'}">${perfStatusLabel(entry.status)}</span>
+              <span class="perf-pill">النقاط المحتسبة: ${Number(entry.awardedPoints||0)}</span>
+            </div>
+          </div>
+          <div class="row" style="margin-top:10px">
+            <div class="col"><div class="small">الحالة</div><select id="perfStatus_${task.id}_${st.id}"><option value="pending"${entry.status==='pending'?' selected':''}>قيد التنفيذ</option><option value="done"${entry.status==='done'?' selected':''}>مكتملة</option><option value="late"${entry.status==='late'?' selected':''}>متأخرة</option></select></div>
+            <div class="col"><div class="small">التقييم</div><input id="perfScore_${task.id}_${st.id}" type="number" min="0" value="${Number(entry.score||0)}"></div>
+          </div>
+          <div class="small" style="margin-top:8px">ملاحظة للطالب/ة</div>
+          <input id="perfNote_${task.id}_${st.id}" value="${esc(entry.note||'')}" placeholder="اكتبي ملاحظة مختصرة">
+          <div class="perf-actions">
+            <button class="btn" onclick="savePerformanceEvalLinked('${task.id}','${st.id}')">حفظ التقييم</button>
+          </div>
+        </div>`;
+    }).join('');
+    const progress = studs.length ? Math.round((doneCount/studs.length)*100) : 0;
+    return `
+      <div class="perf-task">
+        <div class="perf-task-head">
+          <div>
+            <div class="perf-task-title">${esc(task.title||'مهمة أدائية')}</div>
+            <div class="perf-note">${esc(task.skill||'')} • الفصل: ${esc(className)} • من ${esc(task.startDate||'—')} إلى ${esc(task.dueDate||'—')}</div>
+          </div>
+          <div class="perf-task-meta">
+            <span class="perf-pill">${Number(task.pointRate||0)} نقطة</span>
+            <span class="perf-pill ${progress===100?'ok':'warn'}">${progress}% إنجاز</span>
+          </div>
+        </div>
+        <div class="perf-progress"><div style="width:${progress}%"></div></div>
+        <div style="margin-top:12px">${rows || '<div class="perf-empty">لا يوجد طلاب في هذا الفصل.</div>'}</div>
+      </div>`;
+  }
+  async function updatePerfSummary(tasks){
+    const countAll = tasks.length;
+    let done=0, pts=0;
+    tasks.forEach(t=>{
+      Object.values(t.entries||{}).forEach(e=>{
+        if(e.status==='done') done++;
+        pts += Number(e.awardedPoints||0);
+      });
+    });
+    if(gid('perfCountAll')) gid('perfCountAll').textContent = countAll;
+    if(gid('perfCountDone')) gid('perfCountDone').textContent = done;
+    if(gid('perfPointsAll')) gid('perfPointsAll').textContent = pts;
+  }
+  window.renderTeacherPerformanceTasksLinked = async function(){
+    const wrap = gid('teacherPerformanceTasks');
+    if(!wrap) return;
+    const all = await listTasks();
+    const tasks = (typeof currentClassId!=='undefined' && currentClassId) ? all.filter(t=>t.classId===currentClassId) : all;
+    await updatePerfSummary(tasks);
+    if(!tasks.length){ wrap.innerHTML = '<div class="perf-empty">لا توجد مهام أدائية بعد. أضيفي أول مهمة من النموذج بالأعلى.</div>'; return; }
+    const cards = [];
+    for(const t of tasks.sort((a,b)=>(b.createdAtClient||0)-(a.createdAtClient||0))){
+      cards.push(await buildTeacherTaskCard(t));
+    }
+    wrap.innerHTML = cards.join('');
+  };
+  window.renderStudentPerformanceTasksLinked = async function(student){
+    addStudentTab();
+    const wrap = gid('studentPerformanceTaskList');
+    if(!wrap) return;
+    if(!student || !student.classId){ wrap.innerHTML='<div class="perf-empty">سجلي الدخول لعرض المهام الأدائية.</div>'; return; }
+    const tasks = (await listTasks()).filter(t=>t.classId===student.classId).sort((a,b)=>(b.createdAtClient||0)-(a.createdAtClient||0));
+    let done=0, pts=0;
+    if(!tasks.length){
+      wrap.innerHTML = '<div class="perf-empty">لا توجد مهام أدائية مضافة لهذا الفصل حتى الآن.</div>';
+      gid('perfStuCount') && (gid('perfStuCount').textContent='0');
+      gid('perfStuDone') && (gid('perfStuDone').textContent='0');
+      gid('perfStuPts') && (gid('perfStuPts').textContent='0');
+      return;
+    }
+    wrap.innerHTML = tasks.map(t=>{
+      const e = ((t.entries||{})[student.id]) || {status:'pending', score:0, note:'', awardedPoints:0};
+      if(e.status==='done') done++;
+      pts += Number(e.awardedPoints||0);
+      const progress = e.status==='done' ? 100 : e.status==='late' ? 100 : 45;
+      return `
+        <div class="perf-task">
+          <div class="perf-task-head">
+            <div>
+              <div class="perf-task-title">${esc(t.title||'مهمة')}</div>
+              <div class="perf-note">${esc(t.skill||'')} • من ${esc(t.startDate||'—')} إلى ${esc(t.dueDate||'—')}</div>
+            </div>
+            <div class="perf-task-meta">
+              <span class="perf-pill ${e.status==='done'?'ok':e.status==='late'?'no':'warn'}">${perfStatusLabel(e.status)}</span>
+              <span class="perf-pill">التقييم: ${Number(e.score||0)}</span>
+              <span class="perf-pill">النقاط: ${Number(e.awardedPoints||0)}</span>
+            </div>
+          </div>
+          <div class="perf-progress"><div style="width:${progress}%"></div></div>
+          <div class="perf-note">${esc(e.note || (e.status==='done' ? 'أحسنتِ، تم اعتماد المهمة وإضافة النقاط.' : 'بانتظار اعتماد المعلمة أو إكمال المهمة.'))}</div>
+        </div>`;
+    }).join('');
+    gid('perfStuCount') && (gid('perfStuCount').textContent=String(tasks.length));
+    gid('perfStuDone') && (gid('perfStuDone').textContent=String(done));
+    gid('perfStuPts') && (gid('perfStuPts').textContent=String(pts));
+  };
+  async function bindPerf(){
+    addTeacherPane();
+    try{ enhanceTeacherSidebarTabs(); }catch(e){ console.error(e); }
+    addStudentTab();
+    await fillPerfClasses();
+    await renderTeacherPerformanceTasksLinked();
+    if(typeof currentStudentObj!=='undefined' && currentStudentObj){ await renderStudentPerformanceTasksLinked(currentStudentObj); }
+  }
+  const _openStudentPerfOrig = window.openStudentAccount;
+  if(typeof _openStudentPerfOrig === 'function'){
+    window.openStudentAccount = async function(s){
+      await _openStudentPerfOrig(s);
+      try{ await renderStudentPerformanceTasksLinked(s); }catch(e){ console.error(e); }
+    };
+  }
+  const _openClassPerfOrig = window.openClassPage;
+  if(typeof _openClassPerfOrig === 'function'){
+    window.openClassPage = async function(){
+      await _openClassPerfOrig();
+      try{ await fillPerfClasses(); await renderTeacherPerformanceTasksLinked(); }catch(e){ console.error(e); }
+    };
+  }
+  const _renderTabsPerfOrig = window.renderTabs;
+  if(typeof _renderTabsPerfOrig === 'function'){
+    window.renderTabs = async function(){
+      await _renderTabsPerfOrig();
+      try{ await fillPerfClasses(); await renderTeacherPerformanceTasksLinked(); }catch(e){ console.error(e); }
+    };
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', bindPerf);
+  else bindPerf();
+  document.addEventListener('DOMContentLoaded', function(){
+    try{
+      loadSupervisionAccountsToUI();
+      updateTeacherSupervisionSummary();
+      if(sup$('supCertTeacherName') && !sup$('supCertTeacherName').value) sup$('supCertTeacherName').value = getTeacherDisplayName();
+      if(sup$('supEvalTeacherName') && !sup$('supEvalTeacherName').value) sup$('supEvalTeacherName').value = getTeacherDisplayName();
+      if(sup$('supCertDate') && !sup$('supCertDate').value) sup$('supCertDate').value = todayIso();
+      if(sup$('supEvalDate') && !sup$('supEvalDate').value) sup$('supEvalDate').value = todayIso();
+    }catch(e){}
+  });
+})();
+</script>
+
+
+<script id="start-button-hard-fix">
+(function(){
+  function safeGet(id){ return document.getElementById(id); }
+
+  function hardHide(id){
+    var el = safeGet(id);
+    if(!el) return;
+    el.classList.add('hidden');
+    el.style.display = 'none';
+    el.setAttribute('aria-hidden','true');
+  }
+
+  function hardShow(id){
+    var el = safeGet(id);
+    if(!el) return false;
+    el.classList.remove('hidden');
+    el.style.display = 'block';
+    el.setAttribute('aria-hidden','false');
+    try{ el.scrollIntoView({behavior:'auto', block:'start'}); }catch(e){}
+    return true;
+  }
+
+  window.startAppSafeDirect = function(){
+    try{ localStorage.setItem('mb_onboarded_v1','1'); }catch(e){}
+    try{
+      if(typeof hideAllPages === 'function'){ hideAllPages(); }
+    }catch(e){}
+    hardHide('startOverlay');
+    hardHide('onboardOverlay');
+
+    try{
+      if(typeof show === 'function'){
+        show('teacherLoginPage');
+      }
+    }catch(e){}
+
+    if(!hardShow('teacherLoginPage')){
+      // fallback to student if teacher page was renamed
+      hardShow('studentLoginPage');
+    }
+
+    try{ window.currentAccess = 'teacher'; }catch(e){}
+    return false;
+  };
+
+  function bindStartFix(){
+    var btn = safeGet('startNowBtn');
+    if(!btn) return;
+    btn.onclick = function(ev){
+      try{ ev.preventDefault(); }catch(e){}
+      return window.startAppSafeDirect();
+    };
+    btn.setAttribute('type','button');
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', bindStartFix);
+  }else{
+    bindStartFix();
+  }
+  document.addEventListener('DOMContentLoaded', function(){
+    try{
+      loadSupervisionAccountsToUI();
+      updateTeacherSupervisionSummary();
+      if(sup$('supCertTeacherName') && !sup$('supCertTeacherName').value) sup$('supCertTeacherName').value = getTeacherDisplayName();
+      if(sup$('supEvalTeacherName') && !sup$('supEvalTeacherName').value) sup$('supEvalTeacherName').value = getTeacherDisplayName();
+      if(sup$('supCertDate') && !sup$('supCertDate').value) sup$('supCertDate').value = todayIso();
+      if(sup$('supEvalDate') && !sup$('supEvalDate').value) sup$('supEvalDate').value = todayIso();
+    }catch(e){}
+  });
+})();
+</script>
+
+
+<script>
+(function(){
+  const extraIds = ['supervisionLoginPage','supervisionPage'];
+  const oldHideAllPages = window.hideAllPages;
+  window.hideAllPages = function(){
+    try{ if(typeof oldHideAllPages === 'function') oldHideAllPages(); }catch(e){}
+    extraIds.forEach(id=>{ const el=document.getElementById(id); if(el) el.classList.add('hidden'); });
+  };
+
+
+  const SUPERVISION_ACCOUNTS_KEY = 'MATHBANK_SUPERVISION_ACCOUNTS_V2';
+  const SUPERVISION_EVAL_KEY = 'MATHBANK_SUPERVISION_EVALS_V2';
+  const SUPERVISION_CERT_KEY = 'MATHBANK_SUPERVISION_CERTS_V2';
+  const SUPERVISION_LOGIN_KEY = 'MATHBANK_SUPERVISION_LOGINS_V2';
+
+  function getTeacherDisplayName(){
+    try{
+      return (document.getElementById('teacherName')?.value || localStorage.getItem('teacherName') || 'أ. سارة حقوي').trim() || 'أ. سارة حقوي';
+    }catch(e){ return 'أ. سارة حقوي'; }
+  }
+  function todayIso(){
+    try{ return new Date().toISOString().slice(0,10); }catch(e){ return ''; }
+  }
+  function readJson(key, fallback){
+    try{
+      const raw = localStorage.getItem(key);
+      if(!raw) return fallback;
+      return JSON.parse(raw);
+    }catch(e){ return fallback; }
+  }
+  function writeJson(key, value){
+    try{ localStorage.setItem(key, JSON.stringify(value)); }catch(e){}
+  }
+  function getSupervisionAccounts(){
+    const base = {
+      admin:{username:'admin', password:'12345', label:'المديرة'},
+      supervisor:{username:'supervisor', password:'12345', label:'المشرفة'}
+    };
+    const saved = readJson(SUPERVISION_ACCOUNTS_KEY, {});
+    return {
+      admin:{...base.admin, ...((saved||{}).admin||{})},
+      supervisor:{...base.supervisor, ...((saved||{}).supervisor||{})}
+    };
+  }
+  window.loadSupervisionAccountsToUI = function(){
+    const acc = getSupervisionAccounts();
+    if(sup$('supAdminUser')) sup$('supAdminUser').value = acc.admin.username || '';
+    if(sup$('supAdminPass')) sup$('supAdminPass').value = acc.admin.password || '';
+    if(sup$('supSupervisorUser')) sup$('supSupervisorUser').value = acc.supervisor.username || '';
+    if(sup$('supSupervisorPass')) sup$('supSupervisorPass').value = acc.supervisor.password || '';
+    const hint = sup$('supervisionLoginHint');
+    if(hint){
+      hint.textContent = 'أدخلي اسم المستخدم وكلمة المرور للدخول إلى لوحة الإشراف.';
+    }
+    if(sup$('supPanelAdminUser')) sup$('supPanelAdminUser').value = acc.admin.username || '';
+    if(sup$('supPanelAdminPass')) sup$('supPanelAdminPass').value = acc.admin.password || '';
+    if(sup$('supPanelSupervisorUser')) sup$('supPanelSupervisorUser').value = acc.supervisor.username || '';
+    if(sup$('supPanelSupervisorPass')) sup$('supPanelSupervisorPass').value = acc.supervisor.password || '';
+  };
+  function buildSupervisionAccountsFromInputs(prefix){
+    const isPanel = prefix === 'panel';
+    return {
+      admin:{
+        username:String(sup$(isPanel ? 'supPanelAdminUser' : 'supAdminUser')?.value || 'admin').trim() || 'admin',
+        password:String(sup$(isPanel ? 'supPanelAdminPass' : 'supAdminPass')?.value || '12345').trim() || '12345',
+        label:'المديرة'
+      },
+      supervisor:{
+        username:String(sup$(isPanel ? 'supPanelSupervisorUser' : 'supSupervisorUser')?.value || 'supervisor').trim() || 'supervisor',
+        password:String(sup$(isPanel ? 'supPanelSupervisorPass' : 'supSupervisorPass')?.value || '12345').trim() || '12345',
+        label:'المشرفة'
+      }
+    };
+  }
+  window.saveSupervisionAccounts = function(){
+    const acc = buildSupervisionAccountsFromInputs('teacher');
+    writeJson(SUPERVISION_ACCOUNTS_KEY, acc);
+    loadSupervisionAccountsToUI();
+    if(typeof toast==='function') toast('تم حفظ بيانات المديرة والمشرفة ✅');
+  };
+  window.loadSupervisionAccountsToPanel = function(){
+    loadSupervisionAccountsToUI();
+  };
+  window.saveSupervisionAccountsFromPanel = function(){
+    const acc = buildSupervisionAccountsFromInputs('panel');
+    writeJson(SUPERVISION_ACCOUNTS_KEY, acc);
+    loadSupervisionAccountsToUI();
+    if(typeof toast==='function') toast('تم حفظ إعدادات الإشراف من داخل اللوحة ✅');
+  };
+  window.showSupervisionTab = function(tab, btn){
+    ['overview','certificate','evaluation','settings','archive'].forEach(key=>{
+      const sec = sup$('supervisionSection' + key.charAt(0).toUpperCase() + key.slice(1));
+      if(sec) sec.classList.toggle('active', key===tab);
+    });
+    document.querySelectorAll('#supervisionTabsBar .superTab').forEach(b=>b.classList.remove('active'));
+    if(btn) btn.classList.add('active');
+  };
+  function getSupervisionEvaluations(){ return readJson(SUPERVISION_EVAL_KEY, []); }
+  function setSupervisionEvaluations(v){ writeJson(SUPERVISION_EVAL_KEY, v || []); }
+  function getSupervisionCertificates(){ return readJson(SUPERVISION_CERT_KEY, []); }
+  function setSupervisionCertificates(v){ writeJson(SUPERVISION_CERT_KEY, v || []); }
+  function getSupervisionLogins(){ return readJson(SUPERVISION_LOGIN_KEY, []); }
+  function setSupervisionLogins(v){ writeJson(SUPERVISION_LOGIN_KEY, v || []); }
+
+  window.deleteLastTeacherSupervisionEvaluation = function(){
+    const arr = getSupervisionEvaluations();
+    if(!arr.length){
+      if(typeof warn==='function') warn('لا يوجد تقييم محفوظ لحذفه');
+      return;
+    }
+    arr.shift();
+    setSupervisionEvaluations(arr);
+    if(typeof toast==='function') toast('تم حذف آخر تقييم ✅');
+    updateTeacherSupervisionSummary();
+  };
+
+  window.deleteLastTeacherSupervisionCertificate = function(){
+    const arr = getSupervisionCertificates();
+    if(!arr.length){
+      if(typeof warn==='function') warn('لا توجد شهادة شكر محفوظة لحذفها');
+      return;
+    }
+    arr.shift();
+    setSupervisionCertificates(arr);
+    if(typeof toast==='function') toast('تم حذف آخر شهادة شكر ✅');
+    updateTeacherSupervisionSummary();
+  };
+
+  window.deleteSelectedSupervisionArchiveItems = function(){
+    const picks = Array.from(document.querySelectorAll('.supArchivePick:checked'));
+    if(!picks.length){
+      if(typeof warn==='function') warn('حددي عنصرًا واحدًا على الأقل من الأرشيف');
+      return;
+    }
+    let evals = getSupervisionEvaluations();
+    let certs = getSupervisionCertificates();
+    let logins = getSupervisionLogins();
+    const grouped = {eval:[], cert:[], login:[]};
+    picks.forEach(el=>{
+      const src = String(el.getAttribute('data-source') || '');
+      const idx = Number(el.getAttribute('data-index'));
+      if(Number.isInteger(idx) && idx >= 0 && grouped[src]) grouped[src].push(idx);
+    });
+    Object.keys(grouped).forEach(key=> grouped[key].sort((a,b)=>b-a));
+    grouped.eval.forEach(i=>{ if(i < evals.length) evals.splice(i,1); });
+    grouped.cert.forEach(i=>{ if(i < certs.length) certs.splice(i,1); });
+    grouped.login.forEach(i=>{ if(i < logins.length) logins.splice(i,1); });
+    setSupervisionEvaluations(evals);
+    setSupervisionCertificates(certs);
+    setSupervisionLogins(logins);
+    if(typeof toast==='function') toast('تم حذف العناصر المحددة من الأرشيف ✅');
+    updateTeacherSupervisionSummary();
+  };
+
+  function logSupervisionLogin(role, username){
+    const arr = getSupervisionLogins();
+    arr.unshift({role: role || 'الإشراف', username: username || '—', at: Date.now()});
+    setSupervisionLogins(arr.slice(0,50));
+  }
+  function toast(msg){
+    try{
+      let box = document.getElementById('globalToastBox');
+      if(!box){
+        box = document.createElement('div');
+        box.id = 'globalToastBox';
+        box.style.position = 'fixed';
+        box.style.left = '50%';
+        box.style.bottom = '22px';
+        box.style.transform = 'translateX(-50%)';
+        box.style.background = 'linear-gradient(135deg,#0b2a66,#0b5bb5)';
+        box.style.color = '#fff';
+        box.style.padding = '14px 20px';
+        box.style.borderRadius = '16px';
+        box.style.fontWeight = '1000';
+        box.style.boxShadow = '0 12px 28px rgba(0,0,0,.20)';
+        box.style.zIndex = '99999';
+        box.style.minWidth = '220px';
+        box.style.textAlign = 'center';
+        box.style.opacity = '0';
+        box.style.transition = 'opacity .18s ease, transform .18s ease';
+        document.body.appendChild(box);
+      }
+      box.textContent = String(msg || 'تم الحفظ ✅');
+      box.style.opacity = '1';
+      box.style.transform = 'translateX(-50%) translateY(0)';
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(()=>{
+        const b = document.getElementById('globalToastBox');
+        if(b){ b.style.opacity = '0'; b.style.transform = 'translateX(-50%) translateY(8px)'; }
+      }, 2200);
+    }catch(e){ alert(String(msg || 'تم الحفظ ✅')); }
+  }
+
+  function updateTeacherSupervisionSummary(){
+    const evals = getSupervisionEvaluations();
+    const certs = getSupervisionCertificates();
+    const logins = getSupervisionLogins();
+    const lastEval = evals[0];
+    const lastCert = certs[0];
+    const lastLogin = logins[0];
+    if(sup$('teacherSupervisionLastRating')) sup$('teacherSupervisionLastRating').textContent = lastEval ? `${lastEval.rating} — ${lastEval.teacherName}` : '—';
+    if(sup$('teacherSupervisionLastLogin')) sup$('teacherSupervisionLastLogin').textContent = lastLogin ? `${lastLogin.role} — ${dateAr(lastLogin.at)}` : '—';
+    if(sup$('teacherSupervisionLastCertificate')) sup$('teacherSupervisionLastCertificate').textContent = lastCert ? `${lastCert.teacherName} — ${lastCert.date || '—'}` : '—';
+    if(sup$('teacherSupervisionArchiveCount')) sup$('teacherSupervisionArchiveCount').textContent = String(evals.length + certs.length + logins.length);
+    const certPreview = sup$('teacherSupervisionCertificatePreview');
+    if(certPreview){
+      if(lastCert && lastCert.attachment){
+        const isPdf = String(lastCert.fileName || '').toLowerCase().endsWith('.pdf') || String(lastCert.attachment || '').includes('application/pdf');
+        certPreview.innerHTML = isPdf
+          ? `<div class="themeTile" style="padding:12px"><div style="font-weight:1000;color:#0b2a66">معاينة شهادة الشكر المرفوعة</div><div class="small" style="margin-top:6px">${lastCert.fileName || 'ملف PDF'}</div><a href="${lastCert.attachment}" target="_blank" class="btn3" style="display:inline-block;margin-top:10px;text-decoration:none">فتح شهادة الشكر</a></div>`
+          : `<div class="themeTile" style="padding:12px"><div style="font-weight:1000;color:#0b2a66">معاينة شهادة الشكر المرفوعة</div><div class="small" style="margin-top:6px">${lastCert.fileName || 'صورة الشهادة'}</div><img src="${lastCert.attachment}" alt="شهادة الشكر" style="display:block;width:100%;max-width:360px;margin:10px auto 0 auto;border-radius:16px;border:1px solid rgba(0,0,0,.08);box-shadow:0 10px 22px rgba(0,0,0,.08)">${lastCert.note ? `<div class="small" style="margin-top:8px;color:#47607e">${lastCert.note}</div>` : ''}</div>`;
+      }else if(lastCert && lastCert.note){
+        certPreview.innerHTML = `<div class="themeTile" style="padding:12px"><div style="font-weight:1000;color:#0b2a66">آخر نص شهادة شكر</div><div class="small" style="margin-top:8px;color:#47607e">${lastCert.note}</div></div>`;
+      }else{
+        certPreview.innerHTML = '<div class="small" style="color:#6b7280">لا توجد شهادة شكر مرفوعة حاليًا.</div>';
+      }
+    }
+    if(sup$('supArchiveLastLogin')) sup$('supArchiveLastLogin').textContent = lastLogin ? `${lastLogin.role} — ${dateAr(lastLogin.at)}` : '—';
+    if(sup$('supArchiveLastEval')) sup$('supArchiveLastEval').textContent = lastEval ? `${lastEval.rating} — ${lastEval.teacherName}` : '—';
+    if(sup$('supLastEvalBadge')) sup$('supLastEvalBadge').textContent = lastEval ? `آخر تقييم محفوظ: ${lastEval.rating} — ${lastEval.teacherName}` : 'آخر تقييم محفوظ: —';
+    const archive = [];
+    certs.slice(0,10).forEach((c,idx)=> archive.push({source:'cert', index:idx, kind:'🏆 شهادة شكر', time:c.savedAt || Date.now(), title:`${c.teacherName} — ${c.date || '—'}`, note:c.note || 'تم حفظ شهادة شكر'}));
+    evals.slice(0,10).forEach((r,idx)=> archive.push({source:'eval', index:idx, kind:'⭐ تقييم', time:r.savedAt || Date.now(), title:`${r.teacherName} — ${r.rating}`, note:r.note || 'تم حفظ تقييم'}));
+    logins.slice(0,10).forEach((l,idx)=> archive.push({source:'login', index:idx, kind:'🕓 دخول إشرافي', time:l.at || Date.now(), title:`${l.role} — ${l.username}`, note:'تم الدخول إلى لوحة الإشراف'}));
+    archive.sort((a,b)=> (b.time||0)-(a.time||0));
+    const wrap = sup$('supArchiveList');
+    if(wrap){
+      wrap.innerHTML = archive.length ? archive.map(item=>`<label class="supervisionArchiveItem" style="display:block;cursor:pointer"><div style="display:flex;align-items:flex-start;gap:10px"><input type="checkbox" class="supArchivePick" data-source="${item.source}" data-index="${item.index}" style="width:auto;margin-top:4px"><div style="flex:1"><div style="font-weight:1000;color:#0b2a66">${item.kind}</div><div class="small" style="margin-top:4px">${item.title}</div><div class="small" style="margin-top:6px;color:#64748b">${item.note}</div><div class="small" style="margin-top:6px">${dateAr(item.time)}</div></div></div></label>`).join('') : '<div class="small">لا يوجد أرشيف محفوظ حتى الآن.</div>';
+    }
+  }
+  async function readFileAsDataUrl(file){
+    return await new Promise((resolve,reject)=>{
+      try{
+        const reader = new FileReader();
+        reader.onload = ()=> resolve(String(reader.result||''));
+        reader.onerror = ()=> reject(new Error('file'));
+        reader.readAsDataURL(file);
+      }catch(err){ reject(err); }
+    });
+  }
+  window.saveSupervisionCertificate = async function(){
+    try{
+      const file = sup$('supCertFile')?.files?.[0];
+      let attachment = '';
+      if(file) attachment = await readFileAsDataUrl(file);
+      const arr = getSupervisionCertificates();
+      arr.unshift({
+        teacherName: String(sup$('supCertTeacherName')?.value || getTeacherDisplayName()).trim() || getTeacherDisplayName(),
+        day: String(sup$('supCertDay')?.value || '').trim(),
+        date: String(sup$('supCertDate')?.value || todayIso()).trim(),
+        note: String(sup$('supCertNote')?.value || '').trim(),
+        attachment,
+        fileName: file ? file.name : '',
+        savedAt: Date.now()
+      });
+      setSupervisionCertificates(arr.slice(0,50));
+      if(sup$('supCertFile')) sup$('supCertFile').value = '';
+      if(typeof toast==='function') toast('تم حفظ شهادة الشكر ✅');
+      updateTeacherSupervisionSummary();
+    }catch(e){
+      if(typeof warn==='function') warn('تعذر حفظ شهادة الشكر');
+    }
+  };
+  window.saveTeacherSupervisionEvaluation = function(){
+    const arr = getSupervisionEvaluations();
+    arr.unshift({
+      teacherName: String(sup$('supEvalTeacherName')?.value || getTeacherDisplayName()).trim() || getTeacherDisplayName(),
+      day: String(sup$('supEvalDay')?.value || '').trim(),
+      date: String(sup$('supEvalDate')?.value || todayIso()).trim(),
+      rating: String(sup$('supEvalRating')?.value || 'ممتاز').trim(),
+      note: String(sup$('supEvalNote')?.value || '').trim(),
+      savedAt: Date.now()
+    });
+    setSupervisionEvaluations(arr.slice(0,50));
+    if(typeof toast==='function') toast('تم حفظ تقييم المعلمة ✅');
+    updateTeacherSupervisionSummary();
+  };
+
+  const oldGoPublic = window.goPublic;
+  window.goPublic = function(){
+    try{ if(typeof oldGoPublic === 'function') oldGoPublic(); }catch(e){
+      window.hideAllPages();
+      const s=document.getElementById('startOverlay');
+      if(s){ s.classList.remove('hidden'); s.style.display='flex'; }
+    }
+  };
+
+  window.goSupervisionLogin = function(){
+    window.hideAllPages();
+    const p = document.getElementById('supervisionLoginPage');
+    if(p) p.classList.remove('hidden');
+    window.currentAccess = 'supervision';
+    try{ loadSupervisionAccountsToUI(); }catch(e){}
+  };
+
+  window.supervisionRowsCache = [];
+  window.supervisionStudentsCache = [];
+  window.supervisionClassesCache = [];
+
+  function sup$(id){ return document.getElementById(id); }
+  function fmt0(v){ try{ return typeof fmt === 'function' ? fmt(v) : String(Number(v||0)); }catch(e){ return String(Number(v||0)); } }
+  function dayAr(ts){ try{ return new Date(ts).toLocaleDateString('ar-SA',{weekday:'long'}); }catch(e){ return '—'; } }
+  function dateAr(ts){ try{ return new Date(ts).toLocaleString('ar-SA'); }catch(e){ return '—'; } }
+
+  async function loadSupervisionCaches(){
+    const memoryClasses = Array.isArray(classes) ? classes.map(c=>({id:c.id, name:c.name || 'فصل', order:Number(c.order||0)})) : [];
+    const domTabs = Array.from(document.querySelectorAll('#classTabs .tab')).map((el,idx)=>({
+      id: 'dom_class_' + idx,
+      name: String(el.textContent || '').trim() || ('فصل ' + (idx+1)),
+      order: idx + 1
+    }));
+
+    let classesList = [];
+    let studentsList = [];
+    let rows = [];
+
+    if(window.db){
+      try{
+        const classSnap = await db.collection('classes').orderBy('order').get();
+        classSnap.forEach(d=>classesList.push({id:d.id, ...(d.data()||{})}));
+
+        const stuSnap = await db.collection('students').get();
+        stuSnap.forEach(d=>studentsList.push({id:d.id, ...(d.data()||{})}));
+
+        const classMap = Object.fromEntries(classesList.map(c=>[c.id, c.name || '—']));
+        for(const s of studentsList){
+          try{
+            const txSnap = await db.collection('students').doc(s.id).collection('txns').orderBy('createdAtClient','desc').limit(300).get();
+            txSnap.forEach(d=>{
+              const x = d.data() || {};
+              const ts = Number(x.createdAtClient || 0) || Date.now();
+              rows.push({
+                id: d.id,
+                studentId: s.id,
+                studentName: s.name || x.studentName || '—',
+                classId: s.classId || '',
+                className: classMap[s.classId] || '—',
+                type: String(x.type || ''),
+                reason: String(x.reason || '—'),
+                amount: Number(x.amount || 0),
+                balanceAfter: Number(x.balanceAfter || 0),
+                createdAtClient: ts,
+                guardianWhats: s.guardianWhats || x.guardianWhats || '',
+                executor: 'لوحة المعلمة'
+              });
+            });
+          }catch(e){ console.log('sup tx error', e); }
+        }
+      }catch(e){
+        console.log('sup cache db fallback', e);
+      }
+    }
+
+    if(!classesList.length && memoryClasses.length){
+      classesList = memoryClasses.slice();
+    }
+    if(!classesList.length && domTabs.length){
+      classesList = domTabs.slice();
+    }
+
+    window.supervisionClassesCache = classesList;
+    window.supervisionStudentsCache = studentsList;
+    rows.sort((a,b)=> (b.createdAtClient||0) - (a.createdAtClient||0));
+    window.supervisionRowsCache = rows;
+  }
+
+  function ensureSupervisionFilterOptions(){
+    const sel = sup$('supClassFilter');
+    if(!sel) return;
+    const current = sel.value || '';
+    sel.innerHTML = '<option value="">جميع الفصول</option>';
+    (window.supervisionClassesCache || []).forEach(c=>{
+      const o = document.createElement('option');
+      o.value = c.id; o.textContent = c.name || 'فصل';
+      sel.appendChild(o);
+    });
+    sel.value = current;
+  }
+
+  function getFilteredSupervisionRows(){
+    const classId = (sup$('supClassFilter')?.value || '').trim();
+    const typeVal = (sup$('supTypeFilter')?.value || '').trim();
+    const studentQ = (sup$('supStudentFilter')?.value || '').trim().toLowerCase();
+    const fromVal = sup$('supFromDate')?.value || '';
+    const toVal = sup$('supToDate')?.value || '';
+    const fromMs = fromVal ? new Date(fromVal + 'T00:00:00').getTime() : 0;
+    const toMs = toVal ? new Date(toVal + 'T23:59:59').getTime() : Number.MAX_SAFE_INTEGER;
+    return (window.supervisionRowsCache || []).filter(r=>{
+      if(classId && r.classId !== classId) return false;
+      if(typeVal && !String(r.type||'').includes(typeVal)) return false;
+      if(studentQ && !String(r.studentName||'').toLowerCase().includes(studentQ)) return false;
+      const ts = Number(r.createdAtClient || 0);
+      if(ts < fromMs || ts > toMs) return false;
+      return true;
+    });
+  }
+
+  function getFilteredStudents(){
+    const classId = (sup$('supClassFilter')?.value || '').trim();
+    const studentQ = (sup$('supStudentFilter')?.value || '').trim().toLowerCase();
+    return (window.supervisionStudentsCache || []).filter(s=>{
+      if(classId && s.classId !== classId) return false;
+      if(studentQ && !String(s.name||'').toLowerCase().includes(studentQ)) return false;
+      return true;
+    });
+  }
+
+  function renderSupervisionTables(rows, students){
+    const auditBody = sup$('supAuditTable');
+    const guardianBody = sup$('supGuardianTable');
+    if(auditBody){
+      auditBody.innerHTML = rows.length ? rows.slice(0,500).map(r=>`<tr>
+          <td>${dateAr(r.createdAtClient)}</td>
+          <td>${dayAr(r.createdAtClient)}</td>
+          <td>${r.studentName||'—'}</td>
+          <td>${r.className||'—'}</td>
+          <td>${r.type||'—'}</td>
+          <td>${r.reason||'—'}</td>
+          <td>${fmt0(r.amount)}</td>
+          <td>${fmt0(r.balanceAfter)}</td>
+          <td>${r.executor||'لوحة المعلمة'}</td>
+        </tr>`).join('') : '<tr><td colspan="9" class="small" style="padding:18px">لا توجد بيانات مطابقة للفلاتر.</td></tr>';
+    }
+
+    const guardiansMap = new Map();
+    rows.forEach(r=>{
+      if(!r.guardianWhats) return;
+      const key = r.guardianWhats;
+      if(!guardiansMap.has(key)) guardiansMap.set(key,{guardian:r.guardianWhats,studentName:r.studentName,className:r.className,count:0,lastTs:0});
+      const obj = guardiansMap.get(key);
+      obj.count += 1;
+      if((r.createdAtClient||0) > obj.lastTs){ obj.lastTs = r.createdAtClient||0; obj.studentName = r.studentName; obj.className = r.className; }
+    });
+    const guardians = Array.from(guardiansMap.values()).sort((a,b)=>b.lastTs-a.lastTs);
+    if(guardianBody){
+      guardianBody.innerHTML = guardians.length ? guardians.map(g=>`<tr>
+          <td style="direction:ltr">${g.guardian}</td>
+          <td>${g.studentName||'—'}</td>
+          <td>${g.className||'—'}</td>
+          <td>${g.count}</td>
+          <td>${dateAr(g.lastTs)}</td>
+        </tr>`).join('') : '<tr><td colspan="5" class="small" style="padding:18px">لا توجد رسائل/أرقام مرتبطة في البيانات الحالية.</td></tr>';
+    }
+
+    const deposits = rows.filter(r=>String(r.type||'').includes('إيداع')).reduce((a,b)=>a+Number(b.amount||0),0);
+    const withdrawals = rows.filter(r=>String(r.type||'').includes('سحب')).reduce((a,b)=>a+Number(b.amount||0),0);
+    const activeStudents = students.filter(s=>s.active !== false).length;
+    const studentsWithOps = new Set(rows.map(r=>r.studentId)).size;
+    const currentBalance = students.reduce((a,s)=>a+Number(s.balance||0),0);
+    const setText = (id,val)=>{ const el=sup$(id); if(el) el.textContent=val; };
+    const updatedAt = new Date().toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'});
+    setText('supKpiBalance', fmt0(currentBalance));
+    setText('supKpiDeposits', fmt0(deposits));
+    setText('supKpiWithdrawals', fmt0(withdrawals));
+    setText('supKpiOps', String(rows.length));
+    setText('supKpiActive', String(activeStudents));
+    setText('supKpiNoOps', String(Math.max(students.length - studentsWithOps, 0)));
+    setText('supKpiGuardians', String(guardians.length));
+    setText('supKpiUpdated', updatedAt);
+    setText('supHeroUpdated', updatedAt);
+    setText('supHeroOps', String(rows.length));
+    setText('supHeroActive', String(activeStudents));
+
+    const classCounts = new Map();
+    rows.forEach(r=>{
+      const key = r.className || '—';
+      classCounts.set(key, (classCounts.get(key) || 0) + 1);
+    });
+    const topClass = Array.from(classCounts.entries()).sort((a,b)=>b[1]-a[1])[0];
+    const lowClass = Array.from(classCounts.entries()).sort((a,b)=>a[1]-b[1])[0];
+
+    const studentCounts = new Map();
+    rows.forEach(r=>{
+      const key = r.studentName || '—';
+      studentCounts.set(key, (studentCounts.get(key) || 0) + 1);
+    });
+    const topStudent = Array.from(studentCounts.entries()).sort((a,b)=>b[1]-a[1])[0];
+    const lastRow = rows[0];
+
+    setText('supQuickTopClass', topClass ? `${topClass[0]} (${topClass[1]})` : '—');
+    setText('supQuickLowClass', lowClass ? `${lowClass[0]} (${lowClass[1]})` : '—');
+    setText('supQuickTopStudent', topStudent ? `${topStudent[0]} (${topStudent[1]})` : '—');
+    setText('supQuickLastOp', lastRow ? `${lastRow.studentName||'—'} • ${lastRow.type||'—'}` : '—');
+
+    const emptyNote = sup$('supOverviewEmpty');
+    if(emptyNote){
+      if(!rows.length){
+        emptyNote.textContent = 'لا توجد بيانات مطابقة للفلاتر الحالية. غيّري الفصل أو التاريخ أو نوع العملية ثم أعيدي العرض.';
+      }else{
+        emptyNote.textContent = `تم عرض ${rows.length} عملية، مع ${activeStudents} طالب/ـة نشط/ـة و ${guardians.length} جهة تواصل مرتبطة.`;
+      }
+    }
+  }
+
+  window.renderSupervisionDashboard = async function(){
+    try{
+      const page = sup$('supervisionPage');
+      if(page) page.classList.remove('hidden');
+      if(!window.supervisionRowsCache.length || !window.supervisionStudentsCache.length){ await loadSupervisionCaches(); }
+      ensureSupervisionFilterOptions();
+      renderSupervisionTables(getFilteredSupervisionRows(), getFilteredStudents());
+      updateTeacherSupervisionSummary();
+      if(sup$('supCertTeacherName') && !sup$('supCertTeacherName').value) sup$('supCertTeacherName').value = getTeacherDisplayName();
+      if(sup$('supEvalTeacherName') && !sup$('supEvalTeacherName').value) sup$('supEvalTeacherName').value = getTeacherDisplayName();
+      if(sup$('supCertDate') && !sup$('supCertDate').value) sup$('supCertDate').value = todayIso();
+      if(sup$('supEvalDate') && !sup$('supEvalDate').value) sup$('supEvalDate').value = todayIso();
+    }catch(e){ console.log(e); if(typeof warn === 'function') warn('تعذر تحميل بيانات الإشراف الآن.'); }
+  };
+
+  window.resetSupervisionFilters = function(){
+    if(sup$('supClassFilter')) sup$('supClassFilter').value = '';
+    if(sup$('supTypeFilter')) sup$('supTypeFilter').value = '';
+    if(sup$('supStudentFilter')) sup$('supStudentFilter').value = '';
+    if(sup$('supFromDate')) sup$('supFromDate').value = '';
+    if(sup$('supToDate')) sup$('supToDate').value = '';
+    window.renderSupervisionDashboard();
+  };
+
+  window.supervisionLogin = function(){
+    const uRaw = String(sup$('suUser')?.value || '').trim();
+    const u = uRaw.toLowerCase();
+    const p = String(sup$('suPass')?.value || '').trim();
+    const accounts = getSupervisionAccounts();
+    const adminOk = (u === String(accounts.admin.username || '').trim().toLowerCase()) && p === String(accounts.admin.password || '');
+    const supervisorOk = (u === String(accounts.supervisor.username || '').trim().toLowerCase()) && p === String(accounts.supervisor.password || '');
+    if(adminOk || supervisorOk){
+      const role = adminOk ? 'المديرة' : 'المشرفة';
+      window.currentAccess = 'supervision';
+      window.hideAllPages();
+      const pge = sup$('supervisionPage');
+      if(pge) pge.classList.remove('hidden');
+      logSupervisionLogin(role, uRaw || (adminOk ? accounts.admin.username : accounts.supervisor.username));
+      window.renderSupervisionDashboard();
+      setTimeout(()=>window.showSupervisionTab('overview', document.querySelector('#supervisionTabsBar .superTab')), 0);
+    }else if(typeof warn === 'function'){
+      warn('بيانات دخول الإشراف غير صحيحة');
+    }
+  };
+  document.addEventListener('DOMContentLoaded', function(){
+    try{
+      loadSupervisionAccountsToUI();
+      updateTeacherSupervisionSummary();
+      if(sup$('supCertTeacherName') && !sup$('supCertTeacherName').value) sup$('supCertTeacherName').value = getTeacherDisplayName();
+      if(sup$('supEvalTeacherName') && !sup$('supEvalTeacherName').value) sup$('supEvalTeacherName').value = getTeacherDisplayName();
+      if(sup$('supCertDate') && !sup$('supCertDate').value) sup$('supCertDate').value = todayIso();
+      if(sup$('supEvalDate') && !sup$('supEvalDate').value) sup$('supEvalDate').value = todayIso();
+    }catch(e){}
+  });
+})();
+</script>
+
+
+<script>
+(function(){
+  function safeShowSupervisionTab(tab, btn){
+    try{
+      var keys = ['overview','certificate','evaluation','archive'];
+      keys.forEach(function(key){
+        var id = 'supervisionSection' + key.charAt(0).toUpperCase() + key.slice(1);
+        var sec = document.getElementById(id);
+        if(sec){
+          sec.classList.toggle('active', key === tab);
+          sec.style.display = (key === tab) ? 'block' : 'none';
+        }
+      });
+      document.querySelectorAll('#supervisionTabsBar .superTab').forEach(function(b){
+        b.classList.remove('active');
+      });
+      if(btn){
+        btn.classList.add('active');
+      }else{
+        var autoBtn = document.querySelector('#supervisionTabsBar .superTab[data-super-tab="' + tab + '"]');
+        if(autoBtn) autoBtn.classList.add('active');
+      }
+      return false;
+    }catch(err){
+      console.error('supervision tab error', err);
+      return false;
+    }
+  }
+
+  window.showSupervisionTab = safeShowSupervisionTab;
+
+  function bindSupervisionTabs(){
+    var tabs = document.querySelectorAll('#supervisionTabsBar .superTab');
+    tabs.forEach(function(btn){
+      var label = (btn.textContent || '').trim();
+      var tab = btn.getAttribute('data-super-tab');
+      if(!tab){
+        if(label === 'المتابعة') tab = 'overview';
+        else if(label === 'شهادة الشكر') tab = 'certificate';
+        else if(label === 'تقييم المعلمة') tab = 'evaluation';
+                else if(label === 'الأرشيف') tab = 'archive';
+        if(tab) btn.setAttribute('data-super-tab', tab);
+      }
+      if(tab){
+        btn.setAttribute('type','button');
+        btn.onclick = function(){ return safeShowSupervisionTab(tab, btn); };
+      }
+    });
+
+    var activeBtn = document.querySelector('#supervisionTabsBar .superTab.active') || document.querySelector('#supervisionTabsBar .superTab[data-super-tab="overview"]') || document.querySelector('#supervisionTabsBar .superTab');
+    if(activeBtn){
+      safeShowSupervisionTab(activeBtn.getAttribute('data-super-tab') || 'overview', activeBtn);
+    }else{
+      safeShowSupervisionTab('overview', null);
+    }
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', bindSupervisionTabs);
+  }else{
+    bindSupervisionTabs();
+  }
+})();
+</script>
+
 </body>
 </html>
