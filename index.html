@@ -757,8 +757,11 @@ body[data-theme="ahli"] .supervisionTabsCard{background:linear-gradient(180deg,#
 .supervisionCompactTableHeader{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:14px 16px;background:linear-gradient(135deg,#0b2a66,#0b5bb5);color:#fff}
 .supervisionCompactTableHeader .title{font-weight:1000;font-size:16px}
 .supervisionCompactTableHeader .meta{font-size:12px;font-weight:900;opacity:.95}
-.supervisionCompactTable{width:100%;border-collapse:collapse;table-layout:fixed}
-.supervisionCompactTable th,.supervisionCompactTable td{padding:10px 8px;border-bottom:1px solid #e7eef7;text-align:center;vertical-align:middle;word-break:break-word;white-space:normal;line-height:1.55}
+.supervisionCompactTableScroller{overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:thin;background:#fff}
+.supervisionCompactTableScroller::-webkit-scrollbar{height:10px}
+.supervisionCompactTableScroller::-webkit-scrollbar-thumb{background:rgba(11,42,102,.26);border-radius:999px}
+.supervisionCompactTable{width:100%;min-width:920px;border-collapse:collapse;table-layout:auto}
+.supervisionCompactTable th,.supervisionCompactTable td{padding:10px 10px;border-bottom:1px solid #e7eef7;text-align:center;vertical-align:middle;word-break:normal;white-space:nowrap;line-height:1.55}
 .supervisionCompactTable th{background:#eef6ff;color:#0b2a66;font-size:12px;font-weight:1000}
 .supervisionCompactTable td{font-size:12px;color:#1f2937;font-weight:900}
 .supervisionCompactTable tr:last-child td{border-bottom:none}
@@ -786,9 +789,10 @@ body[data-theme="ahli"] .supervisionTabsCard{background:linear-gradient(180deg,#
   .supervisionInnerTab{width:100%}
   .supervisionClassBtn .title{font-size:16px}
   .supervisionCompactTableHeader{padding:12px 14px}
-  .supervisionCompactTable th,.supervisionCompactTable td{padding:9px 4px;font-size:10px}
-  .supervisionCompactTable th{font-size:10px}
-  .supervisionCompactTable .studentName{font-size:11px}
+  .supervisionCompactTable{min-width:860px}
+  .supervisionCompactTable th,.supervisionCompactTable td{padding:9px 8px;font-size:11px}
+  .supervisionCompactTable th{font-size:11px}
+  .supervisionCompactTable .studentName{font-size:12px}
   .supervisionCompactTable .dateCell,.supervisionCompactTable .reasonCell{font-size:10px}
 }
 
@@ -6103,13 +6107,13 @@ function renderRoulettePane(){
       {id:'teacher-wa', label:'واتساب', childIndex:1},
       {id:'teacher-bio', label:'قفل البصمة', childIndex:2},
       {id:'teacher-manage', label:'إدارة الفصول', childIndex:3},
-      {id:'teacher-tasks', label:'المهام الأدائية', selector:'#perfTeacherSection'},
       {id:'teacher-tabs', label:'الفصول', selector:'#classTabs', wrap:true, wrapTitle:'الفصول — اضغطي على اسم الفصل للدخول مباشرة'},
       {id:'teacher-quick', label:'إعدادات سريعة', childIndex:5},
       {id:'teacher-freeze', label:'تجميد الحساب', selector:'#freezeAccountCard'},
       {id:'teacher-theme', label:'ألوان البنك', selector:'#themeBankCard'},
       {id:'teacher-sup-settings', label:'إعدادات الإشراف المدرسي', selector:'#supervisionSettingsTeacherCard'},
-      {id:'teacher-sup-summary', label:'ملخص الإشراف', selector:'#supervisionTeacherSummaryCard'}
+      {id:'teacher-sup-summary', label:'ملخص الإشراف', selector:'#supervisionTeacherSummaryCard'},
+      {id:'teacher-tasks', label:'المهام الأدائية', selector:'#perfTeacherSection'}
     ]);
   }
 
@@ -6124,10 +6128,10 @@ function renderRoulettePane(){
     if(!nav || !content) return;
 
     const extras = [
-      {id:'teacher-tasks', label:'المهام الأدائية', selector:'#perfTeacherSection'},
       {id:'teacher-theme', label:'ألوان البنك', selector:'#themeBankCard'},
       {id:'teacher-sup-settings', label:'إعدادات الإشراف المدرسي', selector:'#supervisionSettingsTeacherCard'},
-      {id:'teacher-sup-summary', label:'ملخص الإشراف', selector:'#supervisionTeacherSummaryCard'}
+      {id:'teacher-sup-summary', label:'ملخص الإشراف', selector:'#supervisionTeacherSummaryCard'},
+      {id:'teacher-tasks', label:'المهام الأدائية', selector:'#perfTeacherSection'}
     ];
 
     extras.forEach((spec)=>{
@@ -6727,16 +6731,6 @@ function renderTasks(){
 .perf-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 @media(max-width:820px){.perf-grid{grid-template-columns:1fr}}
 .perf-card{background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:18px;padding:14px;box-shadow:0 8px 18px rgba(0,0,0,.06)}
-.perf-class-banner{
-  margin:8px 0 12px;
-  padding:12px 14px;
-  border-radius:16px;
-  background:linear-gradient(135deg,#eef6ff,#f9fcff);
-  border:1px solid rgba(11,42,102,.10);
-  color:#0b2a66;
-  font-weight:1000;
-  text-align:center;
-}
 .perf-card h4{margin:0 0 10px;color:#0b2a66;font-size:16px}
 .perf-task-list{display:grid;gap:12px}
 .perf-task{
@@ -6817,7 +6811,6 @@ function renderTasks(){
         <div class="perf-grid">
           <div class="perf-card">
             <h4>إضافة مهمة أدائية</h4>
-            <div id="perfCurrentClassInfo" class="perf-class-banner">الفصل الحالي: —</div>
             <div class="row">
               <div class="col"><div class="small">الفصل</div><select id="perfTaskClass"></select></div>
               <div class="col"><div class="small">اسم المهمة</div><input id="perfTaskTitle" placeholder="مثال: مشروع النسبة والتناسب"></div>
@@ -6848,22 +6841,8 @@ function renderTasks(){
     container.appendChild(wrap);
   }
   async function listClasses(){
-    try{
-      const snap = await db.collection('classes').orderBy('order','asc').get();
-      const docs = snap.docs.map(d=>({id:d.id, ...(d.data()||{})}));
-      if(docs.length) return docs;
-    }catch(e){}
-    try{
-      const snap2 = await db.collection('classes').get();
-      const docs2 = snap2.docs.map(d=>({id:d.id, ...(d.data()||{})}));
-      if(docs2.length) return docs2.sort((a,b)=> Number(a.order||0)-Number(b.order||0));
-    }catch(e){}
-    try{
-      if(Array.isArray(window.classes) && window.classes.length){
-        return window.classes.map(c=>({id:c.id, ...(c||{})}));
-      }
-    }catch(e){}
-    return [];
+    const snap = await db.collection('classes').orderBy('createdAtClient','asc').get();
+    return snap.docs.map(d=>({id:d.id, ...(d.data()||{})}));
   }
   async function listStudentsInClass(classId){
     const snap = await db.collection('students').where('classId','==',classId).get();
@@ -6873,35 +6852,11 @@ function renderTasks(){
     const snap = await db.collection(collName).get();
     return snap.docs.map(d=>({id:d.id, ...(d.data()||{})}));
   }
-  function renderPerfCurrentClassInfo(cls, selectedId){
-    const box = gid('perfCurrentClassInfo');
-    if(!box) return;
-    const selected = (cls||[]).find(c=>c.id===selectedId);
-    if(selected){
-      box.textContent = 'الفصل الحالي في المهام الأدائية: ' + String(selected.name||'فصل');
-    }else if((cls||[]).length){
-      box.textContent = 'اختاري الفصل من القائمة لعرض مهامه الأدائية وتسجيلها.';
-    }else{
-      box.textContent = 'لا توجد فصول مضافة بعد.';
-    }
-  }
   async function fillPerfClasses(){
     const sel = gid('perfTaskClass'); if(!sel) return;
     const cls = await listClasses();
     sel.innerHTML = '<option value="">اختاري الفصل</option>' + cls.map(c=>`<option value="${c.id}">${esc(c.name||'فصل')}</option>`).join('');
-    if(typeof currentClassId!=='undefined' && currentClassId && cls.some(c=>c.id===currentClassId)) sel.value = currentClassId;
-    else if(!sel.value && cls.length===1) sel.value = cls[0].id;
-    renderPerfCurrentClassInfo(cls, sel.value || '');
-    if(!sel.dataset.boundPerfChange){
-      sel.addEventListener('change', async function(){
-        try{
-          const classes = await listClasses();
-          renderPerfCurrentClassInfo(classes, this.value || '');
-          await renderTeacherPerformanceTasksLinked();
-        }catch(e){ console.error(e); }
-      });
-      sel.dataset.boundPerfChange = '1';
-    }
+    if(typeof currentClassId!=='undefined' && currentClassId) sel.value = currentClassId;
   }
   window.createPerformanceTaskLinked = async function(){
     try{
@@ -7038,10 +6993,9 @@ function renderTasks(){
     const wrap = gid('teacherPerformanceTasks');
     if(!wrap) return;
     const all = await listTasks();
-    const selectedClassId = gid('perfTaskClass')?.value || (typeof currentClassId!=='undefined' ? currentClassId : '') || '';
-    const tasks = selectedClassId ? all.filter(t=>t.classId===selectedClassId) : all;
+    const tasks = (typeof currentClassId!=='undefined' && currentClassId) ? all.filter(t=>t.classId===currentClassId) : all;
     await updatePerfSummary(tasks);
-    if(!tasks.length){ wrap.innerHTML = '<div class="perf-empty">لا توجد مهام أدائية لهذا الفصل حاليًا. أضيفي أول مهمة من النموذج بالأعلى.</div>'; return; }
+    if(!tasks.length){ wrap.innerHTML = '<div class="perf-empty">لا توجد مهام أدائية بعد. أضيفي أول مهمة من النموذج بالأعلى.</div>'; return; }
     const cards = [];
     for(const t of tasks.sort((a,b)=>(b.createdAtClient||0)-(a.createdAtClient||0))){
       cards.push(await buildTeacherTaskCard(t));
@@ -7850,9 +7804,9 @@ legacy.forEach((item,idx)=>{
       <div class="supervisionCompactTableWrap">
         <div class="supervisionCompactTableHeader">
           <div class="title">جدول المتابعة والإشراف</div>
-          <div class="meta">${rows.length} عملية • يظهر كاملًا بدون سحب جانبي</div>
+          <div class="meta">${rows.length} عملية • اسحبي الجدول يمينًا ويسارًا لعرضه كاملًا</div>
         </div>
-        <table class="supervisionCompactTable">
+        <div class="supervisionCompactTableScroller"><table class="supervisionCompactTable">
           <thead>
             <tr>
               <th>الاسم</th>
@@ -7873,7 +7827,7 @@ legacy.forEach((item,idx)=>{
               <td class="balanceCell">${fmt0(r.balanceAfter)}</td>
             </tr>`).join('')}
           </tbody>
-        </table>
+        </table></div>
       </div>` : '<div class="supervisionEmptyNote">لا توجد عمليات مطابقة لهذا الفصل أو لهذا النوع.</div>';
   }
 
