@@ -1624,6 +1624,44 @@ body[data-theme="ahli"] .topbar{
         <div id="teacherSupervisionCertificatePreview" style="margin-top:12px"></div>
       </div>
 
+      <div class="card soft" id="teacherGlobalNoteCard" style="margin-top:10px">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+          <div>
+            <div style="font-weight:1000;color:#0b2a66">📝 تسجيل ملاحظة على المعلمة</div>
+            <div class="small" style="margin-top:4px;color:#47607e">اختاري الفصل ثم نوع الملاحظة، وسيتم تسجيلها داخل كشف الحساب والعمليات اليومية لطلاب الفصل المحدد فقط.</div>
+          </div>
+          <span class="badge on">تبويب مستقل</span>
+        </div>
+        <div class="row" style="margin-top:12px">
+          <div class="col">
+            <div class="small">اختيار الفصل</div>
+            <select id="teacherGlobalNoteClass">
+              <option value="">اختاري الفصل…</option>
+            </select>
+          </div>
+          <div class="col">
+            <div class="small">نوع الملاحظة</div>
+            <select id="teacherGlobalNoteType">
+              <option value="">اختاري النوع…</option>
+              <option value="غياب">غياب</option>
+              <option value="استئذان">استئذان</option>
+              <option value="رحلة">رحلة</option>
+              <option value="دورة">دورة</option>
+            </select>
+          </div>
+        </div>
+        <div class="row" style="margin-top:10px">
+          <div class="col">
+            <div class="small">مربع نص للكتابة</div>
+            <input id="teacherGlobalNoteText" type="text" placeholder="اكتبي الملاحظة أو التفاصيل هنا" />
+          </div>
+          <div class="col" style="align-self:flex-end">
+            <button class="btn" onclick="executeTeacherGlobalNote()">تنفيذ العملية</button>
+          </div>
+        </div>
+        <div class="small" id="teacherGlobalNoteStatus" style="margin-top:10px;color:#47607e">سيتم تسجيل العملية في كشف حساب طلاب الفصل المختار فقط داخل النظام.</div>
+      </div>
+
       <div class="card soft" id="freezeAccountCard" style="margin-top:10px">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
           <div>
@@ -3116,6 +3154,7 @@ ${SIGNATURE}`
       });
       const c = classes.find(x=>x.id===currentClassId);
       if($("classTitle")) $("classTitle").textContent = c ? c.name : "الفصل";
+      try{ await fillPerfClasses(); }catch(e){}
     }
 
     async function addClass(){
@@ -4095,8 +4134,27 @@ async function renderStudents(){
     }
 
     function buildDailyMsg(x){
+      const t = String(x?.type || "عملية");
+      if(t.includes("ملاحظة على المعلمة")){
+        const warnLine = "⚠️ رسالة تلقائية";
+        return (
+`${warnLine}
+${TEACHER_BANK_TITLE}
+
+تم تسجيل ${t} في السجل اليومي للطالب/ـة:
+${x.studentName || "—"}
+
+التفاصيل: ${x.reason || "—"}
+
+* هنا لا نستطيع استقبال رسائل.
+للتواصل مع المعلمة اضغط الرابط:
+${contactLink()}
+
+${SIGNATURE}`
+        );
+      }
       return buildOfficialMessage(
-        x.type || "عملية",
+        t,
         x.studentName || "—",
         fmt(x.amount),
         x.reason || "—"
@@ -4166,6 +4224,69 @@ document.addEventListener("DOMContentLoaded", async()=>{
       bindClickSounds();
     });
   
+    async function executeTeacherGlobalNote(){
+      try{
+        const classId = String($("teacherGlobalNoteClass")?.value || "").trim();
+        const type = String($("teacherGlobalNoteType")?.value || "").trim();
+        const text = String($("teacherGlobalNoteText")?.value || "").trim();
+        const status = $("teacherGlobalNoteStatus");
+
+        if(!classId) return warn("اختاري الفصل أولًا");
+        if(!type) return warn("اختاري نوع الملاحظة أولًا");
+
+        const classSnap = await db.collection("classes").doc(classId).get();
+        const className = (classSnap.data()||{}).name || "الفصل المختار";
+
+        const studsSnap = await db.collection("students").where("classId","==",classId).get();
+        const students = [];
+        studsSnap.forEach(d=>students.push({id:d.id, ...(d.data()||{})}));
+        if(!students.length) return warn("لا يوجد طلاب في الفصل المختار حاليًا");
+
+        const reasonBase = text ? `${type} — ${text}` : type;
+        const reason = `${reasonBase} • الفصل: ${className}`;
+        const opType = `ملاحظة على المعلمة - ${type}`;
+        const dateKey = localTodayKey();
+        const createdAtClient = Date.now();
+        const chunkSize = 350;
+
+        for(let i=0;i<students.length;i+=chunkSize){
+          const batch = db.batch();
+          students.slice(i, i + chunkSize).forEach(st=>{
+            const txRef = db.collection("students").doc(st.id).collection("txns").doc();
+            batch.set(txRef, {
+              studentId: st.id || "",
+              studentName: st.name || "",
+              guardianWhats: st.guardianWhats || "",
+              classId,
+              className,
+              type: opType,
+              reason,
+              amount: 0,
+              balanceAfter: Number(st.balance || 0),
+              dateKey,
+              teacherGlobalNote: true,
+              teacherGlobalNoteType: type,
+              createdAtClient,
+              createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+          });
+          await batch.commit();
+        }
+
+        if($("teacherGlobalNoteType")) $("teacherGlobalNoteType").value = "";
+        if($("teacherGlobalNoteText")) $("teacherGlobalNoteText").value = "";
+        if(status){
+          status.textContent = `تم تنفيذ العملية بنجاح، وتم تسجيلها في كشف حساب ${students.length} طالب/ـة من ${className} وستظهر أيضًا في العمليات اليومية.`;
+          status.style.color = "var(--green)";
+          status.style.fontWeight = "1000";
+        }
+        ok(`تم تسجيل ملاحظة المعلمة لطلاب ${className}.`);
+      }catch(e){
+        console.log("executeTeacherGlobalNote error", e);
+        warn("تعذر تنفيذ ملاحظة المعلمة حالياً");
+      }
+    }
+
     // ================== Added: Guardian phone / PIN / PDF ==================
     function isValidPin(p){ return /^[0-9]{4}$/.test(String(p||"").trim()); }
 
@@ -6108,12 +6229,13 @@ function renderRoulettePane(){
       {id:'teacher-bio', label:'قفل البصمة', childIndex:2},
       {id:'teacher-manage', label:'إدارة الفصول', childIndex:3},
       {id:'teacher-tabs', label:'الفصول', selector:'#classTabs', wrap:true, wrapTitle:'الفصول — اضغطي على اسم الفصل للدخول مباشرة'},
+      {id:'teacher-tasks', label:'المهام الأدائية', selector:'#perfTeacherSection'},
+      {id:'teacher-global-note', label:'ملاحظة على المعلمة', selector:'#teacherGlobalNoteCard'},
       {id:'teacher-quick', label:'إعدادات سريعة', childIndex:5},
       {id:'teacher-freeze', label:'تجميد الحساب', selector:'#freezeAccountCard'},
       {id:'teacher-theme', label:'ألوان البنك', selector:'#themeBankCard'},
       {id:'teacher-sup-settings', label:'إعدادات الإشراف المدرسي', selector:'#supervisionSettingsTeacherCard'},
-      {id:'teacher-sup-summary', label:'ملخص الإشراف', selector:'#supervisionTeacherSummaryCard'},
-      {id:'teacher-tasks', label:'المهام الأدائية', selector:'#perfTeacherSection'}
+      {id:'teacher-sup-summary', label:'ملخص الإشراف', selector:'#supervisionTeacherSummaryCard'}
     ]);
   }
 
@@ -6128,10 +6250,11 @@ function renderRoulettePane(){
     if(!nav || !content) return;
 
     const extras = [
+      {id:'teacher-tasks', label:'المهام الأدائية', selector:'#perfTeacherSection'},
+      {id:'teacher-global-note', label:'ملاحظة على المعلمة', selector:'#teacherGlobalNoteCard'},
       {id:'teacher-theme', label:'ألوان البنك', selector:'#themeBankCard'},
       {id:'teacher-sup-settings', label:'إعدادات الإشراف المدرسي', selector:'#supervisionSettingsTeacherCard'},
-      {id:'teacher-sup-summary', label:'ملخص الإشراف', selector:'#supervisionTeacherSummaryCard'},
-      {id:'teacher-tasks', label:'المهام الأدائية', selector:'#perfTeacherSection'}
+      {id:'teacher-sup-summary', label:'ملخص الإشراف', selector:'#supervisionTeacherSummaryCard'}
     ];
 
     extras.forEach((spec)=>{
@@ -6197,12 +6320,13 @@ function renderRoulettePane(){
       {id:'teacher-bio', label:'قفل البصمة'},
       {id:'teacher-manage', label:'إدارة الفصول'},
       {id:'teacher-tabs', label:'الفصول'},
+      {id:'teacher-tasks', label:'المهام الأدائية'},
+      {id:'teacher-global-note', label:'ملاحظة على المعلمة'},
       {id:'teacher-quick', label:'إعدادات سريعة'},
       {id:'teacher-freeze', label:'تجميد الحساب'},
       {id:'teacher-theme', label:'ألوان البنك'},
       {id:'teacher-sup-settings', label:'إعدادات الإشراف المدرسي'},
-      {id:'teacher-sup-summary', label:'ملخص الإشراف'},
-      {id:'teacher-tasks', label:'المهام الأدائية'}
+      {id:'teacher-sup-summary', label:'ملخص الإشراف'}
     ];
     teacherLinks.forEach((item, idx)=>{
       const btn = document.createElement('button');
@@ -6841,8 +6965,21 @@ function renderTasks(){
     container.appendChild(wrap);
   }
   async function listClasses(){
-    const snap = await db.collection('classes').orderBy('createdAtClient','asc').get();
-    return snap.docs.map(d=>({id:d.id, ...(d.data()||{})}));
+    try{
+      if(Array.isArray(classes) && classes.length){
+        return classes.map(c=>({id:c.id, ...(c||{})}));
+      }
+    }catch(e){}
+    try{
+      const snap = await db.collection('classes').orderBy('order','asc').get();
+      if(!snap.empty) return snap.docs.map(d=>({id:d.id, ...(d.data()||{})}));
+    }catch(e){}
+    try{
+      const snap = await db.collection('classes').get();
+      return snap.docs.map(d=>({id:d.id, ...(d.data()||{})}));
+    }catch(e){
+      return [];
+    }
   }
   async function listStudentsInClass(classId){
     const snap = await db.collection('students').where('classId','==',classId).get();
@@ -6853,10 +6990,32 @@ function renderTasks(){
     return snap.docs.map(d=>({id:d.id, ...(d.data()||{})}));
   }
   async function fillPerfClasses(){
-    const sel = gid('perfTaskClass'); if(!sel) return;
     const cls = await listClasses();
-    sel.innerHTML = '<option value="">اختاري الفصل</option>' + cls.map(c=>`<option value="${c.id}">${esc(c.name||'فصل')}</option>`).join('');
-    if(typeof currentClassId!=='undefined' && currentClassId) sel.value = currentClassId;
+    const normalized = (cls || []).filter(c=>c && c.id && String(c.name||'').trim());
+    const classOptions = '<option value="">اختاري الفصل</option>' + normalized.map(c=>`<option value="${c.id}">${esc(c.name||'فصل')}</option>`).join('');
+
+    const perfSel = gid('perfTaskClass');
+    if(perfSel){
+      const previous = perfSel.value || '';
+      perfSel.innerHTML = classOptions;
+      if(previous && normalized.some(c=>c.id===previous)) perfSel.value = previous;
+      else if(typeof currentClassId!=='undefined' && currentClassId && normalized.some(c=>c.id===currentClassId)) perfSel.value = currentClassId;
+    }
+
+    const noteSel = gid('teacherGlobalNoteClass');
+    if(noteSel){
+      const previous = noteSel.value || '';
+      noteSel.innerHTML = '<option value="">اختاري الفصل…</option>' + normalized.map(c=>`<option value="${c.id}">${esc(c.name||'فصل')}</option>`).join('');
+      if(previous && normalized.some(c=>c.id===previous)) noteSel.value = previous;
+      else if(typeof currentClassId!=='undefined' && currentClassId && normalized.some(c=>c.id===currentClassId)) noteSel.value = currentClassId;
+    }
+
+    const noteStatus = gid('teacherGlobalNoteStatus');
+    if(noteStatus && !normalized.length){
+      noteStatus.textContent = 'لا توجد فصول مضافة حاليًا. أضيفي فصلًا أولًا ليظهر هنا وفي المهام الأدائية.';
+    }else if(noteStatus){
+      noteStatus.textContent = 'سيتم تسجيل العملية في كشف حساب طلاب الفصل المختار فقط داخل النظام.';
+    }
   }
   window.createPerformanceTaskLinked = async function(){
     try{
@@ -7044,6 +7203,7 @@ function renderTasks(){
   };
   async function bindPerf(){
     addTeacherPane();
+    try{ await renderTabs(); }catch(e){ console.error(e); }
     try{ enhanceTeacherSidebarTabs(); }catch(e){ console.error(e); }
     addStudentTab();
     await fillPerfClasses();
